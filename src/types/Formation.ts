@@ -7,11 +7,9 @@ export class Formation {
   description: string
   status: 'incomplete' | 'complete'
   certificate?: string
-  date: {
-    start: Date
-    end: Date
-  }
+  start: Date
+  end?: Date
 
   // n:n
-  skills: Skill['id'][]
+  skillsId: Skill['id'][]
 }

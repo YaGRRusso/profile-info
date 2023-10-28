@@ -9,11 +9,8 @@ export class User {
   title: string
   presentation: string
   description: string
-  hobbies: string[]
-  address: {
-    code: string
-    country: string
-    state: string
-    city: string
-  }
+  country: string
+  state: string
+  city: string
+  postal: string
 }

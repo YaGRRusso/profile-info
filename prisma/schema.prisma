@@ -1,0 +1,133 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String   @id @default(cuid())
+  picture      String
+  name         String
+  nickname     String   @unique
+  email        String   @unique
+  phone        String   @unique
+  birth        DateTime
+  title        String
+  presentation String
+  description  String
+  country      String
+  state        String
+  city         String
+  postal       String
+}
+
+model Hobbie {
+  id   String @id
+  name String
+}
+
+model Language {
+  id    String @id
+  name  String
+  level String
+}
+
+// enum LanguageLevelEnum {
+//   LOW
+//   MEDIUM
+//   HIGH
+//   MAX
+// }
+
+model Link {
+  id   String @id
+  name String
+  link String
+}
+
+model Skill {
+  id    String @id
+  name  String
+  icon  String
+  level String
+
+  Course      Course?    @relation(fields: [courseId], references: [id])
+  courseId    String?
+  Formation   Formation? @relation(fields: [formationId], references: [id])
+  formationId String?
+  Project     Project?   @relation(fields: [projectId], references: [id])
+  projectId   String?
+}
+
+// enum SkillLevelEnum {
+//   WORKING
+//   STUDYING
+//   INTERESTED
+// }
+
+model Course {
+  id          String  @id @default(cuid())
+  course      String
+  college     String
+  description String
+  status      String
+  hours       Int
+  certificate String?
+
+  Skills Skill[]
+}
+
+// enum CourseStatusEnum{
+//   INCOMPLETE
+//   COMPLETE
+// }
+
+model Experience {
+  id           String @id @default(cuid())
+  organization String
+
+  Roles Role[]
+}
+
+model Role {
+  id          String   @id @default(cuid())
+  name        String
+  description String
+  date        DateTime
+
+  Experience   Experience? @relation(fields: [experienceId], references: [id])
+  experienceId String?
+}
+
+model Formation {
+  id          String    @id @default(cuid())
+  course      String
+  college     String
+  description String
+  status      String
+  certificate String?
+  start       DateTime?
+  end         DateTime
+
+  Skills Skill[]
+}
+
+// enum FormationStatusEnum{
+//   INCOMPLETE
+//   COMPLETE
+// }
+
+model Project {
+  id          String @id @default(cuid())
+  name        String
+  description String
+  image       String
+
+  Skills Skill[]
+}
