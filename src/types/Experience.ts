@@ -6,10 +6,8 @@ export class Experience {
   roles: {
     name: string
     description: string
-    date: {
-      start: Date
-      end: Date
-    }
+    start: Date
+    end: Date
   }[]
 
   // n:n
