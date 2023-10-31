@@ -52,10 +52,11 @@ model Link {
 }
 
 model Skill {
-  id    String @id
-  name  String
-  icon  String
-  level String
+  id       String @id
+  name     String
+  icon     String
+  level    String
+  category String
 
   Course      Course?    @relation(fields: [courseId], references: [id])
   courseId    String?

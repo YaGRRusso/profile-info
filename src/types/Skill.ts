@@ -3,4 +3,5 @@ export class Skill {
   name: string
   icon: string
   level: 'working' | 'studying' | 'interested'
+  category: 'language' | 'library' | 'tool' | 'system' | 'other'
 }
