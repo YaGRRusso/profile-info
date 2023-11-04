@@ -1,26 +1,35 @@
 import { Injectable } from '@nestjs/common'
-import { CreateUserDto } from './dto/create-user.dto'
-import { UpdateUserDto } from './dto/update-user.dto'
+import { PrismaUsersRepository } from './repositories/users.repository.prisma'
+import { Output } from 'src/common/interfaces/output.interface'
+import { User } from './entities/user.entity'
 
 @Injectable()
 export class UsersService {
-  create(createUserDto: CreateUserDto) {
-    return 'This action adds a new user'
+  constructor(private repository: PrismaUsersRepository) {}
+
+  async findAll(): Output<User[]> {
+    const abc = new Date()
+    console.log(abc)
+    return await this.repository.findAll()
   }
 
-  findAll() {
-    return `This action returns all users`
+  async findOne(id: string): Output<User> {
+    return await this.repository.findOne(id)
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} user`
+  async searchAll(search: Partial<User>): Output<User[]> {
+    return await this.repository.searchAll(search)
   }
 
-  update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`
+  async create(data: Partial<User>): Output<User> {
+    return await this.repository.create(data)
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} user`
+  async update(id: string, data: Partial<User>): Output<User> {
+    return await this.repository.update(id, data)
+  }
+
+  async remove(id: string): Output<User> {
+    return await this.repository.remove(id)
   }
 }
