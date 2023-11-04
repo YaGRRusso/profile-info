@@ -8,8 +8,6 @@ export class UsersService {
   constructor(private repository: PrismaUsersRepository) {}
 
   async findAll(): Output<User[]> {
-    const abc = new Date()
-    console.log(abc)
     return await this.repository.findAll()
   }
 
