@@ -21,22 +21,20 @@ model User {
   title        String
   presentation String
   description  String
-  country      String
-  state        String
-  city         String
+  address      String
   postal       String
 }
 
-model Hobbie {
-  id   String @id
-  name String
-}
+// model Hobbie {
+//   id   String @id
+//   name String
+// }
 
-model Language {
-  id    String @id
-  name  String
-  level String
-}
+// model Language {
+//   id    String @id
+//   name  String
+//   level String
+// }
 
 // enum LanguageLevelEnum {
 //   LOW
@@ -45,26 +43,19 @@ model Language {
 //   MAX
 // }
 
-model Link {
-  id   String @id
-  name String
-  link String
-}
+// model Link {
+//   id   String @id
+//   name String
+//   link String
+// }
 
-model Skill {
-  id       String @id
-  name     String
-  icon     String
-  level    String
-  category String
-
-  Course      Course?    @relation(fields: [courseId], references: [id])
-  courseId    String?
-  Formation   Formation? @relation(fields: [formationId], references: [id])
-  formationId String?
-  Project     Project?   @relation(fields: [projectId], references: [id])
-  projectId   String?
-}
+// model Skill {
+//   id       String @id
+//   name     String
+//   icon     String
+//   level    String
+//   category String
+// }
 
 // enum SkillLevelEnum {
 //   WORKING
@@ -72,63 +63,49 @@ model Skill {
 //   INTERESTED
 // }
 
-model Course {
-  id          String  @id @default(cuid())
-  course      String
-  college     String
-  description String
-  status      String
-  hours       Int
-  certificate String?
-
-  Skills Skill[]
-}
+// model Course {
+//   id          String  @id @default(cuid())
+//   course      String
+//   college     String
+//   description String
+//   status      String
+//   hours       Int
+//   certificate String?
+// }
 
 // enum CourseStatusEnum{
 //   INCOMPLETE
 //   COMPLETE
 // }
 
-model Experience {
-  id           String @id @default(cuid())
-  organization String
+// model Experience {
+//   id           String @id @default(cuid())
+//   role  String
+//   description String
+//   organization String
+//   start       DateTime
+//   end         DateTime?
+// }
 
-  Roles Role[]
-}
-
-model Role {
-  id          String   @id @default(cuid())
-  name        String
-  description String
-  date        DateTime
-
-  Experience   Experience? @relation(fields: [experienceId], references: [id])
-  experienceId String?
-}
-
-model Formation {
-  id          String    @id @default(cuid())
-  course      String
-  college     String
-  description String
-  status      String
-  certificate String?
-  start       DateTime?
-  end         DateTime
-
-  Skills Skill[]
-}
+// model Formation {
+//   id          String    @id @default(cuid())
+//   course      String
+//   college     String
+//   description String
+//   status      String
+//   certificate String?
+//   start       DateTime
+//   end         DateTime?
+// }
 
 // enum FormationStatusEnum{
 //   INCOMPLETE
 //   COMPLETE
 // }
 
-model Project {
-  id          String @id @default(cuid())
-  name        String
-  description String
-  image       String
-
-  Skills Skill[]
-}
+// model Project {
+//   id          String @id @default(cuid())
+//   name        String
+//   description String
+//   image       String
+// }
