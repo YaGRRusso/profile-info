@@ -21,14 +21,14 @@ export class UsersController {
     return this.usersService.findAll()
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.usersService.findOne(id)
+  @Get('search')
+  searchAll(@Body() searchUserDto: SearchUserDto) {
+    return this.usersService.searchAll(searchUserDto)
   }
 
   @Get(':id')
-  searchAll(@Body() searchUserDto: SearchUserDto) {
-    return this.usersService.searchAll(searchUserDto)
+  findOne(@Param('id') id: string) {
+    return this.usersService.findOne(id)
   }
 
   @Post()

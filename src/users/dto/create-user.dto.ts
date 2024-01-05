@@ -1,8 +1,7 @@
-import { Create } from 'src/common/interfaces/input.interface'
 import { User } from '../entities/user.entity'
 import { IsDate, IsEmail, IsNotEmpty, IsString, Length } from 'class-validator'
 
-export class CreateUserDto implements Create<User> {
+export class CreateUserDto implements Partial<User> {
   @IsNotEmpty()
   @IsString()
   name?: string
@@ -10,14 +9,6 @@ export class CreateUserDto implements Create<User> {
   @IsNotEmpty()
   @IsDate()
   birth?: Date
-
-  @IsNotEmpty()
-  @IsString()
-  city?: string
-
-  @IsNotEmpty()
-  @IsString()
-  country?: string
 
   @IsNotEmpty()
   @IsString()
@@ -43,16 +34,16 @@ export class CreateUserDto implements Create<User> {
 
   @IsNotEmpty()
   @IsString()
+  address?: string
+
+  @IsNotEmpty()
+  @IsString()
   @Length(8)
   postal?: string
 
   @IsNotEmpty()
   @IsString()
   presentation?: string
-
-  @IsNotEmpty()
-  @IsString()
-  state?: string
 
   @IsNotEmpty()
   @IsString()

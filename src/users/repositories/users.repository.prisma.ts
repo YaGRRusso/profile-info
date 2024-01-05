@@ -4,7 +4,7 @@ import { User } from '../entities/user.entity'
 import { UsersRepositoryInterface } from './users.repository.interface'
 import { MapperService } from 'src/common/mappers/mapper.service'
 import { PrismaService } from 'src/common/prisma/prisma.service'
-import { Output } from 'src/common/interfaces/output.interface'
+import { PrismaPromise } from '@prisma/client'
 
 @Injectable()
 export class PrismaUsersRepository implements UsersRepositoryInterface {
@@ -15,28 +15,28 @@ export class PrismaUsersRepository implements UsersRepositoryInterface {
     this.mapper = new MapperService()
   }
 
-  findAll(): Output<User[]> {
+  findAll(): PrismaPromise<User[]> {
     return this.prisma.user.findMany()
   }
 
-  findOne(id: string): Output<User> {
+  findOne(id: string): PrismaPromise<User> {
     return this.prisma.user.findUnique({ where: { id } })
   }
 
-  searchAll(search: Partial<User>): Output<User[]> {
+  searchAll(search: Partial<User>): PrismaPromise<User[]> {
     return this.prisma.user.findMany({ where: { ...search } })
   }
 
-  create(data: Partial<User>): Output<User> {
+  create(data: Partial<User>): PrismaPromise<User> {
     const payload = this.mapper.toInstance(data, this.entity)
     return this.prisma.user.create({ data: payload })
   }
 
-  remove(id: string): Output<User> {
+  remove(id: string): PrismaPromise<User> {
     return this.prisma.user.delete({ where: { id } })
   }
 
-  update(id: string, data: Partial<User>): Output<User> {
+  update(id: string, data: Partial<User>): PrismaPromise<User> {
     return this.prisma.user.update({
       where: { id },
       data,

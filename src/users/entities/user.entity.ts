@@ -9,8 +9,6 @@ export class User {
   title: string
   presentation: string
   description: string
-  country: string
-  state: string
-  city: string
+  address: string
   postal: string
 }
