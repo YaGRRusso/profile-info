@@ -16,6 +16,14 @@
     "noImplicitAny": false,
     "strictBindCallApply": false,
     "forceConsistentCasingInFileNames": false,
-    "noFallthroughCasesInSwitch": false
+    "noFallthroughCasesInSwitch": false,
+    "paths": {
+      "@configs/*": ["./src/common/configs/*"],
+      "@handlers/*": ["./src/common/handlers/*"],
+      "@helpers/*": ["./src/common/helpers/*"],
+      "@interfaces/*": ["./src/common/interfaces/*"],
+      "@mappers/*": ["./src/common/mappers/*"],
+      "@src/*": ["./src/*"]
+    }
   }
 }
