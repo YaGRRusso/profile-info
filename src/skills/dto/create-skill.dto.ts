@@ -1,7 +1,11 @@
 import { IsEnum, IsNotEmpty, IsString } from 'class-validator'
-import { SkillCategoryEnum, SkillLevelEnum } from '../entities/skill.entity'
+import {
+  Skill,
+  SkillCategoryEnum,
+  SkillLevelEnum,
+} from '../entities/skill.entity'
 
-export class CreateSkillDto {
+export class CreateSkillDto implements Partial<Skill> {
   @IsNotEmpty()
   @IsString()
   name?: string
