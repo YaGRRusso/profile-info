@@ -23,6 +23,8 @@
       "@helpers/*": ["./src/common/helpers/*"],
       "@interfaces/*": ["./src/common/interfaces/*"],
       "@mappers/*": ["./src/common/mappers/*"],
+      "@prisma/*": ["./src/common/prisma/*"],
+      "@repositories/*": ["./src/common/repositories/*"],
       "@src/*": ["./src/*"]
     }
   }
