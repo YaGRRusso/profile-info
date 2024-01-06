@@ -25,6 +25,27 @@ model User {
   postal       String
 }
 
+// enum SkillCategoryEnum {
+//   LANGUAGE
+//   LIBRARY
+//   TOOL
+//   SYSTEM
+//   OTHER
+// }
+
+// enum SkillLevelEnum {
+//   WORKING
+//   STUDYING
+//   INTERESTED
+// }
+
+model Skill {
+  id       String @id @default(cuid())
+  name     String
+  level    String
+  category String
+}
+
 // model Hobbie {
 //   id   String @id
 //   name String
@@ -47,20 +68,6 @@ model User {
 //   id   String @id
 //   name String
 //   link String
-// }
-
-// model Skill {
-//   id       String @id
-//   name     String
-//   icon     String
-//   level    String
-//   category String
-// }
-
-// enum SkillLevelEnum {
-//   WORKING
-//   STUDYING
-//   INTERESTED
 // }
 
 // model Course {
