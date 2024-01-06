@@ -20,7 +20,7 @@ export class ProjectsService {
   }
 
   searchAll(searchProjectDto: Partial<Project>): Output<Project[]> {
-    return this.repository.searchAll(searchProjectDto)
+    return this.repository.findAll({ where: searchProjectDto })
   }
 
   findOne(id: string): Output<Project> {

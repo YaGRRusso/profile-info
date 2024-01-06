@@ -17,19 +17,13 @@ export class PrismaCommonRepository<T extends { id?: string }>
     this.table = this.entity.name.toLowerCase()
   }
 
-  findAll(): PrismaPromise<T[]> {
-    return this.prisma[this.table].findMany()
+  findAll(args?: any): PrismaPromise<T[]> {
+    return this.prisma[this.table].findMany(args)
   }
 
   findOne(id: string): PrismaPromise<T> {
     return this.prisma[this.table].findUnique({
       where: { id },
-    })
-  }
-
-  searchAll(search: Partial<T> & Record<string, any>): PrismaPromise<T[]> {
-    return this.prisma[this.table].findMany({
-      where: { ...search },
     })
   }
 

@@ -1,3 +1,4 @@
+import { SearchSkillDto } from './dto/search-skill.dto'
 import { Injectable } from '@nestjs/common'
 import { PrismaSkillsRepository } from './repositories/skills.repository.prisma'
 import { Skill } from './entities/skill.entity'
@@ -15,8 +16,8 @@ export class SkillsService {
     return await this.repository.findOne(id)
   }
 
-  async searchAll(search: Partial<Skill>): Output<Skill[]> {
-    return await this.repository.searchAll(search)
+  async searchAll(searchSkillDto: SearchSkillDto): Output<Skill[]> {
+    return await this.repository.findAll({ where: searchSkillDto })
   }
 
   async create(data: Partial<Skill>): Output<Skill> {
