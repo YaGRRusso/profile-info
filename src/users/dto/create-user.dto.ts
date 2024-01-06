@@ -1,5 +1,11 @@
 import { User } from '../entities/user.entity'
-import { IsDate, IsEmail, IsNotEmpty, IsString, Length } from 'class-validator'
+import {
+  IsDateString,
+  IsEmail,
+  IsNotEmpty,
+  IsString,
+  Length,
+} from 'class-validator'
 
 export class CreateUserDto implements Partial<User> {
   @IsNotEmpty()
@@ -7,7 +13,7 @@ export class CreateUserDto implements Partial<User> {
   name?: string
 
   @IsNotEmpty()
-  @IsDate()
+  @IsDateString()
   birth?: Date
 
   @IsNotEmpty()

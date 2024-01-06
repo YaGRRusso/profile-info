@@ -62,12 +62,14 @@ $ npm run test:cov
 - [x] Search
 - [x] Interface Patterns
 - [x] Prisma ORM
-- [x] Database
+- [x] Common Repository
 - [x] Exception Filters
 - [x] Code Formatters
 - [x] Clean Code
 - [x] Nest Clean Architecture
 - [x] Repl
+- [x] SQLite Database
+- [ ] PostgreSQL Database
 - [ ] Pagination
 - [ ] Docker Compose
 - [ ] Swagger

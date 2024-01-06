@@ -1,4 +1,4 @@
-import { CommonRepositoryInterface } from 'src/common/interfaces/repository.interface'
+import { CommonRepositoryInterface } from '@repositories/common.repository.interface'
 import { User } from '../entities/user.entity'
 
 export interface UsersRepositoryInterface
