@@ -46,73 +46,10 @@ model Skill {
   category String
 }
 
-// model Hobbie {
-//   id   String @id
-//   name String
-// }
-
-// model Language {
-//   id    String @id
-//   name  String
-//   level String
-// }
-
-// enum LanguageLevelEnum {
-//   LOW
-//   MEDIUM
-//   HIGH
-//   MAX
-// }
-
-// model Link {
-//   id   String @id
-//   name String
-//   link String
-// }
-
-// model Course {
-//   id          String  @id @default(cuid())
-//   course      String
-//   college     String
-//   description String
-//   status      String
-//   hours       Int
-//   certificate String?
-// }
-
-// enum CourseStatusEnum{
-//   INCOMPLETE
-//   COMPLETE
-// }
-
-// model Experience {
-//   id           String @id @default(cuid())
-//   role  String
-//   description String
-//   organization String
-//   start       DateTime
-//   end         DateTime?
-// }
-
-// model Formation {
-//   id          String    @id @default(cuid())
-//   course      String
-//   college     String
-//   description String
-//   status      String
-//   certificate String?
-//   start       DateTime
-//   end         DateTime?
-// }
-
-// enum FormationStatusEnum{
-//   INCOMPLETE
-//   COMPLETE
-// }
-
-// model Project {
-//   id          String @id @default(cuid())
-//   name        String
-//   description String
-//   image       String
-// }
+model Project {
+  id          String @id @default(cuid())
+  name        String
+  description String
+  image       String
+  link        String
+}
