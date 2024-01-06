@@ -27,13 +27,13 @@ export class PrismaCommonRepository<T extends { id?: string }>
     })
   }
 
-  searchAll(search: Partial<T>): PrismaPromise<T[]> {
+  searchAll(search: Partial<T> & Record<string, any>): PrismaPromise<T[]> {
     return this.prisma[this.table].findMany({
       where: { ...search },
     })
   }
 
-  create(data: Partial<T>): PrismaPromise<T> {
+  create(data: Partial<T> & Record<string, any>): PrismaPromise<T> {
     return this.prisma[this.table].create({ data })
   }
 
@@ -41,7 +41,7 @@ export class PrismaCommonRepository<T extends { id?: string }>
     return this.prisma[this.table].delete({ where: { id } })
   }
 
-  update(id: string, data: Partial<T>): PrismaPromise<T> {
+  update(id: string, data: Partial<T> & Record<string, any>): PrismaPromise<T> {
     return this.prisma[this.table].update({
       where: { id },
       data,

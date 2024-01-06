@@ -2,13 +2,17 @@ import { Injectable } from '@nestjs/common'
 import { PrismaProjectsRepository } from './repositories/projects.repository.prisma'
 import { Project } from './entities/project.entity'
 import { Output } from '@interfaces/output.interface'
+import { connectMany } from '@helpers/prisma.helper'
 
 @Injectable()
 export class ProjectsService {
   constructor(private repository: PrismaProjectsRepository) {}
 
-  create(createProjectDto: Partial<Project>): Output<Project> {
-    return this.repository.create(createProjectDto)
+  create({ skills, ...createProjectDto }: Partial<Project>): Output<Project> {
+    return this.repository.create({
+      ...createProjectDto,
+      Skill: connectMany(skills),
+    })
   }
 
   findAll(): Output<Project[]> {

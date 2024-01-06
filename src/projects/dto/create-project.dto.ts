@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsString } from 'class-validator'
+import { IsArray, IsNotEmpty, IsOptional, IsString } from 'class-validator'
 import { Project } from '../entities/project.entity'
 
 export class CreateProjectDto implements Partial<Project> {
@@ -14,4 +14,9 @@ export class CreateProjectDto implements Partial<Project> {
 
   @IsString()
   link?: string
+
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  skills?: string[]
 }

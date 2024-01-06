@@ -25,25 +25,13 @@ model User {
   postal       String
 }
 
-// enum SkillCategoryEnum {
-//   LANGUAGE
-//   LIBRARY
-//   TOOL
-//   SYSTEM
-//   OTHER
-// }
-
-// enum SkillLevelEnum {
-//   WORKING
-//   STUDYING
-//   INTERESTED
-// }
-
 model Skill {
   id       String @id @default(cuid())
   name     String
   level    String
   category String
+
+  Project Project[]
 }
 
 model Project {
@@ -52,4 +40,6 @@ model Project {
   description String
   image       String
   link        String
+
+  Skill Skill[]
 }
