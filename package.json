@@ -20,7 +20,8 @@
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "prepare": "husky install",
-    "prisma:dev": "npx prisma migrate dev --create-only",
+    "prisma:dev": "npx prisma migrate dev",
+    "prisma:reset": "npx prisma migrate reset",
     "prisma:deploy": "npx prisma migrate deploy",
     "prisma:studio": "npx prisma studio"
   },
