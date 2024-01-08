@@ -1,5 +1,12 @@
+import { Prisma, Skill } from '@prisma/client'
 import { CommonRepositoryInterface } from '@repositories/common.repository.interface'
-import { Skill } from '../entities/skill.entity'
 
 export interface SkillsRepositoryInterface
-  extends CommonRepositoryInterface<Skill> {}
+  extends CommonRepositoryInterface<
+    Skill,
+    Prisma.SkillFindManyArgs,
+    Prisma.SkillFindUniqueArgs,
+    Prisma.SkillCreateArgs,
+    Prisma.SkillDeleteArgs,
+    Prisma.SkillUpdateArgs
+  > {}

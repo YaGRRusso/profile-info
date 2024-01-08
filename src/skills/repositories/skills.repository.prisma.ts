@@ -1,15 +1,22 @@
 import { Injectable } from '@nestjs/common'
 import { SkillsRepositoryInterface } from './skills.repository.interface'
-import { Skill } from '../entities/skill.entity'
 import { PrismaService } from '@prisma/prisma.service'
 import { PrismaCommonRepository } from '@repositories/common.repository.prisma'
+import { Prisma, Skill } from '@prisma/client'
 
 @Injectable()
 export class PrismaSkillsRepository
-  extends PrismaCommonRepository<Skill>
+  extends PrismaCommonRepository<
+    Skill,
+    Prisma.SkillFindManyArgs,
+    Prisma.SkillFindUniqueArgs,
+    Prisma.SkillCreateArgs,
+    Prisma.SkillDeleteArgs,
+    Prisma.SkillUpdateArgs
+  >
   implements SkillsRepositoryInterface
 {
   constructor(protected prisma: PrismaService) {
-    super(prisma, Skill)
+    super(prisma, 'Skill')
   }
 }

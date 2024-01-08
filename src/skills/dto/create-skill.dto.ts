@@ -8,15 +8,15 @@ import {
 export class CreateSkillDto implements Partial<Skill> {
   @IsNotEmpty()
   @IsString()
-  name?: string
+  name: string
 
   @IsNotEmpty()
   @IsString()
   @IsEnum(SkillLevelEnum)
-  level?: SkillLevelEnum
+  level: SkillLevelEnum
 
   @IsNotEmpty()
   @IsString()
   @IsEnum(SkillCategoryEnum)
-  category?: SkillCategoryEnum
+  category: SkillCategoryEnum
 }

@@ -31,7 +31,7 @@ model Skill {
   level    String
   category String
 
-  Project Project[]
+  projects Project[]
 }
 
 model Project {
@@ -41,5 +41,5 @@ model Project {
   image       String
   link        String
 
-  Skill Skill[]
+  skills Skill[]
 }

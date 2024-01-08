@@ -1,44 +1,52 @@
 import { Injectable } from '@nestjs/common'
 import { PrismaService } from '@prisma/prisma.service'
-import { ClassConstructor } from 'class-transformer'
-import { PrismaPromise } from '@prisma/client'
+import { Prisma, PrismaPromise } from '@prisma/client'
 import { CommonRepositoryInterface } from './common.repository.interface'
 
 @Injectable()
-export class PrismaCommonRepository<T extends { id?: string }>
-  implements CommonRepositoryInterface<T>
+export class PrismaCommonRepository<
+  Entity,
+  FindMany,
+  FindUnique,
+  Create,
+  Delete,
+  Update,
+> implements
+    CommonRepositoryInterface<
+      Entity,
+      FindMany,
+      FindUnique,
+      Create,
+      Delete,
+      Update
+    >
 {
   protected readonly table: string
 
   constructor(
     protected prisma: PrismaService,
-    protected entity: ClassConstructor<T>,
+    protected entity: Prisma.ModelName,
   ) {
-    this.table = this.entity.name.toLowerCase()
+    this.table = this.entity.toLowerCase()
   }
 
-  findAll(args?: any): PrismaPromise<T[]> {
+  findAll(args?: FindMany): PrismaPromise<Entity[]> {
     return this.prisma[this.table].findMany(args)
   }
 
-  findOne(id: string): PrismaPromise<T> {
-    return this.prisma[this.table].findUnique({
-      where: { id },
-    })
+  findOne(args?: FindUnique): PrismaPromise<Entity> {
+    return this.prisma[this.table].findUnique(args)
   }
 
-  create(data: Partial<T> & Record<string, any>): PrismaPromise<T> {
-    return this.prisma[this.table].create({ data })
+  create(args?: Create): PrismaPromise<Entity> {
+    return this.prisma[this.table].create(args)
   }
 
-  remove(id: string): PrismaPromise<T> {
-    return this.prisma[this.table].delete({ where: { id } })
+  remove(args?: Delete): PrismaPromise<Entity> {
+    return this.prisma[this.table].delete(args)
   }
 
-  update(id: string, data: Partial<T> & Record<string, any>): PrismaPromise<T> {
-    return this.prisma[this.table].update({
-      where: { id },
-      data,
-    })
+  update(args?: Update): PrismaPromise<Entity> {
+    return this.prisma[this.table].update(args)
   }
 }

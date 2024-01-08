@@ -10,9 +10,13 @@ export class CommonFilter
     const ctx = host.switchToHttp()
     const res = ctx.getResponse()
 
+    console.error(exception)
     return res.status(+exception.status || +exception.statusCode || 500).json({
       data: null,
-      error: exception,
+      error: {
+        ...exception,
+        message: exception.message,
+      },
     })
   }
 }

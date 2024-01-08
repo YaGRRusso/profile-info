@@ -10,48 +10,48 @@ import {
 export class CreateUserDto implements Partial<User> {
   @IsNotEmpty()
   @IsString()
-  name?: string
+  name: string
 
   @IsNotEmpty()
   @IsDateString()
-  birth?: Date
+  birth: Date
 
   @IsNotEmpty()
   @IsString()
-  description?: string
+  description: string
 
   @IsNotEmpty()
   @IsString()
   @IsEmail()
-  email?: string
+  email: string
 
   @IsNotEmpty()
   @IsString()
-  nickname?: string
+  nickname: string
 
   @IsNotEmpty()
   @IsString()
   @Length(11)
-  phone?: string
+  phone: string
 
   @IsNotEmpty()
   @IsString()
-  picture?: string
+  picture: string
 
   @IsNotEmpty()
   @IsString()
-  address?: string
+  address: string
 
   @IsNotEmpty()
   @IsString()
   @Length(8)
-  postal?: string
+  postal: string
 
   @IsNotEmpty()
   @IsString()
-  presentation?: string
+  presentation: string
 
   @IsNotEmpty()
   @IsString()
-  title?: string
+  title: string
 }

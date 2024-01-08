@@ -1,5 +1,12 @@
+import { Prisma, User } from '@prisma/client'
 import { CommonRepositoryInterface } from '@repositories/common.repository.interface'
-import { User } from '../entities/user.entity'
 
 export interface UsersRepositoryInterface
-  extends CommonRepositoryInterface<User> {}
+  extends CommonRepositoryInterface<
+    User,
+    Prisma.UserFindManyArgs,
+    Prisma.UserFindUniqueArgs,
+    Prisma.UserCreateArgs,
+    Prisma.UserDeleteArgs,
+    Prisma.UserUpdateArgs
+  > {}

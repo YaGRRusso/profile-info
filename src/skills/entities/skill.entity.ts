@@ -15,6 +15,6 @@ export enum SkillCategoryEnum {
 export class Skill {
   id: string
   name: string
-  level: SkillLevelEnum
-  category: SkillCategoryEnum
+  level: SkillLevelEnum | string
+  category: SkillCategoryEnum | string
 }
