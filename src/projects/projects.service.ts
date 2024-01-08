@@ -42,8 +42,8 @@ export class ProjectsService {
       where: { id },
       data: {
         ...updateProjectDto,
-        ...(updateProjectDto.skills?.length && {
-          skills: connectMany(updateProjectDto.skills),
+        ...(updateProjectDto.skills && {
+          skills: { set: [], ...connectMany(updateProjectDto.skills) },
         }),
       },
     })
