@@ -3,12 +3,9 @@ import { Injectable } from '@nestjs/common'
 import { PrismaSkillsRepository } from './repositories/skills.repository.prisma'
 import { Skill } from './entities/skill.entity'
 import { Output } from '@interfaces/output.interface'
-import { MapperService } from '@mappers/mapper.service'
 
 @Injectable()
 export class SkillsService {
-  private readonly mapper: MapperService = new MapperService()
-
   constructor(private repository: PrismaSkillsRepository) {}
 
   async findAll(): Output<Skill[]> {
@@ -24,9 +21,9 @@ export class SkillsService {
   }
 
   async create(createSkillDto: Partial<Skill>): Output<Skill> {
-    const payload = this.mapper.toInstance(createSkillDto, Skill)
-    if (payload.level === '')
-      return await this.repository.create({ data: { ...payload } })
+    return await this.repository.create({
+      data: { ...(createSkillDto as Skill) },
+    })
   }
 
   async update(id: string, updateSkillDto: Partial<Skill>): Output<Skill> {

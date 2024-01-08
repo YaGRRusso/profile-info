@@ -3,12 +3,9 @@ import { PrismaUsersRepository } from './repositories/users.repository.prisma'
 import { Output } from 'src/common/interfaces/output.interface'
 import { User } from './entities/user.entity'
 import { SearchUserDto } from './dto/search-user.dto'
-import { MapperService } from '@mappers/mapper.service'
 
 @Injectable()
 export class UsersService {
-  private readonly mapper: MapperService = new MapperService()
-
   constructor(private repository: PrismaUsersRepository) {}
 
   async findAll(): Output<User[]> {
@@ -24,8 +21,9 @@ export class UsersService {
   }
 
   async create(createUserDto: Partial<User>): Output<User> {
-    const payload = this.mapper.toInstance(createUserDto, User)
-    return await this.repository.create({ data: { ...payload } })
+    return await this.repository.create({
+      data: { ...(createUserDto as User) },
+    })
   }
 
   async update(id: string, updateUserDto: Partial<User>): Output<User> {

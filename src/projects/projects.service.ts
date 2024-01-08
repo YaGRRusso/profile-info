@@ -3,18 +3,15 @@ import { PrismaProjectsRepository } from './repositories/projects.repository.pri
 import { Project } from './entities/project.entity'
 import { Output } from '@interfaces/output.interface'
 import { connectMany } from '@helpers/prisma.helper'
-import { MapperService } from '@mappers/mapper.service'
 
 @Injectable()
 export class ProjectsService {
-  private readonly mapper: MapperService = new MapperService()
   constructor(private repository: PrismaProjectsRepository) {}
 
   create(createProjectDto: Partial<Project>): Output<Project> {
-    const payload = this.mapper.toInstance(createProjectDto, Project)
     return this.repository.create({
       data: {
-        ...payload,
+        ...(createProjectDto as Project),
         skills: connectMany(createProjectDto.skills),
       },
       include: { skills: true },
@@ -29,7 +26,7 @@ export class ProjectsService {
     return this.repository.findAll({
       where: {
         ...searchProjectDto,
-        ...(searchProjectDto.skills.length && {
+        ...(searchProjectDto.skills?.length && {
           skills: { some: { id: searchProjectDto.skills[0] } },
         }),
       },
@@ -45,7 +42,7 @@ export class ProjectsService {
       where: { id },
       data: {
         ...updateProjectDto,
-        ...(updateProjectDto.skills.length && {
+        ...(updateProjectDto.skills?.length && {
           skills: connectMany(updateProjectDto.skills),
         }),
       },
