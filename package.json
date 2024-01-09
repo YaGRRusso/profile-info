@@ -11,7 +11,7 @@
     "npm": "10.2.3"
   },
   "scripts": {
-    "build": "nest build",
+    "build": "npx nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "node dist/main",
     "start:dev": "npm run start -- --watch",
