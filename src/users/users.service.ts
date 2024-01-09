@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common'
 import { PrismaUsersRepository } from './repositories/users.repository.prisma'
-import { Output } from 'src/common/interfaces/output.interface'
+import { Output } from '@interfaces/output.interface'
 import { User } from './entities/user.entity'
 import { SearchUserDto } from './dto/search-user.dto'
 

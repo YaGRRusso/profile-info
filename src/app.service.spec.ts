@@ -12,9 +12,7 @@ describe('AppService', () => {
     service = module.get<AppService>(AppService)
   })
 
-  describe('root', () => {
-    it('should be defined', () => {
-      expect(service).toBeDefined()
-    })
+  it('should be defined', () => {
+    expect(service).toBeDefined()
   })
 })

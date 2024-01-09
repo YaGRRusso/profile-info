@@ -95,8 +95,8 @@
       "@mappers/(.*)": [
         "<rootDir>/common/mappers/$1"
       ],
-      "@prisma/(.*)": [
-        "<rootDir>/common/prisma/$1"
+      "@prisma/prisma(.*)": [
+        "<rootDir>/common/prisma/prisma$1"
       ],
       "@repositories/(.*)": [
         "<rootDir>/common/repositories/$1"

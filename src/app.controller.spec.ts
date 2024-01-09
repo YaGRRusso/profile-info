@@ -14,13 +14,11 @@ describe('AppController', () => {
     controller = module.get(AppController)
   })
 
-  describe('root', () => {
-    it('should be defined', () => {
-      expect(controller).toBeDefined()
-    })
+  it('should be defined', () => {
+    expect(controller).toBeDefined()
+  })
 
-    it('should return "Hello World!"', () => {
-      expect(controller.getHello()).toBe('Hello World!')
-    })
+  it('should return "Hello World!"', () => {
+    expect(controller.getHello()).toBe('Hello World!')
   })
 })
