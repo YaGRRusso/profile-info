@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common'
 import { PrismaProjectsRepository } from './repositories/projects.repository.prisma'
 import { Project } from './entities/project.entity'
 import { Output } from '@interfaces/output.interface'
-import { connectMany } from '@helpers/prisma.helper'
+import { manyIds } from '@helpers/prisma.helper'
 
 @Injectable()
 export class ProjectsService {
@@ -12,7 +12,7 @@ export class ProjectsService {
     return this.repository.create({
       data: {
         ...(createProjectDto as Project),
-        skills: connectMany(createProjectDto.skills),
+        skills: { connect: manyIds(createProjectDto.skills) },
       },
       include: { skills: true },
     })
@@ -43,8 +43,26 @@ export class ProjectsService {
       data: {
         ...updateProjectDto,
         ...(updateProjectDto.skills && {
-          skills: { set: [], ...connectMany(updateProjectDto.skills) },
+          skills: { set: [], connect: manyIds(updateProjectDto.skills) },
         }),
+      },
+    })
+  }
+
+  addSkills(id: string, skills: Project['skills']): Output<Project> {
+    return this.repository.update({
+      where: { id },
+      data: {
+        skills: { connect: manyIds(skills) },
+      },
+    })
+  }
+
+  removeSkills(id: string, skills: Project['skills']): Output<Project> {
+    return this.repository.update({
+      where: { id },
+      data: {
+        skills: { disconnect: manyIds(skills) },
       },
     })
   }

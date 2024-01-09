@@ -41,6 +41,16 @@ export class ProjectsController {
     return this.projectsService.update(id, updateProjectDto)
   }
 
+  @Patch(':id/skills/add')
+  addSkills(@Param('id') id: string, @Body() { skills }: UpdateProjectDto) {
+    return this.projectsService.addSkills(id, skills)
+  }
+
+  @Patch(':id/skills/remove')
+  removeSkills(@Param('id') id: string, @Body() { skills }: UpdateProjectDto) {
+    return this.projectsService.removeSkills(id, skills)
+  }
+
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.projectsService.remove(id)
