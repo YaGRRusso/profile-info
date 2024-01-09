@@ -5,10 +5,11 @@
   "author": "YaGRRusso",
   "private": true,
   "license": "MIT",
+  "main": "dist/",
   "scripts": {
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
-    "start": "nest start",
+    "start": "node dist/main",
     "start:dev": "npm run start -- --watch",
     "start:repl": "npm run start -- --entryFile repl",
     "start:debug": "npm run start -- --watch --debug",
