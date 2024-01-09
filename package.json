@@ -6,6 +6,10 @@
   "private": true,
   "license": "MIT",
   "main": "dist/",
+  "engines": {
+    "node": "18.19.0",
+    "npm": "10.2.3"
+  },
   "scripts": {
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
@@ -27,7 +31,7 @@
     "prisma:studio": "npx prisma studio"
   },
   "dependencies": {
-    "@nestjs/cli": "^10.0.0",
+    "@nestjs/cli": "^10.3.0",
     "@nestjs/common": "^10.0.0",
     "@nestjs/core": "^10.0.0",
     "@nestjs/mapped-types": "*",
