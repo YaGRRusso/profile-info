@@ -1,4 +1,4 @@
-# Profile Info
+# [Profile Info](https://yagrrusso-info.onrender.com/swagger) 🚀
 
 API for storing personal and professional information (single tenant)
 
@@ -86,7 +86,7 @@ $ npm run test:cov
 - [ ] E2E Tests
 - [ ] SWC Compiler
 - [ ] CI/CD
-- [ ] Deploy 🚀
+- [x] Deploy 🚀
 
 ## License
 
