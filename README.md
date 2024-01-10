@@ -4,7 +4,7 @@ API for storing personal and professional information (single tenant)
 
 ![modelo](diagram.png)
 
-# Running Swagger
+## Running Swagger
 
 [Run the app](#running-api) and open the link `localhost:8080/swagger` on your browser
 
