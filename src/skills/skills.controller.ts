@@ -12,6 +12,7 @@ import { CreateSkillDto } from './dto/create-skill.dto'
 import { UpdateSkillDto } from './dto/update-skill.dto'
 import { SearchSkillDto } from './dto/search-skill.dto'
 import { ApiTags } from '@nestjs/swagger'
+import { IsPublic } from '@auth/decorators/public.decorator'
 
 @ApiTags('skills')
 @Controller('skills')
@@ -23,16 +24,19 @@ export class SkillsController {
     return this.skillsService.create(createSkillDto)
   }
 
+  @IsPublic()
   @Get()
   findAll() {
     return this.skillsService.findAll()
   }
 
+  @IsPublic()
   @Get('search')
   searchAll(@Body() searchSkillDto: SearchSkillDto) {
     return this.skillsService.searchAll(searchSkillDto)
   }
 
+  @IsPublic()
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.skillsService.findOne(id)

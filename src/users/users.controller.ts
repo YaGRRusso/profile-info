@@ -12,39 +12,53 @@ import { CreateUserDto } from './dto/create-user.dto'
 import { UpdateUserDto } from './dto/update-user.dto'
 import { SearchUserDto } from './dto/search-user.dto'
 import { ApiTags } from '@nestjs/swagger'
+import { removeObjectKey, removeObjectsKey } from '@helpers/object.helper'
+import { IsPublic } from '@auth/decorators/public.decorator'
 
 @ApiTags('users')
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
+  @IsPublic()
   @Get()
-  findAll() {
-    return this.usersService.findAll()
+  async findAll() {
+    return removeObjectsKey(await this.usersService.findAll(), 'password')
   }
 
+  @IsPublic()
   @Get('search')
-  searchAll(@Body() searchUserDto: SearchUserDto) {
-    return this.usersService.searchAll(searchUserDto)
+  async searchAll(@Body() searchUserDto: SearchUserDto) {
+    return removeObjectsKey(
+      await this.usersService.searchAll(searchUserDto),
+      'password',
+    )
   }
 
+  @IsPublic()
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.usersService.findOne(id)
+  async findOne(@Param('id') id: string) {
+    return removeObjectKey(await this.usersService.findOne(id), 'password')
   }
 
   @Post()
-  create(@Body() createUserDto: CreateUserDto) {
-    return this.usersService.create(createUserDto)
+  async create(@Body() createUserDto: CreateUserDto) {
+    return removeObjectKey(
+      await this.usersService.create(createUserDto),
+      'password',
+    )
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    return this.usersService.update(id, updateUserDto)
+  async update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
+    return removeObjectKey(
+      await this.usersService.update(id, updateUserDto),
+      'password',
+    )
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.usersService.remove(id)
+  async remove(@Param('id') id: string) {
+    return removeObjectKey(await this.usersService.remove(id), 'password')
   }
 }

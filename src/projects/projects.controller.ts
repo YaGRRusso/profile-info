@@ -12,6 +12,7 @@ import { CreateProjectDto } from './dto/create-project.dto'
 import { UpdateProjectDto } from './dto/update-project.dto'
 import { SearchProjectDto } from './dto/search-project.dto'
 import { ApiTags } from '@nestjs/swagger'
+import { IsPublic } from '@auth/decorators/public.decorator'
 
 @ApiTags('projects')
 @Controller('projects')
@@ -23,16 +24,19 @@ export class ProjectsController {
     return this.projectsService.create(createProjectDto)
   }
 
+  @IsPublic()
   @Get()
   findAll() {
     return this.projectsService.findAll()
   }
 
+  @IsPublic()
   @Get('/search')
   searchAll(@Body() searchProjectDto: SearchProjectDto) {
     return this.projectsService.searchAll(searchProjectDto)
   }
 
+  @IsPublic()
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.projectsService.findOne(id)

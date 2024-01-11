@@ -77,16 +77,14 @@ $ npm run test:cov
 - [x] Repl
 - [x] Swagger
 - [x] SQLite Database
-- [ ] PostgreSQL Database
-- [ ] Docker Compose
-- [ ] Auth JWT
-- [ ] User Roles
-- [ ] Protected Routes
-- [ ] Protected Queries
+- [x] PostgreSQL Database (Docker Compose)
+- [x] Dockerfile
+- [x] Auth JWT
+- [x] User Roles
+- [x] Protected Routes
 - [ ] E2E Tests
-- [ ] SWC Compiler
-- [ ] CI/CD
-- [x] Deploy 🚀
+- [ ] 90% Tests
+- [x] [Deploy](https://yagrrusso-info.onrender.com/swagger) 🚀
 
 ## License
 
