@@ -21,6 +21,8 @@ model User {
   name         String
   nickname     String   @unique
   email        String   @unique
+  password     String
+  role         String   @default("USER")
   phone        String   @unique
   birth        DateTime
   title        String

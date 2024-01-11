@@ -3,6 +3,7 @@ import { PrismaUsersRepository } from './repositories/users.repository.prisma'
 import { Output } from '@interfaces/output.interface'
 import { User } from './entities/user.entity'
 import { SearchUserDto } from './dto/search-user.dto'
+import * as bcrypt from 'bcrypt'
 
 @Injectable()
 export class UsersService {
@@ -21,8 +22,9 @@ export class UsersService {
   }
 
   async create(createUserDto: Partial<User>): Output<User> {
+    const password = await bcrypt.hash(createUserDto.password, 8)
     return await this.repository.create({
-      data: { ...(createUserDto as User) },
+      data: { ...(createUserDto as User), password },
     })
   }
 
