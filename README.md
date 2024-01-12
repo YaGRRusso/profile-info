@@ -88,7 +88,6 @@ $ npm run test:cov
 - [x] Users
 - [x] Skills
 - [x] Projects
-- [ ] Hobbies
 - [ ] Links
 - [ ] Languages
 - [ ] Courses
