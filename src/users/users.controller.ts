@@ -41,6 +41,7 @@ export class UsersController {
     return removeObjectKey(await this.usersService.findOne(id), 'password')
   }
 
+  @IsPublic()
   @Post()
   async create(@Body() createUserDto: CreateUserDto) {
     return removeObjectKey(
