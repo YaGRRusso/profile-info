@@ -97,6 +97,9 @@
       "ts"
     ],
     "moduleNameMapper": {
+      "@auth/(.*)": [
+        "<rootDir>/auth/$1"
+      ],
       "@configs/(.*)": [
         "<rootDir>/common/configs/$1"
       ],
