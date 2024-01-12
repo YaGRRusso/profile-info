@@ -63,28 +63,38 @@ $ npm run test:cov
 
 ## Features
 
-- [x] REST Routes
-- [x] CRUD - Create, Read, Update and Delete
-- [x] Interface/Types Patterns
-- [x] ORM
-- [x] Common Resources
-- [x] Exception Filters
-- [x] Code Formatters
-- [x] Clean Code
-- [x] Clean Architecture
-- [x] Service Tests
-- [x] Controller Tests
+- [x] Development Patterns (Clean Code, Clean Architecture, SOLID, KISS, DRY and YAGNI)
+- [x] Development Configs (Formatters, Code Patterns, ESLint, Prettier, TSConfig and Husky)
+- [x] App Configs
 - [x] Repl
+- [x] SQL Diagram
+- [x] Prisma SQL Schema
+- [x] Common Repository
+- [x] Error Boundary
+- [x] Tests Configs (Services, Controllers and E2e)
+- [x] Docker (Postgres and Node)
 - [x] Swagger
-- [x] SQLite Database
-- [x] PostgreSQL Database (Docker Compose)
-- [x] Dockerfile
-- [x] Auth JWT
-- [x] User Roles
-- [x] Protected Routes
-- [ ] E2E Tests
-- [ ] 90% Tests
+- [x] Rest Routes
+- [x] JSON Web Token (JWT)
+- [x] Roles (User and Admin)
+- [x] Protected Routes and Queries (Public and Authenticated with Roles)
+- [ ] 80% Test Coverage
 - [x] [Deploy](https://yagrrusso-info.onrender.com/swagger) 🚀
+
+## Resources Routes (Services, Controllers, Repositories, Entities, DTO, Protected Queries and more...)
+
+- [x] App
+- [x] Auth
+- [x] Users
+- [x] Skills
+- [x] Projects
+- [ ] Hobbies
+- [ ] Links
+- [ ] Languages
+- [ ] Courses
+- [ ] Formations
+- [ ] Experiences
+- [ ] Multi Users (Maybe)
 
 ## License
 
