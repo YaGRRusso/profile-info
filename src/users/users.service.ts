@@ -21,10 +21,14 @@ export class UsersService {
     return await this.repository.findAll({ where: { ...searchUserDto } })
   }
 
-  async create(createUserDto: Partial<User>): Output<User> {
-    const password = await bcrypt.hash(createUserDto.password, 8)
+  async create({
+    role = 'USER',
+    password,
+    ...createUserDto
+  }: Partial<User>): Output<User> {
+    const hash = await bcrypt.hash(password, 8)
     return await this.repository.create({
-      data: { ...(createUserDto as User), password },
+      data: { ...(createUserDto as User), password: hash, role },
     })
   }
 
