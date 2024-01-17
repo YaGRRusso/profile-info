@@ -1,9 +1,3 @@
-export enum SkillLevelEnum {
-  'LOW' = 'LOW',
-  'MEDIUM' = 'MEDIUM',
-  'HIGH' = 'HIGH',
-}
-
 export enum SkillCategoryEnum {
   'LANGUAGE' = 'LANGUAGE',
   'LIBRARY' = 'LIBRARY',
@@ -15,6 +9,5 @@ export enum SkillCategoryEnum {
 export class Skill {
   id: string
   name: string
-  level: SkillLevelEnum | string
   category: SkillCategoryEnum | string
 }

@@ -6,6 +6,7 @@ import {
   Patch,
   Param,
   Delete,
+  Req,
 } from '@nestjs/common'
 import { ProjectsService } from './projects.service'
 import { CreateProjectDto } from './dto/create-project.dto'
@@ -13,6 +14,7 @@ import { UpdateProjectDto } from './dto/update-project.dto'
 import { SearchProjectDto } from './dto/search-project.dto'
 import { ApiTags } from '@nestjs/swagger'
 import { IsPublic } from '@auth/decorators/public.decorator'
+import { AuthRequest } from '@auth/entities/request.entity'
 
 @ApiTags('projects')
 @Controller('projects')
@@ -20,8 +22,11 @@ export class ProjectsController {
   constructor(private readonly projectsService: ProjectsService) {}
 
   @Post()
-  create(@Body() createProjectDto: CreateProjectDto) {
-    return this.projectsService.create(createProjectDto)
+  create(@Body() createProjectDto: CreateProjectDto, @Req() req: AuthRequest) {
+    return this.projectsService.create({
+      userId: req.user.id,
+      ...createProjectDto,
+    })
   }
 
   @IsPublic()

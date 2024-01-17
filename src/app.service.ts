@@ -7,7 +7,7 @@ export class AppService {
       name: 'Profile Info',
       version: '0.0',
       url: 'https://yagrrusso-info.onrender.com',
-      repo: 'https://yagrrusso-info.onrender.com',
+      repo: 'https://github.com/YaGRRusso/profile-info',
     }
   }
 }

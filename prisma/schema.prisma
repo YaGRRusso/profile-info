@@ -25,23 +25,28 @@ model User {
   description  String
   address      String
   postal       String
+
+  skills   Skill[]
+  projects Project[]
 }
 
 model Skill {
   id       String @id @default(cuid())
   name     String
-  level    String
   category String
 
   projects Project[]
+  users    User[]
 }
 
 model Project {
+  userId      String
   id          String @id @default(cuid())
   name        String
   description String
   image       String
   link        String
 
+  user   User    @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   skills Skill[]
 }
