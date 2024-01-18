@@ -6,6 +6,7 @@ import {
   Patch,
   Param,
   Delete,
+  Req,
 } from '@nestjs/common'
 import { UsersService } from './users.service'
 import { CreateUserDto } from './dto/create-user.dto'
@@ -14,6 +15,7 @@ import { SearchUserDto } from './dto/search-user.dto'
 import { ApiTags } from '@nestjs/swagger'
 import { removeObjectKey, removeObjectsKey } from '@helpers/object.helper'
 import { IsPublic } from '@auth/decorators/public.decorator'
+import { AuthRequest } from '@auth/entities/request.entity'
 
 @ApiTags('users')
 @Controller('users')
@@ -27,18 +29,18 @@ export class UsersController {
   }
 
   @IsPublic()
+  @Get(':id')
+  async findOne(@Param('id') id: string) {
+    return removeObjectKey(await this.usersService.findOne(id), 'password')
+  }
+
+  @IsPublic()
   @Get('search')
   async searchAll(@Body() searchUserDto: SearchUserDto) {
     return removeObjectsKey(
       await this.usersService.searchAll(searchUserDto),
       'password',
     )
-  }
-
-  @IsPublic()
-  @Get(':id')
-  async findOne(@Param('id') id: string) {
-    return removeObjectKey(await this.usersService.findOne(id), 'password')
   }
 
   @IsPublic()
@@ -50,16 +52,19 @@ export class UsersController {
     )
   }
 
-  @Patch(':id')
-  async update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
+  @Patch('me')
+  async update(@Req() req: AuthRequest, @Body() updateUserDto: UpdateUserDto) {
     return removeObjectKey(
-      await this.usersService.update(id, updateUserDto),
+      await this.usersService.update(req.user.id, updateUserDto),
       'password',
     )
   }
 
-  @Delete(':id')
-  async remove(@Param('id') id: string) {
-    return removeObjectKey(await this.usersService.remove(id), 'password')
+  @Delete('me')
+  async remove(@Req() req: AuthRequest) {
+    return removeObjectKey(
+      await this.usersService.remove(req.user.id),
+      'password',
+    )
   }
 }

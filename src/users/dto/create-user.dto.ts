@@ -1,8 +1,10 @@
 import { User } from '../entities/user.entity'
 import {
+  IsArray,
   IsDateString,
   IsEmail,
   IsNotEmpty,
+  IsOptional,
   IsString,
   IsStrongPassword,
   Length,
@@ -66,4 +68,9 @@ export class CreateUserDto implements Partial<User> {
   @IsNotEmpty()
   @IsString()
   title: string
+
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  skills: string[]
 }
