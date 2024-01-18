@@ -3,6 +3,8 @@ import { Injectable } from '@nestjs/common'
 import { PrismaSkillsRepository } from './repositories/skills.repository.prisma'
 import { Skill } from './entities/skill.entity'
 import { Output } from '@interfaces/output.interface'
+import { CreateSkillDto } from './dto/create-skill.dto'
+import { UpdateSkillDto } from './dto/update-skill.dto'
 
 @Injectable()
 export class SkillsService {
@@ -20,13 +22,13 @@ export class SkillsService {
     return await this.repository.findAll({ where: { ...searchSkillDto } })
   }
 
-  async create(createSkillDto: Partial<Skill>): Output<Skill> {
+  async create(createSkillDto: CreateSkillDto): Output<Skill> {
     return await this.repository.create({
       data: { ...(createSkillDto as Skill) },
     })
   }
 
-  async update(id: string, updateSkillDto: Partial<Skill>): Output<Skill> {
+  async update(id: string, updateSkillDto: UpdateSkillDto): Output<Skill> {
     return await this.repository.update({
       where: { id },
       data: { ...updateSkillDto },

@@ -78,7 +78,7 @@ $ npm run test:cov
 - [x] JSON Web Token (JWT)
 - [x] Roles (User and Admin)
 - [x] Protected Routes and Queries (Public and Authenticated with Roles)
-- [ ] Multi Users
+- [x] Multi Users (Protected)
 - [ ] 80% Test Coverage
 - [x] [Deploy](https://yagrrusso-info.onrender.com/swagger) 🚀
 
