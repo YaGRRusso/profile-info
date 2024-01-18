@@ -24,7 +24,7 @@ export class SkillsService {
 
   async create(createSkillDto: CreateSkillDto): Output<Skill> {
     return await this.repository.create({
-      data: { ...(createSkillDto as Skill) },
+      data: { ...createSkillDto },
     })
   }
 

@@ -60,6 +60,16 @@ export class UsersController {
     )
   }
 
+  @Patch('me/skills/add')
+  addSkills(@Req() req: AuthRequest, @Body() { skills }: UpdateUserDto) {
+    return this.usersService.addSkills(req.user.id, skills)
+  }
+
+  @Patch('me/skills/remove')
+  removeSkills(@Req() req: AuthRequest, @Body() { skills }: UpdateUserDto) {
+    return this.usersService.removeSkills(req.user.id, skills)
+  }
+
   @Delete('me')
   async remove(@Req() req: AuthRequest) {
     return removeObjectKey(

@@ -5,5 +5,4 @@ export class Project {
   description: string
   image: string
   link: string
-  skills: string[]
 }

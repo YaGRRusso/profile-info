@@ -12,9 +12,7 @@ export class ProjectsService {
   constructor(private repository: PrismaProjectsRepository) {}
 
   findAll(): Output<Project[]> {
-    return this.repository.findAll({
-      include: { skills: true },
-    })
+    return this.repository.findAll()
   }
 
   findOne(id: string): Output<Project> {
@@ -36,10 +34,9 @@ export class ProjectsService {
     return this.repository.create({
       data: {
         userId,
-        ...(createProjectDto as Project),
+        ...createProjectDto,
         skills: { connect: manyIds(createProjectDto.skills) },
       },
-      include: { skills: true },
     })
   }
 
@@ -59,26 +56,20 @@ export class ProjectsService {
     })
   }
 
-  addSkills(
-    userId: string,
-    id: string,
-    skills: Project['skills'],
-  ): Output<Project> {
+  addSkills(userId: string, id: string, skills: string[]): Output<Project> {
     return this.repository.update({
       where: { userId, id },
+      include: { skills: true },
       data: {
         skills: { connect: manyIds(skills) },
       },
     })
   }
 
-  removeSkills(
-    userId: string,
-    id: string,
-    skills: Project['skills'],
-  ): Output<Project> {
+  removeSkills(userId: string, id: string, skills: string[]): Output<Project> {
     return this.repository.update({
       where: { userId, id },
+      include: { skills: true },
       data: {
         skills: { disconnect: manyIds(skills) },
       },
