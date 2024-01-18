@@ -21,24 +21,10 @@ import { AuthRequest } from '@auth/entities/request.entity'
 export class ProjectsController {
   constructor(private readonly projectsService: ProjectsService) {}
 
-  @Post()
-  create(@Body() createProjectDto: CreateProjectDto, @Req() req: AuthRequest) {
-    return this.projectsService.create({
-      userId: req.user.id,
-      ...createProjectDto,
-    })
-  }
-
   @IsPublic()
   @Get()
   findAll() {
     return this.projectsService.findAll()
-  }
-
-  @IsPublic()
-  @Get('/search')
-  searchAll(@Body() searchProjectDto: SearchProjectDto) {
-    return this.projectsService.searchAll(searchProjectDto)
   }
 
   @IsPublic()
@@ -47,23 +33,46 @@ export class ProjectsController {
     return this.projectsService.findOne(id)
   }
 
+  @IsPublic()
+  @Get('/search')
+  searchAll(@Body() searchProjectDto: SearchProjectDto) {
+    return this.projectsService.searchAll(searchProjectDto)
+  }
+
+  @Post()
+  create(@Req() req: AuthRequest, @Body() createProjectDto: CreateProjectDto) {
+    return this.projectsService.create(req.user.id, createProjectDto)
+  }
+
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateProjectDto: UpdateProjectDto) {
-    return this.projectsService.update(id, updateProjectDto)
+  update(
+    @Req() req: AuthRequest,
+    @Param('id') id: string,
+    @Body() updateProjectDto: UpdateProjectDto,
+  ) {
+    return this.projectsService.update(req.user.id, id, updateProjectDto)
   }
 
   @Patch(':id/skills/add')
-  addSkills(@Param('id') id: string, @Body() { skills }: UpdateProjectDto) {
-    return this.projectsService.addSkills(id, skills)
+  addSkills(
+    @Req() req: AuthRequest,
+    @Param('id') id: string,
+    @Body() { skills }: UpdateProjectDto,
+  ) {
+    return this.projectsService.addSkills(req.user.id, id, skills)
   }
 
   @Patch(':id/skills/remove')
-  removeSkills(@Param('id') id: string, @Body() { skills }: UpdateProjectDto) {
-    return this.projectsService.removeSkills(id, skills)
+  removeSkills(
+    @Req() req: AuthRequest,
+    @Param('id') id: string,
+    @Body() { skills }: UpdateProjectDto,
+  ) {
+    return this.projectsService.removeSkills(req.user.id, id, skills)
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.projectsService.remove(id)
+  remove(@Req() req: AuthRequest, @Param('id') id: string) {
+    return this.projectsService.remove(req.user.id, id)
   }
 }

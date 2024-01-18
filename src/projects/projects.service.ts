@@ -3,26 +3,25 @@ import { PrismaProjectsRepository } from './repositories/projects.repository.pri
 import { Project } from './entities/project.entity'
 import { Output } from '@interfaces/output.interface'
 import { manyIds } from '@helpers/prisma.helper'
+import { CreateProjectDto } from './dto/create-project.dto'
+import { SearchProjectDto } from './dto/search-project.dto'
+import { UpdateProjectDto } from './dto/update-project.dto'
 
 @Injectable()
 export class ProjectsService {
   constructor(private repository: PrismaProjectsRepository) {}
 
-  create(createProjectDto: Partial<Project>): Output<Project> {
-    return this.repository.create({
-      data: {
-        ...(createProjectDto as Project),
-        skills: { connect: manyIds(createProjectDto.skills) },
-      },
+  findAll(): Output<Project[]> {
+    return this.repository.findAll({
       include: { skills: true },
     })
   }
 
-  findAll(): Output<Project[]> {
-    return this.repository.findAll({ include: { skills: true } })
+  findOne(id: string): Output<Project> {
+    return this.repository.findOne({ where: { id } })
   }
 
-  searchAll(searchProjectDto: Partial<Project>): Output<Project[]> {
+  searchAll(searchProjectDto: SearchProjectDto): Output<Project[]> {
     return this.repository.findAll({
       where: {
         ...searchProjectDto,
@@ -33,13 +32,24 @@ export class ProjectsService {
     })
   }
 
-  findOne(id: string): Output<Project> {
-    return this.repository.findOne({ where: { id } })
+  create(userId: string, createProjectDto: CreateProjectDto): Output<Project> {
+    return this.repository.create({
+      data: {
+        userId,
+        ...(createProjectDto as Project),
+        skills: { connect: manyIds(createProjectDto.skills) },
+      },
+      include: { skills: true },
+    })
   }
 
-  update(id: string, updateProjectDto: Partial<Project>): Output<Project> {
+  update(
+    userId: string,
+    id: string,
+    updateProjectDto: UpdateProjectDto,
+  ): Output<Project> {
     return this.repository.update({
-      where: { id },
+      where: { id, userId },
       data: {
         ...updateProjectDto,
         ...(updateProjectDto.skills && {
@@ -49,25 +59,33 @@ export class ProjectsService {
     })
   }
 
-  addSkills(id: string, skills: Project['skills']): Output<Project> {
+  addSkills(
+    userId: string,
+    id: string,
+    skills: Project['skills'],
+  ): Output<Project> {
     return this.repository.update({
-      where: { id },
+      where: { userId, id },
       data: {
         skills: { connect: manyIds(skills) },
       },
     })
   }
 
-  removeSkills(id: string, skills: Project['skills']): Output<Project> {
+  removeSkills(
+    userId: string,
+    id: string,
+    skills: Project['skills'],
+  ): Output<Project> {
     return this.repository.update({
-      where: { id },
+      where: { userId, id },
       data: {
         skills: { disconnect: manyIds(skills) },
       },
     })
   }
 
-  remove(id: string): Output<Project> {
-    return this.repository.remove({ where: { id } })
+  remove(userId: string, id: string): Output<Project> {
+    return this.repository.remove({ where: { userId, id } })
   }
 }
