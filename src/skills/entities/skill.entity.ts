@@ -10,4 +10,6 @@ export class Skill {
   id: string
   name: string
   category: SkillCategoryEnum | string
+  createdAt: Date
+  updatedAt: Date
 }

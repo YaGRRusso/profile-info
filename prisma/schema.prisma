@@ -25,28 +25,37 @@ model User {
   description  String
   address      String
   postal       String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 
-  skills   Skill[]
-  projects Project[]
+  // Relations
+  Skills   Skill[]
+  Projects Project[]
 }
 
 model Skill {
-  id       String @id @default(cuid())
-  name     String
-  category String
+  id        String   @id @default(cuid())
+  name      String
+  category  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  projects Project[]
-  users    User[]
+  // Relations
+  Projects Project[]
+  Users    User[]
 }
 
 model Project {
-  userId      String
-  id          String @id @default(cuid())
+  id          String   @id @default(cuid())
   name        String
   description String
   image       String
   link        String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
-  user   User    @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  skills Skill[]
+  // Relations
+  userId String
+  User   User    @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  Skills Skill[]
 }

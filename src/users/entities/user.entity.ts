@@ -15,4 +15,6 @@ export class User {
   address: string
   postal: string
   role: Role | string
+  createdAt: Date
+  updatedAt: Date
 }

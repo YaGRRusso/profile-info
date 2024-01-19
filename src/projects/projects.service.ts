@@ -35,7 +35,7 @@ export class ProjectsService {
       data: {
         userId,
         ...createProjectDto,
-        skills: { connect: manyIds(createProjectDto.skills) },
+        Skills: { connect: manyIds(createProjectDto.skills) },
       },
     })
   }
@@ -59,9 +59,9 @@ export class ProjectsService {
   addSkills(userId: string, id: string, skills: string[]): Output<Project> {
     return this.repository.update({
       where: { userId, id },
-      include: { skills: true },
+      include: { Skills: true },
       data: {
-        skills: { connect: manyIds(skills) },
+        Skills: { connect: manyIds(skills) },
       },
     })
   }
@@ -69,9 +69,9 @@ export class ProjectsService {
   removeSkills(userId: string, id: string, skills: string[]): Output<Project> {
     return this.repository.update({
       where: { userId, id },
-      include: { skills: true },
+      include: { Skills: true },
       data: {
-        skills: { disconnect: manyIds(skills) },
+        Skills: { disconnect: manyIds(skills) },
       },
     })
   }

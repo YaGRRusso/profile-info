@@ -38,7 +38,7 @@ export class UsersService {
         ...createUserDto,
         password: hash,
         role: 'USER',
-        skills: { connect: manyIds(createUserDto.skills) },
+        Skills: { connect: manyIds(createUserDto.skills) },
       },
     })
   }
@@ -58,9 +58,9 @@ export class UsersService {
   addSkills(id: string, skills: string[]): Output<User> {
     return this.repository.update({
       where: { id },
-      include: { skills: true },
+      include: { Skills: true },
       data: {
-        skills: { connect: manyIds(skills) },
+        Skills: { connect: manyIds(skills) },
       },
     })
   }
@@ -68,9 +68,9 @@ export class UsersService {
   removeSkills(id: string, skills: string[]): Output<User> {
     return this.repository.update({
       where: { id },
-      include: { skills: true },
+      include: { Skills: true },
       data: {
-        skills: { disconnect: manyIds(skills) },
+        Skills: { disconnect: manyIds(skills) },
       },
     })
   }
