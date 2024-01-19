@@ -1,0 +1,47 @@
+{
+  "rootDir": "src",
+  "testRegex": ".*\\.spec\\.ts$",
+  "coverageDirectory": "../coverage",
+  "testEnvironment": "node",
+  "transform": {
+    "^.+\\.(t|j)s$": "ts-jest"
+  },
+  "collectCoverageFrom": [
+    "**/*.service.(t|j)s",
+    "**/*.controller.(t|j)s"
+  ],
+  "moduleFileExtensions": [
+    "js",
+    "json",
+    "ts"
+  ],
+  "moduleNameMapper": {
+    "@auth/(.*)": [
+      "<rootDir>/auth/$1"
+    ],
+    "@configs/(.*)": [
+      "<rootDir>/common/configs/$1"
+    ],
+    "@handlers/(.*)": [
+      "<rootDir>/common/handlers/$1"
+    ],
+    "@helpers/(.*)": [
+      "<rootDir>/common/helpers/$1"
+    ],
+    "@interfaces/(.*)": [
+      "<rootDir>/common/interfaces/$1"
+    ],
+    "@mappers/(.*)": [
+      "<rootDir>/common/mappers/$1"
+    ],
+    "@prisma/prisma(.*)": [
+      "<rootDir>/common/prisma/prisma$1"
+    ],
+    "@repositories/(.*)": [
+      "<rootDir>/common/repositories/$1"
+    ],
+    "@src/(.*)": [
+      "<rootDir>/$1"
+    ]
+  }
+}

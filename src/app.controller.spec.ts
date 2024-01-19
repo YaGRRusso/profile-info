@@ -18,7 +18,14 @@ describe('AppController', () => {
     expect(controller).toBeDefined()
   })
 
-  it('should return "Hello World!"', () => {
-    expect(controller.getHello()).toBe('Hello World!')
+  it('should return app infos', () => {
+    expect(controller.getHello()).toEqual(
+      expect.objectContaining({
+        name: expect.anything(),
+        version: expect.anything(),
+        url: expect.anything(),
+        repo: expect.anything(),
+      }),
+    )
   })
 })

@@ -79,6 +79,8 @@ $ npm run test:cov
 - [x] Roles (User and Admin)
 - [x] Protected Routes and Queries (Public and Authenticated with Roles)
 - [x] Multi Users (Protected)
+- [x] Unit Tests
+- [ ] E2E Tests
 - [ ] 80% Test Coverage
 - [x] [Deploy](https://yagrrusso-info.onrender.com/swagger) 🚀
 
