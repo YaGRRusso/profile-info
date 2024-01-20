@@ -25,31 +25,40 @@ export class UsersService {
       where: {
         ...searchUserDto,
         ...(searchUserDto.skills?.length && {
-          skills: { some: { id: searchUserDto.skills[0] } },
+          Skills: { some: { id: searchUserDto.skills[0] } },
         }),
       },
     })
   }
 
-  async create({ password, ...createUserDto }: CreateUserDto): Output<User> {
+  async create({
+    password,
+    skills,
+    ...createUserDto
+  }: CreateUserDto): Output<User> {
     const hash = await bcrypt.hash(password, 8)
     return await this.repository.create({
       data: {
         ...createUserDto,
         password: hash,
         role: 'USER',
-        Skills: { connect: manyIds(createUserDto.skills) },
+        ...(skills && {
+          Skills: { connect: manyIds(skills) },
+        }),
       },
     })
   }
 
-  async update(id: string, updateUserDto: UpdateUserDto): Output<User> {
+  async update(
+    id: string,
+    { skills, ...updateUserDto }: UpdateUserDto,
+  ): Output<User> {
     return await this.repository.update({
       where: { id },
       data: {
         ...updateUserDto,
-        ...(updateUserDto.skills && {
-          skills: { set: [], connect: manyIds(updateUserDto.skills) },
+        ...(skills && {
+          Skills: { set: [], connect: manyIds(skills) },
         }),
       },
     })

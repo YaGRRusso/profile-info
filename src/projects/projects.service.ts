@@ -24,18 +24,23 @@ export class ProjectsService {
       where: {
         ...searchProjectDto,
         ...(searchProjectDto.skills?.length && {
-          skills: { some: { id: searchProjectDto.skills[0] } },
+          Skills: { some: { id: searchProjectDto.skills[0] } },
         }),
       },
     })
   }
 
-  create(userId: string, createProjectDto: CreateProjectDto): Output<Project> {
+  create(
+    userId: string,
+    { skills, ...createProjectDto }: CreateProjectDto,
+  ): Output<Project> {
     return this.repository.create({
       data: {
         userId,
         ...createProjectDto,
-        Skills: { connect: manyIds(createProjectDto.skills) },
+        ...(skills?.length && {
+          Skills: { connect: manyIds(skills) },
+        }),
       },
     })
   }
@@ -43,14 +48,14 @@ export class ProjectsService {
   update(
     userId: string,
     id: string,
-    updateProjectDto: UpdateProjectDto,
+    { skills, ...updateProjectDto }: UpdateProjectDto,
   ): Output<Project> {
     return this.repository.update({
       where: { id, userId },
       data: {
         ...updateProjectDto,
-        ...(updateProjectDto.skills && {
-          skills: { set: [], connect: manyIds(updateProjectDto.skills) },
+        ...(skills && {
+          Skills: { set: [], connect: manyIds(skills) },
         }),
       },
     })
