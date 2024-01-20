@@ -1,0 +1,44 @@
+import { Test, TestingModule } from '@nestjs/testing'
+import { INestApplication } from '@nestjs/common'
+import * as request from 'supertest'
+import { AppModule } from '@src/app.module'
+
+describe('AppController (e2e)', () => {
+  let app: INestApplication
+
+  beforeEach(async () => {
+    const moduleFixture: TestingModule = await Test.createTestingModule({
+      imports: [AppModule],
+    }).compile()
+
+    app = moduleFixture.createNestApplication()
+    await app.init()
+  })
+
+  it('/users (GET)', async () => {
+    return await request(app.getHttpServer())
+      .get('/users')
+      .expect(200)
+      .expect(({ body }) => {
+        expect(body).toBeInstanceOf(Array)
+        body.forEach((user) => {
+          expect(user).toHaveProperty('id')
+          expect(user).toHaveProperty('picture')
+          expect(user).toHaveProperty('name')
+          expect(user).toHaveProperty('nickname')
+          expect(user).toHaveProperty('email')
+          expect(user).toHaveProperty('password')
+          expect(user).toHaveProperty('phone')
+          expect(user).toHaveProperty('birth')
+          expect(user).toHaveProperty('title')
+          expect(user).toHaveProperty('presentation')
+          expect(user).toHaveProperty('description')
+          expect(user).toHaveProperty('address')
+          expect(user).toHaveProperty('postal')
+          expect(user).toHaveProperty('role')
+          expect(user).toHaveProperty('createdAt')
+          expect(user).toHaveProperty('updatedAt')
+        })
+      })
+  })
+})

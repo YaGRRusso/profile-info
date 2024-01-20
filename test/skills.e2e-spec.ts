@@ -15,15 +15,19 @@ describe('AppController (e2e)', () => {
     await app.init()
   })
 
-  it('/ (GET)', () => {
-    return request(app.getHttpServer())
-      .get('/')
+  it('/skills (GET)', async () => {
+    return await request(app.getHttpServer())
+      .get('/skills')
       .expect(200)
       .expect(({ body }) => {
-        expect(body).toHaveProperty('name')
-        expect(body).toHaveProperty('version')
-        expect(body).toHaveProperty('url')
-        expect(body).toHaveProperty('repo')
+        expect(body).toBeInstanceOf(Array)
+        body.forEach((skill) => {
+          expect(skill).toHaveProperty('id')
+          expect(skill).toHaveProperty('name')
+          expect(skill).toHaveProperty('category')
+          expect(skill).toHaveProperty('createdAt')
+          expect(skill).toHaveProperty('updatedAt')
+        })
       })
   })
 })

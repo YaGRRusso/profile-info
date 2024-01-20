@@ -1,5 +1,5 @@
 {
-  "rootDir": "src",
+  "rootDir": ".",
   "testRegex": ".*\\.spec\\.ts$",
   "coverageDirectory": "../coverage",
   "testEnvironment": "node",
@@ -17,31 +17,31 @@
   ],
   "moduleNameMapper": {
     "@auth/(.*)": [
-      "<rootDir>/auth/$1"
+      "<rootDir>/src/auth/$1"
     ],
     "@configs/(.*)": [
-      "<rootDir>/common/configs/$1"
+      "<rootDir>/src/common/configs/$1"
     ],
     "@handlers/(.*)": [
-      "<rootDir>/common/handlers/$1"
+      "<rootDir>/src/common/handlers/$1"
     ],
     "@helpers/(.*)": [
-      "<rootDir>/common/helpers/$1"
+      "<rootDir>/src/common/helpers/$1"
     ],
     "@interfaces/(.*)": [
-      "<rootDir>/common/interfaces/$1"
+      "<rootDir>/src/common/interfaces/$1"
     ],
     "@mappers/(.*)": [
-      "<rootDir>/common/mappers/$1"
+      "<rootDir>/src/common/mappers/$1"
     ],
     "@prisma/prisma(.*)": [
-      "<rootDir>/common/prisma/prisma$1"
+      "<rootDir>/src/common/prisma/prisma$1"
     ],
     "@repositories/(.*)": [
-      "<rootDir>/common/repositories/$1"
+      "<rootDir>/src/common/repositories/$1"
     ],
     "@src/(.*)": [
-      "<rootDir>/$1"
+      "<rootDir>/src/$1"
     ]
   }
 }
