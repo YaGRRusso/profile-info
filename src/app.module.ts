@@ -11,6 +11,7 @@ import { JwtAuthGuard } from '@auth/guards/jwt.guard'
 import { APP_GUARD } from '@nestjs/core'
 import { FormationsModule } from './formations/formations.module'
 import { CoursesModule } from './courses/courses.module'
+import { ExperiencesModule } from './experiences/experiences.module'
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { CoursesModule } from './courses/courses.module'
     AuthModule,
     FormationsModule,
     CoursesModule,
+    ExperiencesModule,
   ],
   controllers: [AppController],
   providers: [AppService, { provide: APP_GUARD, useClass: JwtAuthGuard }],

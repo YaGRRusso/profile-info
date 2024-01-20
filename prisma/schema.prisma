@@ -29,10 +29,11 @@ model User {
   updatedAt    DateTime @updatedAt
 
   // Relations
-  Skills    Skill[]
-  Projects  Project[]
-  Formation Formation[]
-  Course    Course[]
+  Skills     Skill[]
+  Projects   Project[]
+  Formation  Formation[]
+  Course     Course[]
+  Experience Experience[]
 }
 
 model Skill {
@@ -43,10 +44,11 @@ model Skill {
   updatedAt DateTime @updatedAt
 
   // Relations
-  Projects   Project[]
-  Users      User[]
-  Formations Formation[]
-  Courses    Course[]
+  Projects    Project[]
+  Users       User[]
+  Formations  Formation[]
+  Courses     Course[]
+  Experiences Experience[]
 }
 
 model Project {
@@ -92,6 +94,22 @@ model Course {
   hours       Int
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+
+  // Relations
+  userId String
+  User   User    @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  Skills Skill[]
+}
+
+model Experience {
+  id           String    @id @default(cuid())
+  role         String
+  description  String
+  organization String
+  start        DateTime
+  end          DateTime?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
 
   // Relations
   userId String
