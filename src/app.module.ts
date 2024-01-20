@@ -9,6 +9,7 @@ import { ProjectsModule } from './projects/projects.module'
 import { AuthModule } from './auth/auth.module'
 import { JwtAuthGuard } from '@auth/guards/jwt.guard'
 import { APP_GUARD } from '@nestjs/core'
+import { FormationsModule } from './formations/formations.module'
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { APP_GUARD } from '@nestjs/core'
     SkillsModule,
     ProjectsModule,
     AuthModule,
+    FormationsModule,
   ],
   controllers: [AppController],
   providers: [AppService, { provide: APP_GUARD, useClass: JwtAuthGuard }],

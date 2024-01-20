@@ -29,8 +29,9 @@ model User {
   updatedAt    DateTime @updatedAt
 
   // Relations
-  Skills   Skill[]
-  Projects Project[]
+  Skills    Skill[]
+  Projects  Project[]
+  Formation Formation[]
 }
 
 model Skill {
@@ -41,8 +42,9 @@ model Skill {
   updatedAt DateTime @updatedAt
 
   // Relations
-  Projects Project[]
-  Users    User[]
+  Projects   Project[]
+  Users      User[]
+  Formations Formation[]
 }
 
 model Project {
@@ -53,6 +55,24 @@ model Project {
   link        String
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+
+  // Relations
+  userId String
+  User   User    @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  Skills Skill[]
+}
+
+model Formation {
+  id          String    @id @default(cuid())
+  name        String
+  school      String
+  description String
+  status      String
+  certificate String
+  start       DateTime
+  end         DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 
   // Relations
   userId String
