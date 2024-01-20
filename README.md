@@ -94,7 +94,7 @@ $ npm run test:cov
 - [x] Skills
 - [x] Projects
 - [x] Formations
-- [ ] Courses
+- [x] Courses
 - [ ] Experiences
 
 ## License
