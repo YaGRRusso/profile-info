@@ -1,0 +1,7 @@
+import type { Config } from 'jest'
+import jestConfig from './jest.config'
+
+export default {
+  ...jestConfig,
+  testRegex: '.e2e-spec.ts$',
+} satisfies Config

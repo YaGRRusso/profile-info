@@ -16,18 +16,16 @@ describe('AppController (e2e)', () => {
   })
 
   it('/skills (GET)', async () => {
-    return await request(app.getHttpServer())
-      .get('/skills')
-      .expect(200)
-      .expect(({ body }) => {
-        expect(body).toBeInstanceOf(Array)
-        body.forEach((skill) => {
-          expect(skill).toHaveProperty('id')
-          expect(skill).toHaveProperty('name')
-          expect(skill).toHaveProperty('category')
-          expect(skill).toHaveProperty('createdAt')
-          expect(skill).toHaveProperty('updatedAt')
-        })
-      })
+    const { body, status } = await request(app.getHttpServer()).get('/skills')
+
+    expect(status).toBe(200)
+    expect(body).toBeInstanceOf(Array)
+    body.forEach((skill) => {
+      expect(skill).toHaveProperty('id')
+      expect(skill).toHaveProperty('name')
+      expect(skill).toHaveProperty('category')
+      expect(skill).toHaveProperty('createdAt')
+      expect(skill).toHaveProperty('updatedAt')
+    })
   })
 })

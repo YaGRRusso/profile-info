@@ -15,15 +15,13 @@ describe('AppController (e2e)', () => {
     await app.init()
   })
 
-  it('/ (GET)', () => {
-    return request(app.getHttpServer())
-      .get('/')
-      .expect(200)
-      .expect(({ body }) => {
-        expect(body).toHaveProperty('name')
-        expect(body).toHaveProperty('version')
-        expect(body).toHaveProperty('url')
-        expect(body).toHaveProperty('repo')
-      })
+  it('/ (GET)', async () => {
+    const { body, status } = await request(app.getHttpServer()).get('/')
+
+    expect(status).toBe(200)
+    expect(body).toHaveProperty('name')
+    expect(body).toHaveProperty('version')
+    expect(body).toHaveProperty('url')
+    expect(body).toHaveProperty('repo')
   })
 })

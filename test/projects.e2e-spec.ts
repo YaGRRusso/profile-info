@@ -16,21 +16,19 @@ describe('AppController (e2e)', () => {
   })
 
   it('/projects (GET)', async () => {
-    return await request(app.getHttpServer())
-      .get('/projects')
-      .expect(200)
-      .expect(({ body }) => {
-        expect(body).toBeInstanceOf(Array)
-        body.forEach((project) => {
-          expect(project).toHaveProperty('id')
-          expect(project).toHaveProperty('name')
-          expect(project).toHaveProperty('description')
-          expect(project).toHaveProperty('image')
-          expect(project).toHaveProperty('link')
-          expect(project).toHaveProperty('createdAt')
-          expect(project).toHaveProperty('updatedAt')
-          expect(project).toHaveProperty('userId')
-        })
-      })
+    const { body, status } = await request(app.getHttpServer()).get('/projects')
+
+    expect(status).toBe(200)
+    expect(body).toBeInstanceOf(Array)
+    body.forEach((project) => {
+      expect(project).toHaveProperty('id')
+      expect(project).toHaveProperty('name')
+      expect(project).toHaveProperty('description')
+      expect(project).toHaveProperty('image')
+      expect(project).toHaveProperty('link')
+      expect(project).toHaveProperty('createdAt')
+      expect(project).toHaveProperty('updatedAt')
+      expect(project).toHaveProperty('userId')
+    })
   })
 })
