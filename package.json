@@ -62,7 +62,7 @@
     "@types/passport-jwt": "^4.0.0",
     "@types/passport-local": "^1.0.38",
     "@types/supertest": "^2.0.16",
-    "@yagrrusso/eslint-config": "^1.2.0",
+    "@yagrrusso/eslint-config": "^1.2.7",
     "eslint": "^8.56.0",
     "husky": "^8.0.3",
     "jest": "^29.7.0",
