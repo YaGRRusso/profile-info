@@ -1,9 +1,9 @@
 import { Injectable } from '@nestjs/common'
-import { ProjectsRepositoryInterface } from './projects.repository.interface'
-import { Project } from '../entities/project.entity'
+import { Prisma } from '@prisma/client'
 import { PrismaService } from '@prisma/prisma.service'
 import { PrismaCommonRepository } from '@repositories/common.repository.prisma'
-import { Prisma } from '@prisma/client'
+import { Project } from '../entities/project.entity'
+import { ProjectsRepositoryInterface } from './projects.repository.interface'
 
 @Injectable()
 export class PrismaProjectsRepository

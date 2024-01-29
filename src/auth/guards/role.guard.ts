@@ -1,3 +1,4 @@
+import { Observable } from 'rxjs'
 import {
   CanActivate,
   ExecutionContext,
@@ -5,7 +6,6 @@ import {
   UnauthorizedException,
 } from '@nestjs/common'
 import { Reflector } from '@nestjs/core'
-import { Observable } from 'rxjs'
 import { AuthRequest } from '../entities/request.entity'
 
 @Injectable()

@@ -1,6 +1,6 @@
+import { IsPublic } from '@auth/decorators/public.decorator'
 import { Controller, Get } from '@nestjs/common'
 import { AppService } from './app.service'
-import { IsPublic } from '@auth/decorators/public.decorator'
 
 @Controller()
 export class AppController {
@@ -8,7 +8,7 @@ export class AppController {
 
   @IsPublic()
   @Get()
-  getHello(): Record<string, any> {
+  getHello(): Record<string, unknown> {
     return this.appService.getHello()
   }
 }

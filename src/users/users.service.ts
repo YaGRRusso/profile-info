@@ -1,12 +1,12 @@
-import { Injectable } from '@nestjs/common'
-import { PrismaUsersRepository } from './repositories/users.repository.prisma'
-import { Output } from '@interfaces/output.interface'
-import { User } from './entities/user.entity'
-import { SearchUserDto } from './dto/search-user.dto'
 import * as bcrypt from 'bcrypt'
-import { CreateUserDto } from './dto/create-user.dto'
-import { UpdateUserDto } from './dto/update-user.dto'
 import { manyIds } from '@helpers/prisma.helper'
+import { Output } from '@interfaces/output.interface'
+import { Injectable } from '@nestjs/common'
+import { CreateUserDto } from './dto/create-user.dto'
+import { SearchUserDto } from './dto/search-user.dto'
+import { UpdateUserDto } from './dto/update-user.dto'
+import { User } from './entities/user.entity'
+import { PrismaUsersRepository } from './repositories/users.repository.prisma'
 
 @Injectable()
 export class UsersService {

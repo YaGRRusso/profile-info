@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing'
+import { PrismaService } from '@prisma/prisma.service'
 import { FormationsController } from '../formations/formations.controller'
 import { FormationsService } from '../formations/formations.service'
-import { PrismaService } from '@prisma/prisma.service'
 import { PrismaFormationsRepository } from '../formations/repositories/formations.repository.prisma'
 
 describe('FormationsController', () => {

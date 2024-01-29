@@ -1,4 +1,4 @@
-import { Prisma, Formation } from '@prisma/client'
+import { Formation, Prisma } from '@prisma/client'
 import { CommonRepositoryInterface } from '@repositories/common.repository.interface'
 
 export interface FormationsRepositoryInterface

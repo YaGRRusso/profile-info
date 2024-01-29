@@ -1,10 +1,10 @@
+import { Output } from '@interfaces/output.interface'
 import { Body, Controller, Get, Post, Req, UseGuards } from '@nestjs/common'
 import { AuthService } from './auth.service'
-import { LoginUserDto } from './dto/login-user.dto'
-import { Output } from '@interfaces/output.interface'
-import { AuthRequest } from './entities/request.entity'
-import { NeedRole } from './decorators/role.decorator'
 import { IsPublic } from './decorators/public.decorator'
+import { NeedRole } from './decorators/role.decorator'
+import { LoginUserDto } from './dto/login-user.dto'
+import { AuthRequest } from './entities/request.entity'
 import { JwtAuthGuard } from './guards/jwt.guard'
 import { RoleGuard } from './guards/role.guard'
 
@@ -19,14 +19,14 @@ export class AuthController {
   }
 
   @Get('me')
-  async me(@Req() req: AuthRequest): Output<any> {
+  async me(@Req() req: AuthRequest): Output<unknown> {
     return req.user
   }
 
   @NeedRole('ADMIN')
   @UseGuards(JwtAuthGuard, RoleGuard)
   @Get('validate')
-  async validate(@Req() req: AuthRequest): Output<any> {
+  async validate(@Req() req: AuthRequest): Output<unknown> {
     return req.user
   }
 }

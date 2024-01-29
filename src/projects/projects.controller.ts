@@ -1,20 +1,20 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Patch,
-  Param,
-  Delete,
-  Req,
-} from '@nestjs/common'
-import { ProjectsService } from './projects.service'
-import { CreateProjectDto } from './dto/create-project.dto'
-import { UpdateProjectDto } from './dto/update-project.dto'
-import { SearchProjectDto } from './dto/search-project.dto'
-import { ApiTags } from '@nestjs/swagger'
 import { IsPublic } from '@auth/decorators/public.decorator'
 import { AuthRequest } from '@auth/entities/request.entity'
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+  Req,
+} from '@nestjs/common'
+import { ApiTags } from '@nestjs/swagger'
+import { CreateProjectDto } from './dto/create-project.dto'
+import { SearchProjectDto } from './dto/search-project.dto'
+import { UpdateProjectDto } from './dto/update-project.dto'
+import { ProjectsService } from './projects.service'
 
 @ApiTags('projects')
 @Controller('projects')

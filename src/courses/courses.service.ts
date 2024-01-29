@@ -1,11 +1,11 @@
-import { Injectable } from '@nestjs/common'
-import { PrismaCoursesRepository } from './repositories/courses.repository.prisma'
-import { Course } from './entities/course.entity'
-import { Output } from '@interfaces/output.interface'
 import { manyIds } from '@helpers/prisma.helper'
+import { Output } from '@interfaces/output.interface'
+import { Injectable } from '@nestjs/common'
 import { CreateCourseDto } from './dto/create-course.dto'
 import { SearchCourseDto } from './dto/search-course.dto'
 import { UpdateCourseDto } from './dto/update-course.dto'
+import { Course } from './entities/course.entity'
+import { PrismaCoursesRepository } from './repositories/courses.repository.prisma'
 
 @Injectable()
 export class CoursesService {

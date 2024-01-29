@@ -1,5 +1,5 @@
-import { INestApplication } from '@nestjs/common'
 import * as dotenv from 'dotenv'
+import { INestApplication } from '@nestjs/common'
 
 dotenv.config()
 

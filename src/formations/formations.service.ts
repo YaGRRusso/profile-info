@@ -1,11 +1,11 @@
-import { Injectable } from '@nestjs/common'
-import { PrismaFormationsRepository } from './repositories/formations.repository.prisma'
-import { Formation } from './entities/formation.entity'
-import { Output } from '@interfaces/output.interface'
 import { manyIds } from '@helpers/prisma.helper'
+import { Output } from '@interfaces/output.interface'
+import { Injectable } from '@nestjs/common'
 import { CreateFormationDto } from './dto/create-formation.dto'
 import { SearchFormationDto } from './dto/search-formation.dto'
 import { UpdateFormationDto } from './dto/update-formation.dto'
+import { Formation } from './entities/formation.entity'
+import { PrismaFormationsRepository } from './repositories/formations.repository.prisma'
 
 @Injectable()
 export class FormationsService {

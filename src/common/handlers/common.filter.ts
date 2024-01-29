@@ -6,12 +6,12 @@ export class CommonFilter
   extends BaseExceptionFilter
   implements ExceptionFilter
 {
-  catch(exception: any, host: ArgumentsHost) {
+  catch(exception: Record<string, unknown>, host: ArgumentsHost) {
     const ctx = host.switchToHttp()
     const res = ctx.getResponse()
 
     console.error(exception)
-    return res.status(+exception.status || +exception.statusCode || 500).json({
+    return res.status(+exception?.status || +exception.statusCode || 500).json({
       data: null,
       error: {
         ...exception,

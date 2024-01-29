@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common'
-import { SkillsRepositoryInterface } from './skills.repository.interface'
+import { Prisma, Skill } from '@prisma/client'
 import { PrismaService } from '@prisma/prisma.service'
 import { PrismaCommonRepository } from '@repositories/common.repository.prisma'
-import { Prisma, Skill } from '@prisma/client'
+import { SkillsRepositoryInterface } from './skills.repository.interface'
 
 @Injectable()
 export class PrismaSkillsRepository

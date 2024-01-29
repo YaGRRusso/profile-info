@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common'
-import { FormationsService } from './formations.service'
 import { FormationsController } from './formations.controller'
+import { FormationsService } from './formations.service'
 import { PrismaFormationsRepository } from './repositories/formations.repository.prisma'
 
 @Module({

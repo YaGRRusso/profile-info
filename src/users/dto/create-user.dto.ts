@@ -1,4 +1,3 @@
-import { User } from '../entities/user.entity'
 import {
   IsArray,
   IsDateString,
@@ -9,6 +8,7 @@ import {
   IsStrongPassword,
   Length,
 } from 'class-validator'
+import { User } from '../entities/user.entity'
 
 export class CreateUserDto implements Partial<User> {
   @IsNotEmpty()

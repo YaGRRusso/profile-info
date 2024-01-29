@@ -1,9 +1,9 @@
 import { Injectable } from '@nestjs/common'
-import { ExperiencesRepositoryInterface } from './experiences.repository.interface'
-import { Experience } from '../entities/experience.entity'
+import { Prisma } from '@prisma/client'
 import { PrismaService } from '@prisma/prisma.service'
 import { PrismaCommonRepository } from '@repositories/common.repository.prisma'
-import { Prisma } from '@prisma/client'
+import { Experience } from '../entities/experience.entity'
+import { ExperiencesRepositoryInterface } from './experiences.repository.interface'
 
 @Injectable()
 export class PrismaExperiencesRepository

@@ -1,4 +1,4 @@
-import { Prisma, Experience } from '@prisma/client'
+import { Experience, Prisma } from '@prisma/client'
 import { CommonRepositoryInterface } from '@repositories/common.repository.interface'
 
 export interface ExperiencesRepositoryInterface

@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common'
 
 @Injectable()
 export class AppService {
-  getHello(): Record<string, any> {
+  getHello(): Record<string, unknown> {
     return {
       name: 'Profile Info',
       version: '0.0',

@@ -1,9 +1,9 @@
 import { Injectable } from '@nestjs/common'
-import { FormationsRepositoryInterface } from './formations.repository.interface'
-import { Formation } from '../entities/formation.entity'
+import { Prisma } from '@prisma/client'
 import { PrismaService } from '@prisma/prisma.service'
 import { PrismaCommonRepository } from '@repositories/common.repository.prisma'
-import { Prisma } from '@prisma/client'
+import { Formation } from '../entities/formation.entity'
+import { FormationsRepositoryInterface } from './formations.repository.interface'
 
 @Injectable()
 export class PrismaFormationsRepository
