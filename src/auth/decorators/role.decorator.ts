@@ -1,4 +1,5 @@
 import { Role as RoleInterface } from '@interfaces/role.interface'
+
 import { SetMetadata } from '@nestjs/common'
 
 export const ROLE_KEY = 'role'

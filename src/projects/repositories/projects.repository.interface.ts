@@ -1,5 +1,6 @@
-import { Prisma, Project } from '@prisma/client'
 import { CommonRepositoryInterface } from '@repositories/common.repository.interface'
+
+import { Prisma, Project } from '@prisma/client'
 
 export interface ProjectsRepositoryInterface
   extends CommonRepositoryInterface<

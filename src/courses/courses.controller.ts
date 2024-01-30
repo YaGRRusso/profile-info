@@ -1,5 +1,11 @@
+import { CoursesService } from '../courses/courses.service'
+import { CreateCourseDto } from '../courses/dto/create-course.dto'
+import { SearchCourseDto } from '../courses/dto/search-course.dto'
+import { UpdateCourseDto } from '../courses/dto/update-course.dto'
+
 import { IsPublic } from '@auth/decorators/public.decorator'
 import { AuthRequest } from '@auth/entities/request.entity'
+
 import {
   Body,
   Controller,
@@ -11,10 +17,6 @@ import {
   Req,
 } from '@nestjs/common'
 import { ApiTags } from '@nestjs/swagger'
-import { CoursesService } from '../courses/courses.service'
-import { CreateCourseDto } from '../courses/dto/create-course.dto'
-import { SearchCourseDto } from '../courses/dto/search-course.dto'
-import { UpdateCourseDto } from '../courses/dto/update-course.dto'
 
 @ApiTags('courses')
 @Controller('courses')

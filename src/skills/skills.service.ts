@@ -1,10 +1,12 @@
-import { Output } from '@interfaces/output.interface'
-import { Injectable } from '@nestjs/common'
 import { CreateSkillDto } from './dto/create-skill.dto'
 import { SearchSkillDto } from './dto/search-skill.dto'
 import { UpdateSkillDto } from './dto/update-skill.dto'
 import { Skill } from './entities/skill.entity'
 import { PrismaSkillsRepository } from './repositories/skills.repository.prisma'
+
+import { Output } from '@interfaces/output.interface'
+
+import { Injectable } from '@nestjs/common'
 
 @Injectable()
 export class SkillsService {

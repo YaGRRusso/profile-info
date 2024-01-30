@@ -1,10 +1,11 @@
+import { User } from '../../users/entities/user.entity'
+
 import {
   IsEmail,
   IsNotEmpty,
   IsString,
   IsStrongPassword,
 } from 'class-validator'
-import { User } from '../../users/entities/user.entity'
 
 export class LoginUserDto implements Partial<User> {
   @IsNotEmpty()

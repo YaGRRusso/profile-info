@@ -1,6 +1,8 @@
-import { IsPublic } from '@auth/decorators/public.decorator'
-import { Controller, Get } from '@nestjs/common'
 import { AppService } from './app.service'
+
+import { IsPublic } from '@auth/decorators/public.decorator'
+
+import { Controller, Get } from '@nestjs/common'
 
 @Controller()
 export class AppController {

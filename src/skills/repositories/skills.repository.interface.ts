@@ -1,5 +1,6 @@
-import { Prisma, Skill } from '@prisma/client'
 import { CommonRepositoryInterface } from '@repositories/common.repository.interface'
+
+import { Prisma, Skill } from '@prisma/client'
 
 export interface SkillsRepositoryInterface
   extends CommonRepositoryInterface<

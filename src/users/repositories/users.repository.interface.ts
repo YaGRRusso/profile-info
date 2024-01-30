@@ -1,5 +1,6 @@
-import { Prisma, User } from '@prisma/client'
 import { CommonRepositoryInterface } from '@repositories/common.repository.interface'
+
+import { Prisma, User } from '@prisma/client'
 
 export interface UsersRepositoryInterface
   extends CommonRepositoryInterface<

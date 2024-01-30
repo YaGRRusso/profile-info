@@ -1,5 +1,11 @@
+import { CreateFormationDto } from '../formations/dto/create-formation.dto'
+import { SearchFormationDto } from '../formations/dto/search-formation.dto'
+import { UpdateFormationDto } from '../formations/dto/update-formation.dto'
+import { FormationsService } from '../formations/formations.service'
+
 import { IsPublic } from '@auth/decorators/public.decorator'
 import { AuthRequest } from '@auth/entities/request.entity'
+
 import {
   Body,
   Controller,
@@ -11,10 +17,6 @@ import {
   Req,
 } from '@nestjs/common'
 import { ApiTags } from '@nestjs/swagger'
-import { CreateFormationDto } from '../formations/dto/create-formation.dto'
-import { SearchFormationDto } from '../formations/dto/search-formation.dto'
-import { UpdateFormationDto } from '../formations/dto/update-formation.dto'
-import { FormationsService } from '../formations/formations.service'
 
 @ApiTags('formations')
 @Controller('formations')

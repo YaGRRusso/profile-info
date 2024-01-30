@@ -1,5 +1,11 @@
+import { CreateProjectDto } from './dto/create-project.dto'
+import { SearchProjectDto } from './dto/search-project.dto'
+import { UpdateProjectDto } from './dto/update-project.dto'
+import { ProjectsService } from './projects.service'
+
 import { IsPublic } from '@auth/decorators/public.decorator'
 import { AuthRequest } from '@auth/entities/request.entity'
+
 import {
   Body,
   Controller,
@@ -11,10 +17,6 @@ import {
   Req,
 } from '@nestjs/common'
 import { ApiTags } from '@nestjs/swagger'
-import { CreateProjectDto } from './dto/create-project.dto'
-import { SearchProjectDto } from './dto/search-project.dto'
-import { UpdateProjectDto } from './dto/update-project.dto'
-import { ProjectsService } from './projects.service'
 
 @ApiTags('projects')
 @Controller('projects')

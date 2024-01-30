@@ -1,6 +1,12 @@
+import { CreateUserDto } from './dto/create-user.dto'
+import { SearchUserDto } from './dto/search-user.dto'
+import { UpdateUserDto } from './dto/update-user.dto'
+import { UsersService } from './users.service'
+
 import { IsPublic } from '@auth/decorators/public.decorator'
 import { AuthRequest } from '@auth/entities/request.entity'
 import { removeObjectKey, removeObjectsKey } from '@helpers/object.helper'
+
 import {
   Body,
   Controller,
@@ -12,10 +18,6 @@ import {
   Req,
 } from '@nestjs/common'
 import { ApiTags } from '@nestjs/swagger'
-import { CreateUserDto } from './dto/create-user.dto'
-import { SearchUserDto } from './dto/search-user.dto'
-import { UpdateUserDto } from './dto/update-user.dto'
-import { UsersService } from './users.service'
 
 @ApiTags('users')
 @Controller('users')

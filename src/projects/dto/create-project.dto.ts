@@ -1,5 +1,6 @@
-import { IsArray, IsNotEmpty, IsOptional, IsString } from 'class-validator'
 import { Project } from '../entities/project.entity'
+
+import { IsArray, IsNotEmpty, IsOptional, IsString } from 'class-validator'
 
 export class CreateProjectDto implements Partial<Project> {
   @IsNotEmpty()

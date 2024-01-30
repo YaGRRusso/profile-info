@@ -1,8 +1,10 @@
-import { Test, TestingModule } from '@nestjs/testing'
-import { PrismaService } from '@prisma/prisma.service'
 import { PrismaSkillsRepository } from './repositories/skills.repository.prisma'
 import { SkillsController } from './skills.controller'
 import { SkillsService } from './skills.service'
+
+import { PrismaService } from '@prisma/prisma.service'
+
+import { Test, TestingModule } from '@nestjs/testing'
 
 describe('SkillsController', () => {
   let controller: SkillsController

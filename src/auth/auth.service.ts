@@ -1,11 +1,13 @@
-import * as bcrypt from 'bcrypt'
+import { UserPayload } from './entities/payload.entity'
+
 import { Output } from '@interfaces/output.interface'
 import { Role } from '@interfaces/role.interface'
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common'
-import { JwtService } from '@nestjs/jwt'
 import { User } from '@src/users/entities/user.entity'
 import { UsersService } from '@src/users/users.service'
-import { UserPayload } from './entities/payload.entity'
+
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common'
+import { JwtService } from '@nestjs/jwt'
+import * as bcrypt from 'bcrypt'
 
 @Injectable()
 export class AuthService {
