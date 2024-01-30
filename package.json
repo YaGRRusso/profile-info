@@ -5,7 +5,7 @@
   "author": "YaGRRusso",
   "private": true,
   "license": "MIT",
-  "main": "dist/",
+  "main": "dist/src/",
   "engines": {
     "node": "18.19.0",
     "npm": "10.2.3"
@@ -14,7 +14,7 @@
     "build": "npx nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "dev": "npm run docker:up & npm run prisma:studio & npm run start:dev",
-    "start": "node dist/main",
+    "start": "node dist/src/main",
     "start:dev": "nest start --watch",
     "start:repl": "nest start --entryFile repl",
     "start:debug": "nest start --watch --debug",
