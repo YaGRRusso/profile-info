@@ -8,7 +8,14 @@ import { validationConfig } from '@configs/validation.config'
 import { NestFactory } from '@nestjs/core'
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule)
+  const app = await NestFactory.create(AppModule, {
+    cors: {
+      origin: [
+        /(https?:[/]{2})?localhost:\d+/,
+        'https://profile-info-panel.vercel.app',
+      ],
+    },
+  })
   swaggerConfig(app)
   validationConfig(app)
   filtersConfig(app)

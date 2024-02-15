@@ -1,5 +1,5 @@
 {
-  "name": "personal-info",
+  "name": "personal-info-api",
   "version": "0.0.1",
   "description": "",
   "author": "YaGRRusso",
@@ -7,8 +7,8 @@
   "license": "MIT",
   "main": "dist/src/",
   "engines": {
-    "node": "18.19.0",
-    "npm": "10.2.3"
+    "node": "18.x",
+    "npm": "10.x"
   },
   "scripts": {
     "build": "npx nest build",
