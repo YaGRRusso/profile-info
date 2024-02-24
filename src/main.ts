@@ -12,7 +12,7 @@ async function bootstrap() {
     cors: {
       origin: [
         /(https?:[/]{2})?localhost:\d+/,
-        'https://profile-info-panel.vercel.app',
+        /https:[/]{2}profile-info-panel.*\.vercel\.app/,
       ],
     },
   })
