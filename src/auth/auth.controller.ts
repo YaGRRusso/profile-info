@@ -16,6 +16,7 @@ import { ApiResponse } from '@nestjs/swagger'
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
+  @ApiResponse({ type: UserDto })
   @IsPublic()
   @Post()
   async login(@Body() { email, password }: LoginUserDto): Output<string> {
