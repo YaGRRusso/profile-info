@@ -1,23 +1,11 @@
-import { Project } from '../entities/project.entity'
+import { ProjectDto } from './project.dto'
 
-import { IsArray, IsNotEmpty, IsOptional, IsString } from 'class-validator'
+import { PickType } from '@nestjs/swagger'
 
-export class CreateProjectDto implements Partial<Project> {
-  @IsNotEmpty()
-  @IsString()
-  name: string
-
-  @IsString()
-  description: string
-
-  @IsString()
-  image: string
-
-  @IsString()
-  link: string
-
-  @IsOptional()
-  @IsArray()
-  @IsString({ each: true })
-  skills: string[]
-}
+export class CreateProjectDto extends PickType(ProjectDto, [
+  'name',
+  'description',
+  'image',
+  'link',
+  'skills',
+]) {}
