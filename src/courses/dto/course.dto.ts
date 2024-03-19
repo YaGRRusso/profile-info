@@ -1,7 +1,13 @@
 import { ApiProperty } from '@nestjs/swagger'
-import { IsArray, IsNotEmpty, IsOptional, IsString } from 'class-validator'
+import {
+  IsArray,
+  IsInt,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+} from 'class-validator'
 
-export class ProjectDto {
+export class CourseDto {
   @ApiProperty({ type: 'string' })
   @IsNotEmpty()
   @IsString()
@@ -13,16 +19,25 @@ export class ProjectDto {
   name: string
 
   @ApiProperty({ type: 'string' })
+  @IsNotEmpty()
+  @IsString()
+  school: string
+
+  @ApiProperty({ type: 'string' })
   @IsString()
   description: string
 
   @ApiProperty({ type: 'string' })
   @IsString()
-  image: string
+  status: string
 
   @ApiProperty({ type: 'string' })
   @IsString()
-  link: string
+  certificate: string
+
+  @ApiProperty({ type: 'number' })
+  @IsInt()
+  hours: number
 
   @ApiProperty({ type: 'string', isArray: true })
   @IsOptional()

@@ -1,12 +1,10 @@
 import { CoursesRepositoryInterface } from './courses.repository.interface'
 
-import { Course } from '../entities/course.entity'
-
 import { PrismaService } from '@prisma/prisma.service'
 import { PrismaCommonRepository } from '@repositories/common.repository.prisma'
 
 import { Injectable } from '@nestjs/common'
-import { Prisma } from '@prisma/client'
+import { Course, Prisma } from '@prisma/client'
 
 @Injectable()
 export class PrismaCoursesRepository

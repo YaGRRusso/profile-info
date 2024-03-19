@@ -1,34 +1,13 @@
-import {
-  IsArray,
-  IsInt,
-  IsNotEmpty,
-  IsOptional,
-  IsString,
-} from 'class-validator'
+import { CourseDto } from './course.dto'
 
-export class CreateCourseDto {
-  @IsNotEmpty()
-  @IsString()
-  name: string
+import { PickType } from '@nestjs/swagger'
 
-  @IsNotEmpty()
-  @IsString()
-  school: string
-
-  @IsString()
-  description: string
-
-  @IsString()
-  status: string
-
-  @IsString()
-  certificate: string
-
-  @IsInt()
-  hours: number
-
-  @IsOptional()
-  @IsArray()
-  @IsString({ each: true })
-  skills: string[]
-}
+export class CreateCourseDto extends PickType(CourseDto, [
+  'name',
+  'school',
+  'description',
+  'status',
+  'certificate',
+  'hours',
+  'skills',
+]) {}

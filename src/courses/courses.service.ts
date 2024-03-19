@@ -1,7 +1,7 @@
+import { CourseDto } from './dto/course.dto'
 import { CreateCourseDto } from './dto/create-course.dto'
 import { SearchCourseDto } from './dto/search-course.dto'
 import { UpdateCourseDto } from './dto/update-course.dto'
-import { Course } from './entities/course.entity'
 import { PrismaCoursesRepository } from './repositories/courses.repository.prisma'
 
 import { manyIds } from '@helpers/prisma.helper'
@@ -13,15 +13,15 @@ import { Injectable } from '@nestjs/common'
 export class CoursesService {
   constructor(private repository: PrismaCoursesRepository) {}
 
-  findAll(): Output<Course[]> {
+  findAll(): Output<CourseDto[]> {
     return this.repository.findAll()
   }
 
-  findOne(id: string): Output<Course> {
+  findOne(id: string): Output<CourseDto> {
     return this.repository.findOne({ where: { id } })
   }
 
-  searchAll(searchCourseDto: SearchCourseDto): Output<Course[]> {
+  searchAll(searchCourseDto: SearchCourseDto): Output<CourseDto[]> {
     return this.repository.findAll({
       where: {
         ...searchCourseDto,
@@ -35,7 +35,7 @@ export class CoursesService {
   create(
     userId: string,
     { skills, ...createCourseDto }: CreateCourseDto,
-  ): Output<Course> {
+  ): Output<CourseDto> {
     return this.repository.create({
       data: {
         userId,
@@ -51,7 +51,7 @@ export class CoursesService {
     userId: string,
     id: string,
     updateCourseDto: UpdateCourseDto,
-  ): Output<Course> {
+  ): Output<CourseDto> {
     return this.repository.update({
       where: { id, userId },
       data: {
@@ -63,7 +63,7 @@ export class CoursesService {
     })
   }
 
-  addSkills(userId: string, id: string, skills: string[]): Output<Course> {
+  addSkills(userId: string, id: string, skills: string[]): Output<CourseDto> {
     return this.repository.update({
       where: { userId, id },
       include: { Skills: true },
@@ -73,7 +73,11 @@ export class CoursesService {
     })
   }
 
-  removeSkills(userId: string, id: string, skills: string[]): Output<Course> {
+  removeSkills(
+    userId: string,
+    id: string,
+    skills: string[],
+  ): Output<CourseDto> {
     return this.repository.update({
       where: { userId, id },
       include: { Skills: true },
@@ -83,7 +87,7 @@ export class CoursesService {
     })
   }
 
-  remove(userId: string, id: string): Output<Course> {
+  remove(userId: string, id: string): Output<CourseDto> {
     return this.repository.remove({ where: { userId, id } })
   }
 }
