@@ -1,7 +1,7 @@
 import { CreateFormationDto } from './dto/create-formation.dto'
+import { FormationDto } from './dto/formation.dto'
 import { SearchFormationDto } from './dto/search-formation.dto'
 import { UpdateFormationDto } from './dto/update-formation.dto'
-import { Formation } from './entities/formation.entity'
 import { PrismaFormationsRepository } from './repositories/formations.repository.prisma'
 
 import { manyIds } from '@helpers/prisma.helper'
@@ -13,15 +13,15 @@ import { Injectable } from '@nestjs/common'
 export class FormationsService {
   constructor(private repository: PrismaFormationsRepository) {}
 
-  findAll(): Output<Formation[]> {
+  findAll(): Output<FormationDto[]> {
     return this.repository.findAll()
   }
 
-  findOne(id: string): Output<Formation> {
+  findOne(id: string): Output<FormationDto> {
     return this.repository.findOne({ where: { id } })
   }
 
-  searchAll(searchFormationDto: SearchFormationDto): Output<Formation[]> {
+  searchAll(searchFormationDto: SearchFormationDto): Output<FormationDto[]> {
     return this.repository.findAll({
       where: {
         ...searchFormationDto,
@@ -35,7 +35,7 @@ export class FormationsService {
   create(
     userId: string,
     { skills, ...createFormationDto }: CreateFormationDto,
-  ): Output<Formation> {
+  ): Output<FormationDto> {
     return this.repository.create({
       data: {
         userId,
@@ -51,7 +51,7 @@ export class FormationsService {
     userId: string,
     id: string,
     updateFormationDto: UpdateFormationDto,
-  ): Output<Formation> {
+  ): Output<FormationDto> {
     return this.repository.update({
       where: { id, userId },
       data: {
@@ -63,7 +63,11 @@ export class FormationsService {
     })
   }
 
-  addSkills(userId: string, id: string, skills: string[]): Output<Formation> {
+  addSkills(
+    userId: string,
+    id: string,
+    skills: string[],
+  ): Output<FormationDto> {
     return this.repository.update({
       where: { userId, id },
       include: { Skills: true },
@@ -77,7 +81,7 @@ export class FormationsService {
     userId: string,
     id: string,
     skills: string[],
-  ): Output<Formation> {
+  ): Output<FormationDto> {
     return this.repository.update({
       where: { userId, id },
       include: { Skills: true },
@@ -87,7 +91,7 @@ export class FormationsService {
     })
   }
 
-  remove(userId: string, id: string): Output<Formation> {
+  remove(userId: string, id: string): Output<FormationDto> {
     return this.repository.remove({ where: { userId, id } })
   }
 }

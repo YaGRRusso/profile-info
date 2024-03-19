@@ -1,38 +1,14 @@
-import {
-  IsArray,
-  IsDateString,
-  IsNotEmpty,
-  IsOptional,
-  IsString,
-} from 'class-validator'
+import { FormationDto } from './formation.dto'
 
-export class CreateFormationDto {
-  @IsNotEmpty()
-  @IsString()
-  name: string
+import { PickType } from '@nestjs/swagger'
 
-  @IsNotEmpty()
-  @IsString()
-  school: string
-
-  @IsString()
-  description: string
-
-  @IsString()
-  status: string
-
-  @IsString()
-  certificate: string
-
-  @IsDateString()
-  start: string
-
-  @IsOptional()
-  @IsDateString()
-  end?: string
-
-  @IsOptional()
-  @IsArray()
-  @IsString({ each: true })
-  skills: string[]
-}
+export class CreateFormationDto extends PickType(FormationDto, [
+  'name',
+  'school',
+  'description',
+  'status',
+  'certificate',
+  'start',
+  'end',
+  'skills',
+]) {}
