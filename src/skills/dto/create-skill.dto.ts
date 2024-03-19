@@ -1,14 +1,5 @@
-import { Skill, SkillCategoryEnum } from '../entities/skill.entity'
+import { SkillDto } from './skill.dto'
 
-import { IsEnum, IsNotEmpty, IsString } from 'class-validator'
+import { PickType } from '@nestjs/swagger'
 
-export class CreateSkillDto implements Partial<Skill> {
-  @IsNotEmpty()
-  @IsString()
-  name: string
-
-  @IsNotEmpty()
-  @IsString()
-  @IsEnum(SkillCategoryEnum)
-  category: SkillCategoryEnum
-}
+export class CreateSkillDto extends PickType(SkillDto, ['name', 'category']) {}
