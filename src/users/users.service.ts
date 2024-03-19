@@ -1,7 +1,7 @@
 import { CreateUserDto } from './dto/create-user.dto'
 import { SearchUserDto } from './dto/search-user.dto'
 import { UpdateUserDto } from './dto/update-user.dto'
-import { User } from './entities/user.entity'
+import { UserDto } from './dto/user.dto'
 import { PrismaUsersRepository } from './repositories/users.repository.prisma'
 
 import { manyIds } from '@helpers/prisma.helper'
@@ -14,15 +14,15 @@ import * as bcrypt from 'bcrypt'
 export class UsersService {
   constructor(private repository: PrismaUsersRepository) {}
 
-  async findAll(): Output<User[]> {
+  async findAll(): Output<UserDto[]> {
     return await this.repository.findAll()
   }
 
-  async findOne(id: string): Output<User> {
+  async findOne(id: string): Output<UserDto> {
     return await this.repository.findOne({ where: { id } })
   }
 
-  async searchAll(searchUserDto: SearchUserDto): Output<User[]> {
+  async searchAll(searchUserDto: SearchUserDto): Output<UserDto[]> {
     return await this.repository.findAll({
       where: {
         ...searchUserDto,
@@ -37,7 +37,7 @@ export class UsersService {
     password,
     skills,
     ...createUserDto
-  }: CreateUserDto): Output<User> {
+  }: CreateUserDto): Output<UserDto> {
     const hash = await bcrypt.hash(password, 8)
     return await this.repository.create({
       data: {
@@ -54,7 +54,7 @@ export class UsersService {
   async update(
     id: string,
     { skills, ...updateUserDto }: UpdateUserDto,
-  ): Output<User> {
+  ): Output<UserDto> {
     return await this.repository.update({
       where: { id },
       data: {
@@ -66,7 +66,7 @@ export class UsersService {
     })
   }
 
-  addSkills(id: string, skills: string[]): Output<User> {
+  addSkills(id: string, skills: string[]): Output<UserDto> {
     return this.repository.update({
       where: { id },
       include: { Skills: true },
@@ -76,7 +76,7 @@ export class UsersService {
     })
   }
 
-  removeSkills(id: string, skills: string[]): Output<User> {
+  removeSkills(id: string, skills: string[]): Output<UserDto> {
     return this.repository.update({
       where: { id },
       include: { Skills: true },
@@ -86,7 +86,7 @@ export class UsersService {
     })
   }
 
-  async remove(id: string): Output<User> {
+  async remove(id: string): Output<UserDto> {
     return await this.repository.remove({ where: { id } })
   }
 }

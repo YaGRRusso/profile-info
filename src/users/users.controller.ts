@@ -1,6 +1,7 @@
 import { CreateUserDto } from './dto/create-user.dto'
 import { SearchUserDto } from './dto/search-user.dto'
 import { UpdateUserDto } from './dto/update-user.dto'
+import { UserDto } from './dto/user.dto'
 import { UsersService } from './users.service'
 
 import { IsPublic } from '@auth/decorators/public.decorator'
@@ -17,25 +18,28 @@ import {
   Post,
   Req,
 } from '@nestjs/common'
-import { ApiTags } from '@nestjs/swagger'
+import { ApiResponse, ApiTags } from '@nestjs/swagger'
 
 @ApiTags('users')
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
+  @ApiResponse({ type: UserDto, isArray: true })
   @IsPublic()
   @Get()
   async findAll() {
     return removeObjectsKey(await this.usersService.findAll(), 'password')
   }
 
+  @ApiResponse({ type: UserDto })
   @IsPublic()
   @Get(':id')
   async findOne(@Param('id') id: string) {
     return removeObjectKey(await this.usersService.findOne(id), 'password')
   }
 
+  @ApiResponse({ type: UserDto, isArray: true })
   @IsPublic()
   @Get('search')
   async searchAll(@Body() searchUserDto: SearchUserDto) {
@@ -45,6 +49,7 @@ export class UsersController {
     )
   }
 
+  @ApiResponse({ type: UserDto })
   @IsPublic()
   @Post()
   async create(@Body() createUserDto: CreateUserDto) {
@@ -54,6 +59,7 @@ export class UsersController {
     )
   }
 
+  @ApiResponse({ type: UserDto })
   @Patch('me')
   async update(@Req() req: AuthRequest, @Body() updateUserDto: UpdateUserDto) {
     return removeObjectKey(
@@ -62,16 +68,19 @@ export class UsersController {
     )
   }
 
+  @ApiResponse({ type: UserDto })
   @Patch('me/skills/add')
   addSkills(@Req() req: AuthRequest, @Body() { skills }: UpdateUserDto) {
     return this.usersService.addSkills(req.user.id, skills)
   }
 
+  @ApiResponse({ type: UserDto })
   @Patch('me/skills/remove')
   removeSkills(@Req() req: AuthRequest, @Body() { skills }: UpdateUserDto) {
     return this.usersService.removeSkills(req.user.id, skills)
   }
 
+  @ApiResponse({ type: UserDto })
   @Delete('me')
   async remove(@Req() req: AuthRequest) {
     return removeObjectKey(

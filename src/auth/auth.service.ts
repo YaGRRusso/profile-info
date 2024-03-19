@@ -2,7 +2,7 @@ import { UserPayload } from './entities/payload.entity'
 
 import { Output } from '@interfaces/output.interface'
 import { Role } from '@interfaces/role.interface'
-import { User } from '@src/users/entities/user.entity'
+import { UserDto } from '@src/users/dto/user.dto'
 import { UsersService } from '@src/users/users.service'
 
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common'
@@ -29,7 +29,7 @@ export class AuthService {
     return this.jwtService.sign(payload)
   }
 
-  async validate(email: string, password: string): Output<User> {
+  async validate(email: string, password: string): Output<UserDto> {
     const res = await this.usersService.searchAll({ email })
     const user = res[0]
 
