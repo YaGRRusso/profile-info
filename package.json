@@ -12,6 +12,7 @@
   },
   "scripts": {
     "build": "npx nest build",
+    "sdk": "openapi-generator-cli generate",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "dev": "npm run docker:up & npm run prisma:studio & npm run start:dev",
     "start": "node dist/src/main",
