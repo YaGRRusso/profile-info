@@ -1,7 +1,7 @@
 import { CreateExperienceDto } from './dto/create-experience.dto'
+import { ExperienceDto } from './dto/experience.dto'
 import { SearchExperienceDto } from './dto/search-experience.dto'
 import { UpdateExperienceDto } from './dto/update-experience.dto'
-import { Experience } from './entities/experience.entity'
 import { PrismaExperiencesRepository } from './repositories/experiences.repository.prisma'
 
 import { manyIds } from '@helpers/prisma.helper'
@@ -13,15 +13,15 @@ import { Injectable } from '@nestjs/common'
 export class ExperiencesService {
   constructor(private repository: PrismaExperiencesRepository) {}
 
-  findAll(): Output<Experience[]> {
+  findAll(): Output<ExperienceDto[]> {
     return this.repository.findAll()
   }
 
-  findOne(id: string): Output<Experience> {
+  findOne(id: string): Output<ExperienceDto> {
     return this.repository.findOne({ where: { id } })
   }
 
-  searchAll(searchExperienceDto: SearchExperienceDto): Output<Experience[]> {
+  searchAll(searchExperienceDto: SearchExperienceDto): Output<ExperienceDto[]> {
     return this.repository.findAll({
       where: {
         ...searchExperienceDto,
@@ -35,7 +35,7 @@ export class ExperiencesService {
   create(
     userId: string,
     { skills, ...createExperienceDto }: CreateExperienceDto,
-  ): Output<Experience> {
+  ): Output<ExperienceDto> {
     return this.repository.create({
       data: {
         userId,
@@ -51,7 +51,7 @@ export class ExperiencesService {
     userId: string,
     id: string,
     updateExperienceDto: UpdateExperienceDto,
-  ): Output<Experience> {
+  ): Output<ExperienceDto> {
     return this.repository.update({
       where: { id, userId },
       data: {
@@ -63,7 +63,11 @@ export class ExperiencesService {
     })
   }
 
-  addSkills(userId: string, id: string, skills: string[]): Output<Experience> {
+  addSkills(
+    userId: string,
+    id: string,
+    skills: string[],
+  ): Output<ExperienceDto> {
     return this.repository.update({
       where: { userId, id },
       include: { Skills: true },
@@ -77,7 +81,7 @@ export class ExperiencesService {
     userId: string,
     id: string,
     skills: string[],
-  ): Output<Experience> {
+  ): Output<ExperienceDto> {
     return this.repository.update({
       where: { userId, id },
       include: { Skills: true },
@@ -87,7 +91,7 @@ export class ExperiencesService {
     })
   }
 
-  remove(userId: string, id: string): Output<Experience> {
+  remove(userId: string, id: string): Output<ExperienceDto> {
     return this.repository.remove({ where: { userId, id } })
   }
 }
