@@ -7,8 +7,10 @@ import { JwtAuthGuard } from './guards/jwt.guard'
 import { RoleGuard } from './guards/role.guard'
 
 import { Output } from '@interfaces/output.interface'
+import { UserDto } from '@src/users/dto/user.dto'
 
 import { Body, Controller, Get, Post, Req, UseGuards } from '@nestjs/common'
+import { ApiResponse } from '@nestjs/swagger'
 
 @Controller('auth')
 export class AuthController {
@@ -20,11 +22,13 @@ export class AuthController {
     return await this.authService.login(email, password)
   }
 
+  @ApiResponse({ type: UserDto })
   @Get('me')
   async me(@Req() req: AuthRequest): Output<unknown> {
     return req.user
   }
 
+  @ApiResponse({ type: UserDto })
   @NeedRole('ADMIN')
   @UseGuards(JwtAuthGuard, RoleGuard)
   @Get('validate')
