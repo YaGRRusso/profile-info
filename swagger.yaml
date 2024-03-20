@@ -436,7 +436,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/'
+                $ref: '#/components/schemas/MeDto'
       tags:
         - auth
   /auth/me:
