@@ -436,7 +436,9 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UserDto'
+                $ref: '#/components/schemas/MeDto'
+      tags:
+        - auth
   /auth/me:
     get:
       operationId: AuthController_me
@@ -447,7 +449,9 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UserDto'
+                $ref: '#/components/schemas/MeDto'
+      tags:
+        - auth
   /auth/validate:
     get:
       operationId: AuthController_validate
@@ -458,7 +462,9 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UserDto'
+                $ref: '#/components/schemas/MeDto'
+      tags:
+        - auth
   /formations:
     get:
       operationId: FormationsController_findAll
@@ -1315,6 +1321,28 @@ components:
       required:
         - email
         - password
+    MeDto:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        email:
+          type: string
+        role:
+          type: string
+          enum:
+            - USER
+            - ADMIN
+          example:
+            - USER
+            - ADMIN
+      required:
+        - id
+        - name
+        - email
+        - role
     FormationDto:
       type: object
       properties:
