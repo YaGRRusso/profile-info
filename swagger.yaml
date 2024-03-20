@@ -436,7 +436,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/MeDto'
+                $ref: '#/components/schemas/'
       tags:
         - auth
   /auth/me:
@@ -1025,7 +1025,6 @@ components:
         - postal
         - presentation
         - title
-        - skills
         - role
         - createdAt
         - updatedAt
@@ -1104,7 +1103,6 @@ components:
         - postal
         - presentation
         - title
-        - skills
     UpdateUserDto:
       type: object
       properties:
@@ -1256,7 +1254,6 @@ components:
         - description
         - image
         - link
-        - skills
         - createdAt
         - updatedAt
         - userId
@@ -1295,7 +1292,6 @@ components:
         - description
         - image
         - link
-        - skills
     UpdateProjectDto:
       type: object
       properties:
@@ -1380,8 +1376,6 @@ components:
         - status
         - certificate
         - start
-        - end
-        - skills
         - createdAt
         - updatedAt
         - userId
@@ -1434,8 +1428,6 @@ components:
         - status
         - certificate
         - start
-        - end
-        - skills
     UpdateFormationDto:
       type: object
       properties:
@@ -1492,7 +1484,6 @@ components:
         - status
         - certificate
         - hours
-        - skills
         - createdAt
         - updatedAt
         - userId
@@ -1541,7 +1532,6 @@ components:
         - status
         - certificate
         - hours
-        - skills
     UpdateCourseDto:
       type: object
       properties:
@@ -1592,8 +1582,6 @@ components:
         - organization
         - description
         - start
-        - end
-        - skills
         - createdAt
         - updatedAt
         - userId
@@ -1636,8 +1624,6 @@ components:
         - organization
         - description
         - start
-        - end
-        - skills
     UpdateExperienceDto:
       type: object
       properties:
