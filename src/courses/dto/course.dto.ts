@@ -39,7 +39,7 @@ export class CourseDto {
   @IsInt()
   hours: number
 
-  @ApiProperty({ type: 'string', isArray: true })
+  @ApiProperty({ type: 'string', isArray: true, required: false })
   @IsOptional()
   @IsArray()
   @IsString({ each: true })

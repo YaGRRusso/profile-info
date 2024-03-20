@@ -31,12 +31,12 @@ export class ExperienceDto {
   @IsDateString()
   start: Date
 
-  @ApiProperty({ type: 'string' })
+  @ApiProperty({ type: 'string', required: false })
   @IsOptional()
   @IsDateString()
   end?: Date
 
-  @ApiProperty({ type: 'string', isArray: true })
+  @ApiProperty({ type: 'string', isArray: true, required: false })
   @IsOptional()
   @IsArray()
   @IsString({ each: true })

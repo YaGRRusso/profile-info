@@ -1,0 +1,1643 @@
+openapi: 3.0.0
+paths:
+  /:
+    get:
+      operationId: AppController_getHello
+      parameters: []
+      responses:
+        '200':
+          description: ''
+  /users:
+    get:
+      operationId: UsersController_findAll
+      parameters: []
+      responses:
+        default:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/UserDto'
+      tags:
+        - users
+    post:
+      operationId: UsersController_create
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateUserDto'
+      responses:
+        default:
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserDto'
+      tags:
+        - users
+  /users/{id}:
+    get:
+      operationId: UsersController_findOne
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        default:
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserDto'
+      tags:
+        - users
+  /users/search:
+    get:
+      operationId: UsersController_searchAll
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SearchUserDto'
+      responses:
+        default:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/UserDto'
+      tags:
+        - users
+  /users/me:
+    patch:
+      operationId: UsersController_update
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateUserDto'
+      responses:
+        default:
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserDto'
+      tags:
+        - users
+    delete:
+      operationId: UsersController_remove
+      parameters: []
+      responses:
+        default:
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserDto'
+      tags:
+        - users
+  /users/me/skills/add:
+    patch:
+      operationId: UsersController_addSkills
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateUserDto'
+      responses:
+        default:
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserDto'
+      tags:
+        - users
+  /users/me/skills/remove:
+    patch:
+      operationId: UsersController_removeSkills
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateUserDto'
+      responses:
+        default:
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserDto'
+      tags:
+        - users
+  /skills:
+    get:
+      operationId: SkillsController_findAll
+      parameters: []
+      responses:
+        default:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SkillDto'
+      tags:
+        - skills
+    post:
+      operationId: SkillsController_create
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateSkillDto'
+      responses:
+        default:
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SkillDto'
+      tags:
+        - skills
+  /skills/{id}:
+    get:
+      operationId: SkillsController_findOne
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        default:
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SkillDto'
+      tags:
+        - skills
+    patch:
+      operationId: SkillsController_update
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateSkillDto'
+      responses:
+        default:
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SkillDto'
+      tags:
+        - skills
+    delete:
+      operationId: SkillsController_remove
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        default:
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SkillDto'
+      tags:
+        - skills
+  /skills/search:
+    get:
+      operationId: SkillsController_searchAll
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SearchSkillDto'
+      responses:
+        default:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SkillDto'
+      tags:
+        - skills
+  /projects:
+    get:
+      operationId: ProjectsController_findAll
+      parameters: []
+      responses:
+        default:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ProjectDto'
+      tags:
+        - projects
+    post:
+      operationId: ProjectsController_create
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateProjectDto'
+      responses:
+        default:
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProjectDto'
+      tags:
+        - projects
+  /projects/{id}:
+    get:
+      operationId: ProjectsController_findOne
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        default:
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProjectDto'
+      tags:
+        - projects
+    patch:
+      operationId: ProjectsController_update
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateProjectDto'
+      responses:
+        default:
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProjectDto'
+      tags:
+        - projects
+    delete:
+      operationId: ProjectsController_remove
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        default:
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProjectDto'
+      tags:
+        - projects
+  /projects/search:
+    get:
+      operationId: ProjectsController_searchAll
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SearchProjectDto'
+      responses:
+        default:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ProjectDto'
+      tags:
+        - projects
+  /projects/{id}/skills/add:
+    patch:
+      operationId: ProjectsController_addSkills
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateProjectDto'
+      responses:
+        default:
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProjectDto'
+      tags:
+        - projects
+  /projects/{id}/skills/remove:
+    patch:
+      operationId: ProjectsController_removeSkills
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateProjectDto'
+      responses:
+        default:
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProjectDto'
+      tags:
+        - projects
+  /auth:
+    post:
+      operationId: AuthController_login
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginUserDto'
+      responses:
+        default:
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MeDto'
+      tags:
+        - auth
+  /auth/me:
+    get:
+      operationId: AuthController_me
+      parameters: []
+      responses:
+        default:
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MeDto'
+      tags:
+        - auth
+  /auth/validate:
+    get:
+      operationId: AuthController_validate
+      parameters: []
+      responses:
+        default:
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MeDto'
+      tags:
+        - auth
+  /formations:
+    get:
+      operationId: FormationsController_findAll
+      parameters: []
+      responses:
+        default:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/FormationDto'
+      tags:
+        - formations
+    post:
+      operationId: FormationsController_create
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateFormationDto'
+      responses:
+        default:
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FormationDto'
+      tags:
+        - formations
+  /formations/{id}:
+    get:
+      operationId: FormationsController_findOne
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        default:
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FormationDto'
+      tags:
+        - formations
+    patch:
+      operationId: FormationsController_update
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateFormationDto'
+      responses:
+        default:
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FormationDto'
+      tags:
+        - formations
+    delete:
+      operationId: FormationsController_remove
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        default:
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FormationDto'
+      tags:
+        - formations
+  /formations/search:
+    get:
+      operationId: FormationsController_searchAll
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SearchFormationDto'
+      responses:
+        default:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/FormationDto'
+      tags:
+        - formations
+  /formations/{id}/skills/add:
+    patch:
+      operationId: FormationsController_addSkills
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateFormationDto'
+      responses:
+        default:
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FormationDto'
+      tags:
+        - formations
+  /formations/{id}/skills/remove:
+    patch:
+      operationId: FormationsController_removeSkills
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateFormationDto'
+      responses:
+        default:
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FormationDto'
+      tags:
+        - formations
+  /courses:
+    get:
+      operationId: CoursesController_findAll
+      parameters: []
+      responses:
+        default:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CourseDto'
+      tags:
+        - courses
+    post:
+      operationId: CoursesController_create
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateCourseDto'
+      responses:
+        default:
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CourseDto'
+      tags:
+        - courses
+  /courses/{id}:
+    get:
+      operationId: CoursesController_findOne
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        default:
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CourseDto'
+      tags:
+        - courses
+    patch:
+      operationId: CoursesController_update
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateCourseDto'
+      responses:
+        default:
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CourseDto'
+      tags:
+        - courses
+    delete:
+      operationId: CoursesController_remove
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        default:
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CourseDto'
+      tags:
+        - courses
+  /courses/search:
+    get:
+      operationId: CoursesController_searchAll
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SearchCourseDto'
+      responses:
+        default:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CourseDto'
+      tags:
+        - courses
+  /courses/{id}/skills/add:
+    patch:
+      operationId: CoursesController_addSkills
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateCourseDto'
+      responses:
+        default:
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CourseDto'
+      tags:
+        - courses
+  /courses/{id}/skills/remove:
+    patch:
+      operationId: CoursesController_removeSkills
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateCourseDto'
+      responses:
+        default:
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CourseDto'
+      tags:
+        - courses
+  /experiences:
+    get:
+      operationId: ExperiencesController_findAll
+      parameters: []
+      responses:
+        default:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ExperienceDto'
+      tags:
+        - experiences
+    post:
+      operationId: ExperiencesController_create
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateExperienceDto'
+      responses:
+        default:
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExperienceDto'
+      tags:
+        - experiences
+  /experiences/{id}:
+    get:
+      operationId: ExperiencesController_findOne
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        default:
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExperienceDto'
+      tags:
+        - experiences
+    patch:
+      operationId: ExperiencesController_update
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateExperienceDto'
+      responses:
+        default:
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExperienceDto'
+      tags:
+        - experiences
+    delete:
+      operationId: ExperiencesController_remove
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        default:
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExperienceDto'
+      tags:
+        - experiences
+  /experiences/search:
+    get:
+      operationId: ExperiencesController_searchAll
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SearchExperienceDto'
+      responses:
+        default:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ExperienceDto'
+      tags:
+        - experiences
+  /experiences/{id}/skills/add:
+    patch:
+      operationId: ExperiencesController_addSkills
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateExperienceDto'
+      responses:
+        default:
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExperienceDto'
+      tags:
+        - experiences
+  /experiences/{id}/skills/remove:
+    patch:
+      operationId: ExperiencesController_removeSkills
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateExperienceDto'
+      responses:
+        default:
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExperienceDto'
+      tags:
+        - experiences
+info:
+  title: Profile Info
+  description: Api de informações pessoais feita em NestJS com Prisma
+  version: '1.0'
+  contact: {}
+tags:
+  - name: users
+    description: ''
+  - name: skills
+    description: ''
+  - name: projects
+    description: ''
+  - name: formations
+    description: ''
+  - name: courses
+    description: ''
+  - name: experiences
+    description: ''
+servers: []
+components:
+  schemas:
+    UserDto:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        birth:
+          type: string
+        description:
+          type: string
+        email:
+          type: string
+        password:
+          type: string
+        nickname:
+          type: string
+        phone:
+          type: string
+        picture:
+          type: string
+        address:
+          type: string
+        postal:
+          type: string
+        presentation:
+          type: string
+        title:
+          type: string
+        skills:
+          type: array
+          items:
+            type: string
+        role:
+          type: string
+          enum:
+            - USER
+            - ADMIN
+          example:
+            - USER
+            - ADMIN
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+      required:
+        - id
+        - name
+        - birth
+        - description
+        - email
+        - password
+        - nickname
+        - phone
+        - picture
+        - address
+        - postal
+        - presentation
+        - title
+        - role
+        - createdAt
+        - updatedAt
+    SearchUserDto:
+      type: object
+      properties:
+        name:
+          type: string
+        birth:
+          type: string
+        description:
+          type: string
+        email:
+          type: string
+        password:
+          type: string
+        nickname:
+          type: string
+        phone:
+          type: string
+        picture:
+          type: string
+        address:
+          type: string
+        postal:
+          type: string
+        presentation:
+          type: string
+        title:
+          type: string
+        skills:
+          type: array
+          items:
+            type: string
+    CreateUserDto:
+      type: object
+      properties:
+        name:
+          type: string
+        birth:
+          type: string
+        description:
+          type: string
+        email:
+          type: string
+        password:
+          type: string
+        nickname:
+          type: string
+        phone:
+          type: string
+        picture:
+          type: string
+        address:
+          type: string
+        postal:
+          type: string
+        presentation:
+          type: string
+        title:
+          type: string
+        skills:
+          type: array
+          items:
+            type: string
+      required:
+        - name
+        - birth
+        - description
+        - email
+        - password
+        - nickname
+        - phone
+        - picture
+        - address
+        - postal
+        - presentation
+        - title
+    UpdateUserDto:
+      type: object
+      properties:
+        name:
+          type: string
+        birth:
+          type: string
+        description:
+          type: string
+        email:
+          type: string
+        password:
+          type: string
+        nickname:
+          type: string
+        phone:
+          type: string
+        picture:
+          type: string
+        address:
+          type: string
+        postal:
+          type: string
+        presentation:
+          type: string
+        title:
+          type: string
+        skills:
+          type: array
+          items:
+            type: string
+    SkillDto:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        category:
+          type: string
+          enum:
+            - LANGUAGE
+            - LIBRARY
+            - TOOL
+            - SYSTEM
+            - OTHER
+          example:
+            - LANGUAGE
+            - LIBRARY
+            - TOOL
+            - SYSTEM
+            - OTHER
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+      required:
+        - id
+        - name
+        - category
+        - createdAt
+        - updatedAt
+    SearchSkillDto:
+      type: object
+      properties:
+        name:
+          type: string
+        category:
+          type: string
+          enum:
+            - LANGUAGE
+            - LIBRARY
+            - TOOL
+            - SYSTEM
+            - OTHER
+          example:
+            - LANGUAGE
+            - LIBRARY
+            - TOOL
+            - SYSTEM
+            - OTHER
+    CreateSkillDto:
+      type: object
+      properties:
+        name:
+          type: string
+        category:
+          type: string
+          enum:
+            - LANGUAGE
+            - LIBRARY
+            - TOOL
+            - SYSTEM
+            - OTHER
+          example:
+            - LANGUAGE
+            - LIBRARY
+            - TOOL
+            - SYSTEM
+            - OTHER
+      required:
+        - name
+        - category
+    UpdateSkillDto:
+      type: object
+      properties:
+        name:
+          type: string
+        category:
+          type: string
+          enum:
+            - LANGUAGE
+            - LIBRARY
+            - TOOL
+            - SYSTEM
+            - OTHER
+          example:
+            - LANGUAGE
+            - LIBRARY
+            - TOOL
+            - SYSTEM
+            - OTHER
+    ProjectDto:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+        image:
+          type: string
+        link:
+          type: string
+        skills:
+          type: array
+          items:
+            type: string
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+        userId:
+          type: string
+      required:
+        - id
+        - name
+        - description
+        - image
+        - link
+        - createdAt
+        - updatedAt
+        - userId
+    SearchProjectDto:
+      type: object
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        image:
+          type: string
+        link:
+          type: string
+        skills:
+          type: array
+          items:
+            type: string
+    CreateProjectDto:
+      type: object
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        image:
+          type: string
+        link:
+          type: string
+        skills:
+          type: array
+          items:
+            type: string
+      required:
+        - name
+        - description
+        - image
+        - link
+    UpdateProjectDto:
+      type: object
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        image:
+          type: string
+        link:
+          type: string
+        skills:
+          type: array
+          items:
+            type: string
+    LoginUserDto:
+      type: object
+      properties:
+        email:
+          type: string
+        password:
+          type: string
+      required:
+        - email
+        - password
+    MeDto:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        email:
+          type: string
+        role:
+          type: string
+          enum:
+            - USER
+            - ADMIN
+          example:
+            - USER
+            - ADMIN
+      required:
+        - id
+        - name
+        - email
+        - role
+    FormationDto:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        school:
+          type: string
+        description:
+          type: string
+        status:
+          type: string
+        certificate:
+          type: string
+        start:
+          type: string
+        end:
+          type: string
+        skills:
+          type: array
+          items:
+            type: string
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+        userId:
+          type: string
+      required:
+        - id
+        - name
+        - school
+        - description
+        - status
+        - certificate
+        - start
+        - createdAt
+        - updatedAt
+        - userId
+    SearchFormationDto:
+      type: object
+      properties:
+        name:
+          type: string
+        school:
+          type: string
+        description:
+          type: string
+        status:
+          type: string
+        certificate:
+          type: string
+        start:
+          type: string
+        end:
+          type: string
+        skills:
+          type: array
+          items:
+            type: string
+    CreateFormationDto:
+      type: object
+      properties:
+        name:
+          type: string
+        school:
+          type: string
+        description:
+          type: string
+        status:
+          type: string
+        certificate:
+          type: string
+        start:
+          type: string
+        end:
+          type: string
+        skills:
+          type: array
+          items:
+            type: string
+      required:
+        - name
+        - school
+        - description
+        - status
+        - certificate
+        - start
+    UpdateFormationDto:
+      type: object
+      properties:
+        name:
+          type: string
+        school:
+          type: string
+        description:
+          type: string
+        status:
+          type: string
+        certificate:
+          type: string
+        start:
+          type: string
+        end:
+          type: string
+        skills:
+          type: array
+          items:
+            type: string
+    CourseDto:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        school:
+          type: string
+        description:
+          type: string
+        status:
+          type: string
+        certificate:
+          type: string
+        hours:
+          type: number
+        skills:
+          type: array
+          items:
+            type: string
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+        userId:
+          type: string
+      required:
+        - id
+        - name
+        - school
+        - description
+        - status
+        - certificate
+        - hours
+        - createdAt
+        - updatedAt
+        - userId
+    SearchCourseDto:
+      type: object
+      properties:
+        name:
+          type: string
+        school:
+          type: string
+        description:
+          type: string
+        status:
+          type: string
+        certificate:
+          type: string
+        hours:
+          type: number
+        skills:
+          type: array
+          items:
+            type: string
+    CreateCourseDto:
+      type: object
+      properties:
+        name:
+          type: string
+        school:
+          type: string
+        description:
+          type: string
+        status:
+          type: string
+        certificate:
+          type: string
+        hours:
+          type: number
+        skills:
+          type: array
+          items:
+            type: string
+      required:
+        - name
+        - school
+        - description
+        - status
+        - certificate
+        - hours
+    UpdateCourseDto:
+      type: object
+      properties:
+        name:
+          type: string
+        school:
+          type: string
+        description:
+          type: string
+        status:
+          type: string
+        certificate:
+          type: string
+        hours:
+          type: number
+        skills:
+          type: array
+          items:
+            type: string
+    ExperienceDto:
+      type: object
+      properties:
+        id:
+          type: string
+        role:
+          type: string
+        organization:
+          type: string
+        description:
+          type: string
+        start:
+          type: string
+        end:
+          type: string
+        skills:
+          type: array
+          items:
+            type: string
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+        userId:
+          type: string
+      required:
+        - id
+        - role
+        - organization
+        - description
+        - start
+        - createdAt
+        - updatedAt
+        - userId
+    SearchExperienceDto:
+      type: object
+      properties:
+        role:
+          type: string
+        organization:
+          type: string
+        description:
+          type: string
+        start:
+          type: string
+        end:
+          type: string
+        skills:
+          type: array
+          items:
+            type: string
+    CreateExperienceDto:
+      type: object
+      properties:
+        role:
+          type: string
+        organization:
+          type: string
+        description:
+          type: string
+        start:
+          type: string
+        end:
+          type: string
+        skills:
+          type: array
+          items:
+            type: string
+      required:
+        - role
+        - organization
+        - description
+        - start
+    UpdateExperienceDto:
+      type: object
+      properties:
+        role:
+          type: string
+        organization:
+          type: string
+        description:
+          type: string
+        start:
+          type: string
+        end:
+          type: string
+        skills:
+          type: array
+          items:
+            type: string
