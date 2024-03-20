@@ -24,7 +24,7 @@ export class ProjectDto {
   @IsString()
   link: string
 
-  @ApiProperty({ type: 'string', isArray: true })
+  @ApiProperty({ type: 'string', isArray: true, required: false })
   @IsOptional()
   @IsArray()
   @IsString({ each: true })
