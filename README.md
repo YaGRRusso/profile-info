@@ -65,19 +65,21 @@ $ npm run test:cov
 
 - [x] Development Patterns (Clean Code, Clean Architecture, SOLID, KISS, DRY and YAGNI)
 - [x] Development Configs (Formatters, Code Patterns, ESLint, Prettier, TSConfig and Husky)
-- [x] App Configs
 - [x] Repl
 - [x] SQL Diagram
 - [x] Prisma SQL Schema
-- [x] Common Repository
+- [x] Common Methods Repository
 - [x] Error Boundary
-- [x] Tests Configs (Services, Controllers and E2e)
+- [x] Tests Configs (Services, Controllers and E2E)
 - [x] Docker (Postgres and Node)
 - [x] Swagger
+- [x] Open API
+- [x] SDK Generator
 - [x] Rest Routes
-- [x] JSON Web Token (JWT)
+- [ ] Pagination
+- [x] Authentication(JWT)
 - [x] Roles (User and Admin)
-- [x] Protected Routes and Queries (Public and Authenticated with Roles)
+- [x] Protected Routes and Queries (Public, Authenticated and By Role)
 - [x] Multi Users (Protected)
 - [x] Unit Tests
 - [x] E2E Tests
