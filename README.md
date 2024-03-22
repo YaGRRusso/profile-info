@@ -19,17 +19,14 @@ $ npm install
 ## Running API
 
 ```bash
-# development
+# production mode
 $ npm run start
 
-# watch mode
+# development mode
 $ npm run start:dev
 
 # dynamic mode
 $ npm run start:repl
-
-# production mode
-$ npm run start:prod
 ```
 
 ## Running Database
@@ -70,14 +67,13 @@ $ npm run test:cov
 - [x] Prisma SQL Schema
 - [x] Common Methods Repository
 - [x] Error Boundary
-- [x] Tests Configs (Services, Controllers and E2E)
 - [x] Docker (Postgres and Node)
 - [x] Swagger
 - [x] Open API
 - [x] SDK Generator
 - [x] Rest Routes
 - [ ] Pagination
-- [x] Authentication(JWT)
+- [x] Authentication (JWT)
 - [x] Roles (User and Admin)
 - [x] Protected Routes and Queries (Public, Authenticated and By Role)
 - [x] Multi Users (Protected)
