@@ -5,7 +5,6 @@ import { SearchExperienceDto } from '../experiences/dto/search-experience.dto'
 import { UpdateExperienceDto } from '../experiences/dto/update-experience.dto'
 import { ExperiencesService } from '../experiences/experiences.service'
 
-import { IsPublic } from '@auth/decorators/public.decorator'
 import { AuthRequest } from '@auth/entities/request.entity'
 
 import {
@@ -26,24 +25,24 @@ export class ExperiencesController {
   constructor(private readonly experiencesService: ExperiencesService) {}
 
   @ApiResponse({ type: ExperienceDto, isArray: true })
-  @IsPublic()
   @Get()
-  findAll() {
-    return this.experiencesService.findAll()
+  findAll(@Req() req: AuthRequest) {
+    return this.experiencesService.findAll(req.user.id)
   }
 
   @ApiResponse({ type: ExperienceDto })
-  @IsPublic()
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.experiencesService.findOne(id)
+  findOne(@Req() req: AuthRequest, @Param('id') id: string) {
+    return this.experiencesService.findOne(req.user.id, id)
   }
 
   @ApiResponse({ type: ExperienceDto, isArray: true })
-  @IsPublic()
   @Get('/search')
-  searchAll(@Body() searchExperienceDto: SearchExperienceDto) {
-    return this.experiencesService.searchAll(searchExperienceDto)
+  searchAll(
+    @Req() req: AuthRequest,
+    @Body() searchExperienceDto: SearchExperienceDto,
+  ) {
+    return this.experiencesService.searchAll(req.user.id, searchExperienceDto)
   }
 
   @ApiResponse({ type: ExperienceDto })

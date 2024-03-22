@@ -5,7 +5,6 @@ import { CreateCourseDto } from '../courses/dto/create-course.dto'
 import { SearchCourseDto } from '../courses/dto/search-course.dto'
 import { UpdateCourseDto } from '../courses/dto/update-course.dto'
 
-import { IsPublic } from '@auth/decorators/public.decorator'
 import { AuthRequest } from '@auth/entities/request.entity'
 
 import {
@@ -26,24 +25,21 @@ export class CoursesController {
   constructor(private readonly coursesService: CoursesService) {}
 
   @ApiResponse({ type: CourseDto, isArray: true })
-  @IsPublic()
   @Get()
-  findAll() {
-    return this.coursesService.findAll()
+  findAll(@Req() req: AuthRequest) {
+    return this.coursesService.findAll(req.user.id)
   }
 
   @ApiResponse({ type: CourseDto })
-  @IsPublic()
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.coursesService.findOne(id)
+  findOne(@Req() req: AuthRequest, @Param('id') id: string) {
+    return this.coursesService.findOne(req.user.id, id)
   }
 
   @ApiResponse({ type: CourseDto, isArray: true })
-  @IsPublic()
   @Get('/search')
-  searchAll(@Body() searchCourseDto: SearchCourseDto) {
-    return this.coursesService.searchAll(searchCourseDto)
+  searchAll(@Req() req: AuthRequest, @Body() searchCourseDto: SearchCourseDto) {
+    return this.coursesService.searchAll(req.user.id, searchCourseDto)
   }
 
   @ApiResponse({ type: CourseDto })

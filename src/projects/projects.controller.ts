@@ -4,7 +4,6 @@ import { SearchProjectDto } from './dto/search-project.dto'
 import { UpdateProjectDto } from './dto/update-project.dto'
 import { ProjectsService } from './projects.service'
 
-import { IsPublic } from '@auth/decorators/public.decorator'
 import { AuthRequest } from '@auth/entities/request.entity'
 
 import {
@@ -25,24 +24,24 @@ export class ProjectsController {
   constructor(private readonly projectsService: ProjectsService) {}
 
   @ApiResponse({ type: ProjectDto, isArray: true })
-  @IsPublic()
   @Get()
-  findAll() {
-    return this.projectsService.findAll()
+  findAll(@Req() req: AuthRequest) {
+    return this.projectsService.findAll(req.user.id)
   }
 
   @ApiResponse({ type: ProjectDto })
-  @IsPublic()
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.projectsService.findOne(id)
+  findOne(@Req() req: AuthRequest, @Param('id') id: string) {
+    return this.projectsService.findOne(req.user.id, id)
   }
 
   @ApiResponse({ type: ProjectDto, isArray: true })
-  @IsPublic()
   @Get('/search')
-  searchAll(@Body() searchProjectDto: SearchProjectDto) {
-    return this.projectsService.searchAll(searchProjectDto)
+  searchAll(
+    @Req() req: AuthRequest,
+    @Body() searchProjectDto: SearchProjectDto,
+  ) {
+    return this.projectsService.searchAll(req.user.id, searchProjectDto)
   }
 
   @ApiResponse({ type: ProjectDto })

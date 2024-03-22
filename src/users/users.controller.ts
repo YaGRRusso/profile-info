@@ -5,7 +5,10 @@ import { UserDto } from './dto/user.dto'
 import { UsersService } from './users.service'
 
 import { IsPublic } from '@auth/decorators/public.decorator'
+import { NeedRole } from '@auth/decorators/role.decorator'
 import { AuthRequest } from '@auth/entities/request.entity'
+import { JwtAuthGuard } from '@auth/guards/jwt.guard'
+import { RoleGuard } from '@auth/guards/role.guard'
 import { removeObjectKey, removeObjectsKey } from '@helpers/object.helper'
 
 import {
@@ -17,6 +20,7 @@ import {
   Patch,
   Post,
   Req,
+  UseGuards,
 } from '@nestjs/common'
 import { ApiResponse, ApiTags } from '@nestjs/swagger'
 
@@ -26,21 +30,24 @@ export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @ApiResponse({ type: UserDto, isArray: true })
-  @IsPublic()
+  @NeedRole('ADMIN')
+  @UseGuards(JwtAuthGuard, RoleGuard)
   @Get()
   async findAll() {
     return removeObjectsKey(await this.usersService.findAll(), 'password')
   }
 
   @ApiResponse({ type: UserDto })
-  @IsPublic()
+  @NeedRole('ADMIN')
+  @UseGuards(JwtAuthGuard, RoleGuard)
   @Get(':id')
   async findOne(@Param('id') id: string) {
     return removeObjectKey(await this.usersService.findOne(id), 'password')
   }
 
   @ApiResponse({ type: UserDto, isArray: true })
-  @IsPublic()
+  @NeedRole('ADMIN')
+  @UseGuards(JwtAuthGuard, RoleGuard)
   @Get('search')
   async searchAll(@Body() searchUserDto: SearchUserDto) {
     return removeObjectsKey(
