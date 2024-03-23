@@ -42,11 +42,11 @@ export class ProjectsService {
   ): Output<ProjectDto> {
     return this.repository.create({
       data: {
-        userId,
         ...createProjectDto,
         ...(skills?.length && {
           Skills: { connect: manyIds(skills) },
         }),
+        userId,
       },
     })
   }

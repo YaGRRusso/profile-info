@@ -42,11 +42,11 @@ export class FormationsService {
   ): Output<FormationDto> {
     return this.repository.create({
       data: {
-        userId,
         ...createFormationDto,
         ...(skills?.length && {
           Skills: { connect: manyIds(skills) },
         }),
+        userId,
       },
     })
   }
