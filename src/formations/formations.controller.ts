@@ -5,6 +5,7 @@ import { SearchFormationDto } from '../formations/dto/search-formation.dto'
 import { UpdateFormationDto } from '../formations/dto/update-formation.dto'
 import { FormationsService } from '../formations/formations.service'
 
+import { IsPublic } from '@auth/decorators/public.decorator'
 import { AuthRequest } from '@auth/entities/request.entity'
 
 import {
@@ -25,15 +26,26 @@ export class FormationsController {
   constructor(private readonly formationsService: FormationsService) {}
 
   @ApiResponse({ type: FormationDto, isArray: true })
+  @IsPublic()
+  @Get('/from/:id')
+  findAllFromUser(@Param('id') id: string) {
+    return this.formationsService.findAll(id)
+  }
+
+  @ApiResponse({ type: FormationDto, isArray: true })
+  @IsPublic()
+  @Get('/from/:id/search')
+  searchAllFromUser(
+    @Param('id') id: string,
+    @Body() searchFormationDto: SearchFormationDto,
+  ) {
+    return this.formationsService.searchAll(id, searchFormationDto)
+  }
+
+  @ApiResponse({ type: FormationDto, isArray: true })
   @Get()
   findAll(@Req() req: AuthRequest) {
     return this.formationsService.findAll(req.user.id)
-  }
-
-  @ApiResponse({ type: FormationDto })
-  @Get(':id')
-  findOne(@Req() req: AuthRequest, @Param('id') id: string) {
-    return this.formationsService.findOne(req.user.id, id)
   }
 
   @ApiResponse({ type: FormationDto, isArray: true })
@@ -43,6 +55,12 @@ export class FormationsController {
     @Body() searchFormationDto: SearchFormationDto,
   ) {
     return this.formationsService.searchAll(req.user.id, searchFormationDto)
+  }
+
+  @ApiResponse({ type: FormationDto })
+  @Get(':id')
+  findOne(@Req() req: AuthRequest, @Param('id') id: string) {
+    return this.formationsService.findOne(req.user.id, id)
   }
 
   @ApiResponse({ type: FormationDto })

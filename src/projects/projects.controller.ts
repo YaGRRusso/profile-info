@@ -4,6 +4,7 @@ import { SearchProjectDto } from './dto/search-project.dto'
 import { UpdateProjectDto } from './dto/update-project.dto'
 import { ProjectsService } from './projects.service'
 
+import { IsPublic } from '@auth/decorators/public.decorator'
 import { AuthRequest } from '@auth/entities/request.entity'
 
 import {
@@ -24,15 +25,26 @@ export class ProjectsController {
   constructor(private readonly projectsService: ProjectsService) {}
 
   @ApiResponse({ type: ProjectDto, isArray: true })
+  @IsPublic()
+  @Get('/from/:id')
+  findAllFromUser(@Param('id') id: string) {
+    return this.projectsService.findAll(id)
+  }
+
+  @ApiResponse({ type: ProjectDto, isArray: true })
+  @IsPublic()
+  @Get('/from/:id/search')
+  searchAllFromUser(
+    @Param('id') id: string,
+    @Body() searchProjectDto: SearchProjectDto,
+  ) {
+    return this.projectsService.searchAll(id, searchProjectDto)
+  }
+
+  @ApiResponse({ type: ProjectDto, isArray: true })
   @Get()
   findAll(@Req() req: AuthRequest) {
     return this.projectsService.findAll(req.user.id)
-  }
-
-  @ApiResponse({ type: ProjectDto })
-  @Get(':id')
-  findOne(@Req() req: AuthRequest, @Param('id') id: string) {
-    return this.projectsService.findOne(req.user.id, id)
   }
 
   @ApiResponse({ type: ProjectDto, isArray: true })
@@ -42,6 +54,12 @@ export class ProjectsController {
     @Body() searchProjectDto: SearchProjectDto,
   ) {
     return this.projectsService.searchAll(req.user.id, searchProjectDto)
+  }
+
+  @ApiResponse({ type: ProjectDto })
+  @Get(':id')
+  findOne(@Req() req: AuthRequest, @Param('id') id: string) {
+    return this.projectsService.findOne(req.user.id, id)
   }
 
   @ApiResponse({ type: ProjectDto })
