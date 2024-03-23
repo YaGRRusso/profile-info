@@ -27,6 +27,7 @@ describe('AppController (e2e)', () => {
       expect(skill).toHaveProperty('category')
       expect(skill).toHaveProperty('createdAt')
       expect(skill).toHaveProperty('updatedAt')
+      expect(skill).toHaveProperty('userId')
     })
   })
 })

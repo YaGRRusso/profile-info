@@ -31,7 +31,6 @@ describe('AppController (e2e)', () => {
       expect(user).toHaveProperty('phone')
       expect(user).toHaveProperty('birth')
       expect(user).toHaveProperty('title')
-      expect(user).toHaveProperty('presentation')
       expect(user).toHaveProperty('description')
       expect(user).toHaveProperty('address')
       expect(user).toHaveProperty('postal')

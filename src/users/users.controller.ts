@@ -91,20 +91,6 @@ export class UsersController {
 
   @ApiHeader({ name: 'Authorization' })
   @ApiResponse({ type: UserDto })
-  @Patch('me/skills/add')
-  addSkills(@Req() req: AuthRequest, @Body() { skills }: UpdateUserDto) {
-    return this.usersService.addSkills(req.user.id, skills)
-  }
-
-  @ApiHeader({ name: 'Authorization' })
-  @ApiResponse({ type: UserDto })
-  @Patch('me/skills/remove')
-  removeSkills(@Req() req: AuthRequest, @Body() { skills }: UpdateUserDto) {
-    return this.usersService.removeSkills(req.user.id, skills)
-  }
-
-  @ApiHeader({ name: 'Authorization' })
-  @ApiResponse({ type: UserDto })
   @Delete('me')
   async remove(@Req() req: AuthRequest) {
     return removeObjectKey(

@@ -4,10 +4,7 @@ import { SkillDto } from './dto/skill.dto'
 import { UpdateSkillDto } from './dto/update-skill.dto'
 import { SkillsService } from './skills.service'
 
-import { IsPublic } from '@auth/decorators/public.decorator'
-import { NeedRole } from '@auth/decorators/role.decorator'
-import { JwtAuthGuard } from '@auth/guards/jwt.guard'
-import { RoleGuard } from '@auth/guards/role.guard'
+import { AuthRequest } from '@auth/entities/request.entity'
 
 import {
   Body,
@@ -17,7 +14,7 @@ import {
   Param,
   Patch,
   Post,
-  UseGuards,
+  Req,
 } from '@nestjs/common'
 import { ApiHeader, ApiResponse, ApiTags } from '@nestjs/swagger'
 
@@ -26,51 +23,49 @@ import { ApiHeader, ApiResponse, ApiTags } from '@nestjs/swagger'
 export class SkillsController {
   constructor(private readonly skillsService: SkillsService) {}
 
+  @ApiHeader({ name: 'Authorization' })
   @ApiResponse({ type: SkillDto, isArray: true })
-  @IsPublic()
   @Get()
-  findAll() {
-    return this.skillsService.findAll()
+  findAll(@Req() req: AuthRequest) {
+    return this.skillsService.findAll(req.user.id)
   }
 
+  @ApiHeader({ name: 'Authorization' })
   @ApiResponse({ type: SkillDto })
-  @IsPublic()
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.skillsService.findOne(id)
+  findOne(@Req() req: AuthRequest, @Param('id') id: string) {
+    return this.skillsService.findOne(req.user.id, id)
   }
 
+  @ApiHeader({ name: 'Authorization' })
   @ApiResponse({ type: SkillDto, isArray: true })
-  @IsPublic()
   @Get('search')
-  searchAll(@Body() searchSkillDto: SearchSkillDto) {
-    return this.skillsService.searchAll(searchSkillDto)
+  searchAll(@Req() req: AuthRequest, @Body() searchSkillDto: SearchSkillDto) {
+    return this.skillsService.searchAll(req.user.id, searchSkillDto)
   }
 
   @ApiHeader({ name: 'Authorization' })
   @ApiResponse({ type: SkillDto })
-  @NeedRole('ADMIN')
-  @UseGuards(JwtAuthGuard, RoleGuard)
   @Post()
-  create(@Body() createSkillDto: CreateSkillDto) {
-    return this.skillsService.create(createSkillDto)
+  create(@Req() req: AuthRequest, @Body() createSkillDto: CreateSkillDto) {
+    return this.skillsService.create(req.user.id, createSkillDto)
   }
 
   @ApiHeader({ name: 'Authorization' })
   @ApiResponse({ type: SkillDto })
-  @NeedRole('ADMIN')
-  @UseGuards(JwtAuthGuard, RoleGuard)
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateSkillDto: UpdateSkillDto) {
-    return this.skillsService.update(id, updateSkillDto)
+  update(
+    @Req() req: AuthRequest,
+    @Param('id') id: string,
+    @Body() updateSkillDto: UpdateSkillDto,
+  ) {
+    return this.skillsService.update(req.user.id, id, updateSkillDto)
   }
 
   @ApiHeader({ name: 'Authorization' })
   @ApiResponse({ type: SkillDto })
-  @NeedRole('ADMIN')
-  @UseGuards(JwtAuthGuard, RoleGuard)
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.skillsService.remove(id)
+  remove(@Req() req: AuthRequest, @Param('id') id: string) {
+    return this.skillsService.remove(req.user.id, id)
   }
 }

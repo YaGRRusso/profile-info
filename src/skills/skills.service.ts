@@ -12,32 +12,44 @@ import { Injectable } from '@nestjs/common'
 export class SkillsService {
   constructor(private repository: PrismaSkillsRepository) {}
 
-  async findAll(): Output<SkillDto[]> {
-    return await this.repository.findAll()
+  async findAll(userId: string): Output<SkillDto[]> {
+    return await this.repository.findAll({ where: { userId } })
   }
 
-  async findOne(id: string): Output<SkillDto> {
-    return await this.repository.findOne({ where: { id } })
+  async findOne(userId: string, id: string): Output<SkillDto> {
+    return await this.repository.findOne({ where: { id, userId } })
   }
 
-  async searchAll(searchSkillDto: SearchSkillDto): Output<SkillDto[]> {
-    return await this.repository.findAll({ where: { ...searchSkillDto } })
-  }
-
-  async create(createSkillDto: CreateSkillDto): Output<SkillDto> {
-    return await this.repository.create({
-      data: { ...createSkillDto },
+  async searchAll(
+    userId: string,
+    searchSkillDto: SearchSkillDto,
+  ): Output<SkillDto[]> {
+    return await this.repository.findAll({
+      where: { ...searchSkillDto, userId },
     })
   }
 
-  async update(id: string, updateSkillDto: UpdateSkillDto): Output<SkillDto> {
+  async create(
+    userId: string,
+    createSkillDto: CreateSkillDto,
+  ): Output<SkillDto> {
+    return await this.repository.create({
+      data: { ...createSkillDto, userId },
+    })
+  }
+
+  async update(
+    userId: string,
+    id: string,
+    updateSkillDto: UpdateSkillDto,
+  ): Output<SkillDto> {
     return await this.repository.update({
-      where: { id },
+      where: { id, userId },
       data: { ...updateSkillDto },
     })
   }
 
-  async remove(id: string): Output<SkillDto> {
-    return await this.repository.remove({ where: { id } })
+  async remove(userId: string, id: string): Output<SkillDto> {
+    return await this.repository.remove({ where: { id, userId } })
   }
 }

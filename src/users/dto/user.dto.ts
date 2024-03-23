@@ -81,11 +81,6 @@ export class UserDto {
   @ApiProperty({ type: 'string' })
   @IsNotEmpty()
   @IsString()
-  presentation: string
-
-  @ApiProperty({ type: 'string' })
-  @IsNotEmpty()
-  @IsString()
   title: string
 
   @ApiProperty({ type: 'string', isArray: true, required: false })

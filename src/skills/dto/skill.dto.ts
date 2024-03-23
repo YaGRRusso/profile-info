@@ -33,4 +33,9 @@ export class SkillDto {
 
   @ApiProperty({ type: 'string' })
   updatedAt: Date
+
+  @ApiProperty({ type: 'string' })
+  @IsNotEmpty()
+  @IsString()
+  userId: string
 }

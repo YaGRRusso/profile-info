@@ -245,88 +245,18 @@
         ]
       }
     },
-    "/users/me/skills/add": {
-      "patch": {
-        "operationId": "UsersController_addSkills",
-        "parameters": [
-          {
-            "name": "Authorization",
-            "in": "header",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/UpdateUserDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "default": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/UserDto"
-                }
-              }
-            }
-          }
-        },
-        "tags": [
-          "users"
-        ]
-      }
-    },
-    "/users/me/skills/remove": {
-      "patch": {
-        "operationId": "UsersController_removeSkills",
-        "parameters": [
-          {
-            "name": "Authorization",
-            "in": "header",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/UpdateUserDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "default": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/UserDto"
-                }
-              }
-            }
-          }
-        },
-        "tags": [
-          "users"
-        ]
-      }
-    },
     "/skills": {
       "get": {
         "operationId": "SkillsController_findAll",
-        "parameters": [],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
         "responses": {
           "default": {
             "description": "",
@@ -392,6 +322,13 @@
             "name": "id",
             "required": true,
             "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "Authorization",
+            "in": "header",
             "schema": {
               "type": "string"
             }
@@ -497,7 +434,15 @@
     "/skills/search": {
       "get": {
         "operationId": "SkillsController_searchAll",
-        "parameters": [],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
         "requestBody": {
           "required": true,
           "content": {
@@ -2281,9 +2226,6 @@
           "postal": {
             "type": "string"
           },
-          "presentation": {
-            "type": "string"
-          },
           "title": {
             "type": "string"
           },
@@ -2323,7 +2265,6 @@
           "picture",
           "address",
           "postal",
-          "presentation",
           "title",
           "role",
           "createdAt",
@@ -2361,9 +2302,6 @@
             "type": "string"
           },
           "postal": {
-            "type": "string"
-          },
-          "presentation": {
             "type": "string"
           },
           "title": {
@@ -2410,9 +2348,6 @@
           "postal": {
             "type": "string"
           },
-          "presentation": {
-            "type": "string"
-          },
           "title": {
             "type": "string"
           },
@@ -2434,7 +2369,6 @@
           "picture",
           "address",
           "postal",
-          "presentation",
           "title"
         ]
       },
@@ -2469,9 +2403,6 @@
             "type": "string"
           },
           "postal": {
-            "type": "string"
-          },
-          "presentation": {
             "type": "string"
           },
           "title": {
@@ -2516,6 +2447,9 @@
           },
           "updatedAt": {
             "type": "string"
+          },
+          "userId": {
+            "type": "string"
           }
         },
         "required": [
@@ -2523,7 +2457,8 @@
           "name",
           "category",
           "createdAt",
-          "updatedAt"
+          "updatedAt",
+          "userId"
         ]
       },
       "SearchSkillDto": {

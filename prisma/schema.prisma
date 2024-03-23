@@ -11,22 +11,21 @@ datasource db {
 }
 
 model User {
-  id           String   @id @default(cuid())
-  picture      String
-  name         String
-  nickname     String   @unique
-  email        String   @unique
-  password     String
-  role         String   @default("USER")
-  phone        String   @unique
-  birth        DateTime
-  title        String
-  presentation String
-  description  String
-  address      String
-  postal       String
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  id          String   @id @default(cuid())
+  picture     String
+  name        String
+  nickname    String   @unique
+  email       String   @unique
+  password    String
+  role        String   @default("USER")
+  phone       String   @unique
+  birth       DateTime
+  title       String
+  description String
+  address     String
+  postal      String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
   // Relations
   Skills     Skill[]
@@ -44,8 +43,9 @@ model Skill {
   updatedAt DateTime @updatedAt
 
   // Relations
+  userId      String
+  User        User         @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   Projects    Project[]
-  Users       User[]
   Formations  Formation[]
   Courses     Course[]
   Experiences Experience[]

@@ -66,26 +66,6 @@ export class UsersService {
     })
   }
 
-  addSkills(id: string, skills: string[]): Output<UserDto> {
-    return this.repository.update({
-      where: { id },
-      include: { Skills: true },
-      data: {
-        Skills: { connect: manyIds(skills) },
-      },
-    })
-  }
-
-  removeSkills(id: string, skills: string[]): Output<UserDto> {
-    return this.repository.update({
-      where: { id },
-      include: { Skills: true },
-      data: {
-        Skills: { disconnect: manyIds(skills) },
-      },
-    })
-  }
-
   async remove(id: string): Output<UserDto> {
     return await this.repository.remove({ where: { id } })
   }
