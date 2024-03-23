@@ -10,7 +10,11 @@ paths:
   /users:
     get:
       operationId: UsersController_findAll
-      parameters: []
+      parameters:
+        - name: Authorization
+          in: header
+          schema:
+            type: string
       responses:
         default:
           description: ''
@@ -49,6 +53,10 @@ paths:
           in: path
           schema:
             type: string
+        - name: Authorization
+          in: header
+          schema:
+            type: string
       responses:
         default:
           description: ''
@@ -61,7 +69,11 @@ paths:
   /users/search:
     get:
       operationId: UsersController_searchAll
-      parameters: []
+      parameters:
+        - name: Authorization
+          in: header
+          schema:
+            type: string
       requestBody:
         required: true
         content:
@@ -82,7 +94,11 @@ paths:
   /users/me:
     patch:
       operationId: UsersController_update
-      parameters: []
+      parameters:
+        - name: Authorization
+          in: header
+          schema:
+            type: string
       requestBody:
         required: true
         content:
@@ -100,7 +116,11 @@ paths:
         - users
     delete:
       operationId: UsersController_remove
-      parameters: []
+      parameters:
+        - name: Authorization
+          in: header
+          schema:
+            type: string
       responses:
         default:
           description: ''
@@ -113,7 +133,11 @@ paths:
   /users/me/skills/add:
     patch:
       operationId: UsersController_addSkills
-      parameters: []
+      parameters:
+        - name: Authorization
+          in: header
+          schema:
+            type: string
       requestBody:
         required: true
         content:
@@ -132,7 +156,11 @@ paths:
   /users/me/skills/remove:
     patch:
       operationId: UsersController_removeSkills
-      parameters: []
+      parameters:
+        - name: Authorization
+          in: header
+          schema:
+            type: string
       requestBody:
         required: true
         content:
@@ -165,7 +193,11 @@ paths:
         - skills
     post:
       operationId: SkillsController_create
-      parameters: []
+      parameters:
+        - name: Authorization
+          in: header
+          schema:
+            type: string
       requestBody:
         required: true
         content:
@@ -207,6 +239,10 @@ paths:
           in: path
           schema:
             type: string
+        - name: Authorization
+          in: header
+          schema:
+            type: string
       requestBody:
         required: true
         content:
@@ -228,6 +264,10 @@ paths:
         - name: id
           required: true
           in: path
+          schema:
+            type: string
+        - name: Authorization
+          in: header
           schema:
             type: string
       responses:
@@ -260,10 +300,60 @@ paths:
                   $ref: '#/components/schemas/SkillDto'
       tags:
         - skills
+  /projects/from/{id}:
+    get:
+      operationId: ProjectsController_findAllFromUser
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        default:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ProjectDto'
+      tags:
+        - projects
+  /projects/from/{id}/search:
+    get:
+      operationId: ProjectsController_searchAllFromUser
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SearchProjectDto'
+      responses:
+        default:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ProjectDto'
+      tags:
+        - projects
   /projects:
     get:
       operationId: ProjectsController_findAll
-      parameters: []
+      parameters:
+        - name: Authorization
+          in: header
+          schema:
+            type: string
       responses:
         default:
           description: ''
@@ -277,7 +367,11 @@ paths:
         - projects
     post:
       operationId: ProjectsController_create
-      parameters: []
+      parameters:
+        - name: Authorization
+          in: header
+          schema:
+            type: string
       requestBody:
         required: true
         content:
@@ -293,6 +387,31 @@ paths:
                 $ref: '#/components/schemas/ProjectDto'
       tags:
         - projects
+  /projects/search:
+    get:
+      operationId: ProjectsController_searchAll
+      parameters:
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SearchProjectDto'
+      responses:
+        default:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ProjectDto'
+      tags:
+        - projects
   /projects/{id}:
     get:
       operationId: ProjectsController_findOne
@@ -300,6 +419,10 @@ paths:
         - name: id
           required: true
           in: path
+          schema:
+            type: string
+        - name: Authorization
+          in: header
           schema:
             type: string
       responses:
@@ -317,6 +440,10 @@ paths:
         - name: id
           required: true
           in: path
+          schema:
+            type: string
+        - name: Authorization
+          in: header
           schema:
             type: string
       requestBody:
@@ -342,6 +469,10 @@ paths:
           in: path
           schema:
             type: string
+        - name: Authorization
+          in: header
+          schema:
+            type: string
       responses:
         default:
           description: ''
@@ -351,27 +482,6 @@ paths:
                 $ref: '#/components/schemas/ProjectDto'
       tags:
         - projects
-  /projects/search:
-    get:
-      operationId: ProjectsController_searchAll
-      parameters: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/SearchProjectDto'
-      responses:
-        default:
-          description: ''
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/ProjectDto'
-      tags:
-        - projects
   /projects/{id}/skills/add:
     patch:
       operationId: ProjectsController_addSkills
@@ -379,6 +489,10 @@ paths:
         - name: id
           required: true
           in: path
+          schema:
+            type: string
+        - name: Authorization
+          in: header
           schema:
             type: string
       requestBody:
@@ -403,6 +517,10 @@ paths:
         - name: id
           required: true
           in: path
+          schema:
+            type: string
+        - name: Authorization
+          in: header
           schema:
             type: string
       requestBody:
@@ -436,13 +554,17 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/MeDto'
+                type: string
       tags:
         - auth
   /auth/me:
     get:
       operationId: AuthController_me
-      parameters: []
+      parameters:
+        - name: Authorization
+          in: header
+          schema:
+            type: string
       responses:
         default:
           description: ''
@@ -455,7 +577,11 @@ paths:
   /auth/validate:
     get:
       operationId: AuthController_validate
-      parameters: []
+      parameters:
+        - name: Authorization
+          in: header
+          schema:
+            type: string
       responses:
         default:
           description: ''
@@ -465,10 +591,60 @@ paths:
                 $ref: '#/components/schemas/MeDto'
       tags:
         - auth
+  /formations/from/{id}:
+    get:
+      operationId: FormationsController_findAllFromUser
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        default:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/FormationDto'
+      tags:
+        - formations
+  /formations/from/{id}/search:
+    get:
+      operationId: FormationsController_searchAllFromUser
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SearchFormationDto'
+      responses:
+        default:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/FormationDto'
+      tags:
+        - formations
   /formations:
     get:
       operationId: FormationsController_findAll
-      parameters: []
+      parameters:
+        - name: Authorization
+          in: header
+          schema:
+            type: string
       responses:
         default:
           description: ''
@@ -482,7 +658,11 @@ paths:
         - formations
     post:
       operationId: FormationsController_create
-      parameters: []
+      parameters:
+        - name: Authorization
+          in: header
+          schema:
+            type: string
       requestBody:
         required: true
         content:
@@ -498,6 +678,31 @@ paths:
                 $ref: '#/components/schemas/FormationDto'
       tags:
         - formations
+  /formations/search:
+    get:
+      operationId: FormationsController_searchAll
+      parameters:
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SearchFormationDto'
+      responses:
+        default:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/FormationDto'
+      tags:
+        - formations
   /formations/{id}:
     get:
       operationId: FormationsController_findOne
@@ -505,6 +710,10 @@ paths:
         - name: id
           required: true
           in: path
+          schema:
+            type: string
+        - name: Authorization
+          in: header
           schema:
             type: string
       responses:
@@ -522,6 +731,10 @@ paths:
         - name: id
           required: true
           in: path
+          schema:
+            type: string
+        - name: Authorization
+          in: header
           schema:
             type: string
       requestBody:
@@ -547,6 +760,10 @@ paths:
           in: path
           schema:
             type: string
+        - name: Authorization
+          in: header
+          schema:
+            type: string
       responses:
         default:
           description: ''
@@ -556,27 +773,6 @@ paths:
                 $ref: '#/components/schemas/FormationDto'
       tags:
         - formations
-  /formations/search:
-    get:
-      operationId: FormationsController_searchAll
-      parameters: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/SearchFormationDto'
-      responses:
-        default:
-          description: ''
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/FormationDto'
-      tags:
-        - formations
   /formations/{id}/skills/add:
     patch:
       operationId: FormationsController_addSkills
@@ -584,6 +780,10 @@ paths:
         - name: id
           required: true
           in: path
+          schema:
+            type: string
+        - name: Authorization
+          in: header
           schema:
             type: string
       requestBody:
@@ -610,6 +810,10 @@ paths:
           in: path
           schema:
             type: string
+        - name: Authorization
+          in: header
+          schema:
+            type: string
       requestBody:
         required: true
         content:
@@ -625,10 +829,60 @@ paths:
                 $ref: '#/components/schemas/FormationDto'
       tags:
         - formations
+  /courses/from/{id}:
+    get:
+      operationId: CoursesController_findAllFromUser
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        default:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CourseDto'
+      tags:
+        - courses
+  /courses/from/{id}/search:
+    get:
+      operationId: CoursesController_searchAllFromUser
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SearchCourseDto'
+      responses:
+        default:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CourseDto'
+      tags:
+        - courses
   /courses:
     get:
       operationId: CoursesController_findAll
-      parameters: []
+      parameters:
+        - name: Authorization
+          in: header
+          schema:
+            type: string
       responses:
         default:
           description: ''
@@ -642,7 +896,11 @@ paths:
         - courses
     post:
       operationId: CoursesController_create
-      parameters: []
+      parameters:
+        - name: Authorization
+          in: header
+          schema:
+            type: string
       requestBody:
         required: true
         content:
@@ -658,6 +916,31 @@ paths:
                 $ref: '#/components/schemas/CourseDto'
       tags:
         - courses
+  /courses/search:
+    get:
+      operationId: CoursesController_searchAll
+      parameters:
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SearchCourseDto'
+      responses:
+        default:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CourseDto'
+      tags:
+        - courses
   /courses/{id}:
     get:
       operationId: CoursesController_findOne
@@ -665,6 +948,10 @@ paths:
         - name: id
           required: true
           in: path
+          schema:
+            type: string
+        - name: Authorization
+          in: header
           schema:
             type: string
       responses:
@@ -682,6 +969,10 @@ paths:
         - name: id
           required: true
           in: path
+          schema:
+            type: string
+        - name: Authorization
+          in: header
           schema:
             type: string
       requestBody:
@@ -707,6 +998,10 @@ paths:
           in: path
           schema:
             type: string
+        - name: Authorization
+          in: header
+          schema:
+            type: string
       responses:
         default:
           description: ''
@@ -716,27 +1011,6 @@ paths:
                 $ref: '#/components/schemas/CourseDto'
       tags:
         - courses
-  /courses/search:
-    get:
-      operationId: CoursesController_searchAll
-      parameters: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/SearchCourseDto'
-      responses:
-        default:
-          description: ''
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/CourseDto'
-      tags:
-        - courses
   /courses/{id}/skills/add:
     patch:
       operationId: CoursesController_addSkills
@@ -744,6 +1018,10 @@ paths:
         - name: id
           required: true
           in: path
+          schema:
+            type: string
+        - name: Authorization
+          in: header
           schema:
             type: string
       requestBody:
@@ -770,6 +1048,10 @@ paths:
           in: path
           schema:
             type: string
+        - name: Authorization
+          in: header
+          schema:
+            type: string
       requestBody:
         required: true
         content:
@@ -785,10 +1067,60 @@ paths:
                 $ref: '#/components/schemas/CourseDto'
       tags:
         - courses
+  /experiences/from/{id}:
+    get:
+      operationId: ExperiencesController_findAllFromUser
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        default:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ExperienceDto'
+      tags:
+        - experiences
+  /experiences/from/{id}/search:
+    get:
+      operationId: ExperiencesController_searchAllFromUser
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SearchExperienceDto'
+      responses:
+        default:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ExperienceDto'
+      tags:
+        - experiences
   /experiences:
     get:
       operationId: ExperiencesController_findAll
-      parameters: []
+      parameters:
+        - name: Authorization
+          in: header
+          schema:
+            type: string
       responses:
         default:
           description: ''
@@ -802,7 +1134,11 @@ paths:
         - experiences
     post:
       operationId: ExperiencesController_create
-      parameters: []
+      parameters:
+        - name: Authorization
+          in: header
+          schema:
+            type: string
       requestBody:
         required: true
         content:
@@ -818,6 +1154,31 @@ paths:
                 $ref: '#/components/schemas/ExperienceDto'
       tags:
         - experiences
+  /experiences/search:
+    get:
+      operationId: ExperiencesController_searchAll
+      parameters:
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SearchExperienceDto'
+      responses:
+        default:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ExperienceDto'
+      tags:
+        - experiences
   /experiences/{id}:
     get:
       operationId: ExperiencesController_findOne
@@ -825,6 +1186,10 @@ paths:
         - name: id
           required: true
           in: path
+          schema:
+            type: string
+        - name: Authorization
+          in: header
           schema:
             type: string
       responses:
@@ -842,6 +1207,10 @@ paths:
         - name: id
           required: true
           in: path
+          schema:
+            type: string
+        - name: Authorization
+          in: header
           schema:
             type: string
       requestBody:
@@ -867,6 +1236,10 @@ paths:
           in: path
           schema:
             type: string
+        - name: Authorization
+          in: header
+          schema:
+            type: string
       responses:
         default:
           description: ''
@@ -876,27 +1249,6 @@ paths:
                 $ref: '#/components/schemas/ExperienceDto'
       tags:
         - experiences
-  /experiences/search:
-    get:
-      operationId: ExperiencesController_searchAll
-      parameters: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/SearchExperienceDto'
-      responses:
-        default:
-          description: ''
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/ExperienceDto'
-      tags:
-        - experiences
   /experiences/{id}/skills/add:
     patch:
       operationId: ExperiencesController_addSkills
@@ -904,6 +1256,10 @@ paths:
         - name: id
           required: true
           in: path
+          schema:
+            type: string
+        - name: Authorization
+          in: header
           schema:
             type: string
       requestBody:
@@ -928,6 +1284,10 @@ paths:
         - name: id
           required: true
           in: path
+          schema:
+            type: string
+        - name: Authorization
+          in: header
           schema:
             type: string
       requestBody:
