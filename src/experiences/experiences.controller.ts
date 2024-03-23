@@ -18,7 +18,7 @@ import {
   Post,
   Req,
 } from '@nestjs/common'
-import { ApiResponse, ApiTags } from '@nestjs/swagger'
+import { ApiHeader, ApiResponse, ApiTags } from '@nestjs/swagger'
 
 @ApiTags('experiences')
 @Controller('experiences')
@@ -27,25 +27,46 @@ export class ExperiencesController {
 
   @ApiResponse({ type: ExperienceDto, isArray: true })
   @IsPublic()
-  @Get()
-  findAll() {
-    return this.experiencesService.findAll()
-  }
-
-  @ApiResponse({ type: ExperienceDto })
-  @IsPublic()
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.experiencesService.findOne(id)
+  @Get('/from/:id')
+  findAllFromUser(@Param('id') id: string) {
+    return this.experiencesService.findAll(id)
   }
 
   @ApiResponse({ type: ExperienceDto, isArray: true })
   @IsPublic()
-  @Get('/search')
-  searchAll(@Body() searchExperienceDto: SearchExperienceDto) {
-    return this.experiencesService.searchAll(searchExperienceDto)
+  @Get('/from/:id/search')
+  searchAllFromUser(
+    @Param('id') id: string,
+    @Body() searchExperienceDto: SearchExperienceDto,
+  ) {
+    return this.experiencesService.searchAll(id, searchExperienceDto)
   }
 
+  @ApiHeader({ name: 'Authorization' })
+  @ApiResponse({ type: ExperienceDto, isArray: true })
+  @Get()
+  findAll(@Req() req: AuthRequest) {
+    return this.experiencesService.findAll(req.user.id)
+  }
+
+  @ApiHeader({ name: 'Authorization' })
+  @ApiResponse({ type: ExperienceDto, isArray: true })
+  @Get('/search')
+  searchAll(
+    @Req() req: AuthRequest,
+    @Body() searchExperienceDto: SearchExperienceDto,
+  ) {
+    return this.experiencesService.searchAll(req.user.id, searchExperienceDto)
+  }
+
+  @ApiHeader({ name: 'Authorization' })
+  @ApiResponse({ type: ExperienceDto })
+  @Get(':id')
+  findOne(@Req() req: AuthRequest, @Param('id') id: string) {
+    return this.experiencesService.findOne(req.user.id, id)
+  }
+
+  @ApiHeader({ name: 'Authorization' })
   @ApiResponse({ type: ExperienceDto })
   @Post()
   create(
@@ -55,6 +76,7 @@ export class ExperiencesController {
     return this.experiencesService.create(req.user.id, createExperienceDto)
   }
 
+  @ApiHeader({ name: 'Authorization' })
   @ApiResponse({ type: ExperienceDto })
   @Patch(':id')
   update(
@@ -65,6 +87,7 @@ export class ExperiencesController {
     return this.experiencesService.update(req.user.id, id, updateExperienceDto)
   }
 
+  @ApiHeader({ name: 'Authorization' })
   @ApiResponse({ type: ExperienceDto })
   @Patch(':id/skills/add')
   addSkills(
@@ -75,6 +98,7 @@ export class ExperiencesController {
     return this.experiencesService.addSkills(req.user.id, id, skills)
   }
 
+  @ApiHeader({ name: 'Authorization' })
   @ApiResponse({ type: ExperienceDto })
   @Patch(':id/skills/remove')
   removeSkills(
@@ -85,6 +109,7 @@ export class ExperiencesController {
     return this.experiencesService.removeSkills(req.user.id, id, skills)
   }
 
+  @ApiHeader({ name: 'Authorization' })
   @ApiResponse({ type: ExperienceDto })
   @Delete(':id')
   remove(@Req() req: AuthRequest, @Param('id') id: string) {

@@ -9,26 +9,28 @@ import { RoleGuard } from './guards/role.guard'
 import { Output } from '@interfaces/output.interface'
 
 import { Body, Controller, Get, Post, Req, UseGuards } from '@nestjs/common'
-import { ApiResponse, ApiTags } from '@nestjs/swagger'
+import { ApiHeader, ApiResponse, ApiTags } from '@nestjs/swagger'
 
 @ApiTags('auth')
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
-  @ApiResponse({ type: 'string' })
+  @ApiResponse({ type: String })
   @IsPublic()
   @Post()
   async login(@Body() { email, password }: LoginUserDto): Output<string> {
     return await this.authService.login(email, password)
   }
 
+  @ApiHeader({ name: 'Authorization' })
   @ApiResponse({ type: MeDto })
   @Get('me')
   async me(@Req() req: AuthRequest): Output<unknown> {
     return req.user
   }
 
+  @ApiHeader({ name: 'Authorization' })
   @ApiResponse({ type: MeDto })
   @NeedRole('ADMIN')
   @UseGuards(JwtAuthGuard, RoleGuard)

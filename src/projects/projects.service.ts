@@ -13,21 +13,25 @@ import { Injectable } from '@nestjs/common'
 export class ProjectsService {
   constructor(private repository: PrismaProjectsRepository) {}
 
-  findAll(): Output<ProjectDto[]> {
-    return this.repository.findAll()
+  findAll(userId: string): Output<ProjectDto[]> {
+    return this.repository.findAll({ where: { userId } })
   }
 
-  findOne(id: string): Output<ProjectDto> {
-    return this.repository.findOne({ where: { id } })
+  findOne(userId: string, id: string): Output<ProjectDto> {
+    return this.repository.findOne({ where: { id, userId } })
   }
 
-  searchAll(searchProjectDto: SearchProjectDto): Output<ProjectDto[]> {
+  searchAll(
+    userId: string,
+    searchProjectDto: SearchProjectDto,
+  ): Output<ProjectDto[]> {
     return this.repository.findAll({
       where: {
         ...searchProjectDto,
         ...(searchProjectDto.skills?.length && {
           Skills: { some: { id: searchProjectDto.skills[0] } },
         }),
+        userId,
       },
     })
   }

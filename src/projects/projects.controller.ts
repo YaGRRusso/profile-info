@@ -17,7 +17,7 @@ import {
   Post,
   Req,
 } from '@nestjs/common'
-import { ApiResponse, ApiTags } from '@nestjs/swagger'
+import { ApiHeader, ApiResponse, ApiTags } from '@nestjs/swagger'
 
 @ApiTags('projects')
 @Controller('projects')
@@ -26,31 +26,53 @@ export class ProjectsController {
 
   @ApiResponse({ type: ProjectDto, isArray: true })
   @IsPublic()
-  @Get()
-  findAll() {
-    return this.projectsService.findAll()
-  }
-
-  @ApiResponse({ type: ProjectDto })
-  @IsPublic()
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.projectsService.findOne(id)
+  @Get('/from/:id')
+  findAllFromUser(@Param('id') id: string) {
+    return this.projectsService.findAll(id)
   }
 
   @ApiResponse({ type: ProjectDto, isArray: true })
   @IsPublic()
-  @Get('/search')
-  searchAll(@Body() searchProjectDto: SearchProjectDto) {
-    return this.projectsService.searchAll(searchProjectDto)
+  @Get('/from/:id/search')
+  searchAllFromUser(
+    @Param('id') id: string,
+    @Body() searchProjectDto: SearchProjectDto,
+  ) {
+    return this.projectsService.searchAll(id, searchProjectDto)
   }
 
+  @ApiHeader({ name: 'Authorization' })
+  @ApiResponse({ type: ProjectDto, isArray: true })
+  @Get()
+  findAll(@Req() req: AuthRequest) {
+    return this.projectsService.findAll(req.user.id)
+  }
+
+  @ApiHeader({ name: 'Authorization' })
+  @ApiResponse({ type: ProjectDto, isArray: true })
+  @Get('/search')
+  searchAll(
+    @Req() req: AuthRequest,
+    @Body() searchProjectDto: SearchProjectDto,
+  ) {
+    return this.projectsService.searchAll(req.user.id, searchProjectDto)
+  }
+
+  @ApiHeader({ name: 'Authorization' })
+  @ApiResponse({ type: ProjectDto })
+  @Get(':id')
+  findOne(@Req() req: AuthRequest, @Param('id') id: string) {
+    return this.projectsService.findOne(req.user.id, id)
+  }
+
+  @ApiHeader({ name: 'Authorization' })
   @ApiResponse({ type: ProjectDto })
   @Post()
   create(@Req() req: AuthRequest, @Body() createProjectDto: CreateProjectDto) {
     return this.projectsService.create(req.user.id, createProjectDto)
   }
 
+  @ApiHeader({ name: 'Authorization' })
   @ApiResponse({ type: ProjectDto })
   @Patch(':id')
   update(
@@ -61,6 +83,7 @@ export class ProjectsController {
     return this.projectsService.update(req.user.id, id, updateProjectDto)
   }
 
+  @ApiHeader({ name: 'Authorization' })
   @ApiResponse({ type: ProjectDto })
   @Patch(':id/skills/add')
   addSkills(
@@ -71,6 +94,7 @@ export class ProjectsController {
     return this.projectsService.addSkills(req.user.id, id, skills)
   }
 
+  @ApiHeader({ name: 'Authorization' })
   @ApiResponse({ type: ProjectDto })
   @Patch(':id/skills/remove')
   removeSkills(
@@ -81,6 +105,7 @@ export class ProjectsController {
     return this.projectsService.removeSkills(req.user.id, id, skills)
   }
 
+  @ApiHeader({ name: 'Authorization' })
   @ApiResponse({ type: ProjectDto })
   @Delete(':id')
   remove(@Req() req: AuthRequest, @Param('id') id: string) {

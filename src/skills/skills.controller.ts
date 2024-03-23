@@ -19,7 +19,7 @@ import {
   Post,
   UseGuards,
 } from '@nestjs/common'
-import { ApiResponse, ApiTags } from '@nestjs/swagger'
+import { ApiHeader, ApiResponse, ApiTags } from '@nestjs/swagger'
 
 @ApiTags('skills')
 @Controller('skills')
@@ -47,6 +47,7 @@ export class SkillsController {
     return this.skillsService.searchAll(searchSkillDto)
   }
 
+  @ApiHeader({ name: 'Authorization' })
   @ApiResponse({ type: SkillDto })
   @NeedRole('ADMIN')
   @UseGuards(JwtAuthGuard, RoleGuard)
@@ -55,6 +56,7 @@ export class SkillsController {
     return this.skillsService.create(createSkillDto)
   }
 
+  @ApiHeader({ name: 'Authorization' })
   @ApiResponse({ type: SkillDto })
   @NeedRole('ADMIN')
   @UseGuards(JwtAuthGuard, RoleGuard)
@@ -63,6 +65,7 @@ export class SkillsController {
     return this.skillsService.update(id, updateSkillDto)
   }
 
+  @ApiHeader({ name: 'Authorization' })
   @ApiResponse({ type: SkillDto })
   @NeedRole('ADMIN')
   @UseGuards(JwtAuthGuard, RoleGuard)

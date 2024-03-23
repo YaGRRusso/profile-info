@@ -13,21 +13,25 @@ import { Injectable } from '@nestjs/common'
 export class FormationsService {
   constructor(private repository: PrismaFormationsRepository) {}
 
-  findAll(): Output<FormationDto[]> {
-    return this.repository.findAll()
+  findAll(userId: string): Output<FormationDto[]> {
+    return this.repository.findAll({ where: { userId } })
   }
 
-  findOne(id: string): Output<FormationDto> {
-    return this.repository.findOne({ where: { id } })
+  findOne(userId: string, id: string): Output<FormationDto> {
+    return this.repository.findOne({ where: { id, userId } })
   }
 
-  searchAll(searchFormationDto: SearchFormationDto): Output<FormationDto[]> {
+  searchAll(
+    userId: string,
+    searchFormationDto: SearchFormationDto,
+  ): Output<FormationDto[]> {
     return this.repository.findAll({
       where: {
         ...searchFormationDto,
         ...(searchFormationDto.skills?.length && {
           Skills: { some: { id: searchFormationDto.skills[0] } },
         }),
+        userId,
       },
     })
   }
