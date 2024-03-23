@@ -18,7 +18,7 @@ import {
   Post,
   Req,
 } from '@nestjs/common'
-import { ApiResponse, ApiTags } from '@nestjs/swagger'
+import { ApiHeader, ApiResponse, ApiTags } from '@nestjs/swagger'
 
 @ApiTags('courses')
 @Controller('courses')
@@ -42,30 +42,35 @@ export class CoursesController {
     return this.coursesService.searchAll(id, searchCourseDto)
   }
 
+  @ApiHeader({ name: 'Authorization' })
   @ApiResponse({ type: CourseDto, isArray: true })
   @Get()
   findAll(@Req() req: AuthRequest) {
     return this.coursesService.findAll(req.user.id)
   }
 
+  @ApiHeader({ name: 'Authorization' })
   @ApiResponse({ type: CourseDto, isArray: true })
   @Get('/search')
   searchAll(@Req() req: AuthRequest, @Body() searchCourseDto: SearchCourseDto) {
     return this.coursesService.searchAll(req.user.id, searchCourseDto)
   }
 
+  @ApiHeader({ name: 'Authorization' })
   @ApiResponse({ type: CourseDto })
   @Get(':id')
   findOne(@Req() req: AuthRequest, @Param('id') id: string) {
     return this.coursesService.findOne(req.user.id, id)
   }
 
+  @ApiHeader({ name: 'Authorization' })
   @ApiResponse({ type: CourseDto })
   @Post()
   create(@Req() req: AuthRequest, @Body() createCourseDto: CreateCourseDto) {
     return this.coursesService.create(req.user.id, createCourseDto)
   }
 
+  @ApiHeader({ name: 'Authorization' })
   @ApiResponse({ type: CourseDto })
   @Patch(':id')
   update(
@@ -76,6 +81,7 @@ export class CoursesController {
     return this.coursesService.update(req.user.id, id, updateCourseDto)
   }
 
+  @ApiHeader({ name: 'Authorization' })
   @ApiResponse({ type: CourseDto })
   @Patch(':id/skills/add')
   addSkills(
@@ -86,6 +92,7 @@ export class CoursesController {
     return this.coursesService.addSkills(req.user.id, id, skills)
   }
 
+  @ApiHeader({ name: 'Authorization' })
   @ApiResponse({ type: CourseDto })
   @Patch(':id/skills/remove')
   removeSkills(
@@ -96,6 +103,7 @@ export class CoursesController {
     return this.coursesService.removeSkills(req.user.id, id, skills)
   }
 
+  @ApiHeader({ name: 'Authorization' })
   @ApiResponse({ type: CourseDto })
   @Delete(':id')
   remove(@Req() req: AuthRequest, @Param('id') id: string) {

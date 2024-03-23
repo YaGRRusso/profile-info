@@ -18,7 +18,7 @@ import {
   Post,
   Req,
 } from '@nestjs/common'
-import { ApiResponse, ApiTags } from '@nestjs/swagger'
+import { ApiHeader, ApiResponse, ApiTags } from '@nestjs/swagger'
 
 @ApiTags('experiences')
 @Controller('experiences')
@@ -42,12 +42,14 @@ export class ExperiencesController {
     return this.experiencesService.searchAll(id, searchExperienceDto)
   }
 
+  @ApiHeader({ name: 'Authorization' })
   @ApiResponse({ type: ExperienceDto, isArray: true })
   @Get()
   findAll(@Req() req: AuthRequest) {
     return this.experiencesService.findAll(req.user.id)
   }
 
+  @ApiHeader({ name: 'Authorization' })
   @ApiResponse({ type: ExperienceDto, isArray: true })
   @Get('/search')
   searchAll(
@@ -57,12 +59,14 @@ export class ExperiencesController {
     return this.experiencesService.searchAll(req.user.id, searchExperienceDto)
   }
 
+  @ApiHeader({ name: 'Authorization' })
   @ApiResponse({ type: ExperienceDto })
   @Get(':id')
   findOne(@Req() req: AuthRequest, @Param('id') id: string) {
     return this.experiencesService.findOne(req.user.id, id)
   }
 
+  @ApiHeader({ name: 'Authorization' })
   @ApiResponse({ type: ExperienceDto })
   @Post()
   create(
@@ -72,6 +76,7 @@ export class ExperiencesController {
     return this.experiencesService.create(req.user.id, createExperienceDto)
   }
 
+  @ApiHeader({ name: 'Authorization' })
   @ApiResponse({ type: ExperienceDto })
   @Patch(':id')
   update(
@@ -82,6 +87,7 @@ export class ExperiencesController {
     return this.experiencesService.update(req.user.id, id, updateExperienceDto)
   }
 
+  @ApiHeader({ name: 'Authorization' })
   @ApiResponse({ type: ExperienceDto })
   @Patch(':id/skills/add')
   addSkills(
@@ -92,6 +98,7 @@ export class ExperiencesController {
     return this.experiencesService.addSkills(req.user.id, id, skills)
   }
 
+  @ApiHeader({ name: 'Authorization' })
   @ApiResponse({ type: ExperienceDto })
   @Patch(':id/skills/remove')
   removeSkills(
@@ -102,6 +109,7 @@ export class ExperiencesController {
     return this.experiencesService.removeSkills(req.user.id, id, skills)
   }
 
+  @ApiHeader({ name: 'Authorization' })
   @ApiResponse({ type: ExperienceDto })
   @Delete(':id')
   remove(@Req() req: AuthRequest, @Param('id') id: string) {

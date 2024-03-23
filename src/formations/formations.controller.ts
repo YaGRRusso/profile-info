@@ -18,7 +18,7 @@ import {
   Post,
   Req,
 } from '@nestjs/common'
-import { ApiResponse, ApiTags } from '@nestjs/swagger'
+import { ApiHeader, ApiResponse, ApiTags } from '@nestjs/swagger'
 
 @ApiTags('formations')
 @Controller('formations')
@@ -42,12 +42,14 @@ export class FormationsController {
     return this.formationsService.searchAll(id, searchFormationDto)
   }
 
+  @ApiHeader({ name: 'Authorization' })
   @ApiResponse({ type: FormationDto, isArray: true })
   @Get()
   findAll(@Req() req: AuthRequest) {
     return this.formationsService.findAll(req.user.id)
   }
 
+  @ApiHeader({ name: 'Authorization' })
   @ApiResponse({ type: FormationDto, isArray: true })
   @Get('/search')
   searchAll(
@@ -57,12 +59,14 @@ export class FormationsController {
     return this.formationsService.searchAll(req.user.id, searchFormationDto)
   }
 
+  @ApiHeader({ name: 'Authorization' })
   @ApiResponse({ type: FormationDto })
   @Get(':id')
   findOne(@Req() req: AuthRequest, @Param('id') id: string) {
     return this.formationsService.findOne(req.user.id, id)
   }
 
+  @ApiHeader({ name: 'Authorization' })
   @ApiResponse({ type: FormationDto })
   @Post()
   create(
@@ -72,6 +76,7 @@ export class FormationsController {
     return this.formationsService.create(req.user.id, createFormationDto)
   }
 
+  @ApiHeader({ name: 'Authorization' })
   @ApiResponse({ type: FormationDto })
   @Patch(':id')
   update(
@@ -82,6 +87,7 @@ export class FormationsController {
     return this.formationsService.update(req.user.id, id, updateFormationDto)
   }
 
+  @ApiHeader({ name: 'Authorization' })
   @ApiResponse({ type: FormationDto })
   @Patch(':id/skills/add')
   addSkills(
@@ -92,6 +98,7 @@ export class FormationsController {
     return this.formationsService.addSkills(req.user.id, id, skills)
   }
 
+  @ApiHeader({ name: 'Authorization' })
   @ApiResponse({ type: FormationDto })
   @Patch(':id/skills/remove')
   removeSkills(
@@ -102,6 +109,7 @@ export class FormationsController {
     return this.formationsService.removeSkills(req.user.id, id, skills)
   }
 
+  @ApiHeader({ name: 'Authorization' })
   @ApiResponse({ type: FormationDto })
   @Delete(':id')
   remove(@Req() req: AuthRequest, @Param('id') id: string) {
