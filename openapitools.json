@@ -6,7 +6,7 @@
     "generators": {
       "v3.0": {
         "generatorName": "typescript-axios",
-        "inputSpec": "swagger.yaml",
+        "inputSpec": "swagger.json",
         "output": "./sdk"
       }
     }
