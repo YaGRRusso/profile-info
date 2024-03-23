@@ -30,6 +30,16 @@ export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @ApiHeader({ name: 'Authorization' })
+  @ApiResponse({ type: UserDto })
+  @Get('me')
+  async findMe(@Req() req: AuthRequest) {
+    return removeObjectKey(
+      await this.usersService.findOne(req.user.id),
+      'password',
+    )
+  }
+
+  @ApiHeader({ name: 'Authorization' })
   @ApiResponse({ type: UserDto, isArray: true })
   @NeedRole('ADMIN')
   @UseGuards(JwtAuthGuard, RoleGuard)

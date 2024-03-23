@@ -7,6 +7,61 @@ paths:
       responses:
         '200':
           description: ''
+  /users/me:
+    get:
+      operationId: UsersController_findMe
+      parameters:
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+      responses:
+        default:
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserDto'
+      tags:
+        - users
+    patch:
+      operationId: UsersController_update
+      parameters:
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateUserDto'
+      responses:
+        default:
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserDto'
+      tags:
+        - users
+    delete:
+      operationId: UsersController_remove
+      parameters:
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+      responses:
+        default:
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserDto'
+      tags:
+        - users
   /users:
     get:
       operationId: UsersController_findAll
@@ -89,45 +144,6 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/UserDto'
-      tags:
-        - users
-  /users/me:
-    patch:
-      operationId: UsersController_update
-      parameters:
-        - name: Authorization
-          in: header
-          schema:
-            type: string
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/UpdateUserDto'
-      responses:
-        default:
-          description: ''
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/UserDto'
-      tags:
-        - users
-    delete:
-      operationId: UsersController_remove
-      parameters:
-        - name: Authorization
-          in: header
-          schema:
-            type: string
-      responses:
-        default:
-          description: ''
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/UserDto'
       tags:
         - users
   /users/me/skills/add:
