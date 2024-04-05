@@ -34,7 +34,11 @@ export class FormationDto {
   @IsString()
   description: string
 
-  @ApiProperty({ type: 'string' })
+  @ApiProperty({
+    type: 'string',
+    enum: FormationStatusEnum,
+    example: Object.keys(FormationStatusEnum),
+  })
   @IsString()
   status: FormationStatusEnum | string
 

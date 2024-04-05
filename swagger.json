@@ -2722,7 +2722,19 @@
             "type": "string"
           },
           "status": {
-            "type": "string"
+            "type": "string",
+            "enum": [
+              "COMPLETE",
+              "INCOMPLETE",
+              "PAUSED",
+              "PROGRESS"
+            ],
+            "example": [
+              "COMPLETE",
+              "INCOMPLETE",
+              "PAUSED",
+              "PROGRESS"
+            ]
           },
           "certificate": {
             "type": "string"
@@ -2774,7 +2786,19 @@
             "type": "string"
           },
           "status": {
-            "type": "string"
+            "type": "string",
+            "enum": [
+              "COMPLETE",
+              "INCOMPLETE",
+              "PAUSED",
+              "PROGRESS"
+            ],
+            "example": [
+              "COMPLETE",
+              "INCOMPLETE",
+              "PAUSED",
+              "PROGRESS"
+            ]
           },
           "certificate": {
             "type": "string"
@@ -2806,7 +2830,19 @@
             "type": "string"
           },
           "status": {
-            "type": "string"
+            "type": "string",
+            "enum": [
+              "COMPLETE",
+              "INCOMPLETE",
+              "PAUSED",
+              "PROGRESS"
+            ],
+            "example": [
+              "COMPLETE",
+              "INCOMPLETE",
+              "PAUSED",
+              "PROGRESS"
+            ]
           },
           "certificate": {
             "type": "string"
@@ -2845,7 +2881,19 @@
             "type": "string"
           },
           "status": {
-            "type": "string"
+            "type": "string",
+            "enum": [
+              "COMPLETE",
+              "INCOMPLETE",
+              "PAUSED",
+              "PROGRESS"
+            ],
+            "example": [
+              "COMPLETE",
+              "INCOMPLETE",
+              "PAUSED",
+              "PROGRESS"
+            ]
           },
           "certificate": {
             "type": "string"
@@ -2880,7 +2928,19 @@
             "type": "string"
           },
           "status": {
-            "type": "string"
+            "type": "string",
+            "enum": [
+              "COMPLETE",
+              "INCOMPLETE",
+              "PAUSED",
+              "PROGRESS"
+            ],
+            "example": [
+              "COMPLETE",
+              "INCOMPLETE",
+              "PAUSED",
+              "PROGRESS"
+            ]
           },
           "certificate": {
             "type": "string"
@@ -2929,7 +2989,19 @@
             "type": "string"
           },
           "status": {
-            "type": "string"
+            "type": "string",
+            "enum": [
+              "COMPLETE",
+              "INCOMPLETE",
+              "PAUSED",
+              "PROGRESS"
+            ],
+            "example": [
+              "COMPLETE",
+              "INCOMPLETE",
+              "PAUSED",
+              "PROGRESS"
+            ]
           },
           "certificate": {
             "type": "string"
@@ -2958,7 +3030,19 @@
             "type": "string"
           },
           "status": {
-            "type": "string"
+            "type": "string",
+            "enum": [
+              "COMPLETE",
+              "INCOMPLETE",
+              "PAUSED",
+              "PROGRESS"
+            ],
+            "example": [
+              "COMPLETE",
+              "INCOMPLETE",
+              "PAUSED",
+              "PROGRESS"
+            ]
           },
           "certificate": {
             "type": "string"
@@ -2994,7 +3078,19 @@
             "type": "string"
           },
           "status": {
-            "type": "string"
+            "type": "string",
+            "enum": [
+              "COMPLETE",
+              "INCOMPLETE",
+              "PAUSED",
+              "PROGRESS"
+            ],
+            "example": [
+              "COMPLETE",
+              "INCOMPLETE",
+              "PAUSED",
+              "PROGRESS"
+            ]
           },
           "certificate": {
             "type": "string"

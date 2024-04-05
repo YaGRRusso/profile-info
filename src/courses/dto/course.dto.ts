@@ -34,7 +34,11 @@ export class CourseDto {
   @IsString()
   description: string
 
-  @ApiProperty({ type: 'string' })
+  @ApiProperty({
+    type: 'string',
+    enum: CourseStatusEnum,
+    example: Object.keys(CourseStatusEnum),
+  })
   @IsString()
   status: CourseStatusEnum | string
 
