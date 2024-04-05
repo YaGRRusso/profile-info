@@ -7,6 +7,13 @@ import {
   IsString,
 } from 'class-validator'
 
+export enum CourseStatusEnum {
+  'COMPLETE' = 'COMPLETE',
+  'INCOMPLETE' = 'INCOMPLETE',
+  'PAUSED' = 'PAUSED',
+  'PROGRESS' = 'PROGRESS',
+}
+
 export class CourseDto {
   @ApiProperty({ type: 'string' })
   @IsNotEmpty()
@@ -29,9 +36,10 @@ export class CourseDto {
 
   @ApiProperty({ type: 'string' })
   @IsString()
-  status: string
+  status: CourseStatusEnum | string
 
-  @ApiProperty({ type: 'string' })
+  @ApiProperty({ type: 'string', required: false })
+  @IsOptional()
   @IsString()
   certificate: string
 

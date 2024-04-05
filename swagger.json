@@ -2755,7 +2755,6 @@
           "school",
           "description",
           "status",
-          "certificate",
           "start",
           "createdAt",
           "updatedAt",
@@ -2830,7 +2829,6 @@
           "school",
           "description",
           "status",
-          "certificate",
           "start"
         ]
       },
@@ -2912,7 +2910,6 @@
           "school",
           "description",
           "status",
-          "certificate",
           "hours",
           "createdAt",
           "updatedAt",
@@ -2981,7 +2978,6 @@
           "school",
           "description",
           "status",
-          "certificate",
           "hours"
         ]
       },
