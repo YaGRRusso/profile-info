@@ -4,8 +4,14 @@ import { IsEnum, IsNotEmpty, IsString } from 'class-validator'
 export enum SkillCategoryEnum {
   'LANGUAGE' = 'LANGUAGE',
   'LIBRARY' = 'LIBRARY',
+  'FRAMEWORK' = 'FRAMEWORK',
+  'DATABASE' = 'DATABASE',
   'TOOL' = 'TOOL',
   'SYSTEM' = 'SYSTEM',
+  'TESTING' = 'TESTING',
+  'PATTERN' = 'PATTERN',
+  'DEVOPS' = 'DEVOPS',
+  'SOFT' = 'SOFT',
   'OTHER' = 'OTHER',
 }
 

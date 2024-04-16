@@ -2430,15 +2430,27 @@
             "enum": [
               "LANGUAGE",
               "LIBRARY",
+              "FRAMEWORK",
+              "DATABASE",
               "TOOL",
               "SYSTEM",
+              "TESTING",
+              "PATTERN",
+              "DEVOPS",
+              "SOFT",
               "OTHER"
             ],
             "example": [
               "LANGUAGE",
               "LIBRARY",
+              "FRAMEWORK",
+              "DATABASE",
               "TOOL",
               "SYSTEM",
+              "TESTING",
+              "PATTERN",
+              "DEVOPS",
+              "SOFT",
               "OTHER"
             ]
           },
@@ -2472,15 +2484,27 @@
             "enum": [
               "LANGUAGE",
               "LIBRARY",
+              "FRAMEWORK",
+              "DATABASE",
               "TOOL",
               "SYSTEM",
+              "TESTING",
+              "PATTERN",
+              "DEVOPS",
+              "SOFT",
               "OTHER"
             ],
             "example": [
               "LANGUAGE",
               "LIBRARY",
+              "FRAMEWORK",
+              "DATABASE",
               "TOOL",
               "SYSTEM",
+              "TESTING",
+              "PATTERN",
+              "DEVOPS",
+              "SOFT",
               "OTHER"
             ]
           }
@@ -2497,15 +2521,27 @@
             "enum": [
               "LANGUAGE",
               "LIBRARY",
+              "FRAMEWORK",
+              "DATABASE",
               "TOOL",
               "SYSTEM",
+              "TESTING",
+              "PATTERN",
+              "DEVOPS",
+              "SOFT",
               "OTHER"
             ],
             "example": [
               "LANGUAGE",
               "LIBRARY",
+              "FRAMEWORK",
+              "DATABASE",
               "TOOL",
               "SYSTEM",
+              "TESTING",
+              "PATTERN",
+              "DEVOPS",
+              "SOFT",
               "OTHER"
             ]
           }
@@ -2526,15 +2562,27 @@
             "enum": [
               "LANGUAGE",
               "LIBRARY",
+              "FRAMEWORK",
+              "DATABASE",
               "TOOL",
               "SYSTEM",
+              "TESTING",
+              "PATTERN",
+              "DEVOPS",
+              "SOFT",
               "OTHER"
             ],
             "example": [
               "LANGUAGE",
               "LIBRARY",
+              "FRAMEWORK",
+              "DATABASE",
               "TOOL",
               "SYSTEM",
+              "TESTING",
+              "PATTERN",
+              "DEVOPS",
+              "SOFT",
               "OTHER"
             ]
           }
