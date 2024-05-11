@@ -54,14 +54,14 @@ export class CoursesService {
   update(
     userId: string,
     id: string,
-    updateCourseDto: UpdateCourseDto,
+    { skills, ...updateCourseDto }: UpdateCourseDto,
   ): Output<CourseDto> {
     return this.repository.update({
       where: { id, userId },
       data: {
         ...updateCourseDto,
-        ...(updateCourseDto.skills && {
-          Skills: { set: [], connect: manyIds(updateCourseDto.skills) },
+        ...(skills && {
+          Skills: { set: [], connect: manyIds(skills) },
         }),
       },
     })

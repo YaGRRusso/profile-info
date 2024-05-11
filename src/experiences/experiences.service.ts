@@ -54,14 +54,14 @@ export class ExperiencesService {
   update(
     userId: string,
     id: string,
-    updateExperienceDto: UpdateExperienceDto,
+    { skills, ...updateExperienceDto }: UpdateExperienceDto,
   ): Output<ExperienceDto> {
     return this.repository.update({
       where: { id, userId },
       data: {
         ...updateExperienceDto,
-        ...(updateExperienceDto.skills && {
-          Skills: { set: [], connect: manyIds(updateExperienceDto.skills) },
+        ...(skills && {
+          Skills: { set: [], connect: manyIds(skills) },
         }),
       },
     })
