@@ -2,30 +2,39 @@ import { CourseDto } from './dto/course.dto'
 import { CreateCourseDto } from './dto/create-course.dto'
 import { SearchCourseDto } from './dto/search-course.dto'
 import { UpdateCourseDto } from './dto/update-course.dto'
-import { PrismaCoursesRepository } from './repositories/courses.repository.prisma'
 
 import { manyIds } from '@helpers/prisma.helper'
 import { Output } from '@interfaces/output.interface'
 
 import { Injectable } from '@nestjs/common'
+import { PrismaClient } from '@prisma/client'
 
 @Injectable()
 export class CoursesService {
-  constructor(private repository: PrismaCoursesRepository) {}
+  constructor(private prisma: PrismaClient) {}
+  private repository = this.prisma.course
 
-  findAll(userId: string): Output<CourseDto[]> {
-    return this.repository.findAll({ where: { userId } })
+  async findAll(userId: string): Output<CourseDto[]> {
+    const res = await this.repository.findMany({
+      where: { userId },
+      include: { Skills: { select: { id: true } } },
+    })
+
+    return res.map(({ Skills, ...course }) => ({
+      ...course,
+      skills: Skills.map((skill) => skill.id),
+    }))
   }
 
   findOne(userId: string, id: string): Output<CourseDto> {
-    return this.repository.findOne({ where: { id, userId } })
+    return this.repository.findUnique({ where: { id, userId } })
   }
 
   searchAll(
     userId: string,
     searchCourseDto: SearchCourseDto,
   ): Output<CourseDto[]> {
-    return this.repository.findAll({
+    return this.repository.findMany({
       where: {
         ...searchCourseDto,
         ...(searchCourseDto.skills?.length && {
@@ -92,6 +101,6 @@ export class CoursesService {
   }
 
   remove(userId: string, id: string): Output<CourseDto> {
-    return this.repository.remove({ where: { userId, id } })
+    return this.repository.delete({ where: { userId, id } })
   }
 }
