@@ -2,28 +2,29 @@ import { CreateUserDto } from './dto/create-user.dto'
 import { SearchUserDto } from './dto/search-user.dto'
 import { UpdateUserDto } from './dto/update-user.dto'
 import { UserDto } from './dto/user.dto'
-import { PrismaUsersRepository } from './repositories/users.repository.prisma'
 
 import { manyIds } from '@/common/helpers/prisma.helper'
 import { Output } from '@/common/interfaces/output.interface'
 
 import { Injectable } from '@nestjs/common'
+import { PrismaClient } from '@prisma/client'
 import * as bcrypt from 'bcrypt'
 
 @Injectable()
 export class UsersService {
-  constructor(private repository: PrismaUsersRepository) {}
+  constructor(private prisma: PrismaClient) {}
+  private repository = this.prisma.user
 
   async findAll(): Output<UserDto[]> {
-    return await this.repository.findAll()
+    return await this.repository.findMany()
   }
 
   async findOne(id: string): Output<UserDto> {
-    return await this.repository.findOne({ where: { id } })
+    return await this.repository.findUnique({ where: { id } })
   }
 
   async searchAll(searchUserDto: SearchUserDto): Output<UserDto[]> {
-    return await this.repository.findAll({
+    return await this.repository.findMany({
       where: {
         ...searchUserDto,
         ...(searchUserDto.skills?.length && {
@@ -67,6 +68,6 @@ export class UsersService {
   }
 
   async remove(id: string): Output<UserDto> {
-    return await this.repository.remove({ where: { id } })
+    return await this.repository.delete({ where: { id } })
   }
 }

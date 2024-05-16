@@ -1,10 +1,10 @@
 import { ExperiencesController } from '../experiences/experiences.controller'
 import { ExperiencesService } from '../experiences/experiences.service'
-import { PrismaExperiencesRepository } from '../experiences/repositories/experiences.repository.prisma'
 
 import { PrismaService } from '@/common/prisma/prisma.service'
 
 import { Test, TestingModule } from '@nestjs/testing'
+import { PrismaClient } from '@prisma/client'
 
 describe('ExperiencesController', () => {
   let controller: ExperiencesController
@@ -13,11 +13,7 @@ describe('ExperiencesController', () => {
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [ExperiencesController],
-      providers: [
-        ExperiencesService,
-        PrismaExperiencesRepository,
-        PrismaService,
-      ],
+      providers: [ExperiencesService, PrismaClient, PrismaService],
     }).compile()
 
     controller = module.get<ExperiencesController>(ExperiencesController)

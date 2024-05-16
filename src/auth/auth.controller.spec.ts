@@ -1,13 +1,13 @@
 import { AuthController } from './auth.controller'
 import { AuthService } from './auth.service'
 
-import { PrismaUsersRepository } from '../users/repositories/users.repository.prisma'
 import { UsersService } from '../users/users.service'
 
 import { PrismaService } from '@/common/prisma/prisma.service'
 
 import { JwtService } from '@nestjs/jwt'
 import { Test, TestingModule } from '@nestjs/testing'
+import { PrismaClient } from '@prisma/client'
 
 describe('AuthController', () => {
   let controller: AuthController
@@ -19,7 +19,7 @@ describe('AuthController', () => {
       providers: [
         AuthService,
         PrismaService,
-        PrismaUsersRepository,
+        PrismaClient,
         UsersService,
         JwtService,
       ],

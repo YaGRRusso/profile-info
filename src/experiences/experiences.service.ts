@@ -2,30 +2,39 @@ import { CreateExperienceDto } from './dto/create-experience.dto'
 import { ExperienceDto } from './dto/experience.dto'
 import { SearchExperienceDto } from './dto/search-experience.dto'
 import { UpdateExperienceDto } from './dto/update-experience.dto'
-import { PrismaExperiencesRepository } from './repositories/experiences.repository.prisma'
 
 import { manyIds } from '@/common/helpers/prisma.helper'
 import { Output } from '@/common/interfaces/output.interface'
 
 import { Injectable } from '@nestjs/common'
+import { PrismaClient } from '@prisma/client'
 
 @Injectable()
 export class ExperiencesService {
-  constructor(private repository: PrismaExperiencesRepository) {}
+  constructor(private prisma: PrismaClient) {}
+  private repository = this.prisma.experience
 
-  findAll(userId: string): Output<ExperienceDto[]> {
-    return this.repository.findAll({ where: { userId } })
+  async findAll(userId: string): Output<ExperienceDto[]> {
+    const res = await this.repository.findMany({
+      where: { userId },
+      include: { Skills: { select: { id: true } } },
+    })
+
+    return res.map(({ Skills, ...experience }) => ({
+      ...experience,
+      skills: Skills.map((skill) => skill.id),
+    }))
   }
 
-  findOne(userId: string, id: string): Output<ExperienceDto> {
-    return this.repository.findOne({ where: { id, userId } })
+  async findOne(userId: string, id: string): Output<ExperienceDto> {
+    return await this.repository.findUnique({ where: { id, userId } })
   }
 
-  searchAll(
+  async searchAll(
     userId: string,
     searchExperienceDto: SearchExperienceDto,
   ): Output<ExperienceDto[]> {
-    return this.repository.findAll({
+    return await this.repository.findMany({
       where: {
         ...searchExperienceDto,
         ...(searchExperienceDto.skills?.length && {
@@ -36,11 +45,11 @@ export class ExperiencesService {
     })
   }
 
-  create(
+  async create(
     userId: string,
     { skills, ...createExperienceDto }: CreateExperienceDto,
   ): Output<ExperienceDto> {
-    return this.repository.create({
+    return await this.repository.create({
       data: {
         ...createExperienceDto,
         ...(skills?.length && {
@@ -51,12 +60,12 @@ export class ExperiencesService {
     })
   }
 
-  update(
+  async update(
     userId: string,
     id: string,
     { skills, ...updateExperienceDto }: UpdateExperienceDto,
   ): Output<ExperienceDto> {
-    return this.repository.update({
+    return await this.repository.update({
       where: { id, userId },
       data: {
         ...updateExperienceDto,
@@ -67,12 +76,12 @@ export class ExperiencesService {
     })
   }
 
-  addSkills(
+  async addSkills(
     userId: string,
     id: string,
     skills: string[],
   ): Output<ExperienceDto> {
-    return this.repository.update({
+    return await this.repository.update({
       where: { userId, id },
       include: { Skills: true },
       data: {
@@ -81,12 +90,12 @@ export class ExperiencesService {
     })
   }
 
-  removeSkills(
+  async removeSkills(
     userId: string,
     id: string,
     skills: string[],
   ): Output<ExperienceDto> {
-    return this.repository.update({
+    return await this.repository.update({
       where: { userId, id },
       include: { Skills: true },
       data: {
@@ -95,7 +104,7 @@ export class ExperiencesService {
     })
   }
 
-  remove(userId: string, id: string): Output<ExperienceDto> {
-    return this.repository.remove({ where: { userId, id } })
+  async remove(userId: string, id: string): Output<ExperienceDto> {
+    return await this.repository.delete({ where: { userId, id } })
   }
 }

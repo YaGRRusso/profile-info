@@ -2,30 +2,39 @@ import { CreateFormationDto } from './dto/create-formation.dto'
 import { FormationDto } from './dto/formation.dto'
 import { SearchFormationDto } from './dto/search-formation.dto'
 import { UpdateFormationDto } from './dto/update-formation.dto'
-import { PrismaFormationsRepository } from './repositories/formations.repository.prisma'
 
 import { manyIds } from '@/common/helpers/prisma.helper'
 import { Output } from '@/common/interfaces/output.interface'
 
 import { Injectable } from '@nestjs/common'
+import { PrismaClient } from '@prisma/client'
 
 @Injectable()
 export class FormationsService {
-  constructor(private repository: PrismaFormationsRepository) {}
+  constructor(private prisma: PrismaClient) {}
+  private repository = this.prisma.formation
 
-  findAll(userId: string): Output<FormationDto[]> {
-    return this.repository.findAll({ where: { userId } })
+  async findAll(userId: string): Output<FormationDto[]> {
+    const res = await this.repository.findMany({
+      where: { userId },
+      include: { Skills: { select: { id: true } } },
+    })
+
+    return res.map(({ Skills, ...formation }) => ({
+      ...formation,
+      skills: Skills.map((skill) => skill.id),
+    }))
   }
 
-  findOne(userId: string, id: string): Output<FormationDto> {
-    return this.repository.findOne({ where: { id, userId } })
+  async findOne(userId: string, id: string): Output<FormationDto> {
+    return await this.repository.findUnique({ where: { id, userId } })
   }
 
-  searchAll(
+  async searchAll(
     userId: string,
     searchFormationDto: SearchFormationDto,
   ): Output<FormationDto[]> {
-    return this.repository.findAll({
+    return await this.repository.findMany({
       where: {
         ...searchFormationDto,
         ...(searchFormationDto.skills?.length && {
@@ -36,11 +45,11 @@ export class FormationsService {
     })
   }
 
-  create(
+  async create(
     userId: string,
     { skills, ...createFormationDto }: CreateFormationDto,
   ): Output<FormationDto> {
-    return this.repository.create({
+    return await this.repository.create({
       data: {
         ...createFormationDto,
         ...(skills?.length && {
@@ -51,28 +60,28 @@ export class FormationsService {
     })
   }
 
-  update(
+  async update(
     userId: string,
     id: string,
-    updateFormationDto: UpdateFormationDto,
+    { skills, ...updateFormationDto }: UpdateFormationDto,
   ): Output<FormationDto> {
-    return this.repository.update({
+    return await this.repository.update({
       where: { id, userId },
       data: {
         ...updateFormationDto,
-        ...(updateFormationDto.skills && {
-          Skills: { set: [], connect: manyIds(updateFormationDto.skills) },
+        ...(skills && {
+          Skills: { set: [], connect: manyIds(skills) },
         }),
       },
     })
   }
 
-  addSkills(
+  async addSkills(
     userId: string,
     id: string,
     skills: string[],
   ): Output<FormationDto> {
-    return this.repository.update({
+    return await this.repository.update({
       where: { userId, id },
       include: { Skills: true },
       data: {
@@ -81,12 +90,12 @@ export class FormationsService {
     })
   }
 
-  removeSkills(
+  async removeSkills(
     userId: string,
     id: string,
     skills: string[],
   ): Output<FormationDto> {
-    return this.repository.update({
+    return await this.repository.update({
       where: { userId, id },
       include: { Skills: true },
       data: {
@@ -95,7 +104,7 @@ export class FormationsService {
     })
   }
 
-  remove(userId: string, id: string): Output<FormationDto> {
-    return this.repository.remove({ where: { userId, id } })
+  async remove(userId: string, id: string): Output<FormationDto> {
+    return await this.repository.delete({ where: { userId, id } })
   }
 }

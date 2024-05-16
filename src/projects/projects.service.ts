@@ -2,30 +2,39 @@ import { CreateProjectDto } from './dto/create-project.dto'
 import { ProjectDto } from './dto/project.dto'
 import { SearchProjectDto } from './dto/search-project.dto'
 import { UpdateProjectDto } from './dto/update-project.dto'
-import { PrismaProjectsRepository } from './repositories/projects.repository.prisma'
 
 import { manyIds } from '@/common/helpers/prisma.helper'
 import { Output } from '@/common/interfaces/output.interface'
 
 import { Injectable } from '@nestjs/common'
+import { PrismaClient } from '@prisma/client'
 
 @Injectable()
 export class ProjectsService {
-  constructor(private repository: PrismaProjectsRepository) {}
+  constructor(private prisma: PrismaClient) {}
+  private repository = this.prisma.project
 
-  findAll(userId: string): Output<ProjectDto[]> {
-    return this.repository.findAll({ where: { userId } })
+  async findAll(userId: string): Output<ProjectDto[]> {
+    const res = await this.repository.findMany({
+      where: { userId },
+      include: { Skills: { select: { id: true } } },
+    })
+
+    return res.map(({ Skills, ...project }) => ({
+      ...project,
+      skills: Skills.map((skill) => skill.id),
+    }))
   }
 
-  findOne(userId: string, id: string): Output<ProjectDto> {
-    return this.repository.findOne({ where: { id, userId } })
+  async findOne(userId: string, id: string): Output<ProjectDto> {
+    return await this.repository.findUnique({ where: { id, userId } })
   }
 
-  searchAll(
+  async searchAll(
     userId: string,
     searchProjectDto: SearchProjectDto,
   ): Output<ProjectDto[]> {
-    return this.repository.findAll({
+    return await this.repository.findMany({
       where: {
         ...searchProjectDto,
         ...(searchProjectDto.skills?.length && {
@@ -36,11 +45,11 @@ export class ProjectsService {
     })
   }
 
-  create(
+  async create(
     userId: string,
     { skills, ...createProjectDto }: CreateProjectDto,
   ): Output<ProjectDto> {
-    return this.repository.create({
+    return await this.repository.create({
       data: {
         ...createProjectDto,
         ...(skills?.length && {
@@ -51,12 +60,12 @@ export class ProjectsService {
     })
   }
 
-  update(
+  async update(
     userId: string,
     id: string,
     { skills, ...updateProjectDto }: UpdateProjectDto,
   ): Output<ProjectDto> {
-    return this.repository.update({
+    return await this.repository.update({
       where: { id, userId },
       data: {
         ...updateProjectDto,
@@ -67,8 +76,12 @@ export class ProjectsService {
     })
   }
 
-  addSkills(userId: string, id: string, skills: string[]): Output<ProjectDto> {
-    return this.repository.update({
+  async addSkills(
+    userId: string,
+    id: string,
+    skills: string[],
+  ): Output<ProjectDto> {
+    return await this.repository.update({
       where: { userId, id },
       include: { Skills: true },
       data: {
@@ -77,12 +90,12 @@ export class ProjectsService {
     })
   }
 
-  removeSkills(
+  async removeSkills(
     userId: string,
     id: string,
     skills: string[],
   ): Output<ProjectDto> {
-    return this.repository.update({
+    return await this.repository.update({
       where: { userId, id },
       include: { Skills: true },
       data: {
@@ -91,7 +104,7 @@ export class ProjectsService {
     })
   }
 
-  remove(userId: string, id: string): Output<ProjectDto> {
-    return this.repository.remove({ where: { userId, id } })
+  async remove(userId: string, id: string): Output<ProjectDto> {
+    return await this.repository.delete({ where: { userId, id } })
   }
 }

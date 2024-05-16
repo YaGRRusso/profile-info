@@ -1,12 +1,12 @@
 import { ExperiencesController } from './experiences.controller'
 import { ExperiencesService } from './experiences.service'
-import { PrismaExperiencesRepository } from './repositories/experiences.repository.prisma'
 
 import { Module } from '@nestjs/common'
+import { PrismaClient } from '@prisma/client'
 
 @Module({
   controllers: [ExperiencesController],
-  providers: [ExperiencesService, PrismaExperiencesRepository],
+  providers: [ExperiencesService, PrismaClient],
   exports: [ExperiencesService],
 })
 export class ExperiencesModule {}

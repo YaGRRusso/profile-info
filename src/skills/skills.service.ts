@@ -2,29 +2,30 @@ import { CreateSkillDto } from './dto/create-skill.dto'
 import { SearchSkillDto } from './dto/search-skill.dto'
 import { SkillDto } from './dto/skill.dto'
 import { UpdateSkillDto } from './dto/update-skill.dto'
-import { PrismaSkillsRepository } from './repositories/skills.repository.prisma'
 
 import { Output } from '@/common/interfaces/output.interface'
 
 import { Injectable } from '@nestjs/common'
+import { PrismaClient } from '@prisma/client'
 
 @Injectable()
 export class SkillsService {
-  constructor(private repository: PrismaSkillsRepository) {}
+  constructor(private prisma: PrismaClient) {}
+  private repository = this.prisma.skill
 
   async findAll(userId: string): Output<SkillDto[]> {
-    return await this.repository.findAll({ where: { userId } })
+    return await this.repository.findMany({ where: { userId } })
   }
 
   async findOne(userId: string, id: string): Output<SkillDto> {
-    return await this.repository.findOne({ where: { id, userId } })
+    return await this.repository.findUnique({ where: { id, userId } })
   }
 
   async searchAll(
     userId: string,
     searchSkillDto: SearchSkillDto,
   ): Output<SkillDto[]> {
-    return await this.repository.findAll({
+    return await this.repository.findMany({
       where: { ...searchSkillDto, userId },
     })
   }
@@ -50,6 +51,6 @@ export class SkillsService {
   }
 
   async remove(userId: string, id: string): Output<SkillDto> {
-    return await this.repository.remove({ where: { id, userId } })
+    return await this.repository.delete({ where: { id, userId } })
   }
 }

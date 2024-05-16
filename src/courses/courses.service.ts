@@ -26,15 +26,15 @@ export class CoursesService {
     }))
   }
 
-  findOne(userId: string, id: string): Output<CourseDto> {
-    return this.repository.findUnique({ where: { id, userId } })
+  async findOne(userId: string, id: string): Output<CourseDto> {
+    return await this.repository.findUnique({ where: { id, userId } })
   }
 
-  searchAll(
+  async searchAll(
     userId: string,
     searchCourseDto: SearchCourseDto,
   ): Output<CourseDto[]> {
-    return this.repository.findMany({
+    return await this.repository.findMany({
       where: {
         ...searchCourseDto,
         ...(searchCourseDto.skills?.length && {
@@ -45,11 +45,11 @@ export class CoursesService {
     })
   }
 
-  create(
+  async create(
     userId: string,
     { skills, ...createCourseDto }: CreateCourseDto,
   ): Output<CourseDto> {
-    return this.repository.create({
+    return await this.repository.create({
       data: {
         ...createCourseDto,
         ...(skills?.length && {
@@ -60,12 +60,12 @@ export class CoursesService {
     })
   }
 
-  update(
+  async update(
     userId: string,
     id: string,
     { skills, ...updateCourseDto }: UpdateCourseDto,
   ): Output<CourseDto> {
-    return this.repository.update({
+    return await this.repository.update({
       where: { id, userId },
       data: {
         ...updateCourseDto,
@@ -76,8 +76,12 @@ export class CoursesService {
     })
   }
 
-  addSkills(userId: string, id: string, skills: string[]): Output<CourseDto> {
-    return this.repository.update({
+  async addSkills(
+    userId: string,
+    id: string,
+    skills: string[],
+  ): Output<CourseDto> {
+    return await this.repository.update({
       where: { userId, id },
       include: { Skills: true },
       data: {
@@ -86,12 +90,12 @@ export class CoursesService {
     })
   }
 
-  removeSkills(
+  async removeSkills(
     userId: string,
     id: string,
     skills: string[],
   ): Output<CourseDto> {
-    return this.repository.update({
+    return await this.repository.update({
       where: { userId, id },
       include: { Skills: true },
       data: {
@@ -100,7 +104,7 @@ export class CoursesService {
     })
   }
 
-  remove(userId: string, id: string): Output<CourseDto> {
-    return this.repository.delete({ where: { userId, id } })
+  async remove(userId: string, id: string): Output<CourseDto> {
+    return await this.repository.delete({ where: { userId, id } })
   }
 }

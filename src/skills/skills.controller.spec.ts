@@ -1,10 +1,10 @@
-import { PrismaSkillsRepository } from './repositories/skills.repository.prisma'
 import { SkillsController } from './skills.controller'
 import { SkillsService } from './skills.service'
 
 import { PrismaService } from '@/common/prisma/prisma.service'
 
 import { Test, TestingModule } from '@nestjs/testing'
+import { PrismaClient } from '@prisma/client'
 
 describe('SkillsController', () => {
   let controller: SkillsController
@@ -13,7 +13,7 @@ describe('SkillsController', () => {
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [SkillsController],
-      providers: [SkillsService, PrismaSkillsRepository, PrismaService],
+      providers: [SkillsService, PrismaClient, PrismaService],
     }).compile()
 
     controller = module.get<SkillsController>(SkillsController)
