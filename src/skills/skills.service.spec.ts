@@ -1,7 +1,7 @@
 import { PrismaSkillsRepository } from './repositories/skills.repository.prisma'
 import { SkillsService } from './skills.service'
 
-import { PrismaService } from '@prisma/prisma.service'
+import { PrismaService } from '@/common/prisma/prisma.service'
 
 import { Test, TestingModule } from '@nestjs/testing'
 

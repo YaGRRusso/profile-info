@@ -1,6 +1,6 @@
 import { UserPayload } from '../entities/payload.entity'
 
-import { JwtUser } from '@auth/entities/user.entity'
+import { JwtUser } from '@/auth/entities/user.entity'
 
 import { Injectable } from '@nestjs/common'
 import { PassportStrategy } from '@nestjs/passport'

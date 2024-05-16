@@ -5,8 +5,8 @@ import { SearchExperienceDto } from '../experiences/dto/search-experience.dto'
 import { UpdateExperienceDto } from '../experiences/dto/update-experience.dto'
 import { ExperiencesService } from '../experiences/experiences.service'
 
-import { IsPublic } from '@auth/decorators/public.decorator'
-import { AuthRequest } from '@auth/entities/request.entity'
+import { IsPublic } from '@/auth/decorators/public.decorator'
+import { AuthRequest } from '@/auth/entities/request.entity'
 
 import {
   Body,

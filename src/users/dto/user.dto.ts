@@ -1,4 +1,4 @@
-import { Role, RoleEnum } from '@interfaces/role.interface'
+import { Role, RoleEnum } from '@/common/interfaces/role.interface'
 
 import { ApiProperty } from '@nestjs/swagger'
 import {

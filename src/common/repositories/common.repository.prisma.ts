@@ -1,6 +1,6 @@
 import { CommonRepositoryInterface } from './common.repository.interface'
 
-import { PrismaService } from '@prisma/prisma.service'
+import { PrismaService } from '@/common/prisma/prisma.service'
 
 import { Injectable } from '@nestjs/common'
 import { Prisma, PrismaPromise } from '@prisma/client'

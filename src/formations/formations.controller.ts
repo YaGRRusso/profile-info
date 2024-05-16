@@ -5,8 +5,8 @@ import { SearchFormationDto } from '../formations/dto/search-formation.dto'
 import { UpdateFormationDto } from '../formations/dto/update-formation.dto'
 import { FormationsService } from '../formations/formations.service'
 
-import { IsPublic } from '@auth/decorators/public.decorator'
-import { AuthRequest } from '@auth/entities/request.entity'
+import { IsPublic } from '@/auth/decorators/public.decorator'
+import { AuthRequest } from '@/auth/entities/request.entity'
 
 import {
   Body,

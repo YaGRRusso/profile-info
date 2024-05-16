@@ -1,4 +1,4 @@
-import { CommonFilter } from '@handlers/common.filter'
+import { CommonFilter } from '@/common/handlers/common.filter'
 
 import { INestApplication } from '@nestjs/common'
 import { HttpAdapterHost } from '@nestjs/core'

@@ -2,7 +2,7 @@ import { FormationsController } from '../formations/formations.controller'
 import { FormationsService } from '../formations/formations.service'
 import { PrismaFormationsRepository } from '../formations/repositories/formations.repository.prisma'
 
-import { PrismaService } from '@prisma/prisma.service'
+import { PrismaService } from '@/common/prisma/prisma.service'
 
 import { Test, TestingModule } from '@nestjs/testing'
 

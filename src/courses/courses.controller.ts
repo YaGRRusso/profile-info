@@ -5,8 +5,8 @@ import { CreateCourseDto } from '../courses/dto/create-course.dto'
 import { SearchCourseDto } from '../courses/dto/search-course.dto'
 import { UpdateCourseDto } from '../courses/dto/update-course.dto'
 
-import { IsPublic } from '@auth/decorators/public.decorator'
-import { AuthRequest } from '@auth/entities/request.entity'
+import { IsPublic } from '@/auth/decorators/public.decorator'
+import { AuthRequest } from '@/auth/entities/request.entity'
 
 import {
   Body,

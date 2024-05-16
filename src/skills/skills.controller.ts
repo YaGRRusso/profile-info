@@ -4,7 +4,7 @@ import { SkillDto } from './dto/skill.dto'
 import { UpdateSkillDto } from './dto/update-skill.dto'
 import { SkillsService } from './skills.service'
 
-import { AuthRequest } from '@auth/entities/request.entity'
+import { AuthRequest } from '@/auth/entities/request.entity'
 
 import {
   Body,

@@ -1,7 +1,7 @@
 import { UsersRepositoryInterface } from './users.repository.interface'
 
-import { PrismaService } from '@prisma/prisma.service'
-import { PrismaCommonRepository } from '@repositories/common.repository.prisma'
+import { PrismaService } from '@/common/prisma/prisma.service'
+import { PrismaCommonRepository } from '@/common/repositories/common.repository.prisma'
 
 import { Injectable } from '@nestjs/common'
 import { Prisma, User } from '@prisma/client'

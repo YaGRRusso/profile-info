@@ -4,12 +4,15 @@ import { UpdateUserDto } from './dto/update-user.dto'
 import { UserDto } from './dto/user.dto'
 import { UsersService } from './users.service'
 
-import { IsPublic } from '@auth/decorators/public.decorator'
-import { NeedRole } from '@auth/decorators/role.decorator'
-import { AuthRequest } from '@auth/entities/request.entity'
-import { JwtAuthGuard } from '@auth/guards/jwt.guard'
-import { RoleGuard } from '@auth/guards/role.guard'
-import { removeObjectKey, removeObjectsKey } from '@helpers/object.helper'
+import { IsPublic } from '@/auth/decorators/public.decorator'
+import { NeedRole } from '@/auth/decorators/role.decorator'
+import { AuthRequest } from '@/auth/entities/request.entity'
+import { JwtAuthGuard } from '@/auth/guards/jwt.guard'
+import { RoleGuard } from '@/auth/guards/role.guard'
+import {
+  removeObjectKey,
+  removeObjectsKey,
+} from '@/common/helpers/object.helper'
 
 import {
   Body,

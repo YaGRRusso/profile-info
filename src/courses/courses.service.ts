@@ -3,8 +3,8 @@ import { CreateCourseDto } from './dto/create-course.dto'
 import { SearchCourseDto } from './dto/search-course.dto'
 import { UpdateCourseDto } from './dto/update-course.dto'
 
-import { manyIds } from '@helpers/prisma.helper'
-import { Output } from '@interfaces/output.interface'
+import { manyIds } from '@/common/helpers/prisma.helper'
+import { Output } from '@/common/interfaces/output.interface'
 
 import { Injectable } from '@nestjs/common'
 import { PrismaClient } from '@prisma/client'

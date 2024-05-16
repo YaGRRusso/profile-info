@@ -6,7 +6,7 @@ import { AuthRequest } from './entities/request.entity'
 import { JwtAuthGuard } from './guards/jwt.guard'
 import { RoleGuard } from './guards/role.guard'
 
-import { Output } from '@interfaces/output.interface'
+import { Output } from '@/common/interfaces/output.interface'
 
 import { Body, Controller, Get, Post, Req, UseGuards } from '@nestjs/common'
 import { ApiHeader, ApiResponse, ApiTags } from '@nestjs/swagger'

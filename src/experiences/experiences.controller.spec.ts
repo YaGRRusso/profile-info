@@ -2,7 +2,7 @@ import { ExperiencesController } from '../experiences/experiences.controller'
 import { ExperiencesService } from '../experiences/experiences.service'
 import { PrismaExperiencesRepository } from '../experiences/repositories/experiences.repository.prisma'
 
-import { PrismaService } from '@prisma/prisma.service'
+import { PrismaService } from '@/common/prisma/prisma.service'
 
 import { Test, TestingModule } from '@nestjs/testing'
 

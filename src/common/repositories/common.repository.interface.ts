@@ -1,4 +1,4 @@
-import { Output } from '@interfaces/output.interface'
+import { Output } from '@/common/interfaces/output.interface'
 
 export interface CommonRepositoryInterface<
   Entity,

@@ -4,7 +4,7 @@ import { SkillDto } from './dto/skill.dto'
 import { UpdateSkillDto } from './dto/update-skill.dto'
 import { PrismaSkillsRepository } from './repositories/skills.repository.prisma'
 
-import { Output } from '@interfaces/output.interface'
+import { Output } from '@/common/interfaces/output.interface'
 
 import { Injectable } from '@nestjs/common'
 

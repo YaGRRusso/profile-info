@@ -10,7 +10,7 @@ import { ProjectsModule } from './projects/projects.module'
 import { SkillsModule } from './skills/skills.module'
 import { UsersModule } from './users/users.module'
 
-import { JwtAuthGuard } from '@auth/guards/jwt.guard'
+import { JwtAuthGuard } from '@/auth/guards/jwt.guard'
 
 import { Module } from '@nestjs/common'
 import { APP_GUARD } from '@nestjs/core'

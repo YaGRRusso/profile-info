@@ -4,8 +4,8 @@ import { SearchProjectDto } from './dto/search-project.dto'
 import { UpdateProjectDto } from './dto/update-project.dto'
 import { PrismaProjectsRepository } from './repositories/projects.repository.prisma'
 
-import { manyIds } from '@helpers/prisma.helper'
-import { Output } from '@interfaces/output.interface'
+import { manyIds } from '@/common/helpers/prisma.helper'
+import { Output } from '@/common/interfaces/output.interface'
 
 import { Injectable } from '@nestjs/common'
 

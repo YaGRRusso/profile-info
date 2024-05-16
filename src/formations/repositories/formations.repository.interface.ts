@@ -1,4 +1,4 @@
-import { CommonRepositoryInterface } from '@repositories/common.repository.interface'
+import { CommonRepositoryInterface } from '@/common/repositories/common.repository.interface'
 
 import { Formation, Prisma } from '@prisma/client'
 

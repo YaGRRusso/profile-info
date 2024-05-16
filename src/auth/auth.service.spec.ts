@@ -1,8 +1,8 @@
 import { AuthService } from './auth.service'
 
-import { PrismaService } from '@prisma/prisma.service'
-import { PrismaUsersRepository } from '@src/users/repositories/users.repository.prisma'
-import { UsersService } from '@src/users/users.service'
+import { PrismaService } from '@/common/prisma/prisma.service'
+import { PrismaUsersRepository } from '@/users/repositories/users.repository.prisma'
+import { UsersService } from '@/users/users.service'
 
 import { JwtService } from '@nestjs/jwt'
 import { Test, TestingModule } from '@nestjs/testing'

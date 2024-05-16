@@ -1,4 +1,4 @@
-import { Role } from '@interfaces/role.interface'
+import { Role } from '@/common/interfaces/role.interface'
 
 export class JwtUser {
   id: string

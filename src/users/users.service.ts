@@ -4,8 +4,8 @@ import { UpdateUserDto } from './dto/update-user.dto'
 import { UserDto } from './dto/user.dto'
 import { PrismaUsersRepository } from './repositories/users.repository.prisma'
 
-import { manyIds } from '@helpers/prisma.helper'
-import { Output } from '@interfaces/output.interface'
+import { manyIds } from '@/common/helpers/prisma.helper'
+import { Output } from '@/common/interfaces/output.interface'
 
 import { Injectable } from '@nestjs/common'
 import * as bcrypt from 'bcrypt'

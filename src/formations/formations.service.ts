@@ -4,8 +4,8 @@ import { SearchFormationDto } from './dto/search-formation.dto'
 import { UpdateFormationDto } from './dto/update-formation.dto'
 import { PrismaFormationsRepository } from './repositories/formations.repository.prisma'
 
-import { manyIds } from '@helpers/prisma.helper'
-import { Output } from '@interfaces/output.interface'
+import { manyIds } from '@/common/helpers/prisma.helper'
+import { Output } from '@/common/interfaces/output.interface'
 
 import { Injectable } from '@nestjs/common'
 

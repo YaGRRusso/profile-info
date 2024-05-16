@@ -1,9 +1,9 @@
 import { UserPayload } from './entities/payload.entity'
 
-import { Output } from '@interfaces/output.interface'
-import { Role } from '@interfaces/role.interface'
-import { UserDto } from '@src/users/dto/user.dto'
-import { UsersService } from '@src/users/users.service'
+import { Output } from '@/common/interfaces/output.interface'
+import { Role } from '@/common/interfaces/role.interface'
+import { UserDto } from '@/users/dto/user.dto'
+import { UsersService } from '@/users/users.service'
 
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common'
 import { JwtService } from '@nestjs/jwt'

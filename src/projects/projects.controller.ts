@@ -4,8 +4,8 @@ import { SearchProjectDto } from './dto/search-project.dto'
 import { UpdateProjectDto } from './dto/update-project.dto'
 import { ProjectsService } from './projects.service'
 
-import { IsPublic } from '@auth/decorators/public.decorator'
-import { AuthRequest } from '@auth/entities/request.entity'
+import { IsPublic } from '@/auth/decorators/public.decorator'
+import { AuthRequest } from '@/auth/entities/request.entity'
 
 import {
   Body,

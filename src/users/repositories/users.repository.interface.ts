@@ -1,4 +1,4 @@
-import { CommonRepositoryInterface } from '@repositories/common.repository.interface'
+import { CommonRepositoryInterface } from '@/common/repositories/common.repository.interface'
 
 import { Prisma, User } from '@prisma/client'
 

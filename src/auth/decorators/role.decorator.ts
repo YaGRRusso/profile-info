@@ -1,4 +1,4 @@
-import { Role as RoleInterface } from '@interfaces/role.interface'
+import { Role as RoleInterface } from '@/common/interfaces/role.interface'
 
 import { SetMetadata } from '@nestjs/common'
 

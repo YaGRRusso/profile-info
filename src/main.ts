@@ -1,9 +1,9 @@
 import { AppModule } from './app.module'
 
-import { appConfig } from '@configs/app.config'
-import { filtersConfig } from '@configs/filter.config'
-import { swaggerConfig } from '@configs/swagger.config'
-import { validationConfig } from '@configs/validation.config'
+import { appConfig } from '@/common/configs/app.config'
+import { filtersConfig } from '@/common/configs/filter.config'
+import { swaggerConfig } from '@/common/configs/swagger.config'
+import { validationConfig } from '@/common/configs/validation.config'
 
 import { NestFactory } from '@nestjs/core'
 
