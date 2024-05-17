@@ -65,7 +65,6 @@ $ npm run test:cov
 - [x] Repl
 - [x] SQL Diagram
 - [x] Prisma SQL Schema
-- [x] Common Methods Repository
 - [x] Error Boundary
 - [x] Docker (Postgres and Node)
 - [x] Swagger
