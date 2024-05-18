@@ -16,6 +16,7 @@ import {
   Param,
   Patch,
   Post,
+  Query,
   Req,
 } from '@nestjs/common'
 import { ApiHeader, ApiResponse, ApiTags } from '@nestjs/swagger'
@@ -52,8 +53,16 @@ export class CoursesController {
   @ApiHeader({ name: 'Authorization' })
   @ApiResponse({ type: CourseDto, isArray: true })
   @Get('/search')
-  searchAll(@Req() req: AuthRequest, @Body() searchCourseDto: SearchCourseDto) {
-    return this.coursesService.searchAll(req.user.id, searchCourseDto)
+  searchAll(
+    @Req() req: AuthRequest,
+    @Body() searchCourseDto: SearchCourseDto,
+    @Query() query: { page: number },
+  ) {
+    return this.coursesService.searchAll(
+      req.user.id,
+      searchCourseDto,
+      +query.page,
+    )
   }
 
   @ApiHeader({ name: 'Authorization' })
