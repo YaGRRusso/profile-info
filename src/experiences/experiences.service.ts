@@ -38,7 +38,7 @@ export class ExperiencesService {
       where: {
         ...searchExperienceDto,
         ...(searchExperienceDto.skills?.length && {
-          Skills: { some: { id: searchExperienceDto.skills[0] } },
+          Skills: { some: { id: { in: searchExperienceDto.skills } } },
         }),
         userId,
       },

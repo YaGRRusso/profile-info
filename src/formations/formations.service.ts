@@ -38,7 +38,7 @@ export class FormationsService {
       where: {
         ...searchFormationDto,
         ...(searchFormationDto.skills?.length && {
-          Skills: { some: { id: searchFormationDto.skills[0] } },
+          Skills: { some: { id: { in: searchFormationDto.skills } } },
         }),
         userId,
       },

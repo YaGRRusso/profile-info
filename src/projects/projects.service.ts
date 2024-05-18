@@ -38,7 +38,7 @@ export class ProjectsService {
       where: {
         ...searchProjectDto,
         ...(searchProjectDto.skills?.length && {
-          Skills: { some: { id: searchProjectDto.skills[0] } },
+          Skills: { some: { id: { in: searchProjectDto.skills } } },
         }),
         userId,
       },

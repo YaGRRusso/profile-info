@@ -28,7 +28,7 @@ export class UsersService {
       where: {
         ...searchUserDto,
         ...(searchUserDto.skills?.length && {
-          Skills: { some: { id: searchUserDto.skills[0] } },
+          Skills: { some: { id: { in: searchUserDto.skills } } },
         }),
       },
     })
