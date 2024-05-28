@@ -4,7 +4,7 @@ import { UpdateUserDto } from './dto/update-user.dto'
 import { UserDto } from './dto/user.dto'
 
 import { manyIds } from '@/common/helpers/prisma.helper'
-import { Output } from '@/common/interfaces/output.interface'
+import { CommonOutput } from '@/common/interfaces/output.interface'
 
 import { Injectable } from '@nestjs/common'
 import { PrismaClient } from '@prisma/client'
@@ -15,15 +15,15 @@ export class UsersService {
   constructor(private prisma: PrismaClient) {}
   private repository = this.prisma.user
 
-  async findAll(): Output<UserDto[]> {
+  async findAll(): CommonOutput<UserDto[]> {
     return await this.repository.findMany()
   }
 
-  async findOne(id: string): Output<UserDto> {
+  async findOne(id: string): CommonOutput<UserDto> {
     return await this.repository.findUnique({ where: { id } })
   }
 
-  async searchAll(searchUserDto: SearchUserDto): Output<UserDto[]> {
+  async searchAll(searchUserDto: SearchUserDto): CommonOutput<UserDto[]> {
     return await this.repository.findMany({
       where: {
         ...searchUserDto,
@@ -38,7 +38,7 @@ export class UsersService {
     password,
     skills,
     ...createUserDto
-  }: CreateUserDto): Output<UserDto> {
+  }: CreateUserDto): CommonOutput<UserDto> {
     const hash = await bcrypt.hash(password, 8)
     return await this.repository.create({
       data: {
@@ -55,7 +55,7 @@ export class UsersService {
   async update(
     id: string,
     { skills, ...updateUserDto }: UpdateUserDto,
-  ): Output<UserDto> {
+  ): CommonOutput<UserDto> {
     return await this.repository.update({
       where: { id },
       data: {
@@ -67,7 +67,7 @@ export class UsersService {
     })
   }
 
-  async remove(id: string): Output<UserDto> {
+  async remove(id: string): CommonOutput<UserDto> {
     return await this.repository.delete({ where: { id } })
   }
 }

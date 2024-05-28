@@ -4,7 +4,7 @@ import { SearchExperienceDto } from './dto/search-experience.dto'
 import { UpdateExperienceDto } from './dto/update-experience.dto'
 
 import { manyIds } from '@/common/helpers/prisma.helper'
-import { Output } from '@/common/interfaces/output.interface'
+import { CommonOutput } from '@/common/interfaces/output.interface'
 
 import { Injectable } from '@nestjs/common'
 import { PrismaClient } from '@prisma/client'
@@ -14,7 +14,7 @@ export class ExperiencesService {
   constructor(private prisma: PrismaClient) {}
   private repository = this.prisma.experience
 
-  async findAll(userId: string): Output<ExperienceDto[]> {
+  async findAll(userId: string): CommonOutput<ExperienceDto[]> {
     const res = await this.repository.findMany({
       where: { userId },
       include: { Skills: { select: { id: true } } },
@@ -26,14 +26,14 @@ export class ExperiencesService {
     }))
   }
 
-  async findOne(userId: string, id: string): Output<ExperienceDto> {
+  async findOne(userId: string, id: string): CommonOutput<ExperienceDto> {
     return await this.repository.findUnique({ where: { id, userId } })
   }
 
   async searchAll(
     userId: string,
     searchExperienceDto: SearchExperienceDto,
-  ): Output<ExperienceDto[]> {
+  ): CommonOutput<ExperienceDto[]> {
     return await this.repository.findMany({
       where: {
         ...searchExperienceDto,
@@ -48,7 +48,7 @@ export class ExperiencesService {
   async create(
     userId: string,
     { skills, ...createExperienceDto }: CreateExperienceDto,
-  ): Output<ExperienceDto> {
+  ): CommonOutput<ExperienceDto> {
     return await this.repository.create({
       data: {
         ...createExperienceDto,
@@ -64,7 +64,7 @@ export class ExperiencesService {
     userId: string,
     id: string,
     { skills, ...updateExperienceDto }: UpdateExperienceDto,
-  ): Output<ExperienceDto> {
+  ): CommonOutput<ExperienceDto> {
     return await this.repository.update({
       where: { id, userId },
       data: {
@@ -80,7 +80,7 @@ export class ExperiencesService {
     userId: string,
     id: string,
     skills: string[],
-  ): Output<ExperienceDto> {
+  ): CommonOutput<ExperienceDto> {
     return await this.repository.update({
       where: { userId, id },
       include: { Skills: true },
@@ -94,7 +94,7 @@ export class ExperiencesService {
     userId: string,
     id: string,
     skills: string[],
-  ): Output<ExperienceDto> {
+  ): CommonOutput<ExperienceDto> {
     return await this.repository.update({
       where: { userId, id },
       include: { Skills: true },
@@ -104,7 +104,7 @@ export class ExperiencesService {
     })
   }
 
-  async remove(userId: string, id: string): Output<ExperienceDto> {
+  async remove(userId: string, id: string): CommonOutput<ExperienceDto> {
     return await this.repository.delete({ where: { userId, id } })
   }
 }

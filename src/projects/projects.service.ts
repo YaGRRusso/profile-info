@@ -4,7 +4,7 @@ import { SearchProjectDto } from './dto/search-project.dto'
 import { UpdateProjectDto } from './dto/update-project.dto'
 
 import { manyIds } from '@/common/helpers/prisma.helper'
-import { Output } from '@/common/interfaces/output.interface'
+import { CommonOutput } from '@/common/interfaces/output.interface'
 
 import { Injectable } from '@nestjs/common'
 import { PrismaClient } from '@prisma/client'
@@ -14,7 +14,7 @@ export class ProjectsService {
   constructor(private prisma: PrismaClient) {}
   private repository = this.prisma.project
 
-  async findAll(userId: string): Output<ProjectDto[]> {
+  async findAll(userId: string): CommonOutput<ProjectDto[]> {
     const res = await this.repository.findMany({
       where: { userId },
       include: { Skills: { select: { id: true } } },
@@ -26,14 +26,14 @@ export class ProjectsService {
     }))
   }
 
-  async findOne(userId: string, id: string): Output<ProjectDto> {
+  async findOne(userId: string, id: string): CommonOutput<ProjectDto> {
     return await this.repository.findUnique({ where: { id, userId } })
   }
 
   async searchAll(
     userId: string,
     searchProjectDto: SearchProjectDto,
-  ): Output<ProjectDto[]> {
+  ): CommonOutput<ProjectDto[]> {
     return await this.repository.findMany({
       where: {
         ...searchProjectDto,
@@ -48,7 +48,7 @@ export class ProjectsService {
   async create(
     userId: string,
     { skills, ...createProjectDto }: CreateProjectDto,
-  ): Output<ProjectDto> {
+  ): CommonOutput<ProjectDto> {
     return await this.repository.create({
       data: {
         ...createProjectDto,
@@ -64,7 +64,7 @@ export class ProjectsService {
     userId: string,
     id: string,
     { skills, ...updateProjectDto }: UpdateProjectDto,
-  ): Output<ProjectDto> {
+  ): CommonOutput<ProjectDto> {
     return await this.repository.update({
       where: { id, userId },
       data: {
@@ -80,7 +80,7 @@ export class ProjectsService {
     userId: string,
     id: string,
     skills: string[],
-  ): Output<ProjectDto> {
+  ): CommonOutput<ProjectDto> {
     return await this.repository.update({
       where: { userId, id },
       include: { Skills: true },
@@ -94,7 +94,7 @@ export class ProjectsService {
     userId: string,
     id: string,
     skills: string[],
-  ): Output<ProjectDto> {
+  ): CommonOutput<ProjectDto> {
     return await this.repository.update({
       where: { userId, id },
       include: { Skills: true },
@@ -104,7 +104,7 @@ export class ProjectsService {
     })
   }
 
-  async remove(userId: string, id: string): Output<ProjectDto> {
+  async remove(userId: string, id: string): CommonOutput<ProjectDto> {
     return await this.repository.delete({ where: { userId, id } })
   }
 }

@@ -6,7 +6,7 @@ import { AuthRequest } from './entities/request.entity'
 import { JwtAuthGuard } from './guards/jwt.guard'
 import { RoleGuard } from './guards/role.guard'
 
-import { Output } from '@/common/interfaces/output.interface'
+import { CommonOutput } from '@/common/interfaces/output.interface'
 
 import { Body, Controller, Get, Post, Req, UseGuards } from '@nestjs/common'
 import { ApiHeader, ApiResponse, ApiTags } from '@nestjs/swagger'
@@ -19,14 +19,14 @@ export class AuthController {
   @ApiResponse({ type: String })
   @IsPublic()
   @Post()
-  async login(@Body() { email, password }: LoginUserDto): Output<string> {
+  async login(@Body() { email, password }: LoginUserDto): CommonOutput<string> {
     return await this.authService.login(email, password)
   }
 
   @ApiHeader({ name: 'Authorization' })
   @ApiResponse({ type: MeDto })
   @Get('me')
-  async me(@Req() req: AuthRequest): Output<unknown> {
+  async me(@Req() req: AuthRequest): CommonOutput<unknown> {
     return req.user
   }
 
@@ -35,7 +35,7 @@ export class AuthController {
   @NeedRole('ADMIN')
   @UseGuards(JwtAuthGuard, RoleGuard)
   @Get('validate')
-  async validate(@Req() req: AuthRequest): Output<unknown> {
+  async validate(@Req() req: AuthRequest): CommonOutput<unknown> {
     return req.user
   }
 }

@@ -4,7 +4,7 @@ import { SearchFormationDto } from './dto/search-formation.dto'
 import { UpdateFormationDto } from './dto/update-formation.dto'
 
 import { manyIds } from '@/common/helpers/prisma.helper'
-import { Output } from '@/common/interfaces/output.interface'
+import { CommonOutput } from '@/common/interfaces/output.interface'
 
 import { Injectable } from '@nestjs/common'
 import { PrismaClient } from '@prisma/client'
@@ -14,7 +14,7 @@ export class FormationsService {
   constructor(private prisma: PrismaClient) {}
   private repository = this.prisma.formation
 
-  async findAll(userId: string): Output<FormationDto[]> {
+  async findAll(userId: string): CommonOutput<FormationDto[]> {
     const res = await this.repository.findMany({
       where: { userId },
       include: { Skills: { select: { id: true } } },
@@ -26,14 +26,14 @@ export class FormationsService {
     }))
   }
 
-  async findOne(userId: string, id: string): Output<FormationDto> {
+  async findOne(userId: string, id: string): CommonOutput<FormationDto> {
     return await this.repository.findUnique({ where: { id, userId } })
   }
 
   async searchAll(
     userId: string,
     searchFormationDto: SearchFormationDto,
-  ): Output<FormationDto[]> {
+  ): CommonOutput<FormationDto[]> {
     return await this.repository.findMany({
       where: {
         ...searchFormationDto,
@@ -48,7 +48,7 @@ export class FormationsService {
   async create(
     userId: string,
     { skills, ...createFormationDto }: CreateFormationDto,
-  ): Output<FormationDto> {
+  ): CommonOutput<FormationDto> {
     return await this.repository.create({
       data: {
         ...createFormationDto,
@@ -64,7 +64,7 @@ export class FormationsService {
     userId: string,
     id: string,
     { skills, ...updateFormationDto }: UpdateFormationDto,
-  ): Output<FormationDto> {
+  ): CommonOutput<FormationDto> {
     return await this.repository.update({
       where: { id, userId },
       data: {
@@ -80,7 +80,7 @@ export class FormationsService {
     userId: string,
     id: string,
     skills: string[],
-  ): Output<FormationDto> {
+  ): CommonOutput<FormationDto> {
     return await this.repository.update({
       where: { userId, id },
       include: { Skills: true },
@@ -94,7 +94,7 @@ export class FormationsService {
     userId: string,
     id: string,
     skills: string[],
-  ): Output<FormationDto> {
+  ): CommonOutput<FormationDto> {
     return await this.repository.update({
       where: { userId, id },
       include: { Skills: true },
@@ -104,7 +104,7 @@ export class FormationsService {
     })
   }
 
-  async remove(userId: string, id: string): Output<FormationDto> {
+  async remove(userId: string, id: string): CommonOutput<FormationDto> {
     return await this.repository.delete({ where: { userId, id } })
   }
 }

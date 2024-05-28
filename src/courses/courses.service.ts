@@ -7,7 +7,10 @@ import { prismaConfig } from '@/common/configs/prisma.config'
 import { PaginationDto } from '@/common/dto/pagination.dto'
 import { getPages, getPagination } from '@/common/helpers/pagination.helper'
 import { manyIds } from '@/common/helpers/prisma.helper'
-import { Output, PaginatedOutput } from '@/common/interfaces/output.interface'
+import {
+  CommonOutput,
+  PaginatedOutput,
+} from '@/common/interfaces/output.interface'
 
 import { Injectable } from '@nestjs/common'
 import { PrismaClient } from '@prisma/client'
@@ -15,7 +18,7 @@ import { PrismaClient } from '@prisma/client'
 @Injectable()
 export class CoursesService {
   constructor(private prisma: PrismaClient) {}
-  private repository = this.prisma.$extends(prismaConfig).course
+  public repository = this.prisma.$extends(prismaConfig).course
 
   async findAll(
     userId: string,
@@ -39,7 +42,7 @@ export class CoursesService {
     return { data, pagination }
   }
 
-  async findOne(userId: string, id: string): Output<CourseDto> {
+  async findOne(userId: string, id: string): CommonOutput<CourseDto> {
     return await this.repository.findUnique({ where: { id, userId } })
   }
 
@@ -75,7 +78,7 @@ export class CoursesService {
   async create(
     userId: string,
     { skills, ...createCourseDto }: CreateCourseDto,
-  ): Output<CourseDto> {
+  ): CommonOutput<CourseDto> {
     return await this.repository.create({
       data: {
         ...createCourseDto,
@@ -91,7 +94,7 @@ export class CoursesService {
     userId: string,
     id: string,
     { skills, ...updateCourseDto }: UpdateCourseDto,
-  ): Output<CourseDto> {
+  ): CommonOutput<CourseDto> {
     return await this.repository.update({
       where: { id, userId },
       data: {
@@ -107,7 +110,7 @@ export class CoursesService {
     userId: string,
     id: string,
     skills: string[],
-  ): Output<CourseDto> {
+  ): CommonOutput<CourseDto> {
     return await this.repository.update({
       where: { userId, id },
       include: { Skills: true },
@@ -121,7 +124,7 @@ export class CoursesService {
     userId: string,
     id: string,
     skills: string[],
-  ): Output<CourseDto> {
+  ): CommonOutput<CourseDto> {
     return await this.repository.update({
       where: { userId, id },
       include: { Skills: true },
@@ -131,7 +134,7 @@ export class CoursesService {
     })
   }
 
-  async remove(userId: string, id: string): Output<CourseDto> {
+  async remove(userId: string, id: string): CommonOutput<CourseDto> {
     return await this.repository.delete({ where: { userId, id } })
   }
 }
