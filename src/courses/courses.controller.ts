@@ -7,6 +7,7 @@ import { UpdateCourseDto } from '../courses/dto/update-course.dto'
 
 import { IsPublic } from '@/auth/decorators/public.decorator'
 import { AuthRequest } from '@/auth/entities/request.entity'
+import { PaginationDto } from '@/common/dto/pagination.dto'
 
 import {
   Body,
@@ -29,8 +30,11 @@ export class CoursesController {
   @ApiResponse({ type: CourseDto, isArray: true })
   @IsPublic()
   @Get('/from/:id')
-  findAllFromUser(@Param('id') id: string) {
-    return this.coursesService.findAll(id)
+  findAllFromUser(
+    @Param('id') id: string,
+    @Query() paginationDto: PaginationDto,
+  ) {
+    return this.coursesService.findAll(id, paginationDto)
   }
 
   @ApiResponse({ type: CourseDto, isArray: true })
@@ -39,15 +43,16 @@ export class CoursesController {
   searchAllFromUser(
     @Param('id') id: string,
     @Body() searchCourseDto: SearchCourseDto,
+    @Query() paginationDto: PaginationDto,
   ) {
-    return this.coursesService.searchAll(id, searchCourseDto)
+    return this.coursesService.searchAll(id, searchCourseDto, paginationDto)
   }
 
   @ApiHeader({ name: 'Authorization' })
   @ApiResponse({ type: CourseDto, isArray: true })
   @Get()
-  findAll(@Req() req: AuthRequest) {
-    return this.coursesService.findAll(req.user.id)
+  findAll(@Req() req: AuthRequest, @Query() paginationDto: PaginationDto) {
+    return this.coursesService.findAll(req.user.id, paginationDto)
   }
 
   @ApiHeader({ name: 'Authorization' })
@@ -56,12 +61,12 @@ export class CoursesController {
   searchAll(
     @Req() req: AuthRequest,
     @Body() searchCourseDto: SearchCourseDto,
-    @Query() query: { page: number },
+    @Query() paginationDto: PaginationDto,
   ) {
     return this.coursesService.searchAll(
       req.user.id,
       searchCourseDto,
-      +query.page,
+      paginationDto,
     )
   }
 

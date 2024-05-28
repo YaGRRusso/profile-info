@@ -3,41 +3,40 @@ import { CreateCourseDto } from './dto/create-course.dto'
 import { SearchCourseDto } from './dto/search-course.dto'
 import { UpdateCourseDto } from './dto/update-course.dto'
 
+import { prismaConfig } from '@/common/configs/prisma.config'
+import { PaginationDto } from '@/common/dto/pagination.dto'
+import { getPages, getPagination } from '@/common/helpers/pagination.helper'
 import { manyIds } from '@/common/helpers/prisma.helper'
-import { Output } from '@/common/interfaces/output.interface'
+import { Output, PaginatedOutput } from '@/common/interfaces/output.interface'
 
 import { Injectable } from '@nestjs/common'
-import { Prisma, PrismaClient } from '@prisma/client'
-
-const getPagination = (page: number, count: number, limit: number) => {
-  const totalPages = Math.ceil(count / limit)
-  return {
-    totalRecords: count,
-    currentPage: page,
-    perPage: limit,
-    totalPages,
-    nextPage: page < totalPages ? page + 1 : null,
-    prevPage: page > 1 ? page - 1 : null,
-  }
-}
+import { PrismaClient } from '@prisma/client'
 
 @Injectable()
 export class CoursesService {
-  private limit: number = 10
-
   constructor(private prisma: PrismaClient) {}
-  private repository = this.prisma.course
+  private repository = this.prisma.$extends(prismaConfig).course
 
-  async findAll(userId: string): Output<CourseDto[]> {
-    const res = await this.repository.findMany({
-      where: { userId },
+  async findAll(
+    userId: string,
+    { limit, page }: PaginationDto,
+  ): PaginatedOutput<CourseDto> {
+    const { skip, take } = getPages({ page, limit })
+
+    const [records, count] = await this.repository.findManyAndCount({
+      skip,
+      take,
       include: { Skills: { select: { id: true } } },
+      where: { userId },
     })
 
-    return res.map(({ Skills, ...course }) => ({
+    const pagination = getPagination({ page, count, take })
+    const data = records.map(({ Skills, ...course }) => ({
       ...course,
       skills: Skills.map((skill) => skill.id),
     }))
+
+    return { data, pagination }
   }
 
   async findOne(userId: string, id: string): Output<CourseDto> {
@@ -47,35 +46,29 @@ export class CoursesService {
   async searchAll(
     userId: string,
     searchCourseDto: SearchCourseDto,
-    page: number = 1,
-  ): Output<CourseDto[]> {
-    const skip = (page - 1) * this.limit
+    { limit, page }: PaginationDto,
+  ): PaginatedOutput<CourseDto> {
+    const { skip, take } = getPages({ page, limit })
 
-    const where: Prisma.CourseWhereInput = {
-      ...searchCourseDto,
-      ...(searchCourseDto.skills?.length && {
-        Skills: { some: { id: { in: searchCourseDto.skills } } },
-      }),
-      userId,
-    }
+    const [records, count] = await this.repository.findManyAndCount({
+      skip,
+      take,
+      include: { Skills: { select: { id: true } } },
+      where: {
+        ...searchCourseDto,
+        ...(searchCourseDto.skills?.length && {
+          Skills: { some: { id: { in: searchCourseDto.skills } } },
+        }),
+        userId,
+      },
+    })
 
-    const [count, records] = await this.prisma.$transaction([
-      this.repository.count({ where }),
-      this.repository.findMany({
-        where,
-        skip,
-        take: this.limit,
-        include: { Skills: { select: { id: true } } },
-      }),
-    ])
-
-    const pagination = getPagination(page, count, this.limit)
+    const pagination = getPagination({ page, count, take })
     const data = records.map(({ Skills, ...course }) => ({
       ...course,
       skills: Skills.map((skill) => skill.id),
     }))
 
-    // @ts-expect-error testing
     return { data, pagination }
   }
 
