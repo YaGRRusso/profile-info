@@ -1,4 +1,5 @@
-import { PaginationDto } from '../dto/pagination.dto'
+import { PaginationDto } from '../dto/input.dto'
+import { PaginationOutputDto } from '../dto/output.dto'
 
 /**
  * Calculates the number of items to take and the number of items to skip based on the provided pagination parameters.
@@ -31,7 +32,7 @@ export const getPagination = ({
   page?: number | string
   count: number | string
   take: number | string
-}) => {
+}): PaginationOutputDto => {
   page = +page
   count = +count
   take = +take

@@ -4,7 +4,7 @@ import { SearchCourseDto } from './dto/search-course.dto'
 import { UpdateCourseDto } from './dto/update-course.dto'
 
 import { prismaConfig } from '@/common/configs/prisma.config'
-import { PaginationDto } from '@/common/dto/pagination.dto'
+import { PaginationDto } from '@/common/dto/input.dto'
 import { getPages, getPagination } from '@/common/helpers/pagination.helper'
 import { manyIds } from '@/common/helpers/prisma.helper'
 import {

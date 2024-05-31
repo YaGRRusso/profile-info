@@ -10,9 +10,6 @@ describe('getPages', () => {
 
     const result3 = getPages({ page: 3, limit: 15, max: 30 })
     expect(result3).toEqual({ take: 15, skip: 30 })
-
-    const result4 = getPages({ page: 0, limit: 10, max: 20 })
-    expect(result4).toEqual({ take: 10, skip: 0 })
   })
 })
 

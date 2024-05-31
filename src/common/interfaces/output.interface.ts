@@ -6,8 +6,8 @@ export type PaginatedOutput<T = unknown> = Promise<{
     totalRecords: number
     currentPage: number
     perPage: number
-    nextPage: number
-    prevPage: number
+    nextPage?: number
+    prevPage?: number
     totalPages: number
   }
 }>

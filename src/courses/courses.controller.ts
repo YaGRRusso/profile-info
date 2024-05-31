@@ -5,9 +5,9 @@ import { CreateCourseDto } from '../courses/dto/create-course.dto'
 import { SearchCourseDto } from '../courses/dto/search-course.dto'
 import { UpdateCourseDto } from '../courses/dto/update-course.dto'
 
-import { IsPublic } from '@/auth/decorators/public.decorator'
 import { AuthRequest } from '@/auth/entities/request.entity'
-import { PaginationDto } from '@/common/dto/pagination.dto'
+import { PaginationDto } from '@/common/dto/input.dto'
+import { PaginatedResponseDto } from '@/common/dto/output.dto'
 
 import {
   Body,
@@ -27,36 +27,36 @@ import { ApiHeader, ApiResponse, ApiTags } from '@nestjs/swagger'
 export class CoursesController {
   constructor(private readonly coursesService: CoursesService) {}
 
-  @ApiResponse({ type: CourseDto, isArray: true })
-  @IsPublic()
-  @Get('/from/:id')
-  findAllFromUser(
-    @Param('id') id: string,
-    @Query() paginationDto: PaginationDto,
-  ) {
-    return this.coursesService.findAll(id, paginationDto)
-  }
+  // @ApiResponse({ type: CourseDto, isArray: true })
+  // @IsPublic()
+  // @Get('/from/:id')
+  // findAllFromUser(
+  //   @Param('id') id: string,
+  //   @Query() paginationDto: PaginationDto,
+  // ) {
+  //   return this.coursesService.findAll(id, paginationDto)
+  // }
 
-  @ApiResponse({ type: CourseDto, isArray: true })
-  @IsPublic()
-  @Get('/from/:id/search')
-  searchAllFromUser(
-    @Param('id') id: string,
-    @Body() searchCourseDto: SearchCourseDto,
-    @Query() paginationDto: PaginationDto,
-  ) {
-    return this.coursesService.searchAll(id, searchCourseDto, paginationDto)
-  }
+  // @ApiResponse({ type: CourseDto, isArray: true })
+  // @IsPublic()
+  // @Get('/from/:id/search')
+  // searchAllFromUser(
+  //   @Param('id') id: string,
+  //   @Body() searchCourseDto: SearchCourseDto,
+  //   @Query() paginationDto: PaginationDto,
+  // ) {
+  //   return this.coursesService.searchAll(id, searchCourseDto, paginationDto)
+  // }
 
   @ApiHeader({ name: 'Authorization' })
-  @ApiResponse({ type: CourseDto, isArray: true })
+  @ApiResponse({ type: PaginatedResponseDto<CourseDto>(CourseDto) })
   @Get()
   findAll(@Req() req: AuthRequest, @Query() paginationDto: PaginationDto) {
     return this.coursesService.findAll(req.user.id, paginationDto)
   }
 
   @ApiHeader({ name: 'Authorization' })
-  @ApiResponse({ type: CourseDto, isArray: true })
+  @ApiResponse({ type: PaginatedResponseDto<CourseDto>(CourseDto) })
   @Get('/search')
   searchAll(
     @Req() req: AuthRequest,

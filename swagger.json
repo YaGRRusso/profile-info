@@ -1358,114 +1358,6 @@
         ]
       }
     },
-    "/courses/from/{id}": {
-      "get": {
-        "operationId": "CoursesController_findAllFromUser",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "page",
-            "required": false,
-            "in": "query",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "limit",
-            "required": false,
-            "in": "query",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "default": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/CourseDto"
-                  }
-                }
-              }
-            }
-          }
-        },
-        "tags": [
-          "courses"
-        ]
-      }
-    },
-    "/courses/from/{id}/search": {
-      "get": {
-        "operationId": "CoursesController_searchAllFromUser",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "page",
-            "required": false,
-            "in": "query",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "limit",
-            "required": false,
-            "in": "query",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/SearchCourseDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "default": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/CourseDto"
-                  }
-                }
-              }
-            }
-          }
-        },
-        "tags": [
-          "courses"
-        ]
-      }
-    },
     "/courses": {
       "get": {
         "operationId": "CoursesController_findAll",
@@ -1500,10 +1392,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/CourseDto"
-                  }
+                  "$ref": "#/components/schemas/PaginatedResponseDtoClass"
                 }
               }
             }
@@ -1595,10 +1484,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/CourseDto"
-                  }
+                  "$ref": "#/components/schemas/PaginatedResponseDtoClass"
                 }
               }
             }
@@ -3086,6 +2972,75 @@
           "createdAt",
           "updatedAt",
           "userId"
+        ]
+      },
+      "PaginationOutputDto": {
+        "type": "object",
+        "properties": {
+          "totalRecords": {
+            "type": "number"
+          },
+          "currentPage": {
+            "type": "number"
+          },
+          "perPage": {
+            "type": "number"
+          },
+          "nextPage": {
+            "type": "number"
+          },
+          "prevPage": {
+            "type": "number"
+          },
+          "totalPages": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "totalRecords",
+          "currentPage",
+          "perPage",
+          "totalPages"
+        ]
+      },
+      "PaginatedResponseDtoClass": {
+        "type": "object",
+        "properties": {
+          "totalRecords": {
+            "type": "number"
+          },
+          "currentPage": {
+            "type": "number"
+          },
+          "perPage": {
+            "type": "number"
+          },
+          "nextPage": {
+            "type": "number"
+          },
+          "prevPage": {
+            "type": "number"
+          },
+          "totalPages": {
+            "type": "number"
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CourseDto"
+            }
+          },
+          "pagination": {
+            "$ref": "#/components/schemas/PaginationOutputDto"
+          }
+        },
+        "required": [
+          "totalRecords",
+          "currentPage",
+          "perPage",
+          "totalPages",
+          "data",
+          "pagination"
         ]
       },
       "SearchCourseDto": {
