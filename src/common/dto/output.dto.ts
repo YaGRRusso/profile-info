@@ -22,10 +22,8 @@ export class PaginationOutputDto {
   totalPages: number
 }
 
-export function PaginatedResponseDto<T>(
-  model: Type<T>,
-): Type<PaginationOutputDto> {
-  class PaginatedResponseDtoClass extends PaginationOutputDto {
+export function PaginatedResponseDto<T>(model: Type<T>) {
+  class PaginatedResponseDtoClass {
     @ApiProperty({ type: [model] })
     @IsArray()
     data: T[]
@@ -33,5 +31,6 @@ export function PaginatedResponseDto<T>(
     @ApiProperty({ type: PaginationOutputDto })
     pagination: PaginationOutputDto
   }
+
   return PaginatedResponseDtoClass
 }

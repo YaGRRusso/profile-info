@@ -3006,24 +3006,6 @@
       "PaginatedResponseDtoClass": {
         "type": "object",
         "properties": {
-          "totalRecords": {
-            "type": "number"
-          },
-          "currentPage": {
-            "type": "number"
-          },
-          "perPage": {
-            "type": "number"
-          },
-          "nextPage": {
-            "type": "number"
-          },
-          "prevPage": {
-            "type": "number"
-          },
-          "totalPages": {
-            "type": "number"
-          },
           "data": {
             "type": "array",
             "items": {
@@ -3035,10 +3017,6 @@
           }
         },
         "required": [
-          "totalRecords",
-          "currentPage",
-          "perPage",
-          "totalPages",
           "data",
           "pagination"
         ]
