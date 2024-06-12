@@ -3,8 +3,11 @@ import { ExperienceDto } from './dto/experience.dto'
 import { SearchExperienceDto } from './dto/search-experience.dto'
 import { UpdateExperienceDto } from './dto/update-experience.dto'
 
+import { prismaConfig } from '@/common/configs/prisma.config'
+import { PaginationDto } from '@/common/dto/input.dto'
+import { getPages, getPagination } from '@/common/helpers/pagination.helper'
 import { manyIds } from '@/common/helpers/prisma.helper'
-import { CommonOutput } from '@/common/interfaces/output.interface'
+import { CommonOutput, PaginatedOutput } from '@/common/interfaces/output.interface'
 
 import { Injectable } from '@nestjs/common'
 import { PrismaClient } from '@prisma/client'
@@ -12,18 +15,25 @@ import { PrismaClient } from '@prisma/client'
 @Injectable()
 export class ExperiencesService {
   constructor(private prisma: PrismaClient) {}
-  private repository = this.prisma.experience
+  public repository = this.prisma.$extends(prismaConfig).experience
 
-  async findAll(userId: string): CommonOutput<ExperienceDto[]> {
-    const res = await this.repository.findMany({
-      where: { userId },
+  async findAll(userId: string, { limit, page }: PaginationDto): PaginatedOutput<ExperienceDto> {
+    const { skip, take } = getPages({ page, limit })
+
+    const [records, count] = await this.repository.findManyAndCount({
+      skip,
+      take,
       include: { Skills: { select: { id: true } } },
+      where: { userId },
     })
 
-    return res.map(({ Skills, ...experience }) => ({
-      ...experience,
+    const pagination = getPagination({ page, count, take })
+    const data = records.map(({ Skills, ...course }) => ({
+      ...course,
       skills: Skills.map((skill) => skill.id),
     }))
+
+    return { data, pagination }
   }
 
   async findOne(userId: string, id: string): CommonOutput<ExperienceDto> {
@@ -32,17 +42,31 @@ export class ExperiencesService {
 
   async searchAll(
     userId: string,
-    searchExperienceDto: SearchExperienceDto,
-  ): CommonOutput<ExperienceDto[]> {
-    return await this.repository.findMany({
+    searchCourseDto: SearchExperienceDto,
+    { limit, page }: PaginationDto,
+  ): PaginatedOutput<ExperienceDto> {
+    const { skip, take } = getPages({ page, limit })
+
+    const [records, count] = await this.repository.findManyAndCount({
+      skip,
+      take,
+      include: { Skills: { select: { id: true } } },
       where: {
-        ...searchExperienceDto,
-        ...(searchExperienceDto.skills?.length && {
-          Skills: { some: { id: { in: searchExperienceDto.skills } } },
+        ...searchCourseDto,
+        ...(searchCourseDto.skills?.length && {
+          Skills: { some: { id: { in: searchCourseDto.skills } } },
         }),
         userId,
       },
     })
+
+    const pagination = getPagination({ page, count, take })
+    const data = records.map(({ Skills, ...course }) => ({
+      ...course,
+      skills: Skills.map((skill) => skill.id),
+    }))
+
+    return { data, pagination }
   }
 
   async create(
@@ -76,11 +100,7 @@ export class ExperiencesService {
     })
   }
 
-  async addSkills(
-    userId: string,
-    id: string,
-    skills: string[],
-  ): CommonOutput<ExperienceDto> {
+  async addSkills(userId: string, id: string, skills: string[]): CommonOutput<ExperienceDto> {
     return await this.repository.update({
       where: { userId, id },
       include: { Skills: true },
@@ -90,11 +110,7 @@ export class ExperiencesService {
     })
   }
 
-  async removeSkills(
-    userId: string,
-    id: string,
-    skills: string[],
-  ): CommonOutput<ExperienceDto> {
+  async removeSkills(userId: string, id: string, skills: string[]): CommonOutput<ExperienceDto> {
     return await this.repository.update({
       where: { userId, id },
       include: { Skills: true },

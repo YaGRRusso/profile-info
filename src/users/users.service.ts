@@ -3,6 +3,7 @@ import { SearchUserDto } from './dto/search-user.dto'
 import { UpdateUserDto } from './dto/update-user.dto'
 import { UserDto } from './dto/user.dto'
 
+import { prismaConfig } from '@/common/configs/prisma.config'
 import { manyIds } from '@/common/helpers/prisma.helper'
 import { CommonOutput } from '@/common/interfaces/output.interface'
 
@@ -13,7 +14,7 @@ import * as bcrypt from 'bcrypt'
 @Injectable()
 export class UsersService {
   constructor(private prisma: PrismaClient) {}
-  private repository = this.prisma.user
+  public repository = this.prisma.$extends(prismaConfig).user
 
   async findAll(): CommonOutput<UserDto[]> {
     return await this.repository.findMany()
@@ -34,11 +35,7 @@ export class UsersService {
     })
   }
 
-  async create({
-    password,
-    skills,
-    ...createUserDto
-  }: CreateUserDto): CommonOutput<UserDto> {
+  async create({ password, skills, ...createUserDto }: CreateUserDto): CommonOutput<UserDto> {
     const hash = await bcrypt.hash(password, 8)
     return await this.repository.create({
       data: {
@@ -52,10 +49,7 @@ export class UsersService {
     })
   }
 
-  async update(
-    id: string,
-    { skills, ...updateUserDto }: UpdateUserDto,
-  ): CommonOutput<UserDto> {
+  async update(id: string, { skills, ...updateUserDto }: UpdateUserDto): CommonOutput<UserDto> {
     return await this.repository.update({
       where: { id },
       data: {

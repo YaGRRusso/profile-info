@@ -3,8 +3,11 @@ import { FormationDto } from './dto/formation.dto'
 import { SearchFormationDto } from './dto/search-formation.dto'
 import { UpdateFormationDto } from './dto/update-formation.dto'
 
+import { prismaConfig } from '@/common/configs/prisma.config'
+import { PaginationDto } from '@/common/dto/input.dto'
+import { getPages, getPagination } from '@/common/helpers/pagination.helper'
 import { manyIds } from '@/common/helpers/prisma.helper'
-import { CommonOutput } from '@/common/interfaces/output.interface'
+import { CommonOutput, PaginatedOutput } from '@/common/interfaces/output.interface'
 
 import { Injectable } from '@nestjs/common'
 import { PrismaClient } from '@prisma/client'
@@ -12,18 +15,25 @@ import { PrismaClient } from '@prisma/client'
 @Injectable()
 export class FormationsService {
   constructor(private prisma: PrismaClient) {}
-  private repository = this.prisma.formation
+  public repository = this.prisma.$extends(prismaConfig).formation
 
-  async findAll(userId: string): CommonOutput<FormationDto[]> {
-    const res = await this.repository.findMany({
-      where: { userId },
+  async findAll(userId: string, { limit, page }: PaginationDto): PaginatedOutput<FormationDto> {
+    const { skip, take } = getPages({ page, limit })
+
+    const [records, count] = await this.repository.findManyAndCount({
+      skip,
+      take,
       include: { Skills: { select: { id: true } } },
+      where: { userId },
     })
 
-    return res.map(({ Skills, ...formation }) => ({
-      ...formation,
+    const pagination = getPagination({ page, count, take })
+    const data = records.map(({ Skills, ...course }) => ({
+      ...course,
       skills: Skills.map((skill) => skill.id),
     }))
+
+    return { data, pagination }
   }
 
   async findOne(userId: string, id: string): CommonOutput<FormationDto> {
@@ -32,17 +42,31 @@ export class FormationsService {
 
   async searchAll(
     userId: string,
-    searchFormationDto: SearchFormationDto,
-  ): CommonOutput<FormationDto[]> {
-    return await this.repository.findMany({
+    searchCourseDto: SearchFormationDto,
+    { limit, page }: PaginationDto,
+  ): PaginatedOutput<FormationDto> {
+    const { skip, take } = getPages({ page, limit })
+
+    const [records, count] = await this.repository.findManyAndCount({
+      skip,
+      take,
+      include: { Skills: { select: { id: true } } },
       where: {
-        ...searchFormationDto,
-        ...(searchFormationDto.skills?.length && {
-          Skills: { some: { id: { in: searchFormationDto.skills } } },
+        ...searchCourseDto,
+        ...(searchCourseDto.skills?.length && {
+          Skills: { some: { id: { in: searchCourseDto.skills } } },
         }),
         userId,
       },
     })
+
+    const pagination = getPagination({ page, count, take })
+    const data = records.map(({ Skills, ...course }) => ({
+      ...course,
+      skills: Skills.map((skill) => skill.id),
+    }))
+
+    return { data, pagination }
   }
 
   async create(
@@ -76,11 +100,7 @@ export class FormationsService {
     })
   }
 
-  async addSkills(
-    userId: string,
-    id: string,
-    skills: string[],
-  ): CommonOutput<FormationDto> {
+  async addSkills(userId: string, id: string, skills: string[]): CommonOutput<FormationDto> {
     return await this.repository.update({
       where: { userId, id },
       include: { Skills: true },
@@ -90,11 +110,7 @@ export class FormationsService {
     })
   }
 
-  async removeSkills(
-    userId: string,
-    id: string,
-    skills: string[],
-  ): CommonOutput<FormationDto> {
+  async removeSkills(userId: string, id: string, skills: string[]): CommonOutput<FormationDto> {
     return await this.repository.update({
       where: { userId, id },
       include: { Skills: true },

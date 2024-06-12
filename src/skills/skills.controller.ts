@@ -6,16 +6,7 @@ import { SkillsService } from './skills.service'
 
 import { AuthRequest } from '@/auth/entities/request.entity'
 
-import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  Param,
-  Patch,
-  Post,
-  Req,
-} from '@nestjs/common'
+import { Body, Controller, Delete, Get, Param, Patch, Post, Req } from '@nestjs/common'
 import { ApiHeader, ApiResponse, ApiTags } from '@nestjs/swagger'
 
 @ApiTags('skills')
@@ -54,11 +45,7 @@ export class SkillsController {
   @ApiHeader({ name: 'Authorization' })
   @ApiResponse({ type: SkillDto })
   @Patch(':id')
-  update(
-    @Req() req: AuthRequest,
-    @Param('id') id: string,
-    @Body() updateSkillDto: UpdateSkillDto,
-  ) {
+  update(@Req() req: AuthRequest, @Param('id') id: string, @Body() updateSkillDto: UpdateSkillDto) {
     return this.skillsService.update(req.user.id, id, updateSkillDto)
   }
 

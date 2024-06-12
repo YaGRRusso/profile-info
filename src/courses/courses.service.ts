@@ -7,10 +7,7 @@ import { prismaConfig } from '@/common/configs/prisma.config'
 import { PaginationDto } from '@/common/dto/input.dto'
 import { getPages, getPagination } from '@/common/helpers/pagination.helper'
 import { manyIds } from '@/common/helpers/prisma.helper'
-import {
-  CommonOutput,
-  PaginatedOutput,
-} from '@/common/interfaces/output.interface'
+import { CommonOutput, PaginatedOutput } from '@/common/interfaces/output.interface'
 
 import { Injectable } from '@nestjs/common'
 import { PrismaClient } from '@prisma/client'
@@ -20,10 +17,7 @@ export class CoursesService {
   constructor(private prisma: PrismaClient) {}
   public repository = this.prisma.$extends(prismaConfig).course
 
-  async findAll(
-    userId: string,
-    { limit, page }: PaginationDto,
-  ): PaginatedOutput<CourseDto> {
+  async findAll(userId: string, { limit, page }: PaginationDto): PaginatedOutput<CourseDto> {
     const { skip, take } = getPages({ page, limit })
 
     const [records, count] = await this.repository.findManyAndCount({
@@ -106,11 +100,7 @@ export class CoursesService {
     })
   }
 
-  async addSkills(
-    userId: string,
-    id: string,
-    skills: string[],
-  ): CommonOutput<CourseDto> {
+  async addSkills(userId: string, id: string, skills: string[]): CommonOutput<CourseDto> {
     return await this.repository.update({
       where: { userId, id },
       include: { Skills: true },
@@ -120,11 +110,7 @@ export class CoursesService {
     })
   }
 
-  async removeSkills(
-    userId: string,
-    id: string,
-    skills: string[],
-  ): CommonOutput<CourseDto> {
+  async removeSkills(userId: string, id: string, skills: string[]): CommonOutput<CourseDto> {
     return await this.repository.update({
       where: { userId, id },
       include: { Skills: true },

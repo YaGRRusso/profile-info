@@ -3,8 +3,11 @@ import { ProjectDto } from './dto/project.dto'
 import { SearchProjectDto } from './dto/search-project.dto'
 import { UpdateProjectDto } from './dto/update-project.dto'
 
+import { prismaConfig } from '@/common/configs/prisma.config'
+import { PaginationDto } from '@/common/dto/input.dto'
+import { getPages, getPagination } from '@/common/helpers/pagination.helper'
 import { manyIds } from '@/common/helpers/prisma.helper'
-import { CommonOutput } from '@/common/interfaces/output.interface'
+import { CommonOutput, PaginatedOutput } from '@/common/interfaces/output.interface'
 
 import { Injectable } from '@nestjs/common'
 import { PrismaClient } from '@prisma/client'
@@ -12,18 +15,25 @@ import { PrismaClient } from '@prisma/client'
 @Injectable()
 export class ProjectsService {
   constructor(private prisma: PrismaClient) {}
-  private repository = this.prisma.project
+  public repository = this.prisma.$extends(prismaConfig).project
 
-  async findAll(userId: string): CommonOutput<ProjectDto[]> {
-    const res = await this.repository.findMany({
-      where: { userId },
+  async findAll(userId: string, { limit, page }: PaginationDto): PaginatedOutput<ProjectDto> {
+    const { skip, take } = getPages({ page, limit })
+
+    const [records, count] = await this.repository.findManyAndCount({
+      skip,
+      take,
       include: { Skills: { select: { id: true } } },
+      where: { userId },
     })
 
-    return res.map(({ Skills, ...project }) => ({
-      ...project,
+    const pagination = getPagination({ page, count, take })
+    const data = records.map(({ Skills, ...course }) => ({
+      ...course,
       skills: Skills.map((skill) => skill.id),
     }))
+
+    return { data, pagination }
   }
 
   async findOne(userId: string, id: string): CommonOutput<ProjectDto> {
@@ -32,17 +42,31 @@ export class ProjectsService {
 
   async searchAll(
     userId: string,
-    searchProjectDto: SearchProjectDto,
-  ): CommonOutput<ProjectDto[]> {
-    return await this.repository.findMany({
+    searchCourseDto: SearchProjectDto,
+    { limit, page }: PaginationDto,
+  ): PaginatedOutput<ProjectDto> {
+    const { skip, take } = getPages({ page, limit })
+
+    const [records, count] = await this.repository.findManyAndCount({
+      skip,
+      take,
+      include: { Skills: { select: { id: true } } },
       where: {
-        ...searchProjectDto,
-        ...(searchProjectDto.skills?.length && {
-          Skills: { some: { id: { in: searchProjectDto.skills } } },
+        ...searchCourseDto,
+        ...(searchCourseDto.skills?.length && {
+          Skills: { some: { id: { in: searchCourseDto.skills } } },
         }),
         userId,
       },
     })
+
+    const pagination = getPagination({ page, count, take })
+    const data = records.map(({ Skills, ...course }) => ({
+      ...course,
+      skills: Skills.map((skill) => skill.id),
+    }))
+
+    return { data, pagination }
   }
 
   async create(
@@ -76,11 +100,7 @@ export class ProjectsService {
     })
   }
 
-  async addSkills(
-    userId: string,
-    id: string,
-    skills: string[],
-  ): CommonOutput<ProjectDto> {
+  async addSkills(userId: string, id: string, skills: string[]): CommonOutput<ProjectDto> {
     return await this.repository.update({
       where: { userId, id },
       include: { Skills: true },
@@ -90,11 +110,7 @@ export class ProjectsService {
     })
   }
 
-  async removeSkills(
-    userId: string,
-    id: string,
-    skills: string[],
-  ): CommonOutput<ProjectDto> {
+  async removeSkills(userId: string, id: string, skills: string[]): CommonOutput<ProjectDto> {
     return await this.repository.update({
       where: { userId, id },
       include: { Skills: true },
