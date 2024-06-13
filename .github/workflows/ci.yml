@@ -9,7 +9,6 @@ on:
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
 
     strategy:
@@ -29,49 +28,24 @@ jobs:
     - name: Install Dependencies
       run: npm ci
 
+    - name: Lint Code
+      run: npm run lint
+
     - name: Build Project
       run: npm run build
 
-  test:
-    runs-on: ubuntu-latest
+    - name: Run Tests
+      run: npm run test
 
-    services:
-      postgres:
-        image: postgres:16-alpine
-        ports:
-          - 5432:5432
-        env:
-          POSTGRES_USER: postgres
-          POSTGRES_DB: personal
-          POSTGRES_PASSWORD: pass123
-        options: >-
-          --health-cmd "pg_isready -U postgres"
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
+  notify:
+    runs-on: ubuntu-latest
+    needs: [build]
 
     steps:
-    - uses: actions/checkout@v2
+    - name: Notify Success
+      if: success()
+      run: echo "Build and tests successful!"
 
-    - name: Set up Node.js
-      uses: actions/setup-node@v2
-      with:
-        node-version: '16'
-
-    - name: Install dependencies
-      run: npm install
-
-    - name: Wait for Postgres to be ready
-      run: |
-        until pg_isready -h localhost -p 5432 -U postgres; do
-          echo "Waiting for postgres container...";
-          sleep 1;
-        done
-
-    - name: Initialize database with Prisma
-      run: npm run prisma:dev
-
-    - name: Run tests
-      env:
-        DATABASE_URL: postgresql://postgres:pass123@localhost:5432/personal?schema=public
-      run: npm test
+    - name: Notify Failure
+      if: failure()
+      run: echo "Build or tests failed!"
