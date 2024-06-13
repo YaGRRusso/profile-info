@@ -9,44 +9,13 @@ import { AuthRequest } from '@/auth/entities/request.entity'
 import { PaginationDto } from '@/common/dto/input.dto'
 import { PaginatedResponseDto } from '@/common/dto/output.dto'
 
-import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  Param,
-  Patch,
-  Post,
-  Query,
-  Req,
-} from '@nestjs/common'
+import { Body, Controller, Delete, Get, Param, Patch, Post, Query, Req } from '@nestjs/common'
 import { ApiHeader, ApiResponse, ApiTags } from '@nestjs/swagger'
 
 @ApiTags('courses')
 @Controller('courses')
 export class CoursesController {
   constructor(private readonly coursesService: CoursesService) {}
-
-  // @ApiResponse({ type: CourseDto, isArray: true })
-  // @IsPublic()
-  // @Get('/from/:id')
-  // findAllFromUser(
-  //   @Param('id') id: string,
-  //   @Query() paginationDto: PaginationDto,
-  // ) {
-  //   return this.coursesService.findAll(id, paginationDto)
-  // }
-
-  // @ApiResponse({ type: CourseDto, isArray: true })
-  // @IsPublic()
-  // @Get('/from/:id/search')
-  // searchAllFromUser(
-  //   @Param('id') id: string,
-  //   @Body() searchCourseDto: SearchCourseDto,
-  //   @Query() paginationDto: PaginationDto,
-  // ) {
-  //   return this.coursesService.searchAll(id, searchCourseDto, paginationDto)
-  // }
 
   @ApiHeader({ name: 'Authorization' })
   @ApiResponse({ type: PaginatedResponseDto<CourseDto>(CourseDto) })
@@ -63,11 +32,7 @@ export class CoursesController {
     @Body() searchCourseDto: SearchCourseDto,
     @Query() paginationDto: PaginationDto,
   ) {
-    return this.coursesService.searchAll(
-      req.user.id,
-      searchCourseDto,
-      paginationDto,
-    )
+    return this.coursesService.searchAll(req.user.id, searchCourseDto, paginationDto)
   }
 
   @ApiHeader({ name: 'Authorization' })
@@ -98,11 +63,7 @@ export class CoursesController {
   @ApiHeader({ name: 'Authorization' })
   @ApiResponse({ type: CourseDto })
   @Patch(':id/skills/add')
-  addSkills(
-    @Req() req: AuthRequest,
-    @Param('id') id: string,
-    @Body() { skills }: UpdateCourseDto,
-  ) {
+  addSkills(@Req() req: AuthRequest, @Param('id') id: string, @Body() { skills }: UpdateCourseDto) {
     return this.coursesService.addSkills(req.user.id, id, skills)
   }
 

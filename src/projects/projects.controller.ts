@@ -4,19 +4,10 @@ import { SearchProjectDto } from './dto/search-project.dto'
 import { UpdateProjectDto } from './dto/update-project.dto'
 import { ProjectsService } from './projects.service'
 
-import { IsPublic } from '@/auth/decorators/public.decorator'
 import { AuthRequest } from '@/auth/entities/request.entity'
+import { PaginationDto } from '@/common/dto/input.dto'
 
-import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  Param,
-  Patch,
-  Post,
-  Req,
-} from '@nestjs/common'
+import { Body, Controller, Delete, Get, Param, Patch, Post, Query, Req } from '@nestjs/common'
 import { ApiHeader, ApiResponse, ApiTags } from '@nestjs/swagger'
 
 @ApiTags('projects')
@@ -24,28 +15,11 @@ import { ApiHeader, ApiResponse, ApiTags } from '@nestjs/swagger'
 export class ProjectsController {
   constructor(private readonly projectsService: ProjectsService) {}
 
-  @ApiResponse({ type: ProjectDto, isArray: true })
-  @IsPublic()
-  @Get('/from/:id')
-  findAllFromUser(@Param('id') id: string) {
-    return this.projectsService.findAll(id)
-  }
-
-  @ApiResponse({ type: ProjectDto, isArray: true })
-  @IsPublic()
-  @Get('/from/:id/search')
-  searchAllFromUser(
-    @Param('id') id: string,
-    @Body() searchProjectDto: SearchProjectDto,
-  ) {
-    return this.projectsService.searchAll(id, searchProjectDto)
-  }
-
   @ApiHeader({ name: 'Authorization' })
   @ApiResponse({ type: ProjectDto, isArray: true })
   @Get()
-  findAll(@Req() req: AuthRequest) {
-    return this.projectsService.findAll(req.user.id)
+  findAll(@Req() req: AuthRequest, @Query() paginationDto: PaginationDto) {
+    return this.projectsService.findAll(req.user.id, paginationDto)
   }
 
   @ApiHeader({ name: 'Authorization' })
@@ -54,8 +28,9 @@ export class ProjectsController {
   searchAll(
     @Req() req: AuthRequest,
     @Body() searchProjectDto: SearchProjectDto,
+    @Query() paginationDto: PaginationDto,
   ) {
-    return this.projectsService.searchAll(req.user.id, searchProjectDto)
+    return this.projectsService.searchAll(req.user.id, searchProjectDto, paginationDto)
   }
 
   @ApiHeader({ name: 'Authorization' })

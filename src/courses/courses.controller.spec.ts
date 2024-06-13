@@ -21,6 +21,11 @@ describe('CoursesController', () => {
     prisma = module.get<PrismaService>(PrismaService)
   })
 
+  it('should be defined', () => {
+    expect(controller).toBeDefined()
+    expect(prisma).toBeDefined()
+  })
+
   it('should return the correct type', async () => {
     const req = { user: { id: '1' } } as AuthRequest
     const result = await controller.findAll(req, { limit: 5, page: 1 })

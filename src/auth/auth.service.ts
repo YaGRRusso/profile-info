@@ -30,8 +30,8 @@ export class AuthService {
   }
 
   async validate(email: string, password: string): CommonOutput<UserDto> {
-    const res = await this.usersService.searchAll({ email })
-    const user = res[0]
+    const res = await this.usersService.searchAll({ email }, { limit: 1, page: 1 })
+    const user = res.data[0]
 
     if (user && (await bcrypt.compare(password, user.password))) {
       return user

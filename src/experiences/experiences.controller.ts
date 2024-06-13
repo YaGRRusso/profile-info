@@ -5,19 +5,10 @@ import { SearchExperienceDto } from '../experiences/dto/search-experience.dto'
 import { UpdateExperienceDto } from '../experiences/dto/update-experience.dto'
 import { ExperiencesService } from '../experiences/experiences.service'
 
-import { IsPublic } from '@/auth/decorators/public.decorator'
 import { AuthRequest } from '@/auth/entities/request.entity'
+import { PaginationDto } from '@/common/dto/input.dto'
 
-import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  Param,
-  Patch,
-  Post,
-  Req,
-} from '@nestjs/common'
+import { Body, Controller, Delete, Get, Param, Patch, Post, Query, Req } from '@nestjs/common'
 import { ApiHeader, ApiResponse, ApiTags } from '@nestjs/swagger'
 
 @ApiTags('experiences')
@@ -25,28 +16,11 @@ import { ApiHeader, ApiResponse, ApiTags } from '@nestjs/swagger'
 export class ExperiencesController {
   constructor(private readonly experiencesService: ExperiencesService) {}
 
-  @ApiResponse({ type: ExperienceDto, isArray: true })
-  @IsPublic()
-  @Get('/from/:id')
-  findAllFromUser(@Param('id') id: string) {
-    return this.experiencesService.findAll(id)
-  }
-
-  @ApiResponse({ type: ExperienceDto, isArray: true })
-  @IsPublic()
-  @Get('/from/:id/search')
-  searchAllFromUser(
-    @Param('id') id: string,
-    @Body() searchExperienceDto: SearchExperienceDto,
-  ) {
-    return this.experiencesService.searchAll(id, searchExperienceDto)
-  }
-
   @ApiHeader({ name: 'Authorization' })
   @ApiResponse({ type: ExperienceDto, isArray: true })
   @Get()
-  findAll(@Req() req: AuthRequest) {
-    return this.experiencesService.findAll(req.user.id)
+  findAll(@Req() req: AuthRequest, @Query() paginationDto: PaginationDto) {
+    return this.experiencesService.findAll(req.user.id, paginationDto)
   }
 
   @ApiHeader({ name: 'Authorization' })
@@ -55,8 +29,9 @@ export class ExperiencesController {
   searchAll(
     @Req() req: AuthRequest,
     @Body() searchExperienceDto: SearchExperienceDto,
+    @Query() paginationDto: PaginationDto,
   ) {
-    return this.experiencesService.searchAll(req.user.id, searchExperienceDto)
+    return this.experiencesService.searchAll(req.user.id, searchExperienceDto, paginationDto)
   }
 
   @ApiHeader({ name: 'Authorization' })
@@ -69,10 +44,7 @@ export class ExperiencesController {
   @ApiHeader({ name: 'Authorization' })
   @ApiResponse({ type: ExperienceDto })
   @Post()
-  create(
-    @Req() req: AuthRequest,
-    @Body() createExperienceDto: CreateExperienceDto,
-  ) {
+  create(@Req() req: AuthRequest, @Body() createExperienceDto: CreateExperienceDto) {
     return this.experiencesService.create(req.user.id, createExperienceDto)
   }
 
