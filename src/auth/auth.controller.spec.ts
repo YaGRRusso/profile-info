@@ -16,13 +16,7 @@ describe('AuthController', () => {
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [AuthController],
-      providers: [
-        AuthService,
-        PrismaService,
-        PrismaClient,
-        UsersService,
-        JwtService,
-      ],
+      providers: [AuthService, PrismaService, PrismaClient, UsersService, JwtService],
     }).compile()
 
     controller = module.get<AuthController>(AuthController)
