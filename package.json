@@ -32,7 +32,8 @@
     "prisma:studio": "npx prisma studio",
     "docker:up": "docker compose up",
     "docker:down": "docker compose down",
-    "docker:ls": "docker container ls"
+    "docker:ls": "docker container ls",
+    "docker:new": "npm run docker:up & npm run prisma:dev"
   },
   "dependencies": {
     "@nestjs/common": "^10.3.9",
