@@ -5,17 +5,9 @@ import { UpdateSkillDto } from './dto/update-skill.dto'
 import { SkillsService } from './skills.service'
 
 import { AuthRequest } from '@/auth/entities/request.entity'
+import { PaginationDto } from '@/common/dto/input.dto'
 
-import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  Param,
-  Patch,
-  Post,
-  Req,
-} from '@nestjs/common'
+import { Body, Controller, Delete, Get, Param, Patch, Post, Query, Req } from '@nestjs/common'
 import { ApiHeader, ApiResponse, ApiTags } from '@nestjs/swagger'
 
 @ApiTags('skills')
@@ -26,8 +18,8 @@ export class SkillsController {
   @ApiHeader({ name: 'Authorization' })
   @ApiResponse({ type: SkillDto, isArray: true })
   @Get()
-  findAll(@Req() req: AuthRequest) {
-    return this.skillsService.findAll(req.user.id)
+  findAll(@Req() req: AuthRequest, @Query() paginationDto: PaginationDto) {
+    return this.skillsService.findAll(req.user.id, paginationDto)
   }
 
   @ApiHeader({ name: 'Authorization' })
@@ -40,8 +32,12 @@ export class SkillsController {
   @ApiHeader({ name: 'Authorization' })
   @ApiResponse({ type: SkillDto, isArray: true })
   @Get('search')
-  searchAll(@Req() req: AuthRequest, @Body() searchSkillDto: SearchSkillDto) {
-    return this.skillsService.searchAll(req.user.id, searchSkillDto)
+  searchAll(
+    @Req() req: AuthRequest,
+    @Body() searchSkillDto: SearchSkillDto,
+    @Query() paginationDto: PaginationDto,
+  ) {
+    return this.skillsService.searchAll(req.user.id, searchSkillDto, paginationDto)
   }
 
   @ApiHeader({ name: 'Authorization' })
@@ -54,11 +50,7 @@ export class SkillsController {
   @ApiHeader({ name: 'Authorization' })
   @ApiResponse({ type: SkillDto })
   @Patch(':id')
-  update(
-    @Req() req: AuthRequest,
-    @Param('id') id: string,
-    @Body() updateSkillDto: UpdateSkillDto,
-  ) {
+  update(@Req() req: AuthRequest, @Param('id') id: string, @Body() updateSkillDto: UpdateSkillDto) {
     return this.skillsService.update(req.user.id, id, updateSkillDto)
   }
 

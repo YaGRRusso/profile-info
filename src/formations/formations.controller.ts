@@ -5,19 +5,10 @@ import { SearchFormationDto } from '../formations/dto/search-formation.dto'
 import { UpdateFormationDto } from '../formations/dto/update-formation.dto'
 import { FormationsService } from '../formations/formations.service'
 
-import { IsPublic } from '@/auth/decorators/public.decorator'
 import { AuthRequest } from '@/auth/entities/request.entity'
+import { PaginationDto } from '@/common/dto/input.dto'
 
-import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  Param,
-  Patch,
-  Post,
-  Req,
-} from '@nestjs/common'
+import { Body, Controller, Delete, Get, Param, Patch, Post, Query, Req } from '@nestjs/common'
 import { ApiHeader, ApiResponse, ApiTags } from '@nestjs/swagger'
 
 @ApiTags('formations')
@@ -25,28 +16,11 @@ import { ApiHeader, ApiResponse, ApiTags } from '@nestjs/swagger'
 export class FormationsController {
   constructor(private readonly formationsService: FormationsService) {}
 
-  @ApiResponse({ type: FormationDto, isArray: true })
-  @IsPublic()
-  @Get('/from/:id')
-  findAllFromUser(@Param('id') id: string) {
-    return this.formationsService.findAll(id)
-  }
-
-  @ApiResponse({ type: FormationDto, isArray: true })
-  @IsPublic()
-  @Get('/from/:id/search')
-  searchAllFromUser(
-    @Param('id') id: string,
-    @Body() searchFormationDto: SearchFormationDto,
-  ) {
-    return this.formationsService.searchAll(id, searchFormationDto)
-  }
-
   @ApiHeader({ name: 'Authorization' })
   @ApiResponse({ type: FormationDto, isArray: true })
   @Get()
-  findAll(@Req() req: AuthRequest) {
-    return this.formationsService.findAll(req.user.id)
+  findAll(@Req() req: AuthRequest, @Query() paginationDto: PaginationDto) {
+    return this.formationsService.findAll(req.user.id, paginationDto)
   }
 
   @ApiHeader({ name: 'Authorization' })
@@ -55,8 +29,9 @@ export class FormationsController {
   searchAll(
     @Req() req: AuthRequest,
     @Body() searchFormationDto: SearchFormationDto,
+    @Query() paginationDto: PaginationDto,
   ) {
-    return this.formationsService.searchAll(req.user.id, searchFormationDto)
+    return this.formationsService.searchAll(req.user.id, searchFormationDto, paginationDto)
   }
 
   @ApiHeader({ name: 'Authorization' })
@@ -69,10 +44,7 @@ export class FormationsController {
   @ApiHeader({ name: 'Authorization' })
   @ApiResponse({ type: FormationDto })
   @Post()
-  create(
-    @Req() req: AuthRequest,
-    @Body() createFormationDto: CreateFormationDto,
-  ) {
+  create(@Req() req: AuthRequest, @Body() createFormationDto: CreateFormationDto) {
     return this.formationsService.create(req.user.id, createFormationDto)
   }
 

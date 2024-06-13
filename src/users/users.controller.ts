@@ -9,10 +9,8 @@ import { NeedRole } from '@/auth/decorators/role.decorator'
 import { AuthRequest } from '@/auth/entities/request.entity'
 import { JwtAuthGuard } from '@/auth/guards/jwt.guard'
 import { RoleGuard } from '@/auth/guards/role.guard'
-import {
-  removeObjectKey,
-  removeObjectsKey,
-} from '@/common/helpers/object.helper'
+import { PaginationDto } from '@/common/dto/input.dto'
+import { removeObjectKey, removeObjectsKey } from '@/common/helpers/object.helper'
 
 import {
   Body,
@@ -22,6 +20,7 @@ import {
   Param,
   Patch,
   Post,
+  Query,
   Req,
   UseGuards,
 } from '@nestjs/common'
@@ -36,10 +35,7 @@ export class UsersController {
   @ApiResponse({ type: UserDto })
   @Get('me')
   async findMe(@Req() req: AuthRequest) {
-    return removeObjectKey(
-      await this.usersService.findOne(req.user.id),
-      'password',
-    )
+    return removeObjectKey(await this.usersService.findOne(req.user.id), 'password')
   }
 
   @ApiHeader({ name: 'Authorization' })
@@ -47,8 +43,12 @@ export class UsersController {
   @NeedRole('ADMIN')
   @UseGuards(JwtAuthGuard, RoleGuard)
   @Get()
-  async findAll() {
-    return removeObjectsKey(await this.usersService.findAll(), 'password')
+  async findAll(@Query() paginationDto: PaginationDto) {
+    const { data, ...rest } = await this.usersService.findAll(paginationDto)
+    return {
+      data: removeObjectsKey(data, 'password'),
+      ...rest,
+    }
   }
 
   @ApiHeader({ name: 'Authorization' })
@@ -65,40 +65,32 @@ export class UsersController {
   @NeedRole('ADMIN')
   @UseGuards(JwtAuthGuard, RoleGuard)
   @Get('search')
-  async searchAll(@Body() searchUserDto: SearchUserDto) {
-    return removeObjectsKey(
-      await this.usersService.searchAll(searchUserDto),
-      'password',
-    )
+  async searchAll(@Body() searchUserDto: SearchUserDto, @Query() paginationDto: PaginationDto) {
+    const { data, ...rest } = await this.usersService.searchAll(searchUserDto, paginationDto)
+    return {
+      data: removeObjectsKey(data, 'password'),
+      ...rest,
+    }
   }
 
   @ApiResponse({ type: UserDto })
   @IsPublic()
   @Post()
   async create(@Body() createUserDto: CreateUserDto) {
-    return removeObjectKey(
-      await this.usersService.create(createUserDto),
-      'password',
-    )
+    return removeObjectKey(await this.usersService.create(createUserDto), 'password')
   }
 
   @ApiHeader({ name: 'Authorization' })
   @ApiResponse({ type: UserDto })
   @Patch('me')
   async update(@Req() req: AuthRequest, @Body() updateUserDto: UpdateUserDto) {
-    return removeObjectKey(
-      await this.usersService.update(req.user.id, updateUserDto),
-      'password',
-    )
+    return removeObjectKey(await this.usersService.update(req.user.id, updateUserDto), 'password')
   }
 
   @ApiHeader({ name: 'Authorization' })
   @ApiResponse({ type: UserDto })
   @Delete('me')
   async remove(@Req() req: AuthRequest) {
-    return removeObjectKey(
-      await this.usersService.remove(req.user.id),
-      'password',
-    )
+    return removeObjectKey(await this.usersService.remove(req.user.id), 'password')
   }
 }

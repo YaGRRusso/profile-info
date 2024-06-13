@@ -110,6 +110,22 @@
         "operationId": "UsersController_findAll",
         "parameters": [
           {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
             "name": "Authorization",
             "in": "header",
             "schema": {
@@ -208,6 +224,22 @@
         "operationId": "UsersController_searchAll",
         "parameters": [
           {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
             "name": "Authorization",
             "in": "header",
             "schema": {
@@ -249,6 +281,22 @@
       "get": {
         "operationId": "SkillsController_findAll",
         "parameters": [
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
           {
             "name": "Authorization",
             "in": "header",
@@ -436,6 +484,22 @@
         "operationId": "SkillsController_searchAll",
         "parameters": [
           {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
             "name": "Authorization",
             "in": "header",
             "schema": {
@@ -473,86 +537,26 @@
         ]
       }
     },
-    "/projects/from/{id}": {
-      "get": {
-        "operationId": "ProjectsController_findAllFromUser",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "default": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/ProjectDto"
-                  }
-                }
-              }
-            }
-          }
-        },
-        "tags": [
-          "projects"
-        ]
-      }
-    },
-    "/projects/from/{id}/search": {
-      "get": {
-        "operationId": "ProjectsController_searchAllFromUser",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/SearchProjectDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "default": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/ProjectDto"
-                  }
-                }
-              }
-            }
-          }
-        },
-        "tags": [
-          "projects"
-        ]
-      }
-    },
     "/projects": {
       "get": {
         "operationId": "ProjectsController_findAll",
         "parameters": [
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
           {
             "name": "Authorization",
             "in": "header",
@@ -622,6 +626,22 @@
       "get": {
         "operationId": "ProjectsController_searchAll",
         "parameters": [
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
           {
             "name": "Authorization",
             "in": "header",
@@ -960,86 +980,26 @@
         ]
       }
     },
-    "/formations/from/{id}": {
-      "get": {
-        "operationId": "FormationsController_findAllFromUser",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "default": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/FormationDto"
-                  }
-                }
-              }
-            }
-          }
-        },
-        "tags": [
-          "formations"
-        ]
-      }
-    },
-    "/formations/from/{id}/search": {
-      "get": {
-        "operationId": "FormationsController_searchAllFromUser",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/SearchFormationDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "default": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/FormationDto"
-                  }
-                }
-              }
-            }
-          }
-        },
-        "tags": [
-          "formations"
-        ]
-      }
-    },
     "/formations": {
       "get": {
         "operationId": "FormationsController_findAll",
         "parameters": [
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
           {
             "name": "Authorization",
             "in": "header",
@@ -1109,6 +1069,22 @@
       "get": {
         "operationId": "FormationsController_searchAll",
         "parameters": [
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
           {
             "name": "Authorization",
             "in": "header",
@@ -1358,86 +1334,26 @@
         ]
       }
     },
-    "/courses/from/{id}": {
-      "get": {
-        "operationId": "CoursesController_findAllFromUser",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "default": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/CourseDto"
-                  }
-                }
-              }
-            }
-          }
-        },
-        "tags": [
-          "courses"
-        ]
-      }
-    },
-    "/courses/from/{id}/search": {
-      "get": {
-        "operationId": "CoursesController_searchAllFromUser",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/SearchCourseDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "default": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/CourseDto"
-                  }
-                }
-              }
-            }
-          }
-        },
-        "tags": [
-          "courses"
-        ]
-      }
-    },
     "/courses": {
       "get": {
         "operationId": "CoursesController_findAll",
         "parameters": [
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
           {
             "name": "Authorization",
             "in": "header",
@@ -1452,10 +1368,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/CourseDto"
-                  }
+                  "$ref": "#/components/schemas/PaginatedResponseDtoClass"
                 }
               }
             }
@@ -1508,6 +1421,22 @@
         "operationId": "CoursesController_searchAll",
         "parameters": [
           {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
             "name": "Authorization",
             "in": "header",
             "schema": {
@@ -1531,10 +1460,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/CourseDto"
-                  }
+                  "$ref": "#/components/schemas/PaginatedResponseDtoClass"
                 }
               }
             }
@@ -1756,86 +1682,26 @@
         ]
       }
     },
-    "/experiences/from/{id}": {
-      "get": {
-        "operationId": "ExperiencesController_findAllFromUser",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "default": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/ExperienceDto"
-                  }
-                }
-              }
-            }
-          }
-        },
-        "tags": [
-          "experiences"
-        ]
-      }
-    },
-    "/experiences/from/{id}/search": {
-      "get": {
-        "operationId": "ExperiencesController_searchAllFromUser",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/SearchExperienceDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "default": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/ExperienceDto"
-                  }
-                }
-              }
-            }
-          }
-        },
-        "tags": [
-          "experiences"
-        ]
-      }
-    },
     "/experiences": {
       "get": {
         "operationId": "ExperiencesController_findAll",
         "parameters": [
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
           {
             "name": "Authorization",
             "in": "header",
@@ -1905,6 +1771,22 @@
       "get": {
         "operationId": "ExperiencesController_searchAll",
         "parameters": [
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
           {
             "name": "Authorization",
             "in": "header",
@@ -3022,6 +2904,53 @@
           "createdAt",
           "updatedAt",
           "userId"
+        ]
+      },
+      "PaginationOutputDto": {
+        "type": "object",
+        "properties": {
+          "totalRecords": {
+            "type": "number"
+          },
+          "currentPage": {
+            "type": "number"
+          },
+          "perPage": {
+            "type": "number"
+          },
+          "nextPage": {
+            "type": "number"
+          },
+          "prevPage": {
+            "type": "number"
+          },
+          "totalPages": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "totalRecords",
+          "currentPage",
+          "perPage",
+          "totalPages"
+        ]
+      },
+      "PaginatedResponseDtoClass": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CourseDto"
+            }
+          },
+          "pagination": {
+            "$ref": "#/components/schemas/PaginationOutputDto"
+          }
+        },
+        "required": [
+          "data",
+          "pagination"
         ]
       },
       "SearchCourseDto": {

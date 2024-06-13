@@ -5,19 +5,11 @@ import { CreateCourseDto } from '../courses/dto/create-course.dto'
 import { SearchCourseDto } from '../courses/dto/search-course.dto'
 import { UpdateCourseDto } from '../courses/dto/update-course.dto'
 
-import { IsPublic } from '@/auth/decorators/public.decorator'
 import { AuthRequest } from '@/auth/entities/request.entity'
+import { PaginationDto } from '@/common/dto/input.dto'
+import { PaginatedResponseDto } from '@/common/dto/output.dto'
 
-import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  Param,
-  Patch,
-  Post,
-  Req,
-} from '@nestjs/common'
+import { Body, Controller, Delete, Get, Param, Patch, Post, Query, Req } from '@nestjs/common'
 import { ApiHeader, ApiResponse, ApiTags } from '@nestjs/swagger'
 
 @ApiTags('courses')
@@ -25,35 +17,22 @@ import { ApiHeader, ApiResponse, ApiTags } from '@nestjs/swagger'
 export class CoursesController {
   constructor(private readonly coursesService: CoursesService) {}
 
-  @ApiResponse({ type: CourseDto, isArray: true })
-  @IsPublic()
-  @Get('/from/:id')
-  findAllFromUser(@Param('id') id: string) {
-    return this.coursesService.findAll(id)
-  }
-
-  @ApiResponse({ type: CourseDto, isArray: true })
-  @IsPublic()
-  @Get('/from/:id/search')
-  searchAllFromUser(
-    @Param('id') id: string,
-    @Body() searchCourseDto: SearchCourseDto,
-  ) {
-    return this.coursesService.searchAll(id, searchCourseDto)
-  }
-
   @ApiHeader({ name: 'Authorization' })
-  @ApiResponse({ type: CourseDto, isArray: true })
+  @ApiResponse({ type: PaginatedResponseDto<CourseDto>(CourseDto) })
   @Get()
-  findAll(@Req() req: AuthRequest) {
-    return this.coursesService.findAll(req.user.id)
+  findAll(@Req() req: AuthRequest, @Query() paginationDto: PaginationDto) {
+    return this.coursesService.findAll(req.user.id, paginationDto)
   }
 
   @ApiHeader({ name: 'Authorization' })
-  @ApiResponse({ type: CourseDto, isArray: true })
+  @ApiResponse({ type: PaginatedResponseDto<CourseDto>(CourseDto) })
   @Get('/search')
-  searchAll(@Req() req: AuthRequest, @Body() searchCourseDto: SearchCourseDto) {
-    return this.coursesService.searchAll(req.user.id, searchCourseDto)
+  searchAll(
+    @Req() req: AuthRequest,
+    @Body() searchCourseDto: SearchCourseDto,
+    @Query() paginationDto: PaginationDto,
+  ) {
+    return this.coursesService.searchAll(req.user.id, searchCourseDto, paginationDto)
   }
 
   @ApiHeader({ name: 'Authorization' })
@@ -84,11 +63,7 @@ export class CoursesController {
   @ApiHeader({ name: 'Authorization' })
   @ApiResponse({ type: CourseDto })
   @Patch(':id/skills/add')
-  addSkills(
-    @Req() req: AuthRequest,
-    @Param('id') id: string,
-    @Body() { skills }: UpdateCourseDto,
-  ) {
+  addSkills(@Req() req: AuthRequest, @Param('id') id: string, @Body() { skills }: UpdateCourseDto) {
     return this.coursesService.addSkills(req.user.id, id, skills)
   }
 
