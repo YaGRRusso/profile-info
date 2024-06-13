@@ -42,7 +42,7 @@ export class ExperiencesService {
 
   async searchAll(
     userId: string,
-    searchCourseDto: SearchExperienceDto,
+    searchExperienceDto: SearchExperienceDto,
     { limit, page }: PaginationDto,
   ): PaginatedOutput<ExperienceDto> {
     const { skip, take } = getPages({ page, limit })
@@ -52,9 +52,9 @@ export class ExperiencesService {
       take,
       include: { Skills: { select: { id: true } } },
       where: {
-        ...searchCourseDto,
-        ...(searchCourseDto.skills?.length && {
-          Skills: { some: { id: { in: searchCourseDto.skills } } },
+        ...searchExperienceDto,
+        ...(searchExperienceDto.skills?.length && {
+          Skills: { some: { id: { in: searchExperienceDto.skills } } },
         }),
         userId,
       },

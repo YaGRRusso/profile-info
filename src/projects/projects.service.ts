@@ -42,7 +42,7 @@ export class ProjectsService {
 
   async searchAll(
     userId: string,
-    searchCourseDto: SearchProjectDto,
+    searchProjectDto: SearchProjectDto,
     { limit, page }: PaginationDto,
   ): PaginatedOutput<ProjectDto> {
     const { skip, take } = getPages({ page, limit })
@@ -52,9 +52,9 @@ export class ProjectsService {
       take,
       include: { Skills: { select: { id: true } } },
       where: {
-        ...searchCourseDto,
-        ...(searchCourseDto.skills?.length && {
-          Skills: { some: { id: { in: searchCourseDto.skills } } },
+        ...searchProjectDto,
+        ...(searchProjectDto.skills?.length && {
+          Skills: { some: { id: { in: searchProjectDto.skills } } },
         }),
         userId,
       },

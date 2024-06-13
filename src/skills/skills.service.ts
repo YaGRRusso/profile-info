@@ -33,15 +33,9 @@ export class SkillsService {
     return await this.repository.findUnique({ where: { id, userId } })
   }
 
-  // async searchAll(userId: string, searchSkillDto: SearchSkillDto): CommonOutput<SkillDto[]> {
-  //   return await this.repository.findMany({
-  //     where: { ...searchSkillDto, userId },
-  //   })
-  // }
-
   async searchAll(
     userId: string,
-    searchCourseDto: SearchSkillDto,
+    searchSkillDto: SearchSkillDto,
     { limit, page }: PaginationDto,
   ): PaginatedOutput<SkillDto> {
     const { skip, take } = getPages({ page, limit })
@@ -50,7 +44,7 @@ export class SkillsService {
       skip,
       take,
       where: {
-        ...searchCourseDto,
+        ...searchSkillDto,
         userId,
       },
     })

@@ -42,7 +42,7 @@ export class FormationsService {
 
   async searchAll(
     userId: string,
-    searchCourseDto: SearchFormationDto,
+    searchFormationDto: SearchFormationDto,
     { limit, page }: PaginationDto,
   ): PaginatedOutput<FormationDto> {
     const { skip, take } = getPages({ page, limit })
@@ -52,9 +52,9 @@ export class FormationsService {
       take,
       include: { Skills: { select: { id: true } } },
       where: {
-        ...searchCourseDto,
-        ...(searchCourseDto.skills?.length && {
-          Skills: { some: { id: { in: searchCourseDto.skills } } },
+        ...searchFormationDto,
+        ...(searchFormationDto.skills?.length && {
+          Skills: { some: { id: { in: searchFormationDto.skills } } },
         }),
         userId,
       },
