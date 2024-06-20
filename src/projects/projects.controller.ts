@@ -6,6 +6,7 @@ import { ProjectsService } from './projects.service'
 
 import { AuthRequest } from '@/auth/entities/request.entity'
 import { PaginationDto } from '@/common/dto/input.dto'
+import { PaginatedResponseDto } from '@/common/dto/output.dto'
 
 import { Body, Controller, Delete, Get, Param, Patch, Post, Query, Req } from '@nestjs/common'
 import { ApiHeader, ApiResponse, ApiTags } from '@nestjs/swagger'
@@ -16,14 +17,14 @@ export class ProjectsController {
   constructor(private readonly projectsService: ProjectsService) {}
 
   @ApiHeader({ name: 'Authorization' })
-  @ApiResponse({ type: ProjectDto, isArray: true })
+  @ApiResponse({ type: PaginatedResponseDto(ProjectDto) })
   @Get()
   findAll(@Req() req: AuthRequest, @Query() paginationDto: PaginationDto) {
     return this.projectsService.findAll(req.user.id, paginationDto)
   }
 
   @ApiHeader({ name: 'Authorization' })
-  @ApiResponse({ type: ProjectDto, isArray: true })
+  @ApiResponse({ type: PaginatedResponseDto(ProjectDto) })
   @Get('/search')
   searchAll(
     @Req() req: AuthRequest,

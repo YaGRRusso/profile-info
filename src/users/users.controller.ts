@@ -10,6 +10,7 @@ import { AuthRequest } from '@/auth/entities/request.entity'
 import { JwtAuthGuard } from '@/auth/guards/jwt.guard'
 import { RoleGuard } from '@/auth/guards/role.guard'
 import { PaginationDto } from '@/common/dto/input.dto'
+import { PaginatedResponseDto } from '@/common/dto/output.dto'
 import { removeObjectKey, removeObjectsKey } from '@/common/helpers/object.helper'
 
 import {
@@ -39,7 +40,7 @@ export class UsersController {
   }
 
   @ApiHeader({ name: 'Authorization' })
-  @ApiResponse({ type: UserDto, isArray: true })
+  @ApiResponse({ type: PaginatedResponseDto(UserDto) })
   @NeedRole('ADMIN')
   @UseGuards(JwtAuthGuard, RoleGuard)
   @Get()
@@ -61,7 +62,7 @@ export class UsersController {
   }
 
   @ApiHeader({ name: 'Authorization' })
-  @ApiResponse({ type: UserDto, isArray: true })
+  @ApiResponse({ type: PaginatedResponseDto(UserDto) })
   @NeedRole('ADMIN')
   @UseGuards(JwtAuthGuard, RoleGuard)
   @Get('search')

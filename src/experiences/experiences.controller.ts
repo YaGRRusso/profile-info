@@ -7,6 +7,7 @@ import { ExperiencesService } from '../experiences/experiences.service'
 
 import { AuthRequest } from '@/auth/entities/request.entity'
 import { PaginationDto } from '@/common/dto/input.dto'
+import { PaginatedResponseDto } from '@/common/dto/output.dto'
 
 import { Body, Controller, Delete, Get, Param, Patch, Post, Query, Req } from '@nestjs/common'
 import { ApiHeader, ApiResponse, ApiTags } from '@nestjs/swagger'
@@ -17,14 +18,14 @@ export class ExperiencesController {
   constructor(private readonly experiencesService: ExperiencesService) {}
 
   @ApiHeader({ name: 'Authorization' })
-  @ApiResponse({ type: ExperienceDto, isArray: true })
+  @ApiResponse({ type: PaginatedResponseDto(ExperienceDto) })
   @Get()
   findAll(@Req() req: AuthRequest, @Query() paginationDto: PaginationDto) {
     return this.experiencesService.findAll(req.user.id, paginationDto)
   }
 
   @ApiHeader({ name: 'Authorization' })
-  @ApiResponse({ type: ExperienceDto, isArray: true })
+  @ApiResponse({ type: PaginatedResponseDto(ExperienceDto) })
   @Get('/search')
   searchAll(
     @Req() req: AuthRequest,

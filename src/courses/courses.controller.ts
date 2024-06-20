@@ -18,14 +18,14 @@ export class CoursesController {
   constructor(private readonly coursesService: CoursesService) {}
 
   @ApiHeader({ name: 'Authorization' })
-  @ApiResponse({ type: PaginatedResponseDto<CourseDto>(CourseDto) })
+  @ApiResponse({ type: PaginatedResponseDto(CourseDto) })
   @Get()
   findAll(@Req() req: AuthRequest, @Query() paginationDto: PaginationDto) {
     return this.coursesService.findAll(req.user.id, paginationDto)
   }
 
   @ApiHeader({ name: 'Authorization' })
-  @ApiResponse({ type: PaginatedResponseDto<CourseDto>(CourseDto) })
+  @ApiResponse({ type: PaginatedResponseDto(CourseDto) })
   @Get('/search')
   searchAll(
     @Req() req: AuthRequest,

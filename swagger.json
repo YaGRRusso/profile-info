@@ -139,10 +139,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/UserDto"
-                  }
+                  "$ref": "#/components/schemas/PaginatedResponseDtoClass"
                 }
               }
             }
@@ -263,10 +260,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/UserDto"
-                  }
+                  "$ref": "#/components/schemas/PaginatedResponseDtoClass"
                 }
               }
             }
@@ -311,10 +305,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/SkillDto"
-                  }
+                  "$ref": "#/components/schemas/PaginatedResponseDtoClass"
                 }
               }
             }
@@ -523,10 +514,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/SkillDto"
-                  }
+                  "$ref": "#/components/schemas/PaginatedResponseDtoClass"
                 }
               }
             }
@@ -571,10 +559,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/ProjectDto"
-                  }
+                  "$ref": "#/components/schemas/PaginatedResponseDtoClass"
                 }
               }
             }
@@ -666,10 +651,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/ProjectDto"
-                  }
+                  "$ref": "#/components/schemas/PaginatedResponseDtoClass"
                 }
               }
             }
@@ -1014,10 +996,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/FormationDto"
-                  }
+                  "$ref": "#/components/schemas/PaginatedResponseDtoClass"
                 }
               }
             }
@@ -1109,10 +1088,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/FormationDto"
-                  }
+                  "$ref": "#/components/schemas/PaginatedResponseDtoClass"
                 }
               }
             }
@@ -1716,10 +1692,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/ExperienceDto"
-                  }
+                  "$ref": "#/components/schemas/PaginatedResponseDtoClass"
                 }
               }
             }
@@ -1811,10 +1784,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/ExperienceDto"
-                  }
+                  "$ref": "#/components/schemas/PaginatedResponseDtoClass"
                 }
               }
             }
@@ -2151,6 +2121,53 @@
           "role",
           "createdAt",
           "updatedAt"
+        ]
+      },
+      "PaginationOutputDto": {
+        "type": "object",
+        "properties": {
+          "totalRecords": {
+            "type": "number"
+          },
+          "currentPage": {
+            "type": "number"
+          },
+          "perPage": {
+            "type": "number"
+          },
+          "nextPage": {
+            "type": "number"
+          },
+          "prevPage": {
+            "type": "number"
+          },
+          "totalPages": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "totalRecords",
+          "currentPage",
+          "perPage",
+          "totalPages"
+        ]
+      },
+      "PaginatedResponseDtoClass": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ExperienceDto"
+            }
+          },
+          "pagination": {
+            "$ref": "#/components/schemas/PaginationOutputDto"
+          }
+        },
+        "required": [
+          "data",
+          "pagination"
         ]
       },
       "SearchUserDto": {
@@ -2904,53 +2921,6 @@
           "createdAt",
           "updatedAt",
           "userId"
-        ]
-      },
-      "PaginationOutputDto": {
-        "type": "object",
-        "properties": {
-          "totalRecords": {
-            "type": "number"
-          },
-          "currentPage": {
-            "type": "number"
-          },
-          "perPage": {
-            "type": "number"
-          },
-          "nextPage": {
-            "type": "number"
-          },
-          "prevPage": {
-            "type": "number"
-          },
-          "totalPages": {
-            "type": "number"
-          }
-        },
-        "required": [
-          "totalRecords",
-          "currentPage",
-          "perPage",
-          "totalPages"
-        ]
-      },
-      "PaginatedResponseDtoClass": {
-        "type": "object",
-        "properties": {
-          "data": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/CourseDto"
-            }
-          },
-          "pagination": {
-            "$ref": "#/components/schemas/PaginationOutputDto"
-          }
-        },
-        "required": [
-          "data",
-          "pagination"
         ]
       },
       "SearchCourseDto": {

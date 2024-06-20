@@ -7,6 +7,7 @@ import { FormationsService } from '../formations/formations.service'
 
 import { AuthRequest } from '@/auth/entities/request.entity'
 import { PaginationDto } from '@/common/dto/input.dto'
+import { PaginatedResponseDto } from '@/common/dto/output.dto'
 
 import { Body, Controller, Delete, Get, Param, Patch, Post, Query, Req } from '@nestjs/common'
 import { ApiHeader, ApiResponse, ApiTags } from '@nestjs/swagger'
@@ -17,14 +18,14 @@ export class FormationsController {
   constructor(private readonly formationsService: FormationsService) {}
 
   @ApiHeader({ name: 'Authorization' })
-  @ApiResponse({ type: FormationDto, isArray: true })
+  @ApiResponse({ type: PaginatedResponseDto(FormationDto) })
   @Get()
   findAll(@Req() req: AuthRequest, @Query() paginationDto: PaginationDto) {
     return this.formationsService.findAll(req.user.id, paginationDto)
   }
 
   @ApiHeader({ name: 'Authorization' })
-  @ApiResponse({ type: FormationDto, isArray: true })
+  @ApiResponse({ type: PaginatedResponseDto(FormationDto) })
   @Get('/search')
   searchAll(
     @Req() req: AuthRequest,
