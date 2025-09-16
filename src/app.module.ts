@@ -1,4 +1,5 @@
 import { join } from "node:path";
+import { ApolloServerPluginLandingPageLocalDefault } from "@apollo/server/plugin/landingPage/default";
 import { ApolloDriver, ApolloDriverConfig } from "@nestjs/apollo";
 import { Module } from "@nestjs/common";
 import { ConfigModule } from "@nestjs/config";
@@ -23,9 +24,10 @@ if (!process.env.DATABASE_URL) {
     }),
     GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,
+      plugins: [ApolloServerPluginLandingPageLocalDefault()],
       autoSchemaFile: join(process.cwd(), "src/schema.gql"),
       sortSchema: true,
-      graphiql: true,
+      playground: false,
     }),
     SkillsModule,
   ],

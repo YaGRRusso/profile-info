@@ -4,9 +4,6 @@ import { HydratedDocument } from "mongoose";
 @Schema({ timestamps: true })
 export class Skill {
   @Prop({ required: true })
-  id: string;
-
-  @Prop({ required: true })
   name: string;
 
   @Prop({ required: true })

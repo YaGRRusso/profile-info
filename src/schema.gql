@@ -3,28 +3,42 @@
 # ------------------------------------------------------
 
 input CreateSkillInput {
-  """Example field (placeholder)"""
-  exampleField: Int!
+  """Category of the skill"""
+  category: String!
+
+  """Name of the skill"""
+  name: String!
 }
 
 type Mutation {
   createSkill(createSkillInput: CreateSkillInput!): Skill!
-  removeSkill(id: Int!): Skill!
+  removeSkill(id: ID!): Skill!
   updateSkill(updateSkillInput: UpdateSkillInput!): Skill!
 }
 
 type Query {
-  skill(id: Int!): Skill!
-  skills: [Skill!]!
+  findAllSkills: [Skill!]!
+  findOneSkill(id: ID!): Skill!
 }
 
 type Skill {
-  """Example field (placeholder)"""
-  exampleField: Int!
+  """Category of the skill"""
+  category: String!
+
+  """Unique identifier for the skill"""
+  id: ID!
+
+  """Name of the skill"""
+  name: String!
 }
 
 input UpdateSkillInput {
-  """Example field (placeholder)"""
-  exampleField: Int
-  id: Int!
+  """Category of the skill"""
+  category: String
+
+  """ID of the skill"""
+  id: ID!
+
+  """Name of the skill"""
+  name: String
 }

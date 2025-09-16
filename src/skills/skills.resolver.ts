@@ -1,4 +1,4 @@
-import { Args, Int, Mutation, Query, Resolver } from "@nestjs/graphql";
+import { Args, ID, Mutation, Query, Resolver } from "@nestjs/graphql";
 import { CreateSkillInput } from "./dto/create-skill.input";
 import { UpdateSkillInput } from "./dto/update-skill.input";
 import { Skill } from "./entities/skill.entity";
@@ -13,13 +13,13 @@ export class SkillsResolver {
     return this.skillsService.create(createSkillInput);
   }
 
-  @Query(() => [Skill], { name: "skills" })
-  findAll() {
+  @Query(() => [Skill])
+  findAllSkills() {
     return this.skillsService.findAll();
   }
 
-  @Query(() => Skill, { name: "skill" })
-  findOne(@Args("id", { type: () => Int }) id: number) {
+  @Query(() => Skill)
+  findOneSkill(@Args("id", { type: () => ID }) id: string) {
     return this.skillsService.findOne(id);
   }
 
@@ -29,7 +29,7 @@ export class SkillsResolver {
   }
 
   @Mutation(() => Skill)
-  removeSkill(@Args("id", { type: () => Int }) id: number) {
+  removeSkill(@Args("id", { type: () => ID }) id: string) {
     return this.skillsService.remove(id);
   }
 }
