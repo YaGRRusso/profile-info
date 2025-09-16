@@ -17,7 +17,8 @@
         "useAtIndex": "off",
         "useImportType": "off",
         "noMagicNumbers": "off",
-        "noParameterProperties": "off"
+        "noParameterProperties": "off",
+        "useBlockStatements": "off"
       }
     }
   }

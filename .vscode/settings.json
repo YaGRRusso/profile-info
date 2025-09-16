@@ -1,5 +1,6 @@
 {
   "editor.tabSize": 2,
+  "editor.rulers": [120],
   "material-icon-theme.activeIconPack": "nest",
   "editor.defaultFormatter": "esbenp.prettier-vscode",
   "[javascript]": {
