@@ -2,7 +2,7 @@ import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { HydratedDocument } from "mongoose";
 
 @Schema({ timestamps: true })
-export class Skill {
+export class SkillModel {
   @Prop({ required: true })
   name: string;
 
@@ -10,5 +10,5 @@ export class Skill {
   category: string;
 }
 
-export type SkillDocument = HydratedDocument<Skill>;
-export const SkillSchema = SchemaFactory.createForClass(Skill);
+export type SkillDocument = HydratedDocument<SkillModel>;
+export const SkillSchema = SchemaFactory.createForClass(SkillModel);

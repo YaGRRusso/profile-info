@@ -7,6 +7,7 @@ import { GraphQLModule } from "@nestjs/graphql";
 import { MongooseModule } from "@nestjs/mongoose";
 import { AppController } from "./app.controller";
 import { AppService } from "./app.service";
+import { ProjectsModule } from "./projects/projects.module";
 import { SkillsModule } from "./skills/skills.module";
 
 @Module({
@@ -36,6 +37,7 @@ import { SkillsModule } from "./skills/skills.module";
       playground: false,
     }),
     SkillsModule,
+    ProjectsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

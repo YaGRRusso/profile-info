@@ -3,11 +3,11 @@ import { IsNotEmpty } from "class-validator";
 
 @InputType()
 export class CreateSkillInput {
-  @Field(() => String, { description: "Name of the skill" })
+  @Field(() => String)
   @IsNotEmpty()
   name: string;
 
-  @Field(() => String, { description: "Category of the skill" })
+  @Field(() => String)
   @IsNotEmpty()
   category: string;
 }
