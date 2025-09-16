@@ -7,9 +7,7 @@ import { UpdateSkillInput } from "./dto/update-skill.input";
 
 @Injectable()
 export class SkillsService {
-  constructor(
-    @InjectModel(Skill.name) private readonly skillModel: Model<Skill>
-  ) {}
+  constructor(@InjectModel(Skill.name) private readonly skillModel: Model<Skill>) {}
 
   create(createSkillInput: CreateSkillInput) {
     return this.skillModel.create(createSkillInput);

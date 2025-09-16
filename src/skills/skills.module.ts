@@ -5,9 +5,7 @@ import { SkillsResolver } from "./skills.resolver";
 import { SkillsService } from "./skills.service";
 
 @Module({
-  imports: [
-    MongooseModule.forFeature([{ name: Skill.name, schema: SkillSchema }]),
-  ],
+  imports: [MongooseModule.forFeature([{ name: Skill.name, schema: SkillSchema }])],
   providers: [SkillsResolver, SkillsService],
 })
 export class SkillsModule {}

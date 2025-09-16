@@ -31,10 +31,7 @@ describe("Skills (e2e)", () => {
           playground: false,
         }),
       ],
-      providers: [
-        SkillsResolver,
-        { provide: SkillsService, useValue: mockSkillsService },
-      ],
+      providers: [SkillsResolver, { provide: SkillsService, useValue: mockSkillsService }],
     }).compile();
 
     app = moduleFixture.createNestApplication();
@@ -75,10 +72,7 @@ describe("Skills (e2e)", () => {
 
     const query = "query { findAllSkills { id name category } }";
 
-    const res = await request(app.getHttpServer())
-      .post("/graphql")
-      .send({ query })
-      .expect(200);
+    const res = await request(app.getHttpServer()).post("/graphql").send({ query }).expect(200);
 
     expect(res.body.data.findAllSkills).toEqual(list);
     expect(mockSkillsService.findAll).toHaveBeenCalled();

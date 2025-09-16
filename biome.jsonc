@@ -6,6 +6,9 @@
       "unsafeParameterDecoratorsEnabled": true
     }
   },
+  "formatter": {
+    "lineWidth": 120
+  },
   "linter": {
     "rules": {
       "suspicious": {
