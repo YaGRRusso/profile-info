@@ -1,0 +1,30 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+input CreateSkillInput {
+  """Example field (placeholder)"""
+  exampleField: Int!
+}
+
+type Mutation {
+  createSkill(createSkillInput: CreateSkillInput!): Skill!
+  removeSkill(id: Int!): Skill!
+  updateSkill(updateSkillInput: UpdateSkillInput!): Skill!
+}
+
+type Query {
+  skill(id: Int!): Skill!
+  skills: [Skill!]!
+}
+
+type Skill {
+  """Example field (placeholder)"""
+  exampleField: Int!
+}
+
+input UpdateSkillInput {
+  """Example field (placeholder)"""
+  exampleField: Int
+  id: Int!
+}
