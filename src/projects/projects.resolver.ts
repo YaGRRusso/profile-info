@@ -1,4 +1,5 @@
 import { Args, ID, Mutation, Parent, Query, ResolveField, Resolver } from "@nestjs/graphql";
+import type { ProjectModel } from "@/schemas/project.schema";
 import { Skill } from "@/skills/entities/skill.entity";
 import { SkillsService } from "@/skills/skills.service";
 import { CreateProjectInput } from "./dto/create-project.input";
@@ -39,7 +40,7 @@ export class ProjectsResolver {
   }
 
   @ResolveField(() => [Skill])
-  skills(@Parent() project: any) {
-    return this.skillsService.findMany(project.skills);
+  skills(@Parent() project: ProjectModel) {
+    return this.skillsService.findMany(project.skills.map((id) => id.toString()));
   }
 }

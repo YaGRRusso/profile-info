@@ -44,5 +44,3 @@ export class ProjectModel {
 
 export type ProjectDocument = HydratedDocument<ProjectModel>;
 export const ProjectSchema = SchemaFactory.createForClass(ProjectModel);
-
-ProjectSchema.index({ slug: 1 });
