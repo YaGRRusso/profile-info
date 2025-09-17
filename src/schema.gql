@@ -2,43 +2,84 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
-input CreateSkillInput {
-  """Category of the skill"""
-  category: String!
+input CreateProjectInput {
+  demoUrl: String!
+  i18n: [ProjectTranslationLocaleInput!]!
+  images: [String!]!
+  repositoryUrl: String!
+  skills: [String!]!
+  slug: String!
+}
 
-  """Name of the skill"""
+input CreateSkillInput {
+  category: String!
   name: String!
 }
 
 type Mutation {
+  createProject(createProjectInput: CreateProjectInput!): Project!
   createSkill(createSkillInput: CreateSkillInput!): Skill!
+  removeProject(id: ID!): Project!
   removeSkill(id: ID!): Skill!
+  updateProject(updateProjectInput: UpdateProjectInput!): Project!
   updateSkill(updateSkillInput: UpdateSkillInput!): Skill!
 }
 
+type Project {
+  demoUrl: String
+  i18n: [ProjectTranslationLocale!]!
+  id: ID!
+  images: [String!]
+  repositoryUrl: String
+  skills: [Skill!]
+  slug: String!
+}
+
+type ProjectTranslation {
+  description: String!
+  name: String!
+}
+
+input ProjectTranslationInput {
+  description: String!
+  name: String!
+}
+
+type ProjectTranslationLocale {
+  locale: String!
+  messages: ProjectTranslation!
+}
+
+input ProjectTranslationLocaleInput {
+  locale: String!
+  messages: ProjectTranslationInput!
+}
+
 type Query {
+  findAllProjects: [Project!]!
   findAllSkills: [Skill!]!
+  findOneProject(id: ID!): Project!
   findOneSkill(id: ID!): Skill!
 }
 
 type Skill {
-  """Category of the skill"""
   category: String!
-
-  """Unique identifier for the skill"""
   id: ID!
-
-  """Name of the skill"""
   name: String!
 }
 
-input UpdateSkillInput {
-  """Category of the skill"""
-  category: String
-
-  """ID of the skill"""
+input UpdateProjectInput {
+  demoUrl: String
+  i18n: [ProjectTranslationLocaleInput!]
   id: ID!
+  images: [String!]
+  repositoryUrl: String
+  skills: [String!]
+  slug: String
+}
 
-  """Name of the skill"""
+input UpdateSkillInput {
+  category: String
+  id: ID!
   name: String
 }

@@ -12,6 +12,15 @@ export class ProjectTranslationModel {
   description: string;
 }
 
+@Schema({ _id: false })
+export class ProjectTranslationLocaleModel {
+  @Prop({ type: String, required: true })
+  locale: string;
+
+  @Prop({ type: ProjectTranslationModel, required: true })
+  messages: ProjectTranslationModel;
+}
+
 @Schema({ timestamps: true })
 export class ProjectModel {
   @Prop({ type: String, required: true, unique: true })
@@ -29,9 +38,11 @@ export class ProjectModel {
   @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: SkillModel.name }] })
   skills: SkillModel[];
 
-  @Prop({ type: Map, of: ProjectTranslationModel, required: true })
-  i18n: Record<string, ProjectTranslationModel>;
+  @Prop({ type: [{ type: SchemaFactory.createForClass(ProjectTranslationLocaleModel) }], required: true })
+  i18n: ProjectTranslationLocaleModel[];
 }
 
 export type ProjectDocument = HydratedDocument<ProjectModel>;
 export const ProjectSchema = SchemaFactory.createForClass(ProjectModel);
+
+ProjectSchema.index({ slug: 1 });

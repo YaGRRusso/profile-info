@@ -21,6 +21,10 @@ export class SkillsService {
     return this.skillModel.findById(id).exec();
   }
 
+  findMany(ids: string[]) {
+    return this.skillModel.find({ _id: { $in: ids } }).exec();
+  }
+
   update(id: string, updateSkillInput: UpdateSkillInput) {
     return this.skillModel.findByIdAndUpdate(id, updateSkillInput).exec();
   }

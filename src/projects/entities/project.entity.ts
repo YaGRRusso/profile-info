@@ -11,6 +11,15 @@ export class ProjectTranslation {
 }
 
 @ObjectType()
+export class ProjectTranslationLocale {
+  @Field()
+  locale: string;
+
+  @Field(() => ProjectTranslation)
+  messages: ProjectTranslation;
+}
+
+@ObjectType()
 export class Project {
   @Field(() => ID)
   id: string;
@@ -30,6 +39,6 @@ export class Project {
   @Field(() => [Skill], { nullable: true })
   skills?: Skill[];
 
-  @Field(() => ProjectTranslation)
-  i18n?: ProjectTranslation;
+  @Field(() => [ProjectTranslationLocale])
+  i18n?: ProjectTranslationLocale[];
 }
