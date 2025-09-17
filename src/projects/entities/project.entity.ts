@@ -1,4 +1,5 @@
-import { Field, ID, ObjectType } from "@nestjs/graphql";
+import { Field, ObjectType } from "@nestjs/graphql";
+import { BaseEntity } from "@/core/entities/base.entity";
 import { Skill } from "@/skills/entities/skill.entity";
 
 @ObjectType()
@@ -20,10 +21,7 @@ export class ProjectTranslationLocale {
 }
 
 @ObjectType()
-export class Project {
-  @Field(() => ID)
-  id: string;
-
+export class Project extends BaseEntity {
   @Field()
   slug: string;
 

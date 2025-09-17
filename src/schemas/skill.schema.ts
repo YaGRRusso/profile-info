@@ -3,10 +3,10 @@ import { HydratedDocument } from "mongoose";
 
 @Schema({ timestamps: true })
 export class SkillModel {
-  @Prop({ required: true })
+  @Prop({ type: String, required: true })
   name: string;
 
-  @Prop({ required: true })
+  @Prop({ type: String, required: true })
   category: string;
 }
 

@@ -1,24 +1,16 @@
 // project.schema.ts
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import mongoose, { HydratedDocument } from "mongoose";
+import { createTranslationModel, TranslationModel } from "@/core/helpers/schema.helper";
 import { SkillModel } from "./skill.schema";
 
 @Schema({ _id: false })
-export class ProjectTranslationModel {
+export class ProjectMessagesModel {
   @Prop({ type: String, required: true })
   name: string;
 
   @Prop({ type: String, required: true })
   description: string;
-}
-
-@Schema({ _id: false })
-export class ProjectTranslationLocaleModel {
-  @Prop({ type: String, required: true })
-  locale: string;
-
-  @Prop({ type: ProjectTranslationModel, required: true })
-  messages: ProjectTranslationModel;
 }
 
 @Schema({ timestamps: true })
@@ -38,8 +30,8 @@ export class ProjectModel {
   @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: SkillModel.name }] })
   skills: SkillModel[];
 
-  @Prop({ type: [{ type: SchemaFactory.createForClass(ProjectTranslationLocaleModel) }], required: true })
-  i18n: ProjectTranslationLocaleModel[];
+  @Prop({ type: [{ type: createTranslationModel(ProjectMessagesModel) }], required: true })
+  i18n: TranslationModel<ProjectMessagesModel>[];
 }
 
 export type ProjectDocument = HydratedDocument<ProjectModel>;

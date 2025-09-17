@@ -16,6 +16,11 @@ input CreateSkillInput {
   name: String!
 }
 
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
 type Mutation {
   createProject(createProjectInput: CreateProjectInput!): Project!
   createSkill(createSkillInput: CreateSkillInput!): Skill!
@@ -26,6 +31,7 @@ type Mutation {
 }
 
 type Project {
+  createdAt: DateTime!
   demoUrl: String
   i18n: [ProjectTranslationLocale!]!
   id: ID!
@@ -33,6 +39,7 @@ type Project {
   repositoryUrl: String
   skills: [Skill!]
   slug: String!
+  updatedAt: DateTime!
 }
 
 type ProjectTranslation {
@@ -64,8 +71,10 @@ type Query {
 
 type Skill {
   category: String!
+  createdAt: DateTime!
   id: ID!
   name: String!
+  updatedAt: DateTime!
 }
 
 input UpdateProjectInput {

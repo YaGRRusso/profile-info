@@ -1,5 +1,5 @@
 import { Args, Context, ID, Mutation, Parent, Query, ResolveField, Resolver } from "@nestjs/graphql";
-import type { Ctx } from "@/interfaces/context.interface";
+import type { Ctx } from "@/core/interfaces/context.interface";
 import type { ProjectModel } from "@/schemas/project.schema";
 import { Skill } from "@/skills/entities/skill.entity";
 import { CreateProjectInput } from "./dto/create-project.input";

@@ -7,7 +7,7 @@ import { GraphQLModule } from "@nestjs/graphql";
 import { MongooseModule } from "@nestjs/mongoose";
 import { AppController } from "./app.controller";
 import { AppService } from "./app.service";
-import { createLoaders } from "./commons/loaders";
+import { createLoaders } from "./core/helpers/loaders.helper";
 import { ProjectsModule } from "./projects/projects.module";
 import { SkillsModule } from "./skills/skills.module";
 import { SkillsService } from "./skills/skills.service";
@@ -31,7 +31,7 @@ import { SkillsService } from "./skills/skills.service";
     }),
     GraphQLModule.forRootAsync({
       driver: ApolloDriver,
-      imports: [SkillsModule, ProjectsModule],
+      imports: [SkillsModule],
       inject: [SkillsService],
       useFactory: (skillsService: SkillsService) => ({
         plugins: [ApolloServerPluginLandingPageLocalDefault()],
@@ -43,6 +43,8 @@ import { SkillsService } from "./skills/skills.service";
         }),
       }),
     }),
+    SkillsModule,
+    ProjectsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
