@@ -1,8 +1,9 @@
 import { Field, InputType } from "@nestjs/graphql";
 import { IsUrl } from "class-validator";
+import { OptionalField } from "@/core/decorators/optional-field.decorator";
 
 @InputType()
-export class ProjectTranslationInput {
+export class CreateProjectTranslationInput {
   @Field(() => String)
   name: string;
 
@@ -11,12 +12,12 @@ export class ProjectTranslationInput {
 }
 
 @InputType()
-export class ProjectTranslationLocaleInput {
+export class CreateProjectTranslationLocaleInput {
   @Field(() => String)
   locale: string;
 
-  @Field(() => ProjectTranslationInput)
-  messages: ProjectTranslationInput;
+  @Field(() => CreateProjectTranslationInput)
+  messages: CreateProjectTranslationInput;
 }
 
 @InputType()
@@ -24,21 +25,21 @@ export class CreateProjectInput {
   @Field(() => String)
   slug: string;
 
-  @Field(() => String, { nullable: true })
+  @OptionalField(() => String)
   @IsUrl()
   demoUrl?: string;
 
-  @Field(() => String, { nullable: true })
+  @OptionalField(() => String)
   @IsUrl()
   repositoryUrl?: string;
 
-  @Field(() => [String], { nullable: true })
+  @OptionalField(() => [String])
   @IsUrl({}, { each: true })
   images?: string[];
 
-  @Field(() => [String], { nullable: true })
+  @OptionalField(() => [String])
   skills?: string[];
 
-  @Field(() => [ProjectTranslationLocaleInput])
-  i18n: ProjectTranslationLocaleInput[];
+  @Field(() => [CreateProjectTranslationLocaleInput])
+  i18n: CreateProjectTranslationLocaleInput[];
 }

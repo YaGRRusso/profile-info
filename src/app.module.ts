@@ -11,6 +11,7 @@ import { createLoaders } from "./core/helpers/loaders.helper";
 import { ProjectsModule } from "./projects/projects.module";
 import { SkillsModule } from "./skills/skills.module";
 import { SkillsService } from "./skills/skills.service";
+import { UsersModule } from './users/users.module';
 
 @Module({
   imports: [
@@ -45,6 +46,7 @@ import { SkillsService } from "./skills/skills.service";
     }),
     SkillsModule,
     ProjectsModule,
+    UsersModule,
   ],
   controllers: [AppController],
   providers: [AppService],

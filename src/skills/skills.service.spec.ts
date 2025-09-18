@@ -3,7 +3,7 @@ import { Test, TestingModule } from "@nestjs/testing";
 import { SkillModel } from "@/schemas/skill.schema";
 import { SkillsService } from "./skills.service";
 
-const skillModelMock = {};
+const SkillModelMock = {};
 
 describe("SkillsService", () => {
   let service: SkillsService;
@@ -15,7 +15,7 @@ describe("SkillsService", () => {
         SkillsService,
         {
           provide: getModelToken(SkillModel.name),
-          useValue: skillModelMock,
+          useValue: SkillModelMock,
         },
       ],
     }).compile();

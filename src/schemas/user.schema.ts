@@ -57,9 +57,7 @@ export class UserModel {
   @Prop({ type: [String] })
   hobbies?: string[];
 
-  @Prop({
-    type: [{ type: SchemaFactory.createForClass(UrlModel) }],
-  })
+  @Prop({ type: [{ type: SchemaFactory.createForClass(UrlModel) }] })
   urls?: UrlModel[];
 }
 

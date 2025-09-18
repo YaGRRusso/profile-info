@@ -4,16 +4,49 @@
 
 input CreateProjectInput {
   demoUrl: String
-  i18n: [ProjectTranslationLocaleInput!]!
+  i18n: [CreateProjectTranslationLocaleInput!]!
   images: [String!]
   repositoryUrl: String
   skills: [String!]
   slug: String!
 }
 
+input CreateProjectTranslationInput {
+  description: String!
+  name: String!
+}
+
+input CreateProjectTranslationLocaleInput {
+  locale: String!
+  messages: CreateProjectTranslationInput!
+}
+
 input CreateSkillInput {
   category: String!
   name: String!
+}
+
+input CreateUserInput {
+  address: String
+  avatar: String
+  birthDate: String
+  description: String
+  email: String!
+  hobbies: [String!]
+  name: String!
+  nickname: String!
+  password: String!
+  phone: String
+  postalCode: String
+  school: String
+  title: String
+  urls: [CreateUserUrlInput!]
+  work: String
+}
+
+input CreateUserUrlInput {
+  code: String!
+  value: String!
 }
 
 """
@@ -24,10 +57,13 @@ scalar DateTime
 type Mutation {
   createProject(createProjectInput: CreateProjectInput!): Project!
   createSkill(createSkillInput: CreateSkillInput!): Skill!
+  createUser(createUserInput: CreateUserInput!): User!
   removeProject(id: ID!): Project!
   removeSkill(id: ID!): Skill!
+  removeUser(id: ID!): User!
   updateProject(updateProjectInput: UpdateProjectInput!): Project!
   updateSkill(updateSkillInput: UpdateSkillInput!): Skill!
+  updateUser(updateUserInput: UpdateUserInput!): User!
 }
 
 type Project {
@@ -47,26 +83,18 @@ type ProjectTranslation {
   name: String!
 }
 
-input ProjectTranslationInput {
-  description: String!
-  name: String!
-}
-
 type ProjectTranslationLocale {
   locale: String!
   messages: ProjectTranslation!
 }
 
-input ProjectTranslationLocaleInput {
-  locale: String!
-  messages: ProjectTranslationInput!
-}
-
 type Query {
   findAllProjects: [Project!]!
   findAllSkills: [Skill!]!
+  findAllUsers: [User!]!
   findOneProject(id: ID!): Project!
   findOneSkill(id: ID!): Skill!
+  findOneUser(id: ID!): User!
 }
 
 type Skill {
@@ -79,7 +107,7 @@ type Skill {
 
 input UpdateProjectInput {
   demoUrl: String
-  i18n: [ProjectTranslationLocaleInput!]
+  i18n: [CreateProjectTranslationLocaleInput!]
   id: ID!
   images: [String!]
   repositoryUrl: String
@@ -91,4 +119,50 @@ input UpdateSkillInput {
   category: String
   id: ID!
   name: String
+}
+
+input UpdateUserInput {
+  address: String
+  avatar: String
+  birthDate: String
+  description: String
+  email: String
+  hobbies: [String!]
+  id: ID!
+  name: String
+  nickname: String
+  password: String
+  phone: String
+  postalCode: String
+  school: String
+  title: String
+  urls: [CreateUserUrlInput!]
+  work: String
+}
+
+type User {
+  address: String
+  avatar: String
+  birthDate: String
+  createdAt: DateTime!
+  description: String
+  email: String!
+  hobbies: [String!]
+  id: ID!
+  name: String!
+  nickname: String!
+  password: String!
+  phone: String
+  postalCode: String
+  role: String!
+  school: String
+  title: String
+  updatedAt: DateTime!
+  urls: [UserUrl!]
+  work: String
+}
+
+type UserUrl {
+  code: String!
+  value: String!
 }
