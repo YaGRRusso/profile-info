@@ -3,11 +3,11 @@
 # ------------------------------------------------------
 
 input CreateProjectInput {
-  demoUrl: String!
+  demoUrl: String
   i18n: [ProjectTranslationLocaleInput!]!
-  images: [String!]!
-  repositoryUrl: String!
-  skills: [String!]!
+  images: [String!]
+  repositoryUrl: String
+  skills: [String!]
   slug: String!
 }
 

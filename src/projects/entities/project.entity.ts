@@ -38,5 +38,5 @@ export class Project extends BaseEntity {
   skills?: Skill[];
 
   @Field(() => [ProjectTranslationLocale])
-  i18n?: ProjectTranslationLocale[];
+  i18n: ProjectTranslationLocale[];
 }
