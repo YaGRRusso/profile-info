@@ -61,6 +61,8 @@ type Mutation {
   removeProject(id: ID!): Project!
   removeSkill(id: ID!): Skill!
   removeUser(id: ID!): User!
+  signIn(signInInput: SignInInput!): String!
+  signOut: Boolean!
   updateProject(updateProjectInput: UpdateProjectInput!): Project!
   updateSkill(updateSkillInput: UpdateSkillInput!): Skill!
   updateUser(updateUserInput: UpdateUserInput!): User!
@@ -92,9 +94,14 @@ type Query {
   findAllProjects: [Project!]!
   findAllSkills: [Skill!]!
   findAllUsers: [User!]!
-  findOneProject(id: ID!): Project!
-  findOneSkill(id: ID!): Skill!
-  findOneUser(id: ID!): User!
+  findOneProjectById(id: ID!): Project!
+  findOneSkillById(id: ID!): Skill!
+  findOneUserById(id: ID!): User!
+}
+
+input SignInInput {
+  email: String!
+  password: String!
 }
 
 type Skill {

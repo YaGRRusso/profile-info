@@ -4,6 +4,7 @@ import { Model } from "mongoose";
 import { UserModel } from "@/schemas/user.schema";
 import { CreateUserInput } from "./dto/create-user.input";
 import { UpdateUserInput } from "./dto/update-user.input";
+import { ReadUserInput } from "./dto/read-user.input";
 
 @Injectable()
 export class UsersService {
@@ -17,8 +18,12 @@ export class UsersService {
     return this.userModel.find().exec();
   }
 
-  findOne(id: string) {
+  findOneById(id: string) {
     return this.userModel.findById(id).exec();
+  }
+
+  findOne(readUserInput: ReadUserInput) {
+    return this.userModel.findOne(readUserInput).exec();
   }
 
   update(id: string, updateUserInput: UpdateUserInput) {

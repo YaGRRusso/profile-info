@@ -17,7 +17,7 @@ export class ProjectsService {
     return this.projectModel.find().exec();
   }
 
-  findOne(id: string) {
+  findOneById(id: string) {
     return this.projectModel.findById(id).exec();
   }
 

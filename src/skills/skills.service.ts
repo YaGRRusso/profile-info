@@ -17,11 +17,11 @@ export class SkillsService {
     return this.skillModel.find().exec();
   }
 
-  findOne(id: string) {
+  findOneById(id: string) {
     return this.skillModel.findById(id).exec();
   }
 
-  findMany(ids: string[]) {
+  findManyById(ids: string[]) {
     return this.skillModel.find({ _id: { $in: ids } }).exec();
   }
 

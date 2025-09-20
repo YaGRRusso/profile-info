@@ -19,8 +19,8 @@ export class UsersResolver {
   }
 
   @Query(() => User)
-  findOneUser(@Args("id", { type: () => ID }) id: string) {
-    return this.usersService.findOne(id);
+  findOneUserById(@Args("id", { type: () => ID }) id: string) {
+    return this.usersService.findOneById(id);
   }
 
   @Mutation(() => User)

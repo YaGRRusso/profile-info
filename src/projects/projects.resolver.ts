@@ -22,8 +22,8 @@ export class ProjectsResolver {
   }
 
   @Query(() => Project)
-  findOneProject(@Args("id", { type: () => ID }) id: string) {
-    return this.projectsService.findOne(id);
+  findOneProjectById(@Args("id", { type: () => ID }) id: string) {
+    return this.projectsService.findOneById(id);
   }
 
   @Mutation(() => Project)
