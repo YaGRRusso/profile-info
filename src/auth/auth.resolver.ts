@@ -4,9 +4,8 @@ import { Public } from "@/core/decorators/public-route.decorator";
 import { User } from "@/users/entities/user.entity";
 import { AuthService } from "./auth.service";
 import { SignInInput } from "./dto/sign-in.input";
-import { AuthUser } from "./entities/auth.entity";
 
-@Resolver(() => AuthUser)
+@Resolver(() => User)
 export class AuthResolver {
   constructor(private readonly authService: AuthService) {}
 

@@ -27,7 +27,8 @@
         "useImportType": "off",
         "noMagicNumbers": "off",
         "noParameterProperties": "off",
-        "useBlockStatements": "off"
+        "useBlockStatements": "off",
+        "useNamingConvention": "off"
       }
     }
   }

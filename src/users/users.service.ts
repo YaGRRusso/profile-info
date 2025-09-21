@@ -3,8 +3,8 @@ import { InjectModel } from "@nestjs/mongoose";
 import { Model } from "mongoose";
 import { UserModel } from "@/schemas/user.schema";
 import { CreateUserInput } from "./dto/create-user.input";
-import { UpdateUserInput } from "./dto/update-user.input";
 import { ReadUserInput } from "./dto/read-user.input";
+import { UpdateUserInput } from "./dto/update-user.input";
 
 @Injectable()
 export class UsersService {
@@ -15,15 +15,15 @@ export class UsersService {
   }
 
   findAll() {
-    return this.userModel.find().exec();
+    return this.userModel.find().select("-password").exec();
   }
 
   findOneById(id: string) {
-    return this.userModel.findById(id).exec();
+    return this.userModel.findById(id).select("-password").exec();
   }
 
   findOne(readUserInput: ReadUserInput) {
-    return this.userModel.findOne(readUserInput).exec();
+    return this.userModel.findOne(readUserInput).select("-password").exec();
   }
 
   update(id: string, updateUserInput: UpdateUserInput) {
