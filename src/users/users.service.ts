@@ -1,5 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
+import { hash } from "bcryptjs";
 import { Model } from "mongoose";
 import { UserModel } from "@/schemas/user.schema";
 import { CreateUserInput } from "./dto/create-user.input";
@@ -10,27 +11,28 @@ import { UpdateUserInput } from "./dto/update-user.input";
 export class UsersService {
   constructor(@InjectModel(UserModel.name) private readonly userModel: Model<UserModel>) {}
 
-  create(createUserInput: CreateUserInput) {
-    return this.userModel.create(createUserInput);
+  async create({ password, ...createUserInput }: CreateUserInput) {
+    const newHash = await hash(password, 8);
+    return await this.userModel.create({ ...createUserInput, password: newHash });
   }
 
-  findAll() {
-    return this.userModel.find().select("-password").exec();
+  async findAll() {
+    return await this.userModel.find().exec();
   }
 
-  findOneById(id: string) {
-    return this.userModel.findById(id).select("-password").exec();
+  async findOneById(id: string) {
+    return await this.userModel.findById(id).exec();
   }
 
-  findOne(readUserInput: ReadUserInput) {
-    return this.userModel.findOne(readUserInput).select("-password").exec();
+  async findOne(readUserInput: ReadUserInput) {
+    return await this.userModel.findOne(readUserInput).exec();
   }
 
-  update(id: string, updateUserInput: UpdateUserInput) {
-    return this.userModel.findByIdAndUpdate(id, updateUserInput).exec();
+  async update(id: string, updateUserInput: UpdateUserInput) {
+    return await this.userModel.findByIdAndUpdate(id, updateUserInput).exec();
   }
 
-  remove(id: string) {
-    return this.userModel.findByIdAndDelete(id).exec();
+  async remove(id: string) {
+    return await this.userModel.findByIdAndDelete(id).exec();
   }
 }

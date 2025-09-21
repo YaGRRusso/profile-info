@@ -9,23 +9,23 @@ import { UpdateProjectInput } from "./dto/update-project.input";
 export class ProjectsService {
   constructor(@InjectModel(ProjectModel.name) private readonly projectModel: Model<ProjectModel>) {}
 
-  create(createProjectInput: CreateProjectInput) {
-    return this.projectModel.create(createProjectInput);
+  async create(createProjectInput: CreateProjectInput) {
+    return await this.projectModel.create(createProjectInput);
   }
 
-  findAll() {
-    return this.projectModel.find().exec();
+  async findAll() {
+    return await this.projectModel.find().exec();
   }
 
-  findOneById(id: string) {
-    return this.projectModel.findById(id).exec();
+  async findOneById(id: string) {
+    return await this.projectModel.findById(id).exec();
   }
 
-  update(id: string, updateProjectInput: UpdateProjectInput) {
-    return this.projectModel.findByIdAndUpdate(id, updateProjectInput).exec();
+  async update(id: string, updateProjectInput: UpdateProjectInput) {
+    return await this.projectModel.findByIdAndUpdate(id, updateProjectInput).exec();
   }
 
-  remove(id: string) {
-    return this.projectModel.findByIdAndDelete(id).exec();
+  async remove(id: string) {
+    return await this.projectModel.findByIdAndDelete(id).exec();
   }
 }

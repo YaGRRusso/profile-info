@@ -9,27 +9,27 @@ import { UpdateSkillInput } from "./dto/update-skill.input";
 export class SkillsService {
   constructor(@InjectModel(SkillModel.name) private readonly skillModel: Model<SkillModel>) {}
 
-  create(createSkillInput: CreateSkillInput) {
-    return this.skillModel.create(createSkillInput);
+  async create(createSkillInput: CreateSkillInput) {
+    return await this.skillModel.create(createSkillInput);
   }
 
-  findAll() {
-    return this.skillModel.find().exec();
+  async findAll() {
+    return await this.skillModel.find().exec();
   }
 
-  findOneById(id: string) {
-    return this.skillModel.findById(id).exec();
+  async findOneById(id: string) {
+    return await this.skillModel.findById(id).exec();
   }
 
-  findManyById(ids: string[]) {
-    return this.skillModel.find({ _id: { $in: ids } }).exec();
+  async findManyById(ids: string[]) {
+    return await this.skillModel.find({ _id: { $in: ids } }).exec();
   }
 
-  update(id: string, updateSkillInput: UpdateSkillInput) {
-    return this.skillModel.findByIdAndUpdate(id, updateSkillInput).exec();
+  async update(id: string, updateSkillInput: UpdateSkillInput) {
+    return await this.skillModel.findByIdAndUpdate(id, updateSkillInput).exec();
   }
 
-  remove(id: string) {
-    return this.skillModel.findByIdAndDelete(id).exec();
+  async remove(id: string) {
+    return await this.skillModel.findByIdAndDelete(id).exec();
   }
 }
