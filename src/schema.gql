@@ -62,7 +62,6 @@ type Mutation {
   removeSkill(id: ID!): Skill!
   removeUser(id: ID!): User!
   signIn(signInInput: SignInInput!): String!
-  signOut: Boolean!
   updateProject(updateProjectInput: UpdateProjectInput!): Project!
   updateSkill(updateSkillInput: UpdateSkillInput!): Skill!
   updateUser(updateUserInput: UpdateUserInput!): User!

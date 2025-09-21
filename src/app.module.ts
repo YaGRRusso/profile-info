@@ -7,12 +7,12 @@ import { GraphQLModule } from "@nestjs/graphql";
 import { MongooseModule } from "@nestjs/mongoose";
 import { AppController } from "./app.controller";
 import { AppService } from "./app.service";
+import { AuthModule } from "./auth/auth.module";
 import { createLoaders } from "./core/helpers/loaders.helper";
 import { ProjectsModule } from "./projects/projects.module";
 import { SkillsModule } from "./skills/skills.module";
 import { SkillsService } from "./skills/skills.service";
-import { UsersModule } from './users/users.module';
-import { AuthModule } from './auth/auth.module';
+import { UsersModule } from "./users/users.module";
 
 @Module({
   imports: [
@@ -40,8 +40,10 @@ import { AuthModule } from './auth/auth.module';
         autoSchemaFile: join(process.cwd(), "src/schema.gql"),
         sortSchema: true,
         playground: false,
-        context: () => ({
+        context: ({ req, res }) => ({
           loaders: createLoaders({ skillsService }),
+          req,
+          res,
         }),
       }),
     }),
