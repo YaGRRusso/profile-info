@@ -14,9 +14,7 @@ export class AuthService {
     const user = await this.usersService.findOne({ email, password });
     if (!user) throw new UnauthorizedException();
 
-    const payload = { sub: user.id, username: user.nickname };
-    return JSON.stringify({
-      access_token: await this.jwtService.signAsync(payload),
-    });
+    const payload = { sub: user.id, username: user.nickname, role: user.role };
+    return await this.jwtService.signAsync(payload);
   }
 }

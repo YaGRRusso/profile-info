@@ -96,6 +96,7 @@ type Query {
   findOneProjectById(id: ID!): Project!
   findOneSkillById(id: ID!): Skill!
   findOneUserById(id: ID!): User!
+  getMe: User!
 }
 
 input SignInInput {
@@ -157,7 +158,6 @@ type User {
   id: ID!
   name: String!
   nickname: String!
-  password: String!
   phone: String
   postalCode: String
   role: String!

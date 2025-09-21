@@ -3,6 +3,7 @@ import { Reflector } from "@nestjs/core";
 import { GqlExecutionContext } from "@nestjs/graphql";
 import { AuthGuard } from "@nestjs/passport";
 import { PUBLIC_KEY } from "@/core/decorators/public-route.decorator";
+import { Ctx } from "@/core/interfaces/context.interface";
 
 @Injectable()
 export class GqlAuthGuard extends AuthGuard("jwt") {
@@ -19,6 +20,6 @@ export class GqlAuthGuard extends AuthGuard("jwt") {
 
   getRequest(context: ExecutionContext) {
     const ctx = GqlExecutionContext.create(context);
-    return ctx.getContext().req;
+    return (ctx.getContext() as Ctx).req;
   }
 }
