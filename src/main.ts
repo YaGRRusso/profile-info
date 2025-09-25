@@ -6,7 +6,7 @@ import { validationConfig } from "./core/configs/validation.config";
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   validationConfig(app);
-  appConfig(app);
+  await appConfig(app);
 }
 
 bootstrap();
