@@ -8,6 +8,9 @@ export class SkillModel {
 
   @Prop({ type: String, required: true })
   category: string;
+
+  @Prop({ type: String })
+  slug?: string;
 }
 
 export type SkillDocument = HydratedDocument<SkillModel>;
