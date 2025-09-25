@@ -15,7 +15,7 @@ import { AuthStrategy } from "./auth.strategy";
     JwtModule.register({
       global: true,
       secret: process.env.JWT_SECRET,
-      signOptions: { expiresIn: "600s" },
+      signOptions: { expiresIn: "8h" },
     }),
   ],
   providers: [AuthResolver, AuthService, AuthStrategy, { provide: APP_GUARD, useClass: GqlAuthGuard }],
