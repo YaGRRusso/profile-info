@@ -6,6 +6,7 @@ import { CreateProjectInput } from "./dto/create-project.input";
 import { UpdateProjectInput } from "./dto/update-project.input";
 import { Project } from "./entities/project.entity";
 import { ProjectsService } from "./projects.service";
+import { Public } from "@/core/decorators/public-route.decorator";
 
 @Resolver(() => Project)
 export class ProjectsResolver {
@@ -16,11 +17,13 @@ export class ProjectsResolver {
     return this.projectsService.create(createProjectInput);
   }
 
+  @Public()
   @Query(() => [Project])
   findAllProjects() {
     return this.projectsService.findAll();
   }
 
+  @Public()
   @Query(() => Project)
   findOneProjectById(@Args("id", { type: () => ID }) id: string) {
     return this.projectsService.findOneById(id);

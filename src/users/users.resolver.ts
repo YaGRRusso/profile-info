@@ -9,17 +9,18 @@ import { UsersService } from "./users.service";
 export class UsersResolver {
   constructor(private readonly usersService: UsersService) {}
 
-  @Public()
   @Mutation(() => User)
   createUser(@Args("createUserInput") createUserInput: CreateUserInput) {
     return this.usersService.create(createUserInput);
   }
 
+  @Public()
   @Query(() => [User])
   findAllUsers() {
     return this.usersService.findAll();
   }
 
+  @Public()
   @Query(() => User)
   findOneUserById(@Args("id", { type: () => ID }) id: string) {
     return this.usersService.findOneById(id);

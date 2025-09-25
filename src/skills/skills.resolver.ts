@@ -3,6 +3,7 @@ import { CreateSkillInput } from "./dto/create-skill.input";
 import { UpdateSkillInput } from "./dto/update-skill.input";
 import { Skill } from "./entities/skill.entity";
 import { SkillsService } from "./skills.service";
+import { Public } from "@/core/decorators/public-route.decorator";
 
 @Resolver(() => Skill)
 export class SkillsResolver {
@@ -13,11 +14,13 @@ export class SkillsResolver {
     return this.skillsService.create(createSkillInput);
   }
 
+  @Public()
   @Query(() => [Skill])
   findAllSkills() {
     return this.skillsService.findAll();
   }
 
+  @Public()
   @Query(() => Skill)
   findOneSkillById(@Args("id", { type: () => ID }) id: string) {
     return this.skillsService.findOneById(id);
