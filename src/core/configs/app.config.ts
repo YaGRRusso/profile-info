@@ -4,7 +4,7 @@ import chalk from "chalk";
 const localhost = /^http:\/\/localhost:\d+$/;
 
 export async function appConfig(app: INestApplication) {
-  const port = Number(process.env.PORT) || 3000;
+  const port = Number(process.env.PORT) || 8080;
   const host = process.env.HOST || "0.0.0.0";
 
   app.enableCors({
