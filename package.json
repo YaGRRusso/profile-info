@@ -9,7 +9,7 @@
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "nest start  --env-file .env.production",
-    "start:dev": "nest start --watch --env-file .env.development",
+    "start:dev": "sudo systemctl start mongod && nest start --watch --env-file .env.development",
     "start:debug": "nest start --debug --watch --env-file .env.development",
     "start:prod": "node dist/main",
     "start:db": "sudo systemctl start mongod",

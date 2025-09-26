@@ -23,8 +23,9 @@ input CreateProjectTranslationLocaleInput {
 
 input CreateSkillInput {
   category: String!
+  color: String
   name: String!
-  slug: String
+  slug: String!
 }
 
 input CreateUserInput {
@@ -107,10 +108,11 @@ input SignInInput {
 
 type Skill {
   category: String!
+  color: String
   createdAt: DateTime!
   id: ID!
   name: String!
-  slug: String
+  slug: String!
   updatedAt: DateTime!
 }
 
@@ -126,6 +128,7 @@ input UpdateProjectInput {
 
 input UpdateSkillInput {
   category: String
+  color: String
   id: ID!
   name: String
   slug: String

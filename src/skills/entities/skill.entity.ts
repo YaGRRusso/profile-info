@@ -1,9 +1,12 @@
 import { Field, ObjectType } from "@nestjs/graphql";
-import { BaseEntity } from "@/core/entities/base.entity";
 import { OptionalField } from "@/core/decorators/optional-field.decorator";
+import { BaseEntity } from "@/core/entities/base.entity";
 
 @ObjectType()
 export class Skill extends BaseEntity {
+  @Field(() => String)
+  slug: string;
+
   @Field(() => String)
   name: string;
 
@@ -11,5 +14,5 @@ export class Skill extends BaseEntity {
   category: string;
 
   @OptionalField(() => String)
-  slug?: string;
+  color?: string;
 }
