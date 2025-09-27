@@ -1,10 +1,26 @@
 services:
   db:
     image: mongo:7-jammy
+    container_name: profile-info-db
     ports:
       - "27017:27017"
     volumes:
       - profile:/data/db
+
+  api:
+    build: .
+    container_name: profile-info-api
+    ports:
+      - "8080:8080"
+    # env_file:
+    #   - .env
+    environment:
+      - DATABASE_URL=mongodb://db:27017/profile
+      - JWT_SECRET=ecstasy
+      - HOST=0.0.0.0
+      - PORT=8080
+    depends_on:
+      - db
 
 volumes:
   profile:
