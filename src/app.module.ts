@@ -38,6 +38,7 @@ import { UsersModule } from "./users/users.module";
       useFactory: (skillsService: SkillsService) => ({
         plugins: [ApolloServerPluginLandingPageLocalDefault()],
         autoSchemaFile: join(process.cwd(), "src/schema.gql"),
+        introspection: true,
         sortSchema: true,
         playground: false,
         context: ({ req, res }) => ({
