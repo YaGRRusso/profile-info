@@ -9,8 +9,12 @@ import { UpdateSkillInput } from "./dto/update-skill.input";
 export class SkillsService {
   constructor(@InjectModel(SkillModel.name) private readonly skillModel: Model<SkillModel>) {}
 
-  async create(createSkillInput: CreateSkillInput) {
-    return await this.skillModel.create(createSkillInput);
+  async create(createSkillInput: CreateSkillInput[]) {
+    return await Promise.all(
+      createSkillInput.map(async (item) => {
+        await this.skillModel.create(item);
+      })
+    );
   }
 
   async findAll() {
@@ -29,7 +33,7 @@ export class SkillsService {
     return await this.skillModel.findByIdAndUpdate(id, updateSkillInput).exec();
   }
 
-  async remove(id: string) {
-    return await this.skillModel.findByIdAndDelete(id).exec();
+  async remove(id: string[]) {
+    return await this.skillModel.deleteMany({ _id: { $in: id } }).exec();
   }
 }

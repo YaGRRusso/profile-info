@@ -9,8 +9,12 @@ import { UpdateProjectInput } from "./dto/update-project.input";
 export class ProjectsService {
   constructor(@InjectModel(ProjectModel.name) private readonly projectModel: Model<ProjectModel>) {}
 
-  async create(createProjectInput: CreateProjectInput) {
-    return await this.projectModel.create(createProjectInput);
+  async create(createProjectInput: CreateProjectInput[]) {
+    return await Promise.all(
+      createProjectInput.map(async (item) => {
+        await this.projectModel.create(item);
+      })
+    );
   }
 
   async findAll() {
@@ -25,7 +29,7 @@ export class ProjectsService {
     return await this.projectModel.findByIdAndUpdate(id, updateProjectInput).exec();
   }
 
-  async remove(id: string) {
-    return await this.projectModel.findByIdAndDelete(id).exec();
+  async remove(id: string[]) {
+    return await this.projectModel.deleteMany({ _id: { $in: id } }).exec();
   }
 }
