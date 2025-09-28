@@ -12,10 +12,10 @@
   "scripts": {
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
-    "start": "node --max-old-space-size=512 dist/main",
+    "start": "nest start",
     "start:dev": "sudo systemctl start mongod && nest start --watch --env-file .env.development",
     "start:debug": "nest start --debug --watch --env-file .env.development",
-    "start:prod": "node dist/main",
+    "start:prod": "node --max-old-space-size=512 dist/main",
     "start:db": "sudo systemctl start mongod",
     "stop:db": "sudo systemctl stop mongod",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
