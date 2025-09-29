@@ -8,7 +8,7 @@ export async function appConfig(app: INestApplication) {
   const host = process.env.HOST || "0.0.0.0";
 
   app.enableCors({
-    origin: [localhost],
+    origin: [localhost, "https://yagrrusso.github.io"],
     methods: ["GET", "POST", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
     credentials: true,
