@@ -12,7 +12,7 @@ export class ProjectsService {
   async create(createProjectInput: CreateProjectInput[]) {
     return await Promise.all(
       createProjectInput.map(async (item) => {
-        await this.projectModel.create(item);
+        return await this.projectModel.create(item as any);
       })
     );
   }
