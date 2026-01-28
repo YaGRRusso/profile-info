@@ -1,34 +1,19 @@
 {
   "$schema": "./node_modules/@biomejs/biome/configuration_schema.json",
-  "extends": ["ultracite"],
-  "javascript": {
-    "parser": {
-      "unsafeParameterDecoratorsEnabled": true
-    }
-  },
-  "formatter": {
-    "lineWidth": 120
+  "extends": ["ultracite/core", "ultracite/next", "ultracite/react"],
+  "files": {
+    "includes": ["!!**/dist", "!!**/node_modules", "!!**/graphql"]
   },
   "linter": {
+    "enabled": true,
     "rules": {
-      "correctness": {
-        "useHookAtTopLevel": "off"
-      },
-      "nursery": {
-        "useConsistentTypeDefinitions": "off"
-      },
-      "suspicious": {
-        "noExplicitAny": "off",
-        "noEmptyBlockStatements": "off"
-      },
-      "style": {
-        "noEnum": "off",
-        "useAtIndex": "off",
-        "useImportType": "off",
-        "noMagicNumbers": "off",
-        "noParameterProperties": "off",
-        "useBlockStatements": "off",
-        "useNamingConvention": "off"
+      "recommended": true
+    }
+  },
+  "assist": {
+    "actions": {
+      "source": {
+        "organizeImports": "on"
       }
     }
   }

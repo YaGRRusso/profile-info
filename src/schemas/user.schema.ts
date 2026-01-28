@@ -1,14 +1,6 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
-import { HydratedDocument } from "mongoose";
-
-@Schema({ _id: false })
-export class UrlModel {
-  @Prop({ required: true })
-  code: string;
-
-  @Prop({ required: true })
-  value: string;
-}
+import type { HydratedDocument } from "mongoose";
+import { UrlModel } from "@/core/schemas/url.schema";
 
 @Schema({ timestamps: true })
 export class UserModel {
@@ -25,9 +17,6 @@ export class UserModel {
   title?: string;
 
   @Prop({ type: String })
-  description?: string;
-
-  @Prop({ type: String })
   phone?: string;
 
   @Prop({ type: String, required: true, unique: true })
@@ -36,14 +25,11 @@ export class UserModel {
   @Prop({ type: String, required: true })
   password: string;
 
-  @Prop({ type: String })
-  birthDate?: Date;
+  @Prop({ type: Date })
+  birth?: Date;
 
   @Prop({ type: String })
   address?: string;
-
-  @Prop({ type: String })
-  postalCode?: string;
 
   @Prop({ type: String })
   school?: string;
@@ -53,9 +39,6 @@ export class UserModel {
 
   @Prop({ type: String, default: "USER" })
   role?: string;
-
-  @Prop({ type: [String] })
-  hobbies?: string[];
 
   @Prop({ type: [{ type: SchemaFactory.createForClass(UrlModel) }] })
   urls?: UrlModel[];

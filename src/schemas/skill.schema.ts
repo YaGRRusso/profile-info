@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
-import { HydratedDocument } from "mongoose";
+import type { HydratedDocument } from "mongoose";
 
 @Schema({ timestamps: true })
 export class SkillModel {
@@ -7,7 +7,7 @@ export class SkillModel {
   slug: string;
 
   @Prop({ type: String, required: true })
-  name: string;
+  title: string;
 
   @Prop({ type: String, required: true })
   category: string;
