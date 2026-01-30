@@ -1,17 +1,11 @@
 import { Field, InputType } from "@nestjs/graphql";
-import {
-  IsDate,
-  IsEmail,
-  IsPhoneNumber,
-  IsPostalCode,
-  IsUrl,
-} from "class-validator";
+import { IsDateString, IsEmail, IsUrl } from "class-validator";
 import { OptionalField } from "@/core/decorators/optional-field.decorator";
 
 @InputType()
 export class CreateUserUrlInput {
   @Field(() => String)
-  code: string;
+  title: string;
 
   @Field(() => String)
   value: string;
@@ -33,10 +27,6 @@ export class CreateUserInput {
   title?: string;
 
   @OptionalField(() => String)
-  description?: string;
-
-  @OptionalField(() => String)
-  @IsPhoneNumber()
   phone?: string;
 
   @Field(() => String)
@@ -47,24 +37,17 @@ export class CreateUserInput {
   password: string;
 
   @OptionalField(() => String)
-  @IsDate()
-  birthDate?: Date;
+  @IsDateString()
+  birth?: Date;
 
   @OptionalField(() => String)
   address?: string;
-
-  @OptionalField(() => String)
-  @IsPostalCode()
-  postalCode?: string;
 
   @OptionalField(() => String)
   school?: string;
 
   @OptionalField(() => String)
   work?: string;
-
-  @OptionalField(() => [String])
-  hobbies?: string[];
 
   @OptionalField(() => [CreateUserUrlInput])
   urls?: CreateUserUrlInput[];

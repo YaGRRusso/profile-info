@@ -4,7 +4,7 @@ import { OptionalField } from "@/core/decorators/optional-field.decorator";
 @InputType()
 export class ReadUserUrlInput {
   @OptionalField(() => String)
-  code?: string;
+  title?: string;
 
   @OptionalField(() => String)
   value?: string;
@@ -25,9 +25,6 @@ export class ReadUserInput {
   title?: string;
 
   @OptionalField(() => String)
-  description?: string;
-
-  @OptionalField(() => String)
   phone?: string;
 
   @OptionalField(() => String)
@@ -37,13 +34,10 @@ export class ReadUserInput {
   password?: string;
 
   @OptionalField(() => String)
-  birthDate?: Date;
+  birth?: Date;
 
   @OptionalField(() => String)
   address?: string;
-
-  @OptionalField(() => String)
-  postalCode?: string;
 
   @OptionalField(() => String)
   school?: string;
@@ -53,9 +47,6 @@ export class ReadUserInput {
 
   @OptionalField(() => String, { defaultValue: "USER" })
   role?: string;
-
-  @OptionalField(() => [String])
-  hobbies?: string[];
 
   @OptionalField(() => [ReadUserUrlInput])
   urls?: ReadUserUrlInput[];

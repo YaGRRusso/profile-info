@@ -5,10 +5,19 @@ import { OptionalField } from "@/core/decorators/optional-field.decorator";
 @InputType()
 export class CreateProjectTranslationInput {
   @Field(() => String)
-  name: string;
+  title: string;
 
   @Field(() => String)
   description: string;
+}
+
+@InputType()
+export class CreateProjectUrlInput {
+  @Field(() => String)
+  title: string;
+
+  @Field(() => String)
+  value: string;
 }
 
 @InputType()
@@ -25,14 +34,6 @@ export class CreateProjectInput {
   @Field(() => String)
   slug: string;
 
-  @OptionalField(() => String)
-  @IsUrl()
-  demoUrl?: string;
-
-  @OptionalField(() => String)
-  @IsUrl()
-  repositoryUrl?: string;
-
   @OptionalField(() => [String])
   @IsUrl({}, { each: true })
   images?: string[];
@@ -42,4 +43,7 @@ export class CreateProjectInput {
 
   @Field(() => [CreateProjectTranslationLocaleInput])
   i18n: CreateProjectTranslationLocaleInput[];
+
+  @OptionalField(() => [CreateProjectUrlInput])
+  urls?: CreateProjectUrlInput[];
 }

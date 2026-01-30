@@ -3,17 +3,16 @@
 # ------------------------------------------------------
 
 input CreateProjectInput {
-  demoUrl: String
   i18n: [CreateProjectTranslationLocaleInput!]!
   images: [String!]
-  repositoryUrl: String
   skills: [String!]
   slug: String!
+  urls: [CreateProjectUrlInput!]
 }
 
 input CreateProjectTranslationInput {
   description: String!
-  name: String!
+  title: String!
 }
 
 input CreateProjectTranslationLocaleInput {
@@ -21,25 +20,27 @@ input CreateProjectTranslationLocaleInput {
   messages: CreateProjectTranslationInput!
 }
 
+input CreateProjectUrlInput {
+  title: String!
+  value: String!
+}
+
 input CreateSkillInput {
   category: String!
   color: String
-  name: String!
   slug: String!
+  title: String!
 }
 
 input CreateUserInput {
   address: String
   avatar: String
-  birthDate: String
-  description: String
+  birth: String
   email: String!
-  hobbies: [String!]
   name: String!
   nickname: String!
   password: String!
   phone: String
-  postalCode: String
   school: String
   title: String
   urls: [CreateUserUrlInput!]
@@ -47,7 +48,7 @@ input CreateUserInput {
 }
 
 input CreateUserUrlInput {
-  code: String!
+  title: String!
   value: String!
 }
 
@@ -71,24 +72,28 @@ type Mutation {
 
 type Project {
   createdAt: DateTime!
-  demoUrl: String
   i18n: [ProjectTranslationLocale!]!
   id: ID!
   images: [String!]
-  repositoryUrl: String
   skills: [Skill!]
   slug: String!
   updatedAt: DateTime!
+  urls: [ProjectUrl!]
 }
 
 type ProjectTranslation {
   description: String!
-  name: String!
+  title: String!
 }
 
 type ProjectTranslationLocale {
   locale: String!
   messages: ProjectTranslation!
+}
+
+type ProjectUrl {
+  title: String!
+  value: String!
 }
 
 type Query {
@@ -111,42 +116,38 @@ type Skill {
   color: String
   createdAt: DateTime!
   id: ID!
-  name: String!
   slug: String!
+  title: String!
   updatedAt: DateTime!
 }
 
 input UpdateProjectInput {
-  demoUrl: String
   i18n: [CreateProjectTranslationLocaleInput!]
   id: ID!
   images: [String!]
-  repositoryUrl: String
   skills: [String!]
   slug: String
+  urls: [CreateProjectUrlInput!]
 }
 
 input UpdateSkillInput {
   category: String
   color: String
   id: ID!
-  name: String
   slug: String
+  title: String
 }
 
 input UpdateUserInput {
   address: String
   avatar: String
-  birthDate: String
-  description: String
+  birth: String
   email: String
-  hobbies: [String!]
   id: ID!
   name: String
   nickname: String
   password: String
   phone: String
-  postalCode: String
   school: String
   title: String
   urls: [CreateUserUrlInput!]
@@ -156,16 +157,13 @@ input UpdateUserInput {
 type User {
   address: String
   avatar: String
-  birthDate: String
+  birth: String
   createdAt: DateTime!
-  description: String
   email: String!
-  hobbies: [String!]
   id: ID!
   name: String!
   nickname: String!
   phone: String
-  postalCode: String
   role: String!
   school: String
   title: String
@@ -175,6 +173,6 @@ type User {
 }
 
 type UserUrl {
-  code: String!
+  title: String!
   value: String!
 }

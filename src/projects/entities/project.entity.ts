@@ -6,7 +6,7 @@ import { Skill } from "@/skills/entities/skill.entity";
 @ObjectType()
 export class ProjectTranslation {
   @Field()
-  name: string;
+  title: string;
 
   @Field()
   description: string;
@@ -22,15 +22,18 @@ export class ProjectTranslationLocale {
 }
 
 @ObjectType()
+export class ProjectUrl {
+  @Field(() => String)
+  title: string;
+
+  @Field(() => String)
+  value: string;
+}
+
+@ObjectType()
 export class Project extends BaseEntity {
   @Field(() => String)
   slug: string;
-
-  @OptionalField(() => String)
-  demoUrl?: string;
-
-  @OptionalField(() => String)
-  repositoryUrl?: string;
 
   @OptionalField(() => [String])
   images?: string[];
@@ -40,4 +43,7 @@ export class Project extends BaseEntity {
 
   @Field(() => [ProjectTranslationLocale])
   i18n: ProjectTranslationLocale[];
+
+  @OptionalField(() => [ProjectUrl])
+  urls?: ProjectUrl[];
 }

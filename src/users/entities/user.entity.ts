@@ -5,7 +5,7 @@ import { BaseEntity } from "@/core/entities/base.entity";
 @ObjectType()
 export class UserUrl {
   @Field(() => String)
-  code: string;
+  title: string;
 
   @Field(() => String)
   value: string;
@@ -26,9 +26,6 @@ export class User extends BaseEntity {
   title?: string;
 
   @OptionalField(() => String)
-  description?: string;
-
-  @OptionalField(() => String)
   phone?: string;
 
   @Field(() => String)
@@ -38,13 +35,10 @@ export class User extends BaseEntity {
   // password: string;
 
   @OptionalField(() => String)
-  birthDate?: Date;
+  birth?: Date;
 
   @OptionalField(() => String)
   address?: string;
-
-  @OptionalField(() => String)
-  postalCode?: string;
 
   @OptionalField(() => String)
   school?: string;
@@ -54,9 +48,6 @@ export class User extends BaseEntity {
 
   @Field(() => String, { defaultValue: "USER" })
   role?: string;
-
-  @OptionalField(() => [String])
-  hobbies?: string[];
 
   @OptionalField(() => [UserUrl])
   urls?: UserUrl[];
