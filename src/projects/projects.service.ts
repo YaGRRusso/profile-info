@@ -7,12 +7,15 @@ import { UpdateProjectInput } from "./dto/update-project.input";
 
 @Injectable()
 export class ProjectsService {
-  constructor(@InjectModel(ProjectModel.name) private readonly projectModel: Model<ProjectModel>) {}
+  constructor(
+    @InjectModel(ProjectModel.name)
+    private readonly projectModel: Model<ProjectModel>
+  ) {}
 
   async create(createProjectInput: CreateProjectInput[]) {
     return await Promise.all(
       createProjectInput.map(async (item) => {
-        return await this.projectModel.create(item as any);
+        return await this.projectModel.create(item);
       })
     );
   }
@@ -26,7 +29,9 @@ export class ProjectsService {
   }
 
   async update(id: string, updateProjectInput: UpdateProjectInput) {
-    return await this.projectModel.findByIdAndUpdate(id, updateProjectInput).exec();
+    return await this.projectModel
+      .findByIdAndUpdate(id, updateProjectInput)
+      .exec();
   }
 
   async remove(id: string[]) {

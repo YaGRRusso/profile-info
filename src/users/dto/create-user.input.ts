@@ -1,5 +1,11 @@
 import { Field, InputType } from "@nestjs/graphql";
-import { IsDate, IsEmail, IsPhoneNumber, IsPostalCode, IsUrl } from "class-validator";
+import {
+  IsDate,
+  IsEmail,
+  IsPhoneNumber,
+  IsPostalCode,
+  IsUrl,
+} from "class-validator";
 import { OptionalField } from "@/core/decorators/optional-field.decorator";
 
 @InputType()

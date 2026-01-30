@@ -8,7 +8,8 @@ import { JwtPayload } from "./entities/jwt.entity";
 export class AuthStrategy extends PassportStrategy(Strategy) {
   constructor(private readonly usersService: UsersService) {
     const JWT_SECRET = process.env.JWT_SECRET;
-    if (!JWT_SECRET) throw new Error("JWT_SECRET environment variable is not defined");
+    if (!JWT_SECRET)
+      throw new Error("JWT_SECRET environment variable is not defined");
 
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),

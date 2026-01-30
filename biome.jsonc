@@ -4,10 +4,23 @@
   "files": {
     "includes": ["!!**/dist", "!!**/node_modules", "!!**/graphql"]
   },
+  "javascript": {
+    "parser": {
+      "unsafeParameterDecoratorsEnabled": true
+    }
+  },
   "linter": {
     "enabled": true,
     "rules": {
-      "recommended": true
+      "recommended": true,
+      "style": {
+        "useImportType": "off",
+        "useBlockStatements": "off",
+        "noParameterProperties": "off"
+      },
+      "suspicious": {
+        "noExplicitAny": "warn"
+      }
     }
   },
   "assist": {

@@ -4,10 +4,14 @@ import { SkillsService } from "@/skills/skills.service";
 
 export type Loaders = ReturnType<typeof createLoaders>;
 
-export function createLoaders({ skillsService }: { skillsService: SkillsService }) {
+export function createLoaders({
+  skillsService,
+}: {
+  skillsService: SkillsService;
+}) {
   const batchSkills = new DataLoader<string, SkillModel | null>(
     async (ids) => {
-      const list = await skillsService.findManyById(ids as string[]);
+      const list = await skillsService.findManyById([...ids]);
 
       const map = new Map<string, SkillModel>();
       for (const item of list) {

@@ -18,6 +18,11 @@ import { AuthStrategy } from "./auth.strategy";
       signOptions: { expiresIn: "8h" },
     }),
   ],
-  providers: [AuthResolver, AuthService, AuthStrategy, { provide: APP_GUARD, useClass: GqlAuthGuard }],
+  providers: [
+    AuthResolver,
+    AuthService,
+    AuthStrategy,
+    { provide: APP_GUARD, useClass: GqlAuthGuard },
+  ],
 })
 export class AuthModule {}

@@ -10,7 +10,10 @@ export class SkillsResolver {
   constructor(private readonly skillsService: SkillsService) {}
 
   @Mutation(() => [Skill])
-  createSkill(@Args("createSkillInput", { type: () => [CreateSkillInput] }) createSkillInput: CreateSkillInput[]) {
+  createSkill(
+    @Args("createSkillInput", { type: () => [CreateSkillInput] })
+    createSkillInput: CreateSkillInput[]
+  ) {
     return this.skillsService.create(createSkillInput);
   }
 

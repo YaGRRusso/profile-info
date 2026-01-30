@@ -9,11 +9,16 @@ import { UpdateUserInput } from "./dto/update-user.input";
 
 @Injectable()
 export class UsersService {
-  constructor(@InjectModel(UserModel.name) private readonly userModel: Model<UserModel>) {}
+  constructor(
+    @InjectModel(UserModel.name) private readonly userModel: Model<UserModel>
+  ) {}
 
   async create({ password, ...createUserInput }: CreateUserInput) {
     const newHash = await hash(password, 8);
-    return await this.userModel.create({ ...createUserInput, password: newHash });
+    return await this.userModel.create({
+      ...createUserInput,
+      password: newHash,
+    });
   }
 
   async findAll() {

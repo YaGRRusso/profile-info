@@ -1,4 +1,13 @@
-import { Args, Context, ID, Mutation, Parent, Query, ResolveField, Resolver } from "@nestjs/graphql";
+import {
+  Args,
+  Context,
+  ID,
+  Mutation,
+  Parent,
+  Query,
+  ResolveField,
+  Resolver,
+} from "@nestjs/graphql";
 import { Public } from "@/core/decorators/public-route.decorator";
 import type { Ctx } from "@/core/interfaces/context.interface";
 import type { ProjectModel } from "@/schemas/project.schema";
@@ -14,7 +23,8 @@ export class ProjectsResolver {
 
   @Mutation(() => [Project])
   createProject(
-    @Args("createProjectInput", { type: () => [CreateProjectInput] }) createProjectInput: CreateProjectInput[]
+    @Args("createProjectInput", { type: () => [CreateProjectInput] })
+    createProjectInput: CreateProjectInput[]
   ) {
     return this.projectsService.create(createProjectInput);
   }
@@ -32,8 +42,13 @@ export class ProjectsResolver {
   }
 
   @Mutation(() => Project)
-  updateProject(@Args("updateProjectInput") updateProjectInput: UpdateProjectInput) {
-    return this.projectsService.update(updateProjectInput.id, updateProjectInput);
+  updateProject(
+    @Args("updateProjectInput") updateProjectInput: UpdateProjectInput
+  ) {
+    return this.projectsService.update(
+      updateProjectInput.id,
+      updateProjectInput
+    );
   }
 
   @Mutation(() => [Project])

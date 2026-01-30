@@ -7,7 +7,9 @@ import { UpdateSkillInput } from "./dto/update-skill.input";
 
 @Injectable()
 export class SkillsService {
-  constructor(@InjectModel(SkillModel.name) private readonly skillModel: Model<SkillModel>) {}
+  constructor(
+    @InjectModel(SkillModel.name) private readonly skillModel: Model<SkillModel>
+  ) {}
 
   async create(createSkillInput: CreateSkillInput[]) {
     return await Promise.all(
