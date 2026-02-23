@@ -1,4 +1,3 @@
-// project.schema.ts
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import mongoose, { type HydratedDocument } from "mongoose";
 import {
