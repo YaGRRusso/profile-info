@@ -9,12 +9,12 @@ import { AppController } from "./app.controller";
 import { AppService } from "./app.service";
 import { AuthModule } from "./auth/auth.module";
 import { createLoaders } from "./core/helpers/loaders.helper";
+import { EducationsModule } from "./educations/educations.module";
+import { ExperiencesModule } from "./experiences/experiences.module";
 import { ProjectsModule } from "./projects/projects.module";
 import { SkillsModule } from "./skills/skills.module";
 import { SkillsService } from "./skills/skills.service";
 import { UsersModule } from "./users/users.module";
-import { EducationsModule } from './educations/educations.module';
-import { ExperiencesModule } from './experiences/experiences.module';
 
 @Module({
   imports: [
