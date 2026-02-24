@@ -1,15 +1,7 @@
 import { Field, ObjectType } from "@nestjs/graphql";
 import { OptionalField } from "@/core/decorators/optional-field.decorator";
 import { BaseEntity } from "@/core/entities/base.entity";
-
-@ObjectType()
-export class UserUrl {
-  @Field(() => String)
-  title: string;
-
-  @Field(() => String)
-  value: string;
-}
+import { Url } from "@/core/entities/url.entity";
 
 @ObjectType()
 export class User extends BaseEntity {
@@ -43,6 +35,6 @@ export class User extends BaseEntity {
   @Field(() => String, { defaultValue: "USER" })
   role?: string;
 
-  @OptionalField(() => [UserUrl])
-  urls?: UserUrl[];
+  @OptionalField(() => [Url])
+  urls?: Url[];
 }

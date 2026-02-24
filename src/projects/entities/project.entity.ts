@@ -1,33 +1,25 @@
 import { Field, ObjectType } from "@nestjs/graphql";
 import { OptionalField } from "@/core/decorators/optional-field.decorator";
 import { BaseEntity } from "@/core/entities/base.entity";
+import { Url } from "@/core/entities/url.entity";
 import { Skill } from "@/skills/entities/skill.entity";
 
 @ObjectType()
 export class ProjectTranslation {
-  @Field()
+  @Field(() => String)
   title: string;
 
-  @Field()
+  @Field(() => String)
   description: string;
 }
 
 @ObjectType()
 export class ProjectTranslationLocale {
-  @Field()
+  @Field(() => String)
   locale: string;
 
   @Field(() => ProjectTranslation)
   messages: ProjectTranslation;
-}
-
-@ObjectType()
-export class ProjectUrl {
-  @Field(() => String)
-  title: string;
-
-  @Field(() => String)
-  value: string;
 }
 
 @ObjectType()
@@ -44,6 +36,6 @@ export class Project extends BaseEntity {
   @Field(() => [ProjectTranslationLocale])
   i18n: ProjectTranslationLocale[];
 
-  @OptionalField(() => [ProjectUrl])
-  urls?: ProjectUrl[];
+  @OptionalField(() => [Url])
+  urls?: Url[];
 }

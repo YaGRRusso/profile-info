@@ -1,6 +1,7 @@
 import { Field, InputType, Int } from "@nestjs/graphql";
 import { IsUrl } from "class-validator";
 import { OptionalField } from "@/core/decorators/optional-field.decorator";
+import { DateRangeInput } from "@/core/inputs/date-range.input";
 
 @InputType()
 export class CreateEducationSchoolInput {
@@ -26,21 +27,12 @@ export class CreateEducationMessagesInput {
 }
 
 @InputType()
-export class CreateEducationTranslationLocaleInput {
+export class CreateEducationTranslationInput {
   @Field(() => String)
   locale: string;
 
   @Field(() => CreateEducationMessagesInput)
   messages: CreateEducationMessagesInput;
-}
-
-@InputType()
-export class CreateDateRangeInput {
-  @OptionalField(() => Date)
-  from?: Date;
-
-  @OptionalField(() => Date)
-  to?: Date;
 }
 
 @InputType()
@@ -64,12 +56,12 @@ export class CreateEducationInput {
   @OptionalField(() => Int)
   hours?: number;
 
-  @Field(() => [CreateEducationTranslationLocaleInput])
-  i18n: CreateEducationTranslationLocaleInput[];
+  @Field(() => [CreateEducationTranslationInput])
+  i18n: CreateEducationTranslationInput[];
+
+  @OptionalField(() => DateRangeInput)
+  date?: DateRangeInput;
 
   @OptionalField(() => [String])
   skills?: string[];
-
-  @OptionalField(() => CreateDateRangeInput)
-  date?: CreateDateRangeInput;
 }

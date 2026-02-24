@@ -1,6 +1,7 @@
 import { Field, ObjectType } from "@nestjs/graphql";
 import { OptionalField } from "@/core/decorators/optional-field.decorator";
 import { BaseEntity } from "@/core/entities/base.entity";
+import { DateRange } from "@/core/entities/date-range.entity";
 import { Skill } from "@/skills/entities/skill.entity";
 
 @ObjectType()
@@ -31,15 +32,6 @@ export class ExperienceTranslationLocale {
 
   @Field(() => ExperienceMessages)
   messages: ExperienceMessages;
-}
-
-@ObjectType()
-export class DateRange {
-  @OptionalField(() => Date)
-  from?: Date;
-
-  @OptionalField(() => Date)
-  to?: Date;
 }
 
 @ObjectType()

@@ -1,14 +1,6 @@
 import { InputType } from "@nestjs/graphql";
 import { OptionalField } from "@/core/decorators/optional-field.decorator";
-
-@InputType()
-export class ReadUserUrlInput {
-  @OptionalField(() => String)
-  title?: string;
-
-  @OptionalField(() => String)
-  value?: string;
-}
+import { UrlInput } from "@/core/inputs/url.input";
 
 @InputType()
 export class ReadUserInput {
@@ -42,6 +34,6 @@ export class ReadUserInput {
   @OptionalField(() => String, { defaultValue: "USER" })
   role?: string;
 
-  @OptionalField(() => [ReadUserUrlInput])
-  urls?: ReadUserUrlInput[];
+  @OptionalField(() => [UrlInput])
+  urls?: UrlInput[];
 }

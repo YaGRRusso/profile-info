@@ -1,26 +1,26 @@
-import { Injectable } from '@nestjs/common';
-import { CreateEducationInput } from './dto/create-education.input';
-import { UpdateEducationInput } from './dto/update-education.input';
+import { Injectable } from "@nestjs/common";
+import { CreateEducationInput } from "./dto/create-education.input";
+import { UpdateEducationInput } from "./dto/update-education.input";
 
 @Injectable()
 export class EducationsService {
   create(createEducationInput: CreateEducationInput) {
-    return 'This action adds a new education';
+    return "This action adds a new education";
   }
 
   findAll() {
-    return `This action returns all educations`;
+    return "This action returns all educations";
   }
 
-  findOne(id: number) {
+  findOne(id: string) {
     return `This action returns a #${id} education`;
   }
 
-  update(id: number, updateEducationInput: UpdateEducationInput) {
+  update(id: string, updateEducationInput: UpdateEducationInput) {
     return `This action updates a #${id} education`;
   }
 
-  remove(id: number) {
+  remove(id: string) {
     return `This action removes a #${id} education`;
   }
 }

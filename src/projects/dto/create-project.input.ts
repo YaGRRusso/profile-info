@@ -1,9 +1,10 @@
 import { Field, InputType } from "@nestjs/graphql";
 import { IsUrl } from "class-validator";
 import { OptionalField } from "@/core/decorators/optional-field.decorator";
+import { UrlInput } from "@/core/inputs/url.input";
 
 @InputType()
-export class CreateProjectTranslationInput {
+export class CreateProjectMessagesInput {
   @Field(() => String)
   title: string;
 
@@ -12,21 +13,12 @@ export class CreateProjectTranslationInput {
 }
 
 @InputType()
-export class CreateProjectUrlInput {
-  @Field(() => String)
-  title: string;
-
-  @Field(() => String)
-  value: string;
-}
-
-@InputType()
-export class CreateProjectTranslationLocaleInput {
+export class CreateProjectTranslationInput {
   @Field(() => String)
   locale: string;
 
-  @Field(() => CreateProjectTranslationInput)
-  messages: CreateProjectTranslationInput;
+  @Field(() => CreateProjectMessagesInput)
+  messages: CreateProjectMessagesInput;
 }
 
 @InputType()
@@ -41,9 +33,9 @@ export class CreateProjectInput {
   @OptionalField(() => [String])
   skills?: string[];
 
-  @Field(() => [CreateProjectTranslationLocaleInput])
-  i18n: CreateProjectTranslationLocaleInput[];
+  @Field(() => [CreateProjectTranslationInput])
+  i18n: CreateProjectTranslationInput[];
 
-  @OptionalField(() => [CreateProjectUrlInput])
-  urls?: CreateProjectUrlInput[];
+  @OptionalField(() => [UrlInput])
+  urls?: UrlInput[];
 }

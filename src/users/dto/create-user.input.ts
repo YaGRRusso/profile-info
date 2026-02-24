@@ -1,15 +1,7 @@
 import { Field, InputType } from "@nestjs/graphql";
 import { IsDateString, IsEmail, IsUrl } from "class-validator";
 import { OptionalField } from "@/core/decorators/optional-field.decorator";
-
-@InputType()
-export class CreateUserUrlInput {
-  @Field(() => String)
-  title: string;
-
-  @Field(() => String)
-  value: string;
-}
+import { UrlInput } from "@/core/inputs/url.input";
 
 @InputType()
 export class CreateUserInput {
@@ -43,6 +35,6 @@ export class CreateUserInput {
   @OptionalField(() => String)
   address?: string;
 
-  @OptionalField(() => [CreateUserUrlInput])
-  urls?: CreateUserUrlInput[];
+  @OptionalField(() => [UrlInput])
+  urls?: UrlInput[];
 }
