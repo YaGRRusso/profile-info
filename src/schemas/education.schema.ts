@@ -1,10 +1,10 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import mongoose, { type HydratedDocument } from "mongoose";
+import { DateRangeModel } from "@/core/schemas/daterange.schema";
 import {
   createTranslationModel,
-  type TranslationModel,
-} from "@/core/helpers/schema.helper";
-import { DateRangeModel } from "@/core/schemas/daterange.schema";
+  TranslationModel,
+} from "@/core/schemas/translation.schema";
 import { SkillModel } from "./skill.schema";
 
 @Schema({ _id: false })
@@ -25,7 +25,7 @@ export class EducationSchoolModel {
   url: string;
 
   @Prop({ type: String, required: true })
-  image: string;
+  thumbnail: string;
 }
 
 @Schema({ timestamps: true })

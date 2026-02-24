@@ -2,8 +2,8 @@ import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import mongoose, { type HydratedDocument } from "mongoose";
 import {
   createTranslationModel,
-  type TranslationModel,
-} from "@/core/helpers/schema.helper";
+  TranslationModel,
+} from "@/core/schemas/translation.schema";
 import { UrlModel } from "@/core/schemas/url.schema";
 import { SkillModel } from "./skill.schema";
 

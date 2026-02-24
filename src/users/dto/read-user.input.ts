@@ -39,12 +39,6 @@ export class ReadUserInput {
   @OptionalField(() => String)
   address?: string;
 
-  @OptionalField(() => String)
-  school?: string;
-
-  @OptionalField(() => String)
-  work?: string;
-
   @OptionalField(() => String, { defaultValue: "USER" })
   role?: string;
 

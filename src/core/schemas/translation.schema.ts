@@ -1,9 +1,14 @@
 import { Type } from "@nestjs/common";
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 
+export interface TranslationModel<T> {
+  locale: string;
+  messages: T;
+}
+
 export function createTranslationModel<T>(MessagesModel: Type<T>) {
   @Schema({ _id: false })
-  class TranslationLocaleModel {
+  class TranslationModel {
     @Prop({ type: String, required: true })
     locale: string;
 
@@ -11,10 +16,5 @@ export function createTranslationModel<T>(MessagesModel: Type<T>) {
     messages: T;
   }
 
-  return SchemaFactory.createForClass(TranslationLocaleModel);
-}
-
-export interface TranslationModel<T> {
-  locale: string;
-  messages: T;
+  return SchemaFactory.createForClass(TranslationModel);
 }

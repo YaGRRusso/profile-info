@@ -31,12 +31,6 @@ export class UserModel {
   @Prop({ type: String })
   address?: string;
 
-  @Prop({ type: String })
-  school?: string;
-
-  @Prop({ type: String })
-  work?: string;
-
   @Prop({ type: String, default: "USER" })
   role?: string;
 
