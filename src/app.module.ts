@@ -13,6 +13,8 @@ import { ProjectsModule } from "./projects/projects.module";
 import { SkillsModule } from "./skills/skills.module";
 import { SkillsService } from "./skills/skills.service";
 import { UsersModule } from "./users/users.module";
+import { EducationsModule } from './educations/educations.module';
+import { ExperiencesModule } from './experiences/experiences.module';
 
 @Module({
   imports: [
@@ -52,6 +54,8 @@ import { UsersModule } from "./users/users.module";
     ProjectsModule,
     UsersModule,
     AuthModule,
+    EducationsModule,
+    ExperiencesModule,
   ],
   controllers: [AppController],
   providers: [AppService],
