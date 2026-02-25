@@ -1,7 +1,7 @@
 import { Field, Int, ObjectType } from "@nestjs/graphql";
 import { OptionalField } from "@/core/decorators/optional-field.decorator";
 import { BaseEntity } from "@/core/entities/base.entity";
-import { DateRange } from "@/core/entities/date-range.entity";
+import { DateRangeEntity } from "@/core/entities/date-range.entity";
 import { Skill } from "@/skills/entities/skill.entity";
 
 @ObjectType()
@@ -60,6 +60,6 @@ export class Education extends BaseEntity {
   @OptionalField(() => [Skill])
   skills?: Skill[];
 
-  @OptionalField(() => DateRange)
-  date?: DateRange;
+  @OptionalField(() => DateRangeEntity)
+  date?: DateRangeEntity;
 }

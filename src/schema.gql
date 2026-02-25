@@ -2,27 +2,79 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
-input CreateProjectInput {
-  i18n: [CreateProjectTranslationLocaleInput!]!
-  images: [String!]
+input CreateEducationInput {
+  category: String!
+  date: DateRangeInput
+  hours: Int
+  i18n: [CreateEducationTranslationInput!]!
+  school: CreateEducationSchoolInput!
   skills: [String!]
   slug: String!
-  urls: [CreateProjectUrlInput!]
+  status: String!
+  url: String
 }
 
-input CreateProjectTranslationInput {
+input CreateEducationMessagesInput {
   description: String!
   title: String!
 }
 
-input CreateProjectTranslationLocaleInput {
-  locale: String!
-  messages: CreateProjectTranslationInput!
+input CreateEducationSchoolInput {
+  thumbnail: String!
+  title: String!
+  url: String!
 }
 
-input CreateProjectUrlInput {
+input CreateEducationTranslationInput {
+  locale: String!
+  messages: CreateEducationMessagesInput!
+}
+
+input CreateExperienceCompanyInput {
+  thumbnail: String!
   title: String!
-  value: String!
+  url: String!
+}
+
+input CreateExperienceInput {
+  category: String!
+  company: CreateExperienceCompanyInput!
+  roles: [CreateExperienceRoleInput!]!
+  slug: String!
+}
+
+input CreateExperienceMessagesInput {
+  description: String!
+  title: String!
+}
+
+input CreateExperienceRoleInput {
+  date: DateRangeInput
+  i18n: [CreateExperienceTranslationInput!]!
+  skills: [String!]
+}
+
+input CreateExperienceTranslationInput {
+  locale: String!
+  messages: CreateExperienceMessagesInput!
+}
+
+input CreateProjectInput {
+  i18n: [CreateProjectMessagesInputTranslationInput!]!
+  images: [String!]
+  skills: [String!]
+  slug: String!
+  urls: [UrlInput!]
+}
+
+input CreateProjectMessagesInput {
+  description: String!
+  title: String!
+}
+
+input CreateProjectMessagesInputTranslationInput {
+  locale: String!
+  messages: CreateProjectMessagesInput!
 }
 
 input CreateSkillInput {
@@ -41,15 +93,18 @@ input CreateUserInput {
   nickname: String!
   password: String!
   phone: String
-  school: String
   title: String
-  urls: [CreateUserUrlInput!]
-  work: String
+  urls: [UrlInput!]
 }
 
-input CreateUserUrlInput {
-  title: String!
-  value: String!
+type DateRangeEntity {
+  from: DateTime
+  to: DateTime
+}
+
+input DateRangeInput {
+  from: DateTime
+  to: DateTime
 }
 
 """
@@ -57,14 +112,83 @@ A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date
 """
 scalar DateTime
 
+type Education {
+  category: String!
+  createdAt: DateTime!
+  date: DateRangeEntity
+  hours: Int
+  i18n: [EducationTranslationLocale!]!
+  id: ID!
+  school: EducationSchool!
+  skills: [Skill!]
+  slug: String!
+  status: String!
+  updatedAt: DateTime!
+  url: String
+}
+
+type EducationMessages {
+  description: String!
+  title: String!
+}
+
+type EducationSchool {
+  thumbnail: String!
+  title: String!
+  url: String!
+}
+
+type EducationTranslationLocale {
+  locale: String!
+  messages: EducationMessages!
+}
+
+type Experience {
+  category: String!
+  company: ExperienceCompany!
+  createdAt: DateTime!
+  id: ID!
+  roles: [ExperienceRole!]!
+  slug: String!
+  updatedAt: DateTime!
+}
+
+type ExperienceCompany {
+  thumbnail: String!
+  title: String!
+  url: String!
+}
+
+type ExperienceMessages {
+  description: String!
+  title: String!
+}
+
+type ExperienceRole {
+  date: DateRangeEntity
+  i18n: [ExperienceTranslationLocale!]!
+  skills: [Skill!]
+}
+
+type ExperienceTranslationLocale {
+  locale: String!
+  messages: ExperienceMessages!
+}
+
 type Mutation {
+  createEducation(createEducationInput: CreateEducationInput!): Education!
+  createExperience(createExperienceInput: CreateExperienceInput!): Experience!
   createProject(createProjectInput: [CreateProjectInput!]!): [Project!]!
   createSkill(createSkillInput: [CreateSkillInput!]!): [Skill!]!
   createUser(createUserInput: CreateUserInput!): User!
+  removeEducation(id: ID!): Education!
+  removeExperience(id: ID!): Experience!
   removeProject(id: ID!): [Project!]!
   removeSkill(id: ID!): [Skill!]!
   removeUser(id: ID!): User!
   signIn(signInInput: SignInInput!): String!
+  updateEducation(updateEducationInput: UpdateEducationInput!): Education!
+  updateExperience(updateExperienceInput: UpdateExperienceInput!): Experience!
   updateProject(updateProjectInput: UpdateProjectInput!): Project!
   updateSkill(updateSkillInput: UpdateSkillInput!): Skill!
   updateUser(updateUserInput: UpdateUserInput!): User!
@@ -72,31 +196,30 @@ type Mutation {
 
 type Project {
   createdAt: DateTime!
-  i18n: [ProjectTranslationLocale!]!
+  i18n: [ProjectMessagesTranslationEntity!]!
   id: ID!
   images: [String!]
   skills: [Skill!]
   slug: String!
   updatedAt: DateTime!
-  urls: [ProjectUrl!]
+  urls: [UrlEntity!]
 }
 
-type ProjectTranslation {
+type ProjectMessages {
   description: String!
   title: String!
 }
 
-type ProjectTranslationLocale {
+type ProjectMessagesTranslationEntity {
   locale: String!
-  messages: ProjectTranslation!
-}
-
-type ProjectUrl {
-  title: String!
-  value: String!
+  messages: ProjectMessages!
 }
 
 type Query {
+  education(id: ID!): Education!
+  educations: [Education!]!
+  experience(id: ID!): Experience!
+  experiences: [Experience!]!
   findAllProjects: [Project!]!
   findAllSkills: [Skill!]!
   findAllUsers: [User!]!
@@ -121,13 +244,34 @@ type Skill {
   updatedAt: DateTime!
 }
 
+input UpdateEducationInput {
+  category: String
+  date: DateRangeInput
+  hours: Int
+  i18n: [CreateEducationTranslationInput!]
+  id: ID!
+  school: CreateEducationSchoolInput
+  skills: [String!]
+  slug: String
+  status: String
+  url: String
+}
+
+input UpdateExperienceInput {
+  category: String
+  company: CreateExperienceCompanyInput
+  id: ID!
+  roles: [CreateExperienceRoleInput!]
+  slug: String
+}
+
 input UpdateProjectInput {
-  i18n: [CreateProjectTranslationLocaleInput!]
+  i18n: [CreateProjectMessagesInputTranslationInput!]
   id: ID!
   images: [String!]
   skills: [String!]
   slug: String
-  urls: [CreateProjectUrlInput!]
+  urls: [UrlInput!]
 }
 
 input UpdateSkillInput {
@@ -148,10 +292,18 @@ input UpdateUserInput {
   nickname: String
   password: String
   phone: String
-  school: String
   title: String
-  urls: [CreateUserUrlInput!]
-  work: String
+  urls: [UrlInput!]
+}
+
+type UrlEntity {
+  title: String!
+  value: String!
+}
+
+input UrlInput {
+  title: String!
+  value: String!
 }
 
 type User {
@@ -165,14 +317,7 @@ type User {
   nickname: String!
   phone: String
   role: String!
-  school: String
   title: String
   updatedAt: DateTime!
-  urls: [UserUrl!]
-  work: String
-}
-
-type UserUrl {
-  title: String!
-  value: String!
+  urls: [UrlEntity!]
 }
