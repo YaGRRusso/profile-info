@@ -9,6 +9,7 @@ import {
   Resolver,
 } from "@nestjs/graphql";
 import { Public } from "@/core/decorators/public-route.decorator";
+import { sortDateRange } from "@/core/helpers/daterange.helper";
 import type { Ctx } from "@/core/interfaces/context.interface";
 import type {
   ExperienceModel,
@@ -58,6 +59,36 @@ export class ExperiencesResolver {
   removeExperience(@Args("id", { type: () => ID }) id: string[]) {
     return this.experiencesService.remove(id);
   }
+
+  @ResolveField(() => [ExperienceRole])
+  roles(@Parent() experience: ExperienceModel) {
+    if (experience.roles) {
+      return sortDateRange([...experience.roles]);
+    }
+  }
+
+  // @ResolveField(() => DateRangeEntity)
+  // date(@Parent() experience: ExperienceModel) {
+  //   const parsed = { from: new Date(0), to: new Date(0) };
+
+  //   for (const role of experience.roles) {
+  //     if (role.date?.from) {
+  //       const from = new Date(role.date.from);
+  //       if (from.getTime() > parsed.from.getTime()) {
+  //         parsed.from = from;
+  //       }
+  //     }
+
+  //     if (role.date?.to) {
+  //       const to = new Date(role.date.to);
+  //       if (to.getTime() > parsed.to.getTime()) {
+  //         parsed.to = to;
+  //       }
+  //     }
+  //   }
+
+  //   return parsed;
+  // }
 
   @ResolveField(() => [Skill])
   skills(@Parent() experience: ExperienceModel, @Context() ctx: Ctx) {

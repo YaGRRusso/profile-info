@@ -62,4 +62,7 @@ export class Experience extends BaseEntity {
 
   @OptionalField(() => [Skill])
   skills?: Skill[];
+
+  // @OptionalField(() => DateRangeEntity)
+  // date?: DateRangeEntity;
 }
