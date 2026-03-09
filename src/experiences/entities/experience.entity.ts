@@ -59,4 +59,7 @@ export class Experience extends BaseEntity {
 
   @Field(() => [ExperienceRole])
   roles: ExperienceRole[];
+
+  @OptionalField(() => [Skill])
+  skills?: Skill[];
 }

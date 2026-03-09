@@ -1,7 +1,10 @@
 import { Module } from "@nestjs/common";
 import { MongooseModule } from "@nestjs/mongoose";
 import { ExperienceModel, ExperienceSchema } from "@/schemas/experience.schema";
-import { ExperiencesResolver } from "./experiences.resolver";
+import {
+  ExperienceRoleResolver,
+  ExperiencesResolver,
+} from "./experiences.resolver";
 import { ExperiencesService } from "./experiences.service";
 
 @Module({
@@ -10,6 +13,6 @@ import { ExperiencesService } from "./experiences.service";
       { name: ExperienceModel.name, schema: ExperienceSchema },
     ]),
   ],
-  providers: [ExperiencesResolver, ExperiencesService],
+  providers: [ExperiencesResolver, ExperienceRoleResolver, ExperiencesService],
 })
 export class ExperiencesModule {}

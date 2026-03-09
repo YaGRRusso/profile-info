@@ -149,6 +149,7 @@ type Experience {
   createdAt: DateTime!
   id: ID!
   roles: [ExperienceRole!]!
+  skills: [Skill!]
   slug: String!
   updatedAt: DateTime!
 }
@@ -176,13 +177,13 @@ type ExperienceTranslationLocale {
 }
 
 type Mutation {
-  createEducation(createEducationInput: CreateEducationInput!): Education!
-  createExperience(createExperienceInput: CreateExperienceInput!): Experience!
+  createEducation(createEducationInput: [CreateEducationInput!]!): [Education!]!
+  createExperience(createExperienceInput: [CreateExperienceInput!]!): [Experience!]!
   createProject(createProjectInput: [CreateProjectInput!]!): [Project!]!
   createSkill(createSkillInput: [CreateSkillInput!]!): [Skill!]!
   createUser(createUserInput: CreateUserInput!): User!
-  removeEducation(id: ID!): Education!
-  removeExperience(id: ID!): Experience!
+  removeEducation(id: ID!): [Education!]!
+  removeExperience(id: ID!): [Experience!]!
   removeProject(id: ID!): [Project!]!
   removeSkill(id: ID!): [Skill!]!
   removeUser(id: ID!): User!
@@ -216,13 +217,13 @@ type ProjectMessagesTranslationEntity {
 }
 
 type Query {
-  education(id: ID!): Education!
-  educations: [Education!]!
-  experience(id: ID!): Experience!
-  experiences: [Experience!]!
+  findAllEducations: [Education!]!
+  findAllExperiences: [Experience!]!
   findAllProjects: [Project!]!
   findAllSkills: [Skill!]!
   findAllUsers: [User!]!
+  findOneEducationById(id: ID!): Education!
+  findOneExperienceById(id: ID!): Experience!
   findOneProjectById(id: ID!): Project!
   findOneSkillById(id: ID!): Skill!
   findOneUserById(id: ID!): User!

@@ -1,28 +1,40 @@
 import { Injectable } from "@nestjs/common";
+import { InjectModel } from "@nestjs/mongoose";
+import { Model } from "mongoose";
+import { EducationModel } from "@/schemas/education.schema";
 import { CreateEducationInput } from "./dto/create-education.input";
 import { UpdateEducationInput } from "./dto/update-education.input";
 
 @Injectable()
 export class EducationsService {
-  create(createEducationInput: CreateEducationInput) {
-    console.log(createEducationInput);
-    return "This action adds a new education";
+  constructor(
+    @InjectModel(EducationModel.name)
+    private readonly educationModel: Model<EducationModel>
+  ) {}
+
+  async create(createEducationInput: CreateEducationInput[]) {
+    return await Promise.all(
+      createEducationInput.map(async (item) => {
+        return await this.educationModel.create(item);
+      })
+    );
   }
 
-  findAll() {
-    return "This action returns all educations";
+  async findAll() {
+    return await this.educationModel.find().exec();
   }
 
-  findOne(id: string) {
-    return `This action returns a #${id} education`;
+  async findOneById(id: string) {
+    return await this.educationModel.findById(id).exec();
   }
 
-  update(id: string, updateEducationInput: UpdateEducationInput) {
-    console.log(updateEducationInput);
-    return `This action updates a #${id} education`;
+  async update(id: string, updateEducationInput: UpdateEducationInput) {
+    return await this.educationModel
+      .findByIdAndUpdate(id, updateEducationInput)
+      .exec();
   }
 
-  remove(id: string) {
-    return `This action removes a #${id} education`;
+  async remove(id: string[]) {
+    return await this.educationModel.deleteMany({ _id: { $in: id } }).exec();
   }
 }

@@ -1,4 +1,17 @@
-import { Args, ID, Mutation, Query, Resolver } from "@nestjs/graphql";
+import {
+  Args,
+  Context,
+  ID,
+  Mutation,
+  Parent,
+  Query,
+  ResolveField,
+  Resolver,
+} from "@nestjs/graphql";
+import { Public } from "@/core/decorators/public-route.decorator";
+import type { Ctx } from "@/core/interfaces/context.interface";
+import type { EducationModel } from "@/schemas/education.schema";
+import { Skill } from "@/skills/entities/skill.entity";
 import { CreateEducationInput } from "./dto/create-education.input";
 import { UpdateEducationInput } from "./dto/update-education.input";
 import { EducationsService } from "./educations.service";
@@ -8,21 +21,24 @@ import { Education } from "./entities/education.entity";
 export class EducationsResolver {
   constructor(private readonly educationsService: EducationsService) {}
 
-  @Mutation(() => Education)
+  @Mutation(() => [Education])
   createEducation(
-    @Args("createEducationInput") createEducationInput: CreateEducationInput
+    @Args("createEducationInput", { type: () => [CreateEducationInput] })
+    createEducationInput: CreateEducationInput[]
   ) {
     return this.educationsService.create(createEducationInput);
   }
 
-  @Query(() => [Education], { name: "educations" })
-  findAll() {
+  @Public()
+  @Query(() => [Education])
+  findAllEducations() {
     return this.educationsService.findAll();
   }
 
-  @Query(() => Education, { name: "education" })
-  findOne(@Args("id", { type: () => ID }) id: string) {
-    return this.educationsService.findOne(id);
+  @Public()
+  @Query(() => Education)
+  findOneEducationById(@Args("id", { type: () => ID }) id: string) {
+    return this.educationsService.findOneById(id);
   }
 
   @Mutation(() => Education)
@@ -35,8 +51,14 @@ export class EducationsResolver {
     );
   }
 
-  @Mutation(() => Education)
-  removeEducation(@Args("id", { type: () => ID }) id: string) {
+  @Mutation(() => [Education])
+  removeEducation(@Args("id", { type: () => ID }) id: string[]) {
     return this.educationsService.remove(id);
+  }
+
+  @ResolveField(() => [Skill])
+  skills(@Parent() education: EducationModel, @Context() ctx: Ctx) {
+    const ids = education.skills?.map((id) => id.toString());
+    if (ids) return ctx.loaders.batchSkills.loadMany(ids);
   }
 }
