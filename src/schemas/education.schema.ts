@@ -60,7 +60,7 @@ export class EducationModel {
   @Prop({
     type: [{ type: mongoose.Schema.Types.ObjectId, ref: SkillModel.name }],
   })
-  skills?: (SkillModel | mongoose.Types.ObjectId)[]; // reference on create and populate on query
+  skills?: (SkillModel | mongoose.Types.ObjectId | string)[]; // reference on create and populate on query
 
   @Prop({
     type: SchemaFactory.createForClass(DateRangeModel),
