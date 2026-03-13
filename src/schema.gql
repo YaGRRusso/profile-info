@@ -7,7 +7,7 @@ input CreateEducationInput {
   date: DateRangeInput
   hours: Int
   i18n: [CreateEducationTranslationInput!]!
-  school: CreateEducationSchoolInput!
+  organization: String!
   skills: [String!]
   slug: String!
   status: String!
@@ -19,26 +19,14 @@ input CreateEducationMessagesInput {
   title: String!
 }
 
-input CreateEducationSchoolInput {
-  thumbnail: String!
-  title: String!
-  url: String!
-}
-
 input CreateEducationTranslationInput {
   locale: String!
   messages: CreateEducationMessagesInput!
 }
 
-input CreateExperienceCompanyInput {
-  thumbnail: String!
-  title: String!
-  url: String!
-}
-
 input CreateExperienceInput {
   category: String!
-  company: CreateExperienceCompanyInput!
+  company: String!
   roles: [CreateExperienceRoleInput!]!
   slug: String!
 }
@@ -126,7 +114,7 @@ type Education {
   hours: Int
   i18n: [EducationTranslationLocale!]!
   id: ID!
-  school: EducationSchool!
+  organization: Organization!
   skills: [Skill!]
   slug: String!
   status: String!
@@ -139,12 +127,6 @@ type EducationMessages {
   title: String!
 }
 
-type EducationSchool {
-  thumbnail: String!
-  title: String!
-  url: String!
-}
-
 type EducationTranslationLocale {
   locale: String!
   messages: EducationMessages!
@@ -152,19 +134,13 @@ type EducationTranslationLocale {
 
 type Experience {
   category: String!
-  company: ExperienceCompany!
   createdAt: DateTime!
   id: ID!
+  organization: Organization!
   roles: [ExperienceRole!]!
   skills: [Skill!]
   slug: String!
   updatedAt: DateTime!
-}
-
-type ExperienceCompany {
-  thumbnail: String!
-  title: String!
-  url: String!
 }
 
 type ExperienceMessages {
@@ -273,7 +249,7 @@ input UpdateEducationInput {
   hours: Int
   i18n: [CreateEducationTranslationInput!]
   id: ID!
-  school: CreateEducationSchoolInput
+  organization: String
   skills: [String!]
   slug: String
   status: String
@@ -282,7 +258,7 @@ input UpdateEducationInput {
 
 input UpdateExperienceInput {
   category: String
-  company: CreateExperienceCompanyInput
+  company: String
   id: ID!
   roles: [CreateExperienceRoleInput!]
   slug: String

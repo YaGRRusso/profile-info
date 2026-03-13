@@ -11,6 +11,7 @@ import {
 import { Public } from "@/core/decorators/public-route.decorator";
 import { sortDateRange } from "@/core/helpers/daterange.helper";
 import type { Ctx } from "@/core/interfaces/context.interface";
+import { Organization } from "@/organizations/entities/organization.entity";
 import type {
   ExperienceModel,
   ExperienceRoleModel,
@@ -67,29 +68,15 @@ export class ExperiencesResolver {
     }
   }
 
-  // @ResolveField(() => DateRangeEntity)
-  // date(@Parent() experience: ExperienceModel) {
-  //   const parsed = { from: new Date(0), to: new Date(0) };
+  @ResolveField(() => Organization)
+  organization(@Parent() experience: ExperienceModel, @Context() ctx: Ctx) {
+    if (!experience?.organization) return null;
+    return ctx.loaders.batchOrganizations.load(
+      experience.organization.toString()
+    );
+  }
 
-  //   for (const role of experience.roles) {
-  //     if (role.date?.from) {
-  //       const from = new Date(role.date.from);
-  //       if (from.getTime() > parsed.from.getTime()) {
-  //         parsed.from = from;
-  //       }
-  //     }
-
-  //     if (role.date?.to) {
-  //       const to = new Date(role.date.to);
-  //       if (to.getTime() > parsed.to.getTime()) {
-  //         parsed.to = to;
-  //       }
-  //     }
-  //   }
-
-  //   return parsed;
-  // }
-
+  // group all skills from experience roles
   @ResolveField(() => [Skill])
   skills(@Parent() experience: ExperienceModel, @Context() ctx: Ctx) {
     const ids = new Set<string>();

@@ -1,21 +1,6 @@
 import { Field, InputType } from "@nestjs/graphql";
-import { IsUrl } from "class-validator";
 import { OptionalField } from "@/core/decorators/optional-field.decorator";
 import { DateRangeInput } from "@/core/inputs/date-range.input";
-
-@InputType()
-export class CreateExperienceCompanyInput {
-  @Field(() => String)
-  title: string;
-
-  @Field(() => String)
-  @IsUrl()
-  url: string;
-
-  @Field(() => String)
-  @IsUrl()
-  thumbnail: string;
-}
 
 @InputType()
 export class CreateExperienceMessagesInput {
@@ -52,8 +37,8 @@ export class CreateExperienceInput {
   @Field(() => String)
   slug: string;
 
-  @Field(() => CreateExperienceCompanyInput)
-  company: CreateExperienceCompanyInput;
+  @Field(() => String)
+  company: string;
 
   @Field(() => String)
   category: string;
