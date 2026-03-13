@@ -59,6 +59,14 @@ input CreateExperienceTranslationInput {
   messages: CreateExperienceMessagesInput!
 }
 
+input CreateOrganizationInput {
+  category: String!
+  slug: String!
+  thumbnail: String!
+  title: String!
+  url: String!
+}
+
 input CreateProjectInput {
   i18n: [CreateProjectMessagesInputTranslationInput!]!
   images: [String!]
@@ -178,20 +186,34 @@ type ExperienceTranslationLocale {
 type Mutation {
   createEducation(createEducationInput: [CreateEducationInput!]!): [Education!]!
   createExperience(createExperienceInput: [CreateExperienceInput!]!): [Experience!]!
+  createOrganization(createOrganizationInput: [CreateOrganizationInput!]!): [Organization!]!
   createProject(createProjectInput: [CreateProjectInput!]!): [Project!]!
   createSkill(createSkillInput: [CreateSkillInput!]!): [Skill!]!
   createUser(createUserInput: CreateUserInput!): User!
   removeEducation(id: ID!): [Education!]!
   removeExperience(id: ID!): [Experience!]!
+  removeOrganization(id: ID!): [Organization!]!
   removeProject(id: ID!): [Project!]!
   removeSkill(id: ID!): [Skill!]!
   removeUser(id: ID!): User!
   signIn(signInInput: SignInInput!): String!
   updateEducation(updateEducationInput: UpdateEducationInput!): Education!
   updateExperience(updateExperienceInput: UpdateExperienceInput!): Experience!
+  updateOrganization(updateOrganizationInput: UpdateOrganizationInput!): Organization!
   updateProject(updateProjectInput: UpdateProjectInput!): Project!
   updateSkill(updateSkillInput: UpdateSkillInput!): Skill!
   updateUser(updateUserInput: UpdateUserInput!): User!
+}
+
+type Organization {
+  category: String!
+  createdAt: DateTime!
+  id: ID!
+  slug: String!
+  thumbnail: String!
+  title: String!
+  updatedAt: DateTime!
+  url: String!
 }
 
 type Project {
@@ -218,11 +240,13 @@ type ProjectMessagesTranslationEntity {
 type Query {
   findAllEducations: [Education!]!
   findAllExperiences: [Experience!]!
+  findAllOrganizations: [Organization!]!
   findAllProjects: [Project!]!
   findAllSkills: [Skill!]!
   findAllUsers: [User!]!
   findOneEducationById(id: ID!): Education!
   findOneExperienceById(id: ID!): Experience!
+  findOneOrganizationById(id: ID!): Organization!
   findOneProjectById(id: ID!): Project!
   findOneSkillById(id: ID!): Skill!
   findOneUserById(id: ID!): User!
@@ -262,6 +286,15 @@ input UpdateExperienceInput {
   id: ID!
   roles: [CreateExperienceRoleInput!]
   slug: String
+}
+
+input UpdateOrganizationInput {
+  category: String
+  id: ID!
+  slug: String
+  thumbnail: String
+  title: String
+  url: String
 }
 
 input UpdateProjectInput {

@@ -11,6 +11,8 @@ import { AuthModule } from "./auth/auth.module";
 import { createLoaders } from "./core/helpers/loaders.helper";
 import { EducationsModule } from "./educations/educations.module";
 import { ExperiencesModule } from "./experiences/experiences.module";
+import { OrganizationsModule } from "./organizations/organizations.module";
+import { OrganizationsService } from "./organizations/organizations.service";
 import { ProjectsModule } from "./projects/projects.module";
 import { SkillsModule } from "./skills/skills.module";
 import { SkillsService } from "./skills/skills.service";
@@ -35,16 +37,19 @@ import { UsersModule } from "./users/users.module";
     }),
     GraphQLModule.forRootAsync({
       driver: ApolloDriver,
-      imports: [SkillsModule],
-      inject: [SkillsService],
-      useFactory: (skillsService: SkillsService) => ({
+      imports: [SkillsModule, OrganizationsModule],
+      inject: [SkillsService, OrganizationsService],
+      useFactory: (
+        skillsService: SkillsService,
+        organizationsService: OrganizationsService
+      ) => ({
         plugins: [ApolloServerPluginLandingPageLocalDefault()],
         autoSchemaFile: join(process.cwd(), "src/schema.gql"),
         introspection: true,
         sortSchema: true,
         playground: false,
         context: ({ req, res }) => ({
-          loaders: createLoaders({ skillsService }),
+          loaders: createLoaders({ skillsService, organizationsService }),
           req,
           res,
         }),
@@ -56,6 +61,7 @@ import { UsersModule } from "./users/users.module";
     AuthModule,
     EducationsModule,
     ExperiencesModule,
+    OrganizationsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

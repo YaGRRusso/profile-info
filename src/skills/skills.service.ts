@@ -14,7 +14,7 @@ export class SkillsService {
   async create(createSkillInput: CreateSkillInput[]) {
     return await Promise.all(
       createSkillInput.map(async (item) => {
-        await this.skillModel.create(item);
+        return await this.skillModel.create(item);
       })
     );
   }
