@@ -4,20 +4,6 @@ import { OptionalField } from "@/core/decorators/optional-field.decorator";
 import { DateRangeInput } from "@/core/inputs/date-range.input";
 
 @InputType()
-export class CreateEducationSchoolInput {
-  @Field(() => String)
-  title: string;
-
-  @Field(() => String)
-  @IsUrl()
-  url: string;
-
-  @Field(() => String)
-  @IsUrl()
-  thumbnail: string;
-}
-
-@InputType()
 export class CreateEducationMessagesInput {
   @Field(() => String)
   title: string;
@@ -40,8 +26,8 @@ export class CreateEducationInput {
   @Field(() => String)
   slug: string;
 
-  @Field(() => CreateEducationSchoolInput)
-  school: CreateEducationSchoolInput;
+  @Field(() => String)
+  organization: string;
 
   @Field(() => String)
   category: string;

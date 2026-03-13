@@ -2,19 +2,8 @@ import { Field, ObjectType } from "@nestjs/graphql";
 import { OptionalField } from "@/core/decorators/optional-field.decorator";
 import { BaseEntity } from "@/core/entities/base.entity";
 import { DateRangeEntity } from "@/core/entities/date-range.entity";
+import { Organization } from "@/organizations/entities/organization.entity";
 import { Skill } from "@/skills/entities/skill.entity";
-
-@ObjectType()
-export class ExperienceCompany {
-  @Field(() => String)
-  title: string;
-
-  @Field(() => String)
-  url: string;
-
-  @Field(() => String)
-  thumbnail: string;
-}
 
 @ObjectType()
 export class ExperienceMessages {
@@ -51,8 +40,8 @@ export class Experience extends BaseEntity {
   @Field(() => String)
   slug: string;
 
-  @Field(() => ExperienceCompany)
-  company: ExperienceCompany;
+  @Field(() => Organization)
+  organization: Organization;
 
   @Field(() => String)
   category: string;
@@ -62,7 +51,4 @@ export class Experience extends BaseEntity {
 
   @OptionalField(() => [Skill])
   skills?: Skill[];
-
-  // @OptionalField(() => DateRangeEntity)
-  // date?: DateRangeEntity;
 }

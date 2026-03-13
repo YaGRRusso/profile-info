@@ -10,6 +10,7 @@ import {
 } from "@nestjs/graphql";
 import { Public } from "@/core/decorators/public-route.decorator";
 import type { Ctx } from "@/core/interfaces/context.interface";
+import { Organization } from "@/organizations/entities/organization.entity";
 import type { EducationModel } from "@/schemas/education.schema";
 import { Skill } from "@/skills/entities/skill.entity";
 import { CreateEducationInput } from "./dto/create-education.input";
@@ -54,6 +55,14 @@ export class EducationsResolver {
   @Mutation(() => [Education])
   removeEducation(@Args("id", { type: () => ID }) id: string[]) {
     return this.educationsService.remove(id);
+  }
+
+  @ResolveField(() => Organization)
+  organization(@Parent() education: EducationModel, @Context() ctx: Ctx) {
+    if (!education?.organization) return null;
+    return ctx.loaders.batchOrganizations.load(
+      education.organization.toString()
+    );
   }
 
   @ResolveField(() => [Skill])

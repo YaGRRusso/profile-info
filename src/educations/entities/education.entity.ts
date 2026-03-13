@@ -2,19 +2,8 @@ import { Field, Int, ObjectType } from "@nestjs/graphql";
 import { OptionalField } from "@/core/decorators/optional-field.decorator";
 import { BaseEntity } from "@/core/entities/base.entity";
 import { DateRangeEntity } from "@/core/entities/date-range.entity";
+import { Organization } from "@/organizations/entities/organization.entity";
 import { Skill } from "@/skills/entities/skill.entity";
-
-@ObjectType()
-export class EducationSchool {
-  @Field(() => String)
-  title: string;
-
-  @Field(() => String)
-  url: string;
-
-  @Field(() => String)
-  thumbnail: string;
-}
 
 @ObjectType()
 export class EducationMessages {
@@ -39,8 +28,8 @@ export class Education extends BaseEntity {
   @Field(() => String)
   slug: string;
 
-  @Field(() => EducationSchool)
-  school: EducationSchool;
+  @Field(() => Organization)
+  organization: Organization;
 
   @Field(() => String)
   category: string;
