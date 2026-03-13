@@ -11,9 +11,6 @@ export class SkillModel {
 
   @Prop({ type: String, required: true })
   category: string;
-
-  @Prop(() => String)
-  color?: string;
 }
 
 export type SkillDocument = HydratedDocument<SkillModel>;

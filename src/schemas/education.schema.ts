@@ -5,6 +5,7 @@ import {
   createTranslationModel,
   TranslationModel,
 } from "@/core/schemas/translation.schema";
+import { OrganizationModel } from "./organization.schema";
 import { SkillModel } from "./skill.schema";
 
 @Schema({ _id: false })
@@ -16,28 +17,13 @@ export class EducationMessagesModel {
   description: string;
 }
 
-@Schema({ _id: false })
-export class EducationSchoolModel {
-  @Prop({ type: String, required: true })
-  title: string;
-
-  @Prop({ type: String, required: true })
-  url: string;
-
-  @Prop({ type: String, required: true })
-  thumbnail: string;
-}
-
 @Schema({ timestamps: true })
 export class EducationModel {
   @Prop({ type: String, required: true, unique: true })
   slug: string;
 
-  @Prop({
-    type: SchemaFactory.createForClass(EducationSchoolModel),
-    required: true,
-  })
-  school: EducationSchoolModel;
+  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: OrganizationModel.name })
+  organization?: OrganizationModel | mongoose.Types.ObjectId | string; // reference on create and populate on query
 
   @Prop({ type: String, required: true })
   category: string;

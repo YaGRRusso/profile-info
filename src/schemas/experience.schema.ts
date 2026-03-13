@@ -5,6 +5,7 @@ import {
   createTranslationModel,
   TranslationModel,
 } from "@/core/schemas/translation.schema";
+import { OrganizationModel } from "./organization.schema";
 import { SkillModel } from "./skill.schema";
 
 @Schema({ _id: false })
@@ -14,18 +15,6 @@ export class ExperienceMessagesModel {
 
   @Prop({ type: String, required: true })
   description: string;
-}
-
-@Schema({ _id: false })
-export class ExperienceCompanyModel {
-  @Prop({ type: String, required: true })
-  title: string;
-
-  @Prop({ type: String, required: true })
-  url: string;
-
-  @Prop({ type: String, required: true })
-  thumbnail: string;
 }
 
 @Schema({ _id: false })
@@ -52,11 +41,8 @@ export class ExperienceModel {
   @Prop({ type: String, required: true, unique: true })
   slug: string;
 
-  @Prop({
-    type: SchemaFactory.createForClass(ExperienceCompanyModel),
-    required: true,
-  })
-  company: ExperienceCompanyModel;
+  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: OrganizationModel.name })
+  organization?: OrganizationModel | mongoose.Types.ObjectId | string; // reference on create and populate on query
 
   @Prop({ type: String, required: true })
   category: string;

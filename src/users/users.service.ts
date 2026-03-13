@@ -30,7 +30,10 @@ export class UsersService {
   }
 
   async findOne(readUserInput: ReadUserInput) {
-    return await this.userModel.findOne(readUserInput).exec();
+    return await this.userModel
+      .findOne(readUserInput)
+      .select("+password")
+      .exec();
   }
 
   async update(id: string, updateUserInput: UpdateUserInput) {
