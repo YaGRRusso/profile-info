@@ -1,9 +1,11 @@
 import { DateRangeModel } from "../schemas/daterange.schema";
 
-export function sortDateRange<T extends { date?: DateRangeModel }>(data: T[]) {
+export function sortDateRange<T extends { period?: DateRangeModel }>(
+  data: T[]
+) {
   return data.sort((a, b) => {
-    const dateA = new Date(a.date?.from ?? 0).getTime();
-    const dateB = new Date(b.date?.from ?? 0).getTime();
+    const dateA = new Date(a.period?.from ?? 0).getTime();
+    const dateB = new Date(b.period?.from ?? 0).getTime();
     return dateB - dateA;
   });
 }

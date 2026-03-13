@@ -7,13 +7,13 @@ export class OrganizationModel {
   slug: string;
 
   @Prop({ type: String, required: true })
-  title: string;
+  name: string;
 
   @Prop({ type: String, required: true })
-  url: string;
+  website: string;
 
   @Prop({ type: String, required: true })
-  thumbnail: string;
+  logo: string;
 
   @Prop({ type: String, required: true })
   category: string;

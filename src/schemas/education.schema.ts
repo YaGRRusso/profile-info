@@ -34,6 +34,9 @@ export class EducationModel {
   @Prop({ type: String })
   url?: string;
 
+  @Prop({ type: String })
+  image?: string;
+
   @Prop({ type: Number })
   hours?: number;
 
@@ -51,7 +54,7 @@ export class EducationModel {
   @Prop({
     type: SchemaFactory.createForClass(DateRangeModel),
   })
-  date?: DateRangeModel;
+  period?: DateRangeModel;
 }
 
 export type EducationDocument = HydratedDocument<EducationModel>;

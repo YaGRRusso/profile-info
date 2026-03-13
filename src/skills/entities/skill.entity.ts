@@ -7,7 +7,7 @@ export class Skill extends BaseEntity {
   slug: string;
 
   @Field(() => String)
-  title: string;
+  name: string;
 
   @Field(() => String)
   category: string;

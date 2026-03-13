@@ -6,7 +6,7 @@ export class CreateSkillInput {
   slug: string;
 
   @Field(() => String)
-  title: string;
+  name: string;
 
   @Field(() => String)
   category: string;

@@ -7,7 +7,7 @@ export class SkillModel {
   slug: string;
 
   @Prop({ type: String, required: true })
-  title: string;
+  name: string;
 
   @Prop({ type: String, required: true })
   category: string;

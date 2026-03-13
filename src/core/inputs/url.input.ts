@@ -1,4 +1,5 @@
 import { Field, InputType } from "@nestjs/graphql";
+import { IsUrl } from "class-validator";
 
 @InputType()
 export class UrlInput {
@@ -6,5 +7,6 @@ export class UrlInput {
   title: string;
 
   @Field(() => String)
+  @IsUrl()
   value: string;
 }

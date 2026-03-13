@@ -39,6 +39,10 @@ export class CreateEducationInput {
   @IsUrl()
   url?: string;
 
+  @OptionalField(() => String)
+  @IsUrl()
+  image?: string;
+
   @OptionalField(() => Int)
   hours?: number;
 
@@ -46,7 +50,7 @@ export class CreateEducationInput {
   i18n: CreateEducationTranslationInput[];
 
   @OptionalField(() => DateRangeInput)
-  date?: DateRangeInput;
+  period?: DateRangeInput;
 
   @OptionalField(() => [String])
   skills?: string[];

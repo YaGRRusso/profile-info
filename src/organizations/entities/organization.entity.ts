@@ -7,13 +7,13 @@ export class Organization extends BaseEntity {
   slug: string;
 
   @Field(() => String)
-  title: string;
+  name: string;
 
   @Field(() => String)
-  url: string;
+  website: string;
 
   @Field(() => String)
-  thumbnail: string;
+  logo: string;
 
   @Field(() => String)
   category: string;

@@ -28,7 +28,7 @@ export class ExperienceRoleModel {
   @Prop({
     type: SchemaFactory.createForClass(DateRangeModel),
   })
-  date?: DateRangeModel;
+  period?: DateRangeModel;
 
   @Prop({
     type: [{ type: mongoose.Schema.Types.ObjectId, ref: SkillModel.name }],

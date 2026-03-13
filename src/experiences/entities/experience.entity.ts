@@ -29,7 +29,7 @@ export class ExperienceRole {
   i18n: ExperienceTranslationLocale[];
 
   @OptionalField(() => DateRangeEntity)
-  date?: DateRangeEntity;
+  period?: DateRangeEntity;
 
   @OptionalField(() => [Skill])
   skills?: Skill[];

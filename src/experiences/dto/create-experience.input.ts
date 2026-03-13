@@ -26,7 +26,7 @@ export class CreateExperienceRoleInput {
   i18n: CreateExperienceTranslationInput[];
 
   @OptionalField(() => DateRangeInput)
-  date?: DateRangeInput;
+  period?: DateRangeInput;
 
   @OptionalField(() => [String])
   skills?: string[];

@@ -40,6 +40,9 @@ export class Education extends BaseEntity {
   @OptionalField(() => String)
   url?: string;
 
+  @OptionalField(() => String)
+  image?: string;
+
   @OptionalField(() => Int)
   hours?: number;
 
@@ -50,5 +53,5 @@ export class Education extends BaseEntity {
   skills?: Skill[];
 
   @OptionalField(() => DateRangeEntity)
-  date?: DateRangeEntity;
+  period?: DateRangeEntity;
 }

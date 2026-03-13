@@ -4,10 +4,11 @@
 
 input CreateEducationInput {
   category: String!
-  date: DateRangeInput
   hours: Int
   i18n: [CreateEducationTranslationInput!]!
+  image: String
   organization: String!
+  period: DateRangeInput
   skills: [String!]
   slug: String!
   status: String!
@@ -37,8 +38,8 @@ input CreateExperienceMessagesInput {
 }
 
 input CreateExperienceRoleInput {
-  date: DateRangeInput
   i18n: [CreateExperienceTranslationInput!]!
+  period: DateRangeInput
   skills: [String!]
 }
 
@@ -49,10 +50,10 @@ input CreateExperienceTranslationInput {
 
 input CreateOrganizationInput {
   category: String!
+  logo: String!
+  name: String!
   slug: String!
-  thumbnail: String!
-  title: String!
-  url: String!
+  website: String!
 }
 
 input CreateProjectInput {
@@ -75,8 +76,8 @@ input CreateProjectMessagesInputTranslationInput {
 
 input CreateSkillInput {
   category: String!
+  name: String!
   slug: String!
-  title: String!
 }
 
 input CreateUserInput {
@@ -110,11 +111,12 @@ scalar DateTime
 type Education {
   category: String!
   createdAt: DateTime!
-  date: DateRangeEntity
   hours: Int
   i18n: [EducationTranslationLocale!]!
   id: ID!
+  image: String
   organization: Organization!
+  period: DateRangeEntity
   skills: [Skill!]
   slug: String!
   status: String!
@@ -149,8 +151,8 @@ type ExperienceMessages {
 }
 
 type ExperienceRole {
-  date: DateRangeEntity
   i18n: [ExperienceTranslationLocale!]!
+  period: DateRangeEntity
   skills: [Skill!]
 }
 
@@ -185,11 +187,11 @@ type Organization {
   category: String!
   createdAt: DateTime!
   id: ID!
+  logo: String!
+  name: String!
   slug: String!
-  thumbnail: String!
-  title: String!
   updatedAt: DateTime!
-  url: String!
+  website: String!
 }
 
 type Project {
@@ -238,18 +240,19 @@ type Skill {
   category: String!
   createdAt: DateTime!
   id: ID!
+  name: String!
   slug: String!
-  title: String!
   updatedAt: DateTime!
 }
 
 input UpdateEducationInput {
   category: String
-  date: DateRangeInput
   hours: Int
   i18n: [CreateEducationTranslationInput!]
   id: ID!
+  image: String
   organization: String
+  period: DateRangeInput
   skills: [String!]
   slug: String
   status: String
@@ -267,10 +270,10 @@ input UpdateExperienceInput {
 input UpdateOrganizationInput {
   category: String
   id: ID!
+  logo: String
+  name: String
   slug: String
-  thumbnail: String
-  title: String
-  url: String
+  website: String
 }
 
 input UpdateProjectInput {
@@ -285,8 +288,8 @@ input UpdateProjectInput {
 input UpdateSkillInput {
   category: String
   id: ID!
+  name: String
   slug: String
-  title: String
 }
 
 input UpdateUserInput {
