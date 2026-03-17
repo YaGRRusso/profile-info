@@ -20,7 +20,7 @@ export class OrganizationsResolver {
   @Public()
   @Query(() => [Organization])
   findAllOrganizations() {
-    return this.organizationsService.findAll();
+    return this.organizationsService.findAll({});
   }
 
   @Public()

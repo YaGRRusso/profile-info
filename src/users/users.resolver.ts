@@ -18,7 +18,7 @@ export class UsersResolver {
   @Public()
   @Query(() => [User])
   findAllUsers() {
-    return this.usersService.findAll();
+    return this.usersService.findAll({});
   }
 
   @Public()

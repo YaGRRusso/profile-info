@@ -1,10 +1,11 @@
 import { Injectable } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import { hash } from "bcryptjs";
-import { Model } from "mongoose";
+import { Model, QueryFilter } from "mongoose";
+import { clearFilters, clearSort } from "@/core/helpers/search.helper";
+import { Search } from "@/core/interfaces/search.interface";
 import { UserModel } from "@/schemas/user.schema";
 import { CreateUserInput } from "./dto/create-user.input";
-import { ReadUserInput } from "./dto/read-user.input";
 import { UpdateUserInput } from "./dto/update-user.input";
 
 @Injectable()
@@ -21,19 +22,21 @@ export class UsersService {
     });
   }
 
-  async findAll() {
-    return await this.userModel.find().exec();
+  async findAll({ filters, sort, skip = 0, limit = 10 }: Search<UserModel>) {
+    return await this.userModel
+      .find(clearFilters(filters))
+      .sort(clearSort(sort))
+      .skip(skip)
+      .limit(limit)
+      .exec();
   }
 
   async findOneById(id: string) {
     return await this.userModel.findById(id).exec();
   }
 
-  async findOne(readUserInput: ReadUserInput) {
-    return await this.userModel
-      .findOne(readUserInput)
-      .select("+password")
-      .exec();
+  async findOne(filters: QueryFilter<UserModel>) {
+    return await this.userModel.findOne(filters).select("+password").exec();
   }
 
   async update(id: string, updateUserInput: UpdateUserInput) {

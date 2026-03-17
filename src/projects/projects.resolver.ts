@@ -32,7 +32,7 @@ export class ProjectsResolver {
   @Public()
   @Query(() => [Project])
   findAllProjects() {
-    return this.projectsService.findAll();
+    return this.projectsService.findAll({});
   }
 
   @Public()

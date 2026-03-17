@@ -20,7 +20,7 @@ export class SkillsResolver {
   @Public()
   @Query(() => [Skill])
   findAllSkills() {
-    return this.skillsService.findAll();
+    return this.skillsService.findAll({});
   }
 
   @Public()

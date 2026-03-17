@@ -1,4 +1,5 @@
 {
+  "material-icon-theme.activeIconPack": "nest",
   "editor.defaultFormatter": "esbenp.prettier-vscode",
   "[javascript]": {
     "editor.defaultFormatter": "biomejs.biome"

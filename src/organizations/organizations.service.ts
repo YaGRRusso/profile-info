@@ -1,6 +1,8 @@
 import { Injectable } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import { Model } from "mongoose";
+import { clearFilters, clearSort } from "@/core/helpers/search.helper";
+import { Search } from "@/core/interfaces/search.interface";
 import { OrganizationModel } from "@/schemas/organization.schema";
 import { CreateOrganizationInput } from "./dto/create-organization.input";
 import { UpdateOrganizationInput } from "./dto/update-organization.input";
@@ -20,8 +22,18 @@ export class OrganizationsService {
     );
   }
 
-  async findAll() {
-    return await this.organizationModel.find().exec();
+  async findAll({
+    filters,
+    sort,
+    skip = 0,
+    limit = 10,
+  }: Search<OrganizationModel>) {
+    return await this.organizationModel
+      .find(clearFilters(filters))
+      .sort(clearSort(sort))
+      .skip(skip)
+      .limit(limit)
+      .exec();
   }
 
   async findOneById(id: string) {

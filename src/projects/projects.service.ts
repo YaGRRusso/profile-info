@@ -1,6 +1,8 @@
 import { Injectable } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import { Model } from "mongoose";
+import { clearFilters, clearSort } from "@/core/helpers/search.helper";
+import { Search } from "@/core/interfaces/search.interface";
 import { ProjectModel } from "@/schemas/project.schema";
 import { CreateProjectInput } from "./dto/create-project.input";
 import { UpdateProjectInput } from "./dto/update-project.input";
@@ -20,8 +22,13 @@ export class ProjectsService {
     );
   }
 
-  async findAll() {
-    return await this.projectModel.find().exec();
+  async findAll({ filters, sort, skip = 0, limit = 10 }: Search<ProjectModel>) {
+    return await this.projectModel
+      .find(clearFilters(filters))
+      .sort(clearSort(sort))
+      .skip(skip)
+      .limit(limit)
+      .exec();
   }
 
   async findOneById(id: string) {

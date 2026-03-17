@@ -33,7 +33,7 @@ export class EducationsResolver {
   @Public()
   @Query(() => [Education])
   findAllEducations() {
-    return this.educationsService.findAll();
+    return this.educationsService.findAll({});
   }
 
   @Public()

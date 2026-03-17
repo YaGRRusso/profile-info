@@ -1,6 +1,8 @@
 import { Injectable } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import { Model } from "mongoose";
+import { clearFilters, clearSort } from "@/core/helpers/search.helper";
+import { Search } from "@/core/interfaces/search.interface";
 import { ExperienceModel } from "@/schemas/experience.schema";
 import { CreateExperienceInput } from "./dto/create-experience.input";
 import { UpdateExperienceInput } from "./dto/update-experience.input";
@@ -20,8 +22,18 @@ export class ExperiencesService {
     );
   }
 
-  async findAll() {
-    return await this.experienceModel.find().exec();
+  async findAll({
+    filters,
+    sort,
+    skip = 0,
+    limit = 10,
+  }: Search<ExperienceModel>) {
+    return await this.experienceModel
+      .find(clearFilters(filters))
+      .sort(clearSort(sort))
+      .skip(skip)
+      .limit(limit)
+      .exec();
   }
 
   async findOneById(id: string) {

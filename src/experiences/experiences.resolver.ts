@@ -37,7 +37,7 @@ export class ExperiencesResolver {
   @Public()
   @Query(() => [Experience])
   findAllExperiences() {
-    return this.experiencesService.findAll();
+    return this.experiencesService.findAll({});
   }
 
   @Public()
