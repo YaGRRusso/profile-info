@@ -6,7 +6,7 @@ import {
   TranslationEntity,
 } from "@/core/entities/translation.entity";
 import { UrlEntity } from "@/core/entities/url.entity";
-import { Skill } from "@/skills/entities/skill.entity";
+import { SkillEntity } from "@/skills/entities/skill.entity";
 
 @ObjectType()
 export class ProjectMessages {
@@ -20,7 +20,7 @@ export class ProjectMessages {
 const ProjectTranslationEntity = createTranslationEntity(ProjectMessages);
 
 @ObjectType()
-export class Project extends BaseEntity {
+export class ProjectEntity extends BaseEntity {
   @Field(() => Boolean)
   isFeatured: boolean;
 
@@ -30,8 +30,8 @@ export class Project extends BaseEntity {
   @OptionalField(() => [String])
   images?: string[];
 
-  @OptionalField(() => [Skill])
-  skills?: Skill[];
+  @OptionalField(() => [SkillEntity])
+  skills?: SkillEntity[];
 
   @Field(() => [ProjectTranslationEntity])
   i18n: TranslationEntity<ProjectMessages>[];

@@ -2,8 +2,8 @@ import { Field, ObjectType } from "@nestjs/graphql";
 import { OptionalField } from "@/core/decorators/optional-field.decorator";
 import { BaseEntity } from "@/core/entities/base.entity";
 import { DateRangeEntity } from "@/core/entities/date-range.entity";
-import { Organization } from "@/organizations/entities/organization.entity";
-import { Skill } from "@/skills/entities/skill.entity";
+import { OrganizationEntity } from "@/organizations/entities/organization.entity";
+import { SkillEntity } from "@/skills/entities/skill.entity";
 import { ExperienceCategory } from "../enums/category.enum";
 
 @ObjectType()
@@ -32,20 +32,20 @@ export class ExperienceRole {
   @OptionalField(() => DateRangeEntity)
   period?: DateRangeEntity;
 
-  @OptionalField(() => [Skill])
-  skills?: Skill[];
+  @OptionalField(() => [SkillEntity])
+  skills?: SkillEntity[];
 }
 
 @ObjectType()
-export class Experience extends BaseEntity {
+export class ExperienceEntity extends BaseEntity {
   @Field(() => Boolean)
   isFeatured: boolean;
 
   @Field(() => String)
   slug: string;
 
-  @Field(() => Organization)
-  organization: Organization;
+  @Field(() => OrganizationEntity)
+  organization: OrganizationEntity;
 
   @Field(() => ExperienceCategory)
   category: ExperienceCategory;
@@ -53,6 +53,6 @@ export class Experience extends BaseEntity {
   @Field(() => [ExperienceRole])
   roles: ExperienceRole[];
 
-  @OptionalField(() => [Skill])
-  skills?: Skill[];
+  @OptionalField(() => [SkillEntity])
+  skills?: SkillEntity[];
 }

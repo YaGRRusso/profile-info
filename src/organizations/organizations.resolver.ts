@@ -4,14 +4,14 @@ import { PaginationInput } from "@/core/inputs/pagination.input";
 import { CreateOrganizationInput } from "./dto/create-organization.input";
 import { FilterOrganizationInput } from "./dto/filter-organization.input";
 import { UpdateOrganizationInput } from "./dto/update-organization.input";
-import { Organization } from "./entities/organization.entity";
+import { OrganizationEntity } from "./entities/organization.entity";
 import { OrganizationsService } from "./organizations.service";
 
-@Resolver(() => Organization)
+@Resolver(() => OrganizationEntity)
 export class OrganizationsResolver {
   constructor(private readonly organizationsService: OrganizationsService) {}
 
-  @Mutation(() => [Organization])
+  @Mutation(() => [OrganizationEntity])
   createOrganization(
     @Args("createOrganizationInput", { type: () => [CreateOrganizationInput] })
     createOrganizationInput: CreateOrganizationInput[]
@@ -20,7 +20,7 @@ export class OrganizationsResolver {
   }
 
   @Public()
-  @Query(() => [Organization])
+  @Query(() => [OrganizationEntity])
   findAllOrganizations(
     @Args("filters", { nullable: true }) filters?: FilterOrganizationInput,
     @Args("pagination", { nullable: true }) pagination?: PaginationInput
@@ -32,12 +32,12 @@ export class OrganizationsResolver {
   }
 
   @Public()
-  @Query(() => Organization)
+  @Query(() => OrganizationEntity)
   findOneOrganizationById(@Args("id", { type: () => ID }) id: string) {
     return this.organizationsService.findOneById(id);
   }
 
-  @Mutation(() => Organization)
+  @Mutation(() => OrganizationEntity)
   updateOrganization(
     @Args("updateOrganizationInput")
     updateOrganizationInput: UpdateOrganizationInput
@@ -48,7 +48,7 @@ export class OrganizationsResolver {
     );
   }
 
-  @Mutation(() => [Organization])
+  @Mutation(() => [OrganizationEntity])
   removeOrganization(@Args("id", { type: () => ID }) id: string[]) {
     return this.organizationsService.remove(id);
   }

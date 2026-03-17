@@ -9,63 +9,117 @@ import {
   Resolver,
 } from "@nestjs/graphql";
 import { Public } from "@/core/decorators/public-route.decorator";
+import { BatchEntity } from "@/core/entities/batch.entity";
 import { PaginationInput } from "@/core/inputs/pagination.input";
 import type { Ctx } from "@/core/interfaces/context.interface";
-import { Organization } from "@/organizations/entities/organization.entity";
+import { OrganizationEntity } from "@/organizations/entities/organization.entity";
 import type { EducationModel } from "@/schemas/education.schema";
-import { Skill } from "@/skills/entities/skill.entity";
+import { SkillEntity } from "@/skills/entities/skill.entity";
 import { CreateEducationInput } from "./dto/create-education.input";
 import { FilterEducationInput } from "./dto/filter-education.input";
 import { UpdateEducationInput } from "./dto/update-education.input";
 import { EducationsService } from "./educations.service";
-import { Education } from "./entities/education.entity";
+import { EducationEntity } from "./entities/education.entity";
 
-@Resolver(() => Education)
+@Resolver(() => EducationEntity)
 export class EducationsResolver {
   constructor(private readonly educationsService: EducationsService) {}
 
-  @Mutation(() => [Education])
-  createEducation(
-    @Args("createEducationInput", { type: () => [CreateEducationInput] })
-    createEducationInput: CreateEducationInput[]
-  ) {
-    return this.educationsService.create(createEducationInput);
+  // QUERIES
+
+  @Public()
+  @Query(() => EducationEntity)
+  findOneEducationById(@Args("id", { type: () => ID }) id: string) {
+    return this.educationsService.findOneById(id);
   }
 
   @Public()
-  @Query(() => [Education])
-  findAllEducations(
-    @Args("filters", { nullable: true }) filters?: FilterEducationInput,
-    @Args("pagination", { nullable: true }) pagination?: PaginationInput
+  @Query(() => EducationEntity)
+  findOneEducation(
+    @Args("filters", {
+      type: () => FilterEducationInput,
+      nullable: true,
+    })
+    filters?: FilterEducationInput
   ) {
-    return this.educationsService.findAll({
+    return this.educationsService.findOne(filters);
+  }
+
+  @Public()
+  @Query(() => [EducationEntity])
+  findManyEducationById(@Args("ids", { type: () => [ID] }) ids: string[]) {
+    return this.educationsService.findManyById(ids);
+  }
+
+  @Public()
+  @Query(() => [EducationEntity])
+  findManyEducations(
+    @Args("filters", {
+      type: () => FilterEducationInput,
+      nullable: true,
+    })
+    filters?: FilterEducationInput,
+    @Args("pagination", {
+      type: () => PaginationInput,
+      nullable: true,
+    })
+    pagination?: PaginationInput
+  ) {
+    return this.educationsService.findMany({
       filters,
       ...pagination,
     });
   }
 
-  @Public()
-  @Query(() => Education)
-  findOneEducationById(@Args("id", { type: () => ID }) id: string) {
-    return this.educationsService.findOneById(id);
-  }
+  // MUTATIONS
 
-  @Mutation(() => Education)
-  updateEducation(
-    @Args("updateEducationInput") updateEducationInput: UpdateEducationInput
+  @Mutation(() => EducationEntity)
+  createOneEducation(
+    @Args("createEducationInput", { type: () => CreateEducationInput })
+    createEducationInput: CreateEducationInput
   ) {
-    return this.educationsService.update(
-      updateEducationInput.id,
-      updateEducationInput
-    );
+    return this.educationsService.createOne(createEducationInput);
   }
 
-  @Mutation(() => [Education])
-  removeEducation(@Args("id", { type: () => ID }) id: string[]) {
-    return this.educationsService.remove(id);
+  @Mutation(() => [EducationEntity])
+  createManyEducations(
+    @Args("createEducationInputs", { type: () => [CreateEducationInput] })
+    createEducationInputs: CreateEducationInput[]
+  ) {
+    return this.educationsService.createMany(createEducationInputs);
   }
 
-  @ResolveField(() => Organization)
+  @Mutation(() => EducationEntity)
+  updateOneEducation(
+    @Args("id", { type: () => ID }) id: string,
+    @Args("updateEducationInput", { type: () => UpdateEducationInput })
+    updateEducationInput: UpdateEducationInput
+  ) {
+    return this.educationsService.updateOne(id, updateEducationInput);
+  }
+
+  @Mutation(() => BatchEntity)
+  updateManyEducations(
+    @Args("ids", { type: () => [ID] }) ids: string[],
+    @Args("updateEducationInput", { type: () => UpdateEducationInput })
+    updateEducationInput: UpdateEducationInput
+  ) {
+    return this.educationsService.updateMany(ids, updateEducationInput);
+  }
+
+  @Mutation(() => EducationEntity)
+  removeOneEducation(@Args("id", { type: () => ID }) id: string) {
+    return this.educationsService.removeOne(id);
+  }
+
+  @Mutation(() => BatchEntity)
+  removeManyEducations(@Args("ids", { type: () => [ID] }) ids: string[]) {
+    return this.educationsService.removeMany(ids);
+  }
+
+  // RESOLVERS
+
+  @ResolveField(() => OrganizationEntity)
   organization(@Parent() education: EducationModel, @Context() ctx: Ctx) {
     if (!education?.organization) return null;
     return ctx.loaders.batchOrganizations.load(
@@ -73,7 +127,7 @@ export class EducationsResolver {
     );
   }
 
-  @ResolveField(() => [Skill])
+  @ResolveField(() => [SkillEntity])
   skills(@Parent() education: EducationModel, @Context() ctx: Ctx) {
     const ids = education.skills?.map((id) => id.toString());
     if (ids) return ctx.loaders.batchSkills.loadMany(ids);

@@ -4,14 +4,14 @@ import { PaginationInput } from "@/core/inputs/pagination.input";
 import { CreateSkillInput } from "./dto/create-skill.input";
 import { FilterSkillInput } from "./dto/filter-skill-input";
 import { UpdateSkillInput } from "./dto/update-skill.input";
-import { Skill } from "./entities/skill.entity";
+import { SkillEntity } from "./entities/skill.entity";
 import { SkillsService } from "./skills.service";
 
-@Resolver(() => Skill)
+@Resolver(() => SkillEntity)
 export class SkillsResolver {
   constructor(private readonly skillsService: SkillsService) {}
 
-  @Mutation(() => [Skill])
+  @Mutation(() => [SkillEntity])
   createSkill(
     @Args("createSkillInput", { type: () => [CreateSkillInput] })
     createSkillInput: CreateSkillInput[]
@@ -20,7 +20,7 @@ export class SkillsResolver {
   }
 
   @Public()
-  @Query(() => [Skill])
+  @Query(() => [SkillEntity])
   findAllSkills(
     @Args("filters", { nullable: true }) filters?: FilterSkillInput,
     @Args("pagination", { nullable: true }) pagination?: PaginationInput
@@ -32,17 +32,17 @@ export class SkillsResolver {
   }
 
   @Public()
-  @Query(() => Skill)
+  @Query(() => SkillEntity)
   findOneSkillById(@Args("id", { type: () => ID }) id: string) {
     return this.skillsService.findOneById(id);
   }
 
-  @Mutation(() => Skill)
+  @Mutation(() => SkillEntity)
   updateSkill(@Args("updateSkillInput") updateSkillInput: UpdateSkillInput) {
     return this.skillsService.update(updateSkillInput.id, updateSkillInput);
   }
 
-  @Mutation(() => [Skill])
+  @Mutation(() => [SkillEntity])
   removeSkill(@Args("id", { type: () => ID }) id: string[]) {
     return this.skillsService.remove(id);
   }

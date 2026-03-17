@@ -4,21 +4,21 @@ import { PaginationInput } from "@/core/inputs/pagination.input";
 import { CreateUserInput } from "./dto/create-user.input";
 import { FilterUserInput } from "./dto/filter-user.input";
 import { UpdateUserInput } from "./dto/update-user.input";
-import { User } from "./entities/user.entity";
+import { UserEntity } from "./entities/user.entity";
 import { UsersService } from "./users.service";
 
-@Resolver(() => User)
+@Resolver(() => UserEntity)
 export class UsersResolver {
   constructor(private readonly usersService: UsersService) {}
 
   @Public()
-  @Mutation(() => User)
+  @Mutation(() => UserEntity)
   createUser(@Args("createUserInput") createUserInput: CreateUserInput) {
     return this.usersService.create(createUserInput);
   }
 
   @Public()
-  @Query(() => [User])
+  @Query(() => [UserEntity])
   findAllUsers(
     @Args("filters", { nullable: true }) filters?: FilterUserInput,
     @Args("pagination", { nullable: true }) pagination?: PaginationInput
@@ -30,17 +30,17 @@ export class UsersResolver {
   }
 
   @Public()
-  @Query(() => User)
+  @Query(() => UserEntity)
   findOneUserById(@Args("id", { type: () => ID }) id: string) {
     return this.usersService.findOneById(id);
   }
 
-  @Mutation(() => User)
+  @Mutation(() => UserEntity)
   updateUser(@Args("updateUserInput") updateUserInput: UpdateUserInput) {
     return this.usersService.update(updateUserInput.id, updateUserInput);
   }
 
-  @Mutation(() => User)
+  @Mutation(() => UserEntity)
   removeUser(@Args("id", { type: () => ID }) id: string) {
     return this.usersService.remove(id);
   }

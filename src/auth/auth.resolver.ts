@@ -1,11 +1,11 @@
 import { Args, Mutation, Query, Resolver } from "@nestjs/graphql";
 import { CurrentUser } from "@/core/decorators/current-user.decorator";
 import { Public } from "@/core/decorators/public-route.decorator";
-import { User } from "@/users/entities/user.entity";
+import { UserEntity } from "@/users/entities/user.entity";
 import { AuthService } from "./auth.service";
 import { SignInInput } from "./dto/sign-in.input";
 
-@Resolver(() => User)
+@Resolver(() => UserEntity)
 export class AuthResolver {
   constructor(private readonly authService: AuthService) {}
 
@@ -15,8 +15,8 @@ export class AuthResolver {
     return this.authService.signIn(signInInput);
   }
 
-  @Query(() => User)
-  getMe(@CurrentUser() user: User) {
+  @Query(() => UserEntity)
+  getMe(@CurrentUser() user: UserEntity) {
     return user;
   }
 }

@@ -2,8 +2,8 @@ import { Field, Int, ObjectType } from "@nestjs/graphql";
 import { OptionalField } from "@/core/decorators/optional-field.decorator";
 import { BaseEntity } from "@/core/entities/base.entity";
 import { DateRangeEntity } from "@/core/entities/date-range.entity";
-import { Organization } from "@/organizations/entities/organization.entity";
-import { Skill } from "@/skills/entities/skill.entity";
+import { OrganizationEntity } from "@/organizations/entities/organization.entity";
+import { SkillEntity } from "@/skills/entities/skill.entity";
 import { EducationCategory } from "../enums/category.enum";
 import { EducationStatus } from "../enums/status.enum";
 
@@ -26,15 +26,15 @@ export class EducationTranslationLocale {
 }
 
 @ObjectType()
-export class Education extends BaseEntity {
+export class EducationEntity extends BaseEntity {
   @Field(() => Boolean)
   isFeatured: boolean;
 
   @Field(() => String)
   slug: string;
 
-  @Field(() => Organization)
-  organization: Organization;
+  @Field(() => OrganizationEntity)
+  organization: OrganizationEntity;
 
   @Field(() => EducationCategory)
   category: EducationCategory;
@@ -54,8 +54,8 @@ export class Education extends BaseEntity {
   @Field(() => [EducationTranslationLocale])
   i18n: EducationTranslationLocale[];
 
-  @OptionalField(() => [Skill])
-  skills?: Skill[];
+  @OptionalField(() => [SkillEntity])
+  skills?: SkillEntity[];
 
   @OptionalField(() => DateRangeEntity)
   period?: DateRangeEntity;

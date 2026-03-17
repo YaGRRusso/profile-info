@@ -4,7 +4,7 @@ import { BaseEntity } from "@/core/entities/base.entity";
 import { UrlEntity } from "@/core/entities/url.entity";
 
 @ObjectType()
-export class User extends BaseEntity {
+export class UserEntity extends BaseEntity {
   @OptionalField(() => String)
   avatar?: string;
 

@@ -3,7 +3,7 @@ import { BaseEntity } from "@/core/entities/base.entity";
 import { SkillCategory } from "../enums/category.enum";
 
 @ObjectType()
-export class Skill extends BaseEntity {
+export class SkillEntity extends BaseEntity {
   @Field(() => Boolean)
   isFeatured: boolean;
 

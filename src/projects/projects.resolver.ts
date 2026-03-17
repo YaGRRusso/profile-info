@@ -12,18 +12,18 @@ import { Public } from "@/core/decorators/public-route.decorator";
 import { PaginationInput } from "@/core/inputs/pagination.input";
 import type { Ctx } from "@/core/interfaces/context.interface";
 import type { ProjectModel } from "@/schemas/project.schema";
-import { Skill } from "@/skills/entities/skill.entity";
+import { SkillEntity } from "@/skills/entities/skill.entity";
 import { CreateProjectInput } from "./dto/create-project.input";
 import { FilterProjectInput } from "./dto/filter-project.input";
 import { UpdateProjectInput } from "./dto/update-project.input";
-import { Project } from "./entities/project.entity";
+import { ProjectEntity } from "./entities/project.entity";
 import { ProjectsService } from "./projects.service";
 
-@Resolver(() => Project)
+@Resolver(() => ProjectEntity)
 export class ProjectsResolver {
   constructor(private readonly projectsService: ProjectsService) {}
 
-  @Mutation(() => [Project])
+  @Mutation(() => [ProjectEntity])
   createProject(
     @Args("createProjectInput", { type: () => [CreateProjectInput] })
     createProjectInput: CreateProjectInput[]
@@ -32,7 +32,7 @@ export class ProjectsResolver {
   }
 
   @Public()
-  @Query(() => [Project])
+  @Query(() => [ProjectEntity])
   findAllProjects(
     @Args("filters", { nullable: true }) filters?: FilterProjectInput,
     @Args("pagination", { nullable: true }) pagination?: PaginationInput
@@ -44,12 +44,12 @@ export class ProjectsResolver {
   }
 
   @Public()
-  @Query(() => Project)
+  @Query(() => ProjectEntity)
   findOneProjectById(@Args("id", { type: () => ID }) id: string) {
     return this.projectsService.findOneById(id);
   }
 
-  @Mutation(() => Project)
+  @Mutation(() => ProjectEntity)
   updateProject(
     @Args("updateProjectInput") updateProjectInput: UpdateProjectInput
   ) {
@@ -59,12 +59,12 @@ export class ProjectsResolver {
     );
   }
 
-  @Mutation(() => [Project])
+  @Mutation(() => [ProjectEntity])
   removeProject(@Args("id", { type: () => ID }) id: string[]) {
     return this.projectsService.remove(id);
   }
 
-  @ResolveField(() => [Skill])
+  @ResolveField(() => [SkillEntity])
   skills(@Parent() project: ProjectModel, @Context() ctx: Ctx) {
     const ids = project.skills?.map((id) => id.toString());
     if (ids) return ctx.loaders.batchSkills.loadMany(ids);

@@ -12,23 +12,23 @@ import { Public } from "@/core/decorators/public-route.decorator";
 import { sortDateRange } from "@/core/helpers/daterange.helper";
 import { PaginationInput } from "@/core/inputs/pagination.input";
 import type { Ctx } from "@/core/interfaces/context.interface";
-import { Organization } from "@/organizations/entities/organization.entity";
+import { OrganizationEntity } from "@/organizations/entities/organization.entity";
 import type {
   ExperienceModel,
   ExperienceRoleModel,
 } from "@/schemas/experience.schema";
-import { Skill } from "@/skills/entities/skill.entity";
+import { SkillEntity } from "@/skills/entities/skill.entity";
 import { CreateExperienceInput } from "./dto/create-experience.input";
 import { FilterExperienceInput } from "./dto/filter-experience.input";
 import { UpdateExperienceInput } from "./dto/update-experience.input";
-import { Experience, ExperienceRole } from "./entities/experience.entity";
+import { ExperienceEntity, ExperienceRole } from "./entities/experience.entity";
 import { ExperiencesService } from "./experiences.service";
 
-@Resolver(() => Experience)
+@Resolver(() => ExperienceEntity)
 export class ExperiencesResolver {
   constructor(private readonly experiencesService: ExperiencesService) {}
 
-  @Mutation(() => [Experience])
+  @Mutation(() => [ExperienceEntity])
   createExperience(
     @Args("createExperienceInput", { type: () => [CreateExperienceInput] })
     createExperienceInput: CreateExperienceInput[]
@@ -37,7 +37,7 @@ export class ExperiencesResolver {
   }
 
   @Public()
-  @Query(() => [Experience])
+  @Query(() => [ExperienceEntity])
   findAllExperiences(
     @Args("filters", { nullable: true }) filters?: FilterExperienceInput,
     @Args("pagination", { nullable: true }) pagination?: PaginationInput
@@ -49,12 +49,12 @@ export class ExperiencesResolver {
   }
 
   @Public()
-  @Query(() => Experience)
+  @Query(() => ExperienceEntity)
   findOneExperienceById(@Args("id", { type: () => ID }) id: string) {
     return this.experiencesService.findOneById(id);
   }
 
-  @Mutation(() => Experience)
+  @Mutation(() => ExperienceEntity)
   updateExperience(
     @Args("updateExperienceInput") updateExperienceInput: UpdateExperienceInput
   ) {
@@ -64,7 +64,7 @@ export class ExperiencesResolver {
     );
   }
 
-  @Mutation(() => [Experience])
+  @Mutation(() => [ExperienceEntity])
   removeExperience(@Args("id", { type: () => ID }) id: string[]) {
     return this.experiencesService.remove(id);
   }
@@ -76,7 +76,7 @@ export class ExperiencesResolver {
     }
   }
 
-  @ResolveField(() => Organization)
+  @ResolveField(() => OrganizationEntity)
   organization(@Parent() experience: ExperienceModel, @Context() ctx: Ctx) {
     if (!experience?.organization) return null;
     return ctx.loaders.batchOrganizations.load(
@@ -85,7 +85,7 @@ export class ExperiencesResolver {
   }
 
   // group all skills from experience roles
-  @ResolveField(() => [Skill])
+  @ResolveField(() => [SkillEntity])
   skills(@Parent() experience: ExperienceModel, @Context() ctx: Ctx) {
     const ids = new Set<string>();
 
@@ -103,7 +103,7 @@ export class ExperiencesResolver {
 
 @Resolver(() => ExperienceRole)
 export class ExperienceRoleResolver {
-  @ResolveField(() => [Skill])
+  @ResolveField(() => [SkillEntity])
   skills(@Parent() role: ExperienceRoleModel, @Context() ctx: Ctx) {
     const ids = role.skills?.map((id) => id.toString());
     if (ids) return ctx.loaders.batchSkills.loadMany(ids);
