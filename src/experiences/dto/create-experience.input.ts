@@ -1,6 +1,7 @@
 import { Field, InputType } from "@nestjs/graphql";
 import { OptionalField } from "@/core/decorators/optional-field.decorator";
 import { DateRangeInput } from "@/core/inputs/date-range.input";
+import { ExperienceCategory } from "../enums/category.enum";
 
 @InputType()
 export class CreateExperienceMessagesInput {
@@ -40,8 +41,8 @@ export class CreateExperienceInput {
   @Field(() => String)
   organization: string;
 
-  @Field(() => String)
-  category: string;
+  @Field(() => ExperienceCategory)
+  category: ExperienceCategory;
 
   @Field(() => [CreateExperienceRoleInput])
   roles: CreateExperienceRoleInput[];

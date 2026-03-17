@@ -15,7 +15,12 @@ export class OrganizationModel {
   @Prop({ type: String, required: true })
   logo: string;
 
-  @Prop({ type: String, required: true })
+  @Prop({
+    type: String,
+    required: true,
+    enum: ["COMPANY", "SCHOOL", "OTHER"],
+    index: true,
+  })
   category: string;
 }
 

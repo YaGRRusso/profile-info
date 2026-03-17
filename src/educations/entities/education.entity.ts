@@ -4,6 +4,8 @@ import { BaseEntity } from "@/core/entities/base.entity";
 import { DateRangeEntity } from "@/core/entities/date-range.entity";
 import { Organization } from "@/organizations/entities/organization.entity";
 import { Skill } from "@/skills/entities/skill.entity";
+import { EducationCategory } from "../enums/category.enum";
+import { EducationStatus } from "../enums/status.enum";
 
 @ObjectType()
 export class EducationMessages {
@@ -31,11 +33,11 @@ export class Education extends BaseEntity {
   @Field(() => Organization)
   organization: Organization;
 
-  @Field(() => String)
-  category: string;
+  @Field(() => EducationCategory)
+  category: EducationCategory;
 
-  @Field(() => String)
-  status: string;
+  @Field(() => EducationStatus)
+  status: EducationStatus;
 
   @OptionalField(() => String)
   url?: string;

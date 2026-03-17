@@ -44,7 +44,12 @@ export class ExperienceModel {
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: OrganizationModel.name })
   organization?: OrganizationModel | mongoose.Types.ObjectId | string; // reference on create and populate on query
 
-  @Prop({ type: String, required: true })
+  @Prop({
+    type: String,
+    required: true,
+    enum: ["FULL_TIME", "PART_TIME", "FREELANCE", "VOLUNTEER"],
+    index: true,
+  })
   category: string;
 
   @Prop({

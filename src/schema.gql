@@ -3,7 +3,7 @@
 # ------------------------------------------------------
 
 input CreateEducationInput {
-  category: String!
+  category: EducationCategory!
   hours: Int
   i18n: [CreateEducationTranslationInput!]!
   image: String
@@ -11,7 +11,7 @@ input CreateEducationInput {
   period: DateRangeInput
   skills: [String!]
   slug: String!
-  status: String!
+  status: EducationStatus!
   url: String
 }
 
@@ -26,7 +26,7 @@ input CreateEducationTranslationInput {
 }
 
 input CreateExperienceInput {
-  category: String!
+  category: ExperienceCategory!
   organization: String!
   roles: [CreateExperienceRoleInput!]!
   slug: String!
@@ -49,7 +49,7 @@ input CreateExperienceTranslationInput {
 }
 
 input CreateOrganizationInput {
-  category: String!
+  category: OrganizationCategory!
   logo: String!
   name: String!
   slug: String!
@@ -75,7 +75,7 @@ input CreateProjectMessagesInputTranslationInput {
 }
 
 input CreateSkillInput {
-  category: String!
+  category: SkillCategory!
   name: String!
   slug: String!
 }
@@ -109,7 +109,7 @@ A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date
 scalar DateTime
 
 type Education {
-  category: String!
+  category: EducationCategory!
   createdAt: DateTime!
   hours: Int
   i18n: [EducationTranslationLocale!]!
@@ -119,14 +119,26 @@ type Education {
   period: DateRangeEntity
   skills: [Skill!]
   slug: String!
-  status: String!
+  status: EducationStatus!
   updatedAt: DateTime!
   url: String
+}
+
+enum EducationCategory {
+  COURSE
+  DEGREE
+  OTHER
 }
 
 type EducationMessages {
   description: String!
   title: String!
+}
+
+enum EducationStatus {
+  COMPLETE
+  INCOMPLETE
+  IN_PROGRESS
 }
 
 type EducationTranslationLocale {
@@ -135,7 +147,7 @@ type EducationTranslationLocale {
 }
 
 type Experience {
-  category: String!
+  category: ExperienceCategory!
   createdAt: DateTime!
   id: ID!
   organization: Organization!
@@ -143,6 +155,13 @@ type Experience {
   skills: [Skill!]
   slug: String!
   updatedAt: DateTime!
+}
+
+enum ExperienceCategory {
+  FREELANCE
+  FULL_TIME
+  PART_TIME
+  VOLUNTEER
 }
 
 type ExperienceMessages {
@@ -162,7 +181,7 @@ type ExperienceTranslationLocale {
 }
 
 input FilterEducationInput {
-  category: String
+  category: EducationCategory
   hours: Int
   i18n: [CreateEducationTranslationInput!]
   image: String
@@ -170,19 +189,19 @@ input FilterEducationInput {
   period: DateRangeInput
   skills: [String!]
   slug: String
-  status: String
+  status: EducationStatus
   url: String
 }
 
 input FilterExperienceInput {
-  category: String
+  category: ExperienceCategory
   organization: String
   roles: [CreateExperienceRoleInput!]
   slug: String
 }
 
 input FilterOrganizationInput {
-  category: String
+  category: OrganizationCategory
   logo: String
   name: String
   slug: String
@@ -198,7 +217,7 @@ input FilterProjectInput {
 }
 
 input FilterSkillInput {
-  category: String
+  category: SkillCategory
   name: String
   slug: String
 }
@@ -239,7 +258,7 @@ type Mutation {
 }
 
 type Organization {
-  category: String!
+  category: OrganizationCategory!
   createdAt: DateTime!
   id: ID!
   logo: String!
@@ -247,6 +266,12 @@ type Organization {
   slug: String!
   updatedAt: DateTime!
   website: String!
+}
+
+enum OrganizationCategory {
+  COMPANY
+  OTHER
+  SCHOOL
 }
 
 input PaginationInput {
@@ -297,7 +322,7 @@ input SignInInput {
 }
 
 type Skill {
-  category: String!
+  category: SkillCategory!
   createdAt: DateTime!
   id: ID!
   name: String!
@@ -305,8 +330,13 @@ type Skill {
   updatedAt: DateTime!
 }
 
+enum SkillCategory {
+  HARD
+  SOFT
+}
+
 input UpdateEducationInput {
-  category: String
+  category: EducationCategory
   hours: Int
   i18n: [CreateEducationTranslationInput!]
   id: ID!
@@ -315,12 +345,12 @@ input UpdateEducationInput {
   period: DateRangeInput
   skills: [String!]
   slug: String
-  status: String
+  status: EducationStatus
   url: String
 }
 
 input UpdateExperienceInput {
-  category: String
+  category: ExperienceCategory
   id: ID!
   organization: String
   roles: [CreateExperienceRoleInput!]
@@ -328,7 +358,7 @@ input UpdateExperienceInput {
 }
 
 input UpdateOrganizationInput {
-  category: String
+  category: OrganizationCategory
   id: ID!
   logo: String
   name: String
@@ -346,7 +376,7 @@ input UpdateProjectInput {
 }
 
 input UpdateSkillInput {
-  category: String
+  category: SkillCategory
   id: ID!
   name: String
   slug: String

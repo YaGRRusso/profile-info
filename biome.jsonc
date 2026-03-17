@@ -16,7 +16,8 @@
       "style": {
         "useImportType": "off",
         "useBlockStatements": "off",
-        "noParameterProperties": "off"
+        "noParameterProperties": "off",
+        "noEnum": "off"
       },
       "suspicious": {
         "noExplicitAny": "warn"

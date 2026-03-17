@@ -1,4 +1,5 @@
 import { Field, InputType } from "@nestjs/graphql";
+import { OrganizationCategory } from "../enums/category.enum";
 
 @InputType()
 export class CreateOrganizationInput {
@@ -14,6 +15,6 @@ export class CreateOrganizationInput {
   @Field(() => String)
   logo: string;
 
-  @Field(() => String)
-  category: string;
+  @Field(() => OrganizationCategory)
+  category: OrganizationCategory;
 }

@@ -9,7 +9,7 @@ export class SkillModel {
   @Prop({ type: String, required: true })
   name: string;
 
-  @Prop({ type: String, required: true })
+  @Prop({ type: String, required: true, enum: ["HARD", "SOFT"], index: true })
   category: string;
 }
 

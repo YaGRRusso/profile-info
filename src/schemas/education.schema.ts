@@ -25,10 +25,20 @@ export class EducationModel {
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: OrganizationModel.name })
   organization?: OrganizationModel | mongoose.Types.ObjectId | string; // reference on create and populate on query
 
-  @Prop({ type: String, required: true })
+  @Prop({
+    type: String,
+    required: true,
+    enum: ["COURSE", "DEGREE", "OTHER"],
+    index: true,
+  })
   category: string;
 
-  @Prop({ type: String, required: true })
+  @Prop({
+    type: String,
+    required: true,
+    enum: ["COMPLETE", "INCOMPLETE", "IN_PROGRESS"],
+    index: true,
+  })
   status: string;
 
   @Prop({ type: String })

@@ -4,6 +4,7 @@ import { BaseEntity } from "@/core/entities/base.entity";
 import { DateRangeEntity } from "@/core/entities/date-range.entity";
 import { Organization } from "@/organizations/entities/organization.entity";
 import { Skill } from "@/skills/entities/skill.entity";
+import { ExperienceCategory } from "../enums/category.enum";
 
 @ObjectType()
 export class ExperienceMessages {
@@ -43,8 +44,8 @@ export class Experience extends BaseEntity {
   @Field(() => Organization)
   organization: Organization;
 
-  @Field(() => String)
-  category: string;
+  @Field(() => ExperienceCategory)
+  category: ExperienceCategory;
 
   @Field(() => [ExperienceRole])
   roles: ExperienceRole[];

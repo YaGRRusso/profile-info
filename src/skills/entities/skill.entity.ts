@@ -1,5 +1,6 @@
 import { Field, ObjectType } from "@nestjs/graphql";
 import { BaseEntity } from "@/core/entities/base.entity";
+import { SkillCategory } from "../enums/category.enum";
 
 @ObjectType()
 export class Skill extends BaseEntity {
@@ -9,6 +10,6 @@ export class Skill extends BaseEntity {
   @Field(() => String)
   name: string;
 
-  @Field(() => String)
-  category: string;
+  @Field(() => SkillCategory)
+  category: SkillCategory;
 }
