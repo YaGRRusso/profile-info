@@ -1,6 +1,6 @@
 import { Args, ID, Mutation, Query, Resolver } from "@nestjs/graphql";
 import { Public } from "@/core/decorators/public-route.decorator";
-import { PaginationArgs } from "@/core/dto/pagination.args";
+import { PaginationInput } from "@/core/inputs/pagination.input";
 import { CreateOrganizationInput } from "./dto/create-organization.input";
 import { FilterOrganizationInput } from "./dto/filter-organization.input";
 import { UpdateOrganizationInput } from "./dto/update-organization.input";
@@ -23,7 +23,7 @@ export class OrganizationsResolver {
   @Query(() => [Organization])
   findAllOrganizations(
     @Args("filters", { nullable: true }) filters?: FilterOrganizationInput,
-    @Args("pagination", { nullable: true }) pagination?: PaginationArgs
+    @Args("pagination", { nullable: true }) pagination?: PaginationInput
   ) {
     return this.organizationsService.findAll({
       filters,

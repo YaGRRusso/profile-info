@@ -1,7 +1,7 @@
 import { Field, InputType, Int } from "@nestjs/graphql";
 
 @InputType()
-export class PaginationArgs {
+export class PaginationInput {
   @Field(() => Int, { defaultValue: 0, nullable: true })
   skip?: number;
 

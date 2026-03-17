@@ -249,7 +249,7 @@ type Organization {
   website: String!
 }
 
-input PaginationArgs {
+input PaginationInput {
   limit: Int = 10
   skip: Int = 0
 }
@@ -276,12 +276,12 @@ type ProjectMessagesTranslationEntity {
 }
 
 type Query {
-  findAllEducations(filters: FilterEducationInput, pagination: PaginationArgs): [Education!]!
-  findAllExperiences(filters: FilterExperienceInput, pagination: PaginationArgs): [Experience!]!
-  findAllOrganizations(filters: FilterOrganizationInput, pagination: PaginationArgs): [Organization!]!
-  findAllProjects(filters: FilterProjectInput, pagination: PaginationArgs): [Project!]!
-  findAllSkills(filters: FilterSkillInput, pagination: PaginationArgs): [Skill!]!
-  findAllUsers(filters: FilterUserInput, pagination: PaginationArgs): [User!]!
+  findAllEducations(filters: FilterEducationInput, pagination: PaginationInput): [Education!]!
+  findAllExperiences(filters: FilterExperienceInput, pagination: PaginationInput): [Experience!]!
+  findAllOrganizations(filters: FilterOrganizationInput, pagination: PaginationInput): [Organization!]!
+  findAllProjects(filters: FilterProjectInput, pagination: PaginationInput): [Project!]!
+  findAllSkills(filters: FilterSkillInput, pagination: PaginationInput): [Skill!]!
+  findAllUsers(filters: FilterUserInput, pagination: PaginationInput): [User!]!
   findOneEducationById(id: ID!): Education!
   findOneExperienceById(id: ID!): Experience!
   findOneOrganizationById(id: ID!): Organization!
