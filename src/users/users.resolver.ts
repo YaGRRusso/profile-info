@@ -1,6 +1,8 @@
 import { Args, ID, Mutation, Query, Resolver } from "@nestjs/graphql";
 import { Public } from "@/core/decorators/public-route.decorator";
+import { PaginationArgs } from "@/core/dto/pagination.args";
 import { CreateUserInput } from "./dto/create-user.input";
+import { FilterUserInput } from "./dto/filter-user.input";
 import { UpdateUserInput } from "./dto/update-user.input";
 import { User } from "./entities/user.entity";
 import { UsersService } from "./users.service";
@@ -17,8 +19,14 @@ export class UsersResolver {
 
   @Public()
   @Query(() => [User])
-  findAllUsers() {
-    return this.usersService.findAll({});
+  findAllUsers(
+    @Args("filters", { nullable: true }) filters?: FilterUserInput,
+    @Args("pagination", { nullable: true }) pagination?: PaginationArgs
+  ) {
+    return this.usersService.findAll({
+      filters,
+      ...pagination,
+    });
   }
 
   @Public()

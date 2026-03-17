@@ -9,11 +9,13 @@ import {
   Resolver,
 } from "@nestjs/graphql";
 import { Public } from "@/core/decorators/public-route.decorator";
+import { PaginationArgs } from "@/core/dto/pagination.args";
 import type { Ctx } from "@/core/interfaces/context.interface";
 import { Organization } from "@/organizations/entities/organization.entity";
 import type { EducationModel } from "@/schemas/education.schema";
 import { Skill } from "@/skills/entities/skill.entity";
 import { CreateEducationInput } from "./dto/create-education.input";
+import { FilterEducationInput } from "./dto/filter-education.input";
 import { UpdateEducationInput } from "./dto/update-education.input";
 import { EducationsService } from "./educations.service";
 import { Education } from "./entities/education.entity";
@@ -32,8 +34,14 @@ export class EducationsResolver {
 
   @Public()
   @Query(() => [Education])
-  findAllEducations() {
-    return this.educationsService.findAll({});
+  findAllEducations(
+    @Args("filters", { nullable: true }) filters?: FilterEducationInput,
+    @Args("pagination", { nullable: true }) pagination?: PaginationArgs
+  ) {
+    return this.educationsService.findAll({
+      filters,
+      ...pagination,
+    });
   }
 
   @Public()

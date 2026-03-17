@@ -9,6 +9,7 @@ import {
   Resolver,
 } from "@nestjs/graphql";
 import { Public } from "@/core/decorators/public-route.decorator";
+import { PaginationArgs } from "@/core/dto/pagination.args";
 import { sortDateRange } from "@/core/helpers/daterange.helper";
 import type { Ctx } from "@/core/interfaces/context.interface";
 import { Organization } from "@/organizations/entities/organization.entity";
@@ -18,6 +19,7 @@ import type {
 } from "@/schemas/experience.schema";
 import { Skill } from "@/skills/entities/skill.entity";
 import { CreateExperienceInput } from "./dto/create-experience.input";
+import { FilterExperienceInput } from "./dto/filter-experience.input";
 import { UpdateExperienceInput } from "./dto/update-experience.input";
 import { Experience, ExperienceRole } from "./entities/experience.entity";
 import { ExperiencesService } from "./experiences.service";
@@ -36,8 +38,14 @@ export class ExperiencesResolver {
 
   @Public()
   @Query(() => [Experience])
-  findAllExperiences() {
-    return this.experiencesService.findAll({});
+  findAllExperiences(
+    @Args("filters", { nullable: true }) filters?: FilterExperienceInput,
+    @Args("pagination", { nullable: true }) pagination?: PaginationArgs
+  ) {
+    return this.experiencesService.findAll({
+      filters,
+      ...pagination,
+    });
   }
 
   @Public()

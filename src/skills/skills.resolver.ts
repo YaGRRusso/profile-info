@@ -1,6 +1,8 @@
 import { Args, ID, Mutation, Query, Resolver } from "@nestjs/graphql";
 import { Public } from "@/core/decorators/public-route.decorator";
+import { PaginationArgs } from "@/core/dto/pagination.args";
 import { CreateSkillInput } from "./dto/create-skill.input";
+import { FilterSkillInput } from "./dto/filter-skill-input";
 import { UpdateSkillInput } from "./dto/update-skill.input";
 import { Skill } from "./entities/skill.entity";
 import { SkillsService } from "./skills.service";
@@ -19,8 +21,14 @@ export class SkillsResolver {
 
   @Public()
   @Query(() => [Skill])
-  findAllSkills() {
-    return this.skillsService.findAll({});
+  findAllSkills(
+    @Args("filters", { nullable: true }) filters?: FilterSkillInput,
+    @Args("pagination", { nullable: true }) pagination?: PaginationArgs
+  ) {
+    return this.skillsService.findAll({
+      filters,
+      ...pagination,
+    });
   }
 
   @Public()

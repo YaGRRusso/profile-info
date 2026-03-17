@@ -161,6 +161,61 @@ type ExperienceTranslationLocale {
   messages: ExperienceMessages!
 }
 
+input FilterEducationInput {
+  category: String
+  hours: Int
+  i18n: [CreateEducationTranslationInput!]
+  image: String
+  organization: String
+  period: DateRangeInput
+  skills: [String!]
+  slug: String
+  status: String
+  url: String
+}
+
+input FilterExperienceInput {
+  category: String
+  organization: String
+  roles: [CreateExperienceRoleInput!]
+  slug: String
+}
+
+input FilterOrganizationInput {
+  category: String
+  logo: String
+  name: String
+  slug: String
+  website: String
+}
+
+input FilterProjectInput {
+  i18n: [CreateProjectMessagesInputTranslationInput!]
+  images: [String!]
+  skills: [String!]
+  slug: String
+  urls: [UrlInput!]
+}
+
+input FilterSkillInput {
+  category: String
+  name: String
+  slug: String
+}
+
+input FilterUserInput {
+  address: String
+  avatar: String
+  birth: String
+  email: String
+  name: String
+  nickname: String
+  password: String
+  phone: String
+  title: String
+  urls: [UrlInput!]
+}
+
 type Mutation {
   createEducation(createEducationInput: [CreateEducationInput!]!): [Education!]!
   createExperience(createExperienceInput: [CreateExperienceInput!]!): [Experience!]!
@@ -194,6 +249,11 @@ type Organization {
   website: String!
 }
 
+input PaginationArgs {
+  limit: Int = 10
+  skip: Int = 0
+}
+
 type Project {
   createdAt: DateTime!
   i18n: [ProjectMessagesTranslationEntity!]!
@@ -216,12 +276,12 @@ type ProjectMessagesTranslationEntity {
 }
 
 type Query {
-  findAllEducations: [Education!]!
-  findAllExperiences: [Experience!]!
-  findAllOrganizations: [Organization!]!
-  findAllProjects: [Project!]!
-  findAllSkills: [Skill!]!
-  findAllUsers: [User!]!
+  findAllEducations(filters: FilterEducationInput, pagination: PaginationArgs): [Education!]!
+  findAllExperiences(filters: FilterExperienceInput, pagination: PaginationArgs): [Experience!]!
+  findAllOrganizations(filters: FilterOrganizationInput, pagination: PaginationArgs): [Organization!]!
+  findAllProjects(filters: FilterProjectInput, pagination: PaginationArgs): [Project!]!
+  findAllSkills(filters: FilterSkillInput, pagination: PaginationArgs): [Skill!]!
+  findAllUsers(filters: FilterUserInput, pagination: PaginationArgs): [User!]!
   findOneEducationById(id: ID!): Education!
   findOneExperienceById(id: ID!): Experience!
   findOneOrganizationById(id: ID!): Organization!

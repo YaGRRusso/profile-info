@@ -9,10 +9,12 @@ import {
   Resolver,
 } from "@nestjs/graphql";
 import { Public } from "@/core/decorators/public-route.decorator";
+import { PaginationArgs } from "@/core/dto/pagination.args";
 import type { Ctx } from "@/core/interfaces/context.interface";
 import type { ProjectModel } from "@/schemas/project.schema";
 import { Skill } from "@/skills/entities/skill.entity";
 import { CreateProjectInput } from "./dto/create-project.input";
+import { FilterProjectInput } from "./dto/filter-project.input";
 import { UpdateProjectInput } from "./dto/update-project.input";
 import { Project } from "./entities/project.entity";
 import { ProjectsService } from "./projects.service";
@@ -31,8 +33,14 @@ export class ProjectsResolver {
 
   @Public()
   @Query(() => [Project])
-  findAllProjects() {
-    return this.projectsService.findAll({});
+  findAllProjects(
+    @Args("filters", { nullable: true }) filters?: FilterProjectInput,
+    @Args("pagination", { nullable: true }) pagination?: PaginationArgs
+  ) {
+    return this.projectsService.findAll({
+      filters,
+      ...pagination,
+    });
   }
 
   @Public()
