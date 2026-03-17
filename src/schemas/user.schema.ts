@@ -1,9 +1,10 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import type { HydratedDocument } from "mongoose";
+import { BaseModel } from "@/core/schemas/base.schema";
 import { UrlModel } from "@/core/schemas/url.schema";
 
 @Schema({ timestamps: true })
-export class UserModel {
+export class UserModel extends BaseModel {
   @Prop({ type: String })
   avatar?: string;
 

@@ -9,6 +9,7 @@ import {
   Resolver,
 } from "@nestjs/graphql";
 import { Public } from "@/core/decorators/public-route.decorator";
+import { BatchEntity } from "@/core/entities/batch.entity";
 import { sortDateRange } from "@/core/helpers/daterange.helper";
 import { PaginationInput } from "@/core/inputs/pagination.input";
 import type { Ctx } from "@/core/interfaces/context.interface";
@@ -28,25 +29,7 @@ import { ExperiencesService } from "./experiences.service";
 export class ExperiencesResolver {
   constructor(private readonly experiencesService: ExperiencesService) {}
 
-  @Mutation(() => [ExperienceEntity])
-  createExperience(
-    @Args("createExperienceInput", { type: () => [CreateExperienceInput] })
-    createExperienceInput: CreateExperienceInput[]
-  ) {
-    return this.experiencesService.create(createExperienceInput);
-  }
-
-  @Public()
-  @Query(() => [ExperienceEntity])
-  findAllExperiences(
-    @Args("filters", { nullable: true }) filters?: FilterExperienceInput,
-    @Args("pagination", { nullable: true }) pagination?: PaginationInput
-  ) {
-    return this.experiencesService.findAll({
-      filters,
-      ...pagination,
-    });
-  }
+  // QUERIES
 
   @Public()
   @Query(() => ExperienceEntity)
@@ -54,20 +37,91 @@ export class ExperiencesResolver {
     return this.experiencesService.findOneById(id);
   }
 
-  @Mutation(() => ExperienceEntity)
-  updateExperience(
-    @Args("updateExperienceInput") updateExperienceInput: UpdateExperienceInput
+  @Public()
+  @Query(() => ExperienceEntity)
+  findOneExperience(
+    @Args("filters", {
+      type: () => FilterExperienceInput,
+      nullable: true,
+    })
+    filters?: FilterExperienceInput
   ) {
-    return this.experiencesService.update(
-      updateExperienceInput.id,
-      updateExperienceInput
-    );
+    return this.experiencesService.findOne(filters);
+  }
+
+  @Public()
+  @Query(() => [ExperienceEntity])
+  findManyExperienceById(@Args("ids", { type: () => [ID] }) ids: string[]) {
+    return this.experiencesService.findManyById(ids);
+  }
+
+  @Public()
+  @Query(() => [ExperienceEntity])
+  findManyExperiences(
+    @Args("filters", {
+      type: () => FilterExperienceInput,
+      nullable: true,
+    })
+    filters?: FilterExperienceInput,
+    @Args("pagination", {
+      type: () => PaginationInput,
+      nullable: true,
+    })
+    pagination?: PaginationInput
+  ) {
+    return this.experiencesService.findMany({
+      filters,
+      ...pagination,
+    });
+  }
+
+  // MUTATIONS
+
+  @Mutation(() => ExperienceEntity)
+  createOneExperience(
+    @Args("createExperienceInput", { type: () => CreateExperienceInput })
+    createExperienceInput: CreateExperienceInput
+  ) {
+    return this.experiencesService.createOne(createExperienceInput);
   }
 
   @Mutation(() => [ExperienceEntity])
-  removeExperience(@Args("id", { type: () => ID }) id: string[]) {
-    return this.experiencesService.remove(id);
+  createManyExperiences(
+    @Args("createExperienceInputs", { type: () => [CreateExperienceInput] })
+    createExperienceInputs: CreateExperienceInput[]
+  ) {
+    return this.experiencesService.createMany(createExperienceInputs);
   }
+
+  @Mutation(() => ExperienceEntity)
+  updateOneExperience(
+    @Args("id", { type: () => ID }) id: string,
+    @Args("updateExperienceInput", { type: () => UpdateExperienceInput })
+    updateExperienceInput: UpdateExperienceInput
+  ) {
+    return this.experiencesService.updateOne(id, updateExperienceInput);
+  }
+
+  @Mutation(() => BatchEntity)
+  updateManyExperiences(
+    @Args("ids", { type: () => [ID] }) ids: string[],
+    @Args("updateExperienceInput", { type: () => UpdateExperienceInput })
+    updateExperienceInput: UpdateExperienceInput
+  ) {
+    return this.experiencesService.updateMany(ids, updateExperienceInput);
+  }
+
+  @Mutation(() => ExperienceEntity)
+  removeOneExperience(@Args("id", { type: () => ID }) id: string) {
+    return this.experiencesService.removeOne(id);
+  }
+
+  @Mutation(() => BatchEntity)
+  removeManyExperiences(@Args("ids", { type: () => [ID] }) ids: string[]) {
+    return this.experiencesService.removeMany(ids);
+  }
+
+  // RESOLVERS
 
   @ResolveField(() => [ExperienceRole])
   roles(@Parent() experience: ExperienceModel) {

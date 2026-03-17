@@ -1,5 +1,6 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import mongoose, { type HydratedDocument } from "mongoose";
+import { BaseModel } from "@/core/schemas/base.schema";
 import {
   createTranslationModel,
   TranslationModel,
@@ -17,7 +18,7 @@ export class ProjectMessagesModel {
 }
 
 @Schema({ timestamps: true })
-export class ProjectModel {
+export class ProjectModel extends BaseModel {
   @Prop({ type: Boolean, default: false })
   isFeatured: boolean;
 

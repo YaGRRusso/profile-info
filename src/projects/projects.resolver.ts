@@ -9,6 +9,7 @@ import {
   Resolver,
 } from "@nestjs/graphql";
 import { Public } from "@/core/decorators/public-route.decorator";
+import { BatchEntity } from "@/core/entities/batch.entity";
 import { PaginationInput } from "@/core/inputs/pagination.input";
 import type { Ctx } from "@/core/interfaces/context.interface";
 import type { ProjectModel } from "@/schemas/project.schema";
@@ -23,25 +24,7 @@ import { ProjectsService } from "./projects.service";
 export class ProjectsResolver {
   constructor(private readonly projectsService: ProjectsService) {}
 
-  @Mutation(() => [ProjectEntity])
-  createProject(
-    @Args("createProjectInput", { type: () => [CreateProjectInput] })
-    createProjectInput: CreateProjectInput[]
-  ) {
-    return this.projectsService.create(createProjectInput);
-  }
-
-  @Public()
-  @Query(() => [ProjectEntity])
-  findAllProjects(
-    @Args("filters", { nullable: true }) filters?: FilterProjectInput,
-    @Args("pagination", { nullable: true }) pagination?: PaginationInput
-  ) {
-    return this.projectsService.findAll({
-      filters,
-      ...pagination,
-    });
-  }
+  // QUERIES
 
   @Public()
   @Query(() => ProjectEntity)
@@ -49,20 +32,91 @@ export class ProjectsResolver {
     return this.projectsService.findOneById(id);
   }
 
-  @Mutation(() => ProjectEntity)
-  updateProject(
-    @Args("updateProjectInput") updateProjectInput: UpdateProjectInput
+  @Public()
+  @Query(() => ProjectEntity)
+  findOneProject(
+    @Args("filters", {
+      type: () => FilterProjectInput,
+      nullable: true,
+    })
+    filters?: FilterProjectInput
   ) {
-    return this.projectsService.update(
-      updateProjectInput.id,
-      updateProjectInput
-    );
+    return this.projectsService.findOne(filters);
+  }
+
+  @Public()
+  @Query(() => [ProjectEntity])
+  findManyProjectById(@Args("ids", { type: () => [ID] }) ids: string[]) {
+    return this.projectsService.findManyById(ids);
+  }
+
+  @Public()
+  @Query(() => [ProjectEntity])
+  findManyProjects(
+    @Args("filters", {
+      type: () => FilterProjectInput,
+      nullable: true,
+    })
+    filters?: FilterProjectInput,
+    @Args("pagination", {
+      type: () => PaginationInput,
+      nullable: true,
+    })
+    pagination?: PaginationInput
+  ) {
+    return this.projectsService.findMany({
+      filters,
+      ...pagination,
+    });
+  }
+
+  // MUTATIONS
+
+  @Mutation(() => ProjectEntity)
+  createOneProject(
+    @Args("createProjectInput", { type: () => CreateProjectInput })
+    createProjectInput: CreateProjectInput
+  ) {
+    return this.projectsService.createOne(createProjectInput);
   }
 
   @Mutation(() => [ProjectEntity])
-  removeProject(@Args("id", { type: () => ID }) id: string[]) {
-    return this.projectsService.remove(id);
+  createManyProjects(
+    @Args("createProjectInputs", { type: () => [CreateProjectInput] })
+    createProjectInputs: CreateProjectInput[]
+  ) {
+    return this.projectsService.createMany(createProjectInputs);
   }
+
+  @Mutation(() => ProjectEntity)
+  updateOneProject(
+    @Args("id", { type: () => ID }) id: string,
+    @Args("updateProjectInput", { type: () => UpdateProjectInput })
+    updateProjectInput: UpdateProjectInput
+  ) {
+    return this.projectsService.updateOne(id, updateProjectInput);
+  }
+
+  @Mutation(() => BatchEntity)
+  updateManyProjects(
+    @Args("ids", { type: () => [ID] }) ids: string[],
+    @Args("updateProjectInput", { type: () => UpdateProjectInput })
+    updateProjectInput: UpdateProjectInput
+  ) {
+    return this.projectsService.updateMany(ids, updateProjectInput);
+  }
+
+  @Mutation(() => ProjectEntity)
+  removeOneProject(@Args("id", { type: () => ID }) id: string) {
+    return this.projectsService.removeOne(id);
+  }
+
+  @Mutation(() => BatchEntity)
+  removeManyProjects(@Args("ids", { type: () => [ID] }) ids: string[]) {
+    return this.projectsService.removeMany(ids);
+  }
+
+  // RESOLVERS
 
   @ResolveField(() => [SkillEntity])
   skills(@Parent() project: ProjectModel, @Context() ctx: Ctx) {

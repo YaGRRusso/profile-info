@@ -1,8 +1,9 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { HydratedDocument } from "mongoose";
+import { BaseModel } from "@/core/schemas/base.schema";
 
 @Schema({ timestamps: true })
-export class OrganizationModel {
+export class OrganizationModel extends BaseModel {
   @Prop({ type: Boolean, default: false })
   isFeatured: boolean;
 

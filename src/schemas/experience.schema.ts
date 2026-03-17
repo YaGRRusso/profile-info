@@ -1,5 +1,6 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import mongoose, { type HydratedDocument } from "mongoose";
+import { BaseModel } from "@/core/schemas/base.schema";
 import { DateRangeModel } from "@/core/schemas/daterange.schema";
 import {
   createTranslationModel,
@@ -37,7 +38,7 @@ export class ExperienceRoleModel {
 }
 
 @Schema({ timestamps: true })
-export class ExperienceModel {
+export class ExperienceModel extends BaseModel {
   @Prop({ type: Boolean, default: false })
   isFeatured: boolean;
 
