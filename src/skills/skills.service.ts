@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import { Model } from "mongoose";
-import { clearFilters, clearSort } from "@/core/helpers/search.helper";
+import { clearObject } from "@/core/helpers/object.helper";
 import { Search } from "@/core/interfaces/search.interface";
 import { SkillModel } from "@/schemas/skill.schema";
 import { CreateSkillInput } from "./dto/create-skill.input";
@@ -23,8 +23,8 @@ export class SkillsService {
 
   async findAll({ filters, sort, skip = 0, limit = 10 }: Search<SkillModel>) {
     return await this.skillModel
-      .find(clearFilters(filters))
-      .sort(clearSort(sort))
+      .find(clearObject(filters))
+      .sort({ isFeatured: -1, updatedAt: -1, ...clearObject(sort) })
       .skip(skip)
       .limit(limit)
       .exec();

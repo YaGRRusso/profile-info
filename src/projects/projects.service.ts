@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import { Model } from "mongoose";
-import { clearFilters, clearSort } from "@/core/helpers/search.helper";
+import { clearObject } from "@/core/helpers/object.helper";
 import { Search } from "@/core/interfaces/search.interface";
 import { ProjectModel } from "@/schemas/project.schema";
 import { CreateProjectInput } from "./dto/create-project.input";
@@ -24,8 +24,8 @@ export class ProjectsService {
 
   async findAll({ filters, sort, skip = 0, limit = 10 }: Search<ProjectModel>) {
     return await this.projectModel
-      .find(clearFilters(filters))
-      .sort(clearSort(sort))
+      .find(clearObject(filters))
+      .sort({ isFeatured: -1, updatedAt: -1, ...clearObject(sort) })
       .skip(skip)
       .limit(limit)
       .exec();

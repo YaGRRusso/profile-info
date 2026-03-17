@@ -22,6 +22,9 @@ const ProjectTranslationInput = createTranslationInput(
 
 @InputType()
 export class CreateProjectInput {
+  @OptionalField(() => Boolean)
+  isFeatured?: boolean;
+
   @Field(() => String)
   slug: string;
 

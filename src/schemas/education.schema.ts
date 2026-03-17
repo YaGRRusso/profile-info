@@ -19,6 +19,9 @@ export class EducationMessagesModel {
 
 @Schema({ timestamps: true })
 export class EducationModel {
+  @Prop({ type: Boolean, default: false })
+  isFeatured: boolean;
+
   @Prop({ type: String, required: true, unique: true })
   slug: string;
 

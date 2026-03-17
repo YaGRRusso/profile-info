@@ -35,6 +35,9 @@ export class CreateExperienceRoleInput {
 
 @InputType()
 export class CreateExperienceInput {
+  @OptionalField(() => Boolean)
+  isFeatured?: boolean;
+
   @Field(() => String)
   slug: string;
 

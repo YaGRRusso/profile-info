@@ -18,6 +18,9 @@ export class ProjectMessagesModel {
 
 @Schema({ timestamps: true })
 export class ProjectModel {
+  @Prop({ type: Boolean, default: false })
+  isFeatured: boolean;
+
   @Prop({ type: String, required: true, unique: true })
   slug: string;
 

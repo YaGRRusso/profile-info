@@ -3,6 +3,9 @@ import type { HydratedDocument } from "mongoose";
 
 @Schema({ timestamps: true })
 export class SkillModel {
+  @Prop({ type: Boolean, default: false })
+  isFeatured: boolean;
+
   @Prop({ type: String, required: true, unique: true })
   slug: string;
 

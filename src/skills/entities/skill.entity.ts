@@ -4,6 +4,9 @@ import { SkillCategory } from "../enums/category.enum";
 
 @ObjectType()
 export class Skill extends BaseEntity {
+  @Field(() => Boolean)
+  isFeatured: boolean;
+
   @Field(() => String)
   slug: string;
 

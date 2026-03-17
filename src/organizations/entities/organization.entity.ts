@@ -4,6 +4,9 @@ import { OrganizationCategory } from "../enums/category.enum";
 
 @ObjectType()
 export class Organization extends BaseEntity {
+  @Field(() => Boolean)
+  isFeatured: boolean;
+
   @Field(() => String)
   slug: string;
 

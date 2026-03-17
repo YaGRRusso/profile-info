@@ -38,6 +38,9 @@ export class ExperienceRoleModel {
 
 @Schema({ timestamps: true })
 export class ExperienceModel {
+  @Prop({ type: Boolean, default: false })
+  isFeatured: boolean;
+
   @Prop({ type: String, required: true, unique: true })
   slug: string;
 

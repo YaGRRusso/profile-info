@@ -2,7 +2,7 @@ import { Injectable } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import { hash } from "bcryptjs";
 import { Model, QueryFilter } from "mongoose";
-import { clearFilters, clearSort } from "@/core/helpers/search.helper";
+import { clearObject } from "@/core/helpers/object.helper";
 import { Search } from "@/core/interfaces/search.interface";
 import { UserModel } from "@/schemas/user.schema";
 import { CreateUserInput } from "./dto/create-user.input";
@@ -24,8 +24,8 @@ export class UsersService {
 
   async findAll({ filters, sort, skip = 0, limit = 10 }: Search<UserModel>) {
     return await this.userModel
-      .find(clearFilters(filters))
-      .sort(clearSort(sort))
+      .find(clearObject(filters))
+      .sort({ updatedAt: -1, ...clearObject(sort) })
       .skip(skip)
       .limit(limit)
       .exec();

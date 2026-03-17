@@ -21,6 +21,9 @@ const ProjectTranslationEntity = createTranslationEntity(ProjectMessages);
 
 @ObjectType()
 export class Project extends BaseEntity {
+  @Field(() => Boolean)
+  isFeatured: boolean;
+
   @Field(() => String)
   slug: string;
 

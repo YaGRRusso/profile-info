@@ -7,6 +7,7 @@ input CreateEducationInput {
   hours: Int
   i18n: [CreateEducationTranslationInput!]!
   image: String
+  isFeatured: Boolean
   organization: String!
   period: DateRangeInput
   skills: [String!]
@@ -27,6 +28,7 @@ input CreateEducationTranslationInput {
 
 input CreateExperienceInput {
   category: ExperienceCategory!
+  isFeatured: Boolean
   organization: String!
   roles: [CreateExperienceRoleInput!]!
   slug: String!
@@ -50,6 +52,7 @@ input CreateExperienceTranslationInput {
 
 input CreateOrganizationInput {
   category: OrganizationCategory!
+  isFeatured: Boolean
   logo: String!
   name: String!
   slug: String!
@@ -59,6 +62,7 @@ input CreateOrganizationInput {
 input CreateProjectInput {
   i18n: [CreateProjectMessagesInputTranslationInput!]!
   images: [String!]
+  isFeatured: Boolean
   skills: [String!]
   slug: String!
   urls: [UrlInput!]
@@ -76,6 +80,7 @@ input CreateProjectMessagesInputTranslationInput {
 
 input CreateSkillInput {
   category: SkillCategory!
+  isFeatured: Boolean
   name: String!
   slug: String!
 }
@@ -115,6 +120,7 @@ type Education {
   i18n: [EducationTranslationLocale!]!
   id: ID!
   image: String
+  isFeatured: Boolean!
   organization: Organization!
   period: DateRangeEntity
   skills: [Skill!]
@@ -150,6 +156,7 @@ type Experience {
   category: ExperienceCategory!
   createdAt: DateTime!
   id: ID!
+  isFeatured: Boolean!
   organization: Organization!
   roles: [ExperienceRole!]!
   skills: [Skill!]
@@ -185,6 +192,7 @@ input FilterEducationInput {
   hours: Int
   i18n: [CreateEducationTranslationInput!]
   image: String
+  isFeatured: Boolean
   organization: String
   period: DateRangeInput
   skills: [String!]
@@ -195,6 +203,7 @@ input FilterEducationInput {
 
 input FilterExperienceInput {
   category: ExperienceCategory
+  isFeatured: Boolean
   organization: String
   roles: [CreateExperienceRoleInput!]
   slug: String
@@ -202,6 +211,7 @@ input FilterExperienceInput {
 
 input FilterOrganizationInput {
   category: OrganizationCategory
+  isFeatured: Boolean
   logo: String
   name: String
   slug: String
@@ -211,6 +221,7 @@ input FilterOrganizationInput {
 input FilterProjectInput {
   i18n: [CreateProjectMessagesInputTranslationInput!]
   images: [String!]
+  isFeatured: Boolean
   skills: [String!]
   slug: String
   urls: [UrlInput!]
@@ -218,6 +229,7 @@ input FilterProjectInput {
 
 input FilterSkillInput {
   category: SkillCategory
+  isFeatured: Boolean
   name: String
   slug: String
 }
@@ -261,6 +273,7 @@ type Organization {
   category: OrganizationCategory!
   createdAt: DateTime!
   id: ID!
+  isFeatured: Boolean!
   logo: String!
   name: String!
   slug: String!
@@ -284,6 +297,7 @@ type Project {
   i18n: [ProjectMessagesTranslationEntity!]!
   id: ID!
   images: [String!]
+  isFeatured: Boolean!
   skills: [Skill!]
   slug: String!
   updatedAt: DateTime!
@@ -325,6 +339,7 @@ type Skill {
   category: SkillCategory!
   createdAt: DateTime!
   id: ID!
+  isFeatured: Boolean!
   name: String!
   slug: String!
   updatedAt: DateTime!
@@ -341,6 +356,7 @@ input UpdateEducationInput {
   i18n: [CreateEducationTranslationInput!]
   id: ID!
   image: String
+  isFeatured: Boolean
   organization: String
   period: DateRangeInput
   skills: [String!]
@@ -352,6 +368,7 @@ input UpdateEducationInput {
 input UpdateExperienceInput {
   category: ExperienceCategory
   id: ID!
+  isFeatured: Boolean
   organization: String
   roles: [CreateExperienceRoleInput!]
   slug: String
@@ -360,6 +377,7 @@ input UpdateExperienceInput {
 input UpdateOrganizationInput {
   category: OrganizationCategory
   id: ID!
+  isFeatured: Boolean
   logo: String
   name: String
   slug: String
@@ -370,6 +388,7 @@ input UpdateProjectInput {
   i18n: [CreateProjectMessagesInputTranslationInput!]
   id: ID!
   images: [String!]
+  isFeatured: Boolean
   skills: [String!]
   slug: String
   urls: [UrlInput!]
@@ -378,6 +397,7 @@ input UpdateProjectInput {
 input UpdateSkillInput {
   category: SkillCategory
   id: ID!
+  isFeatured: Boolean
   name: String
   slug: String
 }
