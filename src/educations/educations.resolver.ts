@@ -42,7 +42,7 @@ export class EducationsResolver {
     })
     filters?: FilterEducationInput
   ) {
-    return this.educationsService.findOne(filters);
+    return this.educationsService.findOne({ filters });
   }
 
   @Public()

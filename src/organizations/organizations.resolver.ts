@@ -29,7 +29,7 @@ export class OrganizationsResolver {
     })
     filters?: FilterOrganizationInput
   ) {
-    return this.organizationsService.findOne(filters);
+    return this.organizationsService.findOne({ filters });
   }
 
   @Public()

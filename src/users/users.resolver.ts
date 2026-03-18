@@ -29,7 +29,7 @@ export class UsersResolver {
     })
     filters?: FilterUserInput
   ) {
-    return this.usersService.findOne(filters);
+    return this.usersService.findOne({ filters });
   }
 
   @Public()

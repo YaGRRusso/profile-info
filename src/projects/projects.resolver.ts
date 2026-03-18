@@ -41,7 +41,7 @@ export class ProjectsResolver {
     })
     filters?: FilterProjectInput
   ) {
-    return this.projectsService.findOne(filters);
+    return this.projectsService.findOne({ filters });
   }
 
   @Public()

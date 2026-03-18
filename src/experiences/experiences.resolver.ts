@@ -46,7 +46,7 @@ export class ExperiencesResolver {
     })
     filters?: FilterExperienceInput
   ) {
-    return this.experiencesService.findOne(filters);
+    return this.experiencesService.findOne({ filters });
   }
 
   @Public()

@@ -29,7 +29,7 @@ export class SkillsResolver {
     })
     filters?: FilterSkillInput
   ) {
-    return this.skillsService.findOne(filters);
+    return this.skillsService.findOne({ filters });
   }
 
   @Public()
