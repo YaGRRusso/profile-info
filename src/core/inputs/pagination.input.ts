@@ -7,7 +7,7 @@ export class PaginationInput {
   @OptionalField(() => Int, { defaultValue: 0, nullable: true })
   skip?: number;
 
-  @OptionalField(() => Int, { defaultValue: 10, nullable: true })
-  @Max(10)
+  @OptionalField(() => Int, { defaultValue: 50, nullable: true })
+  @Max(50)
   limit?: number;
 }

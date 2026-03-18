@@ -310,7 +310,7 @@ type OrganizationEntity {
 }
 
 input PaginationInput {
-  limit: Int = 10
+  limit: Int = 50
   skip: Int = 0
 }
 

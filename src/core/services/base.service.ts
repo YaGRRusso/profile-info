@@ -58,7 +58,7 @@ export abstract class BaseService<
     filters,
     sort,
     skip = 0,
-    limit = 10,
+    limit = 50,
   }: {
     filters?: QueryFilter<ModelType>;
     sort?: Partial<Record<keyof ModelType, SortOrder>>;
