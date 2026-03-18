@@ -1,8 +1,9 @@
 import { Prop, Schema } from "@nestjs/mongoose";
 
-@Schema({ _id: false })
+@Schema()
 export class BaseModel {
-  @Prop({ type: String, required: true })
+  // virtuals
+  _id: string;
   id: string;
 
   @Prop({ type: Date, required: true })

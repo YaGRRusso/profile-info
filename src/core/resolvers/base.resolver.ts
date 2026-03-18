@@ -17,6 +17,8 @@ export function BaseResolver<
   updateInputRef: Type<UpdateInputType>,
   filterInputRef: Type<FilterInputType>
 ) {
+  const entityName = entityRef.name.replace("Entity", "");
+
   @Resolver({ isAbstract: true })
   abstract class BaseResolverHost {
     protected constructor(
@@ -26,90 +28,99 @@ export function BaseResolver<
     // QUERIES
 
     @Public()
-    @Query(() => entityRef, { name: `findOne${entityRef.name}ById` })
+    @Query(() => entityRef, { name: `findOne${entityName}ById` })
     async findOneById(
-      @Args("id", { type: () => ID }) id: string
+      @Args(`${entityName}Id`, { type: () => ID }) id: string
     ): Promise<ModelType> {
       return await this.service.findOneById(id);
     }
 
     @Public()
-    @Query(() => entityRef, { name: `findOne${entityRef.name}` })
+    @Query(() => entityRef, { name: `findOne${entityName}` })
     async findOne(
-      @Args("filters", { type: () => filterInputRef, nullable: true })
+      @Args(`${entityName}Filters`, {
+        type: () => filterInputRef,
+        nullable: true,
+      })
       filters?: FilterInputType
     ): Promise<ModelType> {
-      return await this.service.findOne({ filters: filters as object });
+      return await this.service.findOne({ filters });
     }
 
     @Public()
-    @Query(() => [entityRef], { name: `findMany${entityRef.name}ById` })
+    @Query(() => [entityRef], { name: `findMany${entityName}ById` })
     async findManyById(
-      @Args("ids", { type: () => [ID] }) ids: string[]
+      @Args(`${entityName}Ids`, { type: () => [ID] }) ids: string[]
     ): Promise<ModelType[]> {
       return await this.service.findManyById(ids);
     }
 
     @Public()
-    @Query(() => [entityRef], { name: `findMany${entityRef.name}s` })
+    @Query(() => [entityRef], { name: `findMany${entityName}s` })
     async findMany(
-      @Args("filters", { type: () => filterInputRef, nullable: true })
+      @Args(`${entityName}Filters`, {
+        type: () => filterInputRef,
+        nullable: true,
+      })
       filters?: FilterInputType,
-      @Args("pagination", { type: () => PaginationInput, nullable: true })
+      @Args(`${entityName}Pagination`, {
+        type: () => PaginationInput,
+        nullable: true,
+      })
       pagination?: PaginationInput
     ): Promise<ModelType[]> {
       return await this.service.findMany({
-        filters: filters as object,
+        filters,
         ...pagination,
       });
     }
 
     // MUTATIONS
 
-    @Mutation(() => entityRef, { name: `createOne${entityRef.name}` })
+    @Mutation(() => entityRef, { name: `createOne${entityName}` })
     async createOne(
-      @Args(`create${entityRef.name}Input`, { type: () => createInputRef })
+      @Args(`create${entityName}Input`, { type: () => createInputRef })
       createInput: CreateInputType
     ): Promise<ModelType> {
       return await this.service.createOne(createInput);
     }
 
-    @Mutation(() => [entityRef], { name: `createMany${entityRef.name}s` })
+    @Mutation(() => [entityRef], { name: `createMany${entityName}s` })
     async createMany(
-      @Args(`create${entityRef.name}Inputs`, { type: () => [createInputRef] })
+      @Args(`create${entityName}Inputs`, { type: () => [createInputRef] })
       createInputs: CreateInputType[]
     ): Promise<ModelType[]> {
       return await this.service.createMany(createInputs);
     }
 
-    @Mutation(() => entityRef, { name: `updateOne${entityRef.name}` })
+    @Mutation(() => entityRef, { name: `updateOne${entityName}` })
     async updateOne(
-      @Args("id", { type: () => ID }) id: string,
-      @Args(`update${entityRef.name}Input`, { type: () => updateInputRef })
+      @Args(`${entityName}Id`, { type: () => ID }) id: string,
+      @Args(`update${entityName}Input`, { type: () => updateInputRef })
       updateInput: UpdateInputType
     ): Promise<ModelType> {
       return await this.service.updateOne(id, updateInput);
     }
 
-    @Mutation(() => BatchEntity, { name: `updateMany${entityRef.name}s` })
+    @Mutation(() => BatchEntity, { name: `updateMany${entityName}s` })
     async updateMany(
-      @Args("ids", { type: () => [ID] }) ids: string[],
-      @Args(`update${entityRef.name}Input`, { type: () => updateInputRef })
+      @Args(`${entityName}Ids`, { type: () => [ID] }) ids: string[],
+      @Args(`update${entityName}Input`, { type: () => updateInputRef })
       updateInput: UpdateInputType
     ): Promise<BatchEntity> {
       return await this.service.updateMany(ids, updateInput);
     }
 
-    @Mutation(() => entityRef, { name: `removeOne${entityRef.name}` })
+    @Mutation(() => entityRef, { name: `removeOne${entityName}` })
     async removeOne(
-      @Args("id", { type: () => ID }) id: string
+      @Args(`${entityName}Id`, { type: () => ID }) id: string
     ): Promise<ModelType> {
       return await this.service.removeOne(id);
     }
 
-    @Mutation(() => BatchEntity, { name: `removeMany${entityRef.name}s` })
+    @Mutation(() => BatchEntity, { name: `removeMany${entityName}s` })
     async removeMany(
-      @Args("ids", { type: () => [ID] }) ids: string[]
+      @Args(`${entityName}Ids`, { type: () => [ID] }) ids: string[]
     ): Promise<BatchEntity> {
       return await this.service.removeMany(ids);
     }

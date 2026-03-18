@@ -20,8 +20,6 @@ export class UsersResolver extends BaseResolver<
     super(usersService);
   }
 
-  // MUTATIONS
-
   @Public()
   @Mutation(() => UserEntity)
   async createOneUser(
