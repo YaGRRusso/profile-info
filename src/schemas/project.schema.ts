@@ -31,7 +31,7 @@ export class ProjectModel extends BaseModel {
   @Prop({
     type: [{ type: mongoose.Schema.Types.ObjectId, ref: SkillModel.name }],
   })
-  skills?: (SkillModel | mongoose.Types.ObjectId | string)[]; // reference on create and populate on query
+  skills?: mongoose.Types.ObjectId[];
 
   @Prop({
     type: [{ type: createTranslationModel(ProjectMessagesModel) }],

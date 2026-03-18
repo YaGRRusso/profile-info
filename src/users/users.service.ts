@@ -12,12 +12,10 @@ import { BaseService } from "@/core/services/base.service";
 import { UserModel } from "@/schemas/user.schema";
 import { CreateUserInput } from "./dto/create-user.input";
 import { UpdateUserInput } from "./dto/update-user.input";
-import { UserEntity } from "./entities/user.entity";
 
 @Injectable()
 export class UsersService extends BaseService<
   UserModel,
-  UserEntity,
   CreateUserInput,
   UpdateUserInput
 > {

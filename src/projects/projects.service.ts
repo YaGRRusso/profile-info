@@ -5,12 +5,10 @@ import { BaseService } from "@/core/services/base.service";
 import { ProjectModel } from "@/schemas/project.schema";
 import { CreateProjectInput } from "./dto/create-project.input";
 import { UpdateProjectInput } from "./dto/update-project.input";
-import { ProjectEntity } from "./entities/project.entity";
 
 @Injectable()
 export class ProjectsService extends BaseService<
   ProjectModel,
-  ProjectEntity,
   CreateProjectInput,
   UpdateProjectInput
 > {

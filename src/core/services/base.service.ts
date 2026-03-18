@@ -6,7 +6,6 @@ import { clearObject } from "@/core/helpers/object.helper";
 
 export abstract class BaseService<
   ModelType extends object,
-  EntityType extends object,
   CreateType extends object,
   UpdateType extends object,
 > {
@@ -14,33 +13,33 @@ export abstract class BaseService<
 
   // QUERIES
 
-  async findOneById(id: string): Promise<EntityType> {
+  async findOneById(id: string): Promise<ModelType> {
     const res = await this.model.findById(id).exec();
 
     if (isNil(res)) throw new NotFoundException("Not Found");
-    return res as unknown as EntityType;
+    return res;
   }
 
   async findOne({
     filters,
   }: {
     filters?: QueryFilter<ModelType>;
-  }): Promise<EntityType> {
+  }): Promise<ModelType> {
     const res = await this.model
       .findOne(clearObject(filters) as QueryFilter<ModelType>)
       .exec();
 
     if (isNil(res)) throw new NotFoundException("Not Found");
-    return res as unknown as EntityType;
+    return res;
   }
 
-  async findManyById(ids: string[]): Promise<EntityType[]> {
+  async findManyById(ids: string[]): Promise<ModelType[]> {
     const res = await this.model
       .find({ _id: { $in: ids } } as QueryFilter<ModelType>)
       .exec();
 
     if (isNil(res)) throw new NotFoundException("Not Found");
-    return res as unknown as EntityType[];
+    return res;
   }
 
   async findMany({
@@ -53,7 +52,7 @@ export abstract class BaseService<
     sort?: Partial<Record<keyof ModelType, SortOrder>>;
     limit?: number;
     skip?: number;
-  }): Promise<EntityType[]> {
+  }): Promise<ModelType[]> {
     const res = await this.model
       .find(clearObject(filters) as QueryFilter<ModelType>)
       .sort(clearObject(sort) as Record<keyof ModelType, SortOrder>)
@@ -62,32 +61,32 @@ export abstract class BaseService<
       .exec();
 
     if (isNil(res)) throw new NotFoundException("Not Found");
-    return res as unknown as EntityType[];
+    return res;
   }
 
   // MUTATIONS
 
-  async createOne(createInput: CreateType): Promise<EntityType> {
+  async createOne(createInput: CreateType): Promise<ModelType> {
     const res = await this.model.create(createInput as AnyKeys<ModelType>);
 
     if (isNil(res)) throw new BadRequestException("Not Created");
-    return res as unknown as EntityType;
+    return res;
   }
 
-  async createMany(createInputs: CreateType[]): Promise<EntityType[]> {
+  async createMany(createInputs: CreateType[]): Promise<ModelType[]> {
     const res = await this.model.create(createInputs as AnyKeys<ModelType>[]);
 
     if (isNil(res)) throw new BadRequestException("Not Created");
-    return res as unknown as EntityType[];
+    return res;
   }
 
-  async updateOne(id: string, updateInput: UpdateType): Promise<EntityType> {
+  async updateOne(id: string, updateInput: UpdateType): Promise<ModelType> {
     const res = await this.model
       .findByIdAndUpdate(id, updateInput as object as UpdateQuery<ModelType>)
       .exec();
 
     if (isNil(res)) throw new NotFoundException("Not Updated");
-    return res as unknown as EntityType;
+    return res;
   }
 
   async updateMany(
@@ -105,11 +104,11 @@ export abstract class BaseService<
     return { count: res.modifiedCount };
   }
 
-  async removeOne(id: string): Promise<EntityType> {
+  async removeOne(id: string): Promise<ModelType> {
     const res = await this.model.findByIdAndDelete(id).exec();
 
     if (isNil(res)) throw new NotFoundException("Not Removed");
-    return res as unknown as EntityType;
+    return res;
   }
 
   async removeMany(ids: string[]): Promise<BatchEntity> {

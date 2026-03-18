@@ -27,7 +27,7 @@ export class EducationModel extends BaseModel {
   slug: string;
 
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: OrganizationModel.name })
-  organization?: OrganizationModel | mongoose.Types.ObjectId | string; // reference on create and populate on query
+  organization?: mongoose.Types.ObjectId;
 
   @Prop({
     type: String,
@@ -63,7 +63,7 @@ export class EducationModel extends BaseModel {
   @Prop({
     type: [{ type: mongoose.Schema.Types.ObjectId, ref: SkillModel.name }],
   })
-  skills?: (SkillModel | mongoose.Types.ObjectId | string)[]; // reference on create and populate on query
+  skills?: mongoose.Types.ObjectId[];
 
   @Prop({
     type: SchemaFactory.createForClass(DateRangeModel),

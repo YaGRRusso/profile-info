@@ -5,12 +5,10 @@ import { BaseService } from "@/core/services/base.service";
 import { SkillModel } from "@/schemas/skill.schema";
 import { CreateSkillInput } from "./dto/create-skill.input";
 import { UpdateSkillInput } from "./dto/update-skill.input";
-import { SkillEntity } from "./entities/skill.entity";
 
 @Injectable()
 export class SkillsService extends BaseService<
   SkillModel,
-  SkillEntity,
   CreateSkillInput,
   UpdateSkillInput
 > {
