@@ -34,7 +34,7 @@ export class ExperienceRoleModel {
   @Prop({
     type: [{ type: mongoose.Schema.Types.ObjectId, ref: SkillModel.name }],
   })
-  skills?: mongoose.Types.ObjectId[];
+  skills?: (mongoose.Types.ObjectId | string)[];
 }
 
 @Schema({ timestamps: true })
@@ -46,7 +46,7 @@ export class ExperienceModel extends BaseModel {
   slug: string;
 
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: OrganizationModel.name })
-  organization?: mongoose.Types.ObjectId;
+  organization?: mongoose.Types.ObjectId | string;
 
   @Prop({
     type: String,
