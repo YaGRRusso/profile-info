@@ -1,12 +1,13 @@
-import { Field, InputType, Int } from "@nestjs/graphql";
+import { InputType, Int } from "@nestjs/graphql";
 import { Max } from "class-validator";
+import { OptionalField } from "../decorators/optional-field.decorator";
 
 @InputType()
 export class PaginationInput {
-  @Field(() => Int, { defaultValue: 0, nullable: true })
+  @OptionalField(() => Int, { defaultValue: 0, nullable: true })
   skip?: number;
 
-  @Field(() => Int, { defaultValue: 10, nullable: true })
+  @OptionalField(() => Int, { defaultValue: 10, nullable: true })
   @Max(10)
   limit?: number;
 }

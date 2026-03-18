@@ -1,6 +1,13 @@
 import { BadRequestException, NotFoundException } from "@nestjs/common";
 import { isNil } from "lodash";
-import { AnyKeys, Model, QueryFilter, SortOrder, UpdateQuery } from "mongoose";
+import {
+  AnyKeys,
+  isValidObjectId,
+  Model,
+  QueryFilter,
+  SortOrder,
+  UpdateQuery,
+} from "mongoose";
 import { BatchEntity } from "@/core/entities/batch.entity";
 import { clearObject } from "@/core/helpers/object.helper";
 
@@ -14,6 +21,8 @@ export abstract class BaseService<
   // QUERIES
 
   async findOneById(id: string): Promise<ModelType> {
+    if (!isValidObjectId(id)) throw new BadRequestException("Invalid ID");
+
     const res = await this.model.findById(id).exec();
 
     if (isNil(res)) throw new NotFoundException("Not Found");
@@ -34,6 +43,9 @@ export abstract class BaseService<
   }
 
   async findManyById(ids: string[]): Promise<ModelType[]> {
+    if (ids.some((id) => !isValidObjectId(id)))
+      throw new BadRequestException("Invalid ID");
+
     const res = await this.model
       .find({ _id: { $in: ids } } as QueryFilter<ModelType>)
       .exec();
@@ -81,6 +93,8 @@ export abstract class BaseService<
   }
 
   async updateOne(id: string, updateInput: UpdateType): Promise<ModelType> {
+    if (!isValidObjectId(id)) throw new BadRequestException("Invalid ID");
+
     const res = await this.model
       .findByIdAndUpdate(id, updateInput as object as UpdateQuery<ModelType>)
       .exec();
@@ -93,6 +107,9 @@ export abstract class BaseService<
     ids: string[],
     updateInput: UpdateType
   ): Promise<BatchEntity> {
+    if (ids.some((id) => !isValidObjectId(id)))
+      throw new BadRequestException("Invalid ID");
+
     const res = await this.model
       .updateMany(
         { _id: { $in: ids } } as QueryFilter<ModelType>,
@@ -105,6 +122,8 @@ export abstract class BaseService<
   }
 
   async removeOne(id: string): Promise<ModelType> {
+    if (!isValidObjectId(id)) throw new BadRequestException("Invalid ID");
+
     const res = await this.model.findByIdAndDelete(id).exec();
 
     if (isNil(res)) throw new NotFoundException("Not Removed");
@@ -112,6 +131,9 @@ export abstract class BaseService<
   }
 
   async removeMany(ids: string[]): Promise<BatchEntity> {
+    if (ids.some((id) => !isValidObjectId(id)))
+      throw new BadRequestException("Invalid ID");
+
     const res = await this.model
       .deleteMany({ _id: { $in: ids } } as QueryFilter<ModelType>)
       .exec();
