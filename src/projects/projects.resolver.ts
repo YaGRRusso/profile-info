@@ -5,6 +5,7 @@ import type { ProjectModel } from "@/schemas/project.schema";
 import { SkillEntity } from "@/skills/entities/skill.entity";
 import { CreateProjectInput } from "./dto/create-project.input";
 import { FilterProjectInput } from "./dto/filter-project.input";
+import { SortProjectInput } from "./dto/sort-project.input";
 import { UpdateProjectInput } from "./dto/update-project.input";
 import { ProjectEntity } from "./entities/project.entity";
 import { ProjectsService } from "./projects.service";
@@ -15,8 +16,15 @@ export class ProjectsResolver extends BaseResolver<
   ProjectEntity,
   CreateProjectInput,
   UpdateProjectInput,
-  FilterProjectInput
->(ProjectEntity, CreateProjectInput, UpdateProjectInput, FilterProjectInput) {
+  FilterProjectInput,
+  SortProjectInput
+>(
+  ProjectEntity,
+  CreateProjectInput,
+  UpdateProjectInput,
+  FilterProjectInput,
+  SortProjectInput
+) {
   constructor(readonly projectsService: ProjectsService) {
     super(projectsService);
   }

@@ -11,11 +11,13 @@ export function BaseResolver<
   CreateInputType extends object,
   UpdateInputType extends object,
   FilterInputType extends object,
+  SortInputType extends object,
 >(
   entityRef: Type<EntityType>,
   createInputRef: Type<CreateInputType>,
   updateInputRef: Type<UpdateInputType>,
-  filterInputRef: Type<FilterInputType>
+  filterInputRef: Type<FilterInputType>,
+  sortInputRef: Type<SortInputType>
 ) {
   const entityName = entityRef.name.replace("Entity", "");
 
@@ -67,10 +69,16 @@ export function BaseResolver<
         type: () => PaginationInput,
         nullable: true,
       })
-      pagination?: PaginationInput
+      pagination?: PaginationInput,
+      @Args(`${entityName}Sort`, {
+        type: () => sortInputRef,
+        nullable: true,
+      })
+      sort?: SortInputType
     ): Promise<ModelType[]> {
       return await this.service.findMany({
         filters,
+        sort,
         ...pagination,
       });
     }

@@ -10,6 +10,7 @@ import {
 import { SkillEntity } from "@/skills/entities/skill.entity";
 import { CreateExperienceInput } from "./dto/create-experience.input";
 import { FilterExperienceInput } from "./dto/filter-experience.input";
+import { SortExperienceInput } from "./dto/sort-experience.input";
 import { UpdateExperienceInput } from "./dto/update-experience.input";
 import { ExperienceEntity, ExperienceRole } from "./entities/experience.entity";
 import { ExperiencesService } from "./experiences.service";
@@ -20,12 +21,14 @@ export class ExperiencesResolver extends BaseResolver<
   ExperienceEntity,
   CreateExperienceInput,
   UpdateExperienceInput,
-  FilterExperienceInput
+  FilterExperienceInput,
+  SortExperienceInput
 >(
   ExperienceEntity,
   CreateExperienceInput,
   UpdateExperienceInput,
-  FilterExperienceInput
+  FilterExperienceInput,
+  SortExperienceInput
 ) {
   constructor(readonly experiencesService: ExperiencesService) {
     super(experiencesService);

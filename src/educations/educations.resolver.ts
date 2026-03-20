@@ -6,6 +6,7 @@ import { EducationModel } from "@/schemas/education.schema";
 import { SkillEntity } from "@/skills/entities/skill.entity";
 import { CreateEducationInput } from "./dto/create-education.input";
 import { FilterEducationInput } from "./dto/filter-education.input";
+import { SortEducationInput } from "./dto/sort-education.input";
 import { UpdateEducationInput } from "./dto/update-education.input";
 import { EducationsService } from "./educations.service";
 import { EducationEntity } from "./entities/education.entity";
@@ -16,12 +17,14 @@ export class EducationsResolver extends BaseResolver<
   EducationEntity,
   CreateEducationInput,
   UpdateEducationInput,
-  FilterEducationInput
+  FilterEducationInput,
+  SortEducationInput
 >(
   EducationEntity,
   CreateEducationInput,
   UpdateEducationInput,
-  FilterEducationInput
+  FilterEducationInput,
+  SortEducationInput
 ) {
   constructor(readonly educationsService: EducationsService) {
     super(educationsService);
