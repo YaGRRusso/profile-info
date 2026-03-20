@@ -25,8 +25,8 @@ export class CreateEducationTranslationInput {
 
 @InputType()
 export class CreateEducationInput {
-  @OptionalField(() => Boolean)
-  isFeatured?: boolean;
+  @OptionalField(() => Number)
+  relevance?: number;
 
   @Field(() => String)
   slug: string;

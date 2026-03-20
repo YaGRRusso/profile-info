@@ -4,8 +4,8 @@ import { BaseModel } from "@/core/schemas/base.schema";
 
 @Schema({ timestamps: true })
 export class OrganizationModel extends BaseModel {
-  @Prop({ type: Boolean, default: false })
-  isFeatured: boolean;
+  @Prop({ type: Number })
+  relevance?: number;
 
   @Prop({ type: String, required: true, unique: true })
   slug: string;

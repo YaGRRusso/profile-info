@@ -4,8 +4,8 @@ import { SkillCategory } from "../enums/category.enum";
 
 @InputType()
 export class CreateSkillInput {
-  @OptionalField(() => Boolean)
-  isFeatured?: boolean;
+  @OptionalField(() => Number)
+  relevance?: number;
 
   @Field(() => String)
   slug: string;

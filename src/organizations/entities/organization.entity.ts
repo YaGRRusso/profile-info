@@ -1,11 +1,12 @@
 import { Field, ObjectType } from "@nestjs/graphql";
+import { OptionalField } from "@/core/decorators/optional-field.decorator";
 import { BaseEntity } from "@/core/entities/base.entity";
 import { OrganizationCategory } from "../enums/category.enum";
 
 @ObjectType()
 export class OrganizationEntity extends BaseEntity {
-  @Field(() => Boolean)
-  isFeatured: boolean;
+  @OptionalField(() => Number)
+  relevance?: number;
 
   @Field(() => String)
   slug: string;

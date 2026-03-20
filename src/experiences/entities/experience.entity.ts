@@ -38,8 +38,8 @@ export class ExperienceRole {
 
 @ObjectType()
 export class ExperienceEntity extends BaseEntity {
-  @Field(() => Boolean)
-  isFeatured: boolean;
+  @OptionalField(() => Number)
+  relevance?: number;
 
   @Field(() => String)
   slug: string;

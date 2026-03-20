@@ -27,8 +27,8 @@ export class EducationTranslationLocale {
 
 @ObjectType()
 export class EducationEntity extends BaseEntity {
-  @Field(() => Boolean)
-  isFeatured: boolean;
+  @OptionalField(() => Number)
+  relevance?: number;
 
   @Field(() => String)
   slug: string;

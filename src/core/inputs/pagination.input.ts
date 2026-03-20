@@ -4,10 +4,10 @@ import { OptionalField } from "../decorators/optional-field.decorator";
 
 @InputType()
 export class PaginationInput {
-  @OptionalField(() => Int, { defaultValue: 0, nullable: true })
+  @OptionalField(() => Int)
   skip?: number;
 
-  @OptionalField(() => Int, { defaultValue: 50, nullable: true })
+  @OptionalField(() => Int)
   @Max(50)
   limit?: number;
 }
