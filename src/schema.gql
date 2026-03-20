@@ -387,7 +387,6 @@ type SkillEntity {
 input SortEducationInput {
   createdAt: SortEnum
   relevance: SortEnum
-  title: SortEnum
   updatedAt: SortEnum
 }
 
@@ -412,7 +411,6 @@ input SortOrganizationInput {
 input SortProjectInput {
   createdAt: SortEnum
   relevance: SortEnum
-  slug: SortEnum
   updatedAt: SortEnum
 }
 

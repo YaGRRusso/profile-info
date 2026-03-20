@@ -1,18 +1,11 @@
 import { InputType } from "@nestjs/graphql";
-import { OptionalField } from "@/core/decorators/optional-field.decorator";
-import { SortEnum } from "@/core/enums/sort.enum";
+import { SortType } from "@/core/inputs/sort.input";
+import { OrganizationEntity } from "../entities/organization.entity";
 
 @InputType()
-export class SortOrganizationInput {
-  @OptionalField(() => SortEnum)
-  name?: SortEnum;
-
-  @OptionalField(() => SortEnum)
-  relevance?: SortEnum;
-
-  @OptionalField(() => SortEnum)
-  createdAt?: SortEnum;
-
-  @OptionalField(() => SortEnum)
-  updatedAt?: SortEnum;
-}
+export class SortOrganizationInput extends SortType(OrganizationEntity, [
+  "name",
+  "relevance",
+  "createdAt",
+  "updatedAt",
+]) {}
