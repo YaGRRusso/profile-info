@@ -370,7 +370,14 @@ input SignInInput {
 }
 
 enum SkillCategory {
-  HARD
+  BACKEND
+  CONCEPTS
+  DATA
+  DESIGN
+  DEVOPS
+  FRONTEND
+  LANGUAGE
+  QUALITY
   SOFT
 }
 

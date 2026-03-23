@@ -13,7 +13,22 @@ export class SkillModel extends BaseModel {
   @Prop({ type: String, required: true })
   name: string;
 
-  @Prop({ type: String, required: true, enum: ["HARD", "SOFT"], index: true })
+  @Prop({
+    type: String,
+    required: true,
+    enum: [
+      "LANGUAGE",
+      "FRONTEND",
+      "BACKEND",
+      "DATA",
+      "DEVOPS",
+      "QUALITY",
+      "DESIGN",
+      "CONCEPTS",
+      "SOFT",
+    ],
+    index: true,
+  })
   category: string;
 }
 

@@ -1,7 +1,14 @@
 import { registerEnumType } from "@nestjs/graphql";
 
 export enum SkillCategory {
-  HARD = "HARD",
+  LANGUAGE = "LANGUAGE",
+  FRONTEND = "FRONTEND",
+  BACKEND = "BACKEND",
+  DATA = "DATA",
+  DEVOPS = "DEVOPS",
+  QUALITY = "QUALITY",
+  DESIGN = "DESIGN",
+  CONCEPTS = "CONCEPTS",
   SOFT = "SOFT",
 }
 
