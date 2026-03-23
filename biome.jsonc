@@ -7,7 +7,8 @@
   "javascript": {
     "parser": {
       "unsafeParameterDecoratorsEnabled": true
-    }
+    },
+    "globals": []
   },
   "linter": {
     "enabled": true,
@@ -30,5 +31,34 @@
         "organizeImports": "on"
       }
     }
-  }
+  },
+  "overrides": [
+    {
+      "includes": ["**/*.spec.ts", "**/*.test.ts"],
+      "javascript": {
+        "globals": [
+          "jest",
+          "describe",
+          "it",
+          "test",
+          "expect",
+          "beforeEach",
+          "afterEach",
+          "beforeAll",
+          "afterAll"
+        ]
+      },
+      "linter": {
+        "rules": {
+          "correctness": {
+            "noUndeclaredVariables": "off"
+          },
+          "complexity": {
+            "noUselessConstructor": "off"
+          }
+       }
+      }
+    }
+  ]
 }
+
