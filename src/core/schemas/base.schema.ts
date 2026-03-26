@@ -6,9 +6,9 @@ export class BaseModel {
   _id: string;
   id: string;
 
-  @Prop({ type: Date, required: true })
+  @Prop({ type: Date, required: true, default: Date.now })
   createdAt: Date;
 
-  @Prop({ type: Date, required: true })
+  @Prop({ type: Date, required: true, default: Date.now })
   updatedAt: Date;
 }
