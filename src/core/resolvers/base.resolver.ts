@@ -4,6 +4,10 @@ import { Public } from "@/core/decorators/public-route.decorator";
 import { BatchEntity } from "@/core/entities/batch.entity";
 import { PaginationInput } from "@/core/inputs/pagination.input";
 import { BaseService } from "@/core/services/base.service";
+import {
+  createPaginatedModel,
+  PaginatedModel,
+} from "../schemas/paginated.schema";
 
 export function BaseResolver<
   ModelType extends object,
@@ -20,6 +24,7 @@ export function BaseResolver<
   sortInputRef: Type<SortInputType>
 ) {
   const entityName = entityRef.name.replace("Entity", "");
+  const PaginatedEntity = createPaginatedModel(entityRef);
 
   @Resolver({ isAbstract: true })
   abstract class BaseResolverHost {
@@ -58,7 +63,9 @@ export function BaseResolver<
     }
 
     @Public()
-    @Query(() => [entityRef], { name: `findMany${entityName}s` })
+    @Query(() => PaginatedEntity, {
+      name: `findMany${entityName}s`,
+    })
     async findMany(
       @Args(`${entityName}Filters`, {
         type: () => filterInputRef,
@@ -75,7 +82,7 @@ export function BaseResolver<
         nullable: true,
       })
       sort?: SortInputType
-    ): Promise<ModelType[]> {
+    ): Promise<PaginatedModel<ModelType>> {
       return await this.service.findMany({
         filters,
         sort,

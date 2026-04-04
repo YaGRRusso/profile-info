@@ -10,6 +10,7 @@ import {
 } from "mongoose";
 import { BatchEntity } from "@/core/entities/batch.entity";
 import { clearObject } from "@/core/helpers/object.helper";
+import { PaginatedModel } from "../schemas/paginated.schema";
 
 export abstract class BaseService<
   ModelType extends object,
@@ -64,16 +65,23 @@ export abstract class BaseService<
     sort?: Partial<Record<keyof ModelType, SortOrder>>;
     limit?: number;
     skip?: number;
-  }): Promise<ModelType[]> {
-    const res = await this.model
+  }): Promise<PaginatedModel<ModelType>> {
+    const nodes = await this.model
       .find(clearObject(filters) as QueryFilter<ModelType>)
       .sort(clearObject(sort) as Record<keyof ModelType, SortOrder>)
       .skip(skip)
       .limit(limit)
       .exec();
 
-    if (isNil(res)) throw new NotFoundException("Not Found");
-    return res;
+    const found = await this.model
+      .countDocuments(clearObject(filters) as QueryFilter<ModelType>)
+      .exec();
+
+    if (isNil(nodes) || isNil(found)) throw new NotFoundException("Not Found");
+    return {
+      nodes,
+      found,
+    };
   }
 
   // MUTATIONS

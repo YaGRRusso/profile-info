@@ -8,7 +8,7 @@ export interface TranslationModel<T> {
 
 export function createTranslationModel<T>(MessagesModel: Type<T>) {
   @Schema({ _id: false })
-  class TranslationModel {
+  class TranslationModelClass implements TranslationModel<T> {
     @Prop({ type: String, required: true })
     locale: string;
 
@@ -16,5 +16,5 @@ export function createTranslationModel<T>(MessagesModel: Type<T>) {
     messages: T;
   }
 
-  return SchemaFactory.createForClass(TranslationModel);
+  return SchemaFactory.createForClass(TranslationModelClass);
 }
