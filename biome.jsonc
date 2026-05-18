@@ -1,8 +1,12 @@
 {
   "$schema": "./node_modules/@biomejs/biome/configuration_schema.json",
-  "extends": ["ultracite/core", "ultracite/next", "ultracite/react"],
+  "extends": [
+    "ultracite/biome/core",
+    "ultracite/biome/nestjs",
+    "ultracite/biome/jest"
+  ],
   "files": {
-    "includes": ["!!**/dist", "!!**/node_modules", "!!**/graphql"]
+    "includes": ["!!**/dist", "!!**/node_modules", "!!**/graphql", "!!**/gql"]
   },
   "javascript": {
     "parser": {
@@ -56,9 +60,8 @@
           "complexity": {
             "noUselessConstructor": "off"
           }
-       }
+        }
       }
     }
   ]
 }
-
