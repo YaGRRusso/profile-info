@@ -13,7 +13,7 @@
     "apps/*"
   ],
   "scripts": {
-    "prepare": "husky",
+    "prepare": "husky || true",
     "build": "npm run build --workspaces --if-present",
     "start": "npm run start --workspaces --if-present",
     "start:dev": "npm run start:dev --workspaces --if-present",
@@ -23,6 +23,11 @@
     "test:watch": "npm run test:watch --workspaces --if-present",
     "test:cov": "npm run test:cov --workspaces --if-present",
     "test:e2e": "npm run test:e2e --workspaces --if-present",
+    "api:dev": "npm run start:dev -w apps/api",
+    "api:build": "npm run build -w apps/api",
+    "admin:dev": "npm run dev -w apps/admin",
+    "admin:build": "npm run build -w apps/admin",
+    "admin:preview": "npm run preview -w apps/admin",
     "lint": "biome check .",
     "format": "biome format --write ."
   },
