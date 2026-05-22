@@ -7,20 +7,20 @@ services:
     volumes:
       - profile:/data/db
 
-  api:
-    build: ./apps/api
-    container_name: profile-info-api
-    ports:
-      - "8080:8080"
-    # env_file:
-    #   - .env
-    environment:
-      - DATABASE_URL=mongodb://db:27017/profile
-      - JWT_SECRET=ecstasy
-      - HOST=0.0.0.0
-      - PORT=8080
-    depends_on:
-      - db
+  # api:
+  #   build: ./apps/api
+  #   container_name: profile-info-api
+  #   ports:
+  #     - "8080:8080"
+  #   # env_file:
+  #   #   - .env
+  #   environment:
+  #     - DATABASE_URL=mongodb://db:27017/profile
+  #     - JWT_SECRET=ecstasy
+  #     - HOST=0.0.0.0
+  #     - PORT=8080
+  #   depends_on:
+  #     - db
 
 volumes:
   profile:
