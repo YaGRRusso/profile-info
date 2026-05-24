@@ -1,4 +1,6 @@
+import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
+import { cn } from "@/lib/cn";
 
 type ApiStatus = "loading" | "online" | "offline";
 
@@ -9,12 +11,16 @@ const STATUS_LABEL: Record<ApiStatus, string> = {
 };
 
 const STATUS_STYLE: Record<ApiStatus, string> = {
-  loading: "bg-zinc-800 text-zinc-400 ring-zinc-700",
-  online: "bg-emerald-950 text-emerald-400 ring-emerald-900",
-  offline: "bg-red-950 text-red-400 ring-red-900",
+  loading: "",
+  online: "badge-success",
+  offline: "badge-error",
 };
 
-export function App() {
+export const Route = createFileRoute("/_authenticated/")({
+  component: RouteComponent,
+});
+
+function RouteComponent() {
   const [status, setStatus] = useState<ApiStatus>("loading");
 
   useEffect(() => {
@@ -33,18 +39,11 @@ export function App() {
   }, []);
 
   return (
-    <main className="grid min-h-dvh place-items-center bg-zinc-950 text-zinc-100">
-      <div className="space-y-4 text-center">
-        <div className="space-y-1">
-          <h1 className="font-semibold text-3xl tracking-tight">Admin Panel</h1>
-          <p className="text-sm text-zinc-500">profile-info</p>
-        </div>
-        <span
-          className={`inline-block rounded-full px-3 py-1 text-xs ring-1 ring-inset ${STATUS_STYLE[status]}`}
-        >
-          {STATUS_LABEL[status]}
-        </span>
-      </div>
+    <main className="flex h-screen flex-col items-center justify-center gap-4">
+      <h1 className="font-semibold text-3xl">Admin Panel</h1>
+      <span className={cn("badge badge-soft", STATUS_STYLE[status])}>
+        {STATUS_LABEL[status]}
+      </span>
     </main>
   );
 }

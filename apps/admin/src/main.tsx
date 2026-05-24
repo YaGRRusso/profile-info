@@ -1,16 +1,47 @@
+import { IconContext } from "@phosphor-icons/react";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { createRouter, RouterProvider } from "@tanstack/react-router";
 import { StrictMode } from "react";
-import { createRoot } from "react-dom/client";
-import { App } from "@/app";
-import "@/styles/globals.css";
+import ReactDOM from "react-dom/client";
+import { routeTree } from "./routeTree.gen";
 
-const rootElement = document.getElementById("root");
+import "./styles/globals.css";
 
-if (!rootElement) {
-  throw new Error("Root element #root not found");
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      refetchOnWindowFocus: false,
+      retryDelay: 1000 * 60,
+    },
+    mutations: {
+      retryDelay: 1000 * 60,
+    },
+  },
+});
+
+const router = createRouter({
+  routeTree,
+  scrollRestoration: true,
+  context: { queryClient },
+});
+
+declare module "@tanstack/react-router" {
+  interface Register {
+    router: typeof router;
+  }
 }
 
-createRoot(rootElement).render(
-  <StrictMode>
-    <App />
-  </StrictMode>
-);
+// biome-ignore lint/style/noNonNullAssertion: generated
+const rootElement = document.getElementById("root")!;
+if (!rootElement.innerHTML) {
+  const root = ReactDOM.createRoot(rootElement);
+  root.render(
+    <StrictMode>
+      <QueryClientProvider client={queryClient}>
+        <IconContext.Provider value={{ weight: "bold" }}>
+          <RouterProvider router={router} />
+        </IconContext.Provider>
+      </QueryClientProvider>
+    </StrictMode>
+  );
+}
