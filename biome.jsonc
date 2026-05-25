@@ -37,9 +37,6 @@
       },
       "suspicious": {
         "noExplicitAny": "warn"
-      },
-      "correctness": {
-        "noChildrenProp": "off"
       }
     }
   },

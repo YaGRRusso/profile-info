@@ -34,7 +34,7 @@ function RouteComponent() {
     return (
       <main className="container flex h-screen items-center justify-center">
         <div className="flex w-full max-w-xl flex-wrap rounded bg-base-200">
-          <div className="min-w-32 flex-1 opacity-80">
+          <div className="min-w-32 flex-1">
             <img
               alt="illustration"
               className="h-full w-full rounded object-cover"
