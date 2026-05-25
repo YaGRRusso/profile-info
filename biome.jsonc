@@ -29,7 +29,8 @@
         "useImportType": "off",
         "useBlockStatements": "off",
         "noParameterProperties": "off",
-        "noEnum": "off"
+        "noEnum": "off",
+        "noNonNullAssertion": "off"
       },
       "complexity": {
         "useSimplifiedLogicExpression": "off"
