@@ -6,7 +6,14 @@
     "ultracite/biome/jest"
   ],
   "files": {
-    "includes": ["!!**/dist", "!!**/node_modules", "!!**/graphql", "!!**/gql"]
+    "includes": [
+      "!!**/dist",
+      "!!**/node_modules",
+      "!!**/graphql",
+      "!!**/*.graphql",
+      "!!**/gql",
+      "!!**/out"
+    ]
   },
   "javascript": {
     "parser": {
