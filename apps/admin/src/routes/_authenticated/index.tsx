@@ -15,10 +15,10 @@ function RouteComponent() {
       <span
         className={cn(
           "badge badge-soft",
-          apiStatus.data ? "badge-success" : "badge-error"
+          apiStatus.isSuccess ? "badge-success" : "badge-error"
         )}
       >
-        {apiStatus.data ? "Online" : "Offline"}
+        {apiStatus.isSuccess ? "Online" : "Offline"}
       </span>
     </main>
   );
