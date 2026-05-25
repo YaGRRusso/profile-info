@@ -4,6 +4,7 @@ import { createRouter, RouterProvider } from "@tanstack/react-router";
 import { StrictMode } from "react";
 import ReactDOM from "react-dom/client";
 import { ToastContainer } from "react-toastify";
+import { useAuthStore } from "@/stores/auth";
 import { routeTree } from "./routeTree.gen";
 
 import "./styles/globals.css";
@@ -18,6 +19,10 @@ const queryClient = new QueryClient({
       retryDelay: 1000 * 60,
     },
   },
+});
+
+useAuthStore.subscribe((state, prev) => {
+  if (prev.token && !state.token) queryClient.clear();
 });
 
 const router = createRouter({

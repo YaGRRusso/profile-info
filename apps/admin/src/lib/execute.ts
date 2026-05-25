@@ -32,6 +32,11 @@ export async function execute<Result, Variables>(
 
   if (!response) throw new Error("no response returned");
 
+  if (response.status === 401) {
+    useAuthStore.getState().clearAuth();
+    throw new Error("session expired");
+  }
+
   if (!response.ok) {
     throw new Error(
       `failed to fetch: ${response.status} ${response.statusText}`

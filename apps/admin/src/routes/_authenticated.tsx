@@ -15,10 +15,10 @@ function RouteComponent() {
 
   const signIn = useSignIn();
   const getMe = useGetMe({ enabled: !!token });
+  const user = getMe.data?.getMe;
 
   useEffect(() => {
-    if (getMe.data?.getMe) {
-      const user = getMe.data.getMe;
+    if (user) {
       setUser({
         avatar: user.avatar,
         email: user.email,
@@ -28,7 +28,7 @@ function RouteComponent() {
         role: user.role,
       });
     }
-  }, [getMe.data, setUser]);
+  }, [user, setUser]);
 
   if (!token) {
     return (
