@@ -1,12 +1,9 @@
-type Unwrap<T> = T[keyof T];
+type Unwrap<Result extends object> = Result[keyof Result];
 
-export function unwrap<T extends Record<string, unknown>>(
-  object: T
-): Unwrap<T> {
-  if (object) {
-    const key = Object.keys(object)[0];
-    return object[key] as Unwrap<T>;
-  }
-
-  return {} as Unwrap<T>;
+export function unwrap<Result extends object>(
+  object: Result | null | undefined
+): Unwrap<Result> | undefined {
+  if (!object) return;
+  const key = Object.keys(object)[0] as keyof Result;
+  return object[key] as Unwrap<Result>;
 }

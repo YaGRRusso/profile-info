@@ -1,6 +1,5 @@
 import type { UseQueryOptions } from "@tanstack/react-query";
 import { useQuery } from "@tanstack/react-query";
-import type { ExecutionResult } from "graphql";
 import { graphql } from "@/graphql";
 import type { GetMeQuery } from "@/graphql/graphql";
 import { execute } from "@/lib/execute";
@@ -19,12 +18,9 @@ const getMe = graphql(`
   }
 `);
 
-type GetMeOptions = Omit<
-  UseQueryOptions<ExecutionResult<GetMeQuery>>,
-  "queryKey" | "queryFn"
->;
-
-export function useGetMe(options?: GetMeOptions) {
+export function useGetMe(
+  options?: Omit<UseQueryOptions<GetMeQuery>, "queryKey" | "queryFn">
+) {
   return useQuery({
     queryKey: ["getMe"],
     queryFn: async () => await execute(getMe),

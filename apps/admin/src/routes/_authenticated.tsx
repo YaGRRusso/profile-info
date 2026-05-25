@@ -16,8 +16,8 @@ function RouteComponent() {
   const getMe = useGetMe({ enabled: !!token });
 
   useEffect(() => {
-    if (getMe.data?.data?.getMe) {
-      const user = getMe.data.data.getMe;
+    if (getMe.data?.getMe) {
+      const user = getMe.data.getMe;
       setUser({
         avatar: user.avatar,
         email: user.email,
@@ -40,8 +40,7 @@ function RouteComponent() {
               signIn.mutate(
                 { email, password },
                 {
-                  onSuccess: ({ data }) =>
-                    data?.signIn && setToken(data.signIn),
+                  onSuccess: (data) => data?.signIn && setToken(data.signIn),
                 }
               )
             }
