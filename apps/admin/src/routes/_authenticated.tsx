@@ -1,6 +1,8 @@
 import { createFileRoute, Outlet } from "@tanstack/react-router";
+import { useEffect } from "react";
 import { UserForm } from "@/forms/user";
 import { useSignIn } from "@/hooks/mutations/auth";
+import { useGetMe } from "@/hooks/queries/auth";
 import { useAuthStore } from "@/stores/auth";
 
 export const Route = createFileRoute("/_authenticated")({
@@ -8,9 +10,24 @@ export const Route = createFileRoute("/_authenticated")({
 });
 
 function RouteComponent() {
-  const { token, setToken } = useAuthStore();
+  const { token, setToken, setUser } = useAuthStore();
 
   const signIn = useSignIn();
+  const getMe = useGetMe({ enabled: !!token });
+
+  useEffect(() => {
+    if (getMe.data?.data?.getMe) {
+      const user = getMe.data.data.getMe;
+      setUser({
+        avatar: user.avatar,
+        email: user.email,
+        id: user.id,
+        name: user.name,
+        nickname: user.nickname,
+        role: user.role,
+      });
+    }
+  }, [getMe.data, setUser]);
 
   if (!token) {
     return (

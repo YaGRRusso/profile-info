@@ -2,12 +2,12 @@ import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 
 interface JwtUser {
-  avatar: string;
+  avatar?: string | null;
   email: string;
   id: string;
   name: string;
   nickname: string;
-  role: string;
+  role?: string | null;
 }
 
 interface AuthStore {
