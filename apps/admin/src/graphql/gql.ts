@@ -15,12 +15,24 @@ import * as types from './graphql';
  * Learn more about it here: https://the-guild.dev/graphql/codegen/plugins/presets/preset-client#reducing-bundle-size
  */
 type Documents = {
+    "\n  mutation SignIn($signInInput: SignInInput!) {\n    signIn(signInInput: $signInInput)\n  }\n": typeof types.SignInDocument,
+    "\n  query GetMe {\n    getMe {\n      id\n      email\n      name\n      nickname\n      role\n      title\n      avatar\n    }\n  }\n": typeof types.GetMeDocument,
     "\n  query ApiStatus {\n    __typename\n  }\n": typeof types.ApiStatusDocument,
 };
 const documents: Documents = {
+    "\n  mutation SignIn($signInInput: SignInInput!) {\n    signIn(signInInput: $signInInput)\n  }\n": types.SignInDocument,
+    "\n  query GetMe {\n    getMe {\n      id\n      email\n      name\n      nickname\n      role\n      title\n      avatar\n    }\n  }\n": types.GetMeDocument,
     "\n  query ApiStatus {\n    __typename\n  }\n": types.ApiStatusDocument,
 };
 
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation SignIn($signInInput: SignInInput!) {\n    signIn(signInInput: $signInInput)\n  }\n"): typeof import('./graphql').SignInDocument;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  query GetMe {\n    getMe {\n      id\n      email\n      name\n      nickname\n      role\n      title\n      avatar\n    }\n  }\n"): typeof import('./graphql').GetMeDocument;
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

@@ -914,6 +914,18 @@ export type UserEntity = {
   urls?: Maybe<Array<UrlEntity>>;
 };
 
+export type SignInMutationVariables = Exact<{
+  signInInput: SignInInput;
+}>;
+
+
+export type SignInMutation = { __typename?: 'Mutation', signIn: string };
+
+export type GetMeQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetMeQuery = { __typename?: 'Query', getMe: { __typename?: 'UserEntity', id: string, email: string, name: string, nickname: string, role: string, title?: string | null, avatar?: string | null } };
+
 export type ApiStatusQueryVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -938,6 +950,24 @@ export class TypedDocumentString<TResult, TVariables>
   }
 }
 
+export const SignInDocument = new TypedDocumentString(`
+    mutation SignIn($signInInput: SignInInput!) {
+  signIn(signInInput: $signInInput)
+}
+    `) as unknown as TypedDocumentString<SignInMutation, SignInMutationVariables>;
+export const GetMeDocument = new TypedDocumentString(`
+    query GetMe {
+  getMe {
+    id
+    email
+    name
+    nickname
+    role
+    title
+    avatar
+  }
+}
+    `) as unknown as TypedDocumentString<GetMeQuery, GetMeQueryVariables>;
 export const ApiStatusDocument = new TypedDocumentString(`
     query ApiStatus {
   __typename

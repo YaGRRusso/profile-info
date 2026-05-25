@@ -4,7 +4,7 @@ import { useAuthStore } from "@/stores/auth";
 
 export async function execute<TResult, TVariables>(
   query: TypedDocumentString<TResult, TVariables>,
-  ...[variables]: TVariables extends Record<string, unknown> ? [] : [TVariables]
+  ...[variables]: TVariables extends Record<string, never> ? [] : [TVariables]
 ) {
   const { token } = useAuthStore.getState();
 
