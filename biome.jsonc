@@ -24,6 +24,9 @@
         "noParameterProperties": "off",
         "noEnum": "off"
       },
+      "complexity": {
+        "useSimplifiedLogicExpression": "off"
+      },
       "suspicious": {
         "noExplicitAny": "warn"
       },

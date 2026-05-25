@@ -14,22 +14,31 @@
   ],
   "scripts": {
     "prepare": "husky || true",
+
+    "docker:up": "sudo docker compose up",
+    "docker:down": "sudo docker compose down",
+
+    "dev": "npm run dev --workspaces --if-present",
+    "prod": "npm run prod --workspaces --if-present",
     "build": "npm run build --workspaces --if-present",
     "start": "npm run start --workspaces --if-present",
-    "start:dev": "npm run start:dev --workspaces --if-present",
-    "start:debug": "npm run start:debug --workspaces --if-present",
-    "start:prod": "npm run start:prod --workspaces --if-present",
+
+    "api:dev": "npm run dev --workspace=@profile-info/api",
+    "api:build": "npm run build --workspace=@profile-info/api",
+    "api:start": "npm run start --workspace=@profile-info/api",
+
+    "admin:dev": "npm run dev --workspace=@profile-info/admin",
+    "admin:build": "npm run build --workspace=@profile-info/admin",
+    "admin:start": "npm run start --workspace=@profile-info/admin",
+
     "test": "npm run test --workspaces --if-present",
     "test:watch": "npm run test:watch --workspaces --if-present",
     "test:cov": "npm run test:cov --workspaces --if-present",
     "test:e2e": "npm run test:e2e --workspaces --if-present",
-    "api:dev": "npm run start:dev -w apps/api",
-    "api:build": "npm run build -w apps/api",
-    "admin:dev": "npm run dev -w apps/admin",
-    "admin:build": "npm run build -w apps/admin",
-    "admin:preview": "npm run preview -w apps/admin",
-    "lint": "biome check .",
-    "format": "biome format --write ."
+
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "lint": "npm run lint --workspaces --if-present",
+    "format": "npm run format --workspaces --if-present"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.4.15",

@@ -1,5 +1,6 @@
 import { useForm } from "@tanstack/react-form";
 import z from "zod";
+import { cn } from "@/lib/cn";
 import { CommonFormProps } from "./common";
 
 const userSchema = z.object({
@@ -13,7 +14,6 @@ export interface UserFormProps extends CommonFormProps<UserSchema> {}
 
 export function UserForm({
   onSubmit,
-  onCancel,
   defaultValues,
   customValues,
   isDisabled,
@@ -29,19 +29,26 @@ export function UserForm({
     validators: { onChange: userSchema },
   });
 
+  const { Field, Subscribe } = form;
+
   return (
     <form
-      className="flex w-full max-w-md flex-col gap-4"
+      className="flex w-full flex-col gap-4"
       onSubmit={(e) => {
         e.preventDefault();
         e.stopPropagation();
         form.handleSubmit();
       }}
     >
-      <form.Field
+      <Field
         children={(field) => (
           <input
-            className="input w-full"
+            className={cn(
+              "input w-full",
+              field.state.meta.isTouched &&
+                !field.state.meta.isValid &&
+                "input-error"
+            )}
             id={field.name}
             name={field.name}
             onChange={(e) => field.handleChange(e.target.value)}
@@ -52,10 +59,15 @@ export function UserForm({
         )}
         name="username"
       />
-      <form.Field
+      <Field
         children={(field) => (
           <input
-            className="input w-full"
+            className={cn(
+              "input w-full",
+              field.state.meta.isTouched &&
+                !field.state.meta.isValid &&
+                "input-error"
+            )}
             id={field.name}
             name={field.name}
             onChange={(e) => field.handleChange(e.target.value)}
@@ -67,18 +79,17 @@ export function UserForm({
         name="password"
       />
       <div className="flex items-center gap-2">
-        <button
-          className="btn btn-soft flex-1"
-          onClick={() => onCancel?.()}
-          type="reset"
-        >
-          Cancel
-        </button>
-        <form.Subscribe
-          children={({ canSubmit, isSubmitting }) => (
+        <Subscribe
+          children={({ canSubmit, isSubmitting, isTouched }) => (
             <button
               className="btn btn-soft flex-1"
-              disabled={!canSubmit || isSubmitting || isDisabled || isLoading}
+              disabled={
+                !canSubmit ||
+                !isTouched ||
+                isSubmitting ||
+                isDisabled ||
+                isLoading
+              }
               type="submit"
             >
               Submit
