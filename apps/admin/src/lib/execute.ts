@@ -40,7 +40,7 @@ export async function execute<Result, Variables>(
 
   const { data, errors } = await response.json();
 
-  if (errors?.length) throw new Error(JSON.stringify(errors));
+  if (errors?.length) throw new Error(errors[0].message ?? "an error occurred");
   if (!data) throw new Error("no data returned");
 
   return data as Result;

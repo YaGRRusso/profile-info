@@ -1,4 +1,6 @@
+import { EyeIcon, EyeSlashIcon } from "@phosphor-icons/react";
 import { useForm } from "@tanstack/react-form";
+import { useState } from "react";
 import z from "zod";
 import { cn } from "@/lib/cn";
 import { CommonFormProps } from "./common";
@@ -19,6 +21,8 @@ export function UserForm({
   isDisabled,
   isLoading,
 }: UserFormProps) {
+  const [isShowingPassword, setIsShowingPassword] = useState(false);
+
   const form = useForm({
     defaultValues: {
       email: "",
@@ -61,20 +65,34 @@ export function UserForm({
       />
       <Field
         children={(field) => (
-          <input
+          <label
             className={cn(
               "input w-full",
               field.state.meta.isTouched &&
                 !field.state.meta.isValid &&
                 "input-error"
             )}
-            id={field.name}
-            name={field.name}
-            onChange={(e) => field.handleChange(e.target.value)}
-            placeholder="Password"
-            type="password"
-            value={field.state.value}
-          />
+          >
+            <input
+              id={field.name}
+              name={field.name}
+              onChange={(e) => field.handleChange(e.target.value)}
+              placeholder="Password"
+              type={isShowingPassword ? "text" : "password"}
+              value={field.state.value}
+            />
+            <button
+              className="btn btn-ghost btn-square btn-xs"
+              onClick={() => setIsShowingPassword((prev) => !prev)}
+              type="button"
+            >
+              {isShowingPassword ? (
+                <EyeSlashIcon className="size-4 opacity-50" />
+              ) : (
+                <EyeIcon className="size-4 opacity-50" />
+              )}
+            </button>
+          </label>
         )}
         name="password"
       />
@@ -82,7 +100,7 @@ export function UserForm({
         <Subscribe
           children={({ canSubmit, isSubmitting, isTouched }) => (
             <button
-              className="btn btn-soft flex-1"
+              className="btn btn-soft btn-block"
               disabled={
                 !canSubmit ||
                 !isTouched ||
