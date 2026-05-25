@@ -11,6 +11,6 @@ const apiStatus = graphql(`
 export function useApiStatus() {
   return useQuery({
     queryKey: ["apiStatus"],
-    queryFn: async () => await execute(apiStatus),
+    queryFn: () => execute(apiStatus),
   });
 }

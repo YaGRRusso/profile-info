@@ -23,7 +23,7 @@ export function useGetMe(
 ) {
   return useQuery({
     queryKey: ["getMe"],
-    queryFn: async () => await execute(getMe),
+    queryFn: () => execute(getMe),
     ...options,
   });
 }

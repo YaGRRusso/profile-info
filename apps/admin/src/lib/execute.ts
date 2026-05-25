@@ -1,5 +1,6 @@
 import { TypedDocumentString } from "@/graphql/graphql";
 import { useAuthStore } from "@/stores/auth";
+import { tc } from "./tc";
 
 export async function execute<Result, Variables>(
   query: TypedDocumentString<Result, Variables>,
@@ -18,14 +19,18 @@ export async function execute<Result, Variables>(
 
   if (token) headers.Authorization = `Bearer ${token}`;
 
-  const response = await fetch(import.meta.env.VITE_API_URL, {
-    headers,
-    method: "POST",
-    body: JSON.stringify({
-      query: query.toString(),
-      variables,
-    }),
-  });
+  const response = await tc(
+    fetch(import.meta.env.VITE_API_URL, {
+      headers,
+      method: "POST",
+      body: JSON.stringify({
+        query: query.toString(),
+        variables,
+      }),
+    })
+  );
+
+  if (!response) throw new Error("no response returned");
 
   if (!response.ok) {
     throw new Error(
