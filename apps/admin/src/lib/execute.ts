@@ -1,5 +1,6 @@
 import { TypedDocumentString } from "@/graphql/graphql";
 import { useAuthStore } from "@/stores/auth";
+import type { GqlResponse } from "./gql";
 import { tc } from "./tc";
 
 export async function execute<Result, Variables>(
@@ -32,21 +33,23 @@ export async function execute<Result, Variables>(
 
   if (!response) throw new Error("no response returned");
 
-  if (response.status === 401) {
-    useAuthStore.getState().clearAuth();
-    throw new Error("session expired");
-  }
-
   if (!response.ok) {
     throw new Error(
       `failed to fetch: ${response.status} ${response.statusText}`
     );
   }
 
-  const { data, errors } = await response.json();
+  const { data, errors }: GqlResponse<Result> = await response.json();
 
-  if (errors?.length) throw new Error(errors[0].message ?? "an error occurred");
+  if (errors?.length) {
+    const isUnauthorized = errors.some(
+      (e) => e.extensions?.code === "UNAUTHENTICATED"
+    );
+    if (isUnauthorized) useAuthStore.getState().clearAuth();
+    throw new Error(errors[0].message ?? "an error occurred");
+  }
+
   if (!data) throw new Error("no data returned");
 
-  return data as Result;
+  return data;
 }
