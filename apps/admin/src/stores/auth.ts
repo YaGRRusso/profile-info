@@ -1,16 +1,19 @@
 import { create } from "zustand";
-
-interface User {
-  password: string;
-  username: string;
-}
+import { persist } from "zustand/middleware";
 
 interface AuthStore {
-  setUser: (user: User | undefined) => void;
-  user: User | undefined;
+  clearAuth: () => void;
+  setToken: (token: string) => void;
+  token: string | null;
 }
 
-export const useAuthStore = create<AuthStore>()((set) => ({
-  user: undefined,
-  setUser: (user: User | undefined) => set({ user }),
-}));
+export const useAuthStore = create<AuthStore>()(
+  persist(
+    (set) => ({
+      token: null,
+      setToken: (token) => set({ token }),
+      clearAuth: () => set({ token: null }),
+    }),
+    { name: "auth" }
+  )
+);

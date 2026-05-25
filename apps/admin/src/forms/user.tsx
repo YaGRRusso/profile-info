@@ -4,7 +4,7 @@ import { cn } from "@/lib/cn";
 import { CommonFormProps } from "./common";
 
 const userSchema = z.object({
-  username: z.string().min(1, "required"),
+  email: z.string().email("invalid email"),
   password: z.string().min(1, "required"),
 });
 
@@ -21,7 +21,7 @@ export function UserForm({
 }: UserFormProps) {
   const form = useForm({
     defaultValues: {
-      username: "",
+      email: "",
       password: "",
       ...defaultValues,
     },
@@ -52,12 +52,12 @@ export function UserForm({
             id={field.name}
             name={field.name}
             onChange={(e) => field.handleChange(e.target.value)}
-            placeholder="Username"
-            type="text"
+            placeholder="Email"
+            type="email"
             value={field.state.value}
           />
         )}
-        name="username"
+        name="email"
       />
       <Field
         children={(field) => (
