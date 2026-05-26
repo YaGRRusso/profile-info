@@ -35,7 +35,7 @@ export function RangeInput({
   }, [min, max, step, ruler]);
 
   return (
-    <div>
+    <fieldset className="fieldset">
       <input
         className="range w-full"
         id={field.name}
@@ -48,7 +48,7 @@ export function RangeInput({
         {...props}
       />
       {ruler && (
-        <div className="mt-2.5 flex justify-between px-2.5 text-xs">
+        <div className="mt-1 flex justify-between px-2.5 text-xs">
           {steps?.map((value) => (
             <span
               className={cn(
@@ -61,7 +61,7 @@ export function RangeInput({
           ))}
         </div>
       )}
-      {error && <em className="text-error text-xs">{error}</em>}
-    </div>
+      {error && <span className="text-error text-xs">{error}</span>}
+    </fieldset>
   );
 }

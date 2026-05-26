@@ -8,7 +8,7 @@
     "npm": ">=11.0.0"
   },
   "scripts": {
-    "dev": "graphql-codegen --config codegen.ts --watch && vite",
+    "dev": "graphql-codegen --config codegen.ts --watch & vite",
     "build": "graphql-codegen --config codegen.ts && tsc -b && vite build",
     "start": "vite preview",
     "typecheck": "tsc -b --noEmit",

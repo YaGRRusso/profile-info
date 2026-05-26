@@ -19,7 +19,7 @@ export function SelectInput({
   const error = fieldError(field.state.meta);
 
   return (
-    <div>
+    <fieldset className="fieldset">
       <select
         className={cn("select w-full", error && "select-error", className)}
         id={field.name}
@@ -35,7 +35,7 @@ export function SelectInput({
           </option>
         ))}
       </select>
-      {error && <em className="text-error text-xs">{error}</em>}
-    </div>
+      {error && <span className="text-error text-xs">{error}</span>}
+    </fieldset>
   );
 }

@@ -1,15 +1,15 @@
 import { MoonIcon, SunIcon } from "@phosphor-icons/react";
 import { type ReactNode } from "react";
-import { type ThemePreference, useThemeStore } from "@/stores/theme";
+import { useThemeStore } from "@/stores/theme";
 
 export interface ThemeOption {
   icon: ReactNode;
   label: string;
-  value: ThemePreference;
+  value: string;
 }
 
 const THEME_OPTIONS: ThemeOption[] = [
-  { icon: <MoonIcon />, label: "Dark", value: "dark" },
+  { icon: <MoonIcon />, label: "Dark", value: "dracula" },
   { icon: <SunIcon />, label: "Light", value: "light" },
 ];
 

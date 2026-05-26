@@ -17,7 +17,7 @@ export function PasswordInput({
   const error = fieldError(field.state.meta);
 
   return (
-    <div>
+    <fieldset className="fieldset">
       <label className={cn("input w-full", error && "input-error", className)}>
         <input
           id={field.name}
@@ -39,7 +39,7 @@ export function PasswordInput({
           )}
         </button>
       </label>
-      {error && <em className="text-error text-xs">{error}</em>}
-    </div>
+      {error && <span className="text-error text-xs">{error}</span>}
+    </fieldset>
   );
 }

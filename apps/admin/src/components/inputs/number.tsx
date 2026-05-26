@@ -11,7 +11,7 @@ export function NumberInput({ className, field, ...props }: NumberInputProps) {
   const error = fieldError(field.state.meta);
 
   return (
-    <div>
+    <fieldset className="fieldset">
       <input
         className={cn("input w-full", error && "input-error", className)}
         id={field.name}
@@ -21,7 +21,7 @@ export function NumberInput({ className, field, ...props }: NumberInputProps) {
         value={field.state.value ?? ""}
         {...props}
       />
-      {error && <em className="text-error text-xs">{error}</em>}
-    </div>
+      {error && <span className="text-error text-xs">{error}</span>}
+    </fieldset>
   );
 }

@@ -3,7 +3,7 @@
   logs: false;
   themes:
     light --default,
-    dark --prefersdark;
+    dracula --prefersdark;
 }
 
 @utility container {
