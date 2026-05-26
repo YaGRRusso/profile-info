@@ -1,4 +1,3 @@
-import { IconContext } from "@phosphor-icons/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { createRouter, RouterProvider } from "@tanstack/react-router";
 import { StrictMode } from "react";
@@ -43,10 +42,8 @@ if (!rootElement.innerHTML) {
   root.render(
     <StrictMode>
       <QueryClientProvider client={queryClient}>
-        <IconContext.Provider value={{ weight: "bold" }}>
-          <ToastContainer autoClose={3000} />
-          <RouterProvider router={router} />
-        </IconContext.Provider>
+        <ToastContainer autoClose={3000} />
+        <RouterProvider router={router} />
       </QueryClientProvider>
     </StrictMode>
   );

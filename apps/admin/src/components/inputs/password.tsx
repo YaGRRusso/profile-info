@@ -28,14 +28,14 @@ export function PasswordInput({
           {...props}
         />
         <button
-          className="btn btn-ghost btn-square btn-xs"
+          className="btn btn-ghost btn-square btn-sm -mr-2 text-base"
           onClick={() => setIsShowing((prev) => !prev)}
           type="button"
         >
           {isShowing ? (
-            <EyeSlashIcon className="size-4 opacity-60" />
+            <EyeSlashIcon className="opacity-60" />
           ) : (
-            <EyeIcon className="size-4 opacity-60" />
+            <EyeIcon className="opacity-60" />
           )}
         </button>
       </label>

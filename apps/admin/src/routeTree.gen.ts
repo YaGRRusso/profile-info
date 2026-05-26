@@ -10,35 +10,57 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
-import { Route as AuthenticatedIndexRouteImport } from './routes/_authenticated/index'
+import { Route as AuthenticatedSidebarRouteImport } from './routes/_authenticated/_sidebar'
+import { Route as AuthenticatedSidebarIndexRouteImport } from './routes/_authenticated/_sidebar/index'
+import { Route as AuthenticatedSidebarSkillsRouteImport } from './routes/_authenticated/_sidebar/skills'
 
 const AuthenticatedRoute = AuthenticatedRouteImport.update({
   id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AuthenticatedIndexRoute = AuthenticatedIndexRouteImport.update({
-  id: '/',
-  path: '/',
+const AuthenticatedSidebarRoute = AuthenticatedSidebarRouteImport.update({
+  id: '/_sidebar',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedSidebarIndexRoute =
+  AuthenticatedSidebarIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthenticatedSidebarRoute,
+  } as any)
+const AuthenticatedSidebarSkillsRoute =
+  AuthenticatedSidebarSkillsRouteImport.update({
+    id: '/skills',
+    path: '/skills',
+    getParentRoute: () => AuthenticatedSidebarRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
-  '/': typeof AuthenticatedIndexRoute
+  '/': typeof AuthenticatedSidebarIndexRoute
+  '/skills': typeof AuthenticatedSidebarSkillsRoute
 }
 export interface FileRoutesByTo {
-  '/': typeof AuthenticatedIndexRoute
+  '/': typeof AuthenticatedSidebarIndexRoute
+  '/skills': typeof AuthenticatedSidebarSkillsRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_authenticated': typeof AuthenticatedRouteWithChildren
-  '/_authenticated/': typeof AuthenticatedIndexRoute
+  '/_authenticated/_sidebar': typeof AuthenticatedSidebarRouteWithChildren
+  '/_authenticated/_sidebar/skills': typeof AuthenticatedSidebarSkillsRoute
+  '/_authenticated/_sidebar/': typeof AuthenticatedSidebarIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths: '/' | '/skills'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/_authenticated' | '/_authenticated/'
+  to: '/' | '/skills'
+  id:
+    | '__root__'
+    | '/_authenticated'
+    | '/_authenticated/_sidebar'
+    | '/_authenticated/_sidebar/skills'
+    | '/_authenticated/_sidebar/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -54,22 +76,49 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/_authenticated/': {
-      id: '/_authenticated/'
+    '/_authenticated/_sidebar': {
+      id: '/_authenticated/_sidebar'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedSidebarRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/_sidebar/': {
+      id: '/_authenticated/_sidebar/'
       path: '/'
       fullPath: '/'
-      preLoaderRoute: typeof AuthenticatedIndexRouteImport
-      parentRoute: typeof AuthenticatedRoute
+      preLoaderRoute: typeof AuthenticatedSidebarIndexRouteImport
+      parentRoute: typeof AuthenticatedSidebarRoute
+    }
+    '/_authenticated/_sidebar/skills': {
+      id: '/_authenticated/_sidebar/skills'
+      path: '/skills'
+      fullPath: '/skills'
+      preLoaderRoute: typeof AuthenticatedSidebarSkillsRouteImport
+      parentRoute: typeof AuthenticatedSidebarRoute
     }
   }
 }
 
+interface AuthenticatedSidebarRouteChildren {
+  AuthenticatedSidebarSkillsRoute: typeof AuthenticatedSidebarSkillsRoute
+  AuthenticatedSidebarIndexRoute: typeof AuthenticatedSidebarIndexRoute
+}
+
+const AuthenticatedSidebarRouteChildren: AuthenticatedSidebarRouteChildren = {
+  AuthenticatedSidebarSkillsRoute: AuthenticatedSidebarSkillsRoute,
+  AuthenticatedSidebarIndexRoute: AuthenticatedSidebarIndexRoute,
+}
+
+const AuthenticatedSidebarRouteWithChildren =
+  AuthenticatedSidebarRoute._addFileChildren(AuthenticatedSidebarRouteChildren)
+
 interface AuthenticatedRouteChildren {
-  AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
+  AuthenticatedSidebarRoute: typeof AuthenticatedSidebarRouteWithChildren
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
-  AuthenticatedIndexRoute: AuthenticatedIndexRoute,
+  AuthenticatedSidebarRoute: AuthenticatedSidebarRouteWithChildren,
 }
 
 const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
