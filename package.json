@@ -18,9 +18,6 @@
     "docker:up": "sudo docker compose up",
     "docker:down": "sudo docker compose down",
 
-    "codegen": "npm run codegen --workspaces --if-present",
-    "codegen:watch": "npm run codegen:watch --workspaces --if-present",
-
     "dev": "npm run dev --workspaces --if-present",
     "prod": "npm run prod --workspaces --if-present",
     "build": "npm run build --workspaces --if-present",
