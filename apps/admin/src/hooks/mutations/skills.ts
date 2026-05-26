@@ -18,8 +18,8 @@ const createOneSkill = graphql(`
 `);
 
 const updateOneSkill = graphql(`
-  mutation UpdateOneSkill($SkillId: ID!, $updateSkillInput: UpdateSkillInput!) {
-    updateOneSkill(SkillId: $SkillId, updateSkillInput: $updateSkillInput) {
+  mutation UpdateOneSkill($skillId: ID!, $updateSkillInput: UpdateSkillInput!) {
+    updateOneSkill(skillId: $skillId, updateSkillInput: $updateSkillInput) {
       id
       name
       slug
@@ -33,18 +33,18 @@ const updateOneSkill = graphql(`
 
 const updateManySkills = graphql(`
   mutation UpdateManySkills(
-    $SkillIds: [ID!]!
+    $skillIds: [ID!]!
     $updateSkillInput: UpdateSkillInput!
   ) {
-    updateManySkills(SkillIds: $SkillIds, updateSkillInput: $updateSkillInput) {
+    updateManySkills(skillIds: $skillIds, updateSkillInput: $updateSkillInput) {
       count
     }
   }
 `);
 
 const removeOneSkill = graphql(`
-  mutation RemoveOneSkill($SkillId: ID!) {
-    removeOneSkill(SkillId: $SkillId) {
+  mutation RemoveOneSkill($skillId: ID!) {
+    removeOneSkill(skillId: $skillId) {
       id
       name
       slug
@@ -57,8 +57,8 @@ const removeOneSkill = graphql(`
 `);
 
 const removeManySkills = graphql(`
-  mutation RemoveManySkills($SkillIds: [ID!]!) {
-    removeManySkills(SkillIds: $SkillIds) {
+  mutation RemoveManySkills($skillIds: [ID!]!) {
+    removeManySkills(skillIds: $skillIds) {
       count
     }
   }
@@ -76,12 +76,12 @@ export function useUpdateOneSkill() {
   return useMutation({
     mutationKey: ["updateOneSkill"],
     mutationFn: ({
-      SkillId,
+      skillId,
       updateSkillInput,
     }: {
-      SkillId: string;
+      skillId: string;
       updateSkillInput: UpdateSkillInput;
-    }) => execute(updateOneSkill, { SkillId, updateSkillInput }),
+    }) => execute(updateOneSkill, { skillId, updateSkillInput }),
   });
 }
 
@@ -89,25 +89,25 @@ export function useUpdateManySkills() {
   return useMutation({
     mutationKey: ["updateManySkills"],
     mutationFn: ({
-      SkillIds,
+      skillIds,
       updateSkillInput,
     }: {
-      SkillIds: string[];
+      skillIds: string[];
       updateSkillInput: UpdateSkillInput;
-    }) => execute(updateManySkills, { SkillIds, updateSkillInput }),
+    }) => execute(updateManySkills, { skillIds, updateSkillInput }),
   });
 }
 
 export function useRemoveOneSkill() {
   return useMutation({
     mutationKey: ["removeOneSkill"],
-    mutationFn: (SkillId: string) => execute(removeOneSkill, { SkillId }),
+    mutationFn: (skillId: string) => execute(removeOneSkill, { skillId }),
   });
 }
 
 export function useRemoveManySkills() {
   return useMutation({
     mutationKey: ["removeManySkills"],
-    mutationFn: (SkillIds: string[]) => execute(removeManySkills, { SkillIds }),
+    mutationFn: (skillIds: string[]) => execute(removeManySkills, { skillIds }),
   });
 }

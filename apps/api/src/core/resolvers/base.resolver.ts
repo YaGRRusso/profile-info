@@ -24,6 +24,8 @@ export function BaseResolver<
   sortInputRef: Type<SortInputType>
 ) {
   const entityName = entityRef.name.replace("Entity", "");
+  const entityNameCamel =
+    entityName.charAt(0).toLowerCase() + entityName.slice(1);
   const PaginatedEntity = createPaginatedModel(entityRef);
 
   @Resolver({ isAbstract: true })
@@ -37,7 +39,7 @@ export function BaseResolver<
     @Public()
     @Query(() => entityRef, { name: `findOne${entityName}ById` })
     async findOneById(
-      @Args(`${entityName}Id`, { type: () => ID }) id: string
+      @Args(`${entityNameCamel}Id`, { type: () => ID }) id: string
     ): Promise<ModelType> {
       return await this.service.findOneById(id);
     }
@@ -45,7 +47,7 @@ export function BaseResolver<
     @Public()
     @Query(() => entityRef, { name: `findOne${entityName}` })
     async findOne(
-      @Args(`${entityName}Filters`, {
+      @Args(`${entityNameCamel}Filters`, {
         type: () => filterInputRef,
         nullable: true,
       })
@@ -57,7 +59,7 @@ export function BaseResolver<
     @Public()
     @Query(() => [entityRef], { name: `findMany${entityName}ById` })
     async findManyById(
-      @Args(`${entityName}Ids`, { type: () => [ID] }) ids: string[]
+      @Args(`${entityNameCamel}Ids`, { type: () => [ID] }) ids: string[]
     ): Promise<ModelType[]> {
       return await this.service.findManyById(ids);
     }
@@ -67,17 +69,17 @@ export function BaseResolver<
       name: `findMany${entityName}s`,
     })
     async findMany(
-      @Args(`${entityName}Filters`, {
+      @Args(`${entityNameCamel}Filters`, {
         type: () => filterInputRef,
         nullable: true,
       })
       filters?: FilterInputType,
-      @Args(`${entityName}Pagination`, {
+      @Args(`${entityNameCamel}Pagination`, {
         type: () => PaginationInput,
         nullable: true,
       })
       pagination?: PaginationInput,
-      @Args(`${entityName}Sort`, {
+      @Args(`${entityNameCamel}Sort`, {
         type: () => sortInputRef,
         nullable: true,
       })
@@ -110,7 +112,7 @@ export function BaseResolver<
 
     @Mutation(() => entityRef, { name: `updateOne${entityName}` })
     async updateOne(
-      @Args(`${entityName}Id`, { type: () => ID }) id: string,
+      @Args(`${entityNameCamel}Id`, { type: () => ID }) id: string,
       @Args(`update${entityName}Input`, { type: () => updateInputRef })
       updateInput: UpdateInputType
     ): Promise<ModelType> {
@@ -119,7 +121,7 @@ export function BaseResolver<
 
     @Mutation(() => BatchEntity, { name: `updateMany${entityName}s` })
     async updateMany(
-      @Args(`${entityName}Ids`, { type: () => [ID] }) ids: string[],
+      @Args(`${entityNameCamel}Ids`, { type: () => [ID] }) ids: string[],
       @Args(`update${entityName}Input`, { type: () => updateInputRef })
       updateInput: UpdateInputType
     ): Promise<BatchEntity> {
@@ -128,14 +130,14 @@ export function BaseResolver<
 
     @Mutation(() => entityRef, { name: `removeOne${entityName}` })
     async removeOne(
-      @Args(`${entityName}Id`, { type: () => ID }) id: string
+      @Args(`${entityNameCamel}Id`, { type: () => ID }) id: string
     ): Promise<ModelType> {
       return await this.service.removeOne(id);
     }
 
     @Mutation(() => BatchEntity, { name: `removeMany${entityName}s` })
     async removeMany(
-      @Args(`${entityName}Ids`, { type: () => [ID] }) ids: string[]
+      @Args(`${entityNameCamel}Ids`, { type: () => [ID] }) ids: string[]
     ): Promise<BatchEntity> {
       return await this.service.removeMany(ids);
     }

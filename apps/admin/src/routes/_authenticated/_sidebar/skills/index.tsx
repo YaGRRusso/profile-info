@@ -60,7 +60,7 @@ function RouteComponent() {
         case "UPDATING":
           updateOneSkill.mutate(
             {
-              SkillId: formValues.customValues?.id,
+              skillId: formValues.customValues?.id,
               updateSkillInput: {
                 category: data.category,
                 name: data.name,

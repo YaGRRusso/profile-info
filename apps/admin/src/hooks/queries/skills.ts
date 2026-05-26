@@ -16,14 +16,14 @@ const PAGE_SIZE = 50;
 
 const findManySkills = graphql(`
   query FindManySkills(
-    $SkillFilters: FilterSkillInput
-    $SkillPagination: PaginationInput
-    $SkillSort: SortSkillInput
+    $skillFilters: FilterSkillInput
+    $skillPagination: PaginationInput
+    $skillSort: SortSkillInput
   ) {
     findManySkills(
-      SkillFilters: $SkillFilters
-      SkillPagination: $SkillPagination
-      SkillSort: $SkillSort
+      skillFilters: $skillFilters
+      skillPagination: $skillPagination
+      skillSort: $skillSort
     ) {
       found
       nodes {
@@ -40,8 +40,8 @@ const findManySkills = graphql(`
 `);
 
 const findOneSkillById = graphql(`
-  query FindOneSkillById($SkillId: ID!) {
-    findOneSkillById(SkillId: $SkillId) {
+  query FindOneSkillById($skillId: ID!) {
+    findOneSkillById(skillId: $skillId) {
       id
       name
       slug
@@ -54,8 +54,8 @@ const findOneSkillById = graphql(`
 `);
 
 const findOneSkill = graphql(`
-  query FindOneSkill($SkillFilters: FilterSkillInput) {
-    findOneSkill(SkillFilters: $SkillFilters) {
+  query FindOneSkill($skillFilters: FilterSkillInput) {
+    findOneSkill(skillFilters: $skillFilters) {
       id
       name
       slug
@@ -68,8 +68,8 @@ const findOneSkill = graphql(`
 `);
 
 const findManySkillById = graphql(`
-  query FindManySkillById($SkillIds: [ID!]!) {
-    findManySkillById(SkillIds: $SkillIds) {
+  query FindManySkillById($skillIds: [ID!]!) {
+    findManySkillById(skillIds: $skillIds) {
       id
       name
       slug
@@ -82,7 +82,7 @@ const findManySkillById = graphql(`
 `);
 
 export function useFindManySkills(
-  variables?: { SkillFilters?: FilterSkillInput; SkillSort?: SortSkillInput },
+  variables?: { skillFilters?: FilterSkillInput; skillSort?: SortSkillInput },
   options?: { enabled?: boolean }
 ) {
   return useInfiniteQuery({
@@ -90,7 +90,7 @@ export function useFindManySkills(
     queryFn: ({ pageParam }) =>
       execute(findManySkills, {
         ...variables,
-        SkillPagination: { skip: pageParam, limit: PAGE_SIZE },
+        skillPagination: { skip: pageParam, limit: PAGE_SIZE },
       }),
     initialPageParam: 0,
     getNextPageParam: (lastPage, allPages) => {
@@ -122,7 +122,7 @@ export function useFindOneSkillById(
 }
 
 export function useFindOneSkill(
-  variables: { SkillFilters?: FilterSkillInput },
+  variables: { skillFilters?: FilterSkillInput },
   options?: Omit<UseQueryOptions<FindOneSkillQuery>, "queryKey" | "queryFn">
 ) {
   return useQuery({

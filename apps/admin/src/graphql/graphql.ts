@@ -374,62 +374,62 @@ export type MutationCreateOneUserArgs = {
 
 
 export type MutationRemoveManyEducationsArgs = {
-  EducationIds: Array<Scalars['ID']['input']>;
+  educationIds: Array<Scalars['ID']['input']>;
 };
 
 
 export type MutationRemoveManyExperiencesArgs = {
-  ExperienceIds: Array<Scalars['ID']['input']>;
+  experienceIds: Array<Scalars['ID']['input']>;
 };
 
 
 export type MutationRemoveManyOrganizationsArgs = {
-  OrganizationIds: Array<Scalars['ID']['input']>;
+  organizationIds: Array<Scalars['ID']['input']>;
 };
 
 
 export type MutationRemoveManyProjectsArgs = {
-  ProjectIds: Array<Scalars['ID']['input']>;
+  projectIds: Array<Scalars['ID']['input']>;
 };
 
 
 export type MutationRemoveManySkillsArgs = {
-  SkillIds: Array<Scalars['ID']['input']>;
+  skillIds: Array<Scalars['ID']['input']>;
 };
 
 
 export type MutationRemoveManyUsersArgs = {
-  UserIds: Array<Scalars['ID']['input']>;
+  userIds: Array<Scalars['ID']['input']>;
 };
 
 
 export type MutationRemoveOneEducationArgs = {
-  EducationId: Scalars['ID']['input'];
+  educationId: Scalars['ID']['input'];
 };
 
 
 export type MutationRemoveOneExperienceArgs = {
-  ExperienceId: Scalars['ID']['input'];
+  experienceId: Scalars['ID']['input'];
 };
 
 
 export type MutationRemoveOneOrganizationArgs = {
-  OrganizationId: Scalars['ID']['input'];
+  organizationId: Scalars['ID']['input'];
 };
 
 
 export type MutationRemoveOneProjectArgs = {
-  ProjectId: Scalars['ID']['input'];
+  projectId: Scalars['ID']['input'];
 };
 
 
 export type MutationRemoveOneSkillArgs = {
-  SkillId: Scalars['ID']['input'];
+  skillId: Scalars['ID']['input'];
 };
 
 
 export type MutationRemoveOneUserArgs = {
-  UserId: Scalars['ID']['input'];
+  userId: Scalars['ID']['input'];
 };
 
 
@@ -439,74 +439,74 @@ export type MutationSignInArgs = {
 
 
 export type MutationUpdateManyEducationsArgs = {
-  EducationIds: Array<Scalars['ID']['input']>;
+  educationIds: Array<Scalars['ID']['input']>;
   updateEducationInput: UpdateEducationInput;
 };
 
 
 export type MutationUpdateManyExperiencesArgs = {
-  ExperienceIds: Array<Scalars['ID']['input']>;
+  experienceIds: Array<Scalars['ID']['input']>;
   updateExperienceInput: UpdateExperienceInput;
 };
 
 
 export type MutationUpdateManyOrganizationsArgs = {
-  OrganizationIds: Array<Scalars['ID']['input']>;
+  organizationIds: Array<Scalars['ID']['input']>;
   updateOrganizationInput: UpdateOrganizationInput;
 };
 
 
 export type MutationUpdateManyProjectsArgs = {
-  ProjectIds: Array<Scalars['ID']['input']>;
+  projectIds: Array<Scalars['ID']['input']>;
   updateProjectInput: UpdateProjectInput;
 };
 
 
 export type MutationUpdateManySkillsArgs = {
-  SkillIds: Array<Scalars['ID']['input']>;
+  skillIds: Array<Scalars['ID']['input']>;
   updateSkillInput: UpdateSkillInput;
 };
 
 
 export type MutationUpdateManyUsersArgs = {
-  UserIds: Array<Scalars['ID']['input']>;
   updateUserInput: UpdateUserInput;
+  userIds: Array<Scalars['ID']['input']>;
 };
 
 
 export type MutationUpdateOneEducationArgs = {
-  EducationId: Scalars['ID']['input'];
+  educationId: Scalars['ID']['input'];
   updateEducationInput: UpdateEducationInput;
 };
 
 
 export type MutationUpdateOneExperienceArgs = {
-  ExperienceId: Scalars['ID']['input'];
+  experienceId: Scalars['ID']['input'];
   updateExperienceInput: UpdateExperienceInput;
 };
 
 
 export type MutationUpdateOneOrganizationArgs = {
-  OrganizationId: Scalars['ID']['input'];
+  organizationId: Scalars['ID']['input'];
   updateOrganizationInput: UpdateOrganizationInput;
 };
 
 
 export type MutationUpdateOneProjectArgs = {
-  ProjectId: Scalars['ID']['input'];
+  projectId: Scalars['ID']['input'];
   updateProjectInput: UpdateProjectInput;
 };
 
 
 export type MutationUpdateOneSkillArgs = {
-  SkillId: Scalars['ID']['input'];
+  skillId: Scalars['ID']['input'];
   updateSkillInput: UpdateSkillInput;
 };
 
 
 export type MutationUpdateOneUserArgs = {
-  UserId: Scalars['ID']['input'];
   updateUserInput: UpdateUserInput;
+  userId: Scalars['ID']['input'];
 };
 
 export enum OrganizationCategory {
@@ -625,134 +625,134 @@ export type Query = {
 
 
 export type QueryFindManyEducationByIdArgs = {
-  EducationIds: Array<Scalars['ID']['input']>;
+  educationIds: Array<Scalars['ID']['input']>;
 };
 
 
 export type QueryFindManyEducationsArgs = {
-  EducationFilters?: InputMaybe<FilterEducationInput>;
-  EducationPagination?: InputMaybe<PaginationInput>;
-  EducationSort?: InputMaybe<SortEducationInput>;
+  educationFilters?: InputMaybe<FilterEducationInput>;
+  educationPagination?: InputMaybe<PaginationInput>;
+  educationSort?: InputMaybe<SortEducationInput>;
 };
 
 
 export type QueryFindManyExperienceByIdArgs = {
-  ExperienceIds: Array<Scalars['ID']['input']>;
+  experienceIds: Array<Scalars['ID']['input']>;
 };
 
 
 export type QueryFindManyExperiencesArgs = {
-  ExperienceFilters?: InputMaybe<FilterExperienceInput>;
-  ExperiencePagination?: InputMaybe<PaginationInput>;
-  ExperienceSort?: InputMaybe<SortExperienceInput>;
+  experienceFilters?: InputMaybe<FilterExperienceInput>;
+  experiencePagination?: InputMaybe<PaginationInput>;
+  experienceSort?: InputMaybe<SortExperienceInput>;
 };
 
 
 export type QueryFindManyOrganizationByIdArgs = {
-  OrganizationIds: Array<Scalars['ID']['input']>;
+  organizationIds: Array<Scalars['ID']['input']>;
 };
 
 
 export type QueryFindManyOrganizationsArgs = {
-  OrganizationFilters?: InputMaybe<FilterOrganizationInput>;
-  OrganizationPagination?: InputMaybe<PaginationInput>;
-  OrganizationSort?: InputMaybe<SortOrganizationInput>;
+  organizationFilters?: InputMaybe<FilterOrganizationInput>;
+  organizationPagination?: InputMaybe<PaginationInput>;
+  organizationSort?: InputMaybe<SortOrganizationInput>;
 };
 
 
 export type QueryFindManyProjectByIdArgs = {
-  ProjectIds: Array<Scalars['ID']['input']>;
+  projectIds: Array<Scalars['ID']['input']>;
 };
 
 
 export type QueryFindManyProjectsArgs = {
-  ProjectFilters?: InputMaybe<FilterProjectInput>;
-  ProjectPagination?: InputMaybe<PaginationInput>;
-  ProjectSort?: InputMaybe<SortProjectInput>;
+  projectFilters?: InputMaybe<FilterProjectInput>;
+  projectPagination?: InputMaybe<PaginationInput>;
+  projectSort?: InputMaybe<SortProjectInput>;
 };
 
 
 export type QueryFindManySkillByIdArgs = {
-  SkillIds: Array<Scalars['ID']['input']>;
+  skillIds: Array<Scalars['ID']['input']>;
 };
 
 
 export type QueryFindManySkillsArgs = {
-  SkillFilters?: InputMaybe<FilterSkillInput>;
-  SkillPagination?: InputMaybe<PaginationInput>;
-  SkillSort?: InputMaybe<SortSkillInput>;
+  skillFilters?: InputMaybe<FilterSkillInput>;
+  skillPagination?: InputMaybe<PaginationInput>;
+  skillSort?: InputMaybe<SortSkillInput>;
 };
 
 
 export type QueryFindManyUserByIdArgs = {
-  UserIds: Array<Scalars['ID']['input']>;
+  userIds: Array<Scalars['ID']['input']>;
 };
 
 
 export type QueryFindManyUsersArgs = {
-  UserFilters?: InputMaybe<FilterUserInput>;
-  UserPagination?: InputMaybe<PaginationInput>;
-  UserSort?: InputMaybe<SortUserInput>;
+  userFilters?: InputMaybe<FilterUserInput>;
+  userPagination?: InputMaybe<PaginationInput>;
+  userSort?: InputMaybe<SortUserInput>;
 };
 
 
 export type QueryFindOneEducationArgs = {
-  EducationFilters?: InputMaybe<FilterEducationInput>;
+  educationFilters?: InputMaybe<FilterEducationInput>;
 };
 
 
 export type QueryFindOneEducationByIdArgs = {
-  EducationId: Scalars['ID']['input'];
+  educationId: Scalars['ID']['input'];
 };
 
 
 export type QueryFindOneExperienceArgs = {
-  ExperienceFilters?: InputMaybe<FilterExperienceInput>;
+  experienceFilters?: InputMaybe<FilterExperienceInput>;
 };
 
 
 export type QueryFindOneExperienceByIdArgs = {
-  ExperienceId: Scalars['ID']['input'];
+  experienceId: Scalars['ID']['input'];
 };
 
 
 export type QueryFindOneOrganizationArgs = {
-  OrganizationFilters?: InputMaybe<FilterOrganizationInput>;
+  organizationFilters?: InputMaybe<FilterOrganizationInput>;
 };
 
 
 export type QueryFindOneOrganizationByIdArgs = {
-  OrganizationId: Scalars['ID']['input'];
+  organizationId: Scalars['ID']['input'];
 };
 
 
 export type QueryFindOneProjectArgs = {
-  ProjectFilters?: InputMaybe<FilterProjectInput>;
+  projectFilters?: InputMaybe<FilterProjectInput>;
 };
 
 
 export type QueryFindOneProjectByIdArgs = {
-  ProjectId: Scalars['ID']['input'];
+  projectId: Scalars['ID']['input'];
 };
 
 
 export type QueryFindOneSkillArgs = {
-  SkillFilters?: InputMaybe<FilterSkillInput>;
+  skillFilters?: InputMaybe<FilterSkillInput>;
 };
 
 
 export type QueryFindOneSkillByIdArgs = {
-  SkillId: Scalars['ID']['input'];
+  skillId: Scalars['ID']['input'];
 };
 
 
 export type QueryFindOneUserArgs = {
-  UserFilters?: InputMaybe<FilterUserInput>;
+  userFilters?: InputMaybe<FilterUserInput>;
 };
 
 
 export type QueryFindOneUserByIdArgs = {
-  UserId: Scalars['ID']['input'];
+  userId: Scalars['ID']['input'];
 };
 
 export type SignInInput = {
@@ -929,7 +929,7 @@ export type CreateOneSkillMutationVariables = Exact<{
 export type CreateOneSkillMutation = { __typename?: 'Mutation', createOneSkill: { __typename?: 'SkillEntity', id: string, name: string, slug: string, category: SkillCategory, relevance?: number | null, createdAt: any, updatedAt: any } };
 
 export type UpdateOneSkillMutationVariables = Exact<{
-  SkillId: Scalars['ID']['input'];
+  skillId: Scalars['ID']['input'];
   updateSkillInput: UpdateSkillInput;
 }>;
 
@@ -937,7 +937,7 @@ export type UpdateOneSkillMutationVariables = Exact<{
 export type UpdateOneSkillMutation = { __typename?: 'Mutation', updateOneSkill: { __typename?: 'SkillEntity', id: string, name: string, slug: string, category: SkillCategory, relevance?: number | null, createdAt: any, updatedAt: any } };
 
 export type UpdateManySkillsMutationVariables = Exact<{
-  SkillIds: Array<Scalars['ID']['input']> | Scalars['ID']['input'];
+  skillIds: Array<Scalars['ID']['input']> | Scalars['ID']['input'];
   updateSkillInput: UpdateSkillInput;
 }>;
 
@@ -945,14 +945,14 @@ export type UpdateManySkillsMutationVariables = Exact<{
 export type UpdateManySkillsMutation = { __typename?: 'Mutation', updateManySkills: { __typename?: 'BatchEntity', count: number } };
 
 export type RemoveOneSkillMutationVariables = Exact<{
-  SkillId: Scalars['ID']['input'];
+  skillId: Scalars['ID']['input'];
 }>;
 
 
 export type RemoveOneSkillMutation = { __typename?: 'Mutation', removeOneSkill: { __typename?: 'SkillEntity', id: string, name: string, slug: string, category: SkillCategory, relevance?: number | null, createdAt: any, updatedAt: any } };
 
 export type RemoveManySkillsMutationVariables = Exact<{
-  SkillIds: Array<Scalars['ID']['input']> | Scalars['ID']['input'];
+  skillIds: Array<Scalars['ID']['input']> | Scalars['ID']['input'];
 }>;
 
 
@@ -969,30 +969,30 @@ export type ApiStatusQueryVariables = Exact<{ [key: string]: never; }>;
 export type ApiStatusQuery = { __typename: 'Query' };
 
 export type FindManySkillsQueryVariables = Exact<{
-  SkillFilters?: InputMaybe<FilterSkillInput>;
-  SkillPagination?: InputMaybe<PaginationInput>;
-  SkillSort?: InputMaybe<SortSkillInput>;
+  skillFilters?: InputMaybe<FilterSkillInput>;
+  skillPagination?: InputMaybe<PaginationInput>;
+  skillSort?: InputMaybe<SortSkillInput>;
 }>;
 
 
 export type FindManySkillsQuery = { __typename?: 'Query', findManySkills: { __typename?: 'PaginatedSkillEntity', found: number, nodes: Array<{ __typename?: 'SkillEntity', id: string, name: string, slug: string, category: SkillCategory, relevance?: number | null, createdAt: any, updatedAt: any }> } };
 
 export type FindOneSkillByIdQueryVariables = Exact<{
-  SkillId: Scalars['ID']['input'];
+  skillId: Scalars['ID']['input'];
 }>;
 
 
 export type FindOneSkillByIdQuery = { __typename?: 'Query', findOneSkillById: { __typename?: 'SkillEntity', id: string, name: string, slug: string, category: SkillCategory, relevance?: number | null, createdAt: any, updatedAt: any } };
 
 export type FindOneSkillQueryVariables = Exact<{
-  SkillFilters?: InputMaybe<FilterSkillInput>;
+  skillFilters?: InputMaybe<FilterSkillInput>;
 }>;
 
 
 export type FindOneSkillQuery = { __typename?: 'Query', findOneSkill: { __typename?: 'SkillEntity', id: string, name: string, slug: string, category: SkillCategory, relevance?: number | null, createdAt: any, updatedAt: any } };
 
 export type FindManySkillByIdQueryVariables = Exact<{
-  SkillIds: Array<Scalars['ID']['input']> | Scalars['ID']['input'];
+  skillIds: Array<Scalars['ID']['input']> | Scalars['ID']['input'];
 }>;
 
 
@@ -1036,8 +1036,8 @@ export const CreateOneSkillDocument = new TypedDocumentString(`
 }
     `) as unknown as TypedDocumentString<CreateOneSkillMutation, CreateOneSkillMutationVariables>;
 export const UpdateOneSkillDocument = new TypedDocumentString(`
-    mutation UpdateOneSkill($SkillId: ID!, $updateSkillInput: UpdateSkillInput!) {
-  updateOneSkill(SkillId: $SkillId, updateSkillInput: $updateSkillInput) {
+    mutation UpdateOneSkill($skillId: ID!, $updateSkillInput: UpdateSkillInput!) {
+  updateOneSkill(skillId: $skillId, updateSkillInput: $updateSkillInput) {
     id
     name
     slug
@@ -1049,15 +1049,15 @@ export const UpdateOneSkillDocument = new TypedDocumentString(`
 }
     `) as unknown as TypedDocumentString<UpdateOneSkillMutation, UpdateOneSkillMutationVariables>;
 export const UpdateManySkillsDocument = new TypedDocumentString(`
-    mutation UpdateManySkills($SkillIds: [ID!]!, $updateSkillInput: UpdateSkillInput!) {
-  updateManySkills(SkillIds: $SkillIds, updateSkillInput: $updateSkillInput) {
+    mutation UpdateManySkills($skillIds: [ID!]!, $updateSkillInput: UpdateSkillInput!) {
+  updateManySkills(skillIds: $skillIds, updateSkillInput: $updateSkillInput) {
     count
   }
 }
     `) as unknown as TypedDocumentString<UpdateManySkillsMutation, UpdateManySkillsMutationVariables>;
 export const RemoveOneSkillDocument = new TypedDocumentString(`
-    mutation RemoveOneSkill($SkillId: ID!) {
-  removeOneSkill(SkillId: $SkillId) {
+    mutation RemoveOneSkill($skillId: ID!) {
+  removeOneSkill(skillId: $skillId) {
     id
     name
     slug
@@ -1069,8 +1069,8 @@ export const RemoveOneSkillDocument = new TypedDocumentString(`
 }
     `) as unknown as TypedDocumentString<RemoveOneSkillMutation, RemoveOneSkillMutationVariables>;
 export const RemoveManySkillsDocument = new TypedDocumentString(`
-    mutation RemoveManySkills($SkillIds: [ID!]!) {
-  removeManySkills(SkillIds: $SkillIds) {
+    mutation RemoveManySkills($skillIds: [ID!]!) {
+  removeManySkills(skillIds: $skillIds) {
     count
   }
 }
@@ -1094,11 +1094,11 @@ export const ApiStatusDocument = new TypedDocumentString(`
 }
     `) as unknown as TypedDocumentString<ApiStatusQuery, ApiStatusQueryVariables>;
 export const FindManySkillsDocument = new TypedDocumentString(`
-    query FindManySkills($SkillFilters: FilterSkillInput, $SkillPagination: PaginationInput, $SkillSort: SortSkillInput) {
+    query FindManySkills($skillFilters: FilterSkillInput, $skillPagination: PaginationInput, $skillSort: SortSkillInput) {
   findManySkills(
-    SkillFilters: $SkillFilters
-    SkillPagination: $SkillPagination
-    SkillSort: $SkillSort
+    skillFilters: $skillFilters
+    skillPagination: $skillPagination
+    skillSort: $skillSort
   ) {
     found
     nodes {
@@ -1114,8 +1114,8 @@ export const FindManySkillsDocument = new TypedDocumentString(`
 }
     `) as unknown as TypedDocumentString<FindManySkillsQuery, FindManySkillsQueryVariables>;
 export const FindOneSkillByIdDocument = new TypedDocumentString(`
-    query FindOneSkillById($SkillId: ID!) {
-  findOneSkillById(SkillId: $SkillId) {
+    query FindOneSkillById($skillId: ID!) {
+  findOneSkillById(skillId: $skillId) {
     id
     name
     slug
@@ -1127,8 +1127,8 @@ export const FindOneSkillByIdDocument = new TypedDocumentString(`
 }
     `) as unknown as TypedDocumentString<FindOneSkillByIdQuery, FindOneSkillByIdQueryVariables>;
 export const FindOneSkillDocument = new TypedDocumentString(`
-    query FindOneSkill($SkillFilters: FilterSkillInput) {
-  findOneSkill(SkillFilters: $SkillFilters) {
+    query FindOneSkill($skillFilters: FilterSkillInput) {
+  findOneSkill(skillFilters: $skillFilters) {
     id
     name
     slug
@@ -1140,8 +1140,8 @@ export const FindOneSkillDocument = new TypedDocumentString(`
 }
     `) as unknown as TypedDocumentString<FindOneSkillQuery, FindOneSkillQueryVariables>;
 export const FindManySkillByIdDocument = new TypedDocumentString(`
-    query FindManySkillById($SkillIds: [ID!]!) {
-  findManySkillById(SkillIds: $SkillIds) {
+    query FindManySkillById($skillIds: [ID!]!) {
+  findManySkillById(skillIds: $skillIds) {
     id
     name
     slug
