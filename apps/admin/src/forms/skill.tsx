@@ -72,6 +72,7 @@ export function SkillForm({
       <Field name="relevance">
         {(field) => (
           <RangeInput
+            className="range-xs"
             field={field}
             max={5}
             min={1}

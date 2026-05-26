@@ -37,7 +37,7 @@ export function RangeInput({
   return (
     <fieldset className="fieldset">
       <input
-        className="range w-full"
+        className={cn("range w-full", className)}
         id={field.name}
         max={max}
         min={min}
@@ -51,9 +51,9 @@ export function RangeInput({
         <div className="mt-1 flex justify-between px-2.5 text-xs">
           {steps?.map((value) => (
             <span
-              className={cn(
+              className={
                 field.state.value === value ? "opacity-100" : "opacity-20"
-              )}
+              }
               key={value}
             >
               {value}
