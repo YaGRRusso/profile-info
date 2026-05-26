@@ -36,7 +36,7 @@ export function Alert({
         <div className="flex flex-wrap items-center justify-center gap-2">
           {actions.map((action, index) => (
             <button
-              className={cn("btn btn-soft btn-sm", action.className)}
+              className={cn("btn btn-sm", action.className)}
               key={index}
               onClick={action.onClick}
               type="button"

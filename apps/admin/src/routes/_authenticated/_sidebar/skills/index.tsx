@@ -201,20 +201,29 @@ function RouteComponent() {
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex items-center justify-between gap-4">
-        <PageTitle
-          description="Create, update or delete skills that can be associated with your profile."
-          title="Manage Skills"
-        />
-        <button
-          className="btn btn-primary btn-soft"
-          onClick={() => setFormValues({ state: "CREATING" })}
-          type="button"
-        >
-          <PlusIcon />
-          <span>Add New Skill</span>
-        </button>
-      </div>
+      <PageTitle
+        actions={[
+          {
+            icon: (
+              <ArrowsClockwiseIcon
+                className={cn(findManySkills.isFetching && "animate-spin")}
+              />
+            ),
+            label: "Refetch",
+            className: "btn-ghost",
+            onClick: () => findManySkills.refetch(),
+          },
+          {
+            icon: <PlusIcon />,
+            label: "New Skill",
+            className: "btn-soft",
+            onClick: () =>
+              setFormValues({ state: "CREATING", customValues: {} }),
+          },
+        ]}
+        description="Create, update or delete skills that can be associated with your profile."
+        title="Manage Skills"
+      />
 
       <Modal
         description="Fill the details below and submit."
@@ -261,50 +270,55 @@ function RouteComponent() {
         title="Delete Skill"
       />
 
-      <Alert
-        actions={[
-          {
-            icon: <ArrowsClockwiseIcon />,
-            label: "Refresh",
-            onClick: () => findManySkills.refetch(),
-          },
-        ]}
-        description="Try refreshing the page or create a new skill."
-        icon={<WarningIcon weight="bold" />}
-        title="Nothing found!"
-      />
+      {findManySkills.data?.nodes.length === 0 ? (
+        <Alert
+          actions={[
+            {
+              label: "Refetch",
+              className: "btn-ghost",
+              onClick: () => findManySkills.refetch(),
+            },
+          ]}
+          description="Try refreshing the page or create a new skill."
+          icon={<WarningIcon weight="bold" />}
+          title="Nothing found!"
+        />
+      ) : (
+        <div className="overflow-x-auto rounded bg-base-200">
+          <table className="table">
+            <thead>
+              {table.getHeaderGroups().map((headerGroup) => (
+                <tr key={headerGroup.id}>
+                  {headerGroup.headers.map((header) => (
+                    <th key={header.id}>
+                      {flexRender(
+                        header.column.columnDef.header,
+                        header.getContext()
+                      )}
+                    </th>
+                  ))}
+                </tr>
+              ))}
+            </thead>
+            <tbody>
+              {table.getRowModel().rows.map((row) => (
+                <tr className="hover:bg-base-300" key={row.id}>
+                  {row.getVisibleCells().map((cell) => (
+                    <td key={cell.id}>
+                      {flexRender(
+                        cell.column.columnDef.cell,
+                        cell.getContext()
+                      )}
+                    </td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
 
-      <div className="skeleton h-96 w-full" />
-
-      <div className="overflow-x-auto rounded bg-base-200">
-        <table className="table">
-          <thead>
-            {table.getHeaderGroups().map((headerGroup) => (
-              <tr key={headerGroup.id}>
-                {headerGroup.headers.map((header) => (
-                  <th key={header.id}>
-                    {flexRender(
-                      header.column.columnDef.header,
-                      header.getContext()
-                    )}
-                  </th>
-                ))}
-              </tr>
-            ))}
-          </thead>
-          <tbody>
-            {table.getRowModel().rows.map((row) => (
-              <tr className="hover:bg-base-300" key={row.id}>
-                {row.getVisibleCells().map((cell) => (
-                  <td key={cell.id}>
-                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                  </td>
-                ))}
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+      {findManySkills.isLoading && <div className="skeleton h-96 w-full" />}
     </div>
   );
 }
