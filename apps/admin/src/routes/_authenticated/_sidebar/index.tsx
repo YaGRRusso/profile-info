@@ -8,8 +8,7 @@ export const Route = createFileRoute("/_authenticated/_sidebar/")({
 });
 
 function RouteComponent() {
-  const { clearAuth, user } = useAuthStore();
-
+  const { user } = useAuthStore();
   const apiStatus = useApiStatus();
 
   return (
@@ -24,13 +23,6 @@ function RouteComponent() {
         >
           {apiStatus.isSuccess ? "Online" : "Offline"}
         </span>
-        <button
-          className="badge badge-soft badge-error cursor-pointer"
-          onClick={clearAuth}
-          type="button"
-        >
-          Sign out
-        </button>
       </div>
     </main>
   );

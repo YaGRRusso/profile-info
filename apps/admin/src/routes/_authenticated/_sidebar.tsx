@@ -1,14 +1,45 @@
 import {
   HouseIcon,
   ListIcon,
-  MoonIcon,
   SignOutIcon,
   SquaresFourIcon,
-  SunIcon,
 } from "@phosphor-icons/react";
-import { createFileRoute, Link, Outlet } from "@tanstack/react-router";
+import { createFileRoute, Outlet } from "@tanstack/react-router";
 import { useAuthStore } from "@/stores/auth";
-import { useThemeStore } from "@/stores/theme";
+import { MenuAction, type MenuActionProps } from "./-components/menu-action";
+import { MenuLink, type MenuLinkProps } from "./-components/menu-link";
+import { ThemeSwitch } from "./-components/theme-switch";
+
+interface MenuSection {
+  items: (MenuLinkProps | MenuActionProps)[];
+  label?: string;
+}
+
+const MENU_SECTIONS: MenuSection[] = [
+  {
+    label: "Navigation",
+    items: [
+      { icon: <HouseIcon size={24} />, label: "Home", to: "/", type: "link" },
+      {
+        icon: <SquaresFourIcon size={24} />,
+        label: "Skills",
+        to: "/skills",
+        type: "link",
+      },
+    ],
+  },
+  {
+    label: "Actions",
+    items: [
+      {
+        icon: <SignOutIcon size={24} />,
+        label: "Sign Out",
+        onClick: () => useAuthStore.getState().clearAuth(),
+        type: "action",
+      },
+    ],
+  },
+];
 
 export const Route = createFileRoute("/_authenticated/_sidebar")({
   component: RouteComponent,
@@ -16,7 +47,6 @@ export const Route = createFileRoute("/_authenticated/_sidebar")({
 
 function RouteComponent() {
   const { user } = useAuthStore();
-  const { theme, setTheme } = useThemeStore();
 
   return (
     <div className="flex h-screen">
@@ -55,73 +85,18 @@ function RouteComponent() {
                 <p className="line-clamp-1 text-xs opacity-60">{user?.role}</p>
               </div>
             </div>
-            <div className="join mb-4 is-drawer-close:hidden w-full rounded px-4">
-              <label className="btn btn-sm join-item has-checked:btn-primary flex-1">
-                <input
-                  aria-label="dark"
-                  checked={theme === "dark"}
-                  className="theme-controller hidden"
-                  name="theme-buttons"
-                  onChange={() => setTheme("dark")}
-                  type="radio"
-                  value="dark"
-                />
-                <MoonIcon />
-                <span>Dark</span>
-              </label>
-              <label className="btn btn-sm join-item has-checked:btn-primary flex-1">
-                <input
-                  aria-label="light"
-                  checked={theme === "light"}
-                  className="theme-controller hidden"
-                  name="theme-buttons"
-                  onChange={() => setTheme("light")}
-                  type="radio"
-                  value="light"
-                />
-                <SunIcon />
-                <span>Light</span>
-              </label>
-            </div>
+            <ThemeSwitch />
             <div className="flex w-full flex-1 flex-col justify-between gap-2">
-              <ul className="menu w-full gap-2">
-                <li>
-                  <Link
-                    activeProps={{ className: "menu-active" }}
-                    className="is-drawer-close:tooltip is-drawer-close:tooltip-right"
-                    data-tip="Home"
-                    to="/"
-                  >
-                    <HouseIcon size={24} />
-                    <span className="is-drawer-close:hidden">Home</span>
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    activeProps={{ className: "menu-active" }}
-                    className="is-drawer-close:tooltip is-drawer-close:tooltip-right"
-                    data-tip="Skills"
-                    to="/skills"
-                  >
-                    <SquaresFourIcon size={24} />
-                    <span className="is-drawer-close:hidden">Skills</span>
-                  </Link>
-                </li>
-              </ul>
-              <ul className="menu w-full gap-2">
-                <li>
-                  <button
-                    className="is-drawer-close:tooltip is-drawer-close:tooltip-right"
-                    data-tip="Sign Out"
-                    type="button"
-                  >
-                    <SignOutIcon size={24} />
-                    <span className="line-clamp-1 is-drawer-close:hidden">
-                      Sign Out
-                    </span>
-                  </button>
-                </li>
-              </ul>
+              {MENU_SECTIONS.map((section, i) => (
+                <ul className="menu w-full gap-2" key={section.label ?? i}>
+                  {section.items.map((item) => (
+                    <li key={item.label}>
+                      {item.type === "link" && <MenuLink {...item} />}
+                      {item.type === "action" && <MenuAction {...item} />}
+                    </li>
+                  ))}
+                </ul>
+              ))}
             </div>
           </div>
         </aside>
