@@ -47,7 +47,7 @@ export function SkillForm({
 
   return (
     <form
-      className="flex w-full flex-col gap-2"
+      className="form"
       onSubmit={(e) => {
         e.preventDefault();
         e.stopPropagation();
@@ -82,7 +82,7 @@ export function SkillForm({
           />
         )}
       </Field>
-      <div className="flex items-center gap-2">
+      <div className="form-footer">
         {onCancel && (
           <button
             className="btn btn-ghost flex-1"

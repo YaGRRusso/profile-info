@@ -11,6 +11,7 @@ export interface PasswordInputProps extends ComponentProps<"input"> {
 export function PasswordInput({
   className,
   field,
+  placeholder,
   ...props
 }: PasswordInputProps) {
   const [isShowing, setIsShowing] = useState(false);
@@ -18,11 +19,13 @@ export function PasswordInput({
 
   return (
     <fieldset className="fieldset">
+      <legend className="fieldset-legend">{placeholder}</legend>
       <label className={cn("input w-full", error && "input-error", className)}>
         <input
           id={field.name}
           name={field.name}
           onChange={(e) => field.handleChange(e.target.value)}
+          placeholder={placeholder}
           type={isShowing ? "text" : "password"}
           value={field.state.value}
           {...props}
@@ -39,7 +42,7 @@ export function PasswordInput({
           )}
         </button>
       </label>
-      {error && <span className="text-error text-xs">{error}</span>}
+      {error && <p className="label text-error">{error}</p>}
     </fieldset>
   );
 }

@@ -1,8 +1,9 @@
 import {
+  ArrowsClockwiseIcon,
   PencilIcon,
   PlusIcon,
   TrashSimpleIcon,
-  XIcon,
+  WarningIcon,
 } from "@phosphor-icons/react";
 import { createFileRoute } from "@tanstack/react-router";
 import {
@@ -12,6 +13,10 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 import { useCallback, useMemo, useState } from "react";
+import { Alert } from "@/components/display/alert";
+import { Dialog } from "@/components/display/dialog";
+import { Modal } from "@/components/display/modal";
+import { PageTitle } from "@/components/display/page-title";
 import { CommonFormValuesProps } from "@/forms/common";
 import { SkillForm, type SkillSchema } from "@/forms/skill";
 import type { SkillEntity } from "@/graphql/graphql";
@@ -163,8 +168,9 @@ function RouteComponent() {
               <button
                 className="btn btn-sm btn-soft btn-square btn-error"
                 onClick={() =>
-                  removeOneSkill.mutate(skill.id, {
-                    onSuccess: () => findManySkills.refetch(),
+                  setFormValues({
+                    state: "DELETING",
+                    customValues: { id: skill.id },
                   })
                 }
                 type="button"
@@ -176,7 +182,7 @@ function RouteComponent() {
         },
       }),
     ],
-    [removeOneSkill.mutate, findManySkills.refetch]
+    []
   );
 
   const table = useReactTable({
@@ -196,56 +202,79 @@ function RouteComponent() {
   return (
     <div className="flex flex-col gap-4">
       <div className="flex items-center justify-between gap-4">
-        <div className="flex flex-col">
-          <h1 className="font-semibold text-2xl">Skills</h1>
-          <p className="text-sm opacity-60">
-            {findManySkills.data?.found ?? 0} total
-          </p>
-        </div>
+        <PageTitle
+          description="Create, update or delete skills that can be associated with your profile."
+          title="Manage Skills"
+        />
         <button
-          className="btn btn-primary btn-soft btn-sm"
+          className="btn btn-primary btn-soft"
           onClick={() => setFormValues({ state: "CREATING" })}
           type="button"
         >
           <PlusIcon />
-          <span>Add Skill</span>
+          <span>Add New Skill</span>
         </button>
       </div>
 
-      {formValues?.state && (
-        <dialog className="modal modal-open">
-          <div className="modal-box flex flex-col gap-4">
-            <div className="flex flex-col">
-              <h2 className="font-semibold text-lg">Manage Skill</h2>
-              <p className="text-sm opacity-60">
-                Fill in the details below and submit.
-              </p>
-            </div>
-            <SkillForm
-              customValues={formValues?.customValues}
-              defaultValues={formValues?.defaultValues}
-              isLoading={createOneSkill.isPending || updateOneSkill.isPending}
-              onCancel={() => setFormValues(undefined)}
-              onSubmit={handleSubmit}
-              state={formValues?.state}
-            />
-            <button
-              className="btn btn-sm btn-circle btn-ghost absolute top-2 right-2"
-              onClick={() => setFormValues(undefined)}
-              type="button"
-            >
-              <XIcon />
-            </button>
-          </div>
-          <button
-            className="modal-backdrop"
-            onClick={() => setFormValues(undefined)}
-            type="button"
-          >
-            close
-          </button>
-        </dialog>
-      )}
+      <Modal
+        description="Fill the details below and submit."
+        isOpen={
+          formValues?.state === "CREATING" ||
+          formValues?.state === "UPDATING" ||
+          formValues?.state === "READING"
+        }
+        onClose={() => setFormValues(undefined)}
+        title="Manage Skill"
+      >
+        <SkillForm
+          customValues={formValues?.customValues}
+          defaultValues={formValues?.defaultValues}
+          isLoading={createOneSkill.isPending || updateOneSkill.isPending}
+          onCancel={() => setFormValues(undefined)}
+          onSubmit={handleSubmit}
+          state={formValues?.state}
+        />
+      </Modal>
+
+      <Dialog
+        actions={[
+          {
+            label: "Cancel",
+            className: "btn-ghost",
+            onClick: () => setFormValues(undefined),
+          },
+          {
+            label: "Confirm",
+            className: "btn-soft btn-error",
+            onClick: () =>
+              removeOneSkill.mutate(formValues?.customValues?.id ?? "", {
+                onSuccess: () => {
+                  setFormValues(undefined);
+                  findManySkills.refetch();
+                },
+              }),
+          },
+        ]}
+        description="Are you sure you want to delete this skill?"
+        isOpen={formValues?.state === "DELETING"}
+        onClose={() => setFormValues(undefined)}
+        title="Delete Skill"
+      />
+
+      <Alert
+        actions={[
+          {
+            icon: <ArrowsClockwiseIcon />,
+            label: "Refresh",
+            onClick: () => findManySkills.refetch(),
+          },
+        ]}
+        description="Try refreshing the page or create a new skill."
+        icon={<WarningIcon weight="bold" />}
+        title="Nothing found!"
+      />
+
+      <div className="skeleton h-96 w-full" />
 
       <div className="overflow-x-auto rounded bg-base-200">
         <table className="table">

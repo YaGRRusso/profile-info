@@ -20,6 +20,7 @@ export function SelectInput({
 
   return (
     <fieldset className="fieldset">
+      <legend className="fieldset-legend">{placeholder}</legend>
       <select
         className={cn("select w-full", error && "select-error", className)}
         id={field.name}
@@ -35,7 +36,7 @@ export function SelectInput({
           </option>
         ))}
       </select>
-      {error && <span className="text-error text-xs">{error}</span>}
+      {error && <p className="label text-error">{error}</p>}
     </fieldset>
   );
 }

@@ -36,6 +36,7 @@ export function RangeInput({
 
   return (
     <fieldset className="fieldset">
+      <legend className="fieldset-legend">{placeholder}</legend>
       <input
         className={cn("range w-full", className)}
         id={field.name}
@@ -61,7 +62,7 @@ export function RangeInput({
           ))}
         </div>
       )}
-      {error && <span className="text-error text-xs">{error}</span>}
+      {error && <p className="label text-error">{error}</p>}
     </fieldset>
   );
 }

@@ -37,7 +37,7 @@ export function UserForm({
 
   return (
     <form
-      className="flex w-full flex-col gap-2"
+      className="form"
       onSubmit={(e) => {
         e.preventDefault();
         e.stopPropagation();
@@ -52,7 +52,7 @@ export function UserForm({
       <Field name="password">
         {(field) => <PasswordInput field={field} placeholder="Password" />}
       </Field>
-      <div className="flex items-center gap-2">
+      <div className="form-footer">
         <Subscribe>
           {({ canSubmit, isSubmitting, isTouched }) => (
             <button
