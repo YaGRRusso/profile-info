@@ -53,7 +53,7 @@ export function RangeInput({
           {steps?.map((value) => (
             <span
               className={
-                field.state.value === value ? "opacity-100" : "opacity-20"
+                field.state.value === value ? "opacity-full" : "opacity-sm"
               }
               key={value}
             >

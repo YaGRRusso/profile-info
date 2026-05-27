@@ -82,7 +82,7 @@ function RouteComponent() {
               </div>
               <div className="flex is-drawer-close:hidden flex-col">
                 <strong className="line-clamp-1 text-sm">{user?.name}</strong>
-                <p className="line-clamp-1 text-xs opacity-60">{user?.role}</p>
+                <p className="line-clamp-1 text-xs opacity-md">{user?.role}</p>
               </div>
             </div>
             <ThemeSwitch />

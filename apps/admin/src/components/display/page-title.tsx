@@ -23,7 +23,7 @@ export function PageTitle({
     <div className="flex flex-wrap items-center justify-between gap-x-8">
       <div className={cn("my-4 flex flex-col", className)} {...props}>
         <h1 className="font-semibold text-3xl">{title}</h1>
-        <p className="opacity-60">{description}</p>
+        <p className="opacity-md">{description}</p>
       </div>
       {actions && (
         <div className="scrollbar-hidden flex items-center gap-2 overflow-auto">

@@ -36,9 +36,9 @@ export function PasswordInput({
           type="button"
         >
           {isShowing ? (
-            <EyeSlashIcon className="opacity-60" />
+            <EyeSlashIcon className="opacity-md" />
           ) : (
-            <EyeIcon className="opacity-60" />
+            <EyeIcon className="opacity-md" />
           )}
         </button>
       </label>

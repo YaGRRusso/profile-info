@@ -22,7 +22,7 @@ export function Login() {
         <div className="flex flex-1 flex-col justify-center gap-10 p-12 max-sm:p-4">
           <div className="flex flex-col">
             <h1 className="font-semibold text-5xl max-sm:text-3xl">Welcome</h1>
-            <p className="text-sm opacity-60">
+            <p className="text-sm opacity-md">
               Sign in to your account to continue
             </p>
           </div>

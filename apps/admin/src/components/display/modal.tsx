@@ -30,7 +30,7 @@ export function Modal({
         <div className="modal-box flex flex-col gap-4">
           <div className="flex flex-col">
             <h2 className="font-semibold text-lg">{title}</h2>
-            <p className="text-sm opacity-60">{description}</p>
+            <p className="text-sm opacity-md">{description}</p>
           </div>
           {children}
           <button

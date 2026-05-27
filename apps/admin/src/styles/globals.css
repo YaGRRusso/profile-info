@@ -25,6 +25,22 @@
   }
 }
 
+@utility opacity-sm {
+  opacity: 0.4;
+}
+
+@utility opacity-md {
+  opacity: 0.6;
+}
+
+@utility opacity-lg {
+  opacity: 0.8;
+}
+
+@utility opacity-full {
+  opacity: 1;
+}
+
 @utility form {
   display: flex;
   flex-direction: column;

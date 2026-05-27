@@ -30,7 +30,7 @@ export function Alert({
       {icon}
       <div className="flex flex-col">
         <span>{title}</span>
-        {description && <p className="opacity-60">{description}</p>}
+        {description && <p className="opacity-md">{description}</p>}
       </div>
       {actions && (
         <div className="flex flex-wrap items-center justify-center gap-2">
