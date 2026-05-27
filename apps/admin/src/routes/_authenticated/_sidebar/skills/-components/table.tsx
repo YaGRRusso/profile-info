@@ -1,3 +1,4 @@
+import { PencilIcon, TrashSimpleIcon } from "@phosphor-icons/react";
 import {
   createColumnHelper,
   flexRender,
@@ -8,21 +9,47 @@ import type { SkillEntity } from "@/graphql/graphql";
 
 const columnHelper = createColumnHelper<SkillEntity>();
 
-const columns = [
+const getColumns = (
+  onEdit: (skill: SkillEntity) => void,
+  onDelete: (id: string) => void
+) => [
   columnHelper.accessor("name", { header: "Name" }),
   columnHelper.accessor("slug", { header: "Slug" }),
   columnHelper.accessor("category", { header: "Category" }),
   columnHelper.accessor("relevance", { header: "Relevance" }),
+  columnHelper.display({
+    id: "actions",
+    cell: ({ row }) => (
+      <div className="flex items-center justify-end gap-2">
+        <button
+          className="btn btn-sm btn-square btn-soft"
+          onClick={() => onEdit(row.original)}
+          type="button"
+        >
+          <PencilIcon />
+        </button>
+        <button
+          className="btn btn-sm btn-soft btn-square btn-error"
+          onClick={() => onDelete(row.original.id)}
+          type="button"
+        >
+          <TrashSimpleIcon />
+        </button>
+      </div>
+    ),
+  }),
 ];
 
 interface SkillsTableProps {
   data: SkillEntity[];
+  onDelete: (id: string) => void;
+  onEdit: (skill: SkillEntity) => void;
 }
 
-export function SkillsTable({ data }: SkillsTableProps) {
+export function SkillsTable({ data, onEdit, onDelete }: SkillsTableProps) {
   const table = useReactTable({
     data,
-    columns,
+    columns: getColumns(onEdit, onDelete),
     getCoreRowModel: getCoreRowModel(),
   });
 
