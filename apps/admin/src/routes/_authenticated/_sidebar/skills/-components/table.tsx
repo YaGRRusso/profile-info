@@ -5,6 +5,7 @@ import {
   CalendarIcon,
   MagnifyingGlassIcon,
   PencilIcon,
+  SquaresFourIcon,
   TrashSimpleIcon,
 } from "@phosphor-icons/react";
 import {
@@ -18,6 +19,7 @@ import {
   type RowSelectionState,
   type SortingState,
   useReactTable,
+  type VisibilityState,
 } from "@tanstack/react-table";
 import { useEffect, useState } from "react";
 import type { SkillEntity } from "@/graphql/graphql";
@@ -59,6 +61,7 @@ const getColumns = (
 ) => [
   columnHelper.display({
     id: "select",
+    enableHiding: false,
     header: ({ table }) => (
       <input
         checked={table.getIsAllRowsSelected()}
@@ -118,6 +121,7 @@ const getColumns = (
   }),
   columnHelper.display({
     id: "actions",
+    enableHiding: false,
     cell: ({ row }) => (
       <div className="flex items-center justify-end gap-2">
         <button
@@ -156,6 +160,7 @@ export function SkillsTable({
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
+  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
 
   function setColumnFilter(id: string, value: unknown) {
     setColumnFilters((prev) => {
@@ -178,10 +183,17 @@ export function SkillsTable({
     getFilteredRowModel: getFilteredRowModel(), // pipeline: core → filtered
     getSortedRowModel: getSortedRowModel(), // pipeline: core → filtered → sorted
     getRowId: (row) => row.id,
-    state: { globalFilter, sorting, columnFilters, rowSelection },
+    state: {
+      globalFilter,
+      sorting,
+      columnFilters,
+      rowSelection,
+      columnVisibility,
+    },
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
     onRowSelectionChange: setRowSelection,
+    onColumnVisibilityChange: setColumnVisibility,
   });
 
   useEffect(() => {
@@ -191,7 +203,7 @@ export function SkillsTable({
 
   return (
     <div className="flex flex-col gap-2">
-      <div className="flex gap-2">
+      <div className="flex items-center gap-2">
         <label className="input flex-1">
           <MagnifyingGlassIcon className="opacity-md" />
           <input
@@ -201,7 +213,6 @@ export function SkillsTable({
             value={globalFilter}
           />
         </label>
-
         <select
           className="select"
           onChange={(e) => setColumnFilter("category", e.target.value)}
@@ -217,9 +228,37 @@ export function SkillsTable({
 
         <div className="dropdown dropdown-bottom dropdown-end">
           <button className="btn btn-square btn-soft" type="button">
+            <SquaresFourIcon />
+          </button>
+          <div className="dropdown-content z-1 flex w-40 flex-col gap-2 rounded-box border border-input bg-base-200 p-4">
+            <div className="flex flex-col gap-2">
+              <span className="font-semibold">Visibility</span>
+              {table
+                .getAllColumns()
+                .filter((col) => col.getCanHide())
+                .map((col) => (
+                  <label
+                    className="flex items-center gap-2 text-sm"
+                    key={col.id}
+                  >
+                    <input
+                      checked={col.getIsVisible()}
+                      className="checkbox checkbox-sm"
+                      onChange={col.getToggleVisibilityHandler()}
+                      type="checkbox"
+                    />
+                    <span>{col.columnDef.header as string}</span>
+                  </label>
+                ))}
+            </div>
+          </div>
+        </div>
+
+        <div className="dropdown dropdown-bottom dropdown-end">
+          <button className="btn btn-square btn-soft" type="button">
             <CalendarIcon />
           </button>
-          <div className="dropdown-content z-1 flex w-48 flex-col rounded-box border border-input bg-base-200 p-4">
+          <div className="dropdown-content z-1 flex w-40 flex-col rounded-box border border-input bg-base-200 p-4">
             <div className="flex flex-col gap-2">
               <span className="font-semibold">Created</span>
               {DATE_OPTIONS.map(({ value, label }) => (
