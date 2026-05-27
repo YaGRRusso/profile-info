@@ -1,4 +1,7 @@
 import {
+  ArrowDownIcon,
+  ArrowsDownUpIcon,
+  ArrowUpIcon,
   MagnifyingGlassIcon,
   PencilIcon,
   TrashSimpleIcon,
@@ -8,22 +11,41 @@ import {
   flexRender,
   getCoreRowModel,
   getFilteredRowModel,
+  getSortedRowModel,
+  type SortingState,
   useReactTable,
 } from "@tanstack/react-table";
 import { useState } from "react";
 import type { SkillEntity } from "@/graphql/graphql";
+import { cn } from "@/lib/cn";
 
 const columnHelper = createColumnHelper<SkillEntity>();
+
+// Ícone que reflete o estado atual da coluna
+function SortIcon({ sorted }: { sorted: false | "asc" | "desc" }) {
+  if (sorted === "asc") return <ArrowUpIcon />;
+  if (sorted === "desc") return <ArrowDownIcon />;
+  return <ArrowsDownUpIcon className="opacity-50" />;
+}
 
 const getColumns = (
   onEdit: (skill: SkillEntity) => void,
   onDelete: (id: string) => void
 ) => [
-  columnHelper.accessor("name", { header: "Name" }),
-  columnHelper.accessor("slug", { header: "Slug" }),
+  columnHelper.accessor("name", {
+    header: "Name",
+    enableGlobalFilter: true,
+    enableSorting: true,
+  }),
+  columnHelper.accessor("slug", {
+    header: "Slug",
+    enableGlobalFilter: true,
+    enableSorting: true,
+  }),
   columnHelper.accessor("category", {
     header: "Category",
     enableGlobalFilter: false,
+    enableSorting: false,
     cell: (data) => (
       <span className="badge badge-soft badge-sm">{data.getValue()}</span>
     ),
@@ -31,6 +53,7 @@ const getColumns = (
   columnHelper.accessor("relevance", {
     header: "Relevance",
     enableGlobalFilter: false,
+    enableSorting: true,
     cell: (data) => (
       <span className="badge badge-soft badge-sm">{data.getValue()}</span>
     ),
@@ -66,13 +89,16 @@ interface SkillsTableProps {
 
 export function SkillsTable({ data, onEdit, onDelete }: SkillsTableProps) {
   const [globalFilter, setGlobalFilter] = useState("");
+  const [sorting, setSorting] = useState<SortingState>([]);
 
   const table = useReactTable({
     data,
     columns: getColumns(onEdit, onDelete),
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(), // pipeline: core → filtered
-    state: { globalFilter },
+    getSortedRowModel: getSortedRowModel(), // pipeline: core → filtered → sorted
+    state: { globalFilter, sorting },
+    onSortingChange: setSorting,
   });
 
   return (
@@ -93,11 +119,22 @@ export function SkillsTable({ data, onEdit, onDelete }: SkillsTableProps) {
             {table.getHeaderGroups().map((headerGroup) => (
               <tr key={headerGroup.id}>
                 {headerGroup.headers.map((header) => (
-                  <th key={header.id}>
-                    {flexRender(
-                      header.column.columnDef.header,
-                      header.getContext()
+                  <th
+                    className={cn(
+                      header.column.getCanSort() && "cursor-pointer select-none"
                     )}
+                    key={header.id}
+                    onClick={header.column.getToggleSortingHandler()}
+                  >
+                    <div className="flex items-center gap-1">
+                      {flexRender(
+                        header.column.columnDef.header,
+                        header.getContext()
+                      )}
+                      {header.column.getCanSort() && (
+                        <SortIcon sorted={header.column.getIsSorted()} />
+                      )}
+                    </div>
                   </th>
                 ))}
               </tr>
