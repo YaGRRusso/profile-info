@@ -2,12 +2,15 @@ import {
   ArrowDownIcon,
   ArrowsDownUpIcon,
   ArrowUpIcon,
+  CalendarIcon,
   MagnifyingGlassIcon,
   PencilIcon,
   TrashSimpleIcon,
 } from "@phosphor-icons/react";
 import {
+  type ColumnFiltersState,
   createColumnHelper,
+  type FilterFn,
   flexRender,
   getCoreRowModel,
   getFilteredRowModel,
@@ -17,11 +20,32 @@ import {
 } from "@tanstack/react-table";
 import { useState } from "react";
 import type { SkillEntity } from "@/graphql/graphql";
+import { SkillCategory } from "@/graphql/graphql";
 import { cn } from "@/lib/cn";
+
+const DATE_OPTIONS = [
+  { value: undefined, label: "Any date" },
+  { value: "week", label: "Last 7 days" },
+  { value: "month", label: "This month" },
+];
 
 const columnHelper = createColumnHelper<SkillEntity>();
 
-// Ícone que reflete o estado atual da coluna
+const dateRangeFilter: FilterFn<SkillEntity> = (row, column, value) => {
+  const date = new Date(row.getValue(column));
+  const now = new Date();
+  if (value === "week") {
+    return date >= new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+  }
+  if (value === "month") {
+    return (
+      date.getMonth() === now.getMonth() &&
+      date.getFullYear() === now.getFullYear()
+    );
+  }
+  return true;
+};
+
 function SortIcon({ sorted }: { sorted: false | "asc" | "desc" }) {
   if (sorted === "asc") return <ArrowUpIcon />;
   if (sorted === "desc") return <ArrowDownIcon />;
@@ -44,19 +68,34 @@ const getColumns = (
   }),
   columnHelper.accessor("category", {
     header: "Category",
-    enableGlobalFilter: false,
-    enableSorting: false,
+    enableColumnFilter: true,
+    filterFn: "equals",
     cell: (data) => (
       <span className="badge badge-soft badge-sm">{data.getValue()}</span>
     ),
   }),
   columnHelper.accessor("relevance", {
     header: "Relevance",
-    enableGlobalFilter: false,
     enableSorting: true,
     cell: (data) => (
       <span className="badge badge-soft badge-sm">{data.getValue()}</span>
     ),
+  }),
+  columnHelper.accessor("createdAt", {
+    header: "Created",
+    enableSorting: true,
+    enableColumnFilter: true,
+    sortingFn: "datetime",
+    filterFn: dateRangeFilter,
+    cell: ({ getValue }) => new Date(getValue()).toLocaleDateString(),
+  }),
+  columnHelper.accessor("updatedAt", {
+    header: "Updated",
+    enableSorting: true,
+    enableColumnFilter: true,
+    sortingFn: "datetime",
+    filterFn: dateRangeFilter,
+    cell: ({ getValue }) => new Date(getValue()).toLocaleDateString(),
   }),
   columnHelper.display({
     id: "actions",
@@ -90,6 +129,21 @@ interface SkillsTableProps {
 export function SkillsTable({ data, onEdit, onDelete }: SkillsTableProps) {
   const [globalFilter, setGlobalFilter] = useState("");
   const [sorting, setSorting] = useState<SortingState>([]);
+  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
+
+  function setColumnFilter(id: string, value: unknown) {
+    setColumnFilters((prev) => {
+      const rest = prev.filter((f) => f.id !== id);
+      return value ? [...rest, { id, value }] : rest;
+    });
+  }
+
+  const categoryFilter = columnFilters.find((f) => f.id === "category")
+    ?.value as string | undefined;
+  const createdAtFilter = columnFilters.find((f) => f.id === "createdAt")
+    ?.value as string | undefined;
+  const updatedAtFilter = columnFilters.find((f) => f.id === "updatedAt")
+    ?.value as string | undefined;
 
   const table = useReactTable({
     data,
@@ -97,21 +151,80 @@ export function SkillsTable({ data, onEdit, onDelete }: SkillsTableProps) {
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(), // pipeline: core → filtered
     getSortedRowModel: getSortedRowModel(), // pipeline: core → filtered → sorted
-    state: { globalFilter, sorting },
+    enableGlobalFilter: false,
+    enableSorting: false,
+    state: { globalFilter, sorting, columnFilters },
     onSortingChange: setSorting,
+    onColumnFiltersChange: setColumnFilters,
   });
 
   return (
     <div className="flex flex-col gap-2">
-      <label className="input w-full">
-        <MagnifyingGlassIcon className="opacity-md" />
-        <input
-          onChange={(e) => setGlobalFilter(e.target.value)}
-          placeholder="Search by name or slug..."
-          type="text"
-          value={globalFilter}
-        />
-      </label>
+      <div className="flex gap-2">
+        <label className="input flex-1">
+          <MagnifyingGlassIcon className="opacity-md" />
+          <input
+            onChange={(e) => setGlobalFilter(e.target.value)}
+            placeholder="Search by name or slug..."
+            type="text"
+            value={globalFilter}
+          />
+        </label>
+
+        <select
+          className="select"
+          onChange={(e) => setColumnFilter("category", e.target.value)}
+          value={categoryFilter ?? ""}
+        >
+          <option value="">All categories</option>
+          {Object.values(SkillCategory).map((cat) => (
+            <option key={cat} value={cat}>
+              {cat}
+            </option>
+          ))}
+        </select>
+
+        <div className="dropdown dropdown-bottom dropdown-end">
+          <button className="btn btn-square btn-soft" type="button">
+            <CalendarIcon />
+          </button>
+          <div className="dropdown-content z-1 flex w-48 flex-col rounded-box border border-input bg-base-200 p-4">
+            <div className="flex flex-col gap-2">
+              <span className="font-semibold">Created</span>
+              {DATE_OPTIONS.map(({ value, label }) => (
+                <label className="flex items-center gap-2 text-sm" key={value}>
+                  <input
+                    checked={createdAtFilter === value}
+                    className="radio radio-sm"
+                    name="created"
+                    onChange={() => setColumnFilter("createdAt", value)}
+                    type="radio"
+                    value={value ?? "any"}
+                  />
+                  <span>{label}</span>
+                </label>
+              ))}
+            </div>
+            <div className="divider mt-2 mb-0" />
+            <div className="flex flex-col gap-2">
+              <span className="font-semibold">Updated</span>
+              {DATE_OPTIONS.map(({ value, label }) => (
+                <label className="flex items-center gap-2 text-sm" key={value}>
+                  <input
+                    checked={updatedAtFilter === value}
+                    className="radio radio-sm"
+                    name="updated"
+                    onChange={() => setColumnFilter("updatedAt", value)}
+                    type="radio"
+                    value={value ?? "any"}
+                  />
+                  <span>{label}</span>
+                </label>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
 
       <div className="overflow-x-auto bg-base-200">
         <table className="table">
