@@ -2,10 +2,10 @@ import {
   ArrowDownIcon,
   ArrowsDownUpIcon,
   ArrowUpIcon,
-  CalendarIcon,
+  GearIcon,
   MagnifyingGlassIcon,
   PencilIcon,
-  SquaresFourIcon,
+  SlidersHorizontalIcon,
   TrashSimpleIcon,
 } from "@phosphor-icons/react";
 import {
@@ -14,6 +14,7 @@ import {
   type FilterFn,
   flexRender,
   getCoreRowModel,
+  getFacetedMinMaxValues,
   getFacetedRowModel,
   getFacetedUniqueValues,
   getFilteredRowModel,
@@ -34,6 +35,15 @@ const DATE_OPTIONS = [
 ];
 
 const columnHelper = createColumnHelper<SkillEntity>();
+
+const numberRangeFilter: FilterFn<SkillEntity> = (row, columnId, value) => {
+  const rowValue = row.getValue<number | null>(columnId);
+  if (rowValue === null || rowValue === undefined) return false;
+  const [min, max] = value as [number | undefined, number | undefined];
+  if (min !== undefined && rowValue < min) return false;
+  if (max !== undefined && rowValue > max) return false;
+  return true;
+};
 
 const dateRangeFilter: FilterFn<SkillEntity> = (row, column, value) => {
   const date = new Date(row.getValue(column));
@@ -99,7 +109,9 @@ const getColumns = (
   }),
   columnHelper.accessor("relevance", {
     header: "Relevance",
+    enableColumnFilter: true,
     enableGlobalFilter: false,
+    filterFn: numberRangeFilter,
     cell: (data) => (
       <span className="badge badge-soft badge-sm">{data.getValue()}</span>
     ),
@@ -176,6 +188,8 @@ export function SkillsTable({
     ?.value as string | undefined;
   const updatedAtFilter = columnFilters.find((f) => f.id === "updatedAt")
     ?.value as string | undefined;
+  const relevanceFilter = columnFilters.find((f) => f.id === "relevance")
+    ?.value as [number | undefined, number | undefined] | undefined;
 
   // getCoreRowModel - required
   // getFilteredRowModel - use when using filters
@@ -193,6 +207,7 @@ export function SkillsTable({
     getSortedRowModel: getSortedRowModel(),
     getFacetedRowModel: getFacetedRowModel(),
     getFacetedUniqueValues: getFacetedUniqueValues(),
+    getFacetedMinMaxValues: getFacetedMinMaxValues(),
     getRowId: (row) => row.id,
     state: {
       globalFilter,
@@ -206,6 +221,27 @@ export function SkillsTable({
     onRowSelectionChange: setRowSelection,
     onColumnVisibilityChange: setColumnVisibility,
   });
+
+  // getFacetedMinMaxValues retorna [min, max] dos valores de relevance nas rows
+  // já filtradas pelas demais colunas — excluindo o próprio filtro de relevance.
+  // Isso permite que os placeholders reflitam o range real disponível dado o contexto atual.
+  const relevanceMinMax = table
+    .getColumn("relevance")
+    ?.getFacetedMinMaxValues();
+
+  function setRelevanceFilter(index: 0 | 1, raw: string) {
+    const val = raw === "" ? undefined : Number(raw);
+    const next: [number | undefined, number | undefined] = [
+      relevanceFilter?.[0],
+      relevanceFilter?.[1],
+    ];
+    next[index] = val;
+
+    setColumnFilter(
+      "relevance",
+      next.some((v) => v !== undefined) ? next : undefined
+    );
+  }
 
   useEffect(() => {
     const selected = data.filter((skill) => rowSelection[skill.id]);
@@ -242,7 +278,72 @@ export function SkillsTable({
 
         <div className="dropdown dropdown-bottom dropdown-end">
           <button className="btn btn-square btn-soft" type="button">
-            <SquaresFourIcon />
+            <SlidersHorizontalIcon />
+          </button>
+          <div className="dropdown-content z-1 flex w-52 flex-col rounded-box border border-input bg-base-200 p-4">
+            <fieldset className="flex flex-col gap-2">
+              <span className="font-semibold">Relevance</span>
+              <div className="flex items-center gap-2">
+                <input
+                  className="input input-sm w-full"
+                  max={relevanceMinMax?.[1] ?? 100}
+                  min={relevanceMinMax?.[0] ?? 0}
+                  onChange={(e) => setRelevanceFilter(0, e.target.value)}
+                  placeholder="Min"
+                  type="number"
+                  value={relevanceFilter?.[0] ?? ""}
+                />
+                <input
+                  className="input input-sm w-full"
+                  max={relevanceMinMax?.[1] ?? 100}
+                  min={relevanceMinMax?.[0] ?? 0}
+                  onChange={(e) => setRelevanceFilter(1, e.target.value)}
+                  placeholder="Max"
+                  type="number"
+                  value={relevanceFilter?.[1] ?? ""}
+                />
+              </div>
+            </fieldset>
+            <div className="divider mt-2 mb-0" />
+            <fieldset className="flex flex-col gap-2">
+              <span className="font-semibold">Created</span>
+              {DATE_OPTIONS.map(({ value, label }) => (
+                <label className="flex items-center gap-2 text-sm" key={value}>
+                  <input
+                    checked={createdAtFilter === value}
+                    className="radio radio-sm"
+                    name="created"
+                    onChange={() => setColumnFilter("createdAt", value)}
+                    type="radio"
+                    value={value ?? "any"}
+                  />
+                  <span>{label}</span>
+                </label>
+              ))}
+            </fieldset>
+            <div className="divider mt-2 mb-0" />
+            <fieldset className="flex flex-col gap-2">
+              <span className="font-semibold">Updated</span>
+              {DATE_OPTIONS.map(({ value, label }) => (
+                <label className="flex items-center gap-2 text-sm" key={value}>
+                  <input
+                    checked={updatedAtFilter === value}
+                    className="radio radio-sm"
+                    name="updated"
+                    onChange={() => setColumnFilter("updatedAt", value)}
+                    type="radio"
+                    value={value ?? "any"}
+                  />
+                  <span>{label}</span>
+                </label>
+              ))}
+            </fieldset>
+          </div>
+        </div>
+
+        <div className="dropdown dropdown-bottom dropdown-end">
+          <button className="btn btn-square btn-soft" type="button">
+            <GearIcon />
           </button>
           <div className="dropdown-content z-1 flex w-40 flex-col gap-2 rounded-box border border-input bg-base-200 p-4">
             <div className="flex flex-col gap-2">
@@ -264,47 +365,6 @@ export function SkillsTable({
                     <span>{col.columnDef.header as string}</span>
                   </label>
                 ))}
-            </div>
-          </div>
-        </div>
-
-        <div className="dropdown dropdown-bottom dropdown-end">
-          <button className="btn btn-square btn-soft" type="button">
-            <CalendarIcon />
-          </button>
-          <div className="dropdown-content z-1 flex w-40 flex-col rounded-box border border-input bg-base-200 p-4">
-            <div className="flex flex-col gap-2">
-              <span className="font-semibold">Created</span>
-              {DATE_OPTIONS.map(({ value, label }) => (
-                <label className="flex items-center gap-2 text-sm" key={value}>
-                  <input
-                    checked={createdAtFilter === value}
-                    className="radio radio-sm"
-                    name="created"
-                    onChange={() => setColumnFilter("createdAt", value)}
-                    type="radio"
-                    value={value ?? "any"}
-                  />
-                  <span>{label}</span>
-                </label>
-              ))}
-            </div>
-            <div className="divider mt-2 mb-0" />
-            <div className="flex flex-col gap-2">
-              <span className="font-semibold">Updated</span>
-              {DATE_OPTIONS.map(({ value, label }) => (
-                <label className="flex items-center gap-2 text-sm" key={value}>
-                  <input
-                    checked={updatedAtFilter === value}
-                    className="radio radio-sm"
-                    name="updated"
-                    onChange={() => setColumnFilter("updatedAt", value)}
-                    type="radio"
-                    value={value ?? "any"}
-                  />
-                  <span>{label}</span>
-                </label>
-              ))}
             </div>
           </div>
         </div>
