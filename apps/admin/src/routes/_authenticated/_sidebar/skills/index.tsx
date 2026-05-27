@@ -178,8 +178,11 @@ function RouteComponent() {
         <DataState.Content>
           <SkillsTable
             data={findManySkills.data?.nodes ?? []}
-            onDelete={(id) =>
-              setFormValues({ state: "DELETING", customValues: { id } })
+            onDelete={(skill) =>
+              setFormValues({
+                state: "DELETING",
+                customValues: { id: skill.id },
+              })
             }
             onEdit={(skill) =>
               setFormValues({
@@ -188,6 +191,7 @@ function RouteComponent() {
                 customValues: { id: skill.id },
               })
             }
+            onSelect={(skills) => console.log(skills)}
           />
         </DataState.Content>
       </DataState>

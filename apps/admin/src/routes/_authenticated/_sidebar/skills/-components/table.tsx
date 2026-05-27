@@ -15,10 +15,11 @@ import {
   getCoreRowModel,
   getFilteredRowModel,
   getSortedRowModel,
+  type RowSelectionState,
   type SortingState,
   useReactTable,
 } from "@tanstack/react-table";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { SkillEntity } from "@/graphql/graphql";
 import { SkillCategory } from "@/graphql/graphql";
 import { cn } from "@/lib/cn";
@@ -54,21 +55,39 @@ function SortIcon({ sorted }: { sorted: false | "asc" | "desc" }) {
 
 const getColumns = (
   onEdit: (skill: SkillEntity) => void,
-  onDelete: (id: string) => void
+  onDelete: (skill: SkillEntity) => void
 ) => [
+  columnHelper.display({
+    id: "select",
+    header: ({ table }) => (
+      <input
+        checked={table.getIsAllRowsSelected()}
+        className="checkbox checkbox-sm"
+        onChange={table.getToggleAllRowsSelectedHandler()}
+        type="checkbox"
+      />
+    ),
+    cell: ({ row }) => (
+      <input
+        checked={row.getIsSelected()}
+        className="checkbox checkbox-sm"
+        disabled={!row.getCanSelect()}
+        onChange={row.getToggleSelectedHandler()}
+        type="checkbox"
+      />
+    ),
+  }),
   columnHelper.accessor("name", {
     header: "Name",
-    enableGlobalFilter: true,
-    enableSorting: true,
   }),
   columnHelper.accessor("slug", {
     header: "Slug",
-    enableGlobalFilter: true,
-    enableSorting: true,
   }),
   columnHelper.accessor("category", {
     header: "Category",
     enableColumnFilter: true,
+    enableSorting: false,
+    enableGlobalFilter: false,
     filterFn: "equals",
     cell: (data) => (
       <span className="badge badge-soft badge-sm">{data.getValue()}</span>
@@ -76,23 +95,23 @@ const getColumns = (
   }),
   columnHelper.accessor("relevance", {
     header: "Relevance",
-    enableSorting: true,
+    enableGlobalFilter: false,
     cell: (data) => (
       <span className="badge badge-soft badge-sm">{data.getValue()}</span>
     ),
   }),
   columnHelper.accessor("createdAt", {
     header: "Created",
-    enableSorting: true,
     enableColumnFilter: true,
+    enableGlobalFilter: false,
     sortingFn: "datetime",
     filterFn: dateRangeFilter,
     cell: ({ getValue }) => new Date(getValue()).toLocaleDateString(),
   }),
   columnHelper.accessor("updatedAt", {
     header: "Updated",
-    enableSorting: true,
     enableColumnFilter: true,
+    enableGlobalFilter: false,
     sortingFn: "datetime",
     filterFn: dateRangeFilter,
     cell: ({ getValue }) => new Date(getValue()).toLocaleDateString(),
@@ -110,7 +129,7 @@ const getColumns = (
         </button>
         <button
           className="btn btn-sm btn-soft btn-square btn-error"
-          onClick={() => onDelete(row.original.id)}
+          onClick={() => onDelete(row.original)}
           type="button"
         >
           <TrashSimpleIcon />
@@ -122,14 +141,21 @@ const getColumns = (
 
 interface SkillsTableProps {
   data: SkillEntity[];
-  onDelete: (id: string) => void;
+  onDelete: (id: SkillEntity) => void;
   onEdit: (skill: SkillEntity) => void;
+  onSelect?: (ids: SkillEntity[]) => void;
 }
 
-export function SkillsTable({ data, onEdit, onDelete }: SkillsTableProps) {
+export function SkillsTable({
+  data,
+  onEdit,
+  onDelete,
+  onSelect,
+}: SkillsTableProps) {
   const [globalFilter, setGlobalFilter] = useState("");
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
+  const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
 
   function setColumnFilter(id: string, value: unknown) {
     setColumnFilters((prev) => {
@@ -151,12 +177,17 @@ export function SkillsTable({ data, onEdit, onDelete }: SkillsTableProps) {
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(), // pipeline: core → filtered
     getSortedRowModel: getSortedRowModel(), // pipeline: core → filtered → sorted
-    enableGlobalFilter: false,
-    enableSorting: false,
-    state: { globalFilter, sorting, columnFilters },
+    getRowId: (row) => row.id,
+    state: { globalFilter, sorting, columnFilters, rowSelection },
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
+    onRowSelectionChange: setRowSelection,
   });
+
+  useEffect(() => {
+    const selected = data.filter((skill) => rowSelection[skill.id]);
+    onSelect?.(selected);
+  }, [rowSelection, onSelect, data]);
 
   return (
     <div className="flex flex-col gap-2">
@@ -255,7 +286,13 @@ export function SkillsTable({ data, onEdit, onDelete }: SkillsTableProps) {
           </thead>
           <tbody>
             {table.getRowModel().rows.map((row) => (
-              <tr key={row.id}>
+              <tr
+                className={cn(
+                  "hover:bg-base-300",
+                  row.getIsSelected() && "bg-base-300"
+                )}
+                key={row.id}
+              >
                 {row.getVisibleCells().map((cell) => (
                   <td key={cell.id}>
                     {flexRender(cell.column.columnDef.cell, cell.getContext())}
