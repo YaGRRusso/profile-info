@@ -10,8 +10,9 @@ import { DataState } from "@/components/display/data-state";
 import { Dialog } from "@/components/display/dialog";
 import { Modal } from "@/components/display/modal";
 import { PageTitle } from "@/components/display/page-title";
-import { CommonFormValuesProps } from "@/forms/common";
+import type { CommonFormValuesProps } from "@/forms/common";
 import { SkillForm, type SkillSchema } from "@/forms/skill";
+import { useQueryAllPages } from "@/hooks/custom/use-query-all-pages";
 import {
   useCreateOneSkill,
   useRemoveOneSkill,
@@ -76,6 +77,8 @@ function RouteComponent() {
       updateOneSkill.mutate,
     ]
   );
+
+  useQueryAllPages(findManySkills);
 
   return (
     <div className="flex flex-col gap-4">
