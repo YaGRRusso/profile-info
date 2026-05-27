@@ -1,25 +1,17 @@
 import {
   ArrowsClockwiseIcon,
-  PencilIcon,
   PlusIcon,
-  TrashSimpleIcon,
   WarningIcon,
 } from "@phosphor-icons/react";
 import { createFileRoute } from "@tanstack/react-router";
-import {
-  createColumnHelper,
-  flexRender,
-  getCoreRowModel,
-  useReactTable,
-} from "@tanstack/react-table";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useState } from "react";
 import { Alert } from "@/components/display/alert";
+import { DataState } from "@/components/display/data-state";
 import { Dialog } from "@/components/display/dialog";
 import { Modal } from "@/components/display/modal";
 import { PageTitle } from "@/components/display/page-title";
 import { CommonFormValuesProps } from "@/forms/common";
 import { SkillForm, type SkillSchema } from "@/forms/skill";
-import type { SkillEntity } from "@/graphql/graphql";
 import {
   useCreateOneSkill,
   useRemoveOneSkill,
@@ -27,17 +19,7 @@ import {
 } from "@/hooks/mutations/skills";
 import { useFindManySkills } from "@/hooks/queries/skills";
 import { cn } from "@/lib/cn";
-
-const RELEVANCE_COLORS: Record<number, string> = {
-  0: "",
-  1: "badge-error",
-  2: "badge-error",
-  3: "badge-warning",
-  4: "badge-success",
-  5: "badge-success",
-};
-
-const columnHelper = createColumnHelper<SkillEntity>();
+import { SkillsTable } from "./-components/table";
 
 export const Route = createFileRoute("/_authenticated/_sidebar/skills/")({
   component: RouteComponent,
@@ -94,110 +76,6 @@ function RouteComponent() {
       updateOneSkill.mutate,
     ]
   );
-
-  const columns = useMemo(
-    () => [
-      columnHelper.accessor("name", {
-        header: "Name",
-      }),
-      columnHelper.accessor("slug", {
-        header: "Slug",
-        cell: (info) => (
-          <span className="font-mono text-sm opacity-60">
-            {info.getValue()}
-          </span>
-        ),
-      }),
-      columnHelper.accessor("category", {
-        header: "Category",
-        cell: (info) => (
-          <span className="badge badge-soft">{info.getValue()}</span>
-        ),
-      }),
-      columnHelper.accessor("relevance", {
-        header: "Relevance",
-        cell: (info) => {
-          const value = info.getValue();
-          return value == null ? (
-            <span className="opacity-40">—</span>
-          ) : (
-            <span className={cn("badge badge-soft", RELEVANCE_COLORS[value])}>
-              {value}
-            </span>
-          );
-        },
-      }),
-      columnHelper.accessor("createdAt", {
-        header: "Created At",
-        cell: (info) =>
-          new Date(info.getValue()).toLocaleDateString("pt-BR", {
-            day: "2-digit",
-            month: "short",
-            year: "numeric",
-          }),
-      }),
-      columnHelper.accessor("updatedAt", {
-        header: "Updated At",
-        cell: (info) =>
-          new Date(info.getValue()).toLocaleDateString("pt-BR", {
-            day: "2-digit",
-            month: "short",
-            year: "numeric",
-          }),
-      }),
-      columnHelper.display({
-        id: "actions",
-        header: "",
-        cell: (info) => {
-          const skill = info.row.original;
-          return (
-            <div className="flex items-center gap-2">
-              <button
-                className="btn btn-sm btn-square btn-soft"
-                onClick={() =>
-                  setFormValues({
-                    defaultValues: skill,
-                    state: "UPDATING",
-                    customValues: { id: skill.id },
-                  })
-                }
-                type="button"
-              >
-                <PencilIcon />
-              </button>
-              <button
-                className="btn btn-sm btn-soft btn-square btn-error"
-                onClick={() =>
-                  setFormValues({
-                    state: "DELETING",
-                    customValues: { id: skill.id },
-                  })
-                }
-                type="button"
-              >
-                <TrashSimpleIcon />
-              </button>
-            </div>
-          );
-        },
-      }),
-    ],
-    []
-  );
-
-  const table = useReactTable({
-    data: findManySkills.data?.nodes ?? [],
-    columns,
-    getCoreRowModel: getCoreRowModel(),
-  });
-
-  if (findManySkills.isPending) {
-    return (
-      <main className="flex h-full items-center justify-center">
-        <span className="loading loading-spinner loading-lg" />
-      </main>
-    );
-  }
 
   return (
     <div className="flex flex-col gap-4">
@@ -270,55 +148,46 @@ function RouteComponent() {
         title="Delete Skill"
       />
 
-      {findManySkills.data?.nodes.length === 0 ? (
-        <Alert
-          actions={[
-            {
-              label: "Refetch",
-              className: "btn-ghost",
-              onClick: () => findManySkills.refetch(),
-            },
-          ]}
-          description="Try refreshing the page or create a new skill."
-          icon={<WarningIcon weight="bold" />}
-          title="Nothing found!"
-        />
-      ) : (
-        <div className="overflow-x-auto rounded bg-base-200">
-          <table className="table">
-            <thead>
-              {table.getHeaderGroups().map((headerGroup) => (
-                <tr key={headerGroup.id}>
-                  {headerGroup.headers.map((header) => (
-                    <th key={header.id}>
-                      {flexRender(
-                        header.column.columnDef.header,
-                        header.getContext()
-                      )}
-                    </th>
-                  ))}
-                </tr>
-              ))}
-            </thead>
-            <tbody>
-              {table.getRowModel().rows.map((row) => (
-                <tr className="hover:bg-base-300" key={row.id}>
-                  {row.getVisibleCells().map((cell) => (
-                    <td key={cell.id}>
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext()
-                      )}
-                    </td>
-                  ))}
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
+      <DataState
+        isEmpty={findManySkills.data?.nodes.length === 0}
+        isFetching={findManySkills.isFetching}
+        isLoading={findManySkills.isPending}
+      >
+        <DataState.Loading>
+          <div className="skeleton h-96 w-full" />
+        </DataState.Loading>
 
-      {findManySkills.isLoading && <div className="skeleton h-96 w-full" />}
+        <DataState.Empty>
+          <Alert
+            actions={[
+              {
+                label: "Refetch",
+                className: "btn-ghost",
+                onClick: () => findManySkills.refetch(),
+              },
+            ]}
+            description="Try refreshing the page or create a new skill."
+            icon={<WarningIcon weight="bold" />}
+            title="Nothing found!"
+          />
+        </DataState.Empty>
+
+        <DataState.Content>
+          <SkillsTable
+            data={findManySkills.data?.nodes ?? []}
+            onDelete={(id) =>
+              setFormValues({ state: "DELETING", customValues: { id } })
+            }
+            onEdit={(skill) =>
+              setFormValues({
+                defaultValues: skill,
+                state: "UPDATING",
+                customValues: { id: skill.id },
+              })
+            }
+          />
+        </DataState.Content>
+      </DataState>
     </div>
   );
 }
