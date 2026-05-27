@@ -14,6 +14,8 @@ import {
   type FilterFn,
   flexRender,
   getCoreRowModel,
+  getFacetedRowModel,
+  getFacetedUniqueValues,
   getFilteredRowModel,
   getSortedRowModel,
   type RowSelectionState,
@@ -23,7 +25,6 @@ import {
 } from "@tanstack/react-table";
 import { useEffect, useState } from "react";
 import type { SkillEntity } from "@/graphql/graphql";
-import { SkillCategory } from "@/graphql/graphql";
 import { cn } from "@/lib/cn";
 
 const DATE_OPTIONS = [
@@ -176,12 +177,22 @@ export function SkillsTable({
   const updatedAtFilter = columnFilters.find((f) => f.id === "updatedAt")
     ?.value as string | undefined;
 
+  // getCoreRowModel - required
+  // getFilteredRowModel - use when using filters
+  // getSortedRowModel - use when using sorting
+  // getPaginationRowModel - use when using pagination
+  // getFacetedRowModel - use when using either of the below
+  // getFacetedUniqueValues - use to get a Map<value, count> for a column (e.g. for showing filter options with counts) -
+  // getFacetedMinMaxValues - use to get a [min, max] for a column (e.g. for setting min and max values on a range slider filter)
+
   const table = useReactTable({
     data,
     columns: getColumns(onEdit, onDelete),
     getCoreRowModel: getCoreRowModel(),
-    getFilteredRowModel: getFilteredRowModel(), // pipeline: core → filtered
-    getSortedRowModel: getSortedRowModel(), // pipeline: core → filtered → sorted
+    getFilteredRowModel: getFilteredRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+    getFacetedRowModel: getFacetedRowModel(),
+    getFacetedUniqueValues: getFacetedUniqueValues(),
     getRowId: (row) => row.id,
     state: {
       globalFilter,
@@ -215,15 +226,18 @@ export function SkillsTable({
         </label>
         <select
           className="select"
+          disabled={!table.getColumn("category")?.getFacetedUniqueValues().size}
           onChange={(e) => setColumnFilter("category", e.target.value)}
           value={categoryFilter ?? ""}
         >
           <option value="">All categories</option>
-          {Object.values(SkillCategory).map((cat) => (
-            <option key={cat} value={cat}>
-              {cat}
-            </option>
-          ))}
+          {[...table.getColumn("category")!.getFacetedUniqueValues()].map(
+            ([cat, count]) => (
+              <option key={cat} value={cat}>
+                {cat} ({count})
+              </option>
+            )
+          )}
         </select>
 
         <div className="dropdown dropdown-bottom dropdown-end">
