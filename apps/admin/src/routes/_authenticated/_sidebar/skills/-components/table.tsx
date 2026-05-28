@@ -9,7 +9,6 @@ import {
   TrashSimpleIcon,
 } from "@phosphor-icons/react";
 import {
-  type ColumnFiltersState,
   createColumnHelper,
   type FilterFn,
   flexRender,
@@ -20,7 +19,6 @@ import {
   getFilteredRowModel,
   getSortedRowModel,
   type RowSelectionState,
-  type SortingState,
   useReactTable,
   type VisibilityState,
 } from "@tanstack/react-table";
@@ -29,6 +27,10 @@ import { useEffect, useState } from "react";
 import { SkillCategory, type SkillEntity } from "@/graphql/graphql";
 import { cn } from "@/lib/cn";
 import { getMinMaxFacets, getUniqueFacets } from "@/lib/facets";
+import {
+  parseAsColumnFiltersState,
+  parseAsSortingState,
+} from "@/lib/table-parsers";
 
 const CATEGORY_LABELS: Array<{ value: SkillCategory; label: string }> = [
   { value: SkillCategory.Backend, label: "Backend" },
@@ -43,7 +45,7 @@ const CATEGORY_LABELS: Array<{ value: SkillCategory; label: string }> = [
 ];
 
 const DATE_OPTIONS = [
-  { value: "any", label: "Any date" },
+  { value: "", label: "Any date" },
   { value: "week", label: "Last 7 days" },
   { value: "month", label: "This month" },
 ];
@@ -193,8 +195,20 @@ export function SkillsTable({
       timeMs: 500,
     },
   });
-  const [sorting, setSorting] = useState<SortingState>([]);
-  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
+  const [sorting, setSorting] = useQueryState(
+    "sort",
+    parseAsSortingState.withDefault([]).withOptions({
+      clearOnDefault: true,
+      history: "push",
+    })
+  );
+  const [columnFilters, setColumnFilters] = useQueryState(
+    "filters",
+    parseAsColumnFiltersState.withDefault([]).withOptions({
+      clearOnDefault: true,
+      history: "push",
+    })
+  );
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
 
@@ -332,7 +346,10 @@ export function SkillsTable({
               {DATE_OPTIONS.map(({ value, label }) => (
                 <label className="flex items-center gap-2 text-sm" key={value}>
                   <input
-                    checked={createdAtFilter === value}
+                    checked={
+                      createdAtFilter === value ||
+                      (!createdAtFilter && value === "")
+                    }
                     className="radio radio-sm"
                     name="created"
                     onChange={() => setColumnFilter("createdAt", value)}
@@ -349,7 +366,10 @@ export function SkillsTable({
               {DATE_OPTIONS.map(({ value, label }) => (
                 <label className="flex items-center gap-2 text-sm" key={value}>
                   <input
-                    checked={updatedAtFilter === value}
+                    checked={
+                      updatedAtFilter === value ||
+                      (!updatedAtFilter && value === "")
+                    }
                     className="radio radio-sm"
                     name="updated"
                     onChange={() => setColumnFilter("updatedAt", value)}
