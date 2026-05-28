@@ -24,6 +24,7 @@ import {
   useReactTable,
   type VisibilityState,
 } from "@tanstack/react-table";
+import { useQueryState } from "nuqs";
 import { useEffect, useState } from "react";
 import { SkillCategory, type SkillEntity } from "@/graphql/graphql";
 import { cn } from "@/lib/cn";
@@ -182,7 +183,15 @@ export function SkillsTable({
   onDelete,
   onSelect,
 }: SkillsTableProps) {
-  const [globalFilter, setGlobalFilter] = useState("");
+  const [globalFilter, setGlobalFilter] = useQueryState("query", {
+    defaultValue: "",
+    clearOnDefault: true,
+    history: "push",
+    limitUrlUpdates: {
+      method: "debounce",
+      timeMs: 500,
+    },
+  });
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
