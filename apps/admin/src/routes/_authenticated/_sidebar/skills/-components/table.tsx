@@ -25,8 +25,21 @@ import {
   type VisibilityState,
 } from "@tanstack/react-table";
 import { useEffect, useState } from "react";
-import type { SkillEntity } from "@/graphql/graphql";
+import { SkillCategory, type SkillEntity } from "@/graphql/graphql";
 import { cn } from "@/lib/cn";
+import { getMinMaxFacets, getUniqueFacets } from "@/lib/facets";
+
+const CATEGORY_LABELS: Array<{ value: SkillCategory; label: string }> = [
+  { value: SkillCategory.Backend, label: "Backend" },
+  { value: SkillCategory.Concepts, label: "Concepts" },
+  { value: SkillCategory.Data, label: "Data" },
+  { value: SkillCategory.Design, label: "Design" },
+  { value: SkillCategory.Devops, label: "DevOps" },
+  { value: SkillCategory.Frontend, label: "Frontend" },
+  { value: SkillCategory.Language, label: "Language" },
+  { value: SkillCategory.Quality, label: "Quality" },
+  { value: SkillCategory.Soft, label: "Soft Skills" },
+];
 
 const DATE_OPTIONS = [
   { value: undefined, label: "Any date" },
@@ -222,13 +235,6 @@ export function SkillsTable({
     onColumnVisibilityChange: setColumnVisibility,
   });
 
-  // getFacetedMinMaxValues retorna [min, max] dos valores de relevance nas rows
-  // já filtradas pelas demais colunas — excluindo o próprio filtro de relevance.
-  // Isso permite que os placeholders reflitam o range real disponível dado o contexto atual.
-  const relevanceMinMax = table
-    .getColumn("relevance")
-    ?.getFacetedMinMaxValues();
-
   function setRelevanceFilter(index: 0 | 1, raw: string) {
     const val = raw === "" ? undefined : Number(raw);
     const next: [number | undefined, number | undefined] = [
@@ -242,6 +248,14 @@ export function SkillsTable({
       next.some((v) => v !== undefined) ? next : undefined
     );
   }
+
+  const categoryFacets = getUniqueFacets(
+    table.getColumn("category")!.getFacetedUniqueValues(),
+    CATEGORY_LABELS
+  );
+  const relevanceFacets = getMinMaxFacets(
+    table.getColumn("relevance")?.getFacetedMinMaxValues()
+  );
 
   useEffect(() => {
     const selected = data.filter((skill) => rowSelection[skill.id]);
@@ -262,18 +276,16 @@ export function SkillsTable({
         </label>
         <select
           className="select"
-          disabled={!table.getColumn("category")?.getFacetedUniqueValues().size}
+          disabled={!categoryFacets.length}
           onChange={(e) => setColumnFilter("category", e.target.value)}
           value={categoryFilter ?? ""}
         >
           <option value="">All categories</option>
-          {[...table.getColumn("category")!.getFacetedUniqueValues()].map(
-            ([cat, count]) => (
-              <option key={cat} value={cat}>
-                {cat} ({count})
-              </option>
-            )
-          )}
+          {categoryFacets.map(({ value, label, count }) => (
+            <option key={value} value={value}>
+              {label} ({count})
+            </option>
+          ))}
         </select>
 
         <div className="dropdown dropdown-bottom dropdown-end">
@@ -286,19 +298,19 @@ export function SkillsTable({
               <div className="flex items-center gap-2">
                 <input
                   className="input input-sm w-full"
-                  max={relevanceMinMax?.[1] ?? 100}
-                  min={relevanceMinMax?.[0] ?? 0}
+                  max={relevanceFacets.max ?? 100}
+                  min={relevanceFacets.min ?? 0}
                   onChange={(e) => setRelevanceFilter(0, e.target.value)}
-                  placeholder="Min"
+                  placeholder={`Min (${relevanceFacets.min ?? "–"})`}
                   type="number"
                   value={relevanceFilter?.[0] ?? ""}
                 />
                 <input
                   className="input input-sm w-full"
-                  max={relevanceMinMax?.[1] ?? 100}
-                  min={relevanceMinMax?.[0] ?? 0}
+                  max={relevanceFacets.max ?? 100}
+                  min={relevanceFacets.min ?? 0}
                   onChange={(e) => setRelevanceFilter(1, e.target.value)}
-                  placeholder="Max"
+                  placeholder={`Max (${relevanceFacets.max ?? "–"})`}
                   type="number"
                   value={relevanceFilter?.[1] ?? ""}
                 />
