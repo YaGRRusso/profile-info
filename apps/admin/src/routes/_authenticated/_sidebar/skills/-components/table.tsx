@@ -43,7 +43,7 @@ const CATEGORY_LABELS: Array<{ value: SkillCategory; label: string }> = [
 ];
 
 const DATE_OPTIONS = [
-  { value: undefined, label: "Any date" },
+  { value: "any", label: "Any date" },
   { value: "week", label: "Last 7 days" },
   { value: "month", label: "This month" },
 ];
@@ -62,16 +62,17 @@ const numberRangeFilter: FilterFn<SkillEntity> = (row, columnId, value) => {
 const dateRangeFilter: FilterFn<SkillEntity> = (row, column, value) => {
   const date = new Date(row.getValue(column));
   const now = new Date();
-  if (value === "week") {
-    return date >= new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+  switch (value) {
+    case "week":
+      return date >= new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+    case "month":
+      return (
+        date.getMonth() === now.getMonth() &&
+        date.getFullYear() === now.getFullYear()
+      );
+    default:
+      return true;
   }
-  if (value === "month") {
-    return (
-      date.getMonth() === now.getMonth() &&
-      date.getFullYear() === now.getFullYear()
-    );
-  }
-  return true;
 };
 
 function SortIcon({ sorted }: { sorted: false | "asc" | "desc" }) {
@@ -336,7 +337,7 @@ export function SkillsTable({
                     name="created"
                     onChange={() => setColumnFilter("createdAt", value)}
                     type="radio"
-                    value={value ?? "any"}
+                    value={value}
                   />
                   <span>{label}</span>
                 </label>
@@ -353,7 +354,7 @@ export function SkillsTable({
                     name="updated"
                     onChange={() => setColumnFilter("updatedAt", value)}
                     type="radio"
-                    value={value ?? "any"}
+                    value={value}
                   />
                   <span>{label}</span>
                 </label>
