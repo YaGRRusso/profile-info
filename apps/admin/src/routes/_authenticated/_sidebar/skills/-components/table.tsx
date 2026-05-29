@@ -25,7 +25,7 @@ import {
   useReactTable,
   type VisibilityState,
 } from "@tanstack/react-table";
-import { useQueryStates } from "nuqs";
+import { useQueryState } from "nuqs";
 import { useEffect, useMemo, useState } from "react";
 import { z } from "zod";
 import { SkillCategory, type SkillEntity } from "@/graphql/graphql";
@@ -33,25 +33,32 @@ import { cn } from "@/lib/cn";
 import { getMinMaxFacets, getUniqueFacets } from "@/lib/facets";
 import { parseAsShape } from "@/lib/parsers";
 
-const debounce = { method: "debounce" as const, timeMs: 500 };
+const debouncedUrlUpdates = { method: "debounce" as const, timeMs: 500 };
+const persistentOptions = { clearOnDefault: true, history: "push" as const };
 
-const tableShapes = {
-  query: parseAsShape(z.string())
-    .withDefault("")
-    .withOptions({ limitUrlUpdates: debounce }),
-  sort: parseAsShape(
-    z.array(z.object({ id: z.string(), desc: z.boolean() }))
-  ).withDefault([]),
-  category: parseAsShape(z.string()),
-  createdAt: parseAsShape(z.string()),
-  updatedAt: parseAsShape(z.string()),
-  relevance: parseAsShape(
-    z.object({
-      min: z.number().optional(),
-      max: z.number().optional(),
-    })
-  ).withOptions({ limitUrlUpdates: debounce }),
-};
+const queryParser = parseAsShape(z.string())
+  .withDefault("")
+  .withOptions({ ...persistentOptions, limitUrlUpdates: debouncedUrlUpdates });
+
+const sortParser = parseAsShape(
+  z.array(z.object({ id: z.string(), desc: z.boolean() }))
+)
+  .withDefault([])
+  .withOptions(persistentOptions);
+
+const categoryParser = parseAsShape(z.string()).withOptions(persistentOptions);
+const createdAtParser = parseAsShape(z.string()).withOptions(persistentOptions);
+const updatedAtParser = parseAsShape(z.string()).withOptions(persistentOptions);
+
+const relevanceParser = parseAsShape(
+  z.object({
+    min: z.number().optional(),
+    max: z.number().optional(),
+  })
+).withOptions({
+  ...persistentOptions,
+  limitUrlUpdates: debouncedUrlUpdates,
+});
 
 const CATEGORY_LABELS: Array<{ value: SkillCategory; label: string }> = [
   { value: SkillCategory.Backend, label: "Backend" },
@@ -207,39 +214,42 @@ export function SkillsTable({
   onDelete,
   onSelect,
 }: SkillsTableProps) {
-  const [state, setState] = useQueryStates(tableShapes, {
-    clearOnDefault: true,
-    history: "push",
-  });
+  const [searchQuery, setSearchQuery] = useQueryState("query", queryParser);
+  const [sort, setSort] = useQueryState("sort", sortParser);
+  const [category, setCategory] = useQueryState("category", categoryParser);
+  const [createdAt, setCreatedAt] = useQueryState("createdAt", createdAtParser);
+  const [updatedAt, setUpdatedAt] = useQueryState("updatedAt", updatedAtParser);
+  const [relevance, setRelevance] = useQueryState("relevance", relevanceParser);
+
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
 
   // JSON estabiliza a dep do memo: o nuqs pode entregar uma nova ref de
-  // `state.relevance` mesmo quando o conteúdo é igual; sem isso o memo
-  // re-roda e o TanStack re-faceta tudo a cada keystroke.
-  const relevanceKey = JSON.stringify(state.relevance ?? null);
-  // biome-ignore lint/correctness/useExhaustiveDependencies: relevanceKey serializa state.relevance
+  // `relevance` mesmo quando o conteúdo é igual; sem isso o memo re-roda
+  // e o TanStack re-faceta tudo a cada keystroke.
+  const relevanceKey = JSON.stringify(relevance);
+  // biome-ignore lint/correctness/useExhaustiveDependencies: relevanceKey serializa relevance
   const columnFilters = useMemo<ColumnFiltersState>(() => {
-    const out: ColumnFiltersState = [];
-    if (state.category) out.push({ id: "category", value: state.category });
-    if (state.createdAt) out.push({ id: "createdAt", value: state.createdAt });
-    if (state.updatedAt) out.push({ id: "updatedAt", value: state.updatedAt });
-    if (state.relevance) {
-      out.push({
+    const activeFilters: ColumnFiltersState = [];
+    if (category) activeFilters.push({ id: "category", value: category });
+    if (createdAt) activeFilters.push({ id: "createdAt", value: createdAt });
+    if (updatedAt) activeFilters.push({ id: "updatedAt", value: updatedAt });
+    if (relevance) {
+      activeFilters.push({
         id: "relevance",
-        value: [state.relevance.min, state.relevance.max] as [
+        value: [relevance.min, relevance.max] as [
           number | undefined,
           number | undefined,
         ],
       });
     }
-    return out;
-  }, [state.category, state.createdAt, state.updatedAt, relevanceKey]);
+    return activeFilters;
+  }, [category, createdAt, updatedAt, relevanceKey]);
 
-  const setSorting: OnChangeFn<SortingState> = (updater) => {
-    setState((prev) => ({
-      sort: typeof updater === "function" ? updater(prev.sort) : updater,
-    }));
+  const handleSortingChange: OnChangeFn<SortingState> = (updater) => {
+    setSort((currentSort) =>
+      typeof updater === "function" ? updater(currentSort) : updater
+    );
   };
 
   // getCoreRowModel - required
@@ -261,27 +271,27 @@ export function SkillsTable({
     getFacetedMinMaxValues: getFacetedMinMaxValues(),
     getRowId: (row) => row.id,
     state: {
-      globalFilter: state.query,
-      sorting: state.sort,
+      globalFilter: searchQuery,
+      sorting: sort,
       columnFilters,
       rowSelection,
       columnVisibility,
     },
-    onSortingChange: setSorting,
+    onSortingChange: handleSortingChange,
     onRowSelectionChange: setRowSelection,
     onColumnVisibilityChange: setColumnVisibility,
   });
 
-  function setRelevanceFilter(index: 0 | 1, raw: string) {
-    const val = raw === "" ? undefined : Number(raw);
-    const next: [number | undefined, number | undefined] = [
-      state.relevance?.min,
-      state.relevance?.max,
+  function setRelevanceFilter(inputIndex: 0 | 1, rawValue: string) {
+    const parsedValue = rawValue === "" ? undefined : Number(rawValue);
+    const nextRange: [number | undefined, number | undefined] = [
+      relevance?.min,
+      relevance?.max,
     ];
-    next[index] = val;
-    const [min, max] = next;
-    const hasAny = min !== undefined || max !== undefined;
-    setState({ relevance: hasAny ? { min, max } : null });
+    nextRange[inputIndex] = parsedValue;
+    const [nextMin, nextMax] = nextRange;
+    const hasAnyValue = nextMin !== undefined || nextMax !== undefined;
+    setRelevance(hasAnyValue ? { min: nextMin, max: nextMax } : null);
   }
 
   const categoryFacets = getUniqueFacets(
@@ -303,17 +313,17 @@ export function SkillsTable({
         <label className="input flex-1">
           <MagnifyingGlassIcon className="opacity-md" />
           <input
-            onChange={(e) => setState({ query: e.target.value })}
+            onChange={(event) => setSearchQuery(event.target.value)}
             placeholder="Search by name or slug..."
             type="text"
-            value={state.query}
+            value={searchQuery}
           />
         </label>
         <select
           className="select"
           disabled={!categoryFacets.length}
-          onChange={(e) => setState({ category: e.target.value || null })}
-          value={state.category ?? ""}
+          onChange={(event) => setCategory(event.target.value || null)}
+          value={category ?? ""}
         >
           <option value="">All categories</option>
           {categoryFacets.map(({ value, label, count }) => (
@@ -338,7 +348,7 @@ export function SkillsTable({
                   onChange={(e) => setRelevanceFilter(0, e.target.value)}
                   placeholder={`Min (${relevanceFacets.min ?? "–"})`}
                   type="number"
-                  value={state.relevance?.min ?? ""}
+                  value={relevance?.min ?? ""}
                 />
                 <input
                   className="input input-sm w-full"
@@ -347,7 +357,7 @@ export function SkillsTable({
                   onChange={(e) => setRelevanceFilter(1, e.target.value)}
                   placeholder={`Max (${relevanceFacets.max ?? "–"})`}
                   type="number"
-                  value={state.relevance?.max ?? ""}
+                  value={relevance?.max ?? ""}
                 />
               </div>
             </fieldset>
@@ -358,12 +368,11 @@ export function SkillsTable({
                 <label className="flex items-center gap-2 text-sm" key={value}>
                   <input
                     checked={
-                      state.createdAt === value ||
-                      (!state.createdAt && value === "")
+                      createdAt === value || (!createdAt && value === "")
                     }
                     className="radio radio-sm"
                     name="created"
-                    onChange={() => setState({ createdAt: value || null })}
+                    onChange={() => setCreatedAt(value || null)}
                     type="radio"
                     value={value}
                   />
@@ -378,12 +387,11 @@ export function SkillsTable({
                 <label className="flex items-center gap-2 text-sm" key={value}>
                   <input
                     checked={
-                      state.updatedAt === value ||
-                      (!state.updatedAt && value === "")
+                      updatedAt === value || (!updatedAt && value === "")
                     }
                     className="radio radio-sm"
                     name="updated"
-                    onChange={() => setState({ updatedAt: value || null })}
+                    onChange={() => setUpdatedAt(value || null)}
                     type="radio"
                     value={value}
                   />
