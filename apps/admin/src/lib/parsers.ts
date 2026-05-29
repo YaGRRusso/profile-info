@@ -14,27 +14,28 @@ import type { z } from "zod";
 
 type PrimitiveValue = string | number | boolean;
 type PrimitiveObject = Record<string, PrimitiveValue>;
+type ObjectShape = Record<string, ZodSchemaRef>;
+
+interface ZodSchemaRef {
+  _zod: { def: ZodDefinition };
+}
 
 interface ZodDefinition {
-  element?: { _zod: { def: ZodDefinition } };
-  innerType?: { _zod: { def: ZodDefinition } };
-  shape?: Record<string, { _zod: { def: ZodDefinition } }>;
+  element?: ZodSchemaRef;
+  innerType?: ZodSchemaRef;
+  shape?: ObjectShape;
   type: string;
 }
 
+const WRAPPER_TYPES = new Set(["optional", "nullable", "default"]);
+
 function getZodDefinition(schema: unknown): ZodDefinition {
-  return (schema as { _zod: { def: ZodDefinition } })._zod.def;
+  return (schema as ZodSchemaRef)._zod.def;
 }
 
-// Unwraps optional / nullable / default to reach the inner primitive type
 function getPrimitiveType(schema: unknown): string {
   let definition = getZodDefinition(schema);
-  while (
-    (definition.type === "optional" ||
-      definition.type === "nullable" ||
-      definition.type === "default") &&
-    definition.innerType
-  ) {
+  while (WRAPPER_TYPES.has(definition.type) && definition.innerType) {
     definition = getZodDefinition(definition.innerType);
   }
   return definition.type;
@@ -72,7 +73,7 @@ function serializeObjectFields(objectValue: Record<string, unknown>): string {
 
 function parseObjectFields(
   rawString: string,
-  objectShape: Record<string, { _zod: { def: ZodDefinition } }>
+  objectShape: ObjectShape
 ): PrimitiveObject | null {
   const result: PrimitiveObject = {};
   for (const keyValuePair of rawString.split(",")) {
@@ -98,6 +99,75 @@ function deepEqual<Value>(current: Value, next: Value): boolean {
   return JSON.stringify(current) === JSON.stringify(next);
 }
 
+function validate(schema: z.ZodType, value: unknown): boolean {
+  return schema.safeParse(value).success;
+}
+
+function buildPrimitiveParser(
+  schema: z.ZodType,
+  primitiveType: string
+): SingleParserBuilder<PrimitiveValue> {
+  return createParser<PrimitiveValue>({
+    parse: (rawString) => {
+      const parsedValue = parsePrimitive(rawString, primitiveType);
+      if (parsedValue === null) return null;
+      return validate(schema, parsedValue) ? parsedValue : null;
+    },
+    serialize: String,
+    eq: Object.is,
+  });
+}
+
+function buildObjectParser(
+  schema: z.ZodType,
+  objectShape: ObjectShape
+): SingleParserBuilder<PrimitiveObject> {
+  return createParser<PrimitiveObject>({
+    parse: (rawString) => {
+      const parsedObject = parseObjectFields(rawString, objectShape);
+      if (!parsedObject) return null;
+      return validate(schema, parsedObject) ? parsedObject : null;
+    },
+    serialize: serializeObjectFields,
+    eq: deepEqual,
+  });
+}
+
+function buildPrimitiveArrayParser(
+  schema: z.ZodType,
+  itemPrimitiveType: string
+): MultiParserBuilder<PrimitiveValue[]> {
+  return createMultiParser<PrimitiveValue[]>({
+    parse: (rawValues) => {
+      const decodedItems = rawValues
+        .map((rawItem) => parsePrimitive(rawItem, itemPrimitiveType))
+        .filter((item): item is PrimitiveValue => item !== null);
+      if (!decodedItems.length) return null;
+      return validate(schema, decodedItems) ? decodedItems : null;
+    },
+    serialize: (primitiveArray) => primitiveArray.map(String),
+    eq: deepEqual,
+  });
+}
+
+function buildObjectArrayParser(
+  schema: z.ZodType,
+  itemShape: ObjectShape
+): MultiParserBuilder<PrimitiveObject[]> {
+  return createMultiParser<PrimitiveObject[]>({
+    parse: (rawValues) => {
+      const decodedItems = rawValues
+        .map((rawItem) => parseObjectFields(rawItem, itemShape))
+        .filter((item): item is PrimitiveObject => item !== null);
+      if (!decodedItems.length) return null;
+      return validate(schema, decodedItems) ? decodedItems : null;
+    },
+    serialize: (objectArray) =>
+      objectArray.map(serializeObjectFields).filter(Boolean),
+    eq: deepEqual,
+  });
+}
+
 export function parseAsShape<Schema extends z.ZodArray<z.ZodType>>(
   schema: Schema
 ): MultiParserBuilder<z.infer<Schema>>;
@@ -109,60 +179,15 @@ export function parseAsShape(schema: z.ZodType): unknown {
 
   if (definition.type === "array" && definition.element) {
     const itemDefinition = getZodDefinition(definition.element);
-
     if (itemDefinition.type === "object") {
-      const objectShape = itemDefinition.shape ?? {};
-      return createMultiParser<PrimitiveObject[]>({
-        parse: (rawValues) => {
-          const decodedItems = rawValues
-            .map((rawItem) => parseObjectFields(rawItem, objectShape))
-            .filter((item): item is PrimitiveObject => item !== null);
-          if (!schema.safeParse(decodedItems).success) return null;
-          return decodedItems.length ? decodedItems : null;
-        },
-        serialize: (objectArray) =>
-          objectArray.map(serializeObjectFields).filter(Boolean),
-        eq: deepEqual,
-      });
+      return buildObjectArrayParser(schema, itemDefinition.shape ?? {});
     }
-
-    const itemPrimitiveType = itemDefinition.type;
-    return createMultiParser<PrimitiveValue[]>({
-      parse: (rawValues) => {
-        const decodedItems = rawValues
-          .map((rawItem) => parsePrimitive(rawItem, itemPrimitiveType))
-          .filter((item): item is PrimitiveValue => item !== null);
-        if (!schema.safeParse(decodedItems).success) return null;
-        return decodedItems.length ? decodedItems : null;
-      },
-      serialize: (primitiveArray) => primitiveArray.map(String),
-      eq: (currentArray, nextArray) =>
-        currentArray.length === nextArray.length &&
-        currentArray.every((value, index) => value === nextArray[index]),
-    });
+    return buildPrimitiveArrayParser(schema, itemDefinition.type);
   }
 
   if (definition.type === "object") {
-    const objectShape = definition.shape ?? {};
-    return createParser<PrimitiveObject>({
-      parse: (rawString) => {
-        const parsedObject = parseObjectFields(rawString, objectShape);
-        if (!parsedObject) return null;
-        return schema.safeParse(parsedObject).success ? parsedObject : null;
-      },
-      serialize: serializeObjectFields,
-      eq: deepEqual,
-    });
+    return buildObjectParser(schema, definition.shape ?? {});
   }
 
-  const primitiveType = definition.type;
-  return createParser<PrimitiveValue>({
-    parse: (rawString) => {
-      const parsedValue = parsePrimitive(rawString, primitiveType);
-      if (parsedValue === null) return null;
-      return schema.safeParse(parsedValue).success ? parsedValue : null;
-    },
-    serialize: (primitiveValue) => String(primitiveValue),
-    eq: Object.is,
-  });
+  return buildPrimitiveParser(schema, definition.type);
 }

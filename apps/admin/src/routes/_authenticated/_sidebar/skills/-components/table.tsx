@@ -250,10 +250,10 @@ export function SkillsTable({
   }, [category, createdAt, updatedAt, stableRelevance]);
 
   const { badges: activeBadges, clearAll: clearAllFilters } = useActiveBadges([
-    { id: "category", value: category, set: setCategory },
-    { id: "createdAt", value: createdAt, set: setCreatedAt },
-    { id: "updatedAt", value: updatedAt, set: setUpdatedAt },
-    { id: "relevance", value: stableRelevance, set: setRelevance },
+    { id: "category", state: category, setState: setCategory },
+    { id: "createdAt", state: createdAt, setState: setCreatedAt },
+    { id: "updatedAt", state: updatedAt, setState: setUpdatedAt },
+    { id: "relevance", state: stableRelevance, setState: setRelevance },
   ]);
 
   const handleSortingChange: OnChangeFn<SortingState> = (updater) => {

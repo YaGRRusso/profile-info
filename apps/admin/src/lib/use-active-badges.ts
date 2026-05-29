@@ -9,13 +9,13 @@ export interface ActiveBadge {
 
 export interface FilterEntry<Value = unknown> {
   id: string;
-  /**
-   * Method syntax (bivariant parameter) so callers can pass heterogeneous
-   * setters (Dispatch<string|null>, Dispatch<{min,max}|null>, ...) into the
-   * same FilterEntry<unknown>[] array without casts.
-   */
-  set(next: Value | null): void;
-  value: Value;
+  setState(next: Value | null): void;
+  state: Value;
+}
+
+interface BadgePreview {
+  display: string;
+  valueAfterClear: unknown;
 }
 
 function isEmpty(value: unknown): boolean {
@@ -31,7 +31,7 @@ function isPlainObject(value: unknown): value is Record<string, unknown> {
   );
 }
 
-function nonEmptyFieldEntries(
+function nonEmptyEntries(
   objectValue: Record<string, unknown>
 ): [string, unknown][] {
   return Object.entries(objectValue).filter(
@@ -39,105 +39,70 @@ function nonEmptyFieldEntries(
   );
 }
 
-function removeField(
+function objectWithoutField(
   objectValue: Record<string, unknown>,
   fieldKey: string
 ): Record<string, unknown> | null {
   const next = { ...objectValue, [fieldKey]: undefined };
-  return nonEmptyFieldEntries(next).length ? next : null;
+  return nonEmptyEntries(next).length ? next : null;
 }
 
-function replaceAt<Item>(items: Item[], index: number, next: Item): Item[] {
-  return items.map((current, currentIndex) =>
-    currentIndex === index ? next : current
-  );
+function arrayWithItemReplaced(
+  items: unknown[],
+  itemIndex: number,
+  replacement: unknown
+): unknown[] | null {
+  const next =
+    replacement === null
+      ? items.filter((_, currentIndex) => currentIndex !== itemIndex)
+      : items.map((current, currentIndex) =>
+          currentIndex === itemIndex ? replacement : current
+        );
+  return next.length ? next : null;
 }
 
-function removeAt<Item>(items: Item[], index: number): Item[] {
-  return items.filter((_, currentIndex) => currentIndex !== index);
-}
-
-function badgesForObject(
-  id: string,
-  objectValue: Record<string, unknown>,
-  set: (next: unknown) => void
-): ActiveBadge[] {
-  return nonEmptyFieldEntries(objectValue).map(([fieldKey, fieldValue]) => ({
-    id,
-    value: `${fieldKey} ${fieldValue}`,
-    clear: () => set(removeField(objectValue, fieldKey)),
+function previewsFromObject(
+  objectValue: Record<string, unknown>
+): BadgePreview[] {
+  return nonEmptyEntries(objectValue).map(([fieldKey, fieldValue]) => ({
+    display: `${fieldKey} ${fieldValue}`,
+    valueAfterClear: objectWithoutField(objectValue, fieldKey),
   }));
 }
 
-function badgesForArrayItem(
-  id: string,
-  items: unknown[],
-  itemIndex: number,
-  set: (next: unknown) => void
-): ActiveBadge[] {
-  const item = items[itemIndex];
-  if (isPlainObject(item)) {
-    return nonEmptyFieldEntries(item).map(([fieldKey, fieldValue]) => ({
-      id,
-      value: `${fieldKey} ${fieldValue}`,
-      clear: () => {
-        const nextItem = removeField(item, fieldKey);
-        const nextItems = nextItem
-          ? replaceAt(items, itemIndex, nextItem)
-          : removeAt(items, itemIndex);
-        set(nextItems.length ? nextItems : null);
-      },
-    }));
-  }
-  if (isEmpty(item)) return [];
-  return [
-    {
-      id,
-      value: String(item),
-      clear: () => {
-        const nextItems = removeAt(items, itemIndex);
-        set(nextItems.length ? nextItems : null);
-      },
-    },
-  ];
-}
-
-function badgesForArray(
-  id: string,
-  items: unknown[],
-  set: (next: unknown) => void
-): ActiveBadge[] {
-  return items.flatMap((_, itemIndex) =>
-    badgesForArrayItem(id, items, itemIndex, set)
+function previewsFromArray(items: unknown[]): BadgePreview[] {
+  return items.flatMap((item, itemIndex) =>
+    previewsFromValue(item).map((itemPreview) => ({
+      display: itemPreview.display,
+      valueAfterClear: arrayWithItemReplaced(
+        items,
+        itemIndex,
+        itemPreview.valueAfterClear
+      ),
+    }))
   );
 }
 
-function badgesForFilter(filter: FilterEntry): ActiveBadge[] {
-  const { id, value, set } = filter;
+function previewsFromValue(value: unknown): BadgePreview[] {
   if (isEmpty(value)) return [];
-  if (Array.isArray(value)) return badgesForArray(id, value, set);
-  if (isPlainObject(value)) return badgesForObject(id, value, set);
-  return [{ id, value: String(value), clear: () => set(null) }];
+  if (Array.isArray(value)) return previewsFromArray(value);
+  if (isPlainObject(value)) return previewsFromObject(value);
+  return [{ display: String(value), valueAfterClear: null }];
+}
+
+function badgesForFilter({ id, state, setState }: FilterEntry): ActiveBadge[] {
+  return previewsFromValue(state).map(({ display, valueAfterClear }) => ({
+    id,
+    value: display,
+    clear: () => setState(valueAfterClear),
+  }));
 }
 
 /**
- * Expands a list of generic filter entries into one badge per visible value,
- * plus a `clearAll` that resets every filter to null.
- *
- * Shape-driven, domain-agnostic:
- *   - primitive          -> 1 badge with the value
- *   - object             -> 1 badge per non-empty field ("field value")
- *   - array of primitive -> 1 badge per item
- *   - array of object    -> 1 badge per non-empty field of each item
- *
- * Clearing a single badge produces the smallest change that removes only that
- * value (e.g., clearing "min 5" on a {min,max} object keeps the max). When
- * removing the last visible value, the filter as a whole becomes null.
- *
- * `clearAll` skips the per-badge granularity and resets each filter directly,
- * which is the only correct behavior when multiple badges share the same
- * underlying value (calling each badge's `clear` in sequence would lose
- * intermediate updates due to setter closures over the original value).
+ *   primitive          -> 1 badge with the value
+ *   object             -> 1 badge per non-empty field ("field value")
+ *   array of primitive -> 1 badge per item
+ *   array of object    -> 1 badge per non-empty field of each item
  */
 export function useActiveBadges(filters: FilterEntry[]): {
   badges: ActiveBadge[];
@@ -148,7 +113,7 @@ export function useActiveBadges(filters: FilterEntry[]): {
     () => ({
       badges: stableFilters.flatMap(badgesForFilter),
       clearAll: () => {
-        for (const filter of stableFilters) filter.set(null);
+        for (const filter of stableFilters) filter.setState(null);
       },
     }),
     [stableFilters]
