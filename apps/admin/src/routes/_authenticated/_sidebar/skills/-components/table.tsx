@@ -9,6 +9,7 @@ import {
   TrashSimpleIcon,
 } from "@phosphor-icons/react";
 import {
+  type ColumnFiltersState,
   createColumnHelper,
   type FilterFn,
   flexRender,
@@ -18,19 +19,39 @@ import {
   getFacetedUniqueValues,
   getFilteredRowModel,
   getSortedRowModel,
+  type OnChangeFn,
   type RowSelectionState,
+  type SortingState,
   useReactTable,
   type VisibilityState,
 } from "@tanstack/react-table";
-import { useQueryState } from "nuqs";
-import { useEffect, useState } from "react";
+import { useQueryStates } from "nuqs";
+import { useEffect, useMemo, useState } from "react";
+import { z } from "zod";
 import { SkillCategory, type SkillEntity } from "@/graphql/graphql";
 import { cn } from "@/lib/cn";
 import { getMinMaxFacets, getUniqueFacets } from "@/lib/facets";
-import {
-  parseAsColumnFiltersState,
-  parseAsSortingState,
-} from "@/lib/table-parsers";
+import { parseAsShape } from "@/lib/parsers";
+
+const debounce = { method: "debounce" as const, timeMs: 500 };
+
+const tableShapes = {
+  query: parseAsShape(z.string())
+    .withDefault("")
+    .withOptions({ limitUrlUpdates: debounce }),
+  sort: parseAsShape(
+    z.array(z.object({ id: z.string(), desc: z.boolean() }))
+  ).withDefault([]),
+  category: parseAsShape(z.string()),
+  createdAt: parseAsShape(z.string()),
+  updatedAt: parseAsShape(z.string()),
+  relevance: parseAsShape(
+    z.object({
+      min: z.number().optional(),
+      max: z.number().optional(),
+    })
+  ).withOptions({ limitUrlUpdates: debounce }),
+};
 
 const CATEGORY_LABELS: Array<{ value: SkillCategory; label: string }> = [
   { value: SkillCategory.Backend, label: "Backend" },
@@ -186,47 +207,40 @@ export function SkillsTable({
   onDelete,
   onSelect,
 }: SkillsTableProps) {
-  const [globalFilter, setGlobalFilter] = useQueryState("query", {
-    defaultValue: "",
+  const [state, setState] = useQueryStates(tableShapes, {
     clearOnDefault: true,
     history: "push",
-    limitUrlUpdates: {
-      method: "debounce",
-      timeMs: 500,
-    },
   });
-  const [sorting, setSorting] = useQueryState(
-    "sort",
-    parseAsSortingState.withDefault([]).withOptions({
-      clearOnDefault: true,
-      history: "push",
-    })
-  );
-  const [columnFilters, setColumnFilters] = useQueryState(
-    "filters",
-    parseAsColumnFiltersState.withDefault([]).withOptions({
-      clearOnDefault: true,
-      history: "push",
-    })
-  );
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
 
-  function setColumnFilter(id: string, value: unknown) {
-    setColumnFilters((prev) => {
-      const rest = prev.filter((f) => f.id !== id);
-      return value ? [...rest, { id, value }] : rest;
-    });
-  }
+  // JSON estabiliza a dep do memo: o nuqs pode entregar uma nova ref de
+  // `state.relevance` mesmo quando o conteúdo é igual; sem isso o memo
+  // re-roda e o TanStack re-faceta tudo a cada keystroke.
+  const relevanceKey = JSON.stringify(state.relevance ?? null);
+  // biome-ignore lint/correctness/useExhaustiveDependencies: relevanceKey serializa state.relevance
+  const columnFilters = useMemo<ColumnFiltersState>(() => {
+    const out: ColumnFiltersState = [];
+    if (state.category) out.push({ id: "category", value: state.category });
+    if (state.createdAt) out.push({ id: "createdAt", value: state.createdAt });
+    if (state.updatedAt) out.push({ id: "updatedAt", value: state.updatedAt });
+    if (state.relevance) {
+      out.push({
+        id: "relevance",
+        value: [state.relevance.min, state.relevance.max] as [
+          number | undefined,
+          number | undefined,
+        ],
+      });
+    }
+    return out;
+  }, [state.category, state.createdAt, state.updatedAt, relevanceKey]);
 
-  const categoryFilter = columnFilters.find((f) => f.id === "category")
-    ?.value as string | undefined;
-  const createdAtFilter = columnFilters.find((f) => f.id === "createdAt")
-    ?.value as string | undefined;
-  const updatedAtFilter = columnFilters.find((f) => f.id === "updatedAt")
-    ?.value as string | undefined;
-  const relevanceFilter = columnFilters.find((f) => f.id === "relevance")
-    ?.value as [number | undefined, number | undefined] | undefined;
+  const setSorting: OnChangeFn<SortingState> = (updater) => {
+    setState((prev) => ({
+      sort: typeof updater === "function" ? updater(prev.sort) : updater,
+    }));
+  };
 
   // getCoreRowModel - required
   // getFilteredRowModel - use when using filters
@@ -247,14 +261,13 @@ export function SkillsTable({
     getFacetedMinMaxValues: getFacetedMinMaxValues(),
     getRowId: (row) => row.id,
     state: {
-      globalFilter,
-      sorting,
+      globalFilter: state.query,
+      sorting: state.sort,
       columnFilters,
       rowSelection,
       columnVisibility,
     },
     onSortingChange: setSorting,
-    onColumnFiltersChange: setColumnFilters,
     onRowSelectionChange: setRowSelection,
     onColumnVisibilityChange: setColumnVisibility,
   });
@@ -262,15 +275,13 @@ export function SkillsTable({
   function setRelevanceFilter(index: 0 | 1, raw: string) {
     const val = raw === "" ? undefined : Number(raw);
     const next: [number | undefined, number | undefined] = [
-      relevanceFilter?.[0],
-      relevanceFilter?.[1],
+      state.relevance?.min,
+      state.relevance?.max,
     ];
     next[index] = val;
-
-    setColumnFilter(
-      "relevance",
-      next.some((v) => v !== undefined) ? next : undefined
-    );
+    const [min, max] = next;
+    const hasAny = min !== undefined || max !== undefined;
+    setState({ relevance: hasAny ? { min, max } : null });
   }
 
   const categoryFacets = getUniqueFacets(
@@ -292,17 +303,17 @@ export function SkillsTable({
         <label className="input flex-1">
           <MagnifyingGlassIcon className="opacity-md" />
           <input
-            onChange={(e) => setGlobalFilter(e.target.value)}
+            onChange={(e) => setState({ query: e.target.value })}
             placeholder="Search by name or slug..."
             type="text"
-            value={globalFilter}
+            value={state.query}
           />
         </label>
         <select
           className="select"
           disabled={!categoryFacets.length}
-          onChange={(e) => setColumnFilter("category", e.target.value)}
-          value={categoryFilter ?? ""}
+          onChange={(e) => setState({ category: e.target.value || null })}
+          value={state.category ?? ""}
         >
           <option value="">All categories</option>
           {categoryFacets.map(({ value, label, count }) => (
@@ -327,7 +338,7 @@ export function SkillsTable({
                   onChange={(e) => setRelevanceFilter(0, e.target.value)}
                   placeholder={`Min (${relevanceFacets.min ?? "–"})`}
                   type="number"
-                  value={relevanceFilter?.[0] ?? ""}
+                  value={state.relevance?.min ?? ""}
                 />
                 <input
                   className="input input-sm w-full"
@@ -336,7 +347,7 @@ export function SkillsTable({
                   onChange={(e) => setRelevanceFilter(1, e.target.value)}
                   placeholder={`Max (${relevanceFacets.max ?? "–"})`}
                   type="number"
-                  value={relevanceFilter?.[1] ?? ""}
+                  value={state.relevance?.max ?? ""}
                 />
               </div>
             </fieldset>
@@ -347,12 +358,12 @@ export function SkillsTable({
                 <label className="flex items-center gap-2 text-sm" key={value}>
                   <input
                     checked={
-                      createdAtFilter === value ||
-                      (!createdAtFilter && value === "")
+                      state.createdAt === value ||
+                      (!state.createdAt && value === "")
                     }
                     className="radio radio-sm"
                     name="created"
-                    onChange={() => setColumnFilter("createdAt", value)}
+                    onChange={() => setState({ createdAt: value || null })}
                     type="radio"
                     value={value}
                   />
@@ -367,12 +378,12 @@ export function SkillsTable({
                 <label className="flex items-center gap-2 text-sm" key={value}>
                   <input
                     checked={
-                      updatedAtFilter === value ||
-                      (!updatedAtFilter && value === "")
+                      state.updatedAt === value ||
+                      (!state.updatedAt && value === "")
                     }
                     className="radio radio-sm"
                     name="updated"
-                    onChange={() => setColumnFilter("updatedAt", value)}
+                    onChange={() => setState({ updatedAt: value || null })}
                     type="radio"
                     value={value}
                   />
