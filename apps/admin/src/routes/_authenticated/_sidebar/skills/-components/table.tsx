@@ -249,15 +249,11 @@ export function SkillsTable({
     return activeFilters;
   }, [category, createdAt, updatedAt, stableRelevance]);
 
-  const activeBadges = useActiveBadges([
-    { id: "category", value: category, clear: () => setCategory(null) },
-    { id: "createdAt", value: createdAt, clear: () => setCreatedAt(null) },
-    { id: "updatedAt", value: updatedAt, clear: () => setUpdatedAt(null) },
-    {
-      id: "relevance",
-      value: stableRelevance,
-      clear: () => setRelevance(null),
-    },
+  const { badges: activeBadges, clearAll: clearAllFilters } = useActiveBadges([
+    { id: "category", value: category, set: setCategory },
+    { id: "createdAt", value: createdAt, set: setCreatedAt },
+    { id: "updatedAt", value: updatedAt, set: setUpdatedAt },
+    { id: "relevance", value: stableRelevance, set: setRelevance },
   ]);
 
   const handleSortingChange: OnChangeFn<SortingState> = (updater) => {
@@ -450,7 +446,7 @@ export function SkillsTable({
           {activeBadges.map((badge) => (
             <button
               className="btn btn-soft btn-xs"
-              key={badge.id}
+              key={badge.id + badge.value}
               onClick={badge.clear}
               type="button"
             >
@@ -462,11 +458,7 @@ export function SkillsTable({
           ))}
           <button
             className="btn btn-ghost btn-xs"
-            onClick={() => {
-              for (const badge of activeBadges) {
-                badge.clear();
-              }
-            }}
+            onClick={clearAllFilters}
             type="button"
           >
             clear all
