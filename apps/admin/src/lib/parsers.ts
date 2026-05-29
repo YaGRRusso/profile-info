@@ -6,11 +6,11 @@ import {
 } from "nuqs";
 import type { z } from "zod";
 
-// Cada forma de schema usa um encoding fixo na URL:
-//   primitive                      -> ?key=value
-//   array de primitives            -> ?key=valor1&key=valor2
-//   object de primitives           -> ?key=campo1:valor1,campo2:valor2
-//   array de object de primitives  -> ?key=...&key=...
+// Each schema shape uses a fixed URL encoding:
+//   primitive                       -> ?key=value
+//   array of primitives             -> ?key=value1&key=value2
+//   object of primitives            -> ?key=field1:value1,field2:value2
+//   array of object of primitives   -> ?key=...&key=...
 
 type PrimitiveValue = string | number | boolean;
 type PrimitiveObject = Record<string, PrimitiveValue>;
@@ -26,7 +26,7 @@ function getZodDefinition(schema: unknown): ZodDefinition {
   return (schema as { _zod: { def: ZodDefinition } })._zod.def;
 }
 
-// Desembrulha optional / nullable / default para alcançar o tipo primitivo interno
+// Unwraps optional / nullable / default to reach the inner primitive type
 function getPrimitiveType(schema: unknown): string {
   let definition = getZodDefinition(schema);
   while (

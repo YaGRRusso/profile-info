@@ -7,6 +7,7 @@ import {
   PencilIcon,
   SlidersHorizontalIcon,
   TrashSimpleIcon,
+  XIcon,
 } from "@phosphor-icons/react";
 import {
   type ColumnFiltersState,
@@ -32,6 +33,8 @@ import { SkillCategory, type SkillEntity } from "@/graphql/graphql";
 import { cn } from "@/lib/cn";
 import { getMinMaxFacets, getUniqueFacets } from "@/lib/facets";
 import { parseAsShape } from "@/lib/parsers";
+import { useActiveBadges } from "@/lib/use-active-badges";
+import { useStableValue } from "@/lib/use-stable-value";
 
 const debouncedUrlUpdates = { method: "debounce" as const, timeMs: 500 };
 const persistentOptions = { clearOnDefault: true, history: "push" as const };
@@ -224,27 +227,38 @@ export function SkillsTable({
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
 
-  // JSON estabiliza a dep do memo: o nuqs pode entregar uma nova ref de
-  // `relevance` mesmo quando o conteúdo é igual; sem isso o memo re-roda
-  // e o TanStack re-faceta tudo a cada keystroke.
-  const relevanceKey = JSON.stringify(relevance);
-  // biome-ignore lint/correctness/useExhaustiveDependencies: relevanceKey serializa relevance
+  // nuqs may return a new ref for nested objects on each render even when
+  // the content is identical. useStableValue freezes the ref while content
+  // stays equal, preventing useMemo from re-running and TanStack from
+  // re-faceting on every keystroke.
+  const stableRelevance = useStableValue(relevance);
   const columnFilters = useMemo<ColumnFiltersState>(() => {
     const activeFilters: ColumnFiltersState = [];
     if (category) activeFilters.push({ id: "category", value: category });
     if (createdAt) activeFilters.push({ id: "createdAt", value: createdAt });
     if (updatedAt) activeFilters.push({ id: "updatedAt", value: updatedAt });
-    if (relevance) {
+    if (stableRelevance) {
       activeFilters.push({
         id: "relevance",
-        value: [relevance.min, relevance.max] as [
+        value: [stableRelevance.min, stableRelevance.max] as [
           number | undefined,
           number | undefined,
         ],
       });
     }
     return activeFilters;
-  }, [category, createdAt, updatedAt, relevanceKey]);
+  }, [category, createdAt, updatedAt, stableRelevance]);
+
+  const activeBadges = useActiveBadges([
+    { id: "category", value: category, clear: () => setCategory(null) },
+    { id: "createdAt", value: createdAt, clear: () => setCreatedAt(null) },
+    { id: "updatedAt", value: updatedAt, clear: () => setUpdatedAt(null) },
+    {
+      id: "relevance",
+      value: stableRelevance,
+      clear: () => setRelevance(null),
+    },
+  ]);
 
   const handleSortingChange: OnChangeFn<SortingState> = (updater) => {
     setSort((currentSort) =>
@@ -337,7 +351,7 @@ export function SkillsTable({
           <button className="btn btn-square btn-soft" type="button">
             <SlidersHorizontalIcon />
           </button>
-          <div className="dropdown-content z-1 flex w-52 flex-col rounded-box border border-input bg-base-200 p-4">
+          <div className="dropdown-content z-10 w-52 rounded-box border border-input bg-base-200 p-4">
             <fieldset className="flex flex-col gap-2">
               <span className="font-semibold">Relevance</span>
               <div className="flex items-center gap-2">
@@ -406,7 +420,7 @@ export function SkillsTable({
           <button className="btn btn-square btn-soft" type="button">
             <GearIcon />
           </button>
-          <div className="dropdown-content z-1 flex w-40 flex-col gap-2 rounded-box border border-input bg-base-200 p-4">
+          <div className="dropdown-content z-10 w-40 rounded-box border border-input bg-base-200 p-4">
             <div className="flex flex-col gap-2">
               <span className="font-semibold">Visibility</span>
               {table
@@ -430,6 +444,35 @@ export function SkillsTable({
           </div>
         </div>
       </div>
+
+      {activeBadges.length > 0 && (
+        <div className="flex flex-wrap items-center gap-1">
+          {activeBadges.map((badge) => (
+            <button
+              className="btn btn-soft btn-xs"
+              key={badge.id}
+              onClick={badge.clear}
+              type="button"
+            >
+              <span>
+                {badge.id}: {badge.value}
+              </span>
+              <XIcon />
+            </button>
+          ))}
+          <button
+            className="btn btn-ghost btn-xs"
+            onClick={() => {
+              for (const badge of activeBadges) {
+                badge.clear();
+              }
+            }}
+            type="button"
+          >
+            clear all
+          </button>
+        </div>
+      )}
 
       <div className="overflow-x-auto bg-base-200">
         <table className="table">
