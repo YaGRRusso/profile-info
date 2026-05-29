@@ -1,5 +1,6 @@
 import { createFileRoute, Outlet } from "@tanstack/react-router";
 import { useEffect } from "react";
+import { DataState } from "@/components/display/data-state";
 import { useGetMe } from "@/hooks/queries/auth";
 import { useAuthStore } from "@/stores/auth";
 import { Login } from "./-components/login";
@@ -27,7 +28,19 @@ function RouteComponent() {
     }
   }, [user, setUser]);
 
-  if (!token) return <Login />;
-
-  return <Outlet />;
+  return (
+    <DataState
+      isEmpty={!getMe.data}
+      isFetching={getMe.isFetching}
+      isLoading={getMe.isLoading}
+    >
+      <DataState.Loading />
+      <DataState.Empty>
+        <Login />
+      </DataState.Empty>
+      <DataState.Content>
+        <Outlet />
+      </DataState.Content>
+    </DataState>
+  );
 }

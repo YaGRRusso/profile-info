@@ -34,19 +34,25 @@ export function DataState({
 DataState.Loading = function DataStateLoading({
   children,
 }: {
-  children: ReactNode;
+  children?: ReactNode;
 }) {
   const { isLoading } = useDataStateContext();
-  if (isLoading) return <>{children}</>;
+  if (isLoading) {
+    if (children) return <>{children}</>;
+    return <div className="loading loading-dots mx-auto my-16 block" />;
+  }
 };
 
 DataState.Fetching = function DataStateFetching({
   children,
 }: {
-  children: ReactNode;
+  children?: ReactNode;
 }) {
   const { isFetching } = useDataStateContext();
-  if (isFetching) return <>{children}</>;
+  if (isFetching) {
+    if (children) return <>{children}</>;
+    return <div className="loading loading-dots mx-auto my-16 block" />;
+  }
 };
 
 DataState.Empty = function DataStateEmpty({
