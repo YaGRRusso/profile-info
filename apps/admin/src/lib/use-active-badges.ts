@@ -9,6 +9,7 @@ export interface ActiveBadge {
 
 export interface FilterEntry<Value = unknown> {
   id: string;
+  label?: string;
   setState(next: Value | null): void;
   state: Value;
 }
@@ -90,10 +91,15 @@ function previewsFromValue(value: unknown): BadgePreview[] {
   return [{ display: String(value), valueAfterClear: null }];
 }
 
-function badgesForFilter({ id, state, setState }: FilterEntry): ActiveBadge[] {
+function badgesForFilter({
+  id,
+  label,
+  state,
+  setState,
+}: FilterEntry): ActiveBadge[] {
   return previewsFromValue(state).map(({ display, valueAfterClear }) => ({
     id,
-    value: display,
+    value: label ? `${label}: ${display}` : display,
     clear: () => setState(valueAfterClear),
   }));
 }

@@ -250,10 +250,30 @@ export function SkillsTable({
   }, [category, createdAt, updatedAt, stableRelevance]);
 
   const { badges: activeBadges, clearAll: clearAllFilters } = useActiveBadges([
-    { id: "category", state: category, setState: setCategory },
-    { id: "createdAt", state: createdAt, setState: setCreatedAt },
-    { id: "updatedAt", state: updatedAt, setState: setUpdatedAt },
-    { id: "relevance", state: stableRelevance, setState: setRelevance },
+    {
+      id: "category",
+      label: "Category",
+      state: category,
+      setState: setCategory,
+    },
+    {
+      id: "createdAt",
+      label: "Created",
+      state: createdAt,
+      setState: setCreatedAt,
+    },
+    {
+      id: "updatedAt",
+      label: "Updated",
+      state: updatedAt,
+      setState: setUpdatedAt,
+    },
+    {
+      id: "relevance",
+      label: "Relevance",
+      state: stableRelevance,
+      setState: setRelevance,
+    },
   ]);
 
   const handleSortingChange: OnChangeFn<SortingState> = (updater) => {
@@ -450,9 +470,7 @@ export function SkillsTable({
               onClick={badge.clear}
               type="button"
             >
-              <span>
-                {badge.id}: {badge.value}
-              </span>
+              <span>{badge.value}</span>
               <XIcon />
             </button>
           ))}
