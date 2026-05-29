@@ -26,6 +26,7 @@ useAuthStore.subscribe((state, prev) => {
 
 const router = createRouter({
   routeTree,
+  basepath: import.meta.env.BASE_URL,
   scrollRestoration: true,
   context: { queryClient },
 });

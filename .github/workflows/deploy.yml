@@ -1,0 +1,64 @@
+name: Deploy admin to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build admin
+        env:
+          # GitHub Pages serves a project site under /<repo>/, so the build
+          # must emit assets and the router basepath at that subpath.
+          VITE_BASE_PATH: /${{ github.event.repository.name }}/
+          # Public GraphQL endpoint, baked into the client bundle.
+          # Set in repo Settings > Secrets and variables > Actions > Variables.
+          VITE_API_URL: ${{ vars.VITE_API_URL }}
+        run: npm run admin:build
+
+      - name: Add SPA fallback
+        # GitHub Pages has no SPA rewrite: a refresh on a client route 404s.
+        # Serving the app shell as 404.html lets the router take over.
+        run: |
+          cp apps/admin/dist/index.html apps/admin/dist/404.html
+          touch apps/admin/dist/.nojekyll
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: apps/admin/dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
