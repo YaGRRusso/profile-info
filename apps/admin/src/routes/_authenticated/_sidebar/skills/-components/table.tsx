@@ -118,27 +118,27 @@ const getColumns = (
   onEdit: (skill: SkillEntity) => void,
   onDelete: (skill: SkillEntity) => void
 ) => [
-  columnHelper.display({
-    id: "select",
-    enableHiding: false,
-    header: ({ table }) => (
-      <input
-        checked={table.getIsAllRowsSelected()}
-        className="checkbox checkbox-sm"
-        onChange={table.getToggleAllRowsSelectedHandler()}
-        type="checkbox"
-      />
-    ),
-    cell: ({ row }) => (
-      <input
-        checked={row.getIsSelected()}
-        className="checkbox checkbox-sm"
-        disabled={!row.getCanSelect()}
-        onChange={row.getToggleSelectedHandler()}
-        type="checkbox"
-      />
-    ),
-  }),
+  // columnHelper.display({
+  //   id: "select",
+  //   enableHiding: false,
+  //   header: ({ table }) => (
+  //     <input
+  //       checked={table.getIsAllRowsSelected()}
+  //       className="checkbox checkbox-sm"
+  //       onChange={table.getToggleAllRowsSelectedHandler()}
+  //       type="checkbox"
+  //     />
+  //   ),
+  //   cell: ({ row }) => (
+  //     <input
+  //       checked={row.getIsSelected()}
+  //       className="checkbox checkbox-sm"
+  //       disabled={!row.getCanSelect()}
+  //       onChange={row.getToggleSelectedHandler()}
+  //       type="checkbox"
+  //     />
+  //   ),
+  // }),
   columnHelper.accessor("name", {
     header: "Name",
   }),

@@ -191,7 +191,6 @@ function RouteComponent() {
                 customValues: { id: skill.id },
               })
             }
-            onSelect={(skills) => console.log(skills)}
           />
         </DataState.Content>
       </DataState>
