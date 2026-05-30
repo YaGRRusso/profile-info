@@ -1,9 +1,6 @@
 import {
   ArrowsClockwiseIcon,
-  EyeIcon,
-  PencilIcon,
   PlusIcon,
-  TrashSimpleIcon,
   WarningIcon,
 } from "@phosphor-icons/react";
 import { createFileRoute } from "@tanstack/react-router";
@@ -37,7 +34,6 @@ export const Route = createFileRoute("/_authenticated/_sidebar/skills/")({
 function RouteComponent() {
   const [formValues, setFormValues] =
     useState<CommonFormValuesProps<SkillEntity, SkillEntity[]>>();
-  const [selected, setSelected] = useState<SkillEntity[]>();
 
   const findManySkills = useFindManySkills();
   useQueryAllPages(findManySkills);
@@ -139,36 +135,6 @@ function RouteComponent() {
     <div className="flex flex-col gap-4">
       <PageTitle
         actions={[
-          {
-            icon: <PencilIcon />,
-            className: "btn-ghost btn-square",
-            onClick: () =>
-              setFormValues({
-                state: "MULTI_UPDATING",
-                customValues: selected,
-              }),
-            disabled: !selected?.length,
-          },
-          {
-            icon: <EyeIcon />,
-            className: "btn-ghost btn-square",
-            onClick: () =>
-              setFormValues({
-                state: "MULTI_READING",
-                customValues: selected,
-              }),
-            disabled: !selected?.length,
-          },
-          {
-            icon: <TrashSimpleIcon />,
-            className: "btn-ghost btn-square btn-error",
-            onClick: () =>
-              setFormValues({
-                state: "MULTI_DELETING",
-                customValues: selected,
-              }),
-            disabled: !selected?.length,
-          },
           {
             icon: (
               <ArrowsClockwiseIcon
@@ -326,7 +292,24 @@ function RouteComponent() {
                 customValues: [skill],
               })
             }
-            onSelect={setSelected}
+            onMultiDelete={(skills) =>
+              setFormValues({
+                state: "MULTI_DELETING",
+                customValues: skills,
+              })
+            }
+            onMultiEdit={(skills) =>
+              setFormValues({
+                state: "MULTI_UPDATING",
+                customValues: skills,
+              })
+            }
+            onMultiView={(skills) =>
+              setFormValues({
+                state: "MULTI_READING",
+                customValues: skills,
+              })
+            }
             onView={(skill) =>
               setFormValues({
                 state: "READING",

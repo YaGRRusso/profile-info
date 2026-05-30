@@ -28,7 +28,7 @@ import {
   type VisibilityState,
 } from "@tanstack/react-table";
 import { useQueryState } from "nuqs";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { z } from "zod";
 import { SkillCategory, type SkillEntity } from "@/graphql/graphql";
 import { useActiveBadges } from "@/hooks/custom/use-active-badges";
@@ -215,9 +215,11 @@ const getColumns = (
 
 interface SkillsTableProps {
   data: SkillEntity[];
-  onDelete: (id: SkillEntity) => void;
+  onDelete: (skill: SkillEntity) => void;
   onEdit: (skill: SkillEntity) => void;
-  onSelect: (ids: SkillEntity[]) => void;
+  onMultiDelete: (skills: SkillEntity[]) => void;
+  onMultiEdit: (skills: SkillEntity[]) => void;
+  onMultiView: (skills: SkillEntity[]) => void;
   onView: (skill: SkillEntity) => void;
 }
 
@@ -225,8 +227,10 @@ export function SkillsTable({
   data,
   onEdit,
   onDelete,
-  onSelect,
   onView,
+  onMultiEdit,
+  onMultiView,
+  onMultiDelete,
 }: SkillsTableProps) {
   const [searchQuery, setSearchQuery] = useQueryState("query", queryParser);
   const [sort, setSort] = useQueryState("sort", sortParser);
@@ -331,6 +335,8 @@ export function SkillsTable({
     setRelevance(hasAnyValue ? { min: nextMin, max: nextMax } : null);
   }
 
+  const selected = data.filter((skill) => rowSelection[skill.id]);
+
   const categoryFacets = getUniqueFacets(
     table.getColumn("category")!.getFacetedUniqueValues(),
     CATEGORY_LABELS
@@ -339,13 +345,39 @@ export function SkillsTable({
     table.getColumn("relevance")?.getFacetedMinMaxValues()
   );
 
-  useEffect(() => {
-    const selected = data.filter((skill) => rowSelection[skill.id]);
-    onSelect?.(selected);
-  }, [rowSelection, onSelect, data]);
-
   return (
     <div className="flex flex-col gap-4">
+      <div className="-mb-2 flex justify-end">
+        <div className="scrollbar-hidden flex items-center gap-2 overflow-auto">
+          <button
+            className="btn btn-ghost btn-sm"
+            disabled={!selected?.length}
+            onClick={() => onMultiEdit(selected)}
+            type="button"
+          >
+            <PencilIcon />
+            <span>Update Selected</span>
+          </button>
+          <button
+            className="btn btn-ghost btn-sm"
+            disabled={!selected?.length}
+            onClick={() => onMultiView(selected)}
+            type="button"
+          >
+            <EyeIcon />
+            <span>View Selected</span>
+          </button>
+          <button
+            className="btn btn-ghost btn-sm btn-error"
+            disabled={!selected?.length}
+            onClick={() => onMultiDelete(selected)}
+            type="button"
+          >
+            <TrashSimpleIcon />
+            <span>Remove Selected</span>
+          </button>
+        </div>
+      </div>
       <div className="flex flex-wrap items-center gap-2">
         <div className="flex min-w-64 flex-1 items-center gap-2">
           <label className="input flex-1 bg-base-200">
