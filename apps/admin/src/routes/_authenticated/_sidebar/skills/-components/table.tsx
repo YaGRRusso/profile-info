@@ -30,11 +30,11 @@ import { useQueryState } from "nuqs";
 import { useEffect, useMemo, useState } from "react";
 import { z } from "zod";
 import { SkillCategory, type SkillEntity } from "@/graphql/graphql";
+import { useActiveBadges } from "@/hooks/custom/use-active-badges";
+import { useStableValue } from "@/hooks/custom/use-stable-value";
 import { cn } from "@/lib/cn";
 import { getMinMaxFacets, getUniqueFacets } from "@/lib/facets";
 import { parseAsShape } from "@/lib/parsers";
-import { useActiveBadges } from "@/lib/use-active-badges";
-import { useStableValue } from "@/lib/use-stable-value";
 
 const debouncedUrlUpdates = { method: "debounce" as const, timeMs: 500 };
 const persistentOptions = { clearOnDefault: true, history: "push" as const };
@@ -227,10 +227,6 @@ export function SkillsTable({
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
 
-  // nuqs may return a new ref for nested objects on each render even when
-  // the content is identical. useStableValue freezes the ref while content
-  // stays equal, preventing useMemo from re-running and TanStack from
-  // re-faceting on every keystroke.
   const stableRelevance = useStableValue(relevance);
   const columnFilters = useMemo<ColumnFiltersState>(() => {
     const activeFilters: ColumnFiltersState = [];

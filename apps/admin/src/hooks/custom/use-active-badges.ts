@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { useStableValue } from "@/lib/use-stable-value";
+import { useStableValue } from "@/hooks/custom/use-stable-value";
 
 export interface ActiveBadge {
   clear: () => void;
