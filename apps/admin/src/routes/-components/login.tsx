@@ -1,4 +1,3 @@
-import { toast } from "react-toastify";
 import { UserForm } from "@/forms/user";
 import { useSignIn } from "@/hooks/mutations/auth";
 import { useAuthStore } from "@/stores/auth";
@@ -34,9 +33,6 @@ export function Login() {
                 {
                   onSuccess: (data) => {
                     if (data?.signIn) setToken(data.signIn);
-                  },
-                  onError: (error) => {
-                    toast.error(error.message);
                   },
                 }
               )

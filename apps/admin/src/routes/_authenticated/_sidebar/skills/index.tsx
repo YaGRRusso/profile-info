@@ -8,6 +8,7 @@ import {
 } from "@phosphor-icons/react";
 import { createFileRoute } from "@tanstack/react-router";
 import { useCallback, useMemo, useState } from "react";
+import { toast } from "react-toastify";
 import { Alert } from "@/components/display/alert";
 import { DataState } from "@/components/display/data-state";
 import { Json } from "@/components/display/json";
@@ -64,7 +65,12 @@ function RouteComponent() {
     (data: SkillSchema) => {
       switch (formValues?.state) {
         case "CREATING":
-          createOneSkill.mutate(data, { onSuccess: closeAndRefetch });
+          createOneSkill.mutate(data, {
+            onSuccess: () => {
+              closeAndRefetch();
+              toast.success("Skill created successfully");
+            },
+          });
           break;
         case "UPDATING":
           updateOneSkill.mutate(
@@ -77,7 +83,12 @@ function RouteComponent() {
                 slug: data.slug,
               },
             },
-            { onSuccess: closeAndRefetch }
+            {
+              onSuccess: () => {
+                closeAndRefetch();
+                toast.success("Skill updated successfully");
+              },
+            }
           );
           break;
         default:
@@ -97,12 +108,20 @@ function RouteComponent() {
     switch (formValues?.state) {
       case "DELETING":
         removeOneSkill.mutate(selectedSkillIds[0], {
-          onSuccess: closeAndRefetch,
+          onSuccess: () => {
+            closeAndRefetch();
+            toast.success("Skill deleted successfully");
+          },
         });
         break;
       case "MULTI_DELETING":
         removeManySkills.mutate(selectedSkillIds, {
-          onSuccess: closeAndRefetch,
+          onSuccess: (data) => {
+            closeAndRefetch();
+            toast.success(
+              `${data.removeManySkills.count} skills deleted successfully`
+            );
+          },
         });
         break;
       default:
@@ -202,7 +221,14 @@ function RouteComponent() {
           onSubmit={(updateSkillInput) =>
             updateManySkills.mutate(
               { skillIds: selectedSkillIds, updateSkillInput },
-              { onSuccess: closeAndRefetch }
+              {
+                onSuccess: (data) => {
+                  closeAndRefetch();
+                  toast.success(
+                    `${data.updateManySkills.count} skills updated successfully`
+                  );
+                },
+              }
             )
           }
           state={formValues?.state}
