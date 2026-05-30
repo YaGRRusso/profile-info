@@ -7,7 +7,7 @@ import {
   WarningIcon,
 } from "@phosphor-icons/react";
 import { createFileRoute } from "@tanstack/react-router";
-import { useCallback, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { Alert } from "@/components/display/alert";
 import { DataState } from "@/components/display/data-state";
 import { Json } from "@/components/display/json";
@@ -15,11 +15,14 @@ import { Modal } from "@/components/display/modal";
 import { PageTitle } from "@/components/display/page-title";
 import type { CommonFormValuesProps } from "@/forms/common";
 import { SkillForm, type SkillSchema } from "@/forms/skill";
+import { SkillMultiForm } from "@/forms/skill-multi";
 import { SkillEntity } from "@/graphql/graphql";
 import { useQueryAllPages } from "@/hooks/custom/use-query-all-pages";
 import {
   useCreateOneSkill,
+  useRemoveManySkills,
   useRemoveOneSkill,
+  useUpdateManySkills,
   useUpdateOneSkill,
 } from "@/hooks/mutations/skills";
 import { useFindManySkills } from "@/hooks/queries/skills";
@@ -36,25 +39,37 @@ function RouteComponent() {
   const [selected, setSelected] = useState<SkillEntity[]>();
 
   const findManySkills = useFindManySkills();
+  useQueryAllPages(findManySkills);
+
   const createOneSkill = useCreateOneSkill();
   const updateOneSkill = useUpdateOneSkill();
+  const updateManySkills = useUpdateManySkills();
   const removeOneSkill = useRemoveOneSkill();
+  const removeManySkills = useRemoveManySkills();
+
+  const closeAndRefetch = useCallback(() => {
+    setFormValues(undefined);
+    findManySkills.refetch();
+  }, [findManySkills.refetch]);
+
+  const selectedSkillIds = useMemo(
+    () =>
+      (formValues?.customValues ?? [])
+        .map((skill) => skill?.id)
+        .filter((skillId): skillId is string => Boolean(skillId)),
+    [formValues?.customValues]
+  );
 
   const handleSubmit = useCallback(
     (data: SkillSchema) => {
       switch (formValues?.state) {
         case "CREATING":
-          createOneSkill.mutate(data, {
-            onSuccess: () => {
-              setFormValues(undefined);
-              findManySkills.refetch();
-            },
-          });
+          createOneSkill.mutate(data, { onSuccess: closeAndRefetch });
           break;
         case "UPDATING":
           updateOneSkill.mutate(
             {
-              skillId: formValues.customValues?.[0]?.id ?? "",
+              skillId: selectedSkillIds[0],
               updateSkillInput: {
                 category: data.category,
                 name: data.name,
@@ -62,29 +77,21 @@ function RouteComponent() {
                 slug: data.slug,
               },
             },
-            {
-              onSuccess: () => {
-                setFormValues(undefined);
-                findManySkills.refetch();
-              },
-            }
+            { onSuccess: closeAndRefetch }
           );
           break;
         default:
-          console.log(formValues?.state, data);
           break;
       }
     },
     [
       createOneSkill.mutate,
-      findManySkills.refetch,
-      formValues?.customValues,
+      closeAndRefetch,
       formValues?.state,
       updateOneSkill.mutate,
+      selectedSkillIds,
     ]
   );
-
-  useQueryAllPages(findManySkills);
 
   return (
     <div className="flex flex-col gap-4">
@@ -161,6 +168,25 @@ function RouteComponent() {
       </Modal>
 
       <Modal
+        description={`Update the fields below to apply them to all ${formValues?.customValues?.length ?? 0} selected skills.`}
+        isOpen={formValues?.state === "MULTI_UPDATING"}
+        onClose={() => setFormValues(undefined)}
+        title="Update Skills"
+      >
+        <SkillMultiForm
+          isLoading={updateManySkills.isPending}
+          onCancel={() => setFormValues(undefined)}
+          onSubmit={(updateSkillInput) =>
+            updateManySkills.mutate(
+              { skillIds: selectedSkillIds, updateSkillInput },
+              { onSuccess: closeAndRefetch }
+            )
+          }
+          state={formValues?.state}
+        />
+      </Modal>
+
+      <Modal
         actions={[
           {
             label: "Close",
@@ -191,12 +217,10 @@ function RouteComponent() {
           {
             label: "Confirm",
             className: "btn-soft btn-error",
+            disabled: removeOneSkill.isPending,
             onClick: () =>
-              removeOneSkill.mutate(formValues?.customValues?.[0]?.id ?? "", {
-                onSuccess: () => {
-                  setFormValues(undefined);
-                  findManySkills.refetch();
-                },
+              removeOneSkill.mutate(selectedSkillIds[0], {
+                onSuccess: closeAndRefetch,
               }),
           },
         ]}
@@ -205,6 +229,37 @@ function RouteComponent() {
         onClose={() => setFormValues(undefined)}
         title={`Delete ${formValues?.customValues?.[0]?.name}?`}
       />
+
+      <Modal
+        actions={[
+          {
+            label: "Cancel",
+            className: "btn-ghost",
+            onClick: () => setFormValues(undefined),
+          },
+          {
+            label: "Confirm",
+            className: "btn-soft btn-error",
+            disabled: removeManySkills.isPending,
+            onClick: () =>
+              removeManySkills.mutate(selectedSkillIds, {
+                onSuccess: closeAndRefetch,
+              }),
+          },
+        ]}
+        description="Are you sure you want to delete the following skills?"
+        isOpen={formValues?.state === "MULTI_DELETING"}
+        onClose={() => setFormValues(undefined)}
+        title={`Delete ${formValues?.customValues?.length ?? 0} skills?`}
+      >
+        <ul className="flex flex-wrap items-center gap-1">
+          {formValues?.customValues?.map((skill) => (
+            <li className="badge badge-sm badge-soft" key={skill?.id}>
+              {skill?.name}
+            </li>
+          ))}
+        </ul>
+      </Modal>
 
       <DataState
         isEmpty={findManySkills.data?.nodes.length === 0}
