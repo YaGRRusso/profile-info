@@ -1,9 +1,11 @@
 import { useForm } from "@tanstack/react-form";
 import { useState } from "react";
 import z from "zod";
+import { CheckboxInput } from "@/components/inputs/checkbox";
 import { RangeInput } from "@/components/inputs/range";
 import { SelectInput } from "@/components/inputs/select";
 import { SkillCategory, type UpdateSkillInput } from "@/graphql/graphql";
+import { fieldError } from "@/lib/field-error";
 import { CommonFormProps } from "./common";
 
 const skillMultiSchema = z.object({
@@ -55,48 +57,48 @@ export function SkillMultiForm({
         form.handleSubmit();
       }}
     >
-      <label className="mt-2 flex items-center gap-2 font-semibold text-sm">
-        <input
-          checked={changeCategory}
-          className="checkbox checkbox-xs"
-          onChange={(event) => setChangeCategory(event.target.checked)}
-          type="checkbox"
-        />
-        <span className="text-sm">Change Category</span>
-      </label>
+      <CheckboxInput
+        checked={changeCategory}
+        label="Change Category"
+        onChange={setChangeCategory}
+      />
 
       <Field name="category">
         {(field) => (
           <SelectInput
             disabled={!changeCategory}
-            field={field}
+            error={fieldError(field.state.meta)}
+            name={field.name}
+            onChange={(value) => field.handleChange(value as SkillCategory)}
             options={CATEGORY_OPTIONS}
             placeholder="Category"
+            value={field.state.value}
           />
         )}
       </Field>
 
-      <label className="mt-2 flex items-center gap-2 font-semibold text-sm">
-        <input
-          checked={changeRelevance}
-          className="checkbox checkbox-xs"
-          onChange={(event) => setChangeRelevance(event.target.checked)}
-          type="checkbox"
-        />
-        <span className="text-sm">Change Relevance</span>
-      </label>
+      <div className="divider" />
+
+      <CheckboxInput
+        checked={changeRelevance}
+        label="Change Relevance"
+        onChange={setChangeRelevance}
+      />
 
       <Field name="relevance">
         {(field) => (
           <RangeInput
             className="range-xs"
             disabled={!changeRelevance}
-            field={field}
+            error={fieldError(field.state.meta)}
             max={5}
             min={1}
+            name={field.name}
+            onChange={field.handleChange}
             placeholder="Relevance"
             ruler
             step={1}
+            value={field.state.value}
           />
         )}
       </Field>

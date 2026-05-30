@@ -4,6 +4,7 @@ import { RangeInput } from "@/components/inputs/range";
 import { SelectInput } from "@/components/inputs/select";
 import { TextInput } from "@/components/inputs/text";
 import { SkillCategory } from "@/graphql/graphql";
+import { fieldError } from "@/lib/field-error";
 import { CommonFormProps } from "./common";
 
 const skillSchema = z.object({
@@ -54,17 +55,36 @@ export function SkillForm({
       }}
     >
       <Field name="name">
-        {(field) => <TextInput field={field} placeholder="Name" />}
+        {(field) => (
+          <TextInput
+            error={fieldError(field.state.meta)}
+            name={field.name}
+            onChange={field.handleChange}
+            placeholder="Name"
+            value={field.state.value}
+          />
+        )}
       </Field>
       <Field name="slug">
-        {(field) => <TextInput field={field} placeholder="Slug" />}
+        {(field) => (
+          <TextInput
+            error={fieldError(field.state.meta)}
+            name={field.name}
+            onChange={field.handleChange}
+            placeholder="Slug"
+            value={field.state.value}
+          />
+        )}
       </Field>
       <Field name="category">
         {(field) => (
           <SelectInput
-            field={field}
+            error={fieldError(field.state.meta)}
+            name={field.name}
+            onChange={(value) => field.handleChange(value as SkillCategory)}
             options={CATEGORY_OPTIONS}
             placeholder="Category"
+            value={field.state.value}
           />
         )}
       </Field>
@@ -72,12 +92,15 @@ export function SkillForm({
         {(field) => (
           <RangeInput
             className="range-xs"
-            field={field}
+            error={fieldError(field.state.meta)}
             max={5}
             min={1}
+            name={field.name}
+            onChange={field.handleChange}
             placeholder="Relevance"
             ruler
             step={1}
+            value={field.state.value}
           />
         )}
       </Field>

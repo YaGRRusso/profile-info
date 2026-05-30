@@ -2,6 +2,7 @@ import { useForm } from "@tanstack/react-form";
 import z from "zod";
 import { PasswordInput } from "@/components/inputs/password";
 import { TextInput } from "@/components/inputs/text";
+import { fieldError } from "@/lib/field-error";
 import { CommonFormProps } from "./common";
 
 const userSchema = z.object({
@@ -45,11 +46,26 @@ export function UserForm({
     >
       <Field name="email">
         {(field) => (
-          <TextInput field={field} placeholder="Email" type="email" />
+          <TextInput
+            error={fieldError(field.state.meta)}
+            name={field.name}
+            onChange={field.handleChange}
+            placeholder="Email"
+            type="email"
+            value={field.state.value}
+          />
         )}
       </Field>
       <Field name="password">
-        {(field) => <PasswordInput field={field} placeholder="Password" />}
+        {(field) => (
+          <PasswordInput
+            error={fieldError(field.state.meta)}
+            name={field.name}
+            onChange={field.handleChange}
+            placeholder="Password"
+            value={field.state.value}
+          />
+        )}
       </Field>
       <div className="form-footer">
         <Subscribe>

@@ -1,25 +1,26 @@
-import type { AnyFieldApi } from "@tanstack/react-form";
 import { type ComponentProps, useMemo } from "react";
 import { cn } from "@/lib/cn";
-import { fieldError } from "@/lib/field-error";
 
-export interface RangeInputProps extends ComponentProps<"input"> {
-  field: AnyFieldApi;
+export interface RangeInputProps
+  extends Omit<ComponentProps<"input">, "onChange" | "value"> {
+  error?: string;
+  onChange?: (value: number) => void;
   ruler?: boolean;
+  value?: number;
 }
 
 export function RangeInput({
   className,
-  field,
+  error,
   min = 0,
   max = 10,
   step = 1,
+  onChange,
   placeholder,
   ruler,
+  value,
   ...props
 }: RangeInputProps) {
-  const error = fieldError(field.state.meta);
-
   const steps = useMemo(() => {
     if (!ruler) return;
 
@@ -28,8 +29,8 @@ export function RangeInput({
     const stepNum = Number(step);
 
     const values: number[] = [];
-    for (let i = minNum; i <= maxNum; i += stepNum) {
-      values.push(i);
+    for (let tick = minNum; tick <= maxNum; tick += stepNum) {
+      values.push(tick);
     }
     return values;
   }, [min, max, step, ruler]);
@@ -39,25 +40,21 @@ export function RangeInput({
       <legend className="fieldset-legend">{placeholder}</legend>
       <input
         className={cn("range w-full", className)}
-        id={field.name}
         max={max}
         min={min}
-        name={field.name}
-        onChange={(e) => field.handleChange(e.target.valueAsNumber)}
+        onChange={(event) => onChange?.(event.target.valueAsNumber)}
         type="range"
-        value={field.state.value ?? ""}
+        value={value ?? ""}
         {...props}
       />
       {ruler && (
         <div className="mt-1 flex justify-between px-2.5 text-xs">
-          {steps?.map((value) => (
+          {steps?.map((tick) => (
             <span
-              className={
-                field.state.value === value ? "opacity-full" : "opacity-sm"
-              }
-              key={value}
+              className={value === tick ? "opacity-full" : "opacity-sm"}
+              key={tick}
             >
-              {value}
+              {tick}
             </span>
           ))}
         </div>

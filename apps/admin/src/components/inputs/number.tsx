@@ -1,31 +1,30 @@
-import type { AnyFieldApi } from "@tanstack/react-form";
 import { type ComponentProps } from "react";
 import { cn } from "@/lib/cn";
-import { fieldError } from "@/lib/field-error";
 
-export interface NumberInputProps extends ComponentProps<"input"> {
-  field: AnyFieldApi;
+export interface NumberInputProps
+  extends Omit<ComponentProps<"input">, "onChange" | "value"> {
+  error?: string;
+  onChange?: (value: number) => void;
+  value?: number;
 }
 
 export function NumberInput({
   className,
-  field,
+  error,
+  onChange,
   placeholder,
+  value,
   ...props
 }: NumberInputProps) {
-  const error = fieldError(field.state.meta);
-
   return (
     <fieldset className="fieldset">
       <legend className="fieldset-legend">{placeholder}</legend>
       <input
         className={cn("input w-full", error && "input-error", className)}
-        id={field.name}
-        name={field.name}
-        onChange={(e) => field.handleChange(e.target.valueAsNumber)}
+        onChange={(event) => onChange?.(event.target.valueAsNumber)}
         placeholder={placeholder}
         type="number"
-        value={field.state.value ?? ""}
+        value={value ?? ""}
         {...props}
       />
       {error && <p className="label text-error">{error}</p>}

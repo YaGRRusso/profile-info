@@ -1,32 +1,31 @@
-import type { AnyFieldApi } from "@tanstack/react-form";
 import { type ComponentProps } from "react";
 import { cn } from "@/lib/cn";
-import { fieldError } from "@/lib/field-error";
 
-export interface SelectInputProps extends ComponentProps<"select"> {
-  field: AnyFieldApi;
+export interface SelectInputProps
+  extends Omit<ComponentProps<"select">, "onChange" | "value"> {
+  error?: string;
+  onChange?: (value: string) => void;
   options: { label: string; value: string }[];
   placeholder?: string;
+  value?: string;
 }
 
 export function SelectInput({
   className,
-  field,
+  error,
+  onChange,
   options,
   placeholder,
+  value,
   ...props
 }: SelectInputProps) {
-  const error = fieldError(field.state.meta);
-
   return (
     <fieldset className="fieldset">
       <legend className="fieldset-legend">{placeholder}</legend>
       <select
         className={cn("select w-full", error && "select-error", className)}
-        id={field.name}
-        name={field.name}
-        onChange={(e) => field.handleChange(e.target.value)}
-        value={field.state.value ?? ""}
+        onChange={(event) => onChange?.(event.target.value)}
+        value={value ?? ""}
         {...props}
       >
         {placeholder && <option disabled>{placeholder}</option>}
