@@ -7,7 +7,15 @@ export interface CommonFormValuesProps<
   defaultValues?: Partial<Default>;
   isDisabled?: boolean;
   isLoading?: boolean;
-  state?: "CREATING" | "READING" | "UPDATING" | "DELETING";
+  state?:
+    | "CREATING"
+    | "MULTI_CREATING"
+    | "READING"
+    | "MULTI_READING"
+    | "UPDATING"
+    | "MULTI_UPDATING"
+    | "DELETING"
+    | "MULTI_DELETING";
 }
 
 export interface CommonFormProps<

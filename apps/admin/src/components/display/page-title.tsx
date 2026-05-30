@@ -3,7 +3,7 @@ import { cn } from "@/lib/cn";
 
 interface ActionProps extends ComponentProps<"button"> {
   icon?: ReactNode;
-  label: string;
+  label?: string;
 }
 
 export interface PageTitleProps extends ComponentProps<"div"> {
@@ -35,7 +35,7 @@ export function PageTitle({
         <div className="scrollbar-hidden flex items-center gap-2 overflow-auto">
           {actions.map(({ className, icon, label, ...action }, index) => (
             <button
-              className={cn("btn max-sm:btn-sm", className)}
+              className={cn("btn", className)}
               key={index}
               type="button"
               {...action}

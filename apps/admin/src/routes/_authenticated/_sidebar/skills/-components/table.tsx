@@ -120,27 +120,27 @@ const getColumns = (
   onDelete: (skill: SkillEntity) => void,
   onView: (skill: SkillEntity) => void
 ) => [
-  // columnHelper.display({
-  //   id: "select",
-  //   enableHiding: false,
-  //   header: ({ table }) => (
-  //     <input
-  //       checked={table.getIsAllRowsSelected()}
-  //       className="checkbox checkbox-sm"
-  //       onChange={table.getToggleAllRowsSelectedHandler()}
-  //       type="checkbox"
-  //     />
-  //   ),
-  //   cell: ({ row }) => (
-  //     <input
-  //       checked={row.getIsSelected()}
-  //       className="checkbox checkbox-sm"
-  //       disabled={!row.getCanSelect()}
-  //       onChange={row.getToggleSelectedHandler()}
-  //       type="checkbox"
-  //     />
-  //   ),
-  // }),
+  columnHelper.display({
+    id: "select",
+    enableHiding: false,
+    header: ({ table }) => (
+      <input
+        checked={table.getIsAllRowsSelected()}
+        className="checkbox checkbox-sm"
+        onChange={table.getToggleAllRowsSelectedHandler()}
+        type="checkbox"
+      />
+    ),
+    cell: ({ row }) => (
+      <input
+        checked={row.getIsSelected()}
+        className="checkbox checkbox-sm"
+        disabled={!row.getCanSelect()}
+        onChange={row.getToggleSelectedHandler()}
+        type="checkbox"
+      />
+    ),
+  }),
   columnHelper.accessor("name", {
     header: "Name",
   }),
@@ -345,9 +345,9 @@ export function SkillsTable({
   }, [rowSelection, onSelect, data]);
 
   return (
-    <div className="flex flex-col gap-2">
+    <div className="flex flex-col gap-4">
       <div className="flex items-center gap-2">
-        <label className="input flex-1">
+        <label className="input flex-1 bg-base-200">
           <MagnifyingGlassIcon className="opacity-md" />
           <input
             onChange={(event) => setSearchQuery(event.target.value)}
@@ -357,7 +357,7 @@ export function SkillsTable({
           />
         </label>
         <select
-          className="select"
+          className="select bg-base-200"
           disabled={!categoryFacets.length}
           onChange={(event) => setCategory(event.target.value || null)}
           value={category ?? ""}
@@ -491,7 +491,7 @@ export function SkillsTable({
         </div>
       )}
 
-      <div className="overflow-x-auto bg-base-100">
+      <div className="overflow-x-auto rounded bg-base-200">
         <table className="table">
           <thead>
             {table.getHeaderGroups().map((headerGroup) => (

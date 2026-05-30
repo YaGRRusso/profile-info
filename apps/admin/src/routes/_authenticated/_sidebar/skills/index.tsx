@@ -1,6 +1,9 @@
 import {
   ArrowsClockwiseIcon,
+  EyeIcon,
+  PencilIcon,
   PlusIcon,
+  TrashSimpleIcon,
   WarningIcon,
 } from "@phosphor-icons/react";
 import { createFileRoute } from "@tanstack/react-router";
@@ -12,6 +15,7 @@ import { Modal } from "@/components/display/modal";
 import { PageTitle } from "@/components/display/page-title";
 import type { CommonFormValuesProps } from "@/forms/common";
 import { SkillForm, type SkillSchema } from "@/forms/skill";
+import { SkillEntity } from "@/graphql/graphql";
 import { useQueryAllPages } from "@/hooks/custom/use-query-all-pages";
 import {
   useCreateOneSkill,
@@ -27,12 +31,13 @@ export const Route = createFileRoute("/_authenticated/_sidebar/skills/")({
 });
 
 function RouteComponent() {
+  const [formValues, setFormValues] = useState<CommonFormValuesProps>();
+  const [selected, setSelected] = useState<SkillEntity[]>();
+
   const findManySkills = useFindManySkills();
   const createOneSkill = useCreateOneSkill();
   const updateOneSkill = useUpdateOneSkill();
   const removeOneSkill = useRemoveOneSkill();
-
-  const [formValues, setFormValues] = useState<CommonFormValuesProps>();
 
   const handleSubmit = useCallback(
     (data: SkillSchema) => {
@@ -85,14 +90,32 @@ function RouteComponent() {
       <PageTitle
         actions={[
           {
+            icon: <PencilIcon />,
+            className: "btn-ghost btn-square",
+            onClick: () => setFormValues({ state: "MULTI_UPDATING" }),
+            disabled: !selected?.length,
+          },
+          {
+            icon: <EyeIcon />,
+            className: "btn-ghost btn-square",
+            onClick: () => setFormValues({ state: "MULTI_READING" }),
+            disabled: !selected?.length,
+          },
+          {
+            icon: <TrashSimpleIcon />,
+            className: "btn-ghost btn-square btn-error",
+            onClick: () => setFormValues({ state: "MULTI_DELETING" }),
+            disabled: !selected?.length,
+          },
+          {
             icon: (
               <ArrowsClockwiseIcon
                 className={cn(findManySkills.isFetching && "animate-spin")}
               />
             ),
-            label: "Refetch",
-            className: "btn-ghost",
+            className: "btn-ghost btn-square",
             onClick: () => findManySkills.refetch(),
+            disabled: findManySkills.isFetching,
           },
           {
             icon: <PlusIcon />,
@@ -205,7 +228,7 @@ function RouteComponent() {
                 customValues: { id: skill.id },
               })
             }
-            onSelect={(skill) => console.log(skill)}
+            onSelect={setSelected}
             onView={(skill) =>
               setFormValues({
                 state: "READING",
