@@ -2,6 +2,7 @@ import {
   ArrowDownIcon,
   ArrowsDownUpIcon,
   ArrowUpIcon,
+  EyeIcon,
   GearIcon,
   MagnifyingGlassIcon,
   PencilIcon,
@@ -116,7 +117,8 @@ function SortIcon({ sorted }: { sorted: false | "asc" | "desc" }) {
 
 const getColumns = (
   onEdit: (skill: SkillEntity) => void,
-  onDelete: (skill: SkillEntity) => void
+  onDelete: (skill: SkillEntity) => void,
+  onView: (skill: SkillEntity) => void
 ) => [
   // columnHelper.display({
   //   id: "select",
@@ -184,16 +186,23 @@ const getColumns = (
     id: "actions",
     enableHiding: false,
     cell: ({ row }) => (
-      <div className="flex items-center justify-end gap-2">
+      <div className="flex items-center justify-end gap-1">
         <button
-          className="btn btn-sm btn-square btn-soft"
+          className="btn btn-sm btn-square btn-ghost"
           onClick={() => onEdit(row.original)}
           type="button"
         >
           <PencilIcon />
         </button>
         <button
-          className="btn btn-sm btn-soft btn-square btn-error"
+          className="btn btn-sm btn-square btn-ghost"
+          onClick={() => onView(row.original)}
+          type="button"
+        >
+          <EyeIcon />
+        </button>
+        <button
+          className="btn btn-sm btn-square btn-ghost btn-error"
           onClick={() => onDelete(row.original)}
           type="button"
         >
@@ -208,7 +217,8 @@ interface SkillsTableProps {
   data: SkillEntity[];
   onDelete: (id: SkillEntity) => void;
   onEdit: (skill: SkillEntity) => void;
-  onSelect?: (ids: SkillEntity[]) => void;
+  onSelect: (ids: SkillEntity[]) => void;
+  onView: (skill: SkillEntity) => void;
 }
 
 export function SkillsTable({
@@ -216,6 +226,7 @@ export function SkillsTable({
   onEdit,
   onDelete,
   onSelect,
+  onView,
 }: SkillsTableProps) {
   const [searchQuery, setSearchQuery] = useQueryState("query", queryParser);
   const [sort, setSort] = useQueryState("sort", sortParser);
@@ -288,7 +299,7 @@ export function SkillsTable({
 
   const table = useReactTable({
     data,
-    columns: getColumns(onEdit, onDelete),
+    columns: getColumns(onEdit, onDelete, onView),
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     getSortedRowModel: getSortedRowModel(),
@@ -480,7 +491,7 @@ export function SkillsTable({
         </div>
       )}
 
-      <div className="overflow-x-auto bg-base-200">
+      <div className="overflow-x-auto bg-base-100">
         <table className="table">
           <thead>
             {table.getHeaderGroups().map((headerGroup) => (
@@ -511,8 +522,8 @@ export function SkillsTable({
             {table.getRowModel().rows.map((row) => (
               <tr
                 className={cn(
-                  "hover:bg-base-300",
-                  row.getIsSelected() && "bg-base-300"
+                  "hover:bg-base-200",
+                  row.getIsSelected() && "bg-base-200"
                 )}
                 key={row.id}
               >

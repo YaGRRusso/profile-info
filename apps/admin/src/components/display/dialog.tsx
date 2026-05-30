@@ -11,9 +11,10 @@ export interface DialogProps extends ComponentProps<typeof Modal> {
   }[];
 }
 
-export function Dialog({ actions, ...props }: DialogProps) {
+export function Dialog({ actions, children, ...props }: DialogProps) {
   return (
     <Modal {...props}>
+      {children}
       <div className="flex flex-wrap-reverse items-center gap-2">
         {actions.map((action, index) => (
           <button

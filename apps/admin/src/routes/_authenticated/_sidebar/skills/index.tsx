@@ -8,6 +8,7 @@ import { useCallback, useState } from "react";
 import { Alert } from "@/components/display/alert";
 import { DataState } from "@/components/display/data-state";
 import { Dialog } from "@/components/display/dialog";
+import { Json } from "@/components/display/json";
 import { Modal } from "@/components/display/modal";
 import { PageTitle } from "@/components/display/page-title";
 import type { CommonFormValuesProps } from "@/forms/common";
@@ -109,9 +110,7 @@ function RouteComponent() {
       <Modal
         description="Fill the details below and submit."
         isOpen={
-          formValues?.state === "CREATING" ||
-          formValues?.state === "UPDATING" ||
-          formValues?.state === "READING"
+          formValues?.state === "CREATING" || formValues?.state === "UPDATING"
         }
         onClose={() => setFormValues(undefined)}
         title="Manage Skill"
@@ -125,6 +124,22 @@ function RouteComponent() {
           state={formValues?.state}
         />
       </Modal>
+
+      <Dialog
+        actions={[
+          {
+            label: "Confirm",
+            className: "btn-soft",
+            onClick: () => setFormValues(undefined),
+          },
+        ]}
+        description="Read only view of the skill."
+        isOpen={formValues?.state === "READING"}
+        onClose={() => setFormValues(undefined)}
+        title="Read Skill"
+      >
+        <Json data={{ ...formValues?.customValues }} />
+      </Dialog>
 
       <Dialog
         actions={[
@@ -189,6 +204,13 @@ function RouteComponent() {
                 defaultValues: skill,
                 state: "UPDATING",
                 customValues: { id: skill.id },
+              })
+            }
+            onSelect={(skill) => console.log(skill)}
+            onView={(skill) =>
+              setFormValues({
+                state: "READING",
+                customValues: skill,
               })
             }
           />
