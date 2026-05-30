@@ -346,123 +346,134 @@ export function SkillsTable({
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex items-center gap-2">
-        <label className="input flex-1 bg-base-200">
-          <MagnifyingGlassIcon className="opacity-md" />
-          <input
-            onChange={(event) => setSearchQuery(event.target.value)}
-            placeholder="Search by name or slug..."
-            type="text"
-            value={searchQuery}
-          />
-        </label>
-        <select
-          className="select bg-base-200"
-          disabled={!categoryFacets.length}
-          onChange={(event) => setCategory(event.target.value || null)}
-          value={category ?? ""}
-        >
-          <option value="">All categories</option>
-          {categoryFacets.map(({ value, label, count }) => (
-            <option key={value} value={value}>
-              {label} ({count})
-            </option>
-          ))}
-        </select>
-
-        <div className="dropdown dropdown-bottom dropdown-end">
-          <button className="btn btn-square btn-soft" type="button">
-            <SlidersHorizontalIcon />
-          </button>
-          <div className="dropdown-content z-10 w-52 rounded-box border border-input bg-base-200 p-4">
-            <fieldset className="flex flex-col gap-2">
-              <span className="font-semibold">Relevance</span>
-              <div className="flex items-center gap-2">
-                <input
-                  className="input input-sm w-full"
-                  max={relevanceFacets.max ?? 100}
-                  min={relevanceFacets.min ?? 0}
-                  onChange={(e) => setRelevanceFilter(0, e.target.value)}
-                  placeholder={`Min (${relevanceFacets.min ?? "–"})`}
-                  type="number"
-                  value={relevance?.min ?? ""}
-                />
-                <input
-                  className="input input-sm w-full"
-                  max={relevanceFacets.max ?? 100}
-                  min={relevanceFacets.min ?? 0}
-                  onChange={(e) => setRelevanceFilter(1, e.target.value)}
-                  placeholder={`Max (${relevanceFacets.max ?? "–"})`}
-                  type="number"
-                  value={relevance?.max ?? ""}
-                />
-              </div>
-            </fieldset>
-            <div className="divider mt-2 mb-0" />
-            <fieldset className="flex flex-col gap-2">
-              <span className="font-semibold">Created</span>
-              {DATE_OPTIONS.map(({ value, label }) => (
-                <label className="flex items-center gap-2 text-sm" key={value}>
-                  <input
-                    checked={
-                      createdAt === value || (!createdAt && value === "")
-                    }
-                    className="radio radio-sm"
-                    name="created"
-                    onChange={() => setCreatedAt(value || null)}
-                    type="radio"
-                    value={value}
-                  />
-                  <span>{label}</span>
-                </label>
-              ))}
-            </fieldset>
-            <div className="divider mt-2 mb-0" />
-            <fieldset className="flex flex-col gap-2">
-              <span className="font-semibold">Updated</span>
-              {DATE_OPTIONS.map(({ value, label }) => (
-                <label className="flex items-center gap-2 text-sm" key={value}>
-                  <input
-                    checked={
-                      updatedAt === value || (!updatedAt && value === "")
-                    }
-                    className="radio radio-sm"
-                    name="updated"
-                    onChange={() => setUpdatedAt(value || null)}
-                    type="radio"
-                    value={value}
-                  />
-                  <span>{label}</span>
-                </label>
-              ))}
-            </fieldset>
-          </div>
+      <div className="flex flex-wrap items-center gap-2">
+        <div className="flex min-w-64 flex-1 items-center gap-2">
+          <label className="input flex-1 bg-base-200">
+            <MagnifyingGlassIcon className="opacity-md" />
+            <input
+              onChange={(event) => setSearchQuery(event.target.value)}
+              placeholder="Search by name or slug..."
+              type="text"
+              value={searchQuery}
+            />
+          </label>
         </div>
 
-        <div className="dropdown dropdown-bottom dropdown-end">
-          <button className="btn btn-square btn-soft" type="button">
-            <GearIcon />
-          </button>
-          <div className="dropdown-content z-10 w-40 rounded-box border border-input bg-base-200 p-4">
-            <div className="flex flex-col gap-2">
-              <span className="font-semibold">Visibility</span>
-              {table
-                .getAllColumns()
-                .filter((col) => col.getCanHide())
-                .map((col) => (
+        <div className="flex min-w-64 flex-1 items-center gap-2">
+          <select
+            className="select flex-1 bg-base-200"
+            disabled={!categoryFacets.length}
+            onChange={(event) => setCategory(event.target.value || null)}
+            value={category ?? ""}
+          >
+            <option value="">All categories</option>
+            {categoryFacets.map(({ value, label, count }) => (
+              <option key={value} value={value}>
+                {label} ({count})
+              </option>
+            ))}
+          </select>
+
+          <div className="dropdown dropdown-bottom dropdown-end">
+            <button className="btn btn-square btn-soft" type="button">
+              <SlidersHorizontalIcon />
+            </button>
+            <div className="dropdown-content z-10 w-52 rounded-box bg-base-200 p-4">
+              <fieldset className="flex flex-col gap-2">
+                <span className="font-semibold">Relevance</span>
+                <div className="flex items-center gap-2">
+                  <input
+                    className="input input-sm w-full"
+                    max={relevanceFacets.max ?? 100}
+                    min={relevanceFacets.min ?? 0}
+                    onChange={(e) => setRelevanceFilter(0, e.target.value)}
+                    placeholder={`Min (${relevanceFacets.min ?? "–"})`}
+                    type="number"
+                    value={relevance?.min ?? ""}
+                  />
+                  <input
+                    className="input input-sm w-full"
+                    max={relevanceFacets.max ?? 100}
+                    min={relevanceFacets.min ?? 0}
+                    onChange={(e) => setRelevanceFilter(1, e.target.value)}
+                    placeholder={`Max (${relevanceFacets.max ?? "–"})`}
+                    type="number"
+                    value={relevance?.max ?? ""}
+                  />
+                </div>
+              </fieldset>
+              <div className="divider mt-2 mb-0" />
+              <fieldset className="flex flex-col gap-2">
+                <span className="font-semibold">Created</span>
+                {DATE_OPTIONS.map(({ value, label }) => (
                   <label
                     className="flex items-center gap-2 text-sm"
-                    key={col.id}
+                    key={value}
                   >
                     <input
-                      checked={col.getIsVisible()}
-                      className="checkbox checkbox-sm"
-                      onChange={col.getToggleVisibilityHandler()}
-                      type="checkbox"
+                      checked={
+                        createdAt === value || (!createdAt && value === "")
+                      }
+                      className="radio radio-sm"
+                      name="created"
+                      onChange={() => setCreatedAt(value || null)}
+                      type="radio"
+                      value={value}
                     />
-                    <span>{col.columnDef.header as string}</span>
+                    <span>{label}</span>
                   </label>
                 ))}
+              </fieldset>
+              <div className="divider mt-2 mb-0" />
+              <fieldset className="flex flex-col gap-2">
+                <span className="font-semibold">Updated</span>
+                {DATE_OPTIONS.map(({ value, label }) => (
+                  <label
+                    className="flex items-center gap-2 text-sm"
+                    key={value}
+                  >
+                    <input
+                      checked={
+                        updatedAt === value || (!updatedAt && value === "")
+                      }
+                      className="radio radio-sm"
+                      name="updated"
+                      onChange={() => setUpdatedAt(value || null)}
+                      type="radio"
+                      value={value}
+                    />
+                    <span>{label}</span>
+                  </label>
+                ))}
+              </fieldset>
+            </div>
+          </div>
+
+          <div className="dropdown dropdown-bottom dropdown-end">
+            <button className="btn btn-square btn-soft" type="button">
+              <GearIcon />
+            </button>
+            <div className="dropdown-content z-10 w-40 rounded-box bg-base-200 p-4">
+              <div className="flex flex-col gap-2">
+                <span className="font-semibold">Visibility</span>
+                {table
+                  .getAllColumns()
+                  .filter((col) => col.getCanHide())
+                  .map((col) => (
+                    <label
+                      className="flex items-center gap-2 text-sm"
+                      key={col.id}
+                    >
+                      <input
+                        checked={col.getIsVisible()}
+                        className="checkbox checkbox-sm"
+                        onChange={col.getToggleVisibilityHandler()}
+                        type="checkbox"
+                      />
+                      <span>{col.columnDef.header as string}</span>
+                    </label>
+                  ))}
+              </div>
             </div>
           </div>
         </div>
