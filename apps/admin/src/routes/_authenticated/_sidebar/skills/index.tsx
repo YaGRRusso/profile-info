@@ -7,7 +7,6 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useCallback, useState } from "react";
 import { Alert } from "@/components/display/alert";
 import { DataState } from "@/components/display/data-state";
-import { Dialog } from "@/components/display/dialog";
 import { Json } from "@/components/display/json";
 import { Modal } from "@/components/display/modal";
 import { PageTitle } from "@/components/display/page-title";
@@ -125,11 +124,11 @@ function RouteComponent() {
         />
       </Modal>
 
-      <Dialog
+      <Modal
         actions={[
           {
-            label: "Confirm",
-            className: "btn-soft",
+            label: "Close",
+            className: "btn-ghost",
             onClick: () => setFormValues(undefined),
           },
         ]}
@@ -139,9 +138,9 @@ function RouteComponent() {
         title="Read Skill"
       >
         <Json data={{ ...formValues?.customValues }} />
-      </Dialog>
+      </Modal>
 
-      <Dialog
+      <Modal
         actions={[
           {
             label: "Cancel",

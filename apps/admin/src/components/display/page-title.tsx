@@ -1,13 +1,13 @@
 import { ComponentProps, ReactNode } from "react";
 import { cn } from "@/lib/cn";
 
+interface ActionProps extends ComponentProps<"button"> {
+  icon?: ReactNode;
+  label: string;
+}
+
 export interface PageTitleProps extends ComponentProps<"div"> {
-  actions: {
-    icon?: ReactNode;
-    label: string;
-    onClick: () => void;
-    className?: string;
-  }[];
+  actions?: ActionProps[];
   description?: string;
   title: string;
 }
@@ -33,15 +33,15 @@ export function PageTitle({
       </div>
       {actions && (
         <div className="scrollbar-hidden flex items-center gap-2 overflow-auto">
-          {actions.map((action, index) => (
+          {actions.map(({ className, icon, label, ...action }, index) => (
             <button
-              className={cn("btn max-sm:btn-sm", action.className)}
+              className={cn("btn max-sm:btn-sm", className)}
               key={index}
-              onClick={action.onClick}
               type="button"
+              {...action}
             >
-              {action.icon}
-              {action.label}
+              {icon}
+              {label}
             </button>
           ))}
         </div>

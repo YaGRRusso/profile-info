@@ -1,8 +1,14 @@
 import { XIcon } from "@phosphor-icons/react";
-import { ComponentProps } from "react";
+import { ComponentProps, ReactNode } from "react";
 import { cn } from "@/lib/cn";
 
+interface ActionProps extends ComponentProps<"button"> {
+  icon?: ReactNode;
+  label: string;
+}
+
 export interface ModalProps extends ComponentProps<"dialog"> {
+  actions?: ActionProps[];
   description?: string;
   isOpen?: boolean;
   onClose?: () => void;
@@ -16,6 +22,7 @@ export function Modal({
   children,
   onClose,
   isOpen,
+  actions,
   ...props
 }: ModalProps) {
   return (
@@ -40,6 +47,21 @@ export function Modal({
           >
             <XIcon />
           </button>
+          {actions && (
+            <div className="flex flex-wrap-reverse items-center gap-2">
+              {actions.map((action, index) => (
+                <button
+                  className={cn("btn flex-1", action.className)}
+                  key={index}
+                  onClick={action.onClick}
+                  type="button"
+                >
+                  {action.icon}
+                  {action.label}
+                </button>
+              ))}
+            </div>
+          )}
         </div>
         <button className="modal-backdrop" onClick={onClose} type="button">
           close
