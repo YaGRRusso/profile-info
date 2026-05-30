@@ -93,6 +93,29 @@ function RouteComponent() {
     ]
   );
 
+  const handleDelete = useCallback(() => {
+    switch (formValues?.state) {
+      case "DELETING":
+        removeOneSkill.mutate(selectedSkillIds[0], {
+          onSuccess: closeAndRefetch,
+        });
+        break;
+      case "MULTI_DELETING":
+        removeManySkills.mutate(selectedSkillIds, {
+          onSuccess: closeAndRefetch,
+        });
+        break;
+      default:
+        break;
+    }
+  }, [
+    formValues?.state,
+    removeOneSkill,
+    selectedSkillIds,
+    closeAndRefetch,
+    removeManySkills,
+  ]);
+
   return (
     <div className="flex flex-col gap-4">
       <PageTitle
@@ -217,40 +240,17 @@ function RouteComponent() {
           {
             label: "Confirm",
             className: "btn-soft btn-error",
-            disabled: removeOneSkill.isPending,
-            onClick: () =>
-              removeOneSkill.mutate(selectedSkillIds[0], {
-                onSuccess: closeAndRefetch,
-              }),
-          },
-        ]}
-        description={`Are you sure you want to delete ${formValues?.customValues?.[0]?.name} skill?`}
-        isOpen={formValues?.state === "DELETING"}
-        onClose={() => setFormValues(undefined)}
-        title={`Delete ${formValues?.customValues?.[0]?.name}?`}
-      />
-
-      <Modal
-        actions={[
-          {
-            label: "Cancel",
-            className: "btn-ghost",
-            onClick: () => setFormValues(undefined),
-          },
-          {
-            label: "Confirm",
-            className: "btn-soft btn-error",
-            disabled: removeManySkills.isPending,
-            onClick: () =>
-              removeManySkills.mutate(selectedSkillIds, {
-                onSuccess: closeAndRefetch,
-              }),
+            disabled: removeOneSkill.isPending || removeManySkills.isPending,
+            onClick: () => handleDelete(),
           },
         ]}
         description="Are you sure you want to delete the following skills?"
-        isOpen={formValues?.state === "MULTI_DELETING"}
+        isOpen={
+          formValues?.state === "MULTI_DELETING" ||
+          formValues?.state === "DELETING"
+        }
         onClose={() => setFormValues(undefined)}
-        title={`Delete ${formValues?.customValues?.length ?? 0} skills?`}
+        title="Delete skills?"
       >
         <ul className="flex flex-wrap items-center gap-1">
           {formValues?.customValues?.map((skill) => (
