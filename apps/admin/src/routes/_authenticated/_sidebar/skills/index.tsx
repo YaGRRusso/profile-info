@@ -31,7 +31,8 @@ export const Route = createFileRoute("/_authenticated/_sidebar/skills/")({
 });
 
 function RouteComponent() {
-  const [formValues, setFormValues] = useState<CommonFormValuesProps>();
+  const [formValues, setFormValues] =
+    useState<CommonFormValuesProps<SkillEntity, SkillEntity[]>>();
   const [selected, setSelected] = useState<SkillEntity[]>();
 
   const findManySkills = useFindManySkills();
@@ -53,7 +54,7 @@ function RouteComponent() {
         case "UPDATING":
           updateOneSkill.mutate(
             {
-              skillId: formValues.customValues?.id,
+              skillId: formValues.customValues?.[0]?.id ?? "",
               updateSkillInput: {
                 category: data.category,
                 name: data.name,
@@ -92,19 +93,31 @@ function RouteComponent() {
           {
             icon: <PencilIcon />,
             className: "btn-ghost btn-square",
-            onClick: () => setFormValues({ state: "MULTI_UPDATING" }),
+            onClick: () =>
+              setFormValues({
+                state: "MULTI_UPDATING",
+                customValues: selected,
+              }),
             disabled: !selected?.length,
           },
           {
             icon: <EyeIcon />,
             className: "btn-ghost btn-square",
-            onClick: () => setFormValues({ state: "MULTI_READING" }),
+            onClick: () =>
+              setFormValues({
+                state: "MULTI_READING",
+                customValues: selected,
+              }),
             disabled: !selected?.length,
           },
           {
             icon: <TrashSimpleIcon />,
             className: "btn-ghost btn-square btn-error",
-            onClick: () => setFormValues({ state: "MULTI_DELETING" }),
+            onClick: () =>
+              setFormValues({
+                state: "MULTI_DELETING",
+                customValues: selected,
+              }),
             disabled: !selected?.length,
           },
           {
@@ -121,8 +134,7 @@ function RouteComponent() {
             icon: <PlusIcon />,
             label: "New Skill",
             className: "btn-soft",
-            onClick: () =>
-              setFormValues({ state: "CREATING", customValues: {} }),
+            onClick: () => setFormValues({ state: "CREATING" }),
           },
         ]}
         description="Create, update or delete skills that can be associated with your profile."
@@ -139,6 +151,7 @@ function RouteComponent() {
       >
         <SkillForm
           customValues={formValues?.customValues}
+          // @ts-expect-error TODO fix later
           defaultValues={formValues?.defaultValues}
           isLoading={createOneSkill.isPending || updateOneSkill.isPending}
           onCancel={() => setFormValues(undefined)}
@@ -156,11 +169,16 @@ function RouteComponent() {
           },
         ]}
         description="Read only view of the skill."
-        isOpen={formValues?.state === "READING"}
+        isOpen={
+          formValues?.state === "READING" ||
+          formValues?.state === "MULTI_READING"
+        }
         onClose={() => setFormValues(undefined)}
         title="Read Skill"
       >
-        <Json data={{ ...formValues?.customValues }} />
+        {formValues?.customValues?.map((skill) => (
+          <Json data={skill} key={skill?.id} />
+        ))}
       </Modal>
 
       <Modal
@@ -174,7 +192,7 @@ function RouteComponent() {
             label: "Confirm",
             className: "btn-soft btn-error",
             onClick: () =>
-              removeOneSkill.mutate(formValues?.customValues?.id ?? "", {
+              removeOneSkill.mutate(formValues?.customValues?.[0]?.id ?? "", {
                 onSuccess: () => {
                   setFormValues(undefined);
                   findManySkills.refetch();
@@ -182,10 +200,10 @@ function RouteComponent() {
               }),
           },
         ]}
-        description="Are you sure you want to delete this skill?"
+        description={`Are you sure you want to delete ${formValues?.customValues?.[0]?.name} skill?`}
         isOpen={formValues?.state === "DELETING"}
         onClose={() => setFormValues(undefined)}
-        title="Delete Skill"
+        title={`Delete ${formValues?.customValues?.[0]?.name}?`}
       />
 
       <DataState
@@ -218,21 +236,21 @@ function RouteComponent() {
             onDelete={(skill) =>
               setFormValues({
                 state: "DELETING",
-                customValues: { id: skill.id },
+                customValues: [skill],
               })
             }
             onEdit={(skill) =>
               setFormValues({
                 defaultValues: skill,
                 state: "UPDATING",
-                customValues: { id: skill.id },
+                customValues: [skill],
               })
             }
             onSelect={setSelected}
             onView={(skill) =>
               setFormValues({
                 state: "READING",
-                customValues: skill,
+                customValues: [skill],
               })
             }
           />

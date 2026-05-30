@@ -19,7 +19,6 @@ export interface UserFormProps extends CommonFormProps<UserSchema> {}
 export function UserForm({
   onSubmit,
   defaultValues,
-  customValues,
   isDisabled,
   isLoading,
 }: UserFormProps) {
@@ -29,7 +28,7 @@ export function UserForm({
       password: "",
       ...defaultValues,
     },
-    onSubmit: ({ value }) => onSubmit?.({ ...value, ...customValues }),
+    onSubmit: ({ value }) => onSubmit?.(value),
     validators: { onChange: userSchema },
   });
 

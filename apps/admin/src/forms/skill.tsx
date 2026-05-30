@@ -26,7 +26,6 @@ export function SkillForm({
   onSubmit,
   onCancel,
   defaultValues,
-  customValues,
   isDisabled,
   isLoading,
   state,
@@ -39,7 +38,7 @@ export function SkillForm({
       relevance: 1,
       ...defaultValues,
     },
-    onSubmit: ({ value }) => onSubmit?.({ ...value, ...customValues }),
+    onSubmit: ({ value }) => onSubmit?.(value),
     validators: { onChange: skillSchema },
   });
 

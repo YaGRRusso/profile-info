@@ -34,12 +34,7 @@ export function Modal({
         )}
         {...props}
       >
-        <div className="modal-box flex flex-col gap-4">
-          <div className="flex flex-col">
-            <h2 className="font-semibold text-lg">{title}</h2>
-            <p className="text-sm opacity-md">{description}</p>
-          </div>
-          {children}
+        <div className="modal-box flex flex-col overflow-hidden p-0">
           <button
             className="btn btn-sm btn-circle btn-ghost absolute top-2 right-2"
             onClick={onClose}
@@ -47,21 +42,26 @@ export function Modal({
           >
             <XIcon />
           </button>
-          {actions && (
-            <div className="flex flex-wrap-reverse items-center gap-2">
-              {actions.map((action, index) => (
-                <button
-                  className={cn("btn flex-1", action.className)}
-                  key={index}
-                  onClick={action.onClick}
-                  type="button"
-                >
-                  {action.icon}
-                  {action.label}
-                </button>
-              ))}
-            </div>
-          )}
+          <div className="flex flex-col p-4">
+            <h2 className="font-semibold text-lg">{title}</h2>
+            <p className="text-sm opacity-md">{description}</p>
+          </div>
+          <div className="flex flex-col gap-2 overflow-auto rounded px-4">
+            {children}
+          </div>
+          <div className="flex flex-wrap-reverse items-center gap-2 p-4">
+            {actions?.map((action, index) => (
+              <button
+                className={cn("btn flex-1", action.className)}
+                key={index}
+                onClick={action.onClick}
+                type="button"
+              >
+                {action.icon}
+                {action.label}
+              </button>
+            ))}
+          </div>
         </div>
         <button className="modal-backdrop" onClick={onClose} type="button">
           close
