@@ -778,7 +778,7 @@ export type SkillEntity = {
   createdAt: Scalars['DateTime']['output'];
   id: Scalars['ID']['output'];
   name: Scalars['String']['output'];
-  relevance?: Maybe<Scalars['Float']['output']>;
+  relevance: Scalars['Float']['output'];
   slug: Scalars['String']['output'];
   updatedAt: Scalars['DateTime']['output'];
 };
@@ -926,7 +926,7 @@ export type CreateOneSkillMutationVariables = Exact<{
 }>;
 
 
-export type CreateOneSkillMutation = { __typename?: 'Mutation', createOneSkill: { __typename?: 'SkillEntity', id: string, name: string, slug: string, category: SkillCategory, relevance?: number | null, createdAt: any, updatedAt: any } };
+export type CreateOneSkillMutation = { __typename?: 'Mutation', createOneSkill: { __typename?: 'SkillEntity', id: string, name: string, slug: string, category: SkillCategory, relevance: number, createdAt: any, updatedAt: any } };
 
 export type UpdateOneSkillMutationVariables = Exact<{
   skillId: Scalars['ID']['input'];
@@ -934,7 +934,7 @@ export type UpdateOneSkillMutationVariables = Exact<{
 }>;
 
 
-export type UpdateOneSkillMutation = { __typename?: 'Mutation', updateOneSkill: { __typename?: 'SkillEntity', id: string, name: string, slug: string, category: SkillCategory, relevance?: number | null, createdAt: any, updatedAt: any } };
+export type UpdateOneSkillMutation = { __typename?: 'Mutation', updateOneSkill: { __typename?: 'SkillEntity', id: string, name: string, slug: string, category: SkillCategory, relevance: number, createdAt: any, updatedAt: any } };
 
 export type UpdateManySkillsMutationVariables = Exact<{
   skillIds: Array<Scalars['ID']['input']> | Scalars['ID']['input'];
@@ -949,7 +949,7 @@ export type RemoveOneSkillMutationVariables = Exact<{
 }>;
 
 
-export type RemoveOneSkillMutation = { __typename?: 'Mutation', removeOneSkill: { __typename?: 'SkillEntity', id: string, name: string, slug: string, category: SkillCategory, relevance?: number | null, createdAt: any, updatedAt: any } };
+export type RemoveOneSkillMutation = { __typename?: 'Mutation', removeOneSkill: { __typename?: 'SkillEntity', id: string, name: string, slug: string, category: SkillCategory, relevance: number, createdAt: any, updatedAt: any } };
 
 export type RemoveManySkillsMutationVariables = Exact<{
   skillIds: Array<Scalars['ID']['input']> | Scalars['ID']['input'];
@@ -975,28 +975,28 @@ export type FindManySkillsQueryVariables = Exact<{
 }>;
 
 
-export type FindManySkillsQuery = { __typename?: 'Query', findManySkills: { __typename?: 'PaginatedSkillEntity', found: number, nodes: Array<{ __typename?: 'SkillEntity', id: string, name: string, slug: string, category: SkillCategory, relevance?: number | null, createdAt: any, updatedAt: any }> } };
+export type FindManySkillsQuery = { __typename?: 'Query', findManySkills: { __typename?: 'PaginatedSkillEntity', found: number, nodes: Array<{ __typename?: 'SkillEntity', id: string, name: string, slug: string, category: SkillCategory, relevance: number, createdAt: any, updatedAt: any }> } };
 
 export type FindOneSkillByIdQueryVariables = Exact<{
   skillId: Scalars['ID']['input'];
 }>;
 
 
-export type FindOneSkillByIdQuery = { __typename?: 'Query', findOneSkillById: { __typename?: 'SkillEntity', id: string, name: string, slug: string, category: SkillCategory, relevance?: number | null, createdAt: any, updatedAt: any } };
+export type FindOneSkillByIdQuery = { __typename?: 'Query', findOneSkillById: { __typename?: 'SkillEntity', id: string, name: string, slug: string, category: SkillCategory, relevance: number, createdAt: any, updatedAt: any } };
 
 export type FindOneSkillQueryVariables = Exact<{
   skillFilters?: InputMaybe<FilterSkillInput>;
 }>;
 
 
-export type FindOneSkillQuery = { __typename?: 'Query', findOneSkill: { __typename?: 'SkillEntity', id: string, name: string, slug: string, category: SkillCategory, relevance?: number | null, createdAt: any, updatedAt: any } };
+export type FindOneSkillQuery = { __typename?: 'Query', findOneSkill: { __typename?: 'SkillEntity', id: string, name: string, slug: string, category: SkillCategory, relevance: number, createdAt: any, updatedAt: any } };
 
 export type FindManySkillByIdQueryVariables = Exact<{
   skillIds: Array<Scalars['ID']['input']> | Scalars['ID']['input'];
 }>;
 
 
-export type FindManySkillByIdQuery = { __typename?: 'Query', findManySkillById: Array<{ __typename?: 'SkillEntity', id: string, name: string, slug: string, category: SkillCategory, relevance?: number | null, createdAt: any, updatedAt: any }> };
+export type FindManySkillByIdQuery = { __typename?: 'Query', findManySkillById: Array<{ __typename?: 'SkillEntity', id: string, name: string, slug: string, category: SkillCategory, relevance: number, createdAt: any, updatedAt: any }> };
 
 export class TypedDocumentString<TResult, TVariables>
   extends String

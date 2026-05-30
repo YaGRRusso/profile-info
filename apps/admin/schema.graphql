@@ -417,7 +417,7 @@ type SkillEntity {
   createdAt: DateTime!
   id: ID!
   name: String!
-  relevance: Float
+  relevance: Float!
   slug: String!
   updatedAt: DateTime!
 }

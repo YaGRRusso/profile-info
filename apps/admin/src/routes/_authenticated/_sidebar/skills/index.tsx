@@ -200,7 +200,6 @@ function RouteComponent() {
       >
         <SkillForm
           customValues={formValues?.customValues}
-          // @ts-expect-error TODO fix later
           defaultValues={formValues?.defaultValues}
           isLoading={createOneSkill.isPending || updateOneSkill.isPending}
           onCancel={() => setFormValues(undefined)}
