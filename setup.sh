@@ -10,6 +10,24 @@ export NVM_DIR="$HOME/.nvm"
 CYAN=$'\033[0;36m' RESET=$'\033[0m'
 printVersion() { printf "${CYAN}%-8s${RESET}%s\n" "$1" "$2"; }
 
+ensureUbuntu() {
+  if [ ! -r /etc/os-release ]; then
+    echo "This setup must run on Ubuntu (native or WSL). Aborting." >&2
+    exit 1
+  fi
+  local distroId
+  distroId="$(. /etc/os-release && echo "$ID")"
+  if [ "$distroId" != "ubuntu" ]; then
+    echo "This setup must run on Ubuntu, but detected '$distroId'. Aborting." >&2
+    exit 1
+  fi
+  if grep -qiE "(microsoft|wsl)" /proc/version 2>/dev/null; then
+    printVersion "os" "Ubuntu on WSL"
+  else
+    printVersion "os" "Ubuntu"
+  fi
+}
+
 ensureAptPackage() {
   command -v "$1" >/dev/null && return
   sudo apt-get update -y -qq
@@ -62,6 +80,7 @@ setupDocker() {
 }
 
 main() {
+  ensureUbuntu
   setupGit
   setupCurl
   setupNvm
