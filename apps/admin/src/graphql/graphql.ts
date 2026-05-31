@@ -762,14 +762,10 @@ export type SignInInput = {
 
 export enum SkillCategory {
   Backend = 'BACKEND',
-  Concepts = 'CONCEPTS',
   Data = 'DATA',
-  Design = 'DESIGN',
   Devops = 'DEVOPS',
   Frontend = 'FRONTEND',
-  Language = 'LANGUAGE',
-  Quality = 'QUALITY',
-  Soft = 'SOFT'
+  Language = 'LANGUAGE'
 }
 
 export type SkillEntity = {

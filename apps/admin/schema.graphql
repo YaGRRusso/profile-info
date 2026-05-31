@@ -402,14 +402,10 @@ input SignInInput {
 
 enum SkillCategory {
   BACKEND
-  CONCEPTS
   DATA
-  DESIGN
   DEVOPS
   FRONTEND
   LANGUAGE
-  QUALITY
-  SOFT
 }
 
 type SkillEntity {

@@ -6,10 +6,6 @@ export enum SkillCategory {
   BACKEND = "BACKEND",
   DATA = "DATA",
   DEVOPS = "DEVOPS",
-  QUALITY = "QUALITY",
-  DESIGN = "DESIGN",
-  CONCEPTS = "CONCEPTS",
-  SOFT = "SOFT",
 }
 
 registerEnumType(SkillCategory, {

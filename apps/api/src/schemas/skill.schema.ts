@@ -16,17 +16,7 @@ export class SkillModel extends BaseModel {
   @Prop({
     type: String,
     required: true,
-    enum: [
-      "LANGUAGE",
-      "FRONTEND",
-      "BACKEND",
-      "DATA",
-      "DEVOPS",
-      "QUALITY",
-      "DESIGN",
-      "CONCEPTS",
-      "SOFT",
-    ],
+    enum: ["LANGUAGE", "FRONTEND", "BACKEND", "DATA", "DEVOPS"],
     index: true,
   })
   category: string;

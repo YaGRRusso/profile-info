@@ -66,14 +66,10 @@ const relevanceParser = parseAsShape(
 
 const CATEGORY_LABELS: Array<{ value: SkillCategory; label: string }> = [
   { value: SkillCategory.Backend, label: "Backend" },
-  { value: SkillCategory.Concepts, label: "Concepts" },
   { value: SkillCategory.Data, label: "Data" },
-  { value: SkillCategory.Design, label: "Design" },
   { value: SkillCategory.Devops, label: "DevOps" },
   { value: SkillCategory.Frontend, label: "Frontend" },
   { value: SkillCategory.Language, label: "Language" },
-  { value: SkillCategory.Quality, label: "Quality" },
-  { value: SkillCategory.Soft, label: "Soft Skills" },
 ];
 
 const DATE_OPTIONS = [
