@@ -1,8 +1,8 @@
-import { Field, InputType, Int } from "@nestjs/graphql";
+import { Field, InputType } from "@nestjs/graphql";
 import { IsUrl } from "class-validator";
 import { OptionalField } from "@/core/decorators/optional-field.decorator";
 import { DateRangeInput } from "@/core/inputs/date-range.input";
-import { EducationCategory } from "../enums/category.enum";
+import { EducationLevel } from "../enums/level.enum";
 import { EducationStatus } from "../enums/status.enum";
 
 @InputType()
@@ -34,8 +34,8 @@ export class CreateEducationInput {
   @Field(() => String)
   organization: string;
 
-  @Field(() => EducationCategory)
-  category: EducationCategory;
+  @Field(() => EducationLevel)
+  level: EducationLevel;
 
   @Field(() => EducationStatus)
   status: EducationStatus;
@@ -47,9 +47,6 @@ export class CreateEducationInput {
   @OptionalField(() => String)
   @IsUrl()
   image?: string;
-
-  @OptionalField(() => Int)
-  hours?: number;
 
   @Field(() => [CreateEducationTranslationInput])
   i18n: CreateEducationTranslationInput[];

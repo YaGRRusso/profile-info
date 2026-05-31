@@ -9,6 +9,7 @@ import { AppController } from "./app.controller";
 import { AppService } from "./app.service";
 import { AuthModule } from "./auth/auth.module";
 import { createLoaders } from "./core/helpers/loaders.helper";
+import { CoursesModule } from "./courses/courses.module";
 import { EducationsModule } from "./educations/educations.module";
 import { ExperiencesModule } from "./experiences/experiences.module";
 import { OrganizationsModule } from "./organizations/organizations.module";
@@ -59,6 +60,7 @@ import { UsersModule } from "./users/users.module";
     ProjectsModule,
     UsersModule,
     AuthModule,
+    CoursesModule,
     EducationsModule,
     ExperiencesModule,
     OrganizationsModule,

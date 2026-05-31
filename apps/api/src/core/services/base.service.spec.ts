@@ -46,6 +46,7 @@ function makeMockModel(): jest.Mocked<Model<FakeDoc>> {
     findById: jest.fn(),
     findOne: jest.fn(),
     find: jest.fn(),
+    countDocuments: jest.fn(),
     create: jest.fn(),
     findByIdAndUpdate: jest.fn(),
     updateMany: jest.fn(),
@@ -137,12 +138,13 @@ describe("BaseService", () => {
   // ------------------------------------------------------------------ //
 
   describe("findMany", () => {
-    it("should return documents with default pagination", async () => {
+    it("should return paginated nodes and count with default pagination", async () => {
       const chain = makeChain([fakeDoc]);
       (model.find as jest.Mock).mockReturnValue(chain);
+      (model.countDocuments as jest.Mock).mockReturnValue(makeChain(1));
 
       const result = await service.findMany({});
-      expect(result).toEqual([fakeDoc]);
+      expect(result).toEqual({ nodes: [fakeDoc], found: 1 });
       expect(chain.skip).toHaveBeenCalledWith(0);
       expect(chain.limit).toHaveBeenCalledWith(50);
     });
@@ -150,6 +152,7 @@ describe("BaseService", () => {
     it("should respect custom skip and limit", async () => {
       const chain = makeChain([]);
       (model.find as jest.Mock).mockReturnValue(chain);
+      (model.countDocuments as jest.Mock).mockReturnValue(makeChain(0));
 
       await service.findMany({ skip: 10, limit: 5 });
       expect(chain.skip).toHaveBeenCalledWith(10);

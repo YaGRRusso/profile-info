@@ -22,7 +22,8 @@ Per-package depth lives in the package files. Read those for module-level detail
 ## Overview
 
 profile-info manages a personal professional profile. The domain entities are
-skills, experiences, educations, organizations, projects, and users. The repo is
+skills, experiences, educations (academic degrees), courses (free courses,
+bootcamps, certificates), organizations, projects, and users. The repo is
 an npm workspaces monorepo with two apps under `apps/`:
 
 - `@profile-info/api`: a code-first NestJS + Apollo GraphQL server over MongoDB

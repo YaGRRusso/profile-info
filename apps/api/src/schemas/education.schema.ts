@@ -32,10 +32,17 @@ export class EducationModel extends BaseModel {
   @Prop({
     type: String,
     required: true,
-    enum: ["COURSE", "DEGREE", "OTHER"],
+    enum: [
+      "HIGH_SCHOOL",
+      "TECHNICAL",
+      "BACHELOR",
+      "POSTGRAD",
+      "MASTER",
+      "DOCTORATE",
+    ],
     index: true,
   })
-  category: string;
+  level: string;
 
   @Prop({
     type: String,
@@ -50,9 +57,6 @@ export class EducationModel extends BaseModel {
 
   @Prop({ type: String })
   image?: string;
-
-  @Prop({ type: Number })
-  hours?: number;
 
   @Prop({
     type: [createTranslationModel(EducationMessagesModel)],

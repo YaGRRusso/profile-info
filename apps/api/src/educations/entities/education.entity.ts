@@ -1,10 +1,10 @@
-import { Field, Int, ObjectType } from "@nestjs/graphql";
+import { Field, ObjectType } from "@nestjs/graphql";
 import { OptionalField } from "@/core/decorators/optional-field.decorator";
 import { BaseEntity } from "@/core/entities/base.entity";
 import { DateRangeEntity } from "@/core/entities/date-range.entity";
 import { OrganizationEntity } from "@/organizations/entities/organization.entity";
 import { SkillEntity } from "@/skills/entities/skill.entity";
-import { EducationCategory } from "../enums/category.enum";
+import { EducationLevel } from "../enums/level.enum";
 import { EducationStatus } from "../enums/status.enum";
 
 @ObjectType()
@@ -36,8 +36,8 @@ export class EducationEntity extends BaseEntity {
   @Field(() => OrganizationEntity)
   organization: OrganizationEntity;
 
-  @Field(() => EducationCategory)
-  category: EducationCategory;
+  @Field(() => EducationLevel)
+  level: EducationLevel;
 
   @Field(() => EducationStatus)
   status: EducationStatus;
@@ -47,9 +47,6 @@ export class EducationEntity extends BaseEntity {
 
   @OptionalField(() => String)
   image?: string;
-
-  @OptionalField(() => Int)
-  hours?: number;
 
   @Field(() => [EducationTranslationLocale])
   i18n: EducationTranslationLocale[];

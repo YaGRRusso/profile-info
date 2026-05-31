@@ -45,7 +45,7 @@ Entry point `src/main.ts`:
   `SkillsService` and `OrganizationsService` so it can build the DataLoaders in the
   per-request `context` (`createLoaders(...)`).
 - Feature modules: `SkillsModule`, `ProjectsModule`, `UsersModule`, `AuthModule`,
-  `EducationsModule`, `ExperiencesModule`, `OrganizationsModule`.
+  `CoursesModule`, `EducationsModule`, `ExperiencesModule`, `OrganizationsModule`.
 
 Request flow for a query: Apollo receives the operation, the global `GqlAuthGuard`
 checks the JWT (unless the field is `@Public()`), the resolver method (usually
@@ -111,7 +111,7 @@ organizationsService })` returns `batchSkills` and `batchOrganizations`
   allow when `@Public()` metadata is present; overrides `getRequest` to read the
   Express request out of the GraphQL execution context.
 
-Feature modules (`skills/`, `users/`, `experiences/`, `educations/`,
+Feature modules (`skills/`, `users/`, `experiences/`, `educations/`, `courses/`,
 `organizations/`, `projects/`): each has `<name>.module.ts`, `<name>.resolver.ts`,
 `<name>.service.ts`, `entities/<name>.entity.ts`, `dto/` (create / update / filter
 / sort inputs), and often `enums/`. The matching Mongoose model lives in
@@ -196,7 +196,8 @@ apps/api/
 │   ├── skills/               # Feature module (reference example).
 │   ├── users/                # Feature module; password hashing.
 │   ├── experiences/          # Feature module; @ResolveField + DataLoaders.
-│   ├── educations/           # Feature module.
+│   ├── educations/           # Feature module; academic degrees (level enum).
+│   ├── courses/              # Feature module; free courses/bootcamps/certs (type enum).
 │   ├── organizations/        # Feature module; service exported for loaders.
 │   ├── projects/             # Feature module.
 │   └── schemas/              # Mongoose models for the feature entities.
