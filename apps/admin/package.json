@@ -17,9 +17,9 @@
   },
   "dependencies": {
     "@phosphor-icons/react": "^2.1.10",
-    "@tanstack/react-form": "^1.32.1",
+    "@tanstack/react-form": "^1.33.0",
     "@tanstack/react-query": "^5.100.14",
-    "@tanstack/react-router": "^1.170.8",
+    "@tanstack/react-router": "^1.170.10",
     "@tanstack/react-table": "^8.21.3",
     "clsx": "^2.1.1",
     "nuqs": "^2.8.9",
@@ -29,7 +29,7 @@
     "react-toastify": "^11.1.0",
     "tailwind-merge": "^3.6.0",
     "zod": "^4.4.3",
-    "zustand": "^5.0.13"
+    "zustand": "^5.0.14"
   },
   "devDependencies": {
     "@0no-co/graphqlsp": "^1.15.4",
@@ -37,7 +37,7 @@
     "@graphql-codegen/schema-ast": "^5.0.2",
     "@parcel/watcher": "^2.5.6",
     "@tailwindcss/vite": "^4.3.0",
-    "@tanstack/router-plugin": "^1.168.11",
+    "@tanstack/router-plugin": "^1.168.13",
     "@types/react": "^19.2.15",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^5.2.0",
