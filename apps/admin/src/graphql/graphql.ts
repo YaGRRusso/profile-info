@@ -1087,6 +1087,80 @@ export type SignInMutationVariables = Exact<{
 
 export type SignInMutation = { __typename?: 'Mutation', signIn: string };
 
+export type CreateOneCourseMutationVariables = Exact<{
+  createCourseInput: CreateCourseInput;
+}>;
+
+
+export type CreateOneCourseMutation = { __typename?: 'Mutation', createOneCourse: { __typename?: 'CourseEntity', id: string, slug: string } };
+
+export type UpdateOneCourseMutationVariables = Exact<{
+  courseId: Scalars['ID']['input'];
+  updateCourseInput: UpdateCourseInput;
+}>;
+
+
+export type UpdateOneCourseMutation = { __typename?: 'Mutation', updateOneCourse: { __typename?: 'CourseEntity', id: string, slug: string } };
+
+export type UpdateManyCoursesMutationVariables = Exact<{
+  courseIds: Array<Scalars['ID']['input']> | Scalars['ID']['input'];
+  updateCourseInput: UpdateCourseInput;
+}>;
+
+
+export type UpdateManyCoursesMutation = { __typename?: 'Mutation', updateManyCourses: { __typename?: 'BatchEntity', count: number } };
+
+export type RemoveOneCourseMutationVariables = Exact<{
+  courseId: Scalars['ID']['input'];
+}>;
+
+
+export type RemoveOneCourseMutation = { __typename?: 'Mutation', removeOneCourse: { __typename?: 'CourseEntity', id: string, slug: string } };
+
+export type RemoveManyCoursesMutationVariables = Exact<{
+  courseIds: Array<Scalars['ID']['input']> | Scalars['ID']['input'];
+}>;
+
+
+export type RemoveManyCoursesMutation = { __typename?: 'Mutation', removeManyCourses: { __typename?: 'BatchEntity', count: number } };
+
+export type CreateOneEducationMutationVariables = Exact<{
+  createEducationInput: CreateEducationInput;
+}>;
+
+
+export type CreateOneEducationMutation = { __typename?: 'Mutation', createOneEducation: { __typename?: 'EducationEntity', id: string, slug: string } };
+
+export type UpdateOneEducationMutationVariables = Exact<{
+  educationId: Scalars['ID']['input'];
+  updateEducationInput: UpdateEducationInput;
+}>;
+
+
+export type UpdateOneEducationMutation = { __typename?: 'Mutation', updateOneEducation: { __typename?: 'EducationEntity', id: string, slug: string } };
+
+export type UpdateManyEducationsMutationVariables = Exact<{
+  educationIds: Array<Scalars['ID']['input']> | Scalars['ID']['input'];
+  updateEducationInput: UpdateEducationInput;
+}>;
+
+
+export type UpdateManyEducationsMutation = { __typename?: 'Mutation', updateManyEducations: { __typename?: 'BatchEntity', count: number } };
+
+export type RemoveOneEducationMutationVariables = Exact<{
+  educationId: Scalars['ID']['input'];
+}>;
+
+
+export type RemoveOneEducationMutation = { __typename?: 'Mutation', removeOneEducation: { __typename?: 'EducationEntity', id: string, slug: string } };
+
+export type RemoveManyEducationsMutationVariables = Exact<{
+  educationIds: Array<Scalars['ID']['input']> | Scalars['ID']['input'];
+}>;
+
+
+export type RemoveManyEducationsMutation = { __typename?: 'Mutation', removeManyEducations: { __typename?: 'BatchEntity', count: number } };
+
 export type CreateOneSkillMutationVariables = Exact<{
   createSkillInput: CreateSkillInput;
 }>;
@@ -1133,6 +1207,75 @@ export type ApiStatusQueryVariables = Exact<{ [key: string]: never; }>;
 
 
 export type ApiStatusQuery = { __typename: 'Query' };
+
+export type FindManyCoursesQueryVariables = Exact<{
+  courseFilters?: InputMaybe<FilterCourseInput>;
+  coursePagination?: InputMaybe<PaginationInput>;
+  courseSort?: InputMaybe<SortCourseInput>;
+}>;
+
+
+export type FindManyCoursesQuery = { __typename?: 'Query', findManyCourses: { __typename?: 'PaginatedCourseEntity', found: number, nodes: Array<{ __typename?: 'CourseEntity', id: string, slug: string, type: CourseType, status: CourseStatus, relevance?: number | null, url?: string | null, image?: string | null, hours?: number | null, createdAt: any, updatedAt: any, organization: { __typename?: 'OrganizationEntity', id: string, name: string, slug: string }, i18n: Array<{ __typename?: 'CourseTranslationLocale', locale: string, messages: { __typename?: 'CourseMessages', title: string, description: string } }> }> } };
+
+export type FindOneCourseByIdQueryVariables = Exact<{
+  courseId: Scalars['ID']['input'];
+}>;
+
+
+export type FindOneCourseByIdQuery = { __typename?: 'Query', findOneCourseById: { __typename?: 'CourseEntity', id: string, slug: string, type: CourseType, status: CourseStatus, relevance?: number | null, url?: string | null, image?: string | null, hours?: number | null, createdAt: any, updatedAt: any, organization: { __typename?: 'OrganizationEntity', id: string, name: string, slug: string }, i18n: Array<{ __typename?: 'CourseTranslationLocale', locale: string, messages: { __typename?: 'CourseMessages', title: string, description: string } }> } };
+
+export type FindOneCourseQueryVariables = Exact<{
+  courseFilters?: InputMaybe<FilterCourseInput>;
+}>;
+
+
+export type FindOneCourseQuery = { __typename?: 'Query', findOneCourse: { __typename?: 'CourseEntity', id: string, slug: string, type: CourseType, status: CourseStatus, relevance?: number | null, url?: string | null, image?: string | null, hours?: number | null, createdAt: any, updatedAt: any, organization: { __typename?: 'OrganizationEntity', id: string, name: string, slug: string }, i18n: Array<{ __typename?: 'CourseTranslationLocale', locale: string, messages: { __typename?: 'CourseMessages', title: string, description: string } }> } };
+
+export type FindManyCourseByIdQueryVariables = Exact<{
+  courseIds: Array<Scalars['ID']['input']> | Scalars['ID']['input'];
+}>;
+
+
+export type FindManyCourseByIdQuery = { __typename?: 'Query', findManyCourseById: Array<{ __typename?: 'CourseEntity', id: string, slug: string, type: CourseType, status: CourseStatus, relevance?: number | null, url?: string | null, image?: string | null, hours?: number | null, createdAt: any, updatedAt: any, organization: { __typename?: 'OrganizationEntity', id: string, name: string, slug: string }, i18n: Array<{ __typename?: 'CourseTranslationLocale', locale: string, messages: { __typename?: 'CourseMessages', title: string, description: string } }> }> };
+
+export type FindManyEducationsQueryVariables = Exact<{
+  educationFilters?: InputMaybe<FilterEducationInput>;
+  educationPagination?: InputMaybe<PaginationInput>;
+  educationSort?: InputMaybe<SortEducationInput>;
+}>;
+
+
+export type FindManyEducationsQuery = { __typename?: 'Query', findManyEducations: { __typename?: 'PaginatedEducationEntity', found: number, nodes: Array<{ __typename?: 'EducationEntity', id: string, slug: string, level: EducationLevel, status: EducationStatus, relevance?: number | null, url?: string | null, image?: string | null, createdAt: any, updatedAt: any, organization: { __typename?: 'OrganizationEntity', id: string, name: string, slug: string }, i18n: Array<{ __typename?: 'EducationTranslationLocale', locale: string, messages: { __typename?: 'EducationMessages', title: string, description: string } }> }> } };
+
+export type FindOneEducationByIdQueryVariables = Exact<{
+  educationId: Scalars['ID']['input'];
+}>;
+
+
+export type FindOneEducationByIdQuery = { __typename?: 'Query', findOneEducationById: { __typename?: 'EducationEntity', id: string, slug: string, level: EducationLevel, status: EducationStatus, relevance?: number | null, url?: string | null, image?: string | null, createdAt: any, updatedAt: any, organization: { __typename?: 'OrganizationEntity', id: string, name: string, slug: string }, i18n: Array<{ __typename?: 'EducationTranslationLocale', locale: string, messages: { __typename?: 'EducationMessages', title: string, description: string } }> } };
+
+export type FindOneEducationQueryVariables = Exact<{
+  educationFilters?: InputMaybe<FilterEducationInput>;
+}>;
+
+
+export type FindOneEducationQuery = { __typename?: 'Query', findOneEducation: { __typename?: 'EducationEntity', id: string, slug: string, level: EducationLevel, status: EducationStatus, relevance?: number | null, url?: string | null, image?: string | null, createdAt: any, updatedAt: any, organization: { __typename?: 'OrganizationEntity', id: string, name: string, slug: string }, i18n: Array<{ __typename?: 'EducationTranslationLocale', locale: string, messages: { __typename?: 'EducationMessages', title: string, description: string } }> } };
+
+export type FindManyEducationByIdQueryVariables = Exact<{
+  educationIds: Array<Scalars['ID']['input']> | Scalars['ID']['input'];
+}>;
+
+
+export type FindManyEducationByIdQuery = { __typename?: 'Query', findManyEducationById: Array<{ __typename?: 'EducationEntity', id: string, slug: string, level: EducationLevel, status: EducationStatus, relevance?: number | null, url?: string | null, image?: string | null, createdAt: any, updatedAt: any, organization: { __typename?: 'OrganizationEntity', id: string, name: string, slug: string }, i18n: Array<{ __typename?: 'EducationTranslationLocale', locale: string, messages: { __typename?: 'EducationMessages', title: string, description: string } }> }> };
+
+export type FindManyOrganizationsQueryVariables = Exact<{
+  organizationFilters?: InputMaybe<FilterOrganizationInput>;
+  organizationPagination?: InputMaybe<PaginationInput>;
+  organizationSort?: InputMaybe<SortOrganizationInput>;
+}>;
+
+
+export type FindManyOrganizationsQuery = { __typename?: 'Query', findManyOrganizations: { __typename?: 'PaginatedOrganizationEntity', found: number, nodes: Array<{ __typename?: 'OrganizationEntity', id: string, name: string, slug: string }> } };
 
 export type FindManySkillsQueryVariables = Exact<{
   skillFilters?: InputMaybe<FilterSkillInput>;
@@ -1188,6 +1331,88 @@ export const SignInDocument = new TypedDocumentString(`
   signIn(signInInput: $signInInput)
 }
     `) as unknown as TypedDocumentString<SignInMutation, SignInMutationVariables>;
+export const CreateOneCourseDocument = new TypedDocumentString(`
+    mutation CreateOneCourse($createCourseInput: CreateCourseInput!) {
+  createOneCourse(createCourseInput: $createCourseInput) {
+    id
+    slug
+  }
+}
+    `) as unknown as TypedDocumentString<CreateOneCourseMutation, CreateOneCourseMutationVariables>;
+export const UpdateOneCourseDocument = new TypedDocumentString(`
+    mutation UpdateOneCourse($courseId: ID!, $updateCourseInput: UpdateCourseInput!) {
+  updateOneCourse(courseId: $courseId, updateCourseInput: $updateCourseInput) {
+    id
+    slug
+  }
+}
+    `) as unknown as TypedDocumentString<UpdateOneCourseMutation, UpdateOneCourseMutationVariables>;
+export const UpdateManyCoursesDocument = new TypedDocumentString(`
+    mutation UpdateManyCourses($courseIds: [ID!]!, $updateCourseInput: UpdateCourseInput!) {
+  updateManyCourses(courseIds: $courseIds, updateCourseInput: $updateCourseInput) {
+    count
+  }
+}
+    `) as unknown as TypedDocumentString<UpdateManyCoursesMutation, UpdateManyCoursesMutationVariables>;
+export const RemoveOneCourseDocument = new TypedDocumentString(`
+    mutation RemoveOneCourse($courseId: ID!) {
+  removeOneCourse(courseId: $courseId) {
+    id
+    slug
+  }
+}
+    `) as unknown as TypedDocumentString<RemoveOneCourseMutation, RemoveOneCourseMutationVariables>;
+export const RemoveManyCoursesDocument = new TypedDocumentString(`
+    mutation RemoveManyCourses($courseIds: [ID!]!) {
+  removeManyCourses(courseIds: $courseIds) {
+    count
+  }
+}
+    `) as unknown as TypedDocumentString<RemoveManyCoursesMutation, RemoveManyCoursesMutationVariables>;
+export const CreateOneEducationDocument = new TypedDocumentString(`
+    mutation CreateOneEducation($createEducationInput: CreateEducationInput!) {
+  createOneEducation(createEducationInput: $createEducationInput) {
+    id
+    slug
+  }
+}
+    `) as unknown as TypedDocumentString<CreateOneEducationMutation, CreateOneEducationMutationVariables>;
+export const UpdateOneEducationDocument = new TypedDocumentString(`
+    mutation UpdateOneEducation($educationId: ID!, $updateEducationInput: UpdateEducationInput!) {
+  updateOneEducation(
+    educationId: $educationId
+    updateEducationInput: $updateEducationInput
+  ) {
+    id
+    slug
+  }
+}
+    `) as unknown as TypedDocumentString<UpdateOneEducationMutation, UpdateOneEducationMutationVariables>;
+export const UpdateManyEducationsDocument = new TypedDocumentString(`
+    mutation UpdateManyEducations($educationIds: [ID!]!, $updateEducationInput: UpdateEducationInput!) {
+  updateManyEducations(
+    educationIds: $educationIds
+    updateEducationInput: $updateEducationInput
+  ) {
+    count
+  }
+}
+    `) as unknown as TypedDocumentString<UpdateManyEducationsMutation, UpdateManyEducationsMutationVariables>;
+export const RemoveOneEducationDocument = new TypedDocumentString(`
+    mutation RemoveOneEducation($educationId: ID!) {
+  removeOneEducation(educationId: $educationId) {
+    id
+    slug
+  }
+}
+    `) as unknown as TypedDocumentString<RemoveOneEducationMutation, RemoveOneEducationMutationVariables>;
+export const RemoveManyEducationsDocument = new TypedDocumentString(`
+    mutation RemoveManyEducations($educationIds: [ID!]!) {
+  removeManyEducations(educationIds: $educationIds) {
+    count
+  }
+}
+    `) as unknown as TypedDocumentString<RemoveManyEducationsMutation, RemoveManyEducationsMutationVariables>;
 export const CreateOneSkillDocument = new TypedDocumentString(`
     mutation CreateOneSkill($createSkillInput: CreateSkillInput!) {
   createOneSkill(createSkillInput: $createSkillInput) {
@@ -1259,6 +1484,256 @@ export const ApiStatusDocument = new TypedDocumentString(`
   __typename
 }
     `) as unknown as TypedDocumentString<ApiStatusQuery, ApiStatusQueryVariables>;
+export const FindManyCoursesDocument = new TypedDocumentString(`
+    query FindManyCourses($courseFilters: FilterCourseInput, $coursePagination: PaginationInput, $courseSort: SortCourseInput) {
+  findManyCourses(
+    courseFilters: $courseFilters
+    coursePagination: $coursePagination
+    courseSort: $courseSort
+  ) {
+    found
+    nodes {
+      id
+      slug
+      type
+      status
+      relevance
+      url
+      image
+      hours
+      organization {
+        id
+        name
+        slug
+      }
+      i18n {
+        locale
+        messages {
+          title
+          description
+        }
+      }
+      createdAt
+      updatedAt
+    }
+  }
+}
+    `) as unknown as TypedDocumentString<FindManyCoursesQuery, FindManyCoursesQueryVariables>;
+export const FindOneCourseByIdDocument = new TypedDocumentString(`
+    query FindOneCourseById($courseId: ID!) {
+  findOneCourseById(courseId: $courseId) {
+    id
+    slug
+    type
+    status
+    relevance
+    url
+    image
+    hours
+    organization {
+      id
+      name
+      slug
+    }
+    i18n {
+      locale
+      messages {
+        title
+        description
+      }
+    }
+    createdAt
+    updatedAt
+  }
+}
+    `) as unknown as TypedDocumentString<FindOneCourseByIdQuery, FindOneCourseByIdQueryVariables>;
+export const FindOneCourseDocument = new TypedDocumentString(`
+    query FindOneCourse($courseFilters: FilterCourseInput) {
+  findOneCourse(courseFilters: $courseFilters) {
+    id
+    slug
+    type
+    status
+    relevance
+    url
+    image
+    hours
+    organization {
+      id
+      name
+      slug
+    }
+    i18n {
+      locale
+      messages {
+        title
+        description
+      }
+    }
+    createdAt
+    updatedAt
+  }
+}
+    `) as unknown as TypedDocumentString<FindOneCourseQuery, FindOneCourseQueryVariables>;
+export const FindManyCourseByIdDocument = new TypedDocumentString(`
+    query FindManyCourseById($courseIds: [ID!]!) {
+  findManyCourseById(courseIds: $courseIds) {
+    id
+    slug
+    type
+    status
+    relevance
+    url
+    image
+    hours
+    organization {
+      id
+      name
+      slug
+    }
+    i18n {
+      locale
+      messages {
+        title
+        description
+      }
+    }
+    createdAt
+    updatedAt
+  }
+}
+    `) as unknown as TypedDocumentString<FindManyCourseByIdQuery, FindManyCourseByIdQueryVariables>;
+export const FindManyEducationsDocument = new TypedDocumentString(`
+    query FindManyEducations($educationFilters: FilterEducationInput, $educationPagination: PaginationInput, $educationSort: SortEducationInput) {
+  findManyEducations(
+    educationFilters: $educationFilters
+    educationPagination: $educationPagination
+    educationSort: $educationSort
+  ) {
+    found
+    nodes {
+      id
+      slug
+      level
+      status
+      relevance
+      url
+      image
+      organization {
+        id
+        name
+        slug
+      }
+      i18n {
+        locale
+        messages {
+          title
+          description
+        }
+      }
+      createdAt
+      updatedAt
+    }
+  }
+}
+    `) as unknown as TypedDocumentString<FindManyEducationsQuery, FindManyEducationsQueryVariables>;
+export const FindOneEducationByIdDocument = new TypedDocumentString(`
+    query FindOneEducationById($educationId: ID!) {
+  findOneEducationById(educationId: $educationId) {
+    id
+    slug
+    level
+    status
+    relevance
+    url
+    image
+    organization {
+      id
+      name
+      slug
+    }
+    i18n {
+      locale
+      messages {
+        title
+        description
+      }
+    }
+    createdAt
+    updatedAt
+  }
+}
+    `) as unknown as TypedDocumentString<FindOneEducationByIdQuery, FindOneEducationByIdQueryVariables>;
+export const FindOneEducationDocument = new TypedDocumentString(`
+    query FindOneEducation($educationFilters: FilterEducationInput) {
+  findOneEducation(educationFilters: $educationFilters) {
+    id
+    slug
+    level
+    status
+    relevance
+    url
+    image
+    organization {
+      id
+      name
+      slug
+    }
+    i18n {
+      locale
+      messages {
+        title
+        description
+      }
+    }
+    createdAt
+    updatedAt
+  }
+}
+    `) as unknown as TypedDocumentString<FindOneEducationQuery, FindOneEducationQueryVariables>;
+export const FindManyEducationByIdDocument = new TypedDocumentString(`
+    query FindManyEducationById($educationIds: [ID!]!) {
+  findManyEducationById(educationIds: $educationIds) {
+    id
+    slug
+    level
+    status
+    relevance
+    url
+    image
+    organization {
+      id
+      name
+      slug
+    }
+    i18n {
+      locale
+      messages {
+        title
+        description
+      }
+    }
+    createdAt
+    updatedAt
+  }
+}
+    `) as unknown as TypedDocumentString<FindManyEducationByIdQuery, FindManyEducationByIdQueryVariables>;
+export const FindManyOrganizationsDocument = new TypedDocumentString(`
+    query FindManyOrganizations($organizationFilters: FilterOrganizationInput, $organizationPagination: PaginationInput, $organizationSort: SortOrganizationInput) {
+  findManyOrganizations(
+    organizationFilters: $organizationFilters
+    organizationPagination: $organizationPagination
+    organizationSort: $organizationSort
+  ) {
+    found
+    nodes {
+      id
+      name
+      slug
+    }
+  }
+}
+    `) as unknown as TypedDocumentString<FindManyOrganizationsQuery, FindManyOrganizationsQueryVariables>;
 export const FindManySkillsDocument = new TypedDocumentString(`
     query FindManySkills($skillFilters: FilterSkillInput, $skillPagination: PaginationInput, $skillSort: SortSkillInput) {
   findManySkills(

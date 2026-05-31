@@ -1,8 +1,10 @@
 import {
+  CertificateIcon,
+  GraduationCapIcon,
   HouseIcon,
   ListIcon,
+  PackageIcon,
   SignOutIcon,
-  SquaresFourIcon,
 } from "@phosphor-icons/react";
 import { createFileRoute, Outlet } from "@tanstack/react-router";
 import { useAuthStore } from "@/stores/auth";
@@ -21,9 +23,21 @@ const MENU_SECTIONS: MenuSection[] = [
     items: [
       { icon: <HouseIcon size={24} />, label: "Home", to: "/", type: "link" },
       {
-        icon: <SquaresFourIcon size={24} />,
+        icon: <PackageIcon size={24} />,
         label: "Skills",
         to: "/skills",
+        type: "link",
+      },
+      {
+        icon: <CertificateIcon size={24} />,
+        label: "Courses",
+        to: "/courses",
+        type: "link",
+      },
+      {
+        icon: <GraduationCapIcon size={24} />,
+        label: "Educations",
+        to: "/educations",
         type: "link",
       },
     ],

@@ -49,8 +49,13 @@ Routing and auth gate:
 - `_authenticated.tsx` is the protected layout. It enables `useGetMe()` only when a
   token exists, stores the returned user, and renders the login page when there is
   no authenticated user; otherwise it renders the sidebar shell and the child route.
-- Under `_authenticated/_sidebar/` are the actual pages: `index.tsx` (home) and
-  `skills/` (the skills CRUD page with its `-components/table.tsx`).
+- Under `_authenticated/_sidebar/` are the actual pages: `index.tsx` (home),
+  `skills/`, `courses/`, and `educations/` (each a CRUD page with its
+  `-components/table.tsx`). `courses` and `educations` follow the same pattern as
+  `skills` but their entities carry a required `organization` relation and a
+  required `i18n` translation array, so their route files map the flat form schema
+  to the create/update input (and the entity row back to form defaults), and their
+  forms load the organization options via `useFindManyOrganizations`.
 
 ## Core technologies and where they live
 
@@ -78,19 +83,29 @@ Routing and auth gate:
   wrapper), `cn.ts` (clsx + tailwind-merge), `parsers.ts` (nuqs parsers),
   `field-error.ts` (extracts a form field error string), `facets.ts`, `unwrap.ts`.
 - `src/hooks/queries/`: `auth.ts` (`useGetMe`), `base.ts` (`useApiStatus`),
-  `skills.ts` (`useFindManySkills` infinite, plus by-id/single/by-ids). Each defines
-  its operation with the `graphql` tag and calls `execute`.
-- `src/hooks/mutations/`: `auth.ts` (`useSignIn`), `skills.ts` (`useCreateOneSkill`,
-  `useUpdateOneSkill`, `useUpdateManySkills`, `useRemoveOneSkill`,
-  `useRemoveManySkills`).
+  `skills.ts`, `courses.ts`, `educations.ts` (each `useFindMany*` infinite, plus
+  by-id/single/by-ids), and `organizations.ts` (`useFindManyOrganizations` infinite,
+  used to populate the organization select in the course/education forms). Each
+  defines its operation with the `graphql` tag and calls `execute`. The `graphql`
+  tag needs a static string literal — do not interpolate shared field fragments
+  into it, or codegen can't statically analyze the operation.
+- `src/hooks/mutations/`: `auth.ts` (`useSignIn`), plus `skills.ts`, `courses.ts`,
+  `educations.ts`, each exposing `useCreateOne*`, `useUpdateOne*`, `useUpdateMany*`,
+  `useRemoveOne*`, `useRemoveMany*`.
 - `src/hooks/custom/`: generic, domain-agnostic helpers (`use-debounce`,
   `use-query-all-pages`, `use-stable-value`, `use-active-badges`).
 - `src/graphql/`: codegen output. `graphql.ts` (generated types and the
   `TypedDocumentString` type), `gql.ts` (the typed `graphql()` tag overloads),
   `fragment-masking.ts`, `index.ts`. Treat as generated; regenerate, do not edit.
-- `src/forms/`: `skill.tsx`, `skill-multi.tsx` (batch update), `user.tsx` (login).
-  `common.d.ts` defines `CommonFormProps` and the form `state` union
-  (`CREATING | UPDATING | DELETING | MULTI_*`).
+- `src/forms/`: `skill.tsx`, `skill-multi.tsx` (batch update), `user.tsx` (login),
+  and the `course.tsx`/`course-multi.tsx` and `education.tsx`/`education-multi.tsx`
+  pairs. `common.d.ts` defines `CommonFormProps` and the form `state` union
+  (`CREATING | UPDATING | DELETING | MULTI_*`). The course/education forms use a
+  flat schema (a single `i18n` locale exposed as `locale`/`title`/`description`);
+  the owning route maps it to/from the nested GraphQL input. Note: zod-validated
+  optional text fields must stay non-optional in the schema (default `""`) so the
+  schema's input type matches TanStack Form's inferred value type — convert empty
+  to `undefined` when building the input, not in the schema.
 - `src/components/display/` and `src/components/inputs/`: generic, reusable UI
   (modal, alert, data-state, page-title, json; text/password/number/checkbox/
   range/select inputs). These are domain-agnostic and driven by props.

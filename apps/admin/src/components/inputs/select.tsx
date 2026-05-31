@@ -28,7 +28,11 @@ export function SelectInput({
         value={value ?? ""}
         {...props}
       >
-        {placeholder && <option disabled>{placeholder}</option>}
+        {placeholder && (
+          <option disabled value="">
+            {placeholder}
+          </option>
+        )}
         {options.map((option) => (
           <option key={option.value} value={option.value}>
             {option.label}

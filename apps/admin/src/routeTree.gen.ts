@@ -13,6 +13,8 @@ import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as AuthenticatedSidebarRouteImport } from './routes/_authenticated/_sidebar'
 import { Route as AuthenticatedSidebarIndexRouteImport } from './routes/_authenticated/_sidebar/index'
 import { Route as AuthenticatedSidebarSkillsIndexRouteImport } from './routes/_authenticated/_sidebar/skills/index'
+import { Route as AuthenticatedSidebarEducationsIndexRouteImport } from './routes/_authenticated/_sidebar/educations/index'
+import { Route as AuthenticatedSidebarCoursesIndexRouteImport } from './routes/_authenticated/_sidebar/courses/index'
 
 const AuthenticatedRoute = AuthenticatedRouteImport.update({
   id: '/_authenticated',
@@ -34,13 +36,29 @@ const AuthenticatedSidebarSkillsIndexRoute =
     path: '/skills/',
     getParentRoute: () => AuthenticatedSidebarRoute,
   } as any)
+const AuthenticatedSidebarEducationsIndexRoute =
+  AuthenticatedSidebarEducationsIndexRouteImport.update({
+    id: '/educations/',
+    path: '/educations/',
+    getParentRoute: () => AuthenticatedSidebarRoute,
+  } as any)
+const AuthenticatedSidebarCoursesIndexRoute =
+  AuthenticatedSidebarCoursesIndexRouteImport.update({
+    id: '/courses/',
+    path: '/courses/',
+    getParentRoute: () => AuthenticatedSidebarRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof AuthenticatedSidebarIndexRoute
+  '/courses/': typeof AuthenticatedSidebarCoursesIndexRoute
+  '/educations/': typeof AuthenticatedSidebarEducationsIndexRoute
   '/skills/': typeof AuthenticatedSidebarSkillsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof AuthenticatedSidebarIndexRoute
+  '/courses': typeof AuthenticatedSidebarCoursesIndexRoute
+  '/educations': typeof AuthenticatedSidebarEducationsIndexRoute
   '/skills': typeof AuthenticatedSidebarSkillsIndexRoute
 }
 export interface FileRoutesById {
@@ -48,18 +66,22 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteWithChildren
   '/_authenticated/_sidebar': typeof AuthenticatedSidebarRouteWithChildren
   '/_authenticated/_sidebar/': typeof AuthenticatedSidebarIndexRoute
+  '/_authenticated/_sidebar/courses/': typeof AuthenticatedSidebarCoursesIndexRoute
+  '/_authenticated/_sidebar/educations/': typeof AuthenticatedSidebarEducationsIndexRoute
   '/_authenticated/_sidebar/skills/': typeof AuthenticatedSidebarSkillsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/skills/'
+  fullPaths: '/' | '/courses/' | '/educations/' | '/skills/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/skills'
+  to: '/' | '/courses' | '/educations' | '/skills'
   id:
     | '__root__'
     | '/_authenticated'
     | '/_authenticated/_sidebar'
     | '/_authenticated/_sidebar/'
+    | '/_authenticated/_sidebar/courses/'
+    | '/_authenticated/_sidebar/educations/'
     | '/_authenticated/_sidebar/skills/'
   fileRoutesById: FileRoutesById
 }
@@ -97,16 +119,35 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedSidebarSkillsIndexRouteImport
       parentRoute: typeof AuthenticatedSidebarRoute
     }
+    '/_authenticated/_sidebar/educations/': {
+      id: '/_authenticated/_sidebar/educations/'
+      path: '/educations'
+      fullPath: '/educations/'
+      preLoaderRoute: typeof AuthenticatedSidebarEducationsIndexRouteImport
+      parentRoute: typeof AuthenticatedSidebarRoute
+    }
+    '/_authenticated/_sidebar/courses/': {
+      id: '/_authenticated/_sidebar/courses/'
+      path: '/courses'
+      fullPath: '/courses/'
+      preLoaderRoute: typeof AuthenticatedSidebarCoursesIndexRouteImport
+      parentRoute: typeof AuthenticatedSidebarRoute
+    }
   }
 }
 
 interface AuthenticatedSidebarRouteChildren {
   AuthenticatedSidebarIndexRoute: typeof AuthenticatedSidebarIndexRoute
+  AuthenticatedSidebarCoursesIndexRoute: typeof AuthenticatedSidebarCoursesIndexRoute
+  AuthenticatedSidebarEducationsIndexRoute: typeof AuthenticatedSidebarEducationsIndexRoute
   AuthenticatedSidebarSkillsIndexRoute: typeof AuthenticatedSidebarSkillsIndexRoute
 }
 
 const AuthenticatedSidebarRouteChildren: AuthenticatedSidebarRouteChildren = {
   AuthenticatedSidebarIndexRoute: AuthenticatedSidebarIndexRoute,
+  AuthenticatedSidebarCoursesIndexRoute: AuthenticatedSidebarCoursesIndexRoute,
+  AuthenticatedSidebarEducationsIndexRoute:
+    AuthenticatedSidebarEducationsIndexRoute,
   AuthenticatedSidebarSkillsIndexRoute: AuthenticatedSidebarSkillsIndexRoute,
 }
 

@@ -263,13 +263,6 @@ function RouteComponent() {
 
         <DataState.Empty>
           <Alert
-            actions={[
-              {
-                label: "Refetch",
-                className: "btn-ghost",
-                onClick: () => findManySkills.refetch(),
-              },
-            ]}
             description="Try refreshing the page or create a new skill."
             icon={<WarningIcon weight="bold" />}
             title="Nothing found!"
