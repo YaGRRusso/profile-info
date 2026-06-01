@@ -21,8 +21,8 @@ const ProjectTranslationEntity = createTranslationEntity(ProjectMessages);
 
 @ObjectType()
 export class ProjectEntity extends BaseEntity {
-  @OptionalField(() => Number)
-  relevance?: number;
+  @Field(() => Number)
+  relevance: number;
 
   @Field(() => String)
   slug: string;

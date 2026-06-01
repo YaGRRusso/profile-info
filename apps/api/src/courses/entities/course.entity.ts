@@ -25,8 +25,8 @@ export class CourseTranslationLocale {
 
 @ObjectType()
 export class CourseEntity extends BaseEntity {
-  @OptionalField(() => Number)
-  relevance?: number;
+  @Field(() => Number)
+  relevance: number;
 
   @Field(() => String)
   slug: string;
