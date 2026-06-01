@@ -30,7 +30,7 @@ import {
 import { useQueryState } from "nuqs";
 import { useMemo, useState } from "react";
 import { z } from "zod";
-import { CourseStatus, CourseType } from "@/graphql/graphql";
+import { CourseStatus } from "@/graphql/graphql";
 import { useActiveBadges } from "@/hooks/custom/use-active-badges";
 import { useStableValue } from "@/hooks/custom/use-stable-value";
 import type { CourseRow } from "@/hooks/queries/courses";
@@ -65,13 +65,6 @@ const relevanceParser = parseAsShape(
   ...persistentOptions,
   limitUrlUpdates: debouncedUrlUpdates,
 });
-
-const TYPE_LABELS: Array<{ value: CourseType; label: string }> = [
-  { value: CourseType.Bootcamp, label: "Bootcamp" },
-  { value: CourseType.Certificate, label: "Certificate" },
-  { value: CourseType.Online, label: "Online" },
-  { value: CourseType.Workshop, label: "Workshop" },
-];
 
 const STATUS_LABELS: Array<{ value: CourseStatus; label: string }> = [
   { value: CourseStatus.Complete, label: "Complete" },
@@ -150,16 +143,6 @@ const getColumns = (
   columnHelper.accessor((row) => row.organization?.name ?? "", {
     id: "organization",
     header: "Organization",
-  }),
-  columnHelper.accessor("type", {
-    header: "Type",
-    enableColumnFilter: true,
-    enableSorting: false,
-    enableGlobalFilter: false,
-    filterFn: "equals",
-    cell: (data) => (
-      <span className="badge badge-soft badge-sm">{data.getValue()}</span>
-    ),
   }),
   columnHelper.accessor("status", {
     header: "Status",
@@ -346,10 +329,6 @@ export function CoursesTable({
 
   const selected = data.filter((course) => rowSelection[course.id]);
 
-  const typeFacets = getUniqueFacets(
-    table.getColumn("type")!.getFacetedUniqueValues(),
-    TYPE_LABELS
-  );
   const statusFacets = getUniqueFacets(
     table.getColumn("status")!.getFacetedUniqueValues(),
     STATUS_LABELS
@@ -405,20 +384,6 @@ export function CoursesTable({
         </div>
 
         <div className="flex min-w-64 flex-1 items-center gap-2">
-          <select
-            className="select flex-1 bg-base-200"
-            disabled={!typeFacets.length}
-            onChange={(event) => setType(event.target.value || null)}
-            value={type ?? ""}
-          >
-            <option value="">All types</option>
-            {typeFacets.map(({ value, label, count }) => (
-              <option key={value} value={value}>
-                {label} ({count})
-              </option>
-            ))}
-          </select>
-
           <select
             className="select flex-1 bg-base-200"
             disabled={!statusFacets.length}

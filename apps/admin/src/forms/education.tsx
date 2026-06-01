@@ -1,5 +1,6 @@
 import { useForm } from "@tanstack/react-form";
 import z from "zod";
+import { DateRangeInput } from "@/components/inputs/date-range";
 import { FieldArray } from "@/components/inputs/field-array";
 import { RangeInput } from "@/components/inputs/range";
 import { SelectInput } from "@/components/inputs/select";
@@ -32,6 +33,11 @@ const educationSchema = z.object({
       })
     )
     .min(1, "required group"),
+  period: z
+    .object({ from: z.string(), to: z.string() })
+    .refine((range) => !(range.from && range.to) || range.from <= range.to, {
+      message: "end date must be after start date",
+    }),
 });
 
 export type EducationSchema = z.infer<typeof educationSchema>;
@@ -39,6 +45,18 @@ export type EducationSchema = z.infer<typeof educationSchema>;
 export interface EducationFormProps extends CommonFormProps<EducationSchema> {}
 
 export function educationToInput(data: EducationSchema): CreateEducationInput {
+  const period =
+    data.period.from || data.period.to
+      ? {
+          from: data.period.from
+            ? new Date(data.period.from).toISOString()
+            : undefined,
+          to: data.period.to
+            ? new Date(data.period.to).toISOString()
+            : undefined,
+        }
+      : undefined;
+
   return {
     slug: data.slug,
     organization: data.organization,
@@ -47,6 +65,7 @@ export function educationToInput(data: EducationSchema): CreateEducationInput {
     relevance: data.relevance,
     url: data.url || undefined,
     image: data.image || undefined,
+    period,
     i18n: data.i18n.map((translation) => ({
       locale: translation.locale,
       messages: {
@@ -68,6 +87,12 @@ export function educationToForm(
     relevance: education.relevance ?? 1,
     url: education.url ?? "",
     image: education.image ?? "",
+    period: {
+      from: education.period?.from
+        ? String(education.period.from).slice(0, 10)
+        : "",
+      to: education.period?.to ? String(education.period.to).slice(0, 10) : "",
+    },
     i18n: education.i18n.map((translation) => ({
       locale: translation.locale,
       title: translation.messages.title,
@@ -110,6 +135,7 @@ export function EducationForm({
       relevance: 1,
       url: "",
       image: "",
+      period: { from: "", to: "" },
       i18n: [{ locale: "", title: "", description: "" }],
       ...defaultValues,
     },
@@ -210,6 +236,16 @@ export function EducationForm({
             placeholder="Relevance"
             ruler
             step={1}
+            value={field.state.value}
+          />
+        )}
+      </Field>
+      <Field name="period">
+        {(field) => (
+          <DateRangeInput
+            error={fieldError(field.state.meta)}
+            onChange={field.handleChange}
+            placeholder="Period"
             value={field.state.value}
           />
         )}

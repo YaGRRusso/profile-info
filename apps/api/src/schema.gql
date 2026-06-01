@@ -13,12 +13,10 @@ type CourseEntity {
   id: ID!
   image: String
   organization: OrganizationEntity!
-  period: DateRangeEntity
   relevance: Float
   skills: [SkillEntity!]
   slug: String!
   status: CourseStatus!
-  type: CourseType!
   updatedAt: DateTime!
   url: String
 }
@@ -39,13 +37,6 @@ type CourseTranslationLocale {
   messages: CourseMessages!
 }
 
-enum CourseType {
-  BOOTCAMP
-  CERTIFICATE
-  ONLINE
-  WORKSHOP
-}
-
 input CreateCourseInput {
   hours: Int
   i18n: [CreateCourseTranslationInput!]!
@@ -56,7 +47,6 @@ input CreateCourseInput {
   skills: [String!]
   slug: String!
   status: CourseStatus!
-  type: CourseType!
   url: String
 }
 
@@ -266,7 +256,6 @@ input FilterCourseInput {
   skills: [String!]
   slug: String
   status: CourseStatus
-  type: CourseType
   url: String
 }
 
@@ -569,7 +558,6 @@ input UpdateCourseInput {
   skills: [String!]
   slug: String
   status: CourseStatus
-  type: CourseType
   url: String
 }
 

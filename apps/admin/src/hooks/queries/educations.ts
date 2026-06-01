@@ -50,6 +50,10 @@ const findManyEducations = graphql(`
             description
           }
         }
+        period {
+          from
+          to
+        }
         createdAt
         updatedAt
       }
@@ -79,6 +83,10 @@ const findOneEducationById = graphql(`
           description
         }
       }
+      period {
+        from
+        to
+      }
       createdAt
       updatedAt
     }
@@ -107,6 +115,10 @@ const findOneEducation = graphql(`
           description
         }
       }
+      period {
+        from
+        to
+      }
       createdAt
       updatedAt
     }
@@ -134,6 +146,10 @@ const findManyEducationById = graphql(`
           title
           description
         }
+      }
+      period {
+        from
+        to
       }
       createdAt
       updatedAt

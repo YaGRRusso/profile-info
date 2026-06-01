@@ -5,11 +5,7 @@ import { NumberInput } from "@/components/inputs/number";
 import { RangeInput } from "@/components/inputs/range";
 import { SelectInput } from "@/components/inputs/select";
 import { TextInput } from "@/components/inputs/text";
-import {
-  CourseStatus,
-  CourseType,
-  type CreateCourseInput,
-} from "@/graphql/graphql";
+import { CourseStatus, type CreateCourseInput } from "@/graphql/graphql";
 import { useQueryAllPages } from "@/hooks/custom/use-query-all-pages";
 import type { CourseRow } from "@/hooks/queries/courses";
 import { useFindManyOrganizations } from "@/hooks/queries/organizations";
@@ -19,7 +15,6 @@ import { CommonFormProps } from "./common";
 const courseSchema = z.object({
   slug: z.string().min(1, "required field"),
   organization: z.string().min(1, "required field"),
-  type: z.enum(CourseType, "required field"),
   status: z.enum(CourseStatus, "required field"),
   relevance: z.number().min(1, "must be a positive number"),
   url: z.url().or(z.literal("")),
@@ -44,7 +39,6 @@ export function courseToInput(data: CourseSchema): CreateCourseInput {
   return {
     slug: data.slug,
     organization: data.organization,
-    type: data.type,
     status: data.status,
     relevance: data.relevance,
     url: data.url || undefined,
@@ -64,7 +58,6 @@ export function courseToForm(course: CourseRow): Partial<CourseSchema> {
   return {
     slug: course.slug,
     organization: course.organization?.id ?? "",
-    type: course.type,
     status: course.status,
     relevance: course.relevance ?? 1,
     url: course.url ?? "",
@@ -77,11 +70,6 @@ export function courseToForm(course: CourseRow): Partial<CourseSchema> {
     })),
   };
 }
-
-const TYPE_OPTIONS = Object.values(CourseType).map((type) => ({
-  label: type,
-  value: type,
-}));
 
 const STATUS_OPTIONS = Object.values(CourseStatus).map((status) => ({
   label: status,
@@ -107,7 +95,6 @@ export function CourseForm({
     defaultValues: {
       slug: "",
       organization: "",
-      type: CourseType.Online,
       status: CourseStatus.Complete,
       relevance: 1,
       url: "",
@@ -151,18 +138,6 @@ export function CourseForm({
             onChange={field.handleChange}
             options={organizationOptions}
             placeholder="Organization"
-            value={field.state.value}
-          />
-        )}
-      </Field>
-      <Field name="type">
-        {(field) => (
-          <SelectInput
-            error={fieldError(field.state.meta)}
-            name={field.name}
-            onChange={(value) => field.handleChange(value as CourseType)}
-            options={TYPE_OPTIONS}
-            placeholder="Type"
             value={field.state.value}
           />
         )}

@@ -4,16 +4,11 @@ import z from "zod";
 import { CheckboxInput } from "@/components/inputs/checkbox";
 import { RangeInput } from "@/components/inputs/range";
 import { SelectInput } from "@/components/inputs/select";
-import {
-  CourseStatus,
-  CourseType,
-  type UpdateCourseInput,
-} from "@/graphql/graphql";
+import { CourseStatus, type UpdateCourseInput } from "@/graphql/graphql";
 import { fieldError } from "@/lib/field-error";
 import { CommonFormProps } from "./common";
 
 const courseMultiSchema = z.object({
-  type: z.enum(CourseType),
   status: z.enum(CourseStatus),
   relevance: z.number().min(1, "must be a positive number"),
 });
@@ -22,11 +17,6 @@ export type CourseMultiSchema = z.infer<typeof courseMultiSchema>;
 
 export interface CourseMultiFormProps
   extends CommonFormProps<UpdateCourseInput> {}
-
-const TYPE_OPTIONS = Object.values(CourseType).map((type) => ({
-  label: type,
-  value: type,
-}));
 
 const STATUS_OPTIONS = Object.values(CourseStatus).map((status) => ({
   label: status,
@@ -45,13 +35,11 @@ export function CourseMultiForm({
 
   const form = useForm({
     defaultValues: {
-      type: CourseType.Online,
       status: CourseStatus.Complete,
       relevance: 1,
     },
     onSubmit: ({ value }) => {
       const updateCourseInput: UpdateCourseInput = {};
-      if (changeType) updateCourseInput.type = value.type;
       if (changeStatus) updateCourseInput.status = value.status;
       if (changeRelevance) updateCourseInput.relevance = value.relevance;
       onSubmit?.(updateCourseInput);
@@ -75,20 +63,6 @@ export function CourseMultiForm({
         label="Change Type"
         onChange={setChangeType}
       />
-
-      <Field name="type">
-        {(field) => (
-          <SelectInput
-            disabled={!changeType}
-            error={fieldError(field.state.meta)}
-            name={field.name}
-            onChange={(value) => field.handleChange(value as CourseType)}
-            options={TYPE_OPTIONS}
-            placeholder="Type"
-            value={field.state.value}
-          />
-        )}
-      </Field>
 
       <div className="divider" />
 

@@ -3,7 +3,6 @@ import { IsUrl } from "class-validator";
 import { OptionalField } from "@/core/decorators/optional-field.decorator";
 import { DateRangeInput } from "@/core/inputs/date-range.input";
 import { CourseStatus } from "../enums/status.enum";
-import { CourseType } from "../enums/type.enum";
 
 @InputType()
 export class CreateCourseMessagesInput {
@@ -33,9 +32,6 @@ export class CreateCourseInput {
 
   @Field(() => String)
   organization: string;
-
-  @Field(() => CourseType)
-  type: CourseType;
 
   @Field(() => CourseStatus)
   status: CourseStatus;

@@ -31,12 +31,10 @@ export type CourseEntity = {
   id: Scalars['ID']['output'];
   image?: Maybe<Scalars['String']['output']>;
   organization: OrganizationEntity;
-  period?: Maybe<DateRangeEntity>;
   relevance?: Maybe<Scalars['Float']['output']>;
   skills?: Maybe<Array<SkillEntity>>;
   slug: Scalars['String']['output'];
   status: CourseStatus;
-  type: CourseType;
   updatedAt: Scalars['DateTime']['output'];
   url?: Maybe<Scalars['String']['output']>;
 };
@@ -59,13 +57,6 @@ export type CourseTranslationLocale = {
   messages: CourseMessages;
 };
 
-export enum CourseType {
-  Bootcamp = 'BOOTCAMP',
-  Certificate = 'CERTIFICATE',
-  Online = 'ONLINE',
-  Workshop = 'WORKSHOP'
-}
-
 export type CreateCourseInput = {
   hours?: InputMaybe<Scalars['Int']['input']>;
   i18n: Array<CreateCourseTranslationInput>;
@@ -76,7 +67,6 @@ export type CreateCourseInput = {
   skills?: InputMaybe<Array<Scalars['String']['input']>>;
   slug: Scalars['String']['input'];
   status: CourseStatus;
-  type: CourseType;
   url?: InputMaybe<Scalars['String']['input']>;
 };
 
@@ -289,7 +279,6 @@ export type FilterCourseInput = {
   skills?: InputMaybe<Array<Scalars['String']['input']>>;
   slug?: InputMaybe<Scalars['String']['input']>;
   status?: InputMaybe<CourseStatus>;
-  type?: InputMaybe<CourseType>;
   url?: InputMaybe<Scalars['String']['input']>;
 };
 
@@ -989,7 +978,6 @@ export type UpdateCourseInput = {
   skills?: InputMaybe<Array<Scalars['String']['input']>>;
   slug?: InputMaybe<Scalars['String']['input']>;
   status?: InputMaybe<CourseStatus>;
-  type?: InputMaybe<CourseType>;
   url?: InputMaybe<Scalars['String']['input']>;
 };
 
@@ -1215,28 +1203,28 @@ export type FindManyCoursesQueryVariables = Exact<{
 }>;
 
 
-export type FindManyCoursesQuery = { __typename?: 'Query', findManyCourses: { __typename?: 'PaginatedCourseEntity', found: number, nodes: Array<{ __typename?: 'CourseEntity', id: string, slug: string, type: CourseType, status: CourseStatus, relevance?: number | null, url?: string | null, image?: string | null, hours?: number | null, createdAt: any, updatedAt: any, organization: { __typename?: 'OrganizationEntity', id: string, name: string, slug: string }, i18n: Array<{ __typename?: 'CourseTranslationLocale', locale: string, messages: { __typename?: 'CourseMessages', title: string, description: string } }> }> } };
+export type FindManyCoursesQuery = { __typename?: 'Query', findManyCourses: { __typename?: 'PaginatedCourseEntity', found: number, nodes: Array<{ __typename?: 'CourseEntity', id: string, slug: string, status: CourseStatus, relevance?: number | null, url?: string | null, image?: string | null, hours?: number | null, createdAt: any, updatedAt: any, organization: { __typename?: 'OrganizationEntity', id: string, name: string, slug: string }, i18n: Array<{ __typename?: 'CourseTranslationLocale', locale: string, messages: { __typename?: 'CourseMessages', title: string, description: string } }> }> } };
 
 export type FindOneCourseByIdQueryVariables = Exact<{
   courseId: Scalars['ID']['input'];
 }>;
 
 
-export type FindOneCourseByIdQuery = { __typename?: 'Query', findOneCourseById: { __typename?: 'CourseEntity', id: string, slug: string, type: CourseType, status: CourseStatus, relevance?: number | null, url?: string | null, image?: string | null, hours?: number | null, createdAt: any, updatedAt: any, organization: { __typename?: 'OrganizationEntity', id: string, name: string, slug: string }, i18n: Array<{ __typename?: 'CourseTranslationLocale', locale: string, messages: { __typename?: 'CourseMessages', title: string, description: string } }> } };
+export type FindOneCourseByIdQuery = { __typename?: 'Query', findOneCourseById: { __typename?: 'CourseEntity', id: string, slug: string, status: CourseStatus, relevance?: number | null, url?: string | null, image?: string | null, hours?: number | null, createdAt: any, updatedAt: any, organization: { __typename?: 'OrganizationEntity', id: string, name: string, slug: string }, i18n: Array<{ __typename?: 'CourseTranslationLocale', locale: string, messages: { __typename?: 'CourseMessages', title: string, description: string } }> } };
 
 export type FindOneCourseQueryVariables = Exact<{
   courseFilters?: InputMaybe<FilterCourseInput>;
 }>;
 
 
-export type FindOneCourseQuery = { __typename?: 'Query', findOneCourse: { __typename?: 'CourseEntity', id: string, slug: string, type: CourseType, status: CourseStatus, relevance?: number | null, url?: string | null, image?: string | null, hours?: number | null, createdAt: any, updatedAt: any, organization: { __typename?: 'OrganizationEntity', id: string, name: string, slug: string }, i18n: Array<{ __typename?: 'CourseTranslationLocale', locale: string, messages: { __typename?: 'CourseMessages', title: string, description: string } }> } };
+export type FindOneCourseQuery = { __typename?: 'Query', findOneCourse: { __typename?: 'CourseEntity', id: string, slug: string, status: CourseStatus, relevance?: number | null, url?: string | null, image?: string | null, hours?: number | null, createdAt: any, updatedAt: any, organization: { __typename?: 'OrganizationEntity', id: string, name: string, slug: string }, i18n: Array<{ __typename?: 'CourseTranslationLocale', locale: string, messages: { __typename?: 'CourseMessages', title: string, description: string } }> } };
 
 export type FindManyCourseByIdQueryVariables = Exact<{
   courseIds: Array<Scalars['ID']['input']> | Scalars['ID']['input'];
 }>;
 
 
-export type FindManyCourseByIdQuery = { __typename?: 'Query', findManyCourseById: Array<{ __typename?: 'CourseEntity', id: string, slug: string, type: CourseType, status: CourseStatus, relevance?: number | null, url?: string | null, image?: string | null, hours?: number | null, createdAt: any, updatedAt: any, organization: { __typename?: 'OrganizationEntity', id: string, name: string, slug: string }, i18n: Array<{ __typename?: 'CourseTranslationLocale', locale: string, messages: { __typename?: 'CourseMessages', title: string, description: string } }> }> };
+export type FindManyCourseByIdQuery = { __typename?: 'Query', findManyCourseById: Array<{ __typename?: 'CourseEntity', id: string, slug: string, status: CourseStatus, relevance?: number | null, url?: string | null, image?: string | null, hours?: number | null, createdAt: any, updatedAt: any, organization: { __typename?: 'OrganizationEntity', id: string, name: string, slug: string }, i18n: Array<{ __typename?: 'CourseTranslationLocale', locale: string, messages: { __typename?: 'CourseMessages', title: string, description: string } }> }> };
 
 export type FindManyEducationsQueryVariables = Exact<{
   educationFilters?: InputMaybe<FilterEducationInput>;
@@ -1245,28 +1233,28 @@ export type FindManyEducationsQueryVariables = Exact<{
 }>;
 
 
-export type FindManyEducationsQuery = { __typename?: 'Query', findManyEducations: { __typename?: 'PaginatedEducationEntity', found: number, nodes: Array<{ __typename?: 'EducationEntity', id: string, slug: string, level: EducationLevel, status: EducationStatus, relevance?: number | null, url?: string | null, image?: string | null, createdAt: any, updatedAt: any, organization: { __typename?: 'OrganizationEntity', id: string, name: string, slug: string }, i18n: Array<{ __typename?: 'EducationTranslationLocale', locale: string, messages: { __typename?: 'EducationMessages', title: string, description: string } }> }> } };
+export type FindManyEducationsQuery = { __typename?: 'Query', findManyEducations: { __typename?: 'PaginatedEducationEntity', found: number, nodes: Array<{ __typename?: 'EducationEntity', id: string, slug: string, level: EducationLevel, status: EducationStatus, relevance?: number | null, url?: string | null, image?: string | null, createdAt: any, updatedAt: any, organization: { __typename?: 'OrganizationEntity', id: string, name: string, slug: string }, i18n: Array<{ __typename?: 'EducationTranslationLocale', locale: string, messages: { __typename?: 'EducationMessages', title: string, description: string } }>, period?: { __typename?: 'DateRangeEntity', from?: any | null, to?: any | null } | null }> } };
 
 export type FindOneEducationByIdQueryVariables = Exact<{
   educationId: Scalars['ID']['input'];
 }>;
 
 
-export type FindOneEducationByIdQuery = { __typename?: 'Query', findOneEducationById: { __typename?: 'EducationEntity', id: string, slug: string, level: EducationLevel, status: EducationStatus, relevance?: number | null, url?: string | null, image?: string | null, createdAt: any, updatedAt: any, organization: { __typename?: 'OrganizationEntity', id: string, name: string, slug: string }, i18n: Array<{ __typename?: 'EducationTranslationLocale', locale: string, messages: { __typename?: 'EducationMessages', title: string, description: string } }> } };
+export type FindOneEducationByIdQuery = { __typename?: 'Query', findOneEducationById: { __typename?: 'EducationEntity', id: string, slug: string, level: EducationLevel, status: EducationStatus, relevance?: number | null, url?: string | null, image?: string | null, createdAt: any, updatedAt: any, organization: { __typename?: 'OrganizationEntity', id: string, name: string, slug: string }, i18n: Array<{ __typename?: 'EducationTranslationLocale', locale: string, messages: { __typename?: 'EducationMessages', title: string, description: string } }>, period?: { __typename?: 'DateRangeEntity', from?: any | null, to?: any | null } | null } };
 
 export type FindOneEducationQueryVariables = Exact<{
   educationFilters?: InputMaybe<FilterEducationInput>;
 }>;
 
 
-export type FindOneEducationQuery = { __typename?: 'Query', findOneEducation: { __typename?: 'EducationEntity', id: string, slug: string, level: EducationLevel, status: EducationStatus, relevance?: number | null, url?: string | null, image?: string | null, createdAt: any, updatedAt: any, organization: { __typename?: 'OrganizationEntity', id: string, name: string, slug: string }, i18n: Array<{ __typename?: 'EducationTranslationLocale', locale: string, messages: { __typename?: 'EducationMessages', title: string, description: string } }> } };
+export type FindOneEducationQuery = { __typename?: 'Query', findOneEducation: { __typename?: 'EducationEntity', id: string, slug: string, level: EducationLevel, status: EducationStatus, relevance?: number | null, url?: string | null, image?: string | null, createdAt: any, updatedAt: any, organization: { __typename?: 'OrganizationEntity', id: string, name: string, slug: string }, i18n: Array<{ __typename?: 'EducationTranslationLocale', locale: string, messages: { __typename?: 'EducationMessages', title: string, description: string } }>, period?: { __typename?: 'DateRangeEntity', from?: any | null, to?: any | null } | null } };
 
 export type FindManyEducationByIdQueryVariables = Exact<{
   educationIds: Array<Scalars['ID']['input']> | Scalars['ID']['input'];
 }>;
 
 
-export type FindManyEducationByIdQuery = { __typename?: 'Query', findManyEducationById: Array<{ __typename?: 'EducationEntity', id: string, slug: string, level: EducationLevel, status: EducationStatus, relevance?: number | null, url?: string | null, image?: string | null, createdAt: any, updatedAt: any, organization: { __typename?: 'OrganizationEntity', id: string, name: string, slug: string }, i18n: Array<{ __typename?: 'EducationTranslationLocale', locale: string, messages: { __typename?: 'EducationMessages', title: string, description: string } }> }> };
+export type FindManyEducationByIdQuery = { __typename?: 'Query', findManyEducationById: Array<{ __typename?: 'EducationEntity', id: string, slug: string, level: EducationLevel, status: EducationStatus, relevance?: number | null, url?: string | null, image?: string | null, createdAt: any, updatedAt: any, organization: { __typename?: 'OrganizationEntity', id: string, name: string, slug: string }, i18n: Array<{ __typename?: 'EducationTranslationLocale', locale: string, messages: { __typename?: 'EducationMessages', title: string, description: string } }>, period?: { __typename?: 'DateRangeEntity', from?: any | null, to?: any | null } | null }> };
 
 export type FindManyOrganizationsQueryVariables = Exact<{
   organizationFilters?: InputMaybe<FilterOrganizationInput>;
@@ -1495,7 +1483,6 @@ export const FindManyCoursesDocument = new TypedDocumentString(`
     nodes {
       id
       slug
-      type
       status
       relevance
       url
@@ -1524,7 +1511,6 @@ export const FindOneCourseByIdDocument = new TypedDocumentString(`
   findOneCourseById(courseId: $courseId) {
     id
     slug
-    type
     status
     relevance
     url
@@ -1552,7 +1538,6 @@ export const FindOneCourseDocument = new TypedDocumentString(`
   findOneCourse(courseFilters: $courseFilters) {
     id
     slug
-    type
     status
     relevance
     url
@@ -1580,7 +1565,6 @@ export const FindManyCourseByIdDocument = new TypedDocumentString(`
   findManyCourseById(courseIds: $courseIds) {
     id
     slug
-    type
     status
     relevance
     url
@@ -1631,6 +1615,10 @@ export const FindManyEducationsDocument = new TypedDocumentString(`
           description
         }
       }
+      period {
+        from
+        to
+      }
       createdAt
       updatedAt
     }
@@ -1659,6 +1647,10 @@ export const FindOneEducationByIdDocument = new TypedDocumentString(`
         description
       }
     }
+    period {
+      from
+      to
+    }
     createdAt
     updatedAt
   }
@@ -1686,6 +1678,10 @@ export const FindOneEducationDocument = new TypedDocumentString(`
         description
       }
     }
+    period {
+      from
+      to
+    }
     createdAt
     updatedAt
   }
@@ -1712,6 +1708,10 @@ export const FindManyEducationByIdDocument = new TypedDocumentString(`
         title
         description
       }
+    }
+    period {
+      from
+      to
     }
     createdAt
     updatedAt

@@ -1,11 +1,9 @@
 import { Field, Int, ObjectType } from "@nestjs/graphql";
 import { OptionalField } from "@/core/decorators/optional-field.decorator";
 import { BaseEntity } from "@/core/entities/base.entity";
-import { DateRangeEntity } from "@/core/entities/date-range.entity";
 import { OrganizationEntity } from "@/organizations/entities/organization.entity";
 import { SkillEntity } from "@/skills/entities/skill.entity";
 import { CourseStatus } from "../enums/status.enum";
-import { CourseType } from "../enums/type.enum";
 
 @ObjectType()
 export class CourseMessages {
@@ -36,9 +34,6 @@ export class CourseEntity extends BaseEntity {
   @Field(() => OrganizationEntity)
   organization: OrganizationEntity;
 
-  @Field(() => CourseType)
-  type: CourseType;
-
   @Field(() => CourseStatus)
   status: CourseStatus;
 
@@ -56,7 +51,4 @@ export class CourseEntity extends BaseEntity {
 
   @OptionalField(() => [SkillEntity])
   skills?: SkillEntity[];
-
-  @OptionalField(() => DateRangeEntity)
-  period?: DateRangeEntity;
 }

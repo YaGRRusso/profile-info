@@ -33,7 +33,6 @@ const findManyCourses = graphql(`
       nodes {
         id
         slug
-        type
         status
         relevance
         url
@@ -63,7 +62,6 @@ const findOneCourseById = graphql(`
     findOneCourseById(courseId: $courseId) {
       id
       slug
-      type
       status
       relevance
       url
@@ -92,7 +90,6 @@ const findOneCourse = graphql(`
     findOneCourse(courseFilters: $courseFilters) {
       id
       slug
-      type
       status
       relevance
       url
@@ -121,7 +118,6 @@ const findManyCourseById = graphql(`
     findManyCourseById(courseIds: $courseIds) {
       id
       slug
-      type
       status
       relevance
       url
