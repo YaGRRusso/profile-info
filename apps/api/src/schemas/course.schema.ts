@@ -32,14 +32,6 @@ export class CourseModel extends BaseModel {
   @Prop({
     type: String,
     required: true,
-    enum: ["BOOTCAMP", "ONLINE", "CERTIFICATE", "WORKSHOP"],
-    index: true,
-  })
-  type: string;
-
-  @Prop({
-    type: String,
-    required: true,
     enum: ["COMPLETE", "INCOMPLETE", "IN_PROGRESS"],
     index: true,
   })

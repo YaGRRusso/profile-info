@@ -1,4 +1,5 @@
 import {
+  BuildingsIcon,
   CertificateIcon,
   GraduationCapIcon,
   HouseIcon,
@@ -38,6 +39,12 @@ const MENU_SECTIONS: MenuSection[] = [
         icon: <GraduationCapIcon size={24} />,
         label: "Educations",
         to: "/educations",
+        type: "link",
+      },
+      {
+        icon: <BuildingsIcon size={24} />,
+        label: "Organizations",
+        to: "/organizations",
         type: "link",
       },
     ],

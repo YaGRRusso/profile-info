@@ -19,8 +19,8 @@ export class ProjectMessagesModel {
 
 @Schema({ timestamps: true })
 export class ProjectModel extends BaseModel {
-  @Prop({ type: Number })
-  relevance?: number;
+  @Prop({ type: Number, required: true, default: 0 })
+  relevance: number;
 
   @Prop({ type: String, required: true, unique: true })
   slug: string;

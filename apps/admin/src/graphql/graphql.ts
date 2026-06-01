@@ -31,7 +31,7 @@ export type CourseEntity = {
   id: Scalars['ID']['output'];
   image?: Maybe<Scalars['String']['output']>;
   organization: OrganizationEntity;
-  relevance?: Maybe<Scalars['Float']['output']>;
+  relevance: Scalars['Float']['output'];
   skills?: Maybe<Array<SkillEntity>>;
   slug: Scalars['String']['output'];
   status: CourseStatus;
@@ -195,7 +195,7 @@ export type EducationEntity = {
   level: EducationLevel;
   organization: OrganizationEntity;
   period?: Maybe<DateRangeEntity>;
-  relevance?: Maybe<Scalars['Float']['output']>;
+  relevance: Scalars['Float']['output'];
   skills?: Maybe<Array<SkillEntity>>;
   slug: Scalars['String']['output'];
   status: EducationStatus;
@@ -243,7 +243,7 @@ export type ExperienceEntity = {
   createdAt: Scalars['DateTime']['output'];
   id: Scalars['ID']['output'];
   organization: OrganizationEntity;
-  relevance?: Maybe<Scalars['Float']['output']>;
+  relevance: Scalars['Float']['output'];
   roles: Array<ExperienceRole>;
   skills?: Maybe<Array<SkillEntity>>;
   slug: Scalars['String']['output'];
@@ -630,7 +630,7 @@ export type OrganizationEntity = {
   id: Scalars['ID']['output'];
   logo: Scalars['String']['output'];
   name: Scalars['String']['output'];
-  relevance?: Maybe<Scalars['Float']['output']>;
+  relevance: Scalars['Float']['output'];
   slug: Scalars['String']['output'];
   updatedAt: Scalars['DateTime']['output'];
   website: Scalars['String']['output'];
@@ -689,7 +689,7 @@ export type ProjectEntity = {
   i18n: Array<ProjectMessagesTranslationEntity>;
   id: Scalars['ID']['output'];
   images?: Maybe<Array<Scalars['String']['output']>>;
-  relevance?: Maybe<Scalars['Float']['output']>;
+  relevance: Scalars['Float']['output'];
   skills?: Maybe<Array<SkillEntity>>;
   slug: Scalars['String']['output'];
   updatedAt: Scalars['DateTime']['output'];
@@ -1149,6 +1149,43 @@ export type RemoveManyEducationsMutationVariables = Exact<{
 
 export type RemoveManyEducationsMutation = { __typename?: 'Mutation', removeManyEducations: { __typename?: 'BatchEntity', count: number } };
 
+export type CreateOneOrganizationMutationVariables = Exact<{
+  createOrganizationInput: CreateOrganizationInput;
+}>;
+
+
+export type CreateOneOrganizationMutation = { __typename?: 'Mutation', createOneOrganization: { __typename?: 'OrganizationEntity', id: string, slug: string } };
+
+export type UpdateOneOrganizationMutationVariables = Exact<{
+  organizationId: Scalars['ID']['input'];
+  updateOrganizationInput: UpdateOrganizationInput;
+}>;
+
+
+export type UpdateOneOrganizationMutation = { __typename?: 'Mutation', updateOneOrganization: { __typename?: 'OrganizationEntity', id: string, slug: string } };
+
+export type UpdateManyOrganizationsMutationVariables = Exact<{
+  organizationIds: Array<Scalars['ID']['input']> | Scalars['ID']['input'];
+  updateOrganizationInput: UpdateOrganizationInput;
+}>;
+
+
+export type UpdateManyOrganizationsMutation = { __typename?: 'Mutation', updateManyOrganizations: { __typename?: 'BatchEntity', count: number } };
+
+export type RemoveOneOrganizationMutationVariables = Exact<{
+  organizationId: Scalars['ID']['input'];
+}>;
+
+
+export type RemoveOneOrganizationMutation = { __typename?: 'Mutation', removeOneOrganization: { __typename?: 'OrganizationEntity', id: string, slug: string } };
+
+export type RemoveManyOrganizationsMutationVariables = Exact<{
+  organizationIds: Array<Scalars['ID']['input']> | Scalars['ID']['input'];
+}>;
+
+
+export type RemoveManyOrganizationsMutation = { __typename?: 'Mutation', removeManyOrganizations: { __typename?: 'BatchEntity', count: number } };
+
 export type CreateOneSkillMutationVariables = Exact<{
   createSkillInput: CreateSkillInput;
 }>;
@@ -1203,28 +1240,28 @@ export type FindManyCoursesQueryVariables = Exact<{
 }>;
 
 
-export type FindManyCoursesQuery = { __typename?: 'Query', findManyCourses: { __typename?: 'PaginatedCourseEntity', found: number, nodes: Array<{ __typename?: 'CourseEntity', id: string, slug: string, status: CourseStatus, relevance?: number | null, url?: string | null, image?: string | null, hours?: number | null, createdAt: any, updatedAt: any, organization: { __typename?: 'OrganizationEntity', id: string, name: string, slug: string }, i18n: Array<{ __typename?: 'CourseTranslationLocale', locale: string, messages: { __typename?: 'CourseMessages', title: string, description: string } }> }> } };
+export type FindManyCoursesQuery = { __typename?: 'Query', findManyCourses: { __typename?: 'PaginatedCourseEntity', found: number, nodes: Array<{ __typename?: 'CourseEntity', id: string, slug: string, status: CourseStatus, relevance: number, url?: string | null, image?: string | null, hours?: number | null, createdAt: any, updatedAt: any, organization: { __typename?: 'OrganizationEntity', id: string, name: string, slug: string }, i18n: Array<{ __typename?: 'CourseTranslationLocale', locale: string, messages: { __typename?: 'CourseMessages', title: string, description: string } }> }> } };
 
 export type FindOneCourseByIdQueryVariables = Exact<{
   courseId: Scalars['ID']['input'];
 }>;
 
 
-export type FindOneCourseByIdQuery = { __typename?: 'Query', findOneCourseById: { __typename?: 'CourseEntity', id: string, slug: string, status: CourseStatus, relevance?: number | null, url?: string | null, image?: string | null, hours?: number | null, createdAt: any, updatedAt: any, organization: { __typename?: 'OrganizationEntity', id: string, name: string, slug: string }, i18n: Array<{ __typename?: 'CourseTranslationLocale', locale: string, messages: { __typename?: 'CourseMessages', title: string, description: string } }> } };
+export type FindOneCourseByIdQuery = { __typename?: 'Query', findOneCourseById: { __typename?: 'CourseEntity', id: string, slug: string, status: CourseStatus, relevance: number, url?: string | null, image?: string | null, hours?: number | null, createdAt: any, updatedAt: any, organization: { __typename?: 'OrganizationEntity', id: string, name: string, slug: string }, i18n: Array<{ __typename?: 'CourseTranslationLocale', locale: string, messages: { __typename?: 'CourseMessages', title: string, description: string } }> } };
 
 export type FindOneCourseQueryVariables = Exact<{
   courseFilters?: InputMaybe<FilterCourseInput>;
 }>;
 
 
-export type FindOneCourseQuery = { __typename?: 'Query', findOneCourse: { __typename?: 'CourseEntity', id: string, slug: string, status: CourseStatus, relevance?: number | null, url?: string | null, image?: string | null, hours?: number | null, createdAt: any, updatedAt: any, organization: { __typename?: 'OrganizationEntity', id: string, name: string, slug: string }, i18n: Array<{ __typename?: 'CourseTranslationLocale', locale: string, messages: { __typename?: 'CourseMessages', title: string, description: string } }> } };
+export type FindOneCourseQuery = { __typename?: 'Query', findOneCourse: { __typename?: 'CourseEntity', id: string, slug: string, status: CourseStatus, relevance: number, url?: string | null, image?: string | null, hours?: number | null, createdAt: any, updatedAt: any, organization: { __typename?: 'OrganizationEntity', id: string, name: string, slug: string }, i18n: Array<{ __typename?: 'CourseTranslationLocale', locale: string, messages: { __typename?: 'CourseMessages', title: string, description: string } }> } };
 
 export type FindManyCourseByIdQueryVariables = Exact<{
   courseIds: Array<Scalars['ID']['input']> | Scalars['ID']['input'];
 }>;
 
 
-export type FindManyCourseByIdQuery = { __typename?: 'Query', findManyCourseById: Array<{ __typename?: 'CourseEntity', id: string, slug: string, status: CourseStatus, relevance?: number | null, url?: string | null, image?: string | null, hours?: number | null, createdAt: any, updatedAt: any, organization: { __typename?: 'OrganizationEntity', id: string, name: string, slug: string }, i18n: Array<{ __typename?: 'CourseTranslationLocale', locale: string, messages: { __typename?: 'CourseMessages', title: string, description: string } }> }> };
+export type FindManyCourseByIdQuery = { __typename?: 'Query', findManyCourseById: Array<{ __typename?: 'CourseEntity', id: string, slug: string, status: CourseStatus, relevance: number, url?: string | null, image?: string | null, hours?: number | null, createdAt: any, updatedAt: any, organization: { __typename?: 'OrganizationEntity', id: string, name: string, slug: string }, i18n: Array<{ __typename?: 'CourseTranslationLocale', locale: string, messages: { __typename?: 'CourseMessages', title: string, description: string } }> }> };
 
 export type FindManyEducationsQueryVariables = Exact<{
   educationFilters?: InputMaybe<FilterEducationInput>;
@@ -1233,28 +1270,28 @@ export type FindManyEducationsQueryVariables = Exact<{
 }>;
 
 
-export type FindManyEducationsQuery = { __typename?: 'Query', findManyEducations: { __typename?: 'PaginatedEducationEntity', found: number, nodes: Array<{ __typename?: 'EducationEntity', id: string, slug: string, level: EducationLevel, status: EducationStatus, relevance?: number | null, url?: string | null, image?: string | null, createdAt: any, updatedAt: any, organization: { __typename?: 'OrganizationEntity', id: string, name: string, slug: string }, i18n: Array<{ __typename?: 'EducationTranslationLocale', locale: string, messages: { __typename?: 'EducationMessages', title: string, description: string } }>, period?: { __typename?: 'DateRangeEntity', from?: any | null, to?: any | null } | null }> } };
+export type FindManyEducationsQuery = { __typename?: 'Query', findManyEducations: { __typename?: 'PaginatedEducationEntity', found: number, nodes: Array<{ __typename?: 'EducationEntity', id: string, slug: string, level: EducationLevel, status: EducationStatus, relevance: number, url?: string | null, image?: string | null, createdAt: any, updatedAt: any, organization: { __typename?: 'OrganizationEntity', id: string, name: string, slug: string }, i18n: Array<{ __typename?: 'EducationTranslationLocale', locale: string, messages: { __typename?: 'EducationMessages', title: string, description: string } }>, period?: { __typename?: 'DateRangeEntity', from?: any | null, to?: any | null } | null }> } };
 
 export type FindOneEducationByIdQueryVariables = Exact<{
   educationId: Scalars['ID']['input'];
 }>;
 
 
-export type FindOneEducationByIdQuery = { __typename?: 'Query', findOneEducationById: { __typename?: 'EducationEntity', id: string, slug: string, level: EducationLevel, status: EducationStatus, relevance?: number | null, url?: string | null, image?: string | null, createdAt: any, updatedAt: any, organization: { __typename?: 'OrganizationEntity', id: string, name: string, slug: string }, i18n: Array<{ __typename?: 'EducationTranslationLocale', locale: string, messages: { __typename?: 'EducationMessages', title: string, description: string } }>, period?: { __typename?: 'DateRangeEntity', from?: any | null, to?: any | null } | null } };
+export type FindOneEducationByIdQuery = { __typename?: 'Query', findOneEducationById: { __typename?: 'EducationEntity', id: string, slug: string, level: EducationLevel, status: EducationStatus, relevance: number, url?: string | null, image?: string | null, createdAt: any, updatedAt: any, organization: { __typename?: 'OrganizationEntity', id: string, name: string, slug: string }, i18n: Array<{ __typename?: 'EducationTranslationLocale', locale: string, messages: { __typename?: 'EducationMessages', title: string, description: string } }>, period?: { __typename?: 'DateRangeEntity', from?: any | null, to?: any | null } | null } };
 
 export type FindOneEducationQueryVariables = Exact<{
   educationFilters?: InputMaybe<FilterEducationInput>;
 }>;
 
 
-export type FindOneEducationQuery = { __typename?: 'Query', findOneEducation: { __typename?: 'EducationEntity', id: string, slug: string, level: EducationLevel, status: EducationStatus, relevance?: number | null, url?: string | null, image?: string | null, createdAt: any, updatedAt: any, organization: { __typename?: 'OrganizationEntity', id: string, name: string, slug: string }, i18n: Array<{ __typename?: 'EducationTranslationLocale', locale: string, messages: { __typename?: 'EducationMessages', title: string, description: string } }>, period?: { __typename?: 'DateRangeEntity', from?: any | null, to?: any | null } | null } };
+export type FindOneEducationQuery = { __typename?: 'Query', findOneEducation: { __typename?: 'EducationEntity', id: string, slug: string, level: EducationLevel, status: EducationStatus, relevance: number, url?: string | null, image?: string | null, createdAt: any, updatedAt: any, organization: { __typename?: 'OrganizationEntity', id: string, name: string, slug: string }, i18n: Array<{ __typename?: 'EducationTranslationLocale', locale: string, messages: { __typename?: 'EducationMessages', title: string, description: string } }>, period?: { __typename?: 'DateRangeEntity', from?: any | null, to?: any | null } | null } };
 
 export type FindManyEducationByIdQueryVariables = Exact<{
   educationIds: Array<Scalars['ID']['input']> | Scalars['ID']['input'];
 }>;
 
 
-export type FindManyEducationByIdQuery = { __typename?: 'Query', findManyEducationById: Array<{ __typename?: 'EducationEntity', id: string, slug: string, level: EducationLevel, status: EducationStatus, relevance?: number | null, url?: string | null, image?: string | null, createdAt: any, updatedAt: any, organization: { __typename?: 'OrganizationEntity', id: string, name: string, slug: string }, i18n: Array<{ __typename?: 'EducationTranslationLocale', locale: string, messages: { __typename?: 'EducationMessages', title: string, description: string } }>, period?: { __typename?: 'DateRangeEntity', from?: any | null, to?: any | null } | null }> };
+export type FindManyEducationByIdQuery = { __typename?: 'Query', findManyEducationById: Array<{ __typename?: 'EducationEntity', id: string, slug: string, level: EducationLevel, status: EducationStatus, relevance: number, url?: string | null, image?: string | null, createdAt: any, updatedAt: any, organization: { __typename?: 'OrganizationEntity', id: string, name: string, slug: string }, i18n: Array<{ __typename?: 'EducationTranslationLocale', locale: string, messages: { __typename?: 'EducationMessages', title: string, description: string } }>, period?: { __typename?: 'DateRangeEntity', from?: any | null, to?: any | null } | null }> };
 
 export type FindManyOrganizationsQueryVariables = Exact<{
   organizationFilters?: InputMaybe<FilterOrganizationInput>;
@@ -1263,7 +1300,28 @@ export type FindManyOrganizationsQueryVariables = Exact<{
 }>;
 
 
-export type FindManyOrganizationsQuery = { __typename?: 'Query', findManyOrganizations: { __typename?: 'PaginatedOrganizationEntity', found: number, nodes: Array<{ __typename?: 'OrganizationEntity', id: string, name: string, slug: string }> } };
+export type FindManyOrganizationsQuery = { __typename?: 'Query', findManyOrganizations: { __typename?: 'PaginatedOrganizationEntity', found: number, nodes: Array<{ __typename?: 'OrganizationEntity', id: string, name: string, slug: string, category: OrganizationCategory, logo: string, website: string, relevance: number, createdAt: any, updatedAt: any }> } };
+
+export type FindOneOrganizationByIdQueryVariables = Exact<{
+  organizationId: Scalars['ID']['input'];
+}>;
+
+
+export type FindOneOrganizationByIdQuery = { __typename?: 'Query', findOneOrganizationById: { __typename?: 'OrganizationEntity', id: string, name: string, slug: string, category: OrganizationCategory, logo: string, website: string, relevance: number, createdAt: any, updatedAt: any } };
+
+export type FindOneOrganizationQueryVariables = Exact<{
+  organizationFilters?: InputMaybe<FilterOrganizationInput>;
+}>;
+
+
+export type FindOneOrganizationQuery = { __typename?: 'Query', findOneOrganization: { __typename?: 'OrganizationEntity', id: string, name: string, slug: string, category: OrganizationCategory, logo: string, website: string, relevance: number, createdAt: any, updatedAt: any } };
+
+export type FindManyOrganizationByIdQueryVariables = Exact<{
+  organizationIds: Array<Scalars['ID']['input']> | Scalars['ID']['input'];
+}>;
+
+
+export type FindManyOrganizationByIdQuery = { __typename?: 'Query', findManyOrganizationById: Array<{ __typename?: 'OrganizationEntity', id: string, name: string, slug: string, category: OrganizationCategory, logo: string, website: string, relevance: number, createdAt: any, updatedAt: any }> };
 
 export type FindManySkillsQueryVariables = Exact<{
   skillFilters?: InputMaybe<FilterSkillInput>;
@@ -1401,6 +1459,50 @@ export const RemoveManyEducationsDocument = new TypedDocumentString(`
   }
 }
     `) as unknown as TypedDocumentString<RemoveManyEducationsMutation, RemoveManyEducationsMutationVariables>;
+export const CreateOneOrganizationDocument = new TypedDocumentString(`
+    mutation CreateOneOrganization($createOrganizationInput: CreateOrganizationInput!) {
+  createOneOrganization(createOrganizationInput: $createOrganizationInput) {
+    id
+    slug
+  }
+}
+    `) as unknown as TypedDocumentString<CreateOneOrganizationMutation, CreateOneOrganizationMutationVariables>;
+export const UpdateOneOrganizationDocument = new TypedDocumentString(`
+    mutation UpdateOneOrganization($organizationId: ID!, $updateOrganizationInput: UpdateOrganizationInput!) {
+  updateOneOrganization(
+    organizationId: $organizationId
+    updateOrganizationInput: $updateOrganizationInput
+  ) {
+    id
+    slug
+  }
+}
+    `) as unknown as TypedDocumentString<UpdateOneOrganizationMutation, UpdateOneOrganizationMutationVariables>;
+export const UpdateManyOrganizationsDocument = new TypedDocumentString(`
+    mutation UpdateManyOrganizations($organizationIds: [ID!]!, $updateOrganizationInput: UpdateOrganizationInput!) {
+  updateManyOrganizations(
+    organizationIds: $organizationIds
+    updateOrganizationInput: $updateOrganizationInput
+  ) {
+    count
+  }
+}
+    `) as unknown as TypedDocumentString<UpdateManyOrganizationsMutation, UpdateManyOrganizationsMutationVariables>;
+export const RemoveOneOrganizationDocument = new TypedDocumentString(`
+    mutation RemoveOneOrganization($organizationId: ID!) {
+  removeOneOrganization(organizationId: $organizationId) {
+    id
+    slug
+  }
+}
+    `) as unknown as TypedDocumentString<RemoveOneOrganizationMutation, RemoveOneOrganizationMutationVariables>;
+export const RemoveManyOrganizationsDocument = new TypedDocumentString(`
+    mutation RemoveManyOrganizations($organizationIds: [ID!]!) {
+  removeManyOrganizations(organizationIds: $organizationIds) {
+    count
+  }
+}
+    `) as unknown as TypedDocumentString<RemoveManyOrganizationsMutation, RemoveManyOrganizationsMutationVariables>;
 export const CreateOneSkillDocument = new TypedDocumentString(`
     mutation CreateOneSkill($createSkillInput: CreateSkillInput!) {
   createOneSkill(createSkillInput: $createSkillInput) {
@@ -1730,10 +1832,61 @@ export const FindManyOrganizationsDocument = new TypedDocumentString(`
       id
       name
       slug
+      category
+      logo
+      website
+      relevance
+      createdAt
+      updatedAt
     }
   }
 }
     `) as unknown as TypedDocumentString<FindManyOrganizationsQuery, FindManyOrganizationsQueryVariables>;
+export const FindOneOrganizationByIdDocument = new TypedDocumentString(`
+    query FindOneOrganizationById($organizationId: ID!) {
+  findOneOrganizationById(organizationId: $organizationId) {
+    id
+    name
+    slug
+    category
+    logo
+    website
+    relevance
+    createdAt
+    updatedAt
+  }
+}
+    `) as unknown as TypedDocumentString<FindOneOrganizationByIdQuery, FindOneOrganizationByIdQueryVariables>;
+export const FindOneOrganizationDocument = new TypedDocumentString(`
+    query FindOneOrganization($organizationFilters: FilterOrganizationInput) {
+  findOneOrganization(organizationFilters: $organizationFilters) {
+    id
+    name
+    slug
+    category
+    logo
+    website
+    relevance
+    createdAt
+    updatedAt
+  }
+}
+    `) as unknown as TypedDocumentString<FindOneOrganizationQuery, FindOneOrganizationQueryVariables>;
+export const FindManyOrganizationByIdDocument = new TypedDocumentString(`
+    query FindManyOrganizationById($organizationIds: [ID!]!) {
+  findManyOrganizationById(organizationIds: $organizationIds) {
+    id
+    name
+    slug
+    category
+    logo
+    website
+    relevance
+    createdAt
+    updatedAt
+  }
+}
+    `) as unknown as TypedDocumentString<FindManyOrganizationByIdQuery, FindManyOrganizationByIdQueryVariables>;
 export const FindManySkillsDocument = new TypedDocumentString(`
     query FindManySkills($skillFilters: FilterSkillInput, $skillPagination: PaginationInput, $skillSort: SortSkillInput) {
   findManySkills(
