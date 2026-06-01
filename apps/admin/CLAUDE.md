@@ -49,13 +49,17 @@ Routing and auth gate:
 - `_authenticated.tsx` is the protected layout. It enables `useGetMe()` only when a
   token exists, stores the returned user, and renders the login page when there is
   no authenticated user; otherwise it renders the sidebar shell and the child route.
-- Under `_authenticated/_sidebar/` are the actual pages: `index.tsx` (home),
-  `skills/`, `courses/`, and `educations/` (each a CRUD page with its
-  `-components/table.tsx`). `courses` and `educations` follow the same pattern as
-  `skills` but their entities carry a required `organization` relation and a
-  required `i18n` translation array, so their route files map the flat form schema
-  to the create/update input (and the entity row back to form defaults), and their
-  forms load the organization options via `useFindManyOrganizations`.
+- Under `_authenticated/_sidebar/` are the CRUD pages (each with its
+  `-components/table.tsx`): `index.tsx` (home), `skills/`, `courses/`,
+  `educations/`, `organizations/`, `projects/`, and `experiences/`. They all follow
+  the same shape (route = orchestration; query hook exports the `*Row` type; form +
+  its `*ToInput`/`*ToForm` mappers are co-located). `skills` and `organizations` are
+  the simple case (schema == entity scalars, no mapper needed beyond the row).
+  Richer entities map a flat form schema to/from the nested GraphQL shapes:
+  `organization` relation (select via `useFindManyOrganizations`), `skills` relation
+  (multi-select via `useFindManySkills`), `i18n` translation arrays, `period`
+  (date range), and — for `experiences` — `roles`, an array where each role nests
+  its own `i18n` array, `period`, and `skills`.
 
 ## Core technologies and where they live
 
@@ -82,42 +86,49 @@ Routing and auth gate:
   Companion files: `gql.ts` (`GqlResponse` / `GqlError` types), `tc.ts` (try-catch
   wrapper), `cn.ts` (clsx + tailwind-merge), `parsers.ts` (nuqs parsers),
   `field-error.ts` (extracts a form field error string), `facets.ts`, `unwrap.ts`.
-- `src/hooks/queries/`: `auth.ts` (`useGetMe`), `base.ts` (`useApiStatus`),
-  `skills.ts`, `courses.ts`, `educations.ts` (each `useFindMany*` infinite, plus
-  by-id/single/by-ids), and `organizations.ts` (`useFindManyOrganizations` infinite,
-  used to populate the organization select in the course/education forms). Each
-  defines its operation with the `graphql` tag and calls `execute`. The `graphql`
-  tag needs a static string literal — do not interpolate shared field fragments
-  into it, or codegen can't statically analyze the operation.
-- `src/hooks/mutations/`: `auth.ts` (`useSignIn`), plus `skills.ts`, `courses.ts`,
-  `educations.ts`, each exposing `useCreateOne*`, `useUpdateOne*`, `useUpdateMany*`,
-  `useRemoveOne*`, `useRemoveMany*`.
+- `src/hooks/queries/`: `auth.ts` (`useGetMe`), `base.ts` (`useApiStatus`), and one
+  per entity — `skills.ts`, `courses.ts`, `educations.ts`, `organizations.ts`,
+  `projects.ts`, `experiences.ts` (each `useFindMany*` infinite + by-id/single/by-ids,
+  and each exports its `*Row` type derived from the findMany query node). The
+  `organizations`/`skills` hooks also feed the relation selects/multi-selects in the
+  other forms. Each defines its operation with the `graphql` tag and calls `execute`.
+  The `graphql` tag needs a static string literal — do not interpolate shared field
+  fragments into it, or codegen can't statically analyze the operation.
+- `src/hooks/mutations/`: `auth.ts` (`useSignIn`), plus one per entity (`skills.ts`,
+  `courses.ts`, `educations.ts`, `organizations.ts`, `projects.ts`,
+  `experiences.ts`), each exposing `useCreateOne*`, `useUpdateOne*`,
+  `useUpdateMany*`, `useRemoveOne*`, `useRemoveMany*`.
 - `src/hooks/custom/`: generic, domain-agnostic helpers (`use-debounce`,
   `use-query-all-pages`, `use-stable-value`, `use-active-badges`).
 - `src/graphql/`: codegen output. `graphql.ts` (generated types and the
   `TypedDocumentString` type), `gql.ts` (the typed `graphql()` tag overloads),
   `fragment-masking.ts`, `index.ts`. Treat as generated; regenerate, do not edit.
-- `src/forms/`: `skill.tsx`, `skill-multi.tsx` (batch update), `user.tsx` (login),
-  and the `course.tsx`/`course-multi.tsx` and `education.tsx`/`education-multi.tsx`
-  pairs. `common.d.ts` defines `CommonFormProps` and the form `state` union
-  (`CREATING | UPDATING | DELETING | MULTI_*`). The course/education forms expose
-  `i18n` as a flat array of `{ locale, title, description }` (multi-locale) edited
-  via a TanStack Form array field (`<Field mode="array">` + `pushValue`/`removeValue`,
-  rendered through the generic `FieldArray` component). Each form file also owns the
-  adapters between its schema and the GraphQL shapes — `courseToInput`/`courseToForm`
-  (and the education pair) — co-located with the schema so a shape change is a
-  single-file edit; they map the flat `i18n` to/from the nested GraphQL
-  `i18n: [{ locale, messages: { title, description } }]`, and the route just calls
-  them (pure orchestration). The form consumes the row type (`CourseRow`/`EducationRow`)
-  exported from its query hook, not the table. Note: zod-validated optional text
-  fields must stay non-optional in the schema (default `""`) so the schema's input
-  type matches TanStack Form's inferred value type — convert empty to `undefined`
-  when building the input, not in the schema.
+- `src/forms/`: `user.tsx` (login) plus a `<entity>.tsx` + `<entity>-multi.tsx`
+  pair per entity (skill, course, education, organization, project, experience).
+  `common.d.ts` defines `CommonFormProps` and the form `state` union
+  (`CREATING | UPDATING | DELETING | MULTI_*`). Each form file co-locates the
+  adapters between its flat zod schema and the GraphQL shapes —
+  `<entity>ToInput`/`<entity>ToForm` — so a shape change is a single-file edit; the
+  route just calls them (pure orchestration) and the form consumes the `*Row` type
+  from its query hook (not the table). Conventions across the rich forms: `i18n` is a
+  flat array `{ locale, title, description }` edited via a TanStack array field
+  (`<Field mode="array">` + `FieldArray`) and mapped to/from nested
+  `i18n: [{ locale, messages: {...} }]`; relation selects use `useFindManyOrganizations`
+  / `useFindManySkills`; `period` is a `{ from, to }` date range mapped to/from ISO at
+  the boundary. `experience.tsx` is the deepest: `roles` is a `FieldArray` whose items
+  each contain a nested `i18n` `FieldArray`, a `period`, and a `skills` multi-select
+  (`roles[i].i18n[j].title` style names). Note: zod-validated optional text fields must
+  stay non-optional in the schema (default `""`) so the schema's input type matches
+  TanStack Form's inferred value type — convert empty to `undefined` when building the
+  input, not in the schema.
 - `src/components/display/` and `src/components/inputs/`: generic, reusable UI
   (modal, alert, data-state, page-title, json; text/password/number/checkbox/
-  range/select inputs, and `field-array` — a domain-agnostic repeater that wraps a
-  TanStack Form array field with add/remove chrome and a per-item render-prop).
-  These are domain-agnostic and driven by props.
+  range/select inputs). Composite inputs, all domain-agnostic and prop-driven:
+  `field-array` (repeater wrapping a TanStack array field — add/remove chrome + a
+  per-item render-prop), `date-range` (two native date inputs emitting `{ from, to }`),
+  and `multi-select` (searchable dropdown + removable chips over `options`/`value: string[]`;
+  uses a self-managed open state + outside-click, not the DaisyUI focus-css dropdown,
+  so clicking an option's label doesn't close it).
 - `src/stores/`: `auth.ts` persists `{ token, user }` to localStorage key `auth`
   with `setToken`, `setUser`, `clearAuth`. `theme.ts` persists `{ theme }` to key
   `theme` (default `"system"`).

@@ -1,5 +1,6 @@
 import { PlusIcon, TrashSimpleIcon, WarningIcon } from "@phosphor-icons/react";
 import type { ReactNode } from "react";
+import { cn } from "@/lib/cn";
 import { Alert } from "../display/alert";
 
 export interface FieldArrayProps {
@@ -8,6 +9,7 @@ export interface FieldArrayProps {
   label?: string;
   onAdd: () => void;
   onRemove: (index: number) => void;
+  sublevel?: boolean;
   values: unknown[];
 }
 
@@ -17,6 +19,7 @@ export function FieldArray({
   label,
   onAdd,
   onRemove,
+  sublevel,
   values,
 }: FieldArrayProps) {
   return (
@@ -30,7 +33,10 @@ export function FieldArray({
       )}
       {values.map((_, index) => (
         <div
-          className="flex flex-col gap-2 rounded-md bg-base-200 p-4"
+          className={cn(
+            "flex flex-col gap-2 rounded-md bg-base-200",
+            !sublevel && "p-4"
+          )}
           key={index}
         >
           <div className="flex items-center justify-between">

@@ -25,10 +25,10 @@ export function DateRangeInput({
   return (
     <fieldset className="fieldset">
       {label && <legend className="fieldset-legend">{label}</legend>}
-      <div className="flex items-center gap-2">
+      <div className="flex flex-wrap items-center gap-2">
         <input
           aria-label="From"
-          className={cn("input w-full", error && "input-error", className)}
+          className={cn("input flex-1", error && "input-error", className)}
           disabled={disabled}
           onChange={(event) =>
             onChange?.({ from: event.target.value, to: value?.to ?? "" })
@@ -38,7 +38,7 @@ export function DateRangeInput({
         />
         <input
           aria-label="To"
-          className={cn("input w-full", error && "input-error", className)}
+          className={cn("input flex-1", error && "input-error", className)}
           disabled={disabled}
           onChange={(event) =>
             onChange?.({ from: value?.from ?? "", to: event.target.value })

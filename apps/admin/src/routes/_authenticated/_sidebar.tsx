@@ -1,4 +1,5 @@
 import {
+  BriefcaseIcon,
   BuildingsIcon,
   CertificateIcon,
   GraduationCapIcon,
@@ -52,6 +53,12 @@ const MENU_SECTIONS: MenuSection[] = [
         icon: <RocketLaunchIcon size={24} />,
         label: "Projects",
         to: "/projects",
+        type: "link",
+      },
+      {
+        icon: <BriefcaseIcon size={24} />,
+        label: "Experiences",
+        to: "/experiences",
         type: "link",
       },
     ],

@@ -1,0 +1,366 @@
+import { useForm } from "@tanstack/react-form";
+import z from "zod";
+import { DateRangeInput } from "@/components/inputs/date-range";
+import { FieldArray } from "@/components/inputs/field-array";
+import { MultiSelectInput } from "@/components/inputs/multi-select";
+import { RangeInput } from "@/components/inputs/range";
+import { SelectInput } from "@/components/inputs/select";
+import { TextInput } from "@/components/inputs/text";
+import {
+  type CreateExperienceInput,
+  ExperienceCategory,
+} from "@/graphql/graphql";
+import { useQueryAllPages } from "@/hooks/custom/use-query-all-pages";
+import type { ExperienceRow } from "@/hooks/queries/experiences";
+import { useFindManyOrganizations } from "@/hooks/queries/organizations";
+import { useFindManySkills } from "@/hooks/queries/skills";
+import { fieldError } from "@/lib/field-error";
+import { CommonFormProps } from "./common";
+
+const experienceSchema = z.object({
+  slug: z.string().min(1, "required field"),
+  organization: z.string().min(1, "required field"),
+  category: z.enum(ExperienceCategory, "required field"),
+  relevance: z.number().min(1, "must be a positive number"),
+  roles: z
+    .array(
+      z.object({
+        i18n: z
+          .array(
+            z.object({
+              locale: z.string().min(1, "required field"),
+              title: z.string().min(1, "required field"),
+              description: z.string().min(1, "required field"),
+            })
+          )
+          .min(1, "required group"),
+        period: z
+          .object({ from: z.string(), to: z.string() })
+          .refine(
+            (range) => !(range.from && range.to) || range.from <= range.to,
+            { message: "end date must be after start date" }
+          ),
+        skills: z.array(z.string()),
+      })
+    )
+    .min(1, "required group"),
+});
+
+export type ExperienceSchema = z.infer<typeof experienceSchema>;
+
+export interface ExperienceFormProps
+  extends CommonFormProps<ExperienceSchema> {}
+
+export function experienceToInput(
+  data: ExperienceSchema
+): CreateExperienceInput {
+  return {
+    slug: data.slug,
+    organization: data.organization,
+    category: data.category,
+    relevance: data.relevance,
+    roles: data.roles.map((role) => ({
+      i18n: role.i18n.map((translation) => ({
+        locale: translation.locale,
+        messages: {
+          title: translation.title,
+          description: translation.description,
+        },
+      })),
+      period:
+        role.period.from || role.period.to
+          ? {
+              from: role.period.from
+                ? new Date(role.period.from).toISOString()
+                : undefined,
+              to: role.period.to
+                ? new Date(role.period.to).toISOString()
+                : undefined,
+            }
+          : undefined,
+      skills: role.skills.length ? role.skills : undefined,
+    })),
+  };
+}
+
+export function experienceToForm(
+  experience: ExperienceRow
+): Partial<ExperienceSchema> {
+  return {
+    slug: experience.slug,
+    organization: experience.organization?.id ?? "",
+    category: experience.category,
+    relevance: experience.relevance,
+    roles: (experience.roles ?? []).map((role) => ({
+      i18n: role.i18n.map((translation) => ({
+        locale: translation.locale,
+        title: translation.messages.title,
+        description: translation.messages.description,
+      })),
+      period: {
+        from: role.period?.from ? String(role.period.from).slice(0, 10) : "",
+        to: role.period?.to ? String(role.period.to).slice(0, 10) : "",
+      },
+      skills: (role.skills ?? []).map((skill) => skill.id),
+    })),
+  };
+}
+
+const CATEGORY_OPTIONS = Object.values(ExperienceCategory).map((category) => ({
+  label: category,
+  value: category,
+}));
+
+function emptyRole() {
+  return {
+    i18n: [{ locale: "", title: "", description: "" }],
+    period: { from: "", to: "" },
+    skills: [] as string[],
+  };
+}
+
+export function ExperienceForm({
+  onSubmit,
+  onCancel,
+  defaultValues,
+  isDisabled,
+  isLoading,
+  state,
+}: ExperienceFormProps) {
+  const findManyOrganizations = useFindManyOrganizations();
+  useQueryAllPages(findManyOrganizations);
+
+  const findManySkills = useFindManySkills();
+  useQueryAllPages(findManySkills);
+
+  const organizationOptions = (findManyOrganizations.data?.nodes ?? []).map(
+    (organization) => ({ label: organization.name, value: organization.id })
+  );
+
+  const skillOptions = (findManySkills.data?.nodes ?? []).map((skill) => ({
+    label: skill.name,
+    value: skill.id,
+  }));
+
+  const form = useForm({
+    defaultValues: {
+      slug: "",
+      organization: "",
+      category: ExperienceCategory.FullTime,
+      relevance: 1,
+      roles: [emptyRole()],
+      ...defaultValues,
+    },
+    onSubmit: ({ value }) => onSubmit?.(value),
+    validators: { onChange: experienceSchema },
+  });
+
+  const { Field, Subscribe } = form;
+
+  return (
+    <form
+      className="form"
+      onSubmit={(e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        form.handleSubmit();
+      }}
+    >
+      <Field name="slug">
+        {(field) => (
+          <TextInput
+            error={fieldError(field.state.meta)}
+            label="Slug"
+            name={field.name}
+            onChange={field.handleChange}
+            placeholder="Slug"
+            value={field.state.value}
+          />
+        )}
+      </Field>
+      <Field name="organization">
+        {(field) => (
+          <SelectInput
+            disabled={!organizationOptions.length}
+            error={fieldError(field.state.meta)}
+            label="Organization"
+            name={field.name}
+            onChange={field.handleChange}
+            options={organizationOptions}
+            placeholder="Organization"
+            value={field.state.value}
+          />
+        )}
+      </Field>
+      <Field name="category">
+        {(field) => (
+          <SelectInput
+            error={fieldError(field.state.meta)}
+            label="Category"
+            name={field.name}
+            onChange={(value) =>
+              field.handleChange(value as ExperienceCategory)
+            }
+            options={CATEGORY_OPTIONS}
+            placeholder="Category"
+            value={field.state.value}
+          />
+        )}
+      </Field>
+      <Field name="relevance">
+        {(field) => (
+          <RangeInput
+            className="range-xs"
+            error={fieldError(field.state.meta)}
+            label="Relevance"
+            max={5}
+            min={1}
+            name={field.name}
+            onChange={field.handleChange}
+            placeholder="Relevance"
+            ruler
+            step={1}
+            value={field.state.value}
+          />
+        )}
+      </Field>
+
+      <div className="divider">Roles</div>
+
+      <Field mode="array" name="roles">
+        {(rolesField) => (
+          <FieldArray
+            error={fieldError(rolesField.state.meta)}
+            label="Role"
+            onAdd={() => rolesField.pushValue(emptyRole())}
+            onRemove={(index) => rolesField.removeValue(index)}
+            values={rolesField.state.value}
+          >
+            {(roleIndex) => (
+              <>
+                <Field mode="array" name={`roles[${roleIndex}].i18n`}>
+                  {(i18nField) => (
+                    <FieldArray
+                      error={fieldError(i18nField.state.meta)}
+                      label="Translation"
+                      onAdd={() =>
+                        i18nField.pushValue({
+                          locale: "",
+                          title: "",
+                          description: "",
+                        })
+                      }
+                      onRemove={(index) => i18nField.removeValue(index)}
+                      sublevel
+                      values={i18nField.state.value}
+                    >
+                      {(i18nIndex) => (
+                        <>
+                          <Field
+                            name={`roles[${roleIndex}].i18n[${i18nIndex}].locale`}
+                          >
+                            {(field) => (
+                              <TextInput
+                                error={fieldError(field.state.meta)}
+                                name={field.name}
+                                onChange={field.handleChange}
+                                placeholder="Locale"
+                                value={field.state.value}
+                              />
+                            )}
+                          </Field>
+                          <Field
+                            name={`roles[${roleIndex}].i18n[${i18nIndex}].title`}
+                          >
+                            {(field) => (
+                              <TextInput
+                                error={fieldError(field.state.meta)}
+                                name={field.name}
+                                onChange={field.handleChange}
+                                placeholder="Title"
+                                value={field.state.value}
+                              />
+                            )}
+                          </Field>
+                          <Field
+                            name={`roles[${roleIndex}].i18n[${i18nIndex}].description`}
+                          >
+                            {(field) => (
+                              <TextInput
+                                error={fieldError(field.state.meta)}
+                                name={field.name}
+                                onChange={field.handleChange}
+                                placeholder="Description"
+                                value={field.state.value}
+                              />
+                            )}
+                          </Field>
+                        </>
+                      )}
+                    </FieldArray>
+                  )}
+                </Field>
+
+                <Field name={`roles[${roleIndex}].period`}>
+                  {(field) => (
+                    <DateRangeInput
+                      error={fieldError(field.state.meta)}
+                      label="Period"
+                      onChange={field.handleChange}
+                      value={field.state.value}
+                    />
+                  )}
+                </Field>
+
+                <Field name={`roles[${roleIndex}].skills`}>
+                  {(field) => (
+                    <MultiSelectInput
+                      error={fieldError(field.state.meta)}
+                      label="Skills"
+                      onChange={field.handleChange}
+                      options={skillOptions}
+                      placeholder="Select skills"
+                      value={field.state.value}
+                    />
+                  )}
+                </Field>
+              </>
+            )}
+          </FieldArray>
+        )}
+      </Field>
+
+      <div className="form-footer">
+        {onCancel && (
+          <button
+            className="btn btn-ghost flex-1"
+            onClick={onCancel}
+            type="button"
+          >
+            Cancel
+          </button>
+        )}
+        <Subscribe>
+          {({ canSubmit, isSubmitting, isTouched }) => (
+            <button
+              className="btn btn-soft btn-primary flex-1"
+              disabled={
+                !canSubmit ||
+                !isTouched ||
+                isSubmitting ||
+                isDisabled ||
+                isLoading
+              }
+              type="submit"
+            >
+              {(isSubmitting || isLoading) && (
+                <span className="loading loading-spinner loading-xs" />
+              )}
+              {state === "UPDATING" ? "Update Experience" : "Create Experience"}
+            </button>
+          )}
+        </Subscribe>
+      </div>
+    </form>
+  );
+}

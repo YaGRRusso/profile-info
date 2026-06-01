@@ -1149,6 +1149,43 @@ export type RemoveManyEducationsMutationVariables = Exact<{
 
 export type RemoveManyEducationsMutation = { __typename?: 'Mutation', removeManyEducations: { __typename?: 'BatchEntity', count: number } };
 
+export type CreateOneExperienceMutationVariables = Exact<{
+  createExperienceInput: CreateExperienceInput;
+}>;
+
+
+export type CreateOneExperienceMutation = { __typename?: 'Mutation', createOneExperience: { __typename?: 'ExperienceEntity', id: string, slug: string } };
+
+export type UpdateOneExperienceMutationVariables = Exact<{
+  experienceId: Scalars['ID']['input'];
+  updateExperienceInput: UpdateExperienceInput;
+}>;
+
+
+export type UpdateOneExperienceMutation = { __typename?: 'Mutation', updateOneExperience: { __typename?: 'ExperienceEntity', id: string, slug: string } };
+
+export type UpdateManyExperiencesMutationVariables = Exact<{
+  experienceIds: Array<Scalars['ID']['input']> | Scalars['ID']['input'];
+  updateExperienceInput: UpdateExperienceInput;
+}>;
+
+
+export type UpdateManyExperiencesMutation = { __typename?: 'Mutation', updateManyExperiences: { __typename?: 'BatchEntity', count: number } };
+
+export type RemoveOneExperienceMutationVariables = Exact<{
+  experienceId: Scalars['ID']['input'];
+}>;
+
+
+export type RemoveOneExperienceMutation = { __typename?: 'Mutation', removeOneExperience: { __typename?: 'ExperienceEntity', id: string, slug: string } };
+
+export type RemoveManyExperiencesMutationVariables = Exact<{
+  experienceIds: Array<Scalars['ID']['input']> | Scalars['ID']['input'];
+}>;
+
+
+export type RemoveManyExperiencesMutation = { __typename?: 'Mutation', removeManyExperiences: { __typename?: 'BatchEntity', count: number } };
+
 export type CreateOneOrganizationMutationVariables = Exact<{
   createOrganizationInput: CreateOrganizationInput;
 }>;
@@ -1329,6 +1366,36 @@ export type FindManyEducationByIdQueryVariables = Exact<{
 
 
 export type FindManyEducationByIdQuery = { __typename?: 'Query', findManyEducationById: Array<{ __typename?: 'EducationEntity', id: string, slug: string, level: EducationLevel, status: EducationStatus, relevance: number, url?: string | null, image?: string | null, createdAt: any, updatedAt: any, organization: { __typename?: 'OrganizationEntity', id: string, name: string, slug: string }, i18n: Array<{ __typename?: 'EducationTranslationLocale', locale: string, messages: { __typename?: 'EducationMessages', title: string, description: string } }>, skills?: Array<{ __typename?: 'SkillEntity', id: string, name: string }> | null, period?: { __typename?: 'DateRangeEntity', from?: any | null, to?: any | null } | null }> };
+
+export type FindManyExperiencesQueryVariables = Exact<{
+  experienceFilters?: InputMaybe<FilterExperienceInput>;
+  experiencePagination?: InputMaybe<PaginationInput>;
+  experienceSort?: InputMaybe<SortExperienceInput>;
+}>;
+
+
+export type FindManyExperiencesQuery = { __typename?: 'Query', findManyExperiences: { __typename?: 'PaginatedExperienceEntity', found: number, nodes: Array<{ __typename?: 'ExperienceEntity', id: string, slug: string, category: ExperienceCategory, relevance: number, createdAt: any, updatedAt: any, organization: { __typename?: 'OrganizationEntity', id: string, name: string, slug: string }, roles: Array<{ __typename?: 'ExperienceRole', i18n: Array<{ __typename?: 'ExperienceTranslationLocale', locale: string, messages: { __typename?: 'ExperienceMessages', title: string, description: string } }>, period?: { __typename?: 'DateRangeEntity', from?: any | null, to?: any | null } | null, skills?: Array<{ __typename?: 'SkillEntity', id: string, name: string }> | null }> }> } };
+
+export type FindOneExperienceByIdQueryVariables = Exact<{
+  experienceId: Scalars['ID']['input'];
+}>;
+
+
+export type FindOneExperienceByIdQuery = { __typename?: 'Query', findOneExperienceById: { __typename?: 'ExperienceEntity', id: string, slug: string, category: ExperienceCategory, relevance: number, createdAt: any, updatedAt: any, organization: { __typename?: 'OrganizationEntity', id: string, name: string, slug: string }, roles: Array<{ __typename?: 'ExperienceRole', i18n: Array<{ __typename?: 'ExperienceTranslationLocale', locale: string, messages: { __typename?: 'ExperienceMessages', title: string, description: string } }>, period?: { __typename?: 'DateRangeEntity', from?: any | null, to?: any | null } | null, skills?: Array<{ __typename?: 'SkillEntity', id: string, name: string }> | null }> } };
+
+export type FindOneExperienceQueryVariables = Exact<{
+  experienceFilters?: InputMaybe<FilterExperienceInput>;
+}>;
+
+
+export type FindOneExperienceQuery = { __typename?: 'Query', findOneExperience: { __typename?: 'ExperienceEntity', id: string, slug: string, category: ExperienceCategory, relevance: number, createdAt: any, updatedAt: any, organization: { __typename?: 'OrganizationEntity', id: string, name: string, slug: string }, roles: Array<{ __typename?: 'ExperienceRole', i18n: Array<{ __typename?: 'ExperienceTranslationLocale', locale: string, messages: { __typename?: 'ExperienceMessages', title: string, description: string } }>, period?: { __typename?: 'DateRangeEntity', from?: any | null, to?: any | null } | null, skills?: Array<{ __typename?: 'SkillEntity', id: string, name: string }> | null }> } };
+
+export type FindManyExperienceByIdQueryVariables = Exact<{
+  experienceIds: Array<Scalars['ID']['input']> | Scalars['ID']['input'];
+}>;
+
+
+export type FindManyExperienceByIdQuery = { __typename?: 'Query', findManyExperienceById: Array<{ __typename?: 'ExperienceEntity', id: string, slug: string, category: ExperienceCategory, relevance: number, createdAt: any, updatedAt: any, organization: { __typename?: 'OrganizationEntity', id: string, name: string, slug: string }, roles: Array<{ __typename?: 'ExperienceRole', i18n: Array<{ __typename?: 'ExperienceTranslationLocale', locale: string, messages: { __typename?: 'ExperienceMessages', title: string, description: string } }>, period?: { __typename?: 'DateRangeEntity', from?: any | null, to?: any | null } | null, skills?: Array<{ __typename?: 'SkillEntity', id: string, name: string }> | null }> }> };
 
 export type FindManyOrganizationsQueryVariables = Exact<{
   organizationFilters?: InputMaybe<FilterOrganizationInput>;
@@ -1526,6 +1593,50 @@ export const RemoveManyEducationsDocument = new TypedDocumentString(`
   }
 }
     `) as unknown as TypedDocumentString<RemoveManyEducationsMutation, RemoveManyEducationsMutationVariables>;
+export const CreateOneExperienceDocument = new TypedDocumentString(`
+    mutation CreateOneExperience($createExperienceInput: CreateExperienceInput!) {
+  createOneExperience(createExperienceInput: $createExperienceInput) {
+    id
+    slug
+  }
+}
+    `) as unknown as TypedDocumentString<CreateOneExperienceMutation, CreateOneExperienceMutationVariables>;
+export const UpdateOneExperienceDocument = new TypedDocumentString(`
+    mutation UpdateOneExperience($experienceId: ID!, $updateExperienceInput: UpdateExperienceInput!) {
+  updateOneExperience(
+    experienceId: $experienceId
+    updateExperienceInput: $updateExperienceInput
+  ) {
+    id
+    slug
+  }
+}
+    `) as unknown as TypedDocumentString<UpdateOneExperienceMutation, UpdateOneExperienceMutationVariables>;
+export const UpdateManyExperiencesDocument = new TypedDocumentString(`
+    mutation UpdateManyExperiences($experienceIds: [ID!]!, $updateExperienceInput: UpdateExperienceInput!) {
+  updateManyExperiences(
+    experienceIds: $experienceIds
+    updateExperienceInput: $updateExperienceInput
+  ) {
+    count
+  }
+}
+    `) as unknown as TypedDocumentString<UpdateManyExperiencesMutation, UpdateManyExperiencesMutationVariables>;
+export const RemoveOneExperienceDocument = new TypedDocumentString(`
+    mutation RemoveOneExperience($experienceId: ID!) {
+  removeOneExperience(experienceId: $experienceId) {
+    id
+    slug
+  }
+}
+    `) as unknown as TypedDocumentString<RemoveOneExperienceMutation, RemoveOneExperienceMutationVariables>;
+export const RemoveManyExperiencesDocument = new TypedDocumentString(`
+    mutation RemoveManyExperiences($experienceIds: [ID!]!) {
+  removeManyExperiences(experienceIds: $experienceIds) {
+    count
+  }
+}
+    `) as unknown as TypedDocumentString<RemoveManyExperiencesMutation, RemoveManyExperiencesMutationVariables>;
 export const CreateOneOrganizationDocument = new TypedDocumentString(`
     mutation CreateOneOrganization($createOrganizationInput: CreateOrganizationInput!) {
   createOneOrganization(createOrganizationInput: $createOrganizationInput) {
@@ -1960,6 +2071,149 @@ export const FindManyEducationByIdDocument = new TypedDocumentString(`
   }
 }
     `) as unknown as TypedDocumentString<FindManyEducationByIdQuery, FindManyEducationByIdQueryVariables>;
+export const FindManyExperiencesDocument = new TypedDocumentString(`
+    query FindManyExperiences($experienceFilters: FilterExperienceInput, $experiencePagination: PaginationInput, $experienceSort: SortExperienceInput) {
+  findManyExperiences(
+    experienceFilters: $experienceFilters
+    experiencePagination: $experiencePagination
+    experienceSort: $experienceSort
+  ) {
+    found
+    nodes {
+      id
+      slug
+      category
+      relevance
+      organization {
+        id
+        name
+        slug
+      }
+      roles {
+        i18n {
+          locale
+          messages {
+            title
+            description
+          }
+        }
+        period {
+          from
+          to
+        }
+        skills {
+          id
+          name
+        }
+      }
+      createdAt
+      updatedAt
+    }
+  }
+}
+    `) as unknown as TypedDocumentString<FindManyExperiencesQuery, FindManyExperiencesQueryVariables>;
+export const FindOneExperienceByIdDocument = new TypedDocumentString(`
+    query FindOneExperienceById($experienceId: ID!) {
+  findOneExperienceById(experienceId: $experienceId) {
+    id
+    slug
+    category
+    relevance
+    organization {
+      id
+      name
+      slug
+    }
+    roles {
+      i18n {
+        locale
+        messages {
+          title
+          description
+        }
+      }
+      period {
+        from
+        to
+      }
+      skills {
+        id
+        name
+      }
+    }
+    createdAt
+    updatedAt
+  }
+}
+    `) as unknown as TypedDocumentString<FindOneExperienceByIdQuery, FindOneExperienceByIdQueryVariables>;
+export const FindOneExperienceDocument = new TypedDocumentString(`
+    query FindOneExperience($experienceFilters: FilterExperienceInput) {
+  findOneExperience(experienceFilters: $experienceFilters) {
+    id
+    slug
+    category
+    relevance
+    organization {
+      id
+      name
+      slug
+    }
+    roles {
+      i18n {
+        locale
+        messages {
+          title
+          description
+        }
+      }
+      period {
+        from
+        to
+      }
+      skills {
+        id
+        name
+      }
+    }
+    createdAt
+    updatedAt
+  }
+}
+    `) as unknown as TypedDocumentString<FindOneExperienceQuery, FindOneExperienceQueryVariables>;
+export const FindManyExperienceByIdDocument = new TypedDocumentString(`
+    query FindManyExperienceById($experienceIds: [ID!]!) {
+  findManyExperienceById(experienceIds: $experienceIds) {
+    id
+    slug
+    category
+    relevance
+    organization {
+      id
+      name
+      slug
+    }
+    roles {
+      i18n {
+        locale
+        messages {
+          title
+          description
+        }
+      }
+      period {
+        from
+        to
+      }
+      skills {
+        id
+        name
+      }
+    }
+    createdAt
+    updatedAt
+  }
+}
+    `) as unknown as TypedDocumentString<FindManyExperienceByIdQuery, FindManyExperienceByIdQueryVariables>;
 export const FindManyOrganizationsDocument = new TypedDocumentString(`
     query FindManyOrganizations($organizationFilters: FilterOrganizationInput, $organizationPagination: PaginationInput, $organizationSort: SortOrganizationInput) {
   findManyOrganizations(

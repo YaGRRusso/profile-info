@@ -245,7 +245,7 @@ export function ProjectForm({
                       error={fieldError(field.state.meta)}
                       name={field.name}
                       onChange={field.handleChange}
-                      placeholder="Locale (e.g. en, pt-BR)"
+                      placeholder="Locale"
                       value={field.state.value}
                     />
                   )}
