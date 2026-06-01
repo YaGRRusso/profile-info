@@ -5,6 +5,7 @@ import { cn } from "@/lib/cn";
 export interface PasswordInputProps
   extends Omit<ComponentProps<"input">, "onChange" | "value"> {
   error?: string;
+  label?: string;
   onChange?: (value: string) => void;
   value?: string;
 }
@@ -14,6 +15,7 @@ export function PasswordInput({
   error,
   onChange,
   placeholder,
+  label,
   value,
   ...props
 }: PasswordInputProps) {
@@ -21,7 +23,7 @@ export function PasswordInput({
 
   return (
     <fieldset className="fieldset">
-      <legend className="fieldset-legend">{placeholder}</legend>
+      {label && <legend className="fieldset-legend">{label}</legend>}
       <label className={cn("input w-full", error && "input-error", className)}>
         <input
           onChange={(event) => onChange?.(event.target.value)}

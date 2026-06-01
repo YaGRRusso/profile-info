@@ -4,6 +4,7 @@ import { cn } from "@/lib/cn";
 export interface SelectInputProps
   extends Omit<ComponentProps<"select">, "onChange" | "value"> {
   error?: string;
+  label?: string;
   onChange?: (value: string) => void;
   options: { label: string; value: string }[];
   placeholder?: string;
@@ -15,13 +16,14 @@ export function SelectInput({
   error,
   onChange,
   options,
+  label,
   placeholder,
   value,
   ...props
 }: SelectInputProps) {
   return (
     <fieldset className="fieldset">
-      <legend className="fieldset-legend">{placeholder}</legend>
+      {label && <legend className="fieldset-legend">{label}</legend>}
       <select
         className={cn("select w-full", error && "select-error", className)}
         onChange={(event) => onChange?.(event.target.value)}

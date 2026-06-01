@@ -68,6 +68,7 @@ export function SkillMultiForm({
           <SelectInput
             disabled={!changeCategory}
             error={fieldError(field.state.meta)}
+            label="Category"
             name={field.name}
             onChange={(value) => field.handleChange(value as SkillCategory)}
             options={CATEGORY_OPTIONS}
@@ -91,6 +92,7 @@ export function SkillMultiForm({
             className="range-xs"
             disabled={!changeRelevance}
             error={fieldError(field.state.meta)}
+            label="Relevance"
             max={5}
             min={1}
             name={field.name}

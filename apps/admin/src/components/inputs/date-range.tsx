@@ -9,10 +9,8 @@ export interface DateRangeInputProps {
   className?: string;
   disabled?: boolean;
   error?: string;
-  fromLabel?: string;
+  label?: string;
   onChange?: (value: DateRangeValue) => void;
-  placeholder?: string;
-  toLabel?: string;
   value?: DateRangeValue;
 }
 
@@ -20,18 +18,16 @@ export function DateRangeInput({
   className,
   disabled,
   error,
-  fromLabel = "From",
   onChange,
-  placeholder,
-  toLabel = "To",
+  label,
   value,
 }: DateRangeInputProps) {
   return (
     <fieldset className="fieldset">
-      <legend className="fieldset-legend">{placeholder}</legend>
+      {label && <legend className="fieldset-legend">{label}</legend>}
       <div className="flex items-center gap-2">
         <input
-          aria-label={fromLabel}
+          aria-label="From"
           className={cn("input w-full", error && "input-error", className)}
           disabled={disabled}
           onChange={(event) =>
@@ -41,7 +37,7 @@ export function DateRangeInput({
           value={value?.from ?? ""}
         />
         <input
-          aria-label={toLabel}
+          aria-label="To"
           className={cn("input w-full", error && "input-error", className)}
           disabled={disabled}
           onChange={(event) =>

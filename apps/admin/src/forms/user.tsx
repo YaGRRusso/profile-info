@@ -48,6 +48,7 @@ export function UserForm({
         {(field) => (
           <TextInput
             error={fieldError(field.state.meta)}
+            label="Email"
             name={field.name}
             onChange={field.handleChange}
             placeholder="Email"
@@ -60,6 +61,7 @@ export function UserForm({
         {(field) => (
           <PasswordInput
             error={fieldError(field.state.meta)}
+            label="Password"
             name={field.name}
             onChange={field.handleChange}
             placeholder="Password"

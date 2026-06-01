@@ -77,6 +77,7 @@ export function CourseMultiForm({
           <SelectInput
             disabled={!changeStatus}
             error={fieldError(field.state.meta)}
+            label="Status"
             name={field.name}
             onChange={(value) => field.handleChange(value as CourseStatus)}
             options={STATUS_OPTIONS}
@@ -100,6 +101,7 @@ export function CourseMultiForm({
             className="range-xs"
             disabled={!changeRelevance}
             error={fieldError(field.state.meta)}
+            label="Relevance"
             max={5}
             min={1}
             name={field.name}

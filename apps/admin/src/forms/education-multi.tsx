@@ -81,6 +81,7 @@ export function EducationMultiForm({
           <SelectInput
             disabled={!changeLevel}
             error={fieldError(field.state.meta)}
+            label="Level"
             name={field.name}
             onChange={(value) => field.handleChange(value as EducationLevel)}
             options={LEVEL_OPTIONS}
@@ -103,6 +104,7 @@ export function EducationMultiForm({
           <SelectInput
             disabled={!changeStatus}
             error={fieldError(field.state.meta)}
+            label="Status"
             name={field.name}
             onChange={(value) => field.handleChange(value as EducationStatus)}
             options={STATUS_OPTIONS}
@@ -126,6 +128,7 @@ export function EducationMultiForm({
             className="range-xs"
             disabled={!changeRelevance}
             error={fieldError(field.state.meta)}
+            label="Relevance"
             max={5}
             min={1}
             name={field.name}

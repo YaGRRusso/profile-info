@@ -16,7 +16,7 @@ export function Alert({
 }: AlertProps) {
   return (
     <div
-      className={cn("alert max-sm:alert-vertical", className)}
+      className={cn("alert max-sm:alert-vertical gap-y-2", className)}
       role="alert"
       {...props}
     >

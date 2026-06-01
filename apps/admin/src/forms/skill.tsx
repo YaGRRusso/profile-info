@@ -58,6 +58,7 @@ export function SkillForm({
         {(field) => (
           <TextInput
             error={fieldError(field.state.meta)}
+            label="Name"
             name={field.name}
             onChange={field.handleChange}
             placeholder="Name"
@@ -69,6 +70,7 @@ export function SkillForm({
         {(field) => (
           <TextInput
             error={fieldError(field.state.meta)}
+            label="Slug"
             name={field.name}
             onChange={field.handleChange}
             placeholder="Slug"
@@ -80,6 +82,7 @@ export function SkillForm({
         {(field) => (
           <SelectInput
             error={fieldError(field.state.meta)}
+            label="Category"
             name={field.name}
             onChange={(value) => field.handleChange(value as SkillCategory)}
             options={CATEGORY_OPTIONS}
@@ -93,6 +96,7 @@ export function SkillForm({
           <RangeInput
             className="range-xs"
             error={fieldError(field.state.meta)}
+            label="Relevance"
             max={5}
             min={1}
             name={field.name}

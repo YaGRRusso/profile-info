@@ -122,6 +122,7 @@ export function CourseForm({
         {(field) => (
           <TextInput
             error={fieldError(field.state.meta)}
+            label="Slug"
             name={field.name}
             onChange={field.handleChange}
             placeholder="Slug"
@@ -134,6 +135,7 @@ export function CourseForm({
           <SelectInput
             disabled={!organizationOptions.length}
             error={fieldError(field.state.meta)}
+            label="Organization"
             name={field.name}
             onChange={field.handleChange}
             options={organizationOptions}
@@ -146,6 +148,7 @@ export function CourseForm({
         {(field) => (
           <SelectInput
             error={fieldError(field.state.meta)}
+            label="Status"
             name={field.name}
             onChange={(value) => field.handleChange(value as CourseStatus)}
             options={STATUS_OPTIONS}
@@ -158,6 +161,7 @@ export function CourseForm({
         {(field) => (
           <TextInput
             error={fieldError(field.state.meta)}
+            label="URL"
             name={field.name}
             onChange={field.handleChange}
             placeholder="URL"
@@ -169,6 +173,7 @@ export function CourseForm({
         {(field) => (
           <TextInput
             error={fieldError(field.state.meta)}
+            label="Image"
             name={field.name}
             onChange={field.handleChange}
             placeholder="Image"
@@ -180,6 +185,7 @@ export function CourseForm({
         {(field) => (
           <NumberInput
             error={fieldError(field.state.meta)}
+            label="Hours"
             min={0}
             name={field.name}
             onChange={field.handleChange}
@@ -193,6 +199,7 @@ export function CourseForm({
           <RangeInput
             className="range-xs"
             error={fieldError(field.state.meta)}
+            label="Relevance"
             max={5}
             min={1}
             name={field.name}
@@ -211,11 +218,11 @@ export function CourseForm({
         {(arrayField) => (
           <FieldArray
             error={fieldError(arrayField.state.meta)}
+            label="Translation"
             onAdd={() =>
               arrayField.pushValue({ locale: "", title: "", description: "" })
             }
             onRemove={(index) => arrayField.removeValue(index)}
-            placeholder="Translation"
             values={arrayField.state.value}
           >
             {(index) => (
@@ -224,6 +231,7 @@ export function CourseForm({
                   {(field) => (
                     <TextInput
                       error={fieldError(field.state.meta)}
+                      label="Locale"
                       name={field.name}
                       onChange={field.handleChange}
                       placeholder="Locale"
@@ -235,6 +243,7 @@ export function CourseForm({
                   {(field) => (
                     <TextInput
                       error={fieldError(field.state.meta)}
+                      label="Title"
                       name={field.name}
                       onChange={field.handleChange}
                       placeholder="Title"
@@ -246,6 +255,7 @@ export function CourseForm({
                   {(field) => (
                     <TextInput
                       error={fieldError(field.state.meta)}
+                      label="Description"
                       name={field.name}
                       onChange={field.handleChange}
                       placeholder="Description"

@@ -4,6 +4,7 @@ import { cn } from "@/lib/cn";
 export interface NumberInputProps
   extends Omit<ComponentProps<"input">, "onChange" | "value"> {
   error?: string;
+  label?: string;
   onChange?: (value: number) => void;
   value?: number;
 }
@@ -12,13 +13,14 @@ export function NumberInput({
   className,
   error,
   onChange,
+  label,
   placeholder,
   value,
   ...props
 }: NumberInputProps) {
   return (
     <fieldset className="fieldset">
-      <legend className="fieldset-legend">{placeholder}</legend>
+      {label && <legend className="fieldset-legend">{label}</legend>}
       <input
         className={cn("input w-full", error && "input-error", className)}
         onChange={(event) => onChange?.(event.target.valueAsNumber)}

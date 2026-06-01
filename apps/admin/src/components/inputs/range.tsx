@@ -4,6 +4,7 @@ import { cn } from "@/lib/cn";
 export interface RangeInputProps
   extends Omit<ComponentProps<"input">, "onChange" | "value"> {
   error?: string;
+  label?: string;
   onChange?: (value: number) => void;
   ruler?: boolean;
   value?: number;
@@ -17,6 +18,7 @@ export function RangeInput({
   step = 1,
   onChange,
   placeholder,
+  label,
   ruler,
   value,
   ...props
@@ -37,7 +39,7 @@ export function RangeInput({
 
   return (
     <fieldset className="fieldset">
-      <legend className="fieldset-legend">{placeholder}</legend>
+      {label && <legend className="fieldset-legend">{label}</legend>}
       <input
         className={cn("range w-full", className)}
         max={max}
