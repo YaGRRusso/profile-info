@@ -88,7 +88,7 @@ export function educationToForm(
     organization: education.organization?.id ?? "",
     level: education.level,
     status: education.status,
-    relevance: education.relevance ?? 1,
+    relevance: education.relevance,
     url: education.url ?? "",
     image: education.image ?? "",
     skills: (education.skills ?? []).map((skill) => skill.id),

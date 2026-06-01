@@ -63,7 +63,7 @@ export function courseToForm(course: CourseRow): Partial<CourseSchema> {
     slug: course.slug,
     organization: course.organization?.id ?? "",
     status: course.status,
-    relevance: course.relevance ?? 1,
+    relevance: course.relevance,
     url: course.url ?? "",
     image: course.image ?? "",
     hours: course.hours ?? 0,
