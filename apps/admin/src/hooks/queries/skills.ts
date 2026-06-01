@@ -5,6 +5,7 @@ import type {
   FilterSkillInput,
   FindManySkillByIdQuery,
   FindManySkillByIdQueryVariables,
+  FindManySkillsQuery,
   FindOneSkillByIdQuery,
   FindOneSkillByIdQueryVariables,
   FindOneSkillQuery,
@@ -13,6 +14,8 @@ import type {
 import { execute } from "@/lib/execute";
 
 const PAGE_SIZE = 50;
+
+export type SkillRow = FindManySkillsQuery["findManySkills"]["nodes"][number];
 
 const findManySkills = graphql(`
   query FindManySkills(

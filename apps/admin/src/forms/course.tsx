@@ -5,8 +5,13 @@ import { NumberInput } from "@/components/inputs/number";
 import { RangeInput } from "@/components/inputs/range";
 import { SelectInput } from "@/components/inputs/select";
 import { TextInput } from "@/components/inputs/text";
-import { CourseStatus, CourseType } from "@/graphql/graphql";
+import {
+  CourseStatus,
+  CourseType,
+  type CreateCourseInput,
+} from "@/graphql/graphql";
 import { useQueryAllPages } from "@/hooks/custom/use-query-all-pages";
+import type { CourseRow } from "@/hooks/queries/courses";
 import { useFindManyOrganizations } from "@/hooks/queries/organizations";
 import { fieldError } from "@/lib/field-error";
 import { CommonFormProps } from "./common";
@@ -34,6 +39,44 @@ const courseSchema = z.object({
 export type CourseSchema = z.infer<typeof courseSchema>;
 
 export interface CourseFormProps extends CommonFormProps<CourseSchema> {}
+
+export function courseToInput(data: CourseSchema): CreateCourseInput {
+  return {
+    slug: data.slug,
+    organization: data.organization,
+    type: data.type,
+    status: data.status,
+    relevance: data.relevance,
+    url: data.url || undefined,
+    image: data.image || undefined,
+    hours: data.hours || undefined,
+    i18n: data.i18n.map((translation) => ({
+      locale: translation.locale,
+      messages: {
+        title: translation.title,
+        description: translation.description,
+      },
+    })),
+  };
+}
+
+export function courseToForm(course: CourseRow): Partial<CourseSchema> {
+  return {
+    slug: course.slug,
+    organization: course.organization?.id ?? "",
+    type: course.type,
+    status: course.status,
+    relevance: course.relevance ?? 1,
+    url: course.url ?? "",
+    image: course.image ?? "",
+    hours: course.hours ?? 0,
+    i18n: course.i18n.map((translation) => ({
+      locale: translation.locale,
+      title: translation.messages.title,
+      description: translation.messages.description,
+    })),
+  };
+}
 
 const TYPE_OPTIONS = Object.values(CourseType).map((type) => ({
   label: type,

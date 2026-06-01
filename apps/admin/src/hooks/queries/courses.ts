@@ -5,6 +5,7 @@ import type {
   FilterCourseInput,
   FindManyCourseByIdQuery,
   FindManyCourseByIdQueryVariables,
+  FindManyCoursesQuery,
   FindOneCourseByIdQuery,
   FindOneCourseByIdQueryVariables,
   FindOneCourseQuery,
@@ -13,6 +14,9 @@ import type {
 import { execute } from "@/lib/execute";
 
 const PAGE_SIZE = 50;
+
+export type CourseRow =
+  FindManyCoursesQuery["findManyCourses"]["nodes"][number];
 
 const findManyCourses = graphql(`
   query FindManyCourses(

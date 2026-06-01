@@ -12,9 +12,13 @@ import { Json } from "@/components/display/json";
 import { Modal } from "@/components/display/modal";
 import { PageTitle } from "@/components/display/page-title";
 import type { CommonFormValuesProps } from "@/forms/common";
-import { EducationForm, type EducationSchema } from "@/forms/education";
+import {
+  EducationForm,
+  type EducationSchema,
+  educationToForm,
+  educationToInput,
+} from "@/forms/education";
 import { EducationMultiForm } from "@/forms/education-multi";
-import type { CreateEducationInput } from "@/graphql/graphql";
 import { useQueryAllPages } from "@/hooks/custom/use-query-all-pages";
 import {
   useCreateOneEducation,
@@ -23,51 +27,16 @@ import {
   useUpdateManyEducations,
   useUpdateOneEducation,
 } from "@/hooks/mutations/educations";
-import { useFindManyEducations } from "@/hooks/queries/educations";
+import {
+  type EducationRow,
+  useFindManyEducations,
+} from "@/hooks/queries/educations";
 import { cn } from "@/lib/cn";
-import { type EducationRow, EducationsTable } from "./-components/table";
+import { EducationsTable } from "./-components/table";
 
 export const Route = createFileRoute("/_authenticated/_sidebar/educations/")({
   component: RouteComponent,
 });
-
-function toEducationInput(data: EducationSchema): CreateEducationInput {
-  return {
-    slug: data.slug,
-    organization: data.organization,
-    level: data.level,
-    status: data.status,
-    relevance: data.relevance,
-    url: data.url || undefined,
-    image: data.image || undefined,
-    i18n: data.i18n.map((translation) => ({
-      locale: translation.locale,
-      messages: {
-        title: translation.title,
-        description: translation.description,
-      },
-    })),
-  };
-}
-
-function toEducationDefaults(
-  education: EducationRow
-): Partial<EducationSchema> {
-  return {
-    slug: education.slug,
-    organization: education.organization?.id ?? "",
-    level: education.level,
-    status: education.status,
-    relevance: education.relevance ?? 1,
-    url: education.url ?? "",
-    image: education.image ?? "",
-    i18n: education.i18n.map((translation) => ({
-      locale: translation.locale,
-      title: translation.messages.title,
-      description: translation.messages.description,
-    })),
-  };
-}
 
 function RouteComponent() {
   const [formValues, setFormValues] =
@@ -99,7 +68,7 @@ function RouteComponent() {
     (data: EducationSchema) => {
       switch (formValues?.state) {
         case "CREATING":
-          createOneEducation.mutate(toEducationInput(data), {
+          createOneEducation.mutate(educationToInput(data), {
             onSuccess: () => {
               closeAndRefetch();
               toast.success("Education created successfully");
@@ -110,7 +79,7 @@ function RouteComponent() {
           updateOneEducation.mutate(
             {
               educationId: selectedEducationIds[0],
-              updateEducationInput: toEducationInput(data),
+              updateEducationInput: educationToInput(data),
             },
             {
               onSuccess: () => {
@@ -316,7 +285,7 @@ function RouteComponent() {
             }
             onEdit={(education) =>
               setFormValues({
-                defaultValues: toEducationDefaults(education),
+                defaultValues: educationToForm(education),
                 state: "UPDATING",
                 customValues: [education],
               })

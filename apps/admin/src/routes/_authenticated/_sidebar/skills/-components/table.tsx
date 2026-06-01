@@ -30,9 +30,10 @@ import {
 import { useQueryState } from "nuqs";
 import { useMemo, useState } from "react";
 import { z } from "zod";
-import { SkillCategory, type SkillEntity } from "@/graphql/graphql";
+import { SkillCategory } from "@/graphql/graphql";
 import { useActiveBadges } from "@/hooks/custom/use-active-badges";
 import { useStableValue } from "@/hooks/custom/use-stable-value";
+import type { SkillRow } from "@/hooks/queries/skills";
 import { cn } from "@/lib/cn";
 import { getMinMaxFacets, getUniqueFacets } from "@/lib/facets";
 import { parseAsShape } from "@/lib/parsers";
@@ -78,9 +79,9 @@ const DATE_OPTIONS = [
   { value: "month", label: "This month" },
 ];
 
-const columnHelper = createColumnHelper<SkillEntity>();
+const columnHelper = createColumnHelper<SkillRow>();
 
-const numberRangeFilter: FilterFn<SkillEntity> = (row, columnId, value) => {
+const numberRangeFilter: FilterFn<SkillRow> = (row, columnId, value) => {
   const rowValue = row.getValue<number | null>(columnId);
   if (rowValue === null || rowValue === undefined) return false;
   const [min, max] = value as [number | undefined, number | undefined];
@@ -89,7 +90,7 @@ const numberRangeFilter: FilterFn<SkillEntity> = (row, columnId, value) => {
   return true;
 };
 
-const dateRangeFilter: FilterFn<SkillEntity> = (row, column, value) => {
+const dateRangeFilter: FilterFn<SkillRow> = (row, column, value) => {
   const date = new Date(row.getValue(column));
   const now = new Date();
   switch (value) {
@@ -112,9 +113,9 @@ function SortIcon({ sorted }: { sorted: false | "asc" | "desc" }) {
 }
 
 const getColumns = (
-  onEdit: (skill: SkillEntity) => void,
-  onDelete: (skill: SkillEntity) => void,
-  onView: (skill: SkillEntity) => void
+  onEdit: (skill: SkillRow) => void,
+  onDelete: (skill: SkillRow) => void,
+  onView: (skill: SkillRow) => void
 ) => [
   columnHelper.display({
     id: "select",
@@ -210,13 +211,13 @@ const getColumns = (
 ];
 
 interface SkillsTableProps {
-  data: SkillEntity[];
-  onDelete: (skill: SkillEntity) => void;
-  onEdit: (skill: SkillEntity) => void;
-  onMultiDelete: (skills: SkillEntity[]) => void;
-  onMultiEdit: (skills: SkillEntity[]) => void;
-  onMultiView: (skills: SkillEntity[]) => void;
-  onView: (skill: SkillEntity) => void;
+  data: SkillRow[];
+  onDelete: (skill: SkillRow) => void;
+  onEdit: (skill: SkillRow) => void;
+  onMultiDelete: (skills: SkillRow[]) => void;
+  onMultiEdit: (skills: SkillRow[]) => void;
+  onMultiView: (skills: SkillRow[]) => void;
+  onView: (skill: SkillRow) => void;
 }
 
 export function SkillsTable({

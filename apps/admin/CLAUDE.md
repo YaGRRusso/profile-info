@@ -103,11 +103,16 @@ Routing and auth gate:
   (`CREATING | UPDATING | DELETING | MULTI_*`). The course/education forms expose
   `i18n` as a flat array of `{ locale, title, description }` (multi-locale) edited
   via a TanStack Form array field (`<Field mode="array">` + `pushValue`/`removeValue`,
-  rendered through the generic `FieldArray` component); the owning route maps that
-  array to/from the nested GraphQL `i18n: [{ locale, messages: { title, description } }]`.
-  Note: zod-validated optional text fields must stay non-optional in the schema
-  (default `""`) so the schema's input type matches TanStack Form's inferred value
-  type — convert empty to `undefined` when building the input, not in the schema.
+  rendered through the generic `FieldArray` component). Each form file also owns the
+  adapters between its schema and the GraphQL shapes — `courseToInput`/`courseToForm`
+  (and the education pair) — co-located with the schema so a shape change is a
+  single-file edit; they map the flat `i18n` to/from the nested GraphQL
+  `i18n: [{ locale, messages: { title, description } }]`, and the route just calls
+  them (pure orchestration). The form consumes the row type (`CourseRow`/`EducationRow`)
+  exported from its query hook, not the table. Note: zod-validated optional text
+  fields must stay non-optional in the schema (default `""`) so the schema's input
+  type matches TanStack Form's inferred value type — convert empty to `undefined`
+  when building the input, not in the schema.
 - `src/components/display/` and `src/components/inputs/`: generic, reusable UI
   (modal, alert, data-state, page-title, json; text/password/number/checkbox/
   range/select inputs, and `field-array` — a domain-agnostic repeater that wraps a

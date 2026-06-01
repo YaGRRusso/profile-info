@@ -2,11 +2,15 @@ import { useInfiniteQuery } from "@tanstack/react-query";
 import { graphql } from "@/graphql";
 import type {
   FilterOrganizationInput,
+  FindManyOrganizationsQuery,
   SortOrganizationInput,
 } from "@/graphql/graphql";
 import { execute } from "@/lib/execute";
 
 const PAGE_SIZE = 50;
+
+export type OrganizationRow =
+  FindManyOrganizationsQuery["findManyOrganizations"]["nodes"][number];
 
 const findManyOrganizations = graphql(`
   query FindManyOrganizations(

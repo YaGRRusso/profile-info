@@ -30,19 +30,13 @@ import {
 import { useQueryState } from "nuqs";
 import { useMemo, useState } from "react";
 import { z } from "zod";
-import {
-  EducationLevel,
-  EducationStatus,
-  type FindManyEducationsQuery,
-} from "@/graphql/graphql";
+import { EducationLevel, EducationStatus } from "@/graphql/graphql";
 import { useActiveBadges } from "@/hooks/custom/use-active-badges";
 import { useStableValue } from "@/hooks/custom/use-stable-value";
+import type { EducationRow } from "@/hooks/queries/educations";
 import { cn } from "@/lib/cn";
 import { getMinMaxFacets, getUniqueFacets } from "@/lib/facets";
 import { parseAsShape } from "@/lib/parsers";
-
-export type EducationRow =
-  FindManyEducationsQuery["findManyEducations"]["nodes"][number];
 
 const debouncedUrlUpdates = { method: "debounce" as const, timeMs: 500 };
 const persistentOptions = { clearOnDefault: true, history: "push" as const };

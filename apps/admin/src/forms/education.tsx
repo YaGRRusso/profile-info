@@ -4,8 +4,13 @@ import { FieldArray } from "@/components/inputs/field-array";
 import { RangeInput } from "@/components/inputs/range";
 import { SelectInput } from "@/components/inputs/select";
 import { TextInput } from "@/components/inputs/text";
-import { EducationLevel, EducationStatus } from "@/graphql/graphql";
+import {
+  type CreateEducationInput,
+  EducationLevel,
+  EducationStatus,
+} from "@/graphql/graphql";
 import { useQueryAllPages } from "@/hooks/custom/use-query-all-pages";
+import type { EducationRow } from "@/hooks/queries/educations";
 import { useFindManyOrganizations } from "@/hooks/queries/organizations";
 import { fieldError } from "@/lib/field-error";
 import { CommonFormProps } from "./common";
@@ -32,6 +37,44 @@ const educationSchema = z.object({
 export type EducationSchema = z.infer<typeof educationSchema>;
 
 export interface EducationFormProps extends CommonFormProps<EducationSchema> {}
+
+export function educationToInput(data: EducationSchema): CreateEducationInput {
+  return {
+    slug: data.slug,
+    organization: data.organization,
+    level: data.level,
+    status: data.status,
+    relevance: data.relevance,
+    url: data.url || undefined,
+    image: data.image || undefined,
+    i18n: data.i18n.map((translation) => ({
+      locale: translation.locale,
+      messages: {
+        title: translation.title,
+        description: translation.description,
+      },
+    })),
+  };
+}
+
+export function educationToForm(
+  education: EducationRow
+): Partial<EducationSchema> {
+  return {
+    slug: education.slug,
+    organization: education.organization?.id ?? "",
+    level: education.level,
+    status: education.status,
+    relevance: education.relevance ?? 1,
+    url: education.url ?? "",
+    image: education.image ?? "",
+    i18n: education.i18n.map((translation) => ({
+      locale: translation.locale,
+      title: translation.messages.title,
+      description: translation.messages.description,
+    })),
+  };
+}
 
 const LEVEL_OPTIONS = Object.values(EducationLevel).map((level) => ({
   label: level,

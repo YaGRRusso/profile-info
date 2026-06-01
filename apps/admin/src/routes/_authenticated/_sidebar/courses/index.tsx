@@ -12,9 +12,13 @@ import { Json } from "@/components/display/json";
 import { Modal } from "@/components/display/modal";
 import { PageTitle } from "@/components/display/page-title";
 import type { CommonFormValuesProps } from "@/forms/common";
-import { CourseForm, type CourseSchema } from "@/forms/course";
+import {
+  CourseForm,
+  type CourseSchema,
+  courseToForm,
+  courseToInput,
+} from "@/forms/course";
 import { CourseMultiForm } from "@/forms/course-multi";
-import type { CreateCourseInput } from "@/graphql/graphql";
 import { useQueryAllPages } from "@/hooks/custom/use-query-all-pages";
 import {
   useCreateOneCourse,
@@ -23,51 +27,13 @@ import {
   useUpdateManyCourses,
   useUpdateOneCourse,
 } from "@/hooks/mutations/courses";
-import { useFindManyCourses } from "@/hooks/queries/courses";
+import { type CourseRow, useFindManyCourses } from "@/hooks/queries/courses";
 import { cn } from "@/lib/cn";
-import { type CourseRow, CoursesTable } from "./-components/table";
+import { CoursesTable } from "./-components/table";
 
 export const Route = createFileRoute("/_authenticated/_sidebar/courses/")({
   component: RouteComponent,
 });
-
-function toCourseInput(data: CourseSchema): CreateCourseInput {
-  return {
-    slug: data.slug,
-    organization: data.organization,
-    type: data.type,
-    status: data.status,
-    relevance: data.relevance,
-    url: data.url || undefined,
-    image: data.image || undefined,
-    hours: data.hours || undefined,
-    i18n: data.i18n.map((translation) => ({
-      locale: translation.locale,
-      messages: {
-        title: translation.title,
-        description: translation.description,
-      },
-    })),
-  };
-}
-
-function toCourseDefaults(course: CourseRow): Partial<CourseSchema> {
-  return {
-    slug: course.slug,
-    organization: course.organization?.id ?? "",
-    type: course.type,
-    status: course.status,
-    relevance: course.relevance ?? 1,
-    url: course.url ?? "",
-    image: course.image ?? "",
-    hours: course.hours ?? 0,
-    i18n: course.i18n.map((translation) => ({
-      locale: translation.locale,
-      title: translation.messages.title,
-      description: translation.messages.description,
-    })),
-  };
-}
 
 function RouteComponent() {
   const [formValues, setFormValues] =
@@ -99,7 +65,7 @@ function RouteComponent() {
     (data: CourseSchema) => {
       switch (formValues?.state) {
         case "CREATING":
-          createOneCourse.mutate(toCourseInput(data), {
+          createOneCourse.mutate(courseToInput(data), {
             onSuccess: () => {
               closeAndRefetch();
               toast.success("Course created successfully");
@@ -110,7 +76,7 @@ function RouteComponent() {
           updateOneCourse.mutate(
             {
               courseId: selectedCourseIds[0],
-              updateCourseInput: toCourseInput(data),
+              updateCourseInput: courseToInput(data),
             },
             {
               onSuccess: () => {
@@ -313,7 +279,7 @@ function RouteComponent() {
             }
             onEdit={(course) =>
               setFormValues({
-                defaultValues: toCourseDefaults(course),
+                defaultValues: courseToForm(course),
                 state: "UPDATING",
                 customValues: [course],
               })

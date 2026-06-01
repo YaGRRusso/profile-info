@@ -14,7 +14,6 @@ import { PageTitle } from "@/components/display/page-title";
 import type { CommonFormValuesProps } from "@/forms/common";
 import { SkillForm, type SkillSchema } from "@/forms/skill";
 import { SkillMultiForm } from "@/forms/skill-multi";
-import { SkillEntity } from "@/graphql/graphql";
 import { useQueryAllPages } from "@/hooks/custom/use-query-all-pages";
 import {
   useCreateOneSkill,
@@ -23,7 +22,7 @@ import {
   useUpdateManySkills,
   useUpdateOneSkill,
 } from "@/hooks/mutations/skills";
-import { useFindManySkills } from "@/hooks/queries/skills";
+import { type SkillRow, useFindManySkills } from "@/hooks/queries/skills";
 import { cn } from "@/lib/cn";
 import { SkillsTable } from "./-components/table";
 
@@ -33,7 +32,7 @@ export const Route = createFileRoute("/_authenticated/_sidebar/skills/")({
 
 function RouteComponent() {
   const [formValues, setFormValues] =
-    useState<CommonFormValuesProps<SkillEntity, SkillEntity[]>>();
+    useState<CommonFormValuesProps<SkillSchema, SkillRow[]>>();
 
   const findManySkills = useFindManySkills();
   useQueryAllPages(findManySkills);

@@ -5,6 +5,7 @@ import type {
   FilterEducationInput,
   FindManyEducationByIdQuery,
   FindManyEducationByIdQueryVariables,
+  FindManyEducationsQuery,
   FindOneEducationByIdQuery,
   FindOneEducationByIdQueryVariables,
   FindOneEducationQuery,
@@ -13,6 +14,9 @@ import type {
 import { execute } from "@/lib/execute";
 
 const PAGE_SIZE = 50;
+
+export type EducationRow =
+  FindManyEducationsQuery["findManyEducations"]["nodes"][number];
 
 const findManyEducations = graphql(`
   query FindManyEducations(
