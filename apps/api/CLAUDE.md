@@ -227,6 +227,14 @@ Run from `apps/api/` or via the root `api:*` aliases.
 - `npm run prod`: same in watch mode with `.env.production`.
 - `npm run build`: `nest build`.
 - `npm run start`: `node --max-old-space-size=512 dist/main` (runs a prior build).
+- `npm run seed`: runs `src/seed.ts` via `ts-node`/`tsconfig-paths` with
+  `--env-file .env.development`. Boots a `NestFactory.createApplicationContext(AppModule)`,
+  resolves the Mongoose models by token, **wipes** the profile collections, and inserts a
+  `@faker-js/faker`-generated dev dataset — skills + organizations first, then
+  courses/educations/projects/experiences that reference random subsets of their `_id`s,
+  plus an admin user `admin@profile.info` / `admin123`. Idempotent (clear-then-insert);
+  dev-only; `@faker-js/faker` is a devDependency. Excluded from `nest build` via
+  `tsconfig.build.json`. Root alias: `npm run api:seed`.
 - `npm run test` / `test:watch` / `test:cov`: Jest unit tests.
 - `npm run test:e2e`: Jest with `test/jest-e2e.json`.
 - `npm run typecheck`: `tsc -b --noEmit`.

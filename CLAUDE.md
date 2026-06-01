@@ -152,6 +152,8 @@ Root scripts (run from the repo root):
 - `npm run docker:up` / `npm run docker:down`: start / stop MongoDB via Compose
   (uses `sudo docker compose`).
 - `npm run api:dev` / `npm run admin:dev`: run a single app in watch mode.
+- `npm run api:seed`: wipe and repopulate MongoDB with a coherent dev dataset (and an
+  admin user `admin@profile.info` / `admin123`). See `apps/api/src/seed.ts`.
 - `npm run api:build` / `npm run admin:build`: build a single app.
 - `npm run api:start` / `npm run admin:start`: start a single app.
 - `npm run test`, `test:watch`, `test:cov`, `test:e2e`: delegate to workspaces

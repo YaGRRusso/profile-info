@@ -14,12 +14,11 @@
     "prod": "nest start --watch --env-file .env.production",
     "build": "nest build",
     "start": "node --max-old-space-size=512 dist/main",
-
+    "seed": "node --env-file=.env.development -r ts-node/register -r tsconfig-paths/register src/seed.ts",
     "test": "jest",
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "test:e2e": "jest --config ./test/jest-e2e.json",
-
     "typecheck": "tsc -b --noEmit",
     "lint": "biome check .",
     "format": "biome format --write ."
@@ -50,6 +49,7 @@
     "rxjs": "^7.8.2"
   },
   "devDependencies": {
+    "@faker-js/faker": "^10.4.0",
     "@graphql-codegen/cli": "^6.3.1",
     "@graphql-codegen/typed-document-node": "^6.1.8",
     "@graphql-codegen/typescript": "^5.0.10",
