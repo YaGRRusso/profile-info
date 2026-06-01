@@ -175,6 +175,30 @@ export type CreateUserInput = {
   urls?: InputMaybe<Array<UrlInput>>;
 };
 
+export type DashboardCount = {
+  __typename?: 'DashboardCount';
+  label: Scalars['String']['output'];
+  value: Scalars['Int']['output'];
+};
+
+export type DashboardEntity = {
+  __typename?: 'DashboardEntity';
+  coursesByStatus: Array<DashboardCount>;
+  experiencesByCategory: Array<DashboardCount>;
+  skillsByCategory: Array<DashboardCount>;
+  totals: DashboardTotals;
+};
+
+export type DashboardTotals = {
+  __typename?: 'DashboardTotals';
+  courses: Scalars['Int']['output'];
+  educations: Scalars['Int']['output'];
+  experiences: Scalars['Int']['output'];
+  organizations: Scalars['Int']['output'];
+  projects: Scalars['Int']['output'];
+  skills: Scalars['Int']['output'];
+};
+
 export type DateRangeEntity = {
   __typename?: 'DateRangeEntity';
   from?: Maybe<Scalars['DateTime']['output']>;
@@ -710,6 +734,7 @@ export type ProjectMessagesTranslationEntity = {
 
 export type Query = {
   __typename?: 'Query';
+  dashboard: DashboardEntity;
   findManyCourseById: Array<CourseEntity>;
   findManyCourses: PaginatedCourseEntity;
   findManyEducationById: Array<EducationEntity>;
@@ -1337,6 +1362,11 @@ export type FindManyCourseByIdQueryVariables = Exact<{
 
 export type FindManyCourseByIdQuery = { __typename?: 'Query', findManyCourseById: Array<{ __typename?: 'CourseEntity', id: string, slug: string, status: CourseStatus, relevance: number, url?: string | null, image?: string | null, hours?: number | null, createdAt: any, updatedAt: any, organization: { __typename?: 'OrganizationEntity', id: string, name: string, slug: string }, i18n: Array<{ __typename?: 'CourseTranslationLocale', locale: string, messages: { __typename?: 'CourseMessages', title: string, description: string } }>, skills?: Array<{ __typename?: 'SkillEntity', id: string, name: string }> | null }> };
 
+export type DashboardQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type DashboardQuery = { __typename?: 'Query', dashboard: { __typename?: 'DashboardEntity', totals: { __typename?: 'DashboardTotals', skills: number, courses: number, educations: number, organizations: number, projects: number, experiences: number }, skillsByCategory: Array<{ __typename?: 'DashboardCount', label: string, value: number }>, experiencesByCategory: Array<{ __typename?: 'DashboardCount', label: string, value: number }>, coursesByStatus: Array<{ __typename?: 'DashboardCount', label: string, value: number }> } };
+
 export type FindManyEducationsQueryVariables = Exact<{
   educationFilters?: InputMaybe<FilterEducationInput>;
   educationPagination?: InputMaybe<PaginationInput>;
@@ -1924,6 +1954,32 @@ export const FindManyCourseByIdDocument = new TypedDocumentString(`
   }
 }
     `) as unknown as TypedDocumentString<FindManyCourseByIdQuery, FindManyCourseByIdQueryVariables>;
+export const DashboardDocument = new TypedDocumentString(`
+    query Dashboard {
+  dashboard {
+    totals {
+      skills
+      courses
+      educations
+      organizations
+      projects
+      experiences
+    }
+    skillsByCategory {
+      label
+      value
+    }
+    experiencesByCategory {
+      label
+      value
+    }
+    coursesByStatus {
+      label
+      value
+    }
+  }
+}
+    `) as unknown as TypedDocumentString<DashboardQuery, DashboardQueryVariables>;
 export const FindManyEducationsDocument = new TypedDocumentString(`
     query FindManyEducations($educationFilters: FilterEducationInput, $educationPagination: PaginationInput, $educationSort: SortEducationInput) {
   findManyEducations(

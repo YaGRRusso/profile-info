@@ -12,8 +12,12 @@ export const Route = createFileRoute("/_authenticated")({
 function RouteComponent() {
   const { token, setUser } = useAuthStore();
 
-  const getMe = useGetMe({ enabled: !!token });
+  const getMe = useGetMe({ enabled: !!token, retry: false });
   const user = getMe.data?.getMe;
+
+  useEffect(() => {
+    if (getMe.isError) setUser(null);
+  }, [getMe.isError, setUser]);
 
   useEffect(() => {
     if (user) {

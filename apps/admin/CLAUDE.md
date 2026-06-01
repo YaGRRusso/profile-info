@@ -49,8 +49,12 @@ Routing and auth gate:
 - `_authenticated.tsx` is the protected layout. It enables `useGetMe()` only when a
   token exists, stores the returned user, and renders the login page when there is
   no authenticated user; otherwise it renders the sidebar shell and the child route.
+- `index.tsx` (home) is a read-only dashboard: `useDashboard()` hits the API's
+  `dashboard` aggregation query and renders DaisyUI `stats` count cards plus `recharts`
+  charts (a donut for skills-by-category, bars for experiences-by-category and
+  courses-by-status). `recharts` is a runtime dependency.
 - Under `_authenticated/_sidebar/` are the CRUD pages (each with its
-  `-components/table.tsx`): `index.tsx` (home), `skills/`, `courses/`,
+  `-components/table.tsx`): `skills/`, `courses/`,
   `educations/`, `organizations/`, `projects/`, and `experiences/`. They all follow
   the same shape (route = orchestration; query hook exports the `*Row` type; form +
   its `*ToInput`/`*ToForm` mappers are co-located). `skills` and `organizations` are

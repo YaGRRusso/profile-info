@@ -45,7 +45,11 @@ Entry point `src/main.ts`:
   `SkillsService` and `OrganizationsService` so it can build the DataLoaders in the
   per-request `context` (`createLoaders(...)`).
 - Feature modules: `SkillsModule`, `ProjectsModule`, `UsersModule`, `AuthModule`,
-  `CoursesModule`, `EducationsModule`, `ExperiencesModule`, `OrganizationsModule`.
+  `CoursesModule`, `EducationsModule`, `ExperiencesModule`, `OrganizationsModule`,
+  `DashboardModule`. `DashboardModule` is read-only and does not own an entity/model:
+  it `forFeature`-registers the other schemas and its service computes aggregate stats
+  (`countDocuments` + `aggregate $group`) for one `dashboard` query — it does not use
+  `BaseResolver`/`BaseService`.
 
 Request flow for a query: Apollo receives the operation, the global `GqlAuthGuard`
 checks the JWT (unless the field is `@Public()`), the resolver method (usually
