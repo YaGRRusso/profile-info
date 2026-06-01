@@ -24,39 +24,44 @@ const MENU_SECTIONS: MenuSection[] = [
   {
     label: "Navigation",
     items: [
-      { icon: <HouseIcon size={24} />, label: "Home", to: "/", type: "link" },
       {
-        icon: <PackageIcon size={24} />,
+        icon: <HouseIcon size={24} weight="fill" />,
+        label: "Home",
+        to: "/",
+        type: "link",
+      },
+      {
+        icon: <PackageIcon size={24} weight="fill" />,
         label: "Skills",
         to: "/skills",
         type: "link",
       },
       {
-        icon: <CertificateIcon size={24} />,
+        icon: <CertificateIcon size={24} weight="fill" />,
         label: "Courses",
         to: "/courses",
         type: "link",
       },
       {
-        icon: <GraduationCapIcon size={24} />,
+        icon: <GraduationCapIcon size={24} weight="fill" />,
         label: "Educations",
         to: "/educations",
         type: "link",
       },
       {
-        icon: <BuildingsIcon size={24} />,
+        icon: <BuildingsIcon size={24} weight="fill" />,
         label: "Organizations",
         to: "/organizations",
         type: "link",
       },
       {
-        icon: <RocketLaunchIcon size={24} />,
+        icon: <RocketLaunchIcon size={24} weight="fill" />,
         label: "Projects",
         to: "/projects",
         type: "link",
       },
       {
-        icon: <BriefcaseIcon size={24} />,
+        icon: <BriefcaseIcon size={24} weight="fill" />,
         label: "Experiences",
         to: "/experiences",
         type: "link",
@@ -67,7 +72,7 @@ const MENU_SECTIONS: MenuSection[] = [
     label: "Actions",
     items: [
       {
-        icon: <SignOutIcon size={24} />,
+        icon: <SignOutIcon size={24} weight="fill" />,
         label: "Sign Out",
         onClick: () => useAuthStore.getState().clearAuth(),
         type: "action",
