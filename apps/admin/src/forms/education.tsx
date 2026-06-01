@@ -1,5 +1,6 @@
 import { useForm } from "@tanstack/react-form";
 import z from "zod";
+import { FieldArray } from "@/components/inputs/field-array";
 import { RangeInput } from "@/components/inputs/range";
 import { SelectInput } from "@/components/inputs/select";
 import { TextInput } from "@/components/inputs/text";
@@ -15,11 +16,17 @@ const educationSchema = z.object({
   level: z.enum(EducationLevel, "required field"),
   status: z.enum(EducationStatus, "required field"),
   relevance: z.number().min(1, "must be a positive number"),
-  url: z.url(),
-  image: z.url(),
-  locale: z.string().min(1, "required field"),
-  title: z.string().min(1, "required field"),
-  description: z.string().min(1, "required field"),
+  url: z.url().or(z.literal("")),
+  image: z.url().or(z.literal("")),
+  i18n: z
+    .array(
+      z.object({
+        locale: z.string().min(1, "required field"),
+        title: z.string().min(1, "required field"),
+        description: z.string().min(1, "required field"),
+      })
+    )
+    .min(1, "required group"),
 });
 
 export type EducationSchema = z.infer<typeof educationSchema>;
@@ -60,9 +67,7 @@ export function EducationForm({
       relevance: 1,
       url: "",
       image: "",
-      locale: "en",
-      title: "",
-      description: "",
+      i18n: [{ locale: "", title: "", description: "" }],
       ...defaultValues,
     },
     onSubmit: ({ value }) => onSubmit?.(value),
@@ -167,39 +172,57 @@ export function EducationForm({
         )}
       </Field>
 
-      <div className="divider">Translation</div>
+      <div className="divider">Translations</div>
 
-      <Field name="locale">
-        {(field) => (
-          <TextInput
-            error={fieldError(field.state.meta)}
-            name={field.name}
-            onChange={field.handleChange}
-            placeholder="Locale"
-            value={field.state.value}
-          />
-        )}
-      </Field>
-      <Field name="title">
-        {(field) => (
-          <TextInput
-            error={fieldError(field.state.meta)}
-            name={field.name}
-            onChange={field.handleChange}
-            placeholder="Title"
-            value={field.state.value}
-          />
-        )}
-      </Field>
-      <Field name="description">
-        {(field) => (
-          <TextInput
-            error={fieldError(field.state.meta)}
-            name={field.name}
-            onChange={field.handleChange}
-            placeholder="Description"
-            value={field.state.value}
-          />
+      <Field mode="array" name="i18n">
+        {(arrayField) => (
+          <FieldArray
+            error={fieldError(arrayField.state.meta)}
+            onAdd={() =>
+              arrayField.pushValue({ locale: "", title: "", description: "" })
+            }
+            onRemove={(index) => arrayField.removeValue(index)}
+            placeholder="Translation"
+            values={arrayField.state.value}
+          >
+            {(index) => (
+              <>
+                <Field name={`i18n[${index}].locale`}>
+                  {(field) => (
+                    <TextInput
+                      error={fieldError(field.state.meta)}
+                      name={field.name}
+                      onChange={field.handleChange}
+                      placeholder="Locale"
+                      value={field.state.value}
+                    />
+                  )}
+                </Field>
+                <Field name={`i18n[${index}].title`}>
+                  {(field) => (
+                    <TextInput
+                      error={fieldError(field.state.meta)}
+                      name={field.name}
+                      onChange={field.handleChange}
+                      placeholder="Title"
+                      value={field.state.value}
+                    />
+                  )}
+                </Field>
+                <Field name={`i18n[${index}].description`}>
+                  {(field) => (
+                    <TextInput
+                      error={fieldError(field.state.meta)}
+                      name={field.name}
+                      onChange={field.handleChange}
+                      placeholder="Description"
+                      value={field.state.value}
+                    />
+                  )}
+                </Field>
+              </>
+            )}
+          </FieldArray>
         )}
       </Field>
 

@@ -40,12 +40,13 @@ function toEducationInput(data: EducationSchema): CreateEducationInput {
     relevance: data.relevance,
     url: data.url || undefined,
     image: data.image || undefined,
-    i18n: [
-      {
-        locale: data.locale,
-        messages: { title: data.title, description: data.description },
+    i18n: data.i18n.map((translation) => ({
+      locale: translation.locale,
+      messages: {
+        title: translation.title,
+        description: translation.description,
       },
-    ],
+    })),
   };
 }
 
@@ -60,9 +61,11 @@ function toEducationDefaults(
     relevance: education.relevance ?? 1,
     url: education.url ?? "",
     image: education.image ?? "",
-    locale: education.i18n?.[0]?.locale ?? "en",
-    title: education.i18n?.[0]?.messages?.title ?? "",
-    description: education.i18n?.[0]?.messages?.description ?? "",
+    i18n: education.i18n.map((translation) => ({
+      locale: translation.locale,
+      title: translation.messages.title,
+      description: translation.messages.description,
+    })),
   };
 }
 

@@ -41,12 +41,13 @@ function toCourseInput(data: CourseSchema): CreateCourseInput {
     url: data.url || undefined,
     image: data.image || undefined,
     hours: data.hours || undefined,
-    i18n: [
-      {
-        locale: data.locale,
-        messages: { title: data.title, description: data.description },
+    i18n: data.i18n.map((translation) => ({
+      locale: translation.locale,
+      messages: {
+        title: translation.title,
+        description: translation.description,
       },
-    ],
+    })),
   };
 }
 
@@ -60,9 +61,11 @@ function toCourseDefaults(course: CourseRow): Partial<CourseSchema> {
     url: course.url ?? "",
     image: course.image ?? "",
     hours: course.hours ?? 0,
-    locale: course.i18n?.[0]?.locale ?? "en",
-    title: course.i18n?.[0]?.messages?.title ?? "",
-    description: course.i18n?.[0]?.messages?.description ?? "",
+    i18n: course.i18n.map((translation) => ({
+      locale: translation.locale,
+      title: translation.messages.title,
+      description: translation.messages.description,
+    })),
   };
 }
 

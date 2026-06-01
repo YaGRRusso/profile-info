@@ -100,15 +100,19 @@ Routing and auth gate:
 - `src/forms/`: `skill.tsx`, `skill-multi.tsx` (batch update), `user.tsx` (login),
   and the `course.tsx`/`course-multi.tsx` and `education.tsx`/`education-multi.tsx`
   pairs. `common.d.ts` defines `CommonFormProps` and the form `state` union
-  (`CREATING | UPDATING | DELETING | MULTI_*`). The course/education forms use a
-  flat schema (a single `i18n` locale exposed as `locale`/`title`/`description`);
-  the owning route maps it to/from the nested GraphQL input. Note: zod-validated
-  optional text fields must stay non-optional in the schema (default `""`) so the
-  schema's input type matches TanStack Form's inferred value type — convert empty
-  to `undefined` when building the input, not in the schema.
+  (`CREATING | UPDATING | DELETING | MULTI_*`). The course/education forms expose
+  `i18n` as a flat array of `{ locale, title, description }` (multi-locale) edited
+  via a TanStack Form array field (`<Field mode="array">` + `pushValue`/`removeValue`,
+  rendered through the generic `FieldArray` component); the owning route maps that
+  array to/from the nested GraphQL `i18n: [{ locale, messages: { title, description } }]`.
+  Note: zod-validated optional text fields must stay non-optional in the schema
+  (default `""`) so the schema's input type matches TanStack Form's inferred value
+  type — convert empty to `undefined` when building the input, not in the schema.
 - `src/components/display/` and `src/components/inputs/`: generic, reusable UI
   (modal, alert, data-state, page-title, json; text/password/number/checkbox/
-  range/select inputs). These are domain-agnostic and driven by props.
+  range/select inputs, and `field-array` — a domain-agnostic repeater that wraps a
+  TanStack Form array field with add/remove chrome and a per-item render-prop).
+  These are domain-agnostic and driven by props.
 - `src/stores/`: `auth.ts` persists `{ token, user }` to localStorage key `auth`
   with `setToken`, `setUser`, `clearAuth`. `theme.ts` persists `{ theme }` to key
   `theme` (default `"system"`).
