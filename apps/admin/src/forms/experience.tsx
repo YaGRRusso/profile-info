@@ -14,6 +14,7 @@ import { useQueryAllPages } from "@/hooks/custom/use-query-all-pages";
 import type { ExperienceRow } from "@/hooks/queries/experiences";
 import { useFindManyOrganizations } from "@/hooks/queries/organizations";
 import { useFindManySkills } from "@/hooks/queries/skills";
+import { toDateInput, toIsoDate } from "@/lib/date";
 import { fieldError } from "@/lib/field-error";
 import { CommonFormProps } from "./common";
 
@@ -69,14 +70,7 @@ export function experienceToInput(
       })),
       period:
         role.period.from || role.period.to
-          ? {
-              from: role.period.from
-                ? new Date(role.period.from).toISOString()
-                : undefined,
-              to: role.period.to
-                ? new Date(role.period.to).toISOString()
-                : undefined,
-            }
+          ? { from: toIsoDate(role.period.from), to: toIsoDate(role.period.to) }
           : undefined,
       skills: role.skills.length ? role.skills : undefined,
     })),
@@ -98,8 +92,8 @@ export function experienceToForm(
         description: translation.messages.description,
       })),
       period: {
-        from: role.period?.from ? String(role.period.from).slice(0, 10) : "",
-        to: role.period?.to ? String(role.period.to).slice(0, 10) : "",
+        from: toDateInput(role.period?.from),
+        to: toDateInput(role.period?.to),
       },
       skills: (role.skills ?? []).map((skill) => skill.id),
     })),

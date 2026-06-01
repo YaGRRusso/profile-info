@@ -13,7 +13,6 @@ import {
 import {
   type ColumnFiltersState,
   createColumnHelper,
-  type FilterFn,
   flexRender,
   getCoreRowModel,
   getFacetedMinMaxValues,
@@ -36,6 +35,7 @@ import type { ProjectRow } from "@/hooks/queries/projects";
 import { cn } from "@/lib/cn";
 import { getMinMaxFacets } from "@/lib/facets";
 import { parseAsShape } from "@/lib/parsers";
+import { dateRangeFilter, numberRangeFilter } from "@/lib/table-filters";
 
 const debouncedUrlUpdates = { method: "debounce" as const, timeMs: 500 };
 const persistentOptions = { clearOnDefault: true, history: "push" as const };
@@ -70,31 +70,6 @@ const DATE_OPTIONS = [
 ];
 
 const columnHelper = createColumnHelper<ProjectRow>();
-
-const numberRangeFilter: FilterFn<ProjectRow> = (row, columnId, value) => {
-  const rowValue = row.getValue<number | null>(columnId);
-  if (rowValue === null || rowValue === undefined) return false;
-  const [min, max] = value as [number | undefined, number | undefined];
-  if (min !== undefined && rowValue < min) return false;
-  if (max !== undefined && rowValue > max) return false;
-  return true;
-};
-
-const dateRangeFilter: FilterFn<ProjectRow> = (row, column, value) => {
-  const date = new Date(row.getValue(column));
-  const now = new Date();
-  switch (value) {
-    case "week":
-      return date >= new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
-    case "month":
-      return (
-        date.getMonth() === now.getMonth() &&
-        date.getFullYear() === now.getFullYear()
-      );
-    default:
-      return true;
-  }
-};
 
 function SortIcon({ sorted }: { sorted: false | "asc" | "desc" }) {
   if (sorted === "asc") return <ArrowUpIcon />;

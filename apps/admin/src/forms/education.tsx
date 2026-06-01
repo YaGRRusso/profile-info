@@ -15,6 +15,7 @@ import { useQueryAllPages } from "@/hooks/custom/use-query-all-pages";
 import type { EducationRow } from "@/hooks/queries/educations";
 import { useFindManyOrganizations } from "@/hooks/queries/organizations";
 import { useFindManySkills } from "@/hooks/queries/skills";
+import { toDateInput, toIsoDate } from "@/lib/date";
 import { fieldError } from "@/lib/field-error";
 import { CommonFormProps } from "./common";
 
@@ -50,14 +51,7 @@ export interface EducationFormProps extends CommonFormProps<EducationSchema> {}
 export function educationToInput(data: EducationSchema): CreateEducationInput {
   const period =
     data.period.from || data.period.to
-      ? {
-          from: data.period.from
-            ? new Date(data.period.from).toISOString()
-            : undefined,
-          to: data.period.to
-            ? new Date(data.period.to).toISOString()
-            : undefined,
-        }
+      ? { from: toIsoDate(data.period.from), to: toIsoDate(data.period.to) }
       : undefined;
 
   return {
@@ -93,10 +87,8 @@ export function educationToForm(
     image: education.image ?? "",
     skills: (education.skills ?? []).map((skill) => skill.id),
     period: {
-      from: education.period?.from
-        ? String(education.period.from).slice(0, 10)
-        : "",
-      to: education.period?.to ? String(education.period.to).slice(0, 10) : "",
+      from: toDateInput(education.period?.from),
+      to: toDateInput(education.period?.to),
     },
     i18n: education.i18n.map((translation) => ({
       locale: translation.locale,
