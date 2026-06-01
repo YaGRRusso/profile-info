@@ -1186,6 +1186,43 @@ export type RemoveManyOrganizationsMutationVariables = Exact<{
 
 export type RemoveManyOrganizationsMutation = { __typename?: 'Mutation', removeManyOrganizations: { __typename?: 'BatchEntity', count: number } };
 
+export type CreateOneProjectMutationVariables = Exact<{
+  createProjectInput: CreateProjectInput;
+}>;
+
+
+export type CreateOneProjectMutation = { __typename?: 'Mutation', createOneProject: { __typename?: 'ProjectEntity', id: string, slug: string } };
+
+export type UpdateOneProjectMutationVariables = Exact<{
+  projectId: Scalars['ID']['input'];
+  updateProjectInput: UpdateProjectInput;
+}>;
+
+
+export type UpdateOneProjectMutation = { __typename?: 'Mutation', updateOneProject: { __typename?: 'ProjectEntity', id: string, slug: string } };
+
+export type UpdateManyProjectsMutationVariables = Exact<{
+  projectIds: Array<Scalars['ID']['input']> | Scalars['ID']['input'];
+  updateProjectInput: UpdateProjectInput;
+}>;
+
+
+export type UpdateManyProjectsMutation = { __typename?: 'Mutation', updateManyProjects: { __typename?: 'BatchEntity', count: number } };
+
+export type RemoveOneProjectMutationVariables = Exact<{
+  projectId: Scalars['ID']['input'];
+}>;
+
+
+export type RemoveOneProjectMutation = { __typename?: 'Mutation', removeOneProject: { __typename?: 'ProjectEntity', id: string, slug: string } };
+
+export type RemoveManyProjectsMutationVariables = Exact<{
+  projectIds: Array<Scalars['ID']['input']> | Scalars['ID']['input'];
+}>;
+
+
+export type RemoveManyProjectsMutation = { __typename?: 'Mutation', removeManyProjects: { __typename?: 'BatchEntity', count: number } };
+
 export type CreateOneSkillMutationVariables = Exact<{
   createSkillInput: CreateSkillInput;
 }>;
@@ -1322,6 +1359,36 @@ export type FindManyOrganizationByIdQueryVariables = Exact<{
 
 
 export type FindManyOrganizationByIdQuery = { __typename?: 'Query', findManyOrganizationById: Array<{ __typename?: 'OrganizationEntity', id: string, name: string, slug: string, category: OrganizationCategory, logo: string, website: string, relevance: number, createdAt: any, updatedAt: any }> };
+
+export type FindManyProjectsQueryVariables = Exact<{
+  projectFilters?: InputMaybe<FilterProjectInput>;
+  projectPagination?: InputMaybe<PaginationInput>;
+  projectSort?: InputMaybe<SortProjectInput>;
+}>;
+
+
+export type FindManyProjectsQuery = { __typename?: 'Query', findManyProjects: { __typename?: 'PaginatedProjectEntity', found: number, nodes: Array<{ __typename?: 'ProjectEntity', id: string, slug: string, relevance: number, images?: Array<string> | null, createdAt: any, updatedAt: any, urls?: Array<{ __typename?: 'UrlEntity', title: string, value: string }> | null, i18n: Array<{ __typename?: 'ProjectMessagesTranslationEntity', locale: string, messages: { __typename?: 'ProjectMessages', title: string, description: string } }> }> } };
+
+export type FindOneProjectByIdQueryVariables = Exact<{
+  projectId: Scalars['ID']['input'];
+}>;
+
+
+export type FindOneProjectByIdQuery = { __typename?: 'Query', findOneProjectById: { __typename?: 'ProjectEntity', id: string, slug: string, relevance: number, images?: Array<string> | null, createdAt: any, updatedAt: any, urls?: Array<{ __typename?: 'UrlEntity', title: string, value: string }> | null, i18n: Array<{ __typename?: 'ProjectMessagesTranslationEntity', locale: string, messages: { __typename?: 'ProjectMessages', title: string, description: string } }> } };
+
+export type FindOneProjectQueryVariables = Exact<{
+  projectFilters?: InputMaybe<FilterProjectInput>;
+}>;
+
+
+export type FindOneProjectQuery = { __typename?: 'Query', findOneProject: { __typename?: 'ProjectEntity', id: string, slug: string, relevance: number, images?: Array<string> | null, createdAt: any, updatedAt: any, urls?: Array<{ __typename?: 'UrlEntity', title: string, value: string }> | null, i18n: Array<{ __typename?: 'ProjectMessagesTranslationEntity', locale: string, messages: { __typename?: 'ProjectMessages', title: string, description: string } }> } };
+
+export type FindManyProjectByIdQueryVariables = Exact<{
+  projectIds: Array<Scalars['ID']['input']> | Scalars['ID']['input'];
+}>;
+
+
+export type FindManyProjectByIdQuery = { __typename?: 'Query', findManyProjectById: Array<{ __typename?: 'ProjectEntity', id: string, slug: string, relevance: number, images?: Array<string> | null, createdAt: any, updatedAt: any, urls?: Array<{ __typename?: 'UrlEntity', title: string, value: string }> | null, i18n: Array<{ __typename?: 'ProjectMessagesTranslationEntity', locale: string, messages: { __typename?: 'ProjectMessages', title: string, description: string } }> }> };
 
 export type FindManySkillsQueryVariables = Exact<{
   skillFilters?: InputMaybe<FilterSkillInput>;
@@ -1503,6 +1570,47 @@ export const RemoveManyOrganizationsDocument = new TypedDocumentString(`
   }
 }
     `) as unknown as TypedDocumentString<RemoveManyOrganizationsMutation, RemoveManyOrganizationsMutationVariables>;
+export const CreateOneProjectDocument = new TypedDocumentString(`
+    mutation CreateOneProject($createProjectInput: CreateProjectInput!) {
+  createOneProject(createProjectInput: $createProjectInput) {
+    id
+    slug
+  }
+}
+    `) as unknown as TypedDocumentString<CreateOneProjectMutation, CreateOneProjectMutationVariables>;
+export const UpdateOneProjectDocument = new TypedDocumentString(`
+    mutation UpdateOneProject($projectId: ID!, $updateProjectInput: UpdateProjectInput!) {
+  updateOneProject(projectId: $projectId, updateProjectInput: $updateProjectInput) {
+    id
+    slug
+  }
+}
+    `) as unknown as TypedDocumentString<UpdateOneProjectMutation, UpdateOneProjectMutationVariables>;
+export const UpdateManyProjectsDocument = new TypedDocumentString(`
+    mutation UpdateManyProjects($projectIds: [ID!]!, $updateProjectInput: UpdateProjectInput!) {
+  updateManyProjects(
+    projectIds: $projectIds
+    updateProjectInput: $updateProjectInput
+  ) {
+    count
+  }
+}
+    `) as unknown as TypedDocumentString<UpdateManyProjectsMutation, UpdateManyProjectsMutationVariables>;
+export const RemoveOneProjectDocument = new TypedDocumentString(`
+    mutation RemoveOneProject($projectId: ID!) {
+  removeOneProject(projectId: $projectId) {
+    id
+    slug
+  }
+}
+    `) as unknown as TypedDocumentString<RemoveOneProjectMutation, RemoveOneProjectMutationVariables>;
+export const RemoveManyProjectsDocument = new TypedDocumentString(`
+    mutation RemoveManyProjects($projectIds: [ID!]!) {
+  removeManyProjects(projectIds: $projectIds) {
+    count
+  }
+}
+    `) as unknown as TypedDocumentString<RemoveManyProjectsMutation, RemoveManyProjectsMutationVariables>;
 export const CreateOneSkillDocument = new TypedDocumentString(`
     mutation CreateOneSkill($createSkillInput: CreateSkillInput!) {
   createOneSkill(createSkillInput: $createSkillInput) {
@@ -1887,6 +1995,105 @@ export const FindManyOrganizationByIdDocument = new TypedDocumentString(`
   }
 }
     `) as unknown as TypedDocumentString<FindManyOrganizationByIdQuery, FindManyOrganizationByIdQueryVariables>;
+export const FindManyProjectsDocument = new TypedDocumentString(`
+    query FindManyProjects($projectFilters: FilterProjectInput, $projectPagination: PaginationInput, $projectSort: SortProjectInput) {
+  findManyProjects(
+    projectFilters: $projectFilters
+    projectPagination: $projectPagination
+    projectSort: $projectSort
+  ) {
+    found
+    nodes {
+      id
+      slug
+      relevance
+      images
+      urls {
+        title
+        value
+      }
+      i18n {
+        locale
+        messages {
+          title
+          description
+        }
+      }
+      createdAt
+      updatedAt
+    }
+  }
+}
+    `) as unknown as TypedDocumentString<FindManyProjectsQuery, FindManyProjectsQueryVariables>;
+export const FindOneProjectByIdDocument = new TypedDocumentString(`
+    query FindOneProjectById($projectId: ID!) {
+  findOneProjectById(projectId: $projectId) {
+    id
+    slug
+    relevance
+    images
+    urls {
+      title
+      value
+    }
+    i18n {
+      locale
+      messages {
+        title
+        description
+      }
+    }
+    createdAt
+    updatedAt
+  }
+}
+    `) as unknown as TypedDocumentString<FindOneProjectByIdQuery, FindOneProjectByIdQueryVariables>;
+export const FindOneProjectDocument = new TypedDocumentString(`
+    query FindOneProject($projectFilters: FilterProjectInput) {
+  findOneProject(projectFilters: $projectFilters) {
+    id
+    slug
+    relevance
+    images
+    urls {
+      title
+      value
+    }
+    i18n {
+      locale
+      messages {
+        title
+        description
+      }
+    }
+    createdAt
+    updatedAt
+  }
+}
+    `) as unknown as TypedDocumentString<FindOneProjectQuery, FindOneProjectQueryVariables>;
+export const FindManyProjectByIdDocument = new TypedDocumentString(`
+    query FindManyProjectById($projectIds: [ID!]!) {
+  findManyProjectById(projectIds: $projectIds) {
+    id
+    slug
+    relevance
+    images
+    urls {
+      title
+      value
+    }
+    i18n {
+      locale
+      messages {
+        title
+        description
+      }
+    }
+    createdAt
+    updatedAt
+  }
+}
+    `) as unknown as TypedDocumentString<FindManyProjectByIdQuery, FindManyProjectByIdQueryVariables>;
 export const FindManySkillsDocument = new TypedDocumentString(`
     query FindManySkills($skillFilters: FilterSkillInput, $skillPagination: PaginationInput, $skillSort: SortSkillInput) {
   findManySkills(

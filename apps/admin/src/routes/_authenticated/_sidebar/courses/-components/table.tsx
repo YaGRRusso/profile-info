@@ -51,7 +51,6 @@ const sortParser = parseAsShape(
   .withDefault([])
   .withOptions(persistentOptions);
 
-const typeParser = parseAsShape(z.string()).withOptions(persistentOptions);
 const statusParser = parseAsShape(z.string()).withOptions(persistentOptions);
 const createdAtParser = parseAsShape(z.string()).withOptions(persistentOptions);
 const updatedAtParser = parseAsShape(z.string()).withOptions(persistentOptions);
@@ -236,7 +235,6 @@ export function CoursesTable({
 }: CoursesTableProps) {
   const [searchQuery, setSearchQuery] = useQueryState("query", queryParser);
   const [sort, setSort] = useQueryState("sort", sortParser);
-  const [type, setType] = useQueryState("type", typeParser);
   const [status, setStatus] = useQueryState("status", statusParser);
   const [createdAt, setCreatedAt] = useQueryState("createdAt", createdAtParser);
   const [updatedAt, setUpdatedAt] = useQueryState("updatedAt", updatedAtParser);
@@ -248,7 +246,6 @@ export function CoursesTable({
   const stableRelevance = useStableValue(relevance);
   const columnFilters = useMemo<ColumnFiltersState>(() => {
     const activeFilters: ColumnFiltersState = [];
-    if (type) activeFilters.push({ id: "type", value: type });
     if (status) activeFilters.push({ id: "status", value: status });
     if (createdAt) activeFilters.push({ id: "createdAt", value: createdAt });
     if (updatedAt) activeFilters.push({ id: "updatedAt", value: updatedAt });
@@ -262,10 +259,9 @@ export function CoursesTable({
       });
     }
     return activeFilters;
-  }, [type, status, createdAt, updatedAt, stableRelevance]);
+  }, [status, createdAt, updatedAt, stableRelevance]);
 
   const { badges: activeBadges, clearAll: clearAllFilters } = useActiveBadges([
-    { id: "type", label: "Type", state: type, setState: setType },
     { id: "status", label: "Status", state: status, setState: setStatus },
     {
       id: "createdAt",

@@ -5,6 +5,7 @@ import {
   HouseIcon,
   ListIcon,
   PackageIcon,
+  RocketLaunchIcon,
   SignOutIcon,
 } from "@phosphor-icons/react";
 import { createFileRoute, Outlet } from "@tanstack/react-router";
@@ -45,6 +46,12 @@ const MENU_SECTIONS: MenuSection[] = [
         icon: <BuildingsIcon size={24} />,
         label: "Organizations",
         to: "/organizations",
+        type: "link",
+      },
+      {
+        icon: <RocketLaunchIcon size={24} />,
+        label: "Projects",
+        to: "/projects",
         type: "link",
       },
     ],

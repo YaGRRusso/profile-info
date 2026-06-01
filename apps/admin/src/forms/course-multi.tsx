@@ -29,7 +29,6 @@ export function CourseMultiForm({
   isDisabled,
   isLoading,
 }: CourseMultiFormProps) {
-  const [changeType, setChangeType] = useState(false);
   const [changeStatus, setChangeStatus] = useState(false);
   const [changeRelevance, setChangeRelevance] = useState(false);
 
@@ -58,14 +57,6 @@ export function CourseMultiForm({
         form.handleSubmit();
       }}
     >
-      <CheckboxInput
-        checked={changeType}
-        label="Change Type"
-        onChange={setChangeType}
-      />
-
-      <div className="divider" />
-
       <CheckboxInput
         checked={changeStatus}
         label="Change Status"
@@ -130,7 +121,7 @@ export function CourseMultiForm({
               className="btn btn-soft btn-primary flex-1"
               disabled={
                 !canSubmit ||
-                !(changeType || changeStatus || changeRelevance) ||
+                !(changeStatus || changeRelevance) ||
                 isSubmitting ||
                 isDisabled ||
                 isLoading

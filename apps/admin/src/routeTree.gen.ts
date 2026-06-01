@@ -13,6 +13,7 @@ import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as AuthenticatedSidebarRouteImport } from './routes/_authenticated/_sidebar'
 import { Route as AuthenticatedSidebarIndexRouteImport } from './routes/_authenticated/_sidebar/index'
 import { Route as AuthenticatedSidebarSkillsIndexRouteImport } from './routes/_authenticated/_sidebar/skills/index'
+import { Route as AuthenticatedSidebarProjectsIndexRouteImport } from './routes/_authenticated/_sidebar/projects/index'
 import { Route as AuthenticatedSidebarOrganizationsIndexRouteImport } from './routes/_authenticated/_sidebar/organizations/index'
 import { Route as AuthenticatedSidebarEducationsIndexRouteImport } from './routes/_authenticated/_sidebar/educations/index'
 import { Route as AuthenticatedSidebarCoursesIndexRouteImport } from './routes/_authenticated/_sidebar/courses/index'
@@ -35,6 +36,12 @@ const AuthenticatedSidebarSkillsIndexRoute =
   AuthenticatedSidebarSkillsIndexRouteImport.update({
     id: '/skills/',
     path: '/skills/',
+    getParentRoute: () => AuthenticatedSidebarRoute,
+  } as any)
+const AuthenticatedSidebarProjectsIndexRoute =
+  AuthenticatedSidebarProjectsIndexRouteImport.update({
+    id: '/projects/',
+    path: '/projects/',
     getParentRoute: () => AuthenticatedSidebarRoute,
   } as any)
 const AuthenticatedSidebarOrganizationsIndexRoute =
@@ -61,6 +68,7 @@ export interface FileRoutesByFullPath {
   '/courses/': typeof AuthenticatedSidebarCoursesIndexRoute
   '/educations/': typeof AuthenticatedSidebarEducationsIndexRoute
   '/organizations/': typeof AuthenticatedSidebarOrganizationsIndexRoute
+  '/projects/': typeof AuthenticatedSidebarProjectsIndexRoute
   '/skills/': typeof AuthenticatedSidebarSkillsIndexRoute
 }
 export interface FileRoutesByTo {
@@ -68,6 +76,7 @@ export interface FileRoutesByTo {
   '/courses': typeof AuthenticatedSidebarCoursesIndexRoute
   '/educations': typeof AuthenticatedSidebarEducationsIndexRoute
   '/organizations': typeof AuthenticatedSidebarOrganizationsIndexRoute
+  '/projects': typeof AuthenticatedSidebarProjectsIndexRoute
   '/skills': typeof AuthenticatedSidebarSkillsIndexRoute
 }
 export interface FileRoutesById {
@@ -78,13 +87,26 @@ export interface FileRoutesById {
   '/_authenticated/_sidebar/courses/': typeof AuthenticatedSidebarCoursesIndexRoute
   '/_authenticated/_sidebar/educations/': typeof AuthenticatedSidebarEducationsIndexRoute
   '/_authenticated/_sidebar/organizations/': typeof AuthenticatedSidebarOrganizationsIndexRoute
+  '/_authenticated/_sidebar/projects/': typeof AuthenticatedSidebarProjectsIndexRoute
   '/_authenticated/_sidebar/skills/': typeof AuthenticatedSidebarSkillsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/courses/' | '/educations/' | '/organizations/' | '/skills/'
+  fullPaths:
+    | '/'
+    | '/courses/'
+    | '/educations/'
+    | '/organizations/'
+    | '/projects/'
+    | '/skills/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/courses' | '/educations' | '/organizations' | '/skills'
+  to:
+    | '/'
+    | '/courses'
+    | '/educations'
+    | '/organizations'
+    | '/projects'
+    | '/skills'
   id:
     | '__root__'
     | '/_authenticated'
@@ -93,6 +115,7 @@ export interface FileRouteTypes {
     | '/_authenticated/_sidebar/courses/'
     | '/_authenticated/_sidebar/educations/'
     | '/_authenticated/_sidebar/organizations/'
+    | '/_authenticated/_sidebar/projects/'
     | '/_authenticated/_sidebar/skills/'
   fileRoutesById: FileRoutesById
 }
@@ -130,6 +153,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedSidebarSkillsIndexRouteImport
       parentRoute: typeof AuthenticatedSidebarRoute
     }
+    '/_authenticated/_sidebar/projects/': {
+      id: '/_authenticated/_sidebar/projects/'
+      path: '/projects'
+      fullPath: '/projects/'
+      preLoaderRoute: typeof AuthenticatedSidebarProjectsIndexRouteImport
+      parentRoute: typeof AuthenticatedSidebarRoute
+    }
     '/_authenticated/_sidebar/organizations/': {
       id: '/_authenticated/_sidebar/organizations/'
       path: '/organizations'
@@ -159,6 +189,7 @@ interface AuthenticatedSidebarRouteChildren {
   AuthenticatedSidebarCoursesIndexRoute: typeof AuthenticatedSidebarCoursesIndexRoute
   AuthenticatedSidebarEducationsIndexRoute: typeof AuthenticatedSidebarEducationsIndexRoute
   AuthenticatedSidebarOrganizationsIndexRoute: typeof AuthenticatedSidebarOrganizationsIndexRoute
+  AuthenticatedSidebarProjectsIndexRoute: typeof AuthenticatedSidebarProjectsIndexRoute
   AuthenticatedSidebarSkillsIndexRoute: typeof AuthenticatedSidebarSkillsIndexRoute
 }
 
@@ -169,6 +200,8 @@ const AuthenticatedSidebarRouteChildren: AuthenticatedSidebarRouteChildren = {
     AuthenticatedSidebarEducationsIndexRoute,
   AuthenticatedSidebarOrganizationsIndexRoute:
     AuthenticatedSidebarOrganizationsIndexRoute,
+  AuthenticatedSidebarProjectsIndexRoute:
+    AuthenticatedSidebarProjectsIndexRoute,
   AuthenticatedSidebarSkillsIndexRoute: AuthenticatedSidebarSkillsIndexRoute,
 }
 
