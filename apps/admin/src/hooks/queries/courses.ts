@@ -50,6 +50,10 @@ const findManyCourses = graphql(`
             description
           }
         }
+        skills {
+          id
+          name
+        }
         createdAt
         updatedAt
       }
@@ -79,6 +83,10 @@ const findOneCourseById = graphql(`
           description
         }
       }
+      skills {
+        id
+        name
+      }
       createdAt
       updatedAt
     }
@@ -107,6 +115,10 @@ const findOneCourse = graphql(`
           description
         }
       }
+      skills {
+        id
+        name
+      }
       createdAt
       updatedAt
     }
@@ -134,6 +146,10 @@ const findManyCourseById = graphql(`
           title
           description
         }
+      }
+      skills {
+        id
+        name
       }
       createdAt
       updatedAt

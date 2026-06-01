@@ -46,6 +46,10 @@ const findManyProjects = graphql(`
             description
           }
         }
+        skills {
+          id
+          name
+        }
         createdAt
         updatedAt
       }
@@ -71,6 +75,10 @@ const findOneProjectById = graphql(`
           description
         }
       }
+      skills {
+        id
+        name
+      }
       createdAt
       updatedAt
     }
@@ -95,6 +103,10 @@ const findOneProject = graphql(`
           description
         }
       }
+      skills {
+        id
+        name
+      }
       createdAt
       updatedAt
     }
@@ -118,6 +130,10 @@ const findManyProjectById = graphql(`
           title
           description
         }
+      }
+      skills {
+        id
+        name
       }
       createdAt
       updatedAt

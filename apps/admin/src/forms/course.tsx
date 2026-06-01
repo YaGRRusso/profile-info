@@ -1,6 +1,7 @@
 import { useForm } from "@tanstack/react-form";
 import z from "zod";
 import { FieldArray } from "@/components/inputs/field-array";
+import { MultiSelectInput } from "@/components/inputs/multi-select";
 import { NumberInput } from "@/components/inputs/number";
 import { RangeInput } from "@/components/inputs/range";
 import { SelectInput } from "@/components/inputs/select";
@@ -9,6 +10,7 @@ import { CourseStatus, type CreateCourseInput } from "@/graphql/graphql";
 import { useQueryAllPages } from "@/hooks/custom/use-query-all-pages";
 import type { CourseRow } from "@/hooks/queries/courses";
 import { useFindManyOrganizations } from "@/hooks/queries/organizations";
+import { useFindManySkills } from "@/hooks/queries/skills";
 import { fieldError } from "@/lib/field-error";
 import { CommonFormProps } from "./common";
 
@@ -20,6 +22,7 @@ const courseSchema = z.object({
   url: z.url().or(z.literal("")),
   image: z.url().or(z.literal("")),
   hours: z.number(),
+  skills: z.array(z.string()),
   i18n: z
     .array(
       z.object({
@@ -44,6 +47,7 @@ export function courseToInput(data: CourseSchema): CreateCourseInput {
     url: data.url || undefined,
     image: data.image || undefined,
     hours: data.hours || undefined,
+    skills: data.skills.length ? data.skills : undefined,
     i18n: data.i18n.map((translation) => ({
       locale: translation.locale,
       messages: {
@@ -63,6 +67,7 @@ export function courseToForm(course: CourseRow): Partial<CourseSchema> {
     url: course.url ?? "",
     image: course.image ?? "",
     hours: course.hours ?? 0,
+    skills: (course.skills ?? []).map((skill) => skill.id),
     i18n: course.i18n.map((translation) => ({
       locale: translation.locale,
       title: translation.messages.title,
@@ -87,9 +92,17 @@ export function CourseForm({
   const findManyOrganizations = useFindManyOrganizations();
   useQueryAllPages(findManyOrganizations);
 
+  const findManySkills = useFindManySkills();
+  useQueryAllPages(findManySkills);
+
   const organizationOptions = (findManyOrganizations.data?.nodes ?? []).map(
     (organization) => ({ label: organization.name, value: organization.id })
   );
+
+  const skillOptions = (findManySkills.data?.nodes ?? []).map((skill) => ({
+    label: skill.name,
+    value: skill.id,
+  }));
 
   const form = useForm({
     defaultValues: {
@@ -100,6 +113,7 @@ export function CourseForm({
       url: "",
       image: "",
       hours: 0,
+      skills: [] as string[],
       i18n: [{ locale: "", title: "", description: "" }],
       ...defaultValues,
     },
@@ -207,6 +221,18 @@ export function CourseForm({
             placeholder="Relevance"
             ruler
             step={1}
+            value={field.state.value}
+          />
+        )}
+      </Field>
+      <Field name="skills">
+        {(field) => (
+          <MultiSelectInput
+            error={fieldError(field.state.meta)}
+            label="Skills"
+            onChange={field.handleChange}
+            options={skillOptions}
+            placeholder="Select skills"
             value={field.state.value}
           />
         )}

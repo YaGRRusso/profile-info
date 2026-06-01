@@ -1,16 +1,20 @@
 import { useForm } from "@tanstack/react-form";
 import z from "zod";
 import { FieldArray } from "@/components/inputs/field-array";
+import { MultiSelectInput } from "@/components/inputs/multi-select";
 import { RangeInput } from "@/components/inputs/range";
 import { TextInput } from "@/components/inputs/text";
 import type { CreateProjectInput } from "@/graphql/graphql";
+import { useQueryAllPages } from "@/hooks/custom/use-query-all-pages";
 import type { ProjectRow } from "@/hooks/queries/projects";
+import { useFindManySkills } from "@/hooks/queries/skills";
 import { fieldError } from "@/lib/field-error";
 import { CommonFormProps } from "./common";
 
 const projectSchema = z.object({
   slug: z.string().min(1, "required field"),
   relevance: z.number().min(1, "must be a positive number"),
+  skills: z.array(z.string()),
   images: z.array(z.url()),
   urls: z.array(
     z.object({
@@ -37,6 +41,7 @@ export function projectToInput(data: ProjectSchema): CreateProjectInput {
   return {
     slug: data.slug,
     relevance: data.relevance,
+    skills: data.skills.length ? data.skills : undefined,
     images: data.images.length ? data.images : undefined,
     urls: data.urls.length ? data.urls : undefined,
     i18n: data.i18n.map((translation) => ({
@@ -53,6 +58,7 @@ export function projectToForm(project: ProjectRow): Partial<ProjectSchema> {
   return {
     slug: project.slug,
     relevance: project.relevance,
+    skills: (project.skills ?? []).map((skill) => skill.id),
     images: project.images ?? [],
     urls: (project.urls ?? []).map((url) => ({
       title: url.title,
@@ -74,10 +80,19 @@ export function ProjectForm({
   isLoading,
   state,
 }: ProjectFormProps) {
+  const findManySkills = useFindManySkills();
+  useQueryAllPages(findManySkills);
+
+  const skillOptions = (findManySkills.data?.nodes ?? []).map((skill) => ({
+    label: skill.name,
+    value: skill.id,
+  }));
+
   const form = useForm({
     defaultValues: {
       slug: "",
       relevance: 1,
+      skills: [] as string[],
       images: [] as string[],
       urls: [] as { title: string; value: string }[],
       i18n: [{ locale: "", title: "", description: "" }],
@@ -123,6 +138,18 @@ export function ProjectForm({
             placeholder="Relevance"
             ruler
             step={1}
+            value={field.state.value}
+          />
+        )}
+      </Field>
+      <Field name="skills">
+        {(field) => (
+          <MultiSelectInput
+            error={fieldError(field.state.meta)}
+            label="Skills"
+            onChange={field.handleChange}
+            options={skillOptions}
+            placeholder="Select skills"
             value={field.state.value}
           />
         )}
