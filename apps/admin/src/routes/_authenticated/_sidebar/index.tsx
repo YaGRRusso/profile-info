@@ -9,6 +9,7 @@ import {
   PieChart,
   ResponsiveContainer,
   Tooltip,
+  TooltipProps,
   XAxis,
   YAxis,
 } from "recharts";
@@ -29,6 +30,17 @@ const CHART_COLORS = [
   "#f15bb5",
   "#6a4c93",
 ];
+
+const TOOLTIP_STYLES: TooltipProps = {
+  contentStyle: {
+    backgroundColor: "var(--color-base-100)",
+    borderRadius: 8,
+    padding: 8,
+  },
+  cursor: { fill: "transparent" },
+  itemStyle: { color: "var(--color-base-foreground)" },
+  labelStyle: { color: "var(--color-base-foreground)" },
+};
 
 function ChartCard({
   children,
@@ -87,7 +99,7 @@ function RouteComponent() {
             </div>
 
             <div className="grid gap-4 lg:grid-cols-3">
-              <ChartCard title="Skills by category">
+              <ChartCard title="Skills by Category">
                 <ResponsiveContainer height="100%" width="100%">
                   <PieChart>
                     <Pie
@@ -105,17 +117,17 @@ function RouteComponent() {
                       ))}
                     </Pie>
                     <Legend />
-                    <Tooltip />
+                    <Tooltip {...TOOLTIP_STYLES} />
                   </PieChart>
                 </ResponsiveContainer>
               </ChartCard>
 
-              <ChartCard title="Experiences by category">
+              <ChartCard title="Experiences by Category">
                 <ResponsiveContainer height="100%" width="100%">
                   <BarChart data={data?.experiencesByCategory}>
                     <XAxis dataKey="label" fontSize={12} />
                     <YAxis allowDecimals={false} fontSize={12} width={24} />
-                    <Tooltip cursor={{ fill: "transparent" }} />
+                    <Tooltip {...TOOLTIP_STYLES} />
                     <Bar dataKey="value" radius={4}>
                       {(data?.experiencesByCategory ?? []).map(
                         (entry, index) => (
@@ -130,12 +142,12 @@ function RouteComponent() {
                 </ResponsiveContainer>
               </ChartCard>
 
-              <ChartCard title="Courses by status">
+              <ChartCard title="Courses by Status">
                 <ResponsiveContainer height="100%" width="100%">
                   <BarChart data={data?.coursesByStatus}>
                     <XAxis dataKey="label" fontSize={12} />
                     <YAxis allowDecimals={false} fontSize={12} width={24} />
-                    <Tooltip cursor={{ fill: "transparent" }} />
+                    <Tooltip {...TOOLTIP_STYLES} />
                     <Bar dataKey="value" radius={4}>
                       {(data?.coursesByStatus ?? []).map((entry, index) => (
                         <Cell

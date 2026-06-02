@@ -1,9 +1,12 @@
+import { useQueryClient } from "@tanstack/react-query";
 import { UserForm } from "@/forms/user";
 import { useSignIn } from "@/hooks/mutations/auth";
 import { useAuthStore } from "@/stores/auth";
 
 export function Login() {
   const { setToken } = useAuthStore();
+
+  const queryClient = useQueryClient();
   const signIn = useSignIn();
 
   return (
@@ -32,6 +35,7 @@ export function Login() {
                 { email, password },
                 {
                   onSuccess: (data) => {
+                    queryClient.clear();
                     if (data?.signIn) setToken(data.signIn);
                   },
                 }
