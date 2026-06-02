@@ -29,8 +29,10 @@ import {
 import { useQueryState } from "nuqs";
 import { useMemo, useState } from "react";
 import { z } from "zod";
+import { BadgeList } from "@/components/display/badge-list";
 import { ExperienceCategory } from "@/graphql/graphql";
-import { useActiveBadges } from "@/hooks/custom/use-active-badges";
+import { useActiveFilters } from "@/hooks/custom/use-active-filters";
+import { usePersistedState } from "@/hooks/custom/use-persisted-state";
 import { useStableValue } from "@/hooks/custom/use-stable-value";
 import type { ExperienceRow } from "@/hooks/queries/experiences";
 import { cn } from "@/lib/cn";
@@ -112,12 +114,21 @@ const getColumns = (
       />
     ),
   }),
+  columnHelper.accessor("id", {
+    header: "ID",
+    enableGlobalFilter: false,
+    enableSorting: false,
+    cell: (data) => (
+      <span className="font-mono text-xs">{data.getValue()}</span>
+    ),
+  }),
   columnHelper.accessor("slug", {
     header: "Slug",
   }),
   columnHelper.accessor((row) => row.organization?.name ?? "", {
     id: "organization",
     header: "Organization",
+    cell: (data) => <BadgeList values={[data.getValue()]} />,
   }),
   columnHelper.accessor("category", {
     header: "Category",
@@ -146,6 +157,27 @@ const getColumns = (
       <span className="badge badge-soft badge-sm">{data.getValue()}</span>
     ),
   }),
+  columnHelper.accessor(
+    (row) =>
+      row.roles?.flatMap((role) => role.skills?.map((s) => s.name) ?? []) ?? [],
+    {
+      id: "skills",
+      header: "Skills",
+      enableGlobalFilter: false,
+      enableSorting: false,
+      cell: (data) => <BadgeList values={data.getValue()} />,
+    }
+  ),
+  columnHelper.accessor(
+    (row) => row.roles?.flatMap((role) => role.i18n.map((e) => e.locale)) ?? [],
+    {
+      id: "languages",
+      header: "Languages",
+      enableGlobalFilter: false,
+      enableSorting: false,
+      cell: (data) => <BadgeList values={data.getValue()} />,
+    }
+  ),
   columnHelper.accessor("createdAt", {
     header: "Created",
     enableColumnFilter: true,
@@ -220,7 +252,8 @@ export function ExperiencesTable({
   const [relevance, setRelevance] = useQueryState("relevance", relevanceParser);
 
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
-  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
+  const [columnVisibility, setColumnVisibility] =
+    usePersistedState<VisibilityState>("experiences-table-columns", {});
 
   const stableRelevance = useStableValue(relevance);
   const columnFilters = useMemo<ColumnFiltersState>(() => {
@@ -240,32 +273,33 @@ export function ExperiencesTable({
     return activeFilters;
   }, [category, createdAt, updatedAt, stableRelevance]);
 
-  const { badges: activeBadges, clearAll: clearAllFilters } = useActiveBadges([
-    {
-      id: "category",
-      label: "Category",
-      state: category,
-      setState: setCategory,
-    },
-    {
-      id: "createdAt",
-      label: "Created",
-      state: createdAt,
-      setState: setCreatedAt,
-    },
-    {
-      id: "updatedAt",
-      label: "Updated",
-      state: updatedAt,
-      setState: setUpdatedAt,
-    },
-    {
-      id: "relevance",
-      label: "Relevance",
-      state: stableRelevance,
-      setState: setRelevance,
-    },
-  ]);
+  const { filters: activeFilters, clearAll: clearAllFilters } =
+    useActiveFilters([
+      {
+        id: "category",
+        label: "Category",
+        state: category,
+        setState: setCategory,
+      },
+      {
+        id: "createdAt",
+        label: "Created",
+        state: createdAt,
+        setState: setCreatedAt,
+      },
+      {
+        id: "updatedAt",
+        label: "Updated",
+        state: updatedAt,
+        setState: setUpdatedAt,
+      },
+      {
+        id: "relevance",
+        label: "Relevance",
+        state: stableRelevance,
+        setState: setRelevance,
+      },
+    ]);
 
   const handleSortingChange: OnChangeFn<SortingState> = (updater) => {
     setSort((currentSort) =>
@@ -483,9 +517,9 @@ export function ExperiencesTable({
         </div>
       </div>
 
-      {activeBadges.length > 0 && (
+      {activeFilters.length > 0 && (
         <div className="flex flex-wrap items-center gap-1">
-          {activeBadges.map((badge) => (
+          {activeFilters.map((badge) => (
             <button
               className="btn btn-soft btn-xs"
               key={badge.id + badge.value}
@@ -544,7 +578,12 @@ export function ExperiencesTable({
               >
                 {row.getVisibleCells().map((cell) => (
                   <td key={cell.id}>
-                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                    <div className="line-clamp-1">
+                      {flexRender(
+                        cell.column.columnDef.cell,
+                        cell.getContext()
+                      )}
+                    </div>
                   </td>
                 ))}
               </tr>

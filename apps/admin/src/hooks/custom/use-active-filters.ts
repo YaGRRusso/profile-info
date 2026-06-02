@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import { useStableValue } from "@/hooks/custom/use-stable-value";
 
-export interface ActiveBadge {
+export interface ActiveFilter {
   clear: () => void;
   id: string;
   value: string;
@@ -14,7 +14,7 @@ export interface FilterEntry<Value = unknown> {
   state: Value;
 }
 
-interface BadgePreview {
+interface FilterPreview {
   display: string;
   valueAfterClear: unknown;
 }
@@ -64,14 +64,14 @@ function arrayWithItemReplaced(
 
 function previewsFromObject(
   objectValue: Record<string, unknown>
-): BadgePreview[] {
+): FilterPreview[] {
   return nonEmptyEntries(objectValue).map(([fieldKey, fieldValue]) => ({
     display: `${fieldKey} ${fieldValue}`,
     valueAfterClear: objectWithoutField(objectValue, fieldKey),
   }));
 }
 
-function previewsFromArray(items: unknown[]): BadgePreview[] {
+function previewsFromArray(items: unknown[]): FilterPreview[] {
   return items.flatMap((item, itemIndex) =>
     previewsFromValue(item).map((itemPreview) => ({
       display: itemPreview.display,
@@ -84,19 +84,19 @@ function previewsFromArray(items: unknown[]): BadgePreview[] {
   );
 }
 
-function previewsFromValue(value: unknown): BadgePreview[] {
+function previewsFromValue(value: unknown): FilterPreview[] {
   if (isEmpty(value)) return [];
   if (Array.isArray(value)) return previewsFromArray(value);
   if (isPlainObject(value)) return previewsFromObject(value);
   return [{ display: String(value), valueAfterClear: null }];
 }
 
-function badgesForFilter({
+function filterForFilter({
   id,
   label,
   state,
   setState,
-}: FilterEntry): ActiveBadge[] {
+}: FilterEntry): ActiveFilter[] {
   return previewsFromValue(state).map(({ display, valueAfterClear }) => ({
     id,
     value: label ? `${label}: ${display}` : display,
@@ -105,19 +105,19 @@ function badgesForFilter({
 }
 
 /**
- *   primitive          -> 1 badge with the value
- *   object             -> 1 badge per non-empty field ("field value")
- *   array of primitive -> 1 badge per item
- *   array of object    -> 1 badge per non-empty field of each item
+ *   primitive          -> 1 filter with the value
+ *   object             -> 1 filter per non-empty field ("field value")
+ *   array of primitive -> 1 filter per item
+ *   array of object    -> 1 filter per non-empty field of each item
  */
-export function useActiveBadges(filters: FilterEntry[]): {
-  badges: ActiveBadge[];
+export function useActiveFilters(filters: FilterEntry[]): {
+  filters: ActiveFilter[];
   clearAll: () => void;
 } {
   const stableFilters = useStableValue(filters);
   return useMemo(
     () => ({
-      badges: stableFilters.flatMap(badgesForFilter),
+      filters: stableFilters.flatMap(filterForFilter),
       clearAll: () => {
         for (const filter of stableFilters) filter.setState(null);
       },

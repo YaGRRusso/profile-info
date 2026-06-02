@@ -29,7 +29,9 @@ import {
 import { useQueryState } from "nuqs";
 import { useMemo, useState } from "react";
 import { z } from "zod";
-import { useActiveBadges } from "@/hooks/custom/use-active-badges";
+import { BadgeList } from "@/components/display/badge-list";
+import { useActiveFilters } from "@/hooks/custom/use-active-filters";
+import { usePersistedState } from "@/hooks/custom/use-persisted-state";
 import { useStableValue } from "@/hooks/custom/use-stable-value";
 import type { ProjectRow } from "@/hooks/queries/projects";
 import { cn } from "@/lib/cn";
@@ -103,16 +105,16 @@ const getColumns = (
       />
     ),
   }),
+  columnHelper.accessor("id", {
+    header: "ID",
+    enableGlobalFilter: false,
+    enableSorting: false,
+    cell: (data) => (
+      <span className="font-mono text-xs">{data.getValue()}</span>
+    ),
+  }),
   columnHelper.accessor("slug", {
     header: "Slug",
-  }),
-  columnHelper.accessor((row) => row.urls?.length ?? 0, {
-    id: "links",
-    header: "Links",
-    enableGlobalFilter: false,
-    cell: (data) => (
-      <span className="badge badge-soft badge-sm">{data.getValue()}</span>
-    ),
   }),
   columnHelper.accessor("relevance", {
     header: "Relevance",
@@ -122,6 +124,35 @@ const getColumns = (
     cell: (data) => (
       <span className="badge badge-soft badge-sm">{data.getValue()}</span>
     ),
+  }),
+  columnHelper.accessor((row) => row.skills?.map((skill) => skill.name) ?? [], {
+    id: "skills",
+    header: "Skills",
+    enableGlobalFilter: false,
+    enableSorting: false,
+    cell: (data) => <BadgeList values={data.getValue()} />,
+  }),
+  columnHelper.accessor((row) => row.images?.length ?? 0, {
+    id: "images",
+    header: "Images",
+    enableGlobalFilter: false,
+    cell: (data) => (
+      <span className="badge badge-soft badge-sm">{data.getValue()}</span>
+    ),
+  }),
+  columnHelper.accessor((row) => row.urls?.map((url) => url.title) ?? [], {
+    id: "links",
+    header: "Links",
+    enableGlobalFilter: false,
+    enableSorting: false,
+    cell: (data) => <BadgeList values={data.getValue()} />,
+  }),
+  columnHelper.accessor((row) => row.i18n.map((entry) => entry.locale), {
+    id: "languages",
+    header: "Languages",
+    enableGlobalFilter: false,
+    enableSorting: false,
+    cell: (data) => <BadgeList values={data.getValue()} />,
   }),
   columnHelper.accessor("createdAt", {
     header: "Created",
@@ -196,7 +227,8 @@ export function ProjectsTable({
   const [relevance, setRelevance] = useQueryState("relevance", relevanceParser);
 
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
-  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
+  const [columnVisibility, setColumnVisibility] =
+    usePersistedState<VisibilityState>("projects-table-columns", {});
 
   const stableRelevance = useStableValue(relevance);
   const columnFilters = useMemo<ColumnFiltersState>(() => {
@@ -215,26 +247,27 @@ export function ProjectsTable({
     return activeFilters;
   }, [createdAt, updatedAt, stableRelevance]);
 
-  const { badges: activeBadges, clearAll: clearAllFilters } = useActiveBadges([
-    {
-      id: "createdAt",
-      label: "Created",
-      state: createdAt,
-      setState: setCreatedAt,
-    },
-    {
-      id: "updatedAt",
-      label: "Updated",
-      state: updatedAt,
-      setState: setUpdatedAt,
-    },
-    {
-      id: "relevance",
-      label: "Relevance",
-      state: stableRelevance,
-      setState: setRelevance,
-    },
-  ]);
+  const { filters: activeFilters, clearAll: clearAllFilters } =
+    useActiveFilters([
+      {
+        id: "createdAt",
+        label: "Created",
+        state: createdAt,
+        setState: setCreatedAt,
+      },
+      {
+        id: "updatedAt",
+        label: "Updated",
+        state: updatedAt,
+        setState: setUpdatedAt,
+      },
+      {
+        id: "relevance",
+        label: "Relevance",
+        state: stableRelevance,
+        setState: setRelevance,
+      },
+    ]);
 
   const handleSortingChange: OnChangeFn<SortingState> = (updater) => {
     setSort((currentSort) =>
@@ -432,9 +465,9 @@ export function ProjectsTable({
         </div>
       </div>
 
-      {activeBadges.length > 0 && (
+      {activeFilters.length > 0 && (
         <div className="flex flex-wrap items-center gap-1">
-          {activeBadges.map((badge) => (
+          {activeFilters.map((badge) => (
             <button
               className="btn btn-soft btn-xs"
               key={badge.id + badge.value}
@@ -493,7 +526,12 @@ export function ProjectsTable({
               >
                 {row.getVisibleCells().map((cell) => (
                   <td key={cell.id}>
-                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                    <div className="line-clamp-1">
+                      {flexRender(
+                        cell.column.columnDef.cell,
+                        cell.getContext()
+                      )}
+                    </div>
                   </td>
                 ))}
               </tr>

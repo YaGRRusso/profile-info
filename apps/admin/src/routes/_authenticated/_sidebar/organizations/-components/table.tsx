@@ -29,8 +29,10 @@ import {
 import { useQueryState } from "nuqs";
 import { useMemo, useState } from "react";
 import { z } from "zod";
+import { Link } from "@/components/display/link";
 import { OrganizationCategory } from "@/graphql/graphql";
-import { useActiveBadges } from "@/hooks/custom/use-active-badges";
+import { useActiveFilters } from "@/hooks/custom/use-active-filters";
+import { usePersistedState } from "@/hooks/custom/use-persisted-state";
 import { useStableValue } from "@/hooks/custom/use-stable-value";
 import type { OrganizationRow } from "@/hooks/queries/organizations";
 import { cn } from "@/lib/cn";
@@ -111,6 +113,14 @@ const getColumns = (
       />
     ),
   }),
+  columnHelper.accessor("id", {
+    header: "ID",
+    enableGlobalFilter: false,
+    enableSorting: false,
+    cell: (data) => (
+      <span className="font-mono text-xs">{data.getValue()}</span>
+    ),
+  }),
   columnHelper.accessor("name", {
     header: "Name",
   }),
@@ -127,12 +137,21 @@ const getColumns = (
       <span className="badge badge-soft badge-sm">{data.getValue()}</span>
     ),
   }),
+  columnHelper.accessor("logo", {
+    header: "Logo",
+    enableGlobalFilter: false,
+    enableSorting: false,
+    cell: (data) => {
+      const url = data.getValue();
+      return <Link href={url} />;
+    },
+  }),
   columnHelper.accessor("website", {
     header: "Website",
     enableGlobalFilter: false,
     cell: (data) => (
       <a
-        className="link link-primary"
+        className="link"
         href={data.getValue()}
         rel="noreferrer"
         target="_blank"
@@ -224,7 +243,8 @@ export function OrganizationsTable({
   const [relevance, setRelevance] = useQueryState("relevance", relevanceParser);
 
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
-  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
+  const [columnVisibility, setColumnVisibility] =
+    usePersistedState<VisibilityState>("organizations-table-columns", {});
 
   const stableRelevance = useStableValue(relevance);
   const columnFilters = useMemo<ColumnFiltersState>(() => {
@@ -244,32 +264,33 @@ export function OrganizationsTable({
     return activeFilters;
   }, [category, createdAt, updatedAt, stableRelevance]);
 
-  const { badges: activeBadges, clearAll: clearAllFilters } = useActiveBadges([
-    {
-      id: "category",
-      label: "Category",
-      state: category,
-      setState: setCategory,
-    },
-    {
-      id: "createdAt",
-      label: "Created",
-      state: createdAt,
-      setState: setCreatedAt,
-    },
-    {
-      id: "updatedAt",
-      label: "Updated",
-      state: updatedAt,
-      setState: setUpdatedAt,
-    },
-    {
-      id: "relevance",
-      label: "Relevance",
-      state: stableRelevance,
-      setState: setRelevance,
-    },
-  ]);
+  const { filters: activeFilters, clearAll: clearAllFilters } =
+    useActiveFilters([
+      {
+        id: "category",
+        label: "Category",
+        state: category,
+        setState: setCategory,
+      },
+      {
+        id: "createdAt",
+        label: "Created",
+        state: createdAt,
+        setState: setCreatedAt,
+      },
+      {
+        id: "updatedAt",
+        label: "Updated",
+        state: updatedAt,
+        setState: setUpdatedAt,
+      },
+      {
+        id: "relevance",
+        label: "Relevance",
+        state: stableRelevance,
+        setState: setRelevance,
+      },
+    ]);
 
   const handleSortingChange: OnChangeFn<SortingState> = (updater) => {
     setSort((currentSort) =>
@@ -487,9 +508,9 @@ export function OrganizationsTable({
         </div>
       </div>
 
-      {activeBadges.length > 0 && (
+      {activeFilters.length > 0 && (
         <div className="flex flex-wrap items-center gap-1">
-          {activeBadges.map((badge) => (
+          {activeFilters.map((badge) => (
             <button
               className="btn btn-soft btn-xs"
               key={badge.id + badge.value}
@@ -548,7 +569,12 @@ export function OrganizationsTable({
               >
                 {row.getVisibleCells().map((cell) => (
                   <td key={cell.id}>
-                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                    <div className="line-clamp-1">
+                      {flexRender(
+                        cell.column.columnDef.cell,
+                        cell.getContext()
+                      )}
+                    </div>
                   </td>
                 ))}
               </tr>
