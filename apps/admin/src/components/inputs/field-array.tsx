@@ -1,3 +1,4 @@
+import { useAutoAnimate } from "@formkit/auto-animate/react";
 import {
   ArrowDownIcon,
   ArrowUpIcon,
@@ -32,69 +33,73 @@ export function FieldArray({
   sublevel,
   values,
 }: FieldArrayProps) {
+  const [parent] = useAutoAnimate();
+
   return (
-    <div className="fieldset gap-2">
-      {!values.length && (
-        <Alert
-          description="Click on the button below to add your first item"
-          icon={<WarningIcon />}
-          title="Nothing here yet"
-        />
-      )}
-      {values.map((_, index) => (
-        <div
-          className={cn(
-            "flex flex-col gap-2 rounded-md bg-base-200",
-            !sublevel && "p-4"
-          )}
-          key={index}
-        >
-          <div className="flex items-center justify-between">
-            <span className="font-semibold">
-              {[label ?? "Item", index + 1].join(" ")}
-            </span>
-            <div className="flex gap-1">
-              {onMoveUp && (
+    <div ref={parent}>
+      <div className="fieldset gap-2" key={JSON.stringify(values)}>
+        {!values.length && (
+          <Alert
+            description="Click on the button below to add your first item"
+            icon={<WarningIcon />}
+            title="Nothing here yet"
+          />
+        )}
+        {values.map((_, index) => (
+          <div
+            className={cn(
+              "flex flex-col gap-2 rounded-md bg-base-200",
+              !sublevel && "p-4"
+            )}
+            key={index}
+          >
+            <div className="flex items-center justify-between">
+              <span className="font-semibold">
+                {[label ?? "Item", index + 1].join(" ")}
+              </span>
+              <div className="flex gap-1">
+                {onMoveUp && (
+                  <button
+                    className="btn btn-ghost btn-sm btn-square"
+                    disabled={index === 0}
+                    onClick={() => {
+                      onMoveUp(index);
+                    }}
+                    type="button"
+                  >
+                    <ArrowUpIcon />
+                  </button>
+                )}
+                {onMoveDown && (
+                  <button
+                    className="btn btn-ghost btn-sm btn-square"
+                    disabled={index === values.length - 1}
+                    onClick={() => {
+                      onMoveDown(index);
+                    }}
+                    type="button"
+                  >
+                    <ArrowDownIcon />
+                  </button>
+                )}
                 <button
-                  className="btn btn-ghost btn-sm btn-square"
-                  disabled={index === 0}
-                  onClick={() => {
-                    onMoveUp(index);
-                  }}
+                  className="btn btn-ghost btn-sm btn-square btn-error"
+                  onClick={() => onRemove(index)}
                   type="button"
                 >
-                  <ArrowUpIcon />
+                  <TrashSimpleIcon />
                 </button>
-              )}
-              {onMoveDown && (
-                <button
-                  className="btn btn-ghost btn-sm btn-square"
-                  disabled={index === values.length - 1}
-                  onClick={() => {
-                    onMoveDown(index);
-                  }}
-                  type="button"
-                >
-                  <ArrowDownIcon />
-                </button>
-              )}
-              <button
-                className="btn btn-ghost btn-sm btn-square btn-error"
-                onClick={() => onRemove(index)}
-                type="button"
-              >
-                <TrashSimpleIcon />
-              </button>
+              </div>
             </div>
+            {children(index)}
           </div>
-          {children(index)}
-        </div>
-      ))}
-      <button className="btn btn-soft btn-sm" onClick={onAdd} type="button">
-        <PlusIcon />
-        {["Add", label ?? "Item"].join(" ")}
-      </button>
-      {error && <p className="label text-error">{error}</p>}
+        ))}
+        <button className="btn btn-soft btn-sm" onClick={onAdd} type="button">
+          <PlusIcon />
+          {["Add", label ?? "Item"].join(" ")}
+        </button>
+        {error && <p className="label text-error">{error}</p>}
+      </div>
     </div>
   );
 }
