@@ -1,5 +1,6 @@
 import { DeepKeys, DeepValue, useForm } from "@tanstack/react-form";
 import { useCallback } from "react";
+import { toast } from "react-toastify";
 import z from "zod";
 import { DateRangeInput } from "@/components/inputs/date-range";
 import { FieldArray } from "@/components/inputs/field-array";
@@ -182,6 +183,19 @@ export function ExperienceForm({
         labelKey: "name",
         targetValues: fieldParent.skills,
       });
+      if (!skills.length) return toast.error("At least one skill is required");
+
+      const title = fieldGroup.title;
+      if (!title) return toast.error("Title is required");
+      const titleDetail = `Title: ${fieldGroup.title}`;
+
+      const period = fieldParent.period;
+      if (!period.from && !period.to) return toast.error("Period is required");
+      const periodDetail = `Period: from ${period.from} to ${period.to}`;
+
+      const category = form.getFieldValue("category");
+      if (!category) return toast.error("Category is required");
+      const categoryDetail = `Category: ${category}`;
 
       const organization = findLabelById({
         items: findManyOrganizations.data?.nodes,
@@ -189,10 +203,7 @@ export function ExperienceForm({
         labelKey: "name",
         targetValue: form.getFieldValue("organization"),
       });
-
-      const titleDetail = `Title: ${fieldGroup.title}`;
-      const periodDetail = `Period: from ${fieldParent.period.from} to ${fieldParent.period.to}`;
-      const categoryDetail = `Category: ${form.getFieldValue("category")}`;
+      if (!organization) return toast.error("Organization is required");
       const organizationDetail = `Organization: ${organization}`;
 
       const details = [

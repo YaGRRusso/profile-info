@@ -1,4 +1,6 @@
-import { useForm } from "@tanstack/react-form";
+import { DeepKeys, DeepValue, useForm } from "@tanstack/react-form";
+import { useCallback } from "react";
+import { toast } from "react-toastify";
 import z from "zod";
 import { DateRangeInput } from "@/components/inputs/date-range";
 import { FieldArray } from "@/components/inputs/field-array";
@@ -6,6 +8,7 @@ import { MultiSelectInput } from "@/components/inputs/multi-select";
 import { RangeInput } from "@/components/inputs/range";
 import { SelectInput } from "@/components/inputs/select";
 import { TextInput } from "@/components/inputs/text";
+import { TextareaInput } from "@/components/inputs/textarea";
 import { LOCALES, LocaleEnum } from "@/consts/locales";
 import {
   type CreateEducationInput,
@@ -13,11 +16,13 @@ import {
   EducationStatus,
 } from "@/graphql/graphql";
 import { useQueryAllPages } from "@/hooks/custom/use-query-all-pages";
+import { useAtsSummarize } from "@/hooks/mutations/ia";
 import type { EducationRow } from "@/hooks/queries/educations";
 import { useFindManyOrganizations } from "@/hooks/queries/organizations";
 import { useFindManySkills } from "@/hooks/queries/skills";
 import { toDateInput, toIsoDate } from "@/lib/date";
 import { fieldError } from "@/lib/field-error";
+import { findLabelById, findLabelsByIds } from "@/lib/mappers";
 import { CommonFormProps } from "./common";
 
 const educationSchema = z.object({
@@ -130,6 +135,8 @@ export function EducationForm({
   const findManySkills = useFindManySkills();
   useQueryAllPages(findManySkills);
 
+  const atsSummarize = useAtsSummarize();
+
   const organizationOptions = (findManyOrganizations.data?.nodes ?? []).map(
     (organization) => ({ label: organization.name, value: organization.id })
   );
@@ -159,6 +166,80 @@ export function EducationForm({
     onSubmit: ({ value }) => onSubmit?.(value),
     validators: { onChange: educationSchema },
   });
+
+  const handleAtsOptimize = useCallback(
+    async <Field extends DeepKeys<EducationSchema>>(
+      fieldGroup: EducationSchema["i18n"][number],
+      fieldName: Field,
+      fieldValue: DeepValue<EducationSchema, Field>
+    ) => {
+      const raw = fieldValue as string;
+      const type = "experience";
+
+      const skills = findLabelsByIds({
+        items: findManySkills.data?.nodes,
+        lookupKey: "id",
+        labelKey: "name",
+        targetValues: form.getFieldValue("skills"),
+      });
+      if (!skills.length) return toast.error("At least one skill is required");
+
+      const title = fieldGroup.title;
+      if (!title) return toast.error("Title is required");
+      const titleDetail = `Title: ${title}`;
+
+      const period = form.getFieldValue("period");
+      if (!period.from && !period.to) return toast.error("Period is required");
+      const periodDetail = `Period: from ${period.from} to ${period.to}`;
+
+      const level = form.getFieldValue("level");
+      if (!level) return toast.error("Level is required");
+      const levelDetail = `Level: ${level}`;
+
+      const status = form.getFieldValue("status");
+      if (!status) return toast.error("Status is required");
+      const statusDetail = `Status: ${status}`;
+
+      const organization = findLabelById({
+        items: findManyOrganizations.data?.nodes,
+        lookupKey: "id",
+        labelKey: "name",
+        targetValue: form.getFieldValue("organization"),
+      });
+      if (!organization) return toast.error("Organization is required");
+      const organizationDetail = `Organization: ${organization}`;
+
+      const details = [
+        titleDetail,
+        periodDetail,
+        levelDetail,
+        statusDetail,
+        organizationDetail,
+      ];
+
+      const summarized = await atsSummarize.mutateAsync({
+        raw,
+        type,
+        skills,
+        details,
+      });
+
+      form.setFieldValue(
+        fieldName,
+        summarized.atsSummarize.messages[0].message.content as DeepValue<
+          EducationSchema,
+          Field
+        >
+      );
+    },
+    [
+      atsSummarize.mutateAsync,
+      form.getFieldValue,
+      form.setFieldValue,
+      findManyOrganizations.data?.nodes,
+      findManySkills.data?.nodes,
+    ]
+  );
 
   const { Field, Subscribe } = form;
 
@@ -329,11 +410,19 @@ export function EducationForm({
                 </Field>
                 <Field name={`i18n[${index}].description`}>
                   {(field) => (
-                    <TextInput
+                    <TextareaInput
+                      disabled={atsSummarize.isPending}
                       error={fieldError(field.state.meta)}
                       label="Description"
                       name={field.name}
                       onChange={field.handleChange}
+                      onOptimize={() =>
+                        handleAtsOptimize(
+                          arrayField.state.value[index],
+                          field.name,
+                          field.state.value
+                        )
+                      }
                       placeholder="Description"
                       value={field.state.value}
                     />

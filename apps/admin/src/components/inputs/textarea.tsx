@@ -38,18 +38,20 @@ export function TextareaInput({
         value={value}
         {...props}
       />
-      {onOptimize && (
-        <button
-          className="btn btn-xs btn-primary btn-ghost ml-auto w-fit"
-          disabled={disabled || !value || value.length < 64}
-          onClick={onOptimize}
-          type="button"
-        >
-          <SparkleIcon />
-          Optimize with AI
-        </button>
-      )}
-      {error && <p className="label text-error">{error}</p>}
+      <div className="flex flex-wrap items-center justify-between gap-4">
+        {error && <p className="label text-error">{error}</p>}
+        {onOptimize && (
+          <button
+            className="btn btn-xs btn-primary btn-ghost ml-auto w-fit"
+            disabled={disabled || !value || value.length < 64 || !!error}
+            onClick={onOptimize}
+            type="button"
+          >
+            <SparkleIcon />
+            Optimize with AI
+          </button>
+        )}
+      </div>
     </fieldset>
   );
 }

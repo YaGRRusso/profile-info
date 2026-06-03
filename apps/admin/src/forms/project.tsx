@@ -1,16 +1,21 @@
-import { useForm } from "@tanstack/react-form";
+import { DeepKeys, DeepValue, useForm } from "@tanstack/react-form";
+import { useCallback } from "react";
+import { toast } from "react-toastify";
 import z from "zod";
 import { FieldArray } from "@/components/inputs/field-array";
 import { MultiSelectInput } from "@/components/inputs/multi-select";
 import { RangeInput } from "@/components/inputs/range";
 import { SelectInput } from "@/components/inputs/select";
 import { TextInput } from "@/components/inputs/text";
+import { TextareaInput } from "@/components/inputs/textarea";
 import { LOCALES, LocaleEnum } from "@/consts/locales";
 import type { CreateProjectInput } from "@/graphql/graphql";
 import { useQueryAllPages } from "@/hooks/custom/use-query-all-pages";
+import { useAtsSummarize } from "@/hooks/mutations/ia";
 import type { ProjectRow } from "@/hooks/queries/projects";
 import { useFindManySkills } from "@/hooks/queries/skills";
 import { fieldError } from "@/lib/field-error";
+import { findLabelsByIds } from "@/lib/mappers";
 import { CommonFormProps } from "./common";
 
 const projectSchema = z.object({
@@ -92,6 +97,8 @@ export function ProjectForm({
   const findManySkills = useFindManySkills();
   useQueryAllPages(findManySkills);
 
+  const atsSummarize = useAtsSummarize();
+
   const skillOptions = (findManySkills.data?.nodes ?? []).map((skill) => ({
     label: skill.name,
     value: skill.id,
@@ -113,6 +120,52 @@ export function ProjectForm({
     onSubmit: ({ value }) => onSubmit?.(value),
     validators: { onChange: projectSchema },
   });
+
+  const handleAtsOptimize = useCallback(
+    async <Field extends DeepKeys<ProjectSchema>>(
+      fieldGroup: ProjectSchema["i18n"][number],
+      fieldName: Field,
+      fieldValue: DeepValue<ProjectSchema, Field>
+    ) => {
+      const raw = fieldValue as string;
+      const type = "experience";
+
+      const skills = findLabelsByIds({
+        items: findManySkills.data?.nodes,
+        lookupKey: "id",
+        labelKey: "name",
+        targetValues: form.getFieldValue("skills"),
+      });
+      if (!skills.length) return toast.error("At least one skill is required");
+
+      const title = fieldGroup.title;
+      if (!title) return toast.error("Title is required");
+      const titleDetail = `Title: ${title}`;
+
+      const details = [titleDetail];
+
+      const summarized = await atsSummarize.mutateAsync({
+        raw,
+        type,
+        skills,
+        details,
+      });
+
+      form.setFieldValue(
+        fieldName,
+        summarized.atsSummarize.messages[0].message.content as DeepValue<
+          ProjectSchema,
+          Field
+        >
+      );
+    },
+    [
+      atsSummarize.mutateAsync,
+      form.getFieldValue,
+      form.setFieldValue,
+      findManySkills.data?.nodes,
+    ]
+  );
 
   const { Field, Subscribe } = form;
 
@@ -268,6 +321,7 @@ export function ProjectForm({
                   {(field) => (
                     <TextInput
                       error={fieldError(field.state.meta)}
+                      label="Title"
                       name={field.name}
                       onChange={field.handleChange}
                       placeholder="Title"
@@ -277,10 +331,19 @@ export function ProjectForm({
                 </Field>
                 <Field name={`i18n[${index}].description`}>
                   {(field) => (
-                    <TextInput
+                    <TextareaInput
+                      disabled={atsSummarize.isPending}
                       error={fieldError(field.state.meta)}
+                      label="Description"
                       name={field.name}
                       onChange={field.handleChange}
+                      onOptimize={() =>
+                        handleAtsOptimize(
+                          arrayField.state.value[index],
+                          field.name,
+                          field.state.value
+                        )
+                      }
                       placeholder="Description"
                       value={field.state.value}
                     />

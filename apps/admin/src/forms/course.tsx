@@ -1,4 +1,6 @@
-import { useForm } from "@tanstack/react-form";
+import { DeepKeys, DeepValue, useForm } from "@tanstack/react-form";
+import { useCallback } from "react";
+import { toast } from "react-toastify";
 import z from "zod";
 import { FieldArray } from "@/components/inputs/field-array";
 import { MultiSelectInput } from "@/components/inputs/multi-select";
@@ -6,13 +8,16 @@ import { NumberInput } from "@/components/inputs/number";
 import { RangeInput } from "@/components/inputs/range";
 import { SelectInput } from "@/components/inputs/select";
 import { TextInput } from "@/components/inputs/text";
+import { TextareaInput } from "@/components/inputs/textarea";
 import { LOCALES, LocaleEnum } from "@/consts/locales";
 import { CourseStatus, type CreateCourseInput } from "@/graphql/graphql";
 import { useQueryAllPages } from "@/hooks/custom/use-query-all-pages";
+import { useAtsSummarize } from "@/hooks/mutations/ia";
 import type { CourseRow } from "@/hooks/queries/courses";
 import { useFindManyOrganizations } from "@/hooks/queries/organizations";
 import { useFindManySkills } from "@/hooks/queries/skills";
 import { fieldError } from "@/lib/field-error";
+import { findLabelById, findLabelsByIds } from "@/lib/mappers";
 import { CommonFormProps } from "./common";
 
 const courseSchema = z.object({
@@ -103,6 +108,8 @@ export function CourseForm({
   const findManySkills = useFindManySkills();
   useQueryAllPages(findManySkills);
 
+  const atsSummarize = useAtsSummarize();
+
   const organizationOptions = (findManyOrganizations.data?.nodes ?? []).map(
     (organization) => ({ label: organization.name, value: organization.id })
   );
@@ -131,6 +138,75 @@ export function CourseForm({
     onSubmit: ({ value }) => onSubmit?.(value),
     validators: { onChange: courseSchema },
   });
+
+  const handleAtsOptimize = useCallback(
+    async <Field extends DeepKeys<CourseSchema>>(
+      fieldGroup: CourseSchema["i18n"][number],
+      fieldName: Field,
+      fieldValue: DeepValue<CourseSchema, Field>
+    ) => {
+      const raw = fieldValue as string;
+      const type = "experience";
+
+      const skills = findLabelsByIds({
+        items: findManySkills.data?.nodes,
+        lookupKey: "id",
+        labelKey: "name",
+        targetValues: form.getFieldValue("skills"),
+      });
+      if (!skills.length) return toast.error("At least one skill is required");
+
+      const title = fieldGroup.title;
+      if (!title) return toast.error("Title is required");
+      const titleDetail = `Title: ${title}`;
+
+      const duration = form.getFieldValue("hours");
+      if (!duration) return toast.error("Hours is required");
+      const durationDetail = `Hours: ${form.getFieldValue("hours")}`;
+
+      const status = form.getFieldValue("status");
+      if (!status) return toast.error("Status is required");
+      const statusDetail = `Status: ${status}`;
+
+      const organization = findLabelById({
+        items: findManyOrganizations.data?.nodes,
+        lookupKey: "id",
+        labelKey: "name",
+        targetValue: form.getFieldValue("organization"),
+      });
+      if (!organization) return toast.error("Organization is required");
+      const organizationDetail = `Organization: ${organization}`;
+
+      const details = [
+        titleDetail,
+        durationDetail,
+        statusDetail,
+        organizationDetail,
+      ];
+
+      const summarized = await atsSummarize.mutateAsync({
+        raw,
+        type,
+        skills,
+        details,
+      });
+
+      form.setFieldValue(
+        fieldName,
+        summarized.atsSummarize.messages[0].message.content as DeepValue<
+          CourseSchema,
+          Field
+        >
+      );
+    },
+    [
+      atsSummarize.mutateAsync,
+      form.getFieldValue,
+      form.setFieldValue,
+      findManyOrganizations.data?.nodes,
+      findManySkills.data?.nodes,
+    ]
+  );
 
   const { Field, Subscribe } = form;
 
@@ -291,11 +367,19 @@ export function CourseForm({
                 </Field>
                 <Field name={`i18n[${index}].description`}>
                   {(field) => (
-                    <TextInput
+                    <TextareaInput
+                      disabled={atsSummarize.isPending}
                       error={fieldError(field.state.meta)}
                       label="Description"
                       name={field.name}
                       onChange={field.handleChange}
+                      onOptimize={() =>
+                        handleAtsOptimize(
+                          arrayField.state.value[index],
+                          field.name,
+                          field.state.value
+                        )
+                      }
                       placeholder="Description"
                       value={field.state.value}
                     />
