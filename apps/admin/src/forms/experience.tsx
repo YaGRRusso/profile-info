@@ -1,4 +1,5 @@
-import { useForm } from "@tanstack/react-form";
+import { DeepKeys, DeepValue, useForm } from "@tanstack/react-form";
+import { useCallback } from "react";
 import z from "zod";
 import { DateRangeInput } from "@/components/inputs/date-range";
 import { FieldArray } from "@/components/inputs/field-array";
@@ -6,12 +7,14 @@ import { MultiSelectInput } from "@/components/inputs/multi-select";
 import { RangeInput } from "@/components/inputs/range";
 import { SelectInput } from "@/components/inputs/select";
 import { TextInput } from "@/components/inputs/text";
+import { TextareaInput } from "@/components/inputs/textarea";
 import { LOCALES, LocaleEnum } from "@/consts/locales";
 import {
   type CreateExperienceInput,
   ExperienceCategory,
 } from "@/graphql/graphql";
 import { useQueryAllPages } from "@/hooks/custom/use-query-all-pages";
+import { useAtsSummarize } from "@/hooks/mutations/ia";
 import type { ExperienceRow } from "@/hooks/queries/experiences";
 import { useFindManyOrganizations } from "@/hooks/queries/organizations";
 import { useFindManySkills } from "@/hooks/queries/skills";
@@ -138,6 +141,8 @@ export function ExperienceForm({
   const findManySkills = useFindManySkills();
   useQueryAllPages(findManySkills);
 
+  const atsSummarize = useAtsSummarize();
+
   const organizationOptions = (findManyOrganizations.data?.nodes ?? []).map(
     (organization) => ({ label: organization.name, value: organization.id })
   );
@@ -159,6 +164,45 @@ export function ExperienceForm({
     onSubmit: ({ value }) => onSubmit?.(value),
     validators: { onChange: experienceSchema },
   });
+
+  // TODO get more context
+  const handleOptimize = useCallback(
+    async <Field extends DeepKeys<ExperienceSchema>>(
+      fieldName: Field,
+      fieldValue: DeepValue<ExperienceSchema, Field>
+    ) => {
+      const summarized = await atsSummarize.mutateAsync({
+        raw: fieldValue as string,
+        type: "experience",
+        skills: [
+          "react",
+          "typescript",
+          "node",
+          "nest",
+          "dynamo",
+          "aws",
+          "graphql",
+          "tailwind",
+          "tanstack",
+          "shadcn",
+          "jest",
+          "lambda",
+          "monorepo",
+        ],
+        details: "dev senior fullstack",
+        organization: "Droz",
+      });
+
+      form.setFieldValue(
+        fieldName,
+        summarized.atsSummarize.messages[0].message.content as DeepValue<
+          ExperienceSchema,
+          Field
+        >
+      );
+    },
+    [form, atsSummarize.mutateAsync]
+  );
 
   const { Field, Subscribe } = form;
 
@@ -284,6 +328,7 @@ export function ExperienceForm({
                             {(field) => (
                               <TextInput
                                 error={fieldError(field.state.meta)}
+                                label="Title"
                                 name={field.name}
                                 onChange={field.handleChange}
                                 placeholder="Title"
@@ -295,13 +340,23 @@ export function ExperienceForm({
                             name={`roles[${roleIndex}].i18n[${i18nIndex}].description`}
                           >
                             {(field) => (
-                              <TextInput
-                                error={fieldError(field.state.meta)}
-                                name={field.name}
-                                onChange={field.handleChange}
-                                placeholder="Description"
-                                value={field.state.value}
-                              />
+                              <>
+                                <TextareaInput
+                                  disabled={atsSummarize.isPending}
+                                  error={fieldError(field.state.meta)}
+                                  label="Description"
+                                  name={field.name}
+                                  onChange={field.handleChange}
+                                  onOptimize={() =>
+                                    handleOptimize(
+                                      field.name,
+                                      field.state.value
+                                    )
+                                  }
+                                  placeholder="Description"
+                                  value={field.state.value}
+                                />
+                              </>
                             )}
                           </Field>
                         </>
