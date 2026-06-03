@@ -13,8 +13,5 @@ export class AtsSummarizeInput {
   skills: string[];
 
   @Field(() => String)
-  type: "experience" | "project" | "education" | "course";
-
-  @OptionalField(() => String)
-  organization?: string;
+  type: string;
 }

@@ -12,8 +12,7 @@ Your task is to transform a developer's raw description into a highly profession
 2. **Result-Oriented:** Apply the STAR method (Situation, Task, Action, Result) wherever possible. Start sentences with strong technical action verbs.
 3. **Keyword Density:** Seamlessly integrate the provided Hard Skills into the text, showcasing *how* they were utilized.
 4. **Scannability:** The text must be direct and technical. Avoid empty corporate buzzwords.
-5. **Format:** Output the final description formatted in clean Markdown.
-6. **Tone:** Maintain a formal and professional tone, suitable for a resume or portfolio description aimed at impressing technical recruiters and passing ATS filters.
+5. **Tone:** Maintain a formal and professional tone, suitable for a resume or portfolio description aimed at impressing technical recruiters and passing ATS filters.
 
 # Format Restrictions (CRUCIAL)
 - **NO Markdown Formatting:** Do NOT use bold (\`**\`), italics, headers (\`#\`), or any other markdown decorators. 
@@ -23,10 +22,9 @@ Your task is to transform a developer's raw description into a highly profession
 
 export interface AtsSumarizeContextArgs {
   details?: string[];
-  organization?: string;
   raw: string;
   skills: string[];
-  type: "experience" | "project" | "education" | "course";
+  type: string;
 }
 
 export const createAtsSummarizeContextPrompt = ({
@@ -34,13 +32,11 @@ export const createAtsSummarizeContextPrompt = ({
   raw,
   skills,
   type,
-  organization,
 }: AtsSumarizeContextArgs) =>
   `
 # Resource Context
 - Type: ${type}
-- Organization: ${organization}
-- Hard Skills: ${skills.join(", ")}
+- Skills: ${skills.join(", ")}
 
 # Extra Details:
 ${compact(details)

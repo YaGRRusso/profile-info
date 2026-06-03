@@ -5,7 +5,6 @@ schema {
 
 input AtsSummarizeInput {
   details: [String!]
-  organization: String
   raw: String!
   skills: [String!]!
   type: String!

@@ -27,7 +27,6 @@ export class AiService {
     skills,
     type,
     details,
-    organization,
   }: AtsSummarizeInput): Promise<GenericIaEntity> {
     const completion = await this.client.chat.send({
       chatRequest: {
@@ -44,7 +43,6 @@ export class AiService {
               skills,
               type,
               details,
-              organization,
             }),
           },
         ],

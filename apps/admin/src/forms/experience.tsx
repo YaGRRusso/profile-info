@@ -20,6 +20,7 @@ import { useFindManyOrganizations } from "@/hooks/queries/organizations";
 import { useFindManySkills } from "@/hooks/queries/skills";
 import { toDateInput, toIsoDate } from "@/lib/date";
 import { fieldError } from "@/lib/field-error";
+import { findLabelById, findLabelsByIds } from "@/lib/mappers";
 import { CommonFormProps } from "./common";
 
 const experienceSchema = z.object({
@@ -172,42 +173,40 @@ export function ExperienceForm({
       fieldName: Field,
       fieldValue: DeepValue<ExperienceSchema, Field>
     ) => {
-      console.log({ fieldParent, fieldGroup, fieldName, fieldValue });
-
       const raw = fieldValue as string;
       const type = "experience";
 
-      const skills = fieldParent.skills.map(
-        (skillId) =>
-          findManySkills.data?.nodes.find((skill) => skill.id === skillId)
-            ?.name ?? ""
-      );
-
-      const organization =
-        findManyOrganizations.data?.nodes.find(
-          (organization) =>
-            organization.id === form.getFieldValue("organization")
-        )?.name ?? "";
-
-      const fromTitle = `title: ${fieldGroup.title}`;
-      const fromDetail = `period: from ${fieldParent.period.from} to ${fieldParent.period.to}`;
-      const categoryDetail = `category: ${form.getFieldValue("category")}`;
-      const details = [fromTitle, fromDetail, categoryDetail];
-
-      console.log({
-        raw,
-        type,
-        skills,
-        organization,
-        details,
+      const skills = findLabelsByIds({
+        items: findManySkills.data?.nodes,
+        lookupKey: "id",
+        labelKey: "name",
+        targetValues: fieldParent.skills,
       });
+
+      const organization = findLabelById({
+        items: findManyOrganizations.data?.nodes,
+        lookupKey: "id",
+        labelKey: "name",
+        targetValue: form.getFieldValue("organization"),
+      });
+
+      const titleDetail = `Title: ${fieldGroup.title}`;
+      const periodDetail = `Period: from ${fieldParent.period.from} to ${fieldParent.period.to}`;
+      const categoryDetail = `Category: ${form.getFieldValue("category")}`;
+      const organizationDetail = `Organization: ${organization}`;
+
+      const details = [
+        titleDetail,
+        periodDetail,
+        categoryDetail,
+        organizationDetail,
+      ];
 
       const summarized = await atsSummarize.mutateAsync({
         raw,
         type,
         skills,
         details,
-        organization,
       });
 
       form.setFieldValue(
@@ -222,8 +221,8 @@ export function ExperienceForm({
       atsSummarize.mutateAsync,
       form.getFieldValue,
       form.setFieldValue,
-      findManyOrganizations.data?.nodes.find,
-      findManySkills.data?.nodes.find,
+      findManyOrganizations.data?.nodes,
+      findManySkills.data?.nodes,
     ]
   );
 
