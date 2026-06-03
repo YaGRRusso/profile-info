@@ -1,5 +1,11 @@
-import { PlusIcon, TrashSimpleIcon, WarningIcon } from "@phosphor-icons/react";
-import type { ReactNode } from "react";
+import {
+  ArrowDownIcon,
+  ArrowUpIcon,
+  PlusIcon,
+  TrashSimpleIcon,
+  WarningIcon,
+} from "@phosphor-icons/react";
+import { type ReactNode, useEffect, useState } from "react";
 import { cn } from "@/lib/cn";
 import { Alert } from "../display/alert";
 
@@ -8,6 +14,8 @@ export interface FieldArrayProps {
   error?: string;
   label?: string;
   onAdd: () => void;
+  onMoveDown?: (index: number) => void;
+  onMoveUp?: (index: number) => void;
   onRemove: (index: number) => void;
   sublevel?: boolean;
   values: unknown[];
@@ -19,9 +27,20 @@ export function FieldArray({
   label,
   onAdd,
   onRemove,
+  onMoveUp,
+  onMoveDown,
   sublevel,
   values,
 }: FieldArrayProps) {
+  const [isMoving, setIsMoving] = useState(false);
+
+  useEffect(() => {
+    if (isMoving) {
+      const timeout = setTimeout(() => setIsMoving(false), 300);
+      return () => clearTimeout(timeout);
+    }
+  }, [isMoving]);
+
   return (
     <div className="fieldset gap-2">
       {!values.length && (
@@ -35,6 +54,7 @@ export function FieldArray({
         <div
           className={cn(
             "flex flex-col gap-2 rounded-md bg-base-200",
+            isMoving && "animate-blink",
             !sublevel && "p-4"
           )}
           key={index}
@@ -43,13 +63,41 @@ export function FieldArray({
             <span className="font-semibold">
               {[label ?? "Item", index + 1].join(" ")}
             </span>
-            <button
-              className="btn btn-ghost btn-sm btn-square btn-error"
-              onClick={() => onRemove(index)}
-              type="button"
-            >
-              <TrashSimpleIcon />
-            </button>
+            <div className="flex gap-1">
+              {onMoveUp && (
+                <button
+                  className="btn btn-ghost btn-sm btn-square"
+                  disabled={index === 0}
+                  onClick={() => {
+                    setIsMoving(true);
+                    onMoveUp(index);
+                  }}
+                  type="button"
+                >
+                  <ArrowUpIcon />
+                </button>
+              )}
+              {onMoveDown && (
+                <button
+                  className="btn btn-ghost btn-sm btn-square"
+                  disabled={index === values.length - 1}
+                  onClick={() => {
+                    setIsMoving(true);
+                    onMoveDown(index);
+                  }}
+                  type="button"
+                >
+                  <ArrowDownIcon />
+                </button>
+              )}
+              <button
+                className="btn btn-ghost btn-sm btn-square btn-error"
+                onClick={() => onRemove(index)}
+                type="button"
+              >
+                <TrashSimpleIcon />
+              </button>
+            </div>
           </div>
           {children(index)}
         </div>

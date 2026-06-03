@@ -88,3 +88,16 @@
     transparent
   );
 }
+
+@theme {
+  --animate-blink: blink 300ms ease-in;
+
+  @keyframes blink {
+    0% {
+      opacity: 0;
+    }
+    100% {
+      opacity: 1;
+    }
+  }
+}

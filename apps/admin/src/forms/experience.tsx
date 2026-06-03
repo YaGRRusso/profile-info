@@ -238,6 +238,8 @@ export function ExperienceForm({
             error={fieldError(rolesField.state.meta)}
             label="Role"
             onAdd={() => rolesField.pushValue(emptyRole())}
+            onMoveDown={(index) => rolesField.swapValues(index, index + 1)}
+            onMoveUp={(index) => rolesField.swapValues(index, index - 1)}
             onRemove={(index) => rolesField.removeValue(index)}
             values={rolesField.state.value}
           >
