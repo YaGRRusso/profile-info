@@ -3,7 +3,7 @@
 # ------------------------------------------------------
 
 input AtsSummarizeInput {
-  details: String
+  details: [String!]
   organization: String
   raw: String!
   skills: [String!]!

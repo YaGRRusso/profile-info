@@ -165,32 +165,49 @@ export function ExperienceForm({
     validators: { onChange: experienceSchema },
   });
 
-  // TODO get more context
-  const handleOptimize = useCallback(
+  const handleAtsOptimize = useCallback(
     async <Field extends DeepKeys<ExperienceSchema>>(
+      fieldParent: ExperienceSchema["roles"][number],
+      fieldGroup: ExperienceSchema["roles"][number]["i18n"][number],
       fieldName: Field,
       fieldValue: DeepValue<ExperienceSchema, Field>
     ) => {
+      console.log({ fieldParent, fieldGroup, fieldName, fieldValue });
+
+      const raw = fieldValue as string;
+      const type = "experience";
+
+      const skills = fieldParent.skills.map(
+        (skillId) =>
+          findManySkills.data?.nodes.find((skill) => skill.id === skillId)
+            ?.name ?? ""
+      );
+
+      const organization =
+        findManyOrganizations.data?.nodes.find(
+          (organization) =>
+            organization.id === form.getFieldValue("organization")
+        )?.name ?? "";
+
+      const fromTitle = `title: ${fieldGroup.title}`;
+      const fromDetail = `period: from ${fieldParent.period.from} to ${fieldParent.period.to}`;
+      const categoryDetail = `category: ${form.getFieldValue("category")}`;
+      const details = [fromTitle, fromDetail, categoryDetail];
+
+      console.log({
+        raw,
+        type,
+        skills,
+        organization,
+        details,
+      });
+
       const summarized = await atsSummarize.mutateAsync({
-        raw: fieldValue as string,
-        type: "experience",
-        skills: [
-          "react",
-          "typescript",
-          "node",
-          "nest",
-          "dynamo",
-          "aws",
-          "graphql",
-          "tailwind",
-          "tanstack",
-          "shadcn",
-          "jest",
-          "lambda",
-          "monorepo",
-        ],
-        details: "dev senior fullstack",
-        organization: "Droz",
+        raw,
+        type,
+        skills,
+        details,
+        organization,
       });
 
       form.setFieldValue(
@@ -201,7 +218,13 @@ export function ExperienceForm({
         >
       );
     },
-    [form, atsSummarize.mutateAsync]
+    [
+      atsSummarize.mutateAsync,
+      form.getFieldValue,
+      form.setFieldValue,
+      findManyOrganizations.data?.nodes.find,
+      findManySkills.data?.nodes.find,
+    ]
   );
 
   const { Field, Subscribe } = form;
@@ -289,6 +312,32 @@ export function ExperienceForm({
           >
             {(roleIndex) => (
               <>
+                <Field name={`roles[${roleIndex}].period`}>
+                  {(field) => (
+                    <DateRangeInput
+                      error={fieldError(field.state.meta)}
+                      label="Period"
+                      onChange={field.handleChange}
+                      value={field.state.value}
+                    />
+                  )}
+                </Field>
+
+                <Field name={`roles[${roleIndex}].skills`}>
+                  {(field) => (
+                    <MultiSelectInput
+                      error={fieldError(field.state.meta)}
+                      label="Skills"
+                      onChange={field.handleChange}
+                      options={skillOptions}
+                      placeholder="Select skills"
+                      value={field.state.value}
+                    />
+                  )}
+                </Field>
+
+                <div className="divider">Translations</div>
+
                 <Field mode="array" name={`roles[${roleIndex}].i18n`}>
                   {(i18nField) => (
                     <FieldArray
@@ -340,52 +389,28 @@ export function ExperienceForm({
                             name={`roles[${roleIndex}].i18n[${i18nIndex}].description`}
                           >
                             {(field) => (
-                              <>
-                                <TextareaInput
-                                  disabled={atsSummarize.isPending}
-                                  error={fieldError(field.state.meta)}
-                                  label="Description"
-                                  name={field.name}
-                                  onChange={field.handleChange}
-                                  onOptimize={() =>
-                                    handleOptimize(
-                                      field.name,
-                                      field.state.value
-                                    )
-                                  }
-                                  placeholder="Description"
-                                  value={field.state.value}
-                                />
-                              </>
+                              <TextareaInput
+                                disabled={atsSummarize.isPending}
+                                error={fieldError(field.state.meta)}
+                                label="Description"
+                                name={field.name}
+                                onChange={field.handleChange}
+                                onOptimize={() =>
+                                  handleAtsOptimize(
+                                    rolesField.state.value[roleIndex],
+                                    i18nField.state.value[i18nIndex],
+                                    field.name,
+                                    field.state.value
+                                  )
+                                }
+                                placeholder="Description"
+                                value={field.state.value}
+                              />
                             )}
                           </Field>
                         </>
                       )}
                     </FieldArray>
-                  )}
-                </Field>
-
-                <Field name={`roles[${roleIndex}].period`}>
-                  {(field) => (
-                    <DateRangeInput
-                      error={fieldError(field.state.meta)}
-                      label="Period"
-                      onChange={field.handleChange}
-                      value={field.state.value}
-                    />
-                  )}
-                </Field>
-
-                <Field name={`roles[${roleIndex}].skills`}>
-                  {(field) => (
-                    <MultiSelectInput
-                      error={fieldError(field.state.meta)}
-                      label="Skills"
-                      onChange={field.handleChange}
-                      options={skillOptions}
-                      placeholder="Select skills"
-                      value={field.state.value}
-                    />
                   )}
                 </Field>
               </>

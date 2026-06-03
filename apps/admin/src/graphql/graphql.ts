@@ -19,7 +19,7 @@ export type Scalars = {
 };
 
 export type AtsSummarizeInput = {
-  details?: InputMaybe<Scalars['String']['input']>;
+  details?: InputMaybe<Array<Scalars['String']['input']>>;
   organization?: InputMaybe<Scalars['String']['input']>;
   raw: Scalars['String']['input'];
   skills: Array<Scalars['String']['input']>;
