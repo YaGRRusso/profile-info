@@ -2,8 +2,29 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
+input AtsSummarizeInput {
+  details: String
+  organization: String
+  raw: String!
+  skills: [String!]!
+  type: String!
+}
+
 type BatchEntity {
   count: Int!
+}
+
+enum ChatFinishReason {
+  CONTENT_FILTER
+  ERROR
+  LENGTH
+  STOP
+  TOOL_CALLS
+}
+
+type ChoiceEntity {
+  finishReason: ChatFinishReason
+  message: MessageEntity!
 }
 
 type CourseEntity {
@@ -339,7 +360,20 @@ input FilterUserInput {
   urls: [UrlInput!]
 }
 
+type GenericIaEntity {
+  messages: [ChoiceEntity!]!
+  usage: UsageEntity
+}
+
+type MessageEntity {
+  content: String!
+  reasoning: String
+  refusal: String
+  role: OpenRouterRole!
+}
+
 type Mutation {
+  atsSummarize(atsSummarizeInput: AtsSummarizeInput!): GenericIaEntity!
   createManyCourses(createCourseInputs: [CreateCourseInput!]!): [CourseEntity!]!
   createManyEducations(createEducationInputs: [CreateEducationInput!]!): [EducationEntity!]!
   createManyExperiences(createExperienceInputs: [CreateExperienceInput!]!): [ExperienceEntity!]!
@@ -383,6 +417,14 @@ type Mutation {
   updateOneProject(projectId: ID!, updateProjectInput: UpdateProjectInput!): ProjectEntity!
   updateOneSkill(skillId: ID!, updateSkillInput: UpdateSkillInput!): SkillEntity!
   updateOneUser(updateUserInput: UpdateUserInput!, userId: ID!): UserEntity!
+}
+
+enum OpenRouterRole {
+  ASSISTANT
+  DEVELOPER
+  SYSTEM
+  TOOL
+  USER
 }
 
 enum OrganizationCategory {
@@ -650,6 +692,13 @@ type UrlEntity {
 input UrlInput {
   title: String!
   value: String!
+}
+
+type UsageEntity {
+  completionTokens: Float
+  cost: Float
+  promptTokens: Float
+  totalTokens: Float
 }
 
 type UserEntity {

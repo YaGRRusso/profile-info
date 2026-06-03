@@ -18,9 +18,31 @@ export type Scalars = {
   DateTime: { input: any; output: any; }
 };
 
+export type AtsSummarizeInput = {
+  details?: InputMaybe<Scalars['String']['input']>;
+  organization?: InputMaybe<Scalars['String']['input']>;
+  raw: Scalars['String']['input'];
+  skills: Array<Scalars['String']['input']>;
+  type: Scalars['String']['input'];
+};
+
 export type BatchEntity = {
   __typename?: 'BatchEntity';
   count: Scalars['Int']['output'];
+};
+
+export enum ChatFinishReason {
+  ContentFilter = 'CONTENT_FILTER',
+  Error = 'ERROR',
+  Length = 'LENGTH',
+  Stop = 'STOP',
+  ToolCalls = 'TOOL_CALLS'
+}
+
+export type ChoiceEntity = {
+  __typename?: 'ChoiceEntity';
+  finishReason?: Maybe<ChatFinishReason>;
+  message: MessageEntity;
 };
 
 export type CourseEntity = {
@@ -365,8 +387,23 @@ export type FilterUserInput = {
   urls?: InputMaybe<Array<UrlInput>>;
 };
 
+export type GenericIaEntity = {
+  __typename?: 'GenericIaEntity';
+  messages: Array<ChoiceEntity>;
+  usage?: Maybe<UsageEntity>;
+};
+
+export type MessageEntity = {
+  __typename?: 'MessageEntity';
+  content: Scalars['String']['output'];
+  reasoning?: Maybe<Scalars['String']['output']>;
+  refusal?: Maybe<Scalars['String']['output']>;
+  role: OpenRouterRole;
+};
+
 export type Mutation = {
   __typename?: 'Mutation';
+  atsSummarize: GenericIaEntity;
   createManyCourses: Array<CourseEntity>;
   createManyEducations: Array<EducationEntity>;
   createManyExperiences: Array<ExperienceEntity>;
@@ -410,6 +447,11 @@ export type Mutation = {
   updateOneProject: ProjectEntity;
   updateOneSkill: SkillEntity;
   updateOneUser: UserEntity;
+};
+
+
+export type MutationAtsSummarizeArgs = {
+  atsSummarizeInput: AtsSummarizeInput;
 };
 
 
@@ -640,6 +682,14 @@ export type MutationUpdateOneUserArgs = {
   updateUserInput: UpdateUserInput;
   userId: Scalars['ID']['input'];
 };
+
+export enum OpenRouterRole {
+  Assistant = 'ASSISTANT',
+  Developer = 'DEVELOPER',
+  System = 'SYSTEM',
+  Tool = 'TOOL',
+  User = 'USER'
+}
 
 export enum OrganizationCategory {
   Company = 'COMPANY',
@@ -1076,6 +1126,14 @@ export type UrlInput = {
   value: Scalars['String']['input'];
 };
 
+export type UsageEntity = {
+  __typename?: 'UsageEntity';
+  completionTokens?: Maybe<Scalars['Float']['output']>;
+  cost?: Maybe<Scalars['Float']['output']>;
+  promptTokens?: Maybe<Scalars['Float']['output']>;
+  totalTokens?: Maybe<Scalars['Float']['output']>;
+};
+
 export type UserEntity = {
   __typename?: 'UserEntity';
   address?: Maybe<Scalars['String']['output']>;
@@ -1210,6 +1268,13 @@ export type RemoveManyExperiencesMutationVariables = Exact<{
 
 
 export type RemoveManyExperiencesMutation = { __typename?: 'Mutation', removeManyExperiences: { __typename?: 'BatchEntity', count: number } };
+
+export type AtsSummarizeMutationVariables = Exact<{
+  atsSummarizeInput: AtsSummarizeInput;
+}>;
+
+
+export type AtsSummarizeMutation = { __typename?: 'Mutation', atsSummarize: { __typename?: 'GenericIaEntity', messages: Array<{ __typename?: 'ChoiceEntity', finishReason?: ChatFinishReason | null, message: { __typename?: 'MessageEntity', content: string, reasoning?: string | null, refusal?: string | null, role: OpenRouterRole } }>, usage?: { __typename?: 'UsageEntity', completionTokens?: number | null, cost?: number | null, promptTokens?: number | null, totalTokens?: number | null } | null } };
 
 export type CreateOneOrganizationMutationVariables = Exact<{
   createOrganizationInput: CreateOrganizationInput;
@@ -1667,6 +1732,27 @@ export const RemoveManyExperiencesDocument = new TypedDocumentString(`
   }
 }
     `) as unknown as TypedDocumentString<RemoveManyExperiencesMutation, RemoveManyExperiencesMutationVariables>;
+export const AtsSummarizeDocument = new TypedDocumentString(`
+    mutation AtsSummarize($atsSummarizeInput: AtsSummarizeInput!) {
+  atsSummarize(atsSummarizeInput: $atsSummarizeInput) {
+    messages {
+      finishReason
+      message {
+        content
+        reasoning
+        refusal
+        role
+      }
+    }
+    usage {
+      completionTokens
+      cost
+      promptTokens
+      totalTokens
+    }
+  }
+}
+    `) as unknown as TypedDocumentString<AtsSummarizeMutation, AtsSummarizeMutationVariables>;
 export const CreateOneOrganizationDocument = new TypedDocumentString(`
     mutation CreateOneOrganization($createOrganizationInput: CreateOrganizationInput!) {
   createOneOrganization(createOrganizationInput: $createOrganizationInput) {

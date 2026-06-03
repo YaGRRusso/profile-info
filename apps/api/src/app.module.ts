@@ -5,6 +5,7 @@ import { Module } from "@nestjs/common";
 import { ConfigModule, ConfigService } from "@nestjs/config";
 import { GraphQLModule } from "@nestjs/graphql";
 import { MongooseModule } from "@nestjs/mongoose";
+import { AiModule } from "./ai/ai.module";
 import { AppController } from "./app.controller";
 import { AppService } from "./app.service";
 import { AuthModule } from "./auth/auth.module";
@@ -57,6 +58,7 @@ import { UsersModule } from "./users/users.module";
         }),
       }),
     }),
+    AiModule,
     SkillsModule,
     ProjectsModule,
     UsersModule,
