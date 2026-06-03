@@ -16,6 +16,7 @@
     "format": "biome format --write ."
   },
   "dependencies": {
+    "@formkit/auto-animate": "^0.9.0",
     "@phosphor-icons/react": "^2.1.10",
     "@tanstack/react-form": "^1.33.0",
     "@tanstack/react-query": "^5.100.14",

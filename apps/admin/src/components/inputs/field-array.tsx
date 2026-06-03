@@ -5,7 +5,7 @@ import {
   TrashSimpleIcon,
   WarningIcon,
 } from "@phosphor-icons/react";
-import { type ReactNode, useEffect, useState } from "react";
+import { type ReactNode } from "react";
 import { cn } from "@/lib/cn";
 import { Alert } from "../display/alert";
 
@@ -32,15 +32,6 @@ export function FieldArray({
   sublevel,
   values,
 }: FieldArrayProps) {
-  const [isMoving, setIsMoving] = useState(false);
-
-  useEffect(() => {
-    if (isMoving) {
-      const timeout = setTimeout(() => setIsMoving(false), 300);
-      return () => clearTimeout(timeout);
-    }
-  }, [isMoving]);
-
   return (
     <div className="fieldset gap-2">
       {!values.length && (
@@ -54,7 +45,6 @@ export function FieldArray({
         <div
           className={cn(
             "flex flex-col gap-2 rounded-md bg-base-200",
-            isMoving && "animate-blink",
             !sublevel && "p-4"
           )}
           key={index}
@@ -69,7 +59,6 @@ export function FieldArray({
                   className="btn btn-ghost btn-sm btn-square"
                   disabled={index === 0}
                   onClick={() => {
-                    setIsMoving(true);
                     onMoveUp(index);
                   }}
                   type="button"
@@ -82,7 +71,6 @@ export function FieldArray({
                   className="btn btn-ghost btn-sm btn-square"
                   disabled={index === values.length - 1}
                   onClick={() => {
-                    setIsMoving(true);
                     onMoveDown(index);
                   }}
                   type="button"
