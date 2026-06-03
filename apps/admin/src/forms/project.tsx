@@ -3,7 +3,9 @@ import z from "zod";
 import { FieldArray } from "@/components/inputs/field-array";
 import { MultiSelectInput } from "@/components/inputs/multi-select";
 import { RangeInput } from "@/components/inputs/range";
+import { SelectInput } from "@/components/inputs/select";
 import { TextInput } from "@/components/inputs/text";
+import { LOCALES, LocaleEnum } from "@/consts/locales";
 import type { CreateProjectInput } from "@/graphql/graphql";
 import { useQueryAllPages } from "@/hooks/custom/use-query-all-pages";
 import type { ProjectRow } from "@/hooks/queries/projects";
@@ -30,7 +32,14 @@ const projectSchema = z.object({
         description: z.string().min(1, "required field"),
       })
     )
-    .min(1, "required group"),
+    .min(1, "required group")
+    .refine(
+      (items) => {
+        const locales = items.map((item) => item.locale);
+        return new Set(locales).size === locales.length;
+      },
+      { message: "locales must be unique" }
+    ),
 });
 
 export type ProjectSchema = z.infer<typeof projectSchema>;
@@ -95,7 +104,10 @@ export function ProjectForm({
       skills: [] as string[],
       images: [] as string[],
       urls: [] as { title: string; value: string }[],
-      i18n: [{ locale: "", title: "", description: "" }],
+      i18n: [
+        { locale: LocaleEnum.PORTUGUESE, title: "", description: "" },
+        { locale: LocaleEnum.ENGLISH, title: "", description: "" },
+      ],
       ...defaultValues,
     },
     onSubmit: ({ value }) => onSubmit?.(value),
@@ -241,10 +253,12 @@ export function ProjectForm({
               <>
                 <Field name={`i18n[${index}].locale`}>
                   {(field) => (
-                    <TextInput
+                    <SelectInput
                       error={fieldError(field.state.meta)}
+                      label="Locale"
                       name={field.name}
                       onChange={field.handleChange}
+                      options={LOCALES}
                       placeholder="Locale"
                       value={field.state.value}
                     />

@@ -12,6 +12,41 @@ import { ProjectModel } from "./schemas/project.schema";
 import { SkillModel } from "./schemas/skill.schema";
 import { UserModel } from "./schemas/user.schema";
 
+const URL_TYPES = [
+  "github",
+  "linkedin",
+  "whatsapp",
+  "email",
+  "phone",
+  "other",
+  "website",
+  "repository",
+  "demo",
+];
+
+const SKILLS_SLUGS = [
+  "javascript",
+  "typescript",
+  "react",
+  "nodedotjs",
+  "nextdotjs",
+  "nestjs",
+  "tailwindcss",
+  "docker",
+  "kubernetes",
+  "amazonaws",
+  "postgresql",
+  "mongodb",
+  "redis",
+  "graphql",
+  "vitest",
+  "vite",
+  "html5",
+  "css3",
+  "linux",
+  "git",
+];
+
 const SKILL_CATEGORIES = ["LANGUAGE", "FRONTEND", "BACKEND", "DATA", "DEVOPS"];
 const ORGANIZATION_CATEGORIES = ["COMPANY", "SCHOOL", "OTHER"];
 const STATUSES = ["COMPLETE", "INCOMPLETE", "IN_PROGRESS"];
@@ -84,11 +119,11 @@ async function seed() {
   ]);
 
   const skillDocs = await skills.create(
-    buildMany(12, (index) => {
-      const name = capitalize(faker.hacker.noun());
+    SKILLS_SLUGS.map((slug) => {
+      const name = capitalize(slug);
       return {
         name,
-        slug: slugFor(name, index),
+        slug,
         category: faker.helpers.arrayElement(SKILL_CATEGORIES),
         relevance: relevance(),
       };
@@ -113,7 +148,7 @@ async function seed() {
 
   const randomOrganization = () => faker.helpers.arrayElement(organizationIds);
   const randomSkills = () =>
-    faker.helpers.arrayElements(skillIds, { min: 1, max: 4 });
+    faker.helpers.arrayElements(skillIds, { min: 3, max: 9 });
 
   await courses.create(
     buildMany(8, (index) => ({
@@ -150,10 +185,10 @@ async function seed() {
         count: { min: 1, max: 3 },
       }),
       skills: randomSkills(),
-      urls: faker.helpers.multiple(
-        () => ({ title: faker.lorem.word(), value: faker.internet.url() }),
-        { count: { min: 1, max: 3 } }
-      ),
+      urls: faker.helpers.arrayElements(URL_TYPES).map((type) => ({
+        title: type,
+        value: faker.internet.url(),
+      })),
       i18n: i18n(),
     }))
   );

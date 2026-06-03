@@ -6,6 +6,7 @@ import { MultiSelectInput } from "@/components/inputs/multi-select";
 import { RangeInput } from "@/components/inputs/range";
 import { SelectInput } from "@/components/inputs/select";
 import { TextInput } from "@/components/inputs/text";
+import { LOCALES, LocaleEnum } from "@/consts/locales";
 import {
   type CreateExperienceInput,
   ExperienceCategory,
@@ -34,7 +35,14 @@ const experienceSchema = z.object({
               description: z.string().min(1, "required field"),
             })
           )
-          .min(1, "required group"),
+          .min(1, "required group")
+          .refine(
+            (items) => {
+              const locales = items.map((item) => item.locale);
+              return new Set(locales).size === locales.length;
+            },
+            { message: "locales must be unique" }
+          ),
         period: z
           .object({ from: z.string(), to: z.string() })
           .refine(
@@ -107,7 +115,10 @@ const CATEGORY_OPTIONS = Object.values(ExperienceCategory).map((category) => ({
 
 function emptyRole() {
   return {
-    i18n: [{ locale: "", title: "", description: "" }],
+    i18n: [
+      { locale: LocaleEnum.PORTUGUESE, title: "", description: "" },
+      { locale: LocaleEnum.ENGLISH, title: "", description: "" },
+    ],
     period: { from: "", to: "" },
     skills: [] as string[],
   };
@@ -254,10 +265,12 @@ export function ExperienceForm({
                             name={`roles[${roleIndex}].i18n[${i18nIndex}].locale`}
                           >
                             {(field) => (
-                              <TextInput
+                              <SelectInput
                                 error={fieldError(field.state.meta)}
+                                label="Locale"
                                 name={field.name}
                                 onChange={field.handleChange}
+                                options={LOCALES}
                                 placeholder="Locale"
                                 value={field.state.value}
                               />

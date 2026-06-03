@@ -6,6 +6,7 @@ import { NumberInput } from "@/components/inputs/number";
 import { RangeInput } from "@/components/inputs/range";
 import { SelectInput } from "@/components/inputs/select";
 import { TextInput } from "@/components/inputs/text";
+import { LOCALES, LocaleEnum } from "@/consts/locales";
 import { CourseStatus, type CreateCourseInput } from "@/graphql/graphql";
 import { useQueryAllPages } from "@/hooks/custom/use-query-all-pages";
 import type { CourseRow } from "@/hooks/queries/courses";
@@ -31,7 +32,14 @@ const courseSchema = z.object({
         description: z.string().min(1, "required field"),
       })
     )
-    .min(1, "required group"),
+    .min(1, "required group")
+    .refine(
+      (items) => {
+        const locales = items.map((item) => item.locale);
+        return new Set(locales).size === locales.length;
+      },
+      { message: "locales must be unique" }
+    ),
 });
 
 export type CourseSchema = z.infer<typeof courseSchema>;
@@ -114,7 +122,10 @@ export function CourseForm({
       image: "",
       hours: 0,
       skills: [] as string[],
-      i18n: [{ locale: "", title: "", description: "" }],
+      i18n: [
+        { locale: LocaleEnum.PORTUGUESE, title: "", description: "" },
+        { locale: LocaleEnum.ENGLISH, title: "", description: "" },
+      ],
       ...defaultValues,
     },
     onSubmit: ({ value }) => onSubmit?.(value),
@@ -255,11 +266,12 @@ export function CourseForm({
               <>
                 <Field name={`i18n[${index}].locale`}>
                   {(field) => (
-                    <TextInput
+                    <SelectInput
                       error={fieldError(field.state.meta)}
                       label="Locale"
                       name={field.name}
                       onChange={field.handleChange}
+                      options={LOCALES}
                       placeholder="Locale"
                       value={field.state.value}
                     />

@@ -57,33 +57,25 @@ export function MultiSelectInput({
   }
 
   return (
-    <fieldset className="fieldset">
+    <fieldset className="fieldset" disabled={disabled}>
       {label && <legend className="fieldset-legend">{label}</legend>}
       <div className="relative w-full" ref={containerRef}>
-        <button
-          className={cn(
-            "input w-full justify-between",
-            error && "input-error",
-            className
-          )}
-          disabled={disabled}
-          onClick={() => setIsOpen((previous) => !previous)}
-          type="button"
+        <label
+          className={cn("input w-full", error && "input-error", className)}
         >
-          <span className={cn(!value.length && "opacity-md")}>
-            {value.length ? `${value.length} selected` : placeholder}
-          </span>
+          <input
+            onChange={(event) => setSearch(event.target.value)}
+            onFocus={() => setIsOpen(true)}
+            placeholder={
+              value.length ? `${value.length} selected` : placeholder
+            }
+            type="text"
+            value={search}
+          />
           <CaretDownIcon />
-        </button>
+        </label>
         {isOpen && (
           <div className="absolute top-full left-0 z-20 mt-1 flex max-h-64 w-full flex-col gap-2 overflow-auto rounded-box bg-base-200 p-2 shadow">
-            <input
-              className="input input-sm w-full"
-              onChange={(event) => setSearch(event.target.value)}
-              placeholder="Search"
-              type="text"
-              value={search}
-            />
             <ul className="flex flex-col">
               {filteredOptions.map((option) => (
                 <li key={option.value}>
