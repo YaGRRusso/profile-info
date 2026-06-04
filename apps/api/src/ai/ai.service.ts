@@ -2,10 +2,10 @@ import { Injectable } from "@nestjs/common";
 import { Octokit } from "@octokit/rest";
 import { OpenRouter } from "@openrouter/sdk";
 import { ChatRequest } from "@openrouter/sdk/models";
+import pLimit from "p-limit";
 import { AtsSummarizeInput, DetailInput } from "./dto/ats-summarize";
 import { GenericIaEntity } from "./entities/ai.entity";
 import { FreeAiModels } from "./enums/model.enum";
-import { ResourceType } from "./enums/resource-type";
 import { OpenRouterRole } from "./enums/role.enum";
 import { createDetails } from "./helpers/detail";
 import { openRouterMapper } from "./mappers/open-routes";
@@ -116,21 +116,56 @@ export class AiService {
     return repositoryDetails;
   }
 
-  private async getProjectResourceDetails(
+  // TODO IMPORTANT
+  // Create a ResourceDetailOrchestrator service that will handle the orchestration of fetching resource details, including concurrency control and error handling.
+  // This will keep the AiService focused on its core responsibilities and make the code more modular and maintainable.
+  private async getResourceDetails(
     details: DetailInput[]
   ): Promise<DetailInput[]> {
-    const resourceDetails: DetailInput[] = [];
-    const githubDetail = details.find(
-      (detail) => detail.key.trim().toLocaleLowerCase() === "github"
-    )?.value[0];
+    const promises: Promise<DetailInput[]>[] = [];
+    const limit = pLimit(5);
 
-    if (githubDetail) {
-      const { owner, repo } = this.getRepositoryMeta(githubDetail);
-      const repositoryDetails = await this.getRepositoryDetails(owner, repo);
-      resourceDetails.push(...repositoryDetails);
+    const urlKeys = ["urls", "links", "references", "resources"];
+
+    const urlMatchingDetails = details.filter((detail) =>
+      urlKeys.includes(detail.key.trim().toLocaleLowerCase())
+    );
+
+    for (const urlDetailMatch of urlMatchingDetails) {
+      const ghUrls = urlDetailMatch.value.filter((url) =>
+        url.includes("github.com")
+      );
+
+      for (const ghValue of ghUrls) {
+        const { owner, repo } = this.getRepositoryMeta(ghValue);
+
+        const fetchPromise = limit(() =>
+          this.getRepositoryDetails(owner, repo)
+        );
+
+        promises.push(fetchPromise);
+      }
     }
 
-    return resourceDetails;
+    if (promises.length === 0) return [];
+
+    try {
+      const timeoutDuration = 30_000;
+      const timeoutPromise = new Promise<never>((_, reject) =>
+        setTimeout(() => reject(new Error("timeout")), timeoutDuration)
+      );
+
+      const results = await Promise.race([
+        Promise.all(promises),
+        timeoutPromise,
+      ]);
+
+      return results.flat();
+    } catch (error) {
+      console.error(error);
+
+      return [];
+    }
   }
 
   async atsSummarize({
@@ -141,10 +176,9 @@ export class AiService {
   }: AtsSummarizeInput): Promise<GenericIaEntity> {
     const parsedDetails = createDetails(details || []);
 
-    if (details && type === ResourceType.PROJECT) {
-      const projectResourceDetails =
-        await this.getProjectResourceDetails(details);
-      parsedDetails.push(...createDetails(projectResourceDetails));
+    if (details) {
+      const resourceDetails = await this.getResourceDetails(details);
+      parsedDetails.push(...createDetails(resourceDetails));
     }
 
     const chatRequest: ChatRequest & { stream?: false } = {
@@ -166,10 +200,9 @@ export class AiService {
       ],
     };
 
-    console.log({ chatRequest });
-    const completion = await this.client.chat.send({
-      chatRequest,
-    });
+    console.dir(chatRequest, { depth: null });
+    const completion = await this.client.chat.send({ chatRequest });
+    console.dir(completion, { depth: null });
 
     if (!completion) throw new Error("No completion received from OpenRouter");
     return openRouterMapper(completion);

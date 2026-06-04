@@ -13,6 +13,7 @@ import { LOCALES, LocaleEnum } from "@/consts/locales";
 import {
   CourseStatus,
   type CreateCourseInput,
+  DetailInput,
   ResourceType,
 } from "@/graphql/graphql";
 import { useQueryAllPages } from "@/hooks/custom/use-query-all-pages";
@@ -149,6 +150,8 @@ export function CourseForm({
       fieldName: Field,
       fieldValue: DeepValue<CourseSchema, Field>
     ) => {
+      const details: DetailInput[] = [];
+
       const raw = fieldValue as string;
       const type = ResourceType.Course;
 
@@ -162,15 +165,15 @@ export function CourseForm({
 
       const title = fieldGroup.title;
       if (!title) return toast.error("Title is required");
-      const titleDetail = `Title: ${title}`;
+      details.push({ key: "Title", value: [title] });
 
       const duration = form.getFieldValue("hours");
       if (!duration) return toast.error("Hours is required");
-      const durationDetail = `Hours: ${form.getFieldValue("hours")}`;
+      details.push({ key: "Hours", value: [`${duration} hours`] });
 
       const status = form.getFieldValue("status");
       if (!status) return toast.error("Status is required");
-      const statusDetail = `Status: ${status}`;
+      details.push({ key: "Status", value: [status] });
 
       const organization = findLabelById({
         items: findManyOrganizations.data?.nodes,
@@ -179,14 +182,13 @@ export function CourseForm({
         targetValue: form.getFieldValue("organization"),
       });
       if (!organization) return toast.error("Organization is required");
-      const organizationDetail = `Organization: ${organization}`;
+      details.push({ key: "Organization", value: [organization] });
 
-      const details = [
-        titleDetail,
-        durationDetail,
-        statusDetail,
-        organizationDetail,
-      ];
+      const language = fieldGroup.locale;
+      if (language) details.push({ key: "Language", value: [language] });
+
+      const url = form.getFieldValue("url");
+      if (url) details.push({ key: "URLs", value: [url] });
 
       const summarized = await atsSummarize.mutateAsync({
         raw,

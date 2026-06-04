@@ -9,7 +9,11 @@ import { SelectInput } from "@/components/inputs/select";
 import { TextInput } from "@/components/inputs/text";
 import { TextareaInput } from "@/components/inputs/textarea";
 import { LOCALES, LocaleEnum } from "@/consts/locales";
-import { type CreateProjectInput, ResourceType } from "@/graphql/graphql";
+import {
+  type CreateProjectInput,
+  DetailInput,
+  ResourceType,
+} from "@/graphql/graphql";
 import { useQueryAllPages } from "@/hooks/custom/use-query-all-pages";
 import { useAtsSummarize } from "@/hooks/mutations/ai";
 import type { ProjectRow } from "@/hooks/queries/projects";
@@ -127,6 +131,8 @@ export function ProjectForm({
       fieldName: Field,
       fieldValue: DeepValue<ProjectSchema, Field>
     ) => {
+      const details: DetailInput[] = [];
+
       const raw = fieldValue as string;
       const type = ResourceType.Project;
 
@@ -140,9 +146,13 @@ export function ProjectForm({
 
       const title = fieldGroup.title;
       if (!title) return toast.error("Title is required");
-      const titleDetail = `Title: ${title}`;
+      details.push({ key: "Title", value: [title] });
 
-      const details = [titleDetail];
+      const language = fieldGroup.locale;
+      if (language) details.push({ key: "Language", value: [language] });
+
+      const urls = form.getFieldValue("urls")?.map((url) => url.value) ?? [];
+      if (urls) details.push({ key: "URLs", value: urls });
 
       const summarized = await atsSummarize.mutateAsync({
         raw,

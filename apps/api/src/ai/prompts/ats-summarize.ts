@@ -43,6 +43,8 @@ ${compact(details)
   ?.map((detail) => `- ${detail}`)
   .join("\n")}
 
+---
+
 # User Raw Input
 <user_input>
 ${raw}

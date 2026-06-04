@@ -12,6 +12,7 @@ import { TextareaInput } from "@/components/inputs/textarea";
 import { LOCALES, LocaleEnum } from "@/consts/locales";
 import {
   type CreateEducationInput,
+  DetailInput,
   EducationLevel,
   EducationStatus,
   ResourceType,
@@ -174,6 +175,8 @@ export function EducationForm({
       fieldName: Field,
       fieldValue: DeepValue<EducationSchema, Field>
     ) => {
+      const details: DetailInput[] = [];
+
       const raw = fieldValue as string;
       const type = ResourceType.Education;
 
@@ -187,19 +190,22 @@ export function EducationForm({
 
       const title = fieldGroup.title;
       if (!title) return toast.error("Title is required");
-      const titleDetail = `Title: ${title}`;
+      details.push({ key: "Title", value: [title] });
 
       const period = form.getFieldValue("period");
       if (!period.from && !period.to) return toast.error("Period is required");
-      const periodDetail = `Period: from ${period.from} to ${period.to}`;
+      details.push({
+        key: "Period",
+        value: [`from ${period.from} to ${period.to}`],
+      });
 
       const level = form.getFieldValue("level");
       if (!level) return toast.error("Level is required");
-      const levelDetail = `Level: ${level}`;
+      details.push({ key: "Level", value: [level] });
 
       const status = form.getFieldValue("status");
       if (!status) return toast.error("Status is required");
-      const statusDetail = `Status: ${status}`;
+      details.push({ key: "Status", value: [status] });
 
       const organization = findLabelById({
         items: findManyOrganizations.data?.nodes,
@@ -208,15 +214,13 @@ export function EducationForm({
         targetValue: form.getFieldValue("organization"),
       });
       if (!organization) return toast.error("Organization is required");
-      const organizationDetail = `Organization: ${organization}`;
+      details.push({ key: "Organization", value: [organization] });
 
-      const details = [
-        titleDetail,
-        periodDetail,
-        levelDetail,
-        statusDetail,
-        organizationDetail,
-      ];
+      const language = fieldGroup.locale;
+      if (language) details.push({ key: "Language", value: [language] });
+
+      const url = form.getFieldValue("url");
+      if (url) details.push({ key: "URLs", value: [url] });
 
       const summarized = await atsSummarize.mutateAsync({
         raw,

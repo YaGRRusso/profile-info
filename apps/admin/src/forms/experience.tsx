@@ -12,6 +12,7 @@ import { TextareaInput } from "@/components/inputs/textarea";
 import { LOCALES, LocaleEnum } from "@/consts/locales";
 import {
   type CreateExperienceInput,
+  DetailInput,
   ExperienceCategory,
   ResourceType,
 } from "@/graphql/graphql";
@@ -175,6 +176,8 @@ export function ExperienceForm({
       fieldName: Field,
       fieldValue: DeepValue<ExperienceSchema, Field>
     ) => {
+      const details: DetailInput[] = [];
+
       const raw = fieldValue as string;
       const type = ResourceType.Experience;
 
@@ -188,15 +191,21 @@ export function ExperienceForm({
 
       const title = fieldGroup.title;
       if (!title) return toast.error("Title is required");
-      const titleDetail = `Title: ${fieldGroup.title}`;
+      details.push({ key: "Title", value: [title] });
 
       const period = fieldParent.period;
       if (!period.from && !period.to) return toast.error("Period is required");
-      const periodDetail = `Period: from ${period.from} to ${period.to}`;
+      details.push({
+        key: "Period",
+        value: [
+          period.from ? `from ${period.from}` : "",
+          period.to ? `to ${period.to}` : "",
+        ].filter(Boolean),
+      });
 
       const category = form.getFieldValue("category");
       if (!category) return toast.error("Category is required");
-      const categoryDetail = `Category: ${category}`;
+      details.push({ key: "Category", value: [category] });
 
       const organization = findLabelById({
         items: findManyOrganizations.data?.nodes,
@@ -205,14 +214,10 @@ export function ExperienceForm({
         targetValue: form.getFieldValue("organization"),
       });
       if (!organization) return toast.error("Organization is required");
-      const organizationDetail = `Organization: ${organization}`;
+      details.push({ key: "Organization", value: [organization] });
 
-      const details = [
-        titleDetail,
-        periodDetail,
-        categoryDetail,
-        organizationDetail,
-      ];
+      const language = fieldGroup.locale;
+      if (language) details.push({ key: "Language", value: [language] });
 
       const summarized = await atsSummarize.mutateAsync({
         raw,
