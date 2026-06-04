@@ -19,7 +19,7 @@ export type Scalars = {
 };
 
 export type AtsSummarizeInput = {
-  details?: InputMaybe<Array<Scalars['String']['input']>>;
+  details?: InputMaybe<Array<DetailInput>>;
   raw: Scalars['String']['input'];
   skills: Array<Scalars['String']['input']>;
   type: ResourceType;
@@ -229,6 +229,11 @@ export type DateRangeEntity = {
 export type DateRangeInput = {
   from?: InputMaybe<Scalars['DateTime']['input']>;
   to?: InputMaybe<Scalars['DateTime']['input']>;
+};
+
+export type DetailInput = {
+  key: Scalars['String']['input'];
+  value: Array<Scalars['String']['input']>;
 };
 
 export type EducationEntity = {

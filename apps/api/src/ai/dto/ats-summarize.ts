@@ -3,9 +3,18 @@ import { OptionalField } from "@/core/decorators/optional-field.decorator";
 import { ResourceType } from "../enums/resource-type";
 
 @InputType()
+export class DetailInput {
+  @Field(() => String)
+  key: string;
+
+  @Field(() => [String])
+  value: string[];
+}
+
+@InputType()
 export class AtsSummarizeInput {
-  @OptionalField(() => [String])
-  details?: string[];
+  @OptionalField(() => [DetailInput])
+  details?: DetailInput[];
 
   @Field(() => String)
   raw: string;

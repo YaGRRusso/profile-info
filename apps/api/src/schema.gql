@@ -3,7 +3,7 @@
 # ------------------------------------------------------
 
 input AtsSummarizeInput {
-  details: [String!]
+  details: [DetailInput!]
   raw: String!
   skills: [String!]!
   type: ResourceType!
@@ -210,6 +210,11 @@ input DateRangeInput {
 A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
 """
 scalar DateTime
+
+input DetailInput {
+  key: String!
+  value: [String!]!
+}
 
 type EducationEntity {
   createdAt: DateTime!
