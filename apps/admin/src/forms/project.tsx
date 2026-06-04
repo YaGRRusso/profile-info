@@ -11,7 +11,7 @@ import { TextareaInput } from "@/components/inputs/textarea";
 import { LOCALES, LocaleEnum } from "@/consts/locales";
 import type { CreateProjectInput } from "@/graphql/graphql";
 import { useQueryAllPages } from "@/hooks/custom/use-query-all-pages";
-import { useAtsSummarize } from "@/hooks/mutations/ia";
+import { useAtsSummarize } from "@/hooks/mutations/ai";
 import type { ProjectRow } from "@/hooks/queries/projects";
 import { useFindManySkills } from "@/hooks/queries/skills";
 import { fieldError } from "@/lib/field-error";

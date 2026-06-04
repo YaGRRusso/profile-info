@@ -16,7 +16,7 @@ import {
   EducationStatus,
 } from "@/graphql/graphql";
 import { useQueryAllPages } from "@/hooks/custom/use-query-all-pages";
-import { useAtsSummarize } from "@/hooks/mutations/ia";
+import { useAtsSummarize } from "@/hooks/mutations/ai";
 import type { EducationRow } from "@/hooks/queries/educations";
 import { useFindManyOrganizations } from "@/hooks/queries/organizations";
 import { useFindManySkills } from "@/hooks/queries/skills";

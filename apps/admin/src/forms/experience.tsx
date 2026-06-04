@@ -15,7 +15,7 @@ import {
   ExperienceCategory,
 } from "@/graphql/graphql";
 import { useQueryAllPages } from "@/hooks/custom/use-query-all-pages";
-import { useAtsSummarize } from "@/hooks/mutations/ia";
+import { useAtsSummarize } from "@/hooks/mutations/ai";
 import type { ExperienceRow } from "@/hooks/queries/experiences";
 import { useFindManyOrganizations } from "@/hooks/queries/organizations";
 import { useFindManySkills } from "@/hooks/queries/skills";
