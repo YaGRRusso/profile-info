@@ -1,6 +1,6 @@
 import { Args, Mutation, Resolver } from "@nestjs/graphql";
 import { AiService } from "./ai.service";
-import { AtsSummarizeInput, TranslateInput } from "./dto/ats-summarize";
+import { AtsSummarizeInput, TranslateInput } from "./dto/ats-summarize.input";
 import { GenericIaEntity } from "./entities/ai.entity";
 
 @Resolver(() => GenericIaEntity)

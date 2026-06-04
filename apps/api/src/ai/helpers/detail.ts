@@ -1,4 +1,4 @@
-import { DetailInput } from "../dto/ats-summarize";
+import { DetailInput } from "../dto/detail.input";
 
 /**
  * Transforms a DetailInput object into a formatted string.
