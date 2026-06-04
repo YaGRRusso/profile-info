@@ -10,6 +10,7 @@ import { SelectInput } from "@/components/inputs/select";
 import { TextInput } from "@/components/inputs/text";
 import { TextareaInput } from "@/components/inputs/textarea";
 import { LOCALES, LocaleEnum } from "@/consts/locales";
+import { RawSizeEnum } from "@/consts/raw-size";
 import {
   type CreateEducationInput,
   DetailInput,
@@ -18,7 +19,7 @@ import {
   ResourceType,
 } from "@/graphql/graphql";
 import { useQueryAllPages } from "@/hooks/custom/use-query-all-pages";
-import { useAtsSummarize } from "@/hooks/mutations/ai";
+import { useAtsSummarize, useTranslate } from "@/hooks/mutations/ai";
 import type { EducationRow } from "@/hooks/queries/educations";
 import { useFindManyOrganizations } from "@/hooks/queries/organizations";
 import { useFindManySkills } from "@/hooks/queries/skills";
@@ -138,6 +139,7 @@ export function EducationForm({
   useQueryAllPages(findManySkills);
 
   const atsSummarize = useAtsSummarize();
+  const translate = useTranslate();
 
   const organizationOptions = (findManyOrganizations.data?.nodes ?? []).map(
     (organization) => ({ label: organization.name, value: organization.id })
@@ -179,6 +181,9 @@ export function EducationForm({
 
       const raw = fieldValue as string;
       const type = ResourceType.Education;
+
+      if (raw.trim().length <= RawSizeEnum.XSMALL)
+        return toast.error("Description must be at least 32 characters long");
 
       const skills = findLabelsByIds({
         items: findManySkills.data?.nodes,
@@ -244,6 +249,33 @@ export function EducationForm({
       findManyOrganizations.data?.nodes,
       findManySkills.data?.nodes,
     ]
+  );
+
+  const handleTranslate = useCallback(
+    async <Field extends DeepKeys<EducationSchema>>(
+      fieldGroup: EducationSchema["i18n"][number],
+      fieldName: Field,
+      fieldValue: DeepValue<EducationSchema, Field>
+    ) => {
+      const raw = fieldValue as string;
+
+      if (raw.trim().length <= RawSizeEnum.XSMALL)
+        return toast.error("Description must be at least 32 characters long");
+
+      const translated = await translate.mutateAsync({
+        raw,
+        targetLanguage: fieldGroup.locale,
+      });
+
+      form.setFieldValue(
+        fieldName,
+        translated.translate.messages[0].message.content as DeepValue<
+          EducationSchema,
+          Field
+        >
+      );
+    },
+    [translate.mutateAsync, form.setFieldValue]
   );
 
   const { Field, Subscribe } = form;
@@ -416,13 +448,24 @@ export function EducationForm({
                 <Field name={`i18n[${index}].description`}>
                   {(field) => (
                     <TextareaInput
-                      disabled={atsSummarize.isPending}
+                      disabled={
+                        atsSummarize.isPending ||
+                        translate.isPending ||
+                        field.state.value.trim().length <= RawSizeEnum.XSMALL
+                      }
                       error={fieldError(field.state.meta)}
                       label="Description"
                       name={field.name}
                       onChange={field.handleChange}
                       onOptimize={() =>
                         handleAtsOptimize(
+                          arrayField.state.value[index],
+                          field.name,
+                          field.state.value
+                        )
+                      }
+                      onTranslate={() =>
+                        handleTranslate(
                           arrayField.state.value[index],
                           field.name,
                           field.state.value

@@ -46,7 +46,7 @@ export function TextareaInput({
           {onTranslate && (
             <button
               className="btn btn-xs btn-primary btn-ghost w-fit"
-              disabled={disabled || !value || value.length < 64 || !!error}
+              disabled={disabled || !value || !!error}
               onClick={onTranslate}
               type="button"
             >
@@ -57,7 +57,7 @@ export function TextareaInput({
           {onOptimize && (
             <button
               className="btn btn-xs btn-primary btn-ghost w-fit"
-              disabled={disabled || !value || value.length < 64 || !!error}
+              disabled={disabled || !value || !!error}
               onClick={onOptimize}
               type="button"
             >

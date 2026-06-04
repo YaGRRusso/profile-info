@@ -10,6 +10,7 @@ import { SelectInput } from "@/components/inputs/select";
 import { TextInput } from "@/components/inputs/text";
 import { TextareaInput } from "@/components/inputs/textarea";
 import { LOCALES, LocaleEnum } from "@/consts/locales";
+import { RawSizeEnum } from "@/consts/raw-size";
 import {
   type CreateExperienceInput,
   DetailInput,
@@ -17,7 +18,7 @@ import {
   ResourceType,
 } from "@/graphql/graphql";
 import { useQueryAllPages } from "@/hooks/custom/use-query-all-pages";
-import { useAtsSummarize } from "@/hooks/mutations/ai";
+import { useAtsSummarize, useTranslate } from "@/hooks/mutations/ai";
 import type { ExperienceRow } from "@/hooks/queries/experiences";
 import { useFindManyOrganizations } from "@/hooks/queries/organizations";
 import { useFindManySkills } from "@/hooks/queries/skills";
@@ -146,6 +147,7 @@ export function ExperienceForm({
   useQueryAllPages(findManySkills);
 
   const atsSummarize = useAtsSummarize();
+  const translate = useTranslate();
 
   const organizationOptions = (findManyOrganizations.data?.nodes ?? []).map(
     (organization) => ({ label: organization.name, value: organization.id })
@@ -180,6 +182,9 @@ export function ExperienceForm({
 
       const raw = fieldValue as string;
       const type = ResourceType.Experience;
+
+      if (raw.trim().length <= RawSizeEnum.XSMALL)
+        return toast.error("Description must be at least 32 characters long");
 
       const skills = findLabelsByIds({
         items: findManySkills.data?.nodes,
@@ -241,6 +246,33 @@ export function ExperienceForm({
       findManyOrganizations.data?.nodes,
       findManySkills.data?.nodes,
     ]
+  );
+
+  const handleTranslate = useCallback(
+    async <Field extends DeepKeys<ExperienceSchema>>(
+      fieldGroup: ExperienceSchema["roles"][number]["i18n"][number],
+      fieldName: Field,
+      fieldValue: DeepValue<ExperienceSchema, Field>
+    ) => {
+      const raw = fieldValue as string;
+
+      if (raw.trim().length <= RawSizeEnum.XSMALL)
+        return toast.error("Description must be at least 32 characters long");
+
+      const translated = await translate.mutateAsync({
+        raw,
+        targetLanguage: fieldGroup.locale,
+      });
+
+      form.setFieldValue(
+        fieldName,
+        translated.translate.messages[0].message.content as DeepValue<
+          ExperienceSchema,
+          Field
+        >
+      );
+    },
+    [translate.mutateAsync, form.setFieldValue]
   );
 
   const { Field, Subscribe } = form;
@@ -406,7 +438,12 @@ export function ExperienceForm({
                           >
                             {(field) => (
                               <TextareaInput
-                                disabled={atsSummarize.isPending}
+                                disabled={
+                                  atsSummarize.isPending ||
+                                  translate.isPending ||
+                                  field.state.value.trim().length <=
+                                    RawSizeEnum.XSMALL
+                                }
                                 error={fieldError(field.state.meta)}
                                 label="Description"
                                 name={field.name}
@@ -415,6 +452,15 @@ export function ExperienceForm({
                                   handleAtsOptimize(
                                     rolesField.state.value[roleIndex],
                                     i18nField.state.value[i18nIndex],
+                                    field.name,
+                                    field.state.value
+                                  )
+                                }
+                                onTranslate={() =>
+                                  handleTranslate(
+                                    rolesField.state.value[roleIndex].i18n[
+                                      i18nIndex
+                                    ],
                                     field.name,
                                     field.state.value
                                   )

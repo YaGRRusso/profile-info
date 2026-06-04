@@ -9,13 +9,14 @@ import { SelectInput } from "@/components/inputs/select";
 import { TextInput } from "@/components/inputs/text";
 import { TextareaInput } from "@/components/inputs/textarea";
 import { LOCALES, LocaleEnum } from "@/consts/locales";
+import { RawSizeEnum } from "@/consts/raw-size";
 import {
   type CreateProjectInput,
   DetailInput,
   ResourceType,
 } from "@/graphql/graphql";
 import { useQueryAllPages } from "@/hooks/custom/use-query-all-pages";
-import { useAtsSummarize } from "@/hooks/mutations/ai";
+import { useAtsSummarize, useTranslate } from "@/hooks/mutations/ai";
 import type { ProjectRow } from "@/hooks/queries/projects";
 import { useFindManySkills } from "@/hooks/queries/skills";
 import { fieldError } from "@/lib/field-error";
@@ -102,6 +103,7 @@ export function ProjectForm({
   useQueryAllPages(findManySkills);
 
   const atsSummarize = useAtsSummarize();
+  const translate = useTranslate();
 
   const skillOptions = (findManySkills.data?.nodes ?? []).map((skill) => ({
     label: skill.name,
@@ -135,6 +137,9 @@ export function ProjectForm({
 
       const raw = fieldValue as string;
       const type = ResourceType.Project;
+
+      if (raw.trim().length <= RawSizeEnum.XSMALL)
+        return toast.error("Description must be at least 32 characters long");
 
       const skills = findLabelsByIds({
         items: findManySkills.data?.nodes,
@@ -175,6 +180,33 @@ export function ProjectForm({
       form.setFieldValue,
       findManySkills.data?.nodes,
     ]
+  );
+
+  const handleTranslate = useCallback(
+    async <Field extends DeepKeys<ProjectSchema>>(
+      fieldGroup: ProjectSchema["i18n"][number],
+      fieldName: Field,
+      fieldValue: DeepValue<ProjectSchema, Field>
+    ) => {
+      const raw = fieldValue as string;
+
+      if (raw.trim().length <= RawSizeEnum.XSMALL)
+        return toast.error("Description must be at least 32 characters long");
+
+      const translated = await translate.mutateAsync({
+        raw,
+        targetLanguage: fieldGroup.locale,
+      });
+
+      form.setFieldValue(
+        fieldName,
+        translated.translate.messages[0].message.content as DeepValue<
+          ProjectSchema,
+          Field
+        >
+      );
+    },
+    [translate.mutateAsync, form.setFieldValue]
   );
 
   const { Field, Subscribe } = form;
@@ -342,13 +374,24 @@ export function ProjectForm({
                 <Field name={`i18n[${index}].description`}>
                   {(field) => (
                     <TextareaInput
-                      disabled={atsSummarize.isPending}
+                      disabled={
+                        atsSummarize.isPending ||
+                        translate.isPending ||
+                        field.state.value.trim().length <= RawSizeEnum.XSMALL
+                      }
                       error={fieldError(field.state.meta)}
                       label="Description"
                       name={field.name}
                       onChange={field.handleChange}
                       onOptimize={() =>
                         handleAtsOptimize(
+                          arrayField.state.value[index],
+                          field.name,
+                          field.state.value
+                        )
+                      }
+                      onTranslate={() =>
+                        handleTranslate(
                           arrayField.state.value[index],
                           field.name,
                           field.state.value

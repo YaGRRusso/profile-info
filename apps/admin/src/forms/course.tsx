@@ -10,6 +10,7 @@ import { SelectInput } from "@/components/inputs/select";
 import { TextInput } from "@/components/inputs/text";
 import { TextareaInput } from "@/components/inputs/textarea";
 import { LOCALES, LocaleEnum } from "@/consts/locales";
+import { RawSizeEnum } from "@/consts/raw-size";
 import {
   CourseStatus,
   type CreateCourseInput,
@@ -156,6 +157,9 @@ export function CourseForm({
       const raw = fieldValue as string;
       const type = ResourceType.Course;
 
+      if (raw.trim().length <= RawSizeEnum.XSMALL)
+        return toast.error("Description must be at least 64 characters long");
+
       const skills = findLabelsByIds({
         items: findManySkills.data?.nodes,
         lookupKey: "id",
@@ -222,6 +226,9 @@ export function CourseForm({
       fieldValue: DeepValue<CourseSchema, Field>
     ) => {
       const raw = fieldValue as string;
+
+      if (raw.trim().length <= RawSizeEnum.XSMALL)
+        return toast.error("Description must be at least 64 characters long");
 
       const translated = await translate.mutateAsync({
         raw,
@@ -399,7 +406,11 @@ export function CourseForm({
                 <Field name={`i18n[${index}].description`}>
                   {(field) => (
                     <TextareaInput
-                      disabled={atsSummarize.isPending || translate.isPending}
+                      disabled={
+                        atsSummarize.isPending ||
+                        translate.isPending ||
+                        field.state.value.trim().length <= RawSizeEnum.XSMALL
+                      }
                       error={fieldError(field.state.meta)}
                       label="Description"
                       name={field.name}
