@@ -17,7 +17,7 @@ import {
   ResourceType,
 } from "@/graphql/graphql";
 import { useQueryAllPages } from "@/hooks/custom/use-query-all-pages";
-import { useAtsSummarize } from "@/hooks/mutations/ai";
+import { useAtsSummarize, useTranslate } from "@/hooks/mutations/ai";
 import type { CourseRow } from "@/hooks/queries/courses";
 import { useFindManyOrganizations } from "@/hooks/queries/organizations";
 import { useFindManySkills } from "@/hooks/queries/skills";
@@ -114,6 +114,7 @@ export function CourseForm({
   useQueryAllPages(findManySkills);
 
   const atsSummarize = useAtsSummarize();
+  const translate = useTranslate();
 
   const organizationOptions = (findManyOrganizations.data?.nodes ?? []).map(
     (organization) => ({ label: organization.name, value: organization.id })
@@ -212,6 +213,30 @@ export function CourseForm({
       findManyOrganizations.data?.nodes,
       findManySkills.data?.nodes,
     ]
+  );
+
+  const handleTranslate = useCallback(
+    async <Field extends DeepKeys<CourseSchema>>(
+      fieldGroup: CourseSchema["i18n"][number],
+      fieldName: Field,
+      fieldValue: DeepValue<CourseSchema, Field>
+    ) => {
+      const raw = fieldValue as string;
+
+      const translated = await translate.mutateAsync({
+        raw,
+        targetLanguage: fieldGroup.locale,
+      });
+
+      form.setFieldValue(
+        fieldName,
+        translated.translate.messages[0].message.content as DeepValue<
+          CourseSchema,
+          Field
+        >
+      );
+    },
+    [translate.mutateAsync, form.setFieldValue]
   );
 
   const { Field, Subscribe } = form;
@@ -374,13 +399,20 @@ export function CourseForm({
                 <Field name={`i18n[${index}].description`}>
                   {(field) => (
                     <TextareaInput
-                      disabled={atsSummarize.isPending}
+                      disabled={atsSummarize.isPending || translate.isPending}
                       error={fieldError(field.state.meta)}
                       label="Description"
                       name={field.name}
                       onChange={field.handleChange}
                       onOptimize={() =>
                         handleAtsOptimize(
+                          arrayField.state.value[index],
+                          field.name,
+                          field.state.value
+                        )
+                      }
+                      onTranslate={() =>
+                        handleTranslate(
                           arrayField.state.value[index],
                           field.name,
                           field.state.value

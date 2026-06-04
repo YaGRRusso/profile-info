@@ -25,3 +25,15 @@ export class AtsSummarizeInput {
   @Field(() => ResourceType)
   type: ResourceType;
 }
+
+@InputType()
+export class TranslateInput {
+  @Field(() => String)
+  raw: string;
+
+  @Field(() => String)
+  targetLanguage: string;
+
+  @OptionalField(() => String)
+  sourceLanguage?: string;
+}

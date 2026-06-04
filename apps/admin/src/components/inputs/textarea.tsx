@@ -1,4 +1,4 @@
-import { SparkleIcon } from "@phosphor-icons/react";
+import { SparkleIcon, TranslateIcon } from "@phosphor-icons/react";
 import { ComponentProps } from "react";
 import { cn } from "@/lib/cn";
 
@@ -8,6 +8,7 @@ export interface TextareaInputProps
   label?: string;
   onChange?: (value: string) => void;
   onOptimize?: () => void;
+  onTranslate?: () => void;
   value?: string;
 }
 
@@ -16,6 +17,7 @@ export function TextareaInput({
   error,
   onChange,
   onOptimize,
+  onTranslate,
   placeholder,
   label,
   disabled,
@@ -40,17 +42,30 @@ export function TextareaInput({
       />
       <div className="flex flex-wrap items-center justify-between gap-4">
         {error && <p className="label text-error">{error}</p>}
-        {onOptimize && (
-          <button
-            className="btn btn-xs btn-primary btn-ghost ml-auto w-fit"
-            disabled={disabled || !value || value.length < 64 || !!error}
-            onClick={onOptimize}
-            type="button"
-          >
-            <SparkleIcon />
-            Optimize with AI
-          </button>
-        )}
+        <div className="ml-auto flex items-center gap-1">
+          {onTranslate && (
+            <button
+              className="btn btn-xs btn-primary btn-ghost w-fit"
+              disabled={disabled || !value || value.length < 64 || !!error}
+              onClick={onTranslate}
+              type="button"
+            >
+              <TranslateIcon />
+              Translate with AI
+            </button>
+          )}
+          {onOptimize && (
+            <button
+              className="btn btn-xs btn-primary btn-ghost w-fit"
+              disabled={disabled || !value || value.length < 64 || !!error}
+              onClick={onOptimize}
+              type="button"
+            >
+              <SparkleIcon />
+              Optimize with AI
+            </button>
+          )}
+        </div>
       </div>
     </fieldset>
   );

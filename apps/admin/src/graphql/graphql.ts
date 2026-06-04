@@ -437,6 +437,7 @@ export type Mutation = {
   removeOneSkill: SkillEntity;
   removeOneUser: UserEntity;
   signIn: Scalars['String']['output'];
+  translate: GenericIaEntity;
   updateManyCourses: BatchEntity;
   updateManyEducations: BatchEntity;
   updateManyExperiences: BatchEntity;
@@ -601,6 +602,11 @@ export type MutationRemoveOneUserArgs = {
 
 export type MutationSignInArgs = {
   signInInput: SignInInput;
+};
+
+
+export type MutationTranslateArgs = {
+  translateInput: TranslateInput;
 };
 
 
@@ -1054,6 +1060,12 @@ export type SortUserInput = {
   updatedAt?: InputMaybe<SortEnum>;
 };
 
+export type TranslateInput = {
+  raw: Scalars['String']['input'];
+  sourceLanguage?: InputMaybe<Scalars['String']['input']>;
+  targetLanguage: Scalars['String']['input'];
+};
+
 export type UpdateCourseInput = {
   hours?: InputMaybe<Scalars['Int']['input']>;
   i18n?: InputMaybe<Array<CreateCourseTranslationInput>>;
@@ -1168,6 +1180,13 @@ export type AtsSummarizeMutationVariables = Exact<{
 
 
 export type AtsSummarizeMutation = { __typename?: 'Mutation', atsSummarize: { __typename?: 'GenericIaEntity', messages: Array<{ __typename?: 'ChoiceEntity', finishReason?: ChatFinishReason | null, message: { __typename?: 'MessageEntity', content: string, reasoning?: string | null, refusal?: string | null, role: OpenRouterRole } }>, usage?: { __typename?: 'UsageEntity', completionTokens?: number | null, cost?: number | null, promptTokens?: number | null, totalTokens?: number | null } | null } };
+
+export type TranslateMutationVariables = Exact<{
+  translateInput: TranslateInput;
+}>;
+
+
+export type TranslateMutation = { __typename?: 'Mutation', translate: { __typename?: 'GenericIaEntity', messages: Array<{ __typename?: 'ChoiceEntity', finishReason?: ChatFinishReason | null, message: { __typename?: 'MessageEntity', content: string, reasoning?: string | null, refusal?: string | null, role: OpenRouterRole } }>, usage?: { __typename?: 'UsageEntity', completionTokens?: number | null, cost?: number | null, promptTokens?: number | null, totalTokens?: number | null } | null } };
 
 export type SignInMutationVariables = Exact<{
   signInInput: SignInInput;
@@ -1633,6 +1652,27 @@ export const AtsSummarizeDocument = new TypedDocumentString(`
   }
 }
     `) as unknown as TypedDocumentString<AtsSummarizeMutation, AtsSummarizeMutationVariables>;
+export const TranslateDocument = new TypedDocumentString(`
+    mutation Translate($translateInput: TranslateInput!) {
+  translate(translateInput: $translateInput) {
+    messages {
+      finishReason
+      message {
+        content
+        reasoning
+        refusal
+        role
+      }
+    }
+    usage {
+      completionTokens
+      cost
+      promptTokens
+      totalTokens
+    }
+  }
+}
+    `) as unknown as TypedDocumentString<TranslateMutation, TranslateMutationVariables>;
 export const SignInDocument = new TypedDocumentString(`
     mutation SignIn($signInInput: SignInInput!) {
   signIn(signInInput: $signInInput)

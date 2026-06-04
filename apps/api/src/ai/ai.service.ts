@@ -3,7 +3,11 @@ import { Octokit } from "@octokit/rest";
 import { OpenRouter } from "@openrouter/sdk";
 import { ChatRequest } from "@openrouter/sdk/models";
 import pLimit from "p-limit";
-import { AtsSummarizeInput, DetailInput } from "./dto/ats-summarize";
+import {
+  AtsSummarizeInput,
+  DetailInput,
+  TranslateInput,
+} from "./dto/ats-summarize";
 import { GenericIaEntity } from "./entities/ai.entity";
 import { FreeAiModels } from "./enums/model.enum";
 import { OpenRouterRole } from "./enums/role.enum";
@@ -12,6 +16,8 @@ import { openRouterMapper } from "./mappers/open-routes";
 import {
   ATS_SUMMARIZE_SYSTEM_PROMPT,
   createAtsSummarizeContextPrompt,
+  createTranslateContextPrompt,
+  TRANSLATE_SYSTEM_PROMPT,
 } from "./prompts/ats-summarize";
 
 @Injectable()
@@ -195,6 +201,37 @@ export class AiService {
             skills,
             type,
             details: parsedDetails,
+          }),
+        },
+      ],
+    };
+
+    console.dir(chatRequest, { depth: null });
+    const completion = await this.client.chat.send({ chatRequest });
+    console.dir(completion, { depth: null });
+
+    if (!completion) throw new Error("No completion received from OpenRouter");
+    return openRouterMapper(completion);
+  }
+
+  async translate({
+    raw,
+    targetLanguage,
+    sourceLanguage,
+  }: TranslateInput): Promise<GenericIaEntity> {
+    const chatRequest: ChatRequest & { stream?: false } = {
+      model: FreeAiModels.openrouter,
+      messages: [
+        {
+          role: OpenRouterRole.SYSTEM,
+          content: TRANSLATE_SYSTEM_PROMPT,
+        },
+        {
+          role: OpenRouterRole.USER,
+          content: createTranslateContextPrompt({
+            raw,
+            targetLanguage,
+            sourceLanguage,
           }),
         },
       ],
