@@ -6,7 +6,7 @@ input AtsSummarizeInput {
   details: [String!]
   raw: String!
   skills: [String!]!
-  type: String!
+  type: ResourceType!
 }
 
 type BatchEntity {
@@ -537,6 +537,13 @@ type Query {
   findOneUser(userFilters: FilterUserInput): UserEntity!
   findOneUserById(userId: ID!): UserEntity!
   getMe: UserEntity!
+}
+
+enum ResourceType {
+  COURSE
+  EDUCATION
+  EXPERIENCE
+  PROJECT
 }
 
 input SignInInput {

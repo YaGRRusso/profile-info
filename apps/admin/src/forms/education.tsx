@@ -14,6 +14,7 @@ import {
   type CreateEducationInput,
   EducationLevel,
   EducationStatus,
+  ResourceType,
 } from "@/graphql/graphql";
 import { useQueryAllPages } from "@/hooks/custom/use-query-all-pages";
 import { useAtsSummarize } from "@/hooks/mutations/ai";
@@ -174,7 +175,7 @@ export function EducationForm({
       fieldValue: DeepValue<EducationSchema, Field>
     ) => {
       const raw = fieldValue as string;
-      const type = "experience";
+      const type = ResourceType.Education;
 
       const skills = findLabelsByIds({
         items: findManySkills.data?.nodes,

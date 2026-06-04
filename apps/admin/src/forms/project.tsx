@@ -9,7 +9,7 @@ import { SelectInput } from "@/components/inputs/select";
 import { TextInput } from "@/components/inputs/text";
 import { TextareaInput } from "@/components/inputs/textarea";
 import { LOCALES, LocaleEnum } from "@/consts/locales";
-import type { CreateProjectInput } from "@/graphql/graphql";
+import { type CreateProjectInput, ResourceType } from "@/graphql/graphql";
 import { useQueryAllPages } from "@/hooks/custom/use-query-all-pages";
 import { useAtsSummarize } from "@/hooks/mutations/ai";
 import type { ProjectRow } from "@/hooks/queries/projects";
@@ -128,7 +128,7 @@ export function ProjectForm({
       fieldValue: DeepValue<ProjectSchema, Field>
     ) => {
       const raw = fieldValue as string;
-      const type = "experience";
+      const type = ResourceType.Project;
 
       const skills = findLabelsByIds({
         items: findManySkills.data?.nodes,

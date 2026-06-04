@@ -2,7 +2,7 @@ import { Injectable } from "@nestjs/common";
 import { OpenRouter } from "@openrouter/sdk";
 import { AtsSummarizeInput } from "./dto/ats-summarize";
 import { GenericIaEntity } from "./entities/ai.entity";
-import { FreeModelsEnum } from "./enums/model.enum";
+import { FreeAiModels } from "./enums/model.enum";
 import { OpenRouterRole } from "./enums/role.enum";
 import { openRouterMapper } from "./mappers/open-routes";
 import {
@@ -22,6 +22,38 @@ export class AiService {
     this.client = new OpenRouter({ apiKey: process.env.OPENROUTER_API_KEY });
   }
 
+  // private async getRepositoryData({
+  //   owner,
+  //   repo,
+  // }: {
+  //   owner: string;
+  //   repo: string;
+  // }) {
+  //   const [repository, languages, readme, topics] = await Promise.all([
+  //     this.octokit.request("GET /repos/{owner}/{repo}", { owner, repo }),
+  //     this.octokit.request("GET /repos/{owner}/{repo}/languages", {
+  //       owner,
+  //       repo,
+  //     }),
+  //     this.octokit.request("GET /repos/{owner}/{repo}/readme", {
+  //       owner,
+  //       repo,
+  //       headers: { accept: "application/vnd.github.raw" },
+  //     }),
+  //     await this.octokit.request("GET /repos/{owner}/{repo}/topics", {
+  //       owner,
+  //       repo,
+  //     }),
+  //   ]);
+
+  //   return {
+  //     description: repository.data.description,
+  //     languages: languages.data,
+  //     readme: readme.data,
+  //     topics: topics.data.names,
+  //   };
+  // }
+
   async atsSummarize({
     raw,
     skills,
@@ -30,7 +62,7 @@ export class AiService {
   }: AtsSummarizeInput): Promise<GenericIaEntity> {
     const completion = await this.client.chat.send({
       chatRequest: {
-        model: FreeModelsEnum.openrouter,
+        model: FreeAiModels.openrouter,
         messages: [
           {
             role: OpenRouterRole.SYSTEM,

@@ -122,6 +122,19 @@ const getColumns = (
       <span className="font-mono text-xs">{data.getValue()}</span>
     ),
   }),
+  columnHelper.display({
+    id: "icon",
+    header: "Icon",
+    cell: (data) => (
+      <img
+        alt={data.row.original.slug}
+        className="size-4"
+        height={16}
+        src={`https://cdn.simpleicons.org/${data.row.original.slug}`}
+        width={16}
+      />
+    ),
+  }),
   columnHelper.accessor("name", {
     header: "Name",
   }),

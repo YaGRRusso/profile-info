@@ -1,5 +1,6 @@
 import { Field, InputType } from "@nestjs/graphql";
 import { OptionalField } from "@/core/decorators/optional-field.decorator";
+import { ResourceType } from "../enums/resource-type";
 
 @InputType()
 export class AtsSummarizeInput {
@@ -12,6 +13,6 @@ export class AtsSummarizeInput {
   @Field(() => [String])
   skills: string[];
 
-  @Field(() => String)
-  type: string;
+  @Field(() => ResourceType)
+  type: ResourceType;
 }

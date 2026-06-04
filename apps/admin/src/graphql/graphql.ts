@@ -22,7 +22,7 @@ export type AtsSummarizeInput = {
   details?: InputMaybe<Array<Scalars['String']['input']>>;
   raw: Scalars['String']['input'];
   skills: Array<Scalars['String']['input']>;
-  type: Scalars['String']['input'];
+  type: ResourceType;
 };
 
 export type BatchEntity = {
@@ -969,6 +969,13 @@ export type QueryFindOneUserByIdArgs = {
   userId: Scalars['ID']['input'];
 };
 
+export enum ResourceType {
+  Course = 'COURSE',
+  Education = 'EDUCATION',
+  Experience = 'EXPERIENCE',
+  Project = 'PROJECT'
+}
+
 export type SignInInput = {
   email: Scalars['String']['input'];
   password: Scalars['String']['input'];
@@ -1150,6 +1157,13 @@ export type UserEntity = {
   urls?: Maybe<Array<UrlEntity>>;
 };
 
+export type AtsSummarizeMutationVariables = Exact<{
+  atsSummarizeInput: AtsSummarizeInput;
+}>;
+
+
+export type AtsSummarizeMutation = { __typename?: 'Mutation', atsSummarize: { __typename?: 'GenericIaEntity', messages: Array<{ __typename?: 'ChoiceEntity', finishReason?: ChatFinishReason | null, message: { __typename?: 'MessageEntity', content: string, reasoning?: string | null, refusal?: string | null, role: OpenRouterRole } }>, usage?: { __typename?: 'UsageEntity', completionTokens?: number | null, cost?: number | null, promptTokens?: number | null, totalTokens?: number | null } | null } };
+
 export type SignInMutationVariables = Exact<{
   signInInput: SignInInput;
 }>;
@@ -1267,13 +1281,6 @@ export type RemoveManyExperiencesMutationVariables = Exact<{
 
 
 export type RemoveManyExperiencesMutation = { __typename?: 'Mutation', removeManyExperiences: { __typename?: 'BatchEntity', count: number } };
-
-export type AtsSummarizeMutationVariables = Exact<{
-  atsSummarizeInput: AtsSummarizeInput;
-}>;
-
-
-export type AtsSummarizeMutation = { __typename?: 'Mutation', atsSummarize: { __typename?: 'GenericIaEntity', messages: Array<{ __typename?: 'ChoiceEntity', finishReason?: ChatFinishReason | null, message: { __typename?: 'MessageEntity', content: string, reasoning?: string | null, refusal?: string | null, role: OpenRouterRole } }>, usage?: { __typename?: 'UsageEntity', completionTokens?: number | null, cost?: number | null, promptTokens?: number | null, totalTokens?: number | null } | null } };
 
 export type CreateOneOrganizationMutationVariables = Exact<{
   createOrganizationInput: CreateOrganizationInput;
@@ -1600,6 +1607,27 @@ export class TypedDocumentString<TResult, TVariables>
   }
 }
 
+export const AtsSummarizeDocument = new TypedDocumentString(`
+    mutation AtsSummarize($atsSummarizeInput: AtsSummarizeInput!) {
+  atsSummarize(atsSummarizeInput: $atsSummarizeInput) {
+    messages {
+      finishReason
+      message {
+        content
+        reasoning
+        refusal
+        role
+      }
+    }
+    usage {
+      completionTokens
+      cost
+      promptTokens
+      totalTokens
+    }
+  }
+}
+    `) as unknown as TypedDocumentString<AtsSummarizeMutation, AtsSummarizeMutationVariables>;
 export const SignInDocument = new TypedDocumentString(`
     mutation SignIn($signInInput: SignInInput!) {
   signIn(signInInput: $signInInput)
@@ -1731,27 +1759,6 @@ export const RemoveManyExperiencesDocument = new TypedDocumentString(`
   }
 }
     `) as unknown as TypedDocumentString<RemoveManyExperiencesMutation, RemoveManyExperiencesMutationVariables>;
-export const AtsSummarizeDocument = new TypedDocumentString(`
-    mutation AtsSummarize($atsSummarizeInput: AtsSummarizeInput!) {
-  atsSummarize(atsSummarizeInput: $atsSummarizeInput) {
-    messages {
-      finishReason
-      message {
-        content
-        reasoning
-        refusal
-        role
-      }
-    }
-    usage {
-      completionTokens
-      cost
-      promptTokens
-      totalTokens
-    }
-  }
-}
-    `) as unknown as TypedDocumentString<AtsSummarizeMutation, AtsSummarizeMutationVariables>;
 export const CreateOneOrganizationDocument = new TypedDocumentString(`
     mutation CreateOneOrganization($createOrganizationInput: CreateOrganizationInput!) {
   createOneOrganization(createOrganizationInput: $createOrganizationInput) {

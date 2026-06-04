@@ -15,6 +15,7 @@ import * as types from './graphql';
  * Learn more about it here: https://the-guild.dev/graphql/codegen/plugins/presets/preset-client#reducing-bundle-size
  */
 type Documents = {
+    "\n  mutation AtsSummarize($atsSummarizeInput: AtsSummarizeInput!) {\n    atsSummarize(atsSummarizeInput: $atsSummarizeInput) {\n      messages {\n        finishReason\n        message {\n          content\n          reasoning\n          refusal\n          role\n        }\n      }\n      usage {\n        completionTokens\n        cost\n        promptTokens\n        totalTokens\n      }\n    }\n  }\n": typeof types.AtsSummarizeDocument,
     "\n  mutation SignIn($signInInput: SignInInput!) {\n    signIn(signInInput: $signInInput)\n  }\n": typeof types.SignInDocument,
     "\n  mutation CreateOneCourse($createCourseInput: CreateCourseInput!) {\n    createOneCourse(createCourseInput: $createCourseInput) {\n      id\n      slug\n    }\n  }\n": typeof types.CreateOneCourseDocument,
     "\n  mutation UpdateOneCourse(\n    $courseId: ID!\n    $updateCourseInput: UpdateCourseInput!\n  ) {\n    updateOneCourse(courseId: $courseId, updateCourseInput: $updateCourseInput) {\n      id\n      slug\n    }\n  }\n": typeof types.UpdateOneCourseDocument,
@@ -31,7 +32,6 @@ type Documents = {
     "\n  mutation UpdateManyExperiences(\n    $experienceIds: [ID!]!\n    $updateExperienceInput: UpdateExperienceInput!\n  ) {\n    updateManyExperiences(\n      experienceIds: $experienceIds\n      updateExperienceInput: $updateExperienceInput\n    ) {\n      count\n    }\n  }\n": typeof types.UpdateManyExperiencesDocument,
     "\n  mutation RemoveOneExperience($experienceId: ID!) {\n    removeOneExperience(experienceId: $experienceId) {\n      id\n      slug\n    }\n  }\n": typeof types.RemoveOneExperienceDocument,
     "\n  mutation RemoveManyExperiences($experienceIds: [ID!]!) {\n    removeManyExperiences(experienceIds: $experienceIds) {\n      count\n    }\n  }\n": typeof types.RemoveManyExperiencesDocument,
-    "\n  mutation AtsSummarize($atsSummarizeInput: AtsSummarizeInput!) {\n    atsSummarize(atsSummarizeInput: $atsSummarizeInput) {\n      messages {\n        finishReason\n        message {\n          content\n          reasoning\n          refusal\n          role\n        }\n      }\n      usage {\n        completionTokens\n        cost\n        promptTokens\n        totalTokens\n      }\n    }\n  }\n": typeof types.AtsSummarizeDocument,
     "\n  mutation CreateOneOrganization(\n    $createOrganizationInput: CreateOrganizationInput!\n  ) {\n    createOneOrganization(createOrganizationInput: $createOrganizationInput) {\n      id\n      slug\n    }\n  }\n": typeof types.CreateOneOrganizationDocument,
     "\n  mutation UpdateOneOrganization(\n    $organizationId: ID!\n    $updateOrganizationInput: UpdateOrganizationInput!\n  ) {\n    updateOneOrganization(\n      organizationId: $organizationId\n      updateOrganizationInput: $updateOrganizationInput\n    ) {\n      id\n      slug\n    }\n  }\n": typeof types.UpdateOneOrganizationDocument,
     "\n  mutation UpdateManyOrganizations(\n    $organizationIds: [ID!]!\n    $updateOrganizationInput: UpdateOrganizationInput!\n  ) {\n    updateManyOrganizations(\n      organizationIds: $organizationIds\n      updateOrganizationInput: $updateOrganizationInput\n    ) {\n      count\n    }\n  }\n": typeof types.UpdateManyOrganizationsDocument,
@@ -76,6 +76,7 @@ type Documents = {
     "\n  query FindManySkillById($skillIds: [ID!]!) {\n    findManySkillById(skillIds: $skillIds) {\n      id\n      name\n      slug\n      category\n      relevance\n      createdAt\n      updatedAt\n    }\n  }\n": typeof types.FindManySkillByIdDocument,
 };
 const documents: Documents = {
+    "\n  mutation AtsSummarize($atsSummarizeInput: AtsSummarizeInput!) {\n    atsSummarize(atsSummarizeInput: $atsSummarizeInput) {\n      messages {\n        finishReason\n        message {\n          content\n          reasoning\n          refusal\n          role\n        }\n      }\n      usage {\n        completionTokens\n        cost\n        promptTokens\n        totalTokens\n      }\n    }\n  }\n": types.AtsSummarizeDocument,
     "\n  mutation SignIn($signInInput: SignInInput!) {\n    signIn(signInInput: $signInInput)\n  }\n": types.SignInDocument,
     "\n  mutation CreateOneCourse($createCourseInput: CreateCourseInput!) {\n    createOneCourse(createCourseInput: $createCourseInput) {\n      id\n      slug\n    }\n  }\n": types.CreateOneCourseDocument,
     "\n  mutation UpdateOneCourse(\n    $courseId: ID!\n    $updateCourseInput: UpdateCourseInput!\n  ) {\n    updateOneCourse(courseId: $courseId, updateCourseInput: $updateCourseInput) {\n      id\n      slug\n    }\n  }\n": types.UpdateOneCourseDocument,
@@ -92,7 +93,6 @@ const documents: Documents = {
     "\n  mutation UpdateManyExperiences(\n    $experienceIds: [ID!]!\n    $updateExperienceInput: UpdateExperienceInput!\n  ) {\n    updateManyExperiences(\n      experienceIds: $experienceIds\n      updateExperienceInput: $updateExperienceInput\n    ) {\n      count\n    }\n  }\n": types.UpdateManyExperiencesDocument,
     "\n  mutation RemoveOneExperience($experienceId: ID!) {\n    removeOneExperience(experienceId: $experienceId) {\n      id\n      slug\n    }\n  }\n": types.RemoveOneExperienceDocument,
     "\n  mutation RemoveManyExperiences($experienceIds: [ID!]!) {\n    removeManyExperiences(experienceIds: $experienceIds) {\n      count\n    }\n  }\n": types.RemoveManyExperiencesDocument,
-    "\n  mutation AtsSummarize($atsSummarizeInput: AtsSummarizeInput!) {\n    atsSummarize(atsSummarizeInput: $atsSummarizeInput) {\n      messages {\n        finishReason\n        message {\n          content\n          reasoning\n          refusal\n          role\n        }\n      }\n      usage {\n        completionTokens\n        cost\n        promptTokens\n        totalTokens\n      }\n    }\n  }\n": types.AtsSummarizeDocument,
     "\n  mutation CreateOneOrganization(\n    $createOrganizationInput: CreateOrganizationInput!\n  ) {\n    createOneOrganization(createOrganizationInput: $createOrganizationInput) {\n      id\n      slug\n    }\n  }\n": types.CreateOneOrganizationDocument,
     "\n  mutation UpdateOneOrganization(\n    $organizationId: ID!\n    $updateOrganizationInput: UpdateOrganizationInput!\n  ) {\n    updateOneOrganization(\n      organizationId: $organizationId\n      updateOrganizationInput: $updateOrganizationInput\n    ) {\n      id\n      slug\n    }\n  }\n": types.UpdateOneOrganizationDocument,
     "\n  mutation UpdateManyOrganizations(\n    $organizationIds: [ID!]!\n    $updateOrganizationInput: UpdateOrganizationInput!\n  ) {\n    updateManyOrganizations(\n      organizationIds: $organizationIds\n      updateOrganizationInput: $updateOrganizationInput\n    ) {\n      count\n    }\n  }\n": types.UpdateManyOrganizationsDocument,
@@ -137,6 +137,10 @@ const documents: Documents = {
     "\n  query FindManySkillById($skillIds: [ID!]!) {\n    findManySkillById(skillIds: $skillIds) {\n      id\n      name\n      slug\n      category\n      relevance\n      createdAt\n      updatedAt\n    }\n  }\n": types.FindManySkillByIdDocument,
 };
 
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation AtsSummarize($atsSummarizeInput: AtsSummarizeInput!) {\n    atsSummarize(atsSummarizeInput: $atsSummarizeInput) {\n      messages {\n        finishReason\n        message {\n          content\n          reasoning\n          refusal\n          role\n        }\n      }\n      usage {\n        completionTokens\n        cost\n        promptTokens\n        totalTokens\n      }\n    }\n  }\n"): typeof import('./graphql').AtsSummarizeDocument;
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
@@ -201,10 +205,6 @@ export function graphql(source: "\n  mutation RemoveOneExperience($experienceId:
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function graphql(source: "\n  mutation RemoveManyExperiences($experienceIds: [ID!]!) {\n    removeManyExperiences(experienceIds: $experienceIds) {\n      count\n    }\n  }\n"): typeof import('./graphql').RemoveManyExperiencesDocument;
-/**
- * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
- */
-export function graphql(source: "\n  mutation AtsSummarize($atsSummarizeInput: AtsSummarizeInput!) {\n    atsSummarize(atsSummarizeInput: $atsSummarizeInput) {\n      messages {\n        finishReason\n        message {\n          content\n          reasoning\n          refusal\n          role\n        }\n      }\n      usage {\n        completionTokens\n        cost\n        promptTokens\n        totalTokens\n      }\n    }\n  }\n"): typeof import('./graphql').AtsSummarizeDocument;
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

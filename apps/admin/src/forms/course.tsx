@@ -10,7 +10,11 @@ import { SelectInput } from "@/components/inputs/select";
 import { TextInput } from "@/components/inputs/text";
 import { TextareaInput } from "@/components/inputs/textarea";
 import { LOCALES, LocaleEnum } from "@/consts/locales";
-import { CourseStatus, type CreateCourseInput } from "@/graphql/graphql";
+import {
+  CourseStatus,
+  type CreateCourseInput,
+  ResourceType,
+} from "@/graphql/graphql";
 import { useQueryAllPages } from "@/hooks/custom/use-query-all-pages";
 import { useAtsSummarize } from "@/hooks/mutations/ai";
 import type { CourseRow } from "@/hooks/queries/courses";
@@ -146,7 +150,7 @@ export function CourseForm({
       fieldValue: DeepValue<CourseSchema, Field>
     ) => {
       const raw = fieldValue as string;
-      const type = "experience";
+      const type = ResourceType.Course;
 
       const skills = findLabelsByIds({
         items: findManySkills.data?.nodes,

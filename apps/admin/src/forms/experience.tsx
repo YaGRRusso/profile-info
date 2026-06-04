@@ -13,6 +13,7 @@ import { LOCALES, LocaleEnum } from "@/consts/locales";
 import {
   type CreateExperienceInput,
   ExperienceCategory,
+  ResourceType,
 } from "@/graphql/graphql";
 import { useQueryAllPages } from "@/hooks/custom/use-query-all-pages";
 import { useAtsSummarize } from "@/hooks/mutations/ai";
@@ -175,7 +176,7 @@ export function ExperienceForm({
       fieldValue: DeepValue<ExperienceSchema, Field>
     ) => {
       const raw = fieldValue as string;
-      const type = "experience";
+      const type = ResourceType.Experience;
 
       const skills = findLabelsByIds({
         items: findManySkills.data?.nodes,
