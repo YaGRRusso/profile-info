@@ -1,4 +1,3 @@
-// src/common/orchestrator/async-orchestrator.module.ts
 import { Global, Module } from "@nestjs/common";
 import { OrchestratorService } from "./orchestrator.service";
 
@@ -7,4 +6,4 @@ import { OrchestratorService } from "./orchestrator.service";
   providers: [OrchestratorService],
   exports: [OrchestratorService],
 })
-export class AsyncOrchestratorModule {}
+export class OrchestratorModule {}

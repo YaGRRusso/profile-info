@@ -20,6 +20,7 @@ import { ProjectsModule } from "./projects/projects.module";
 import { SkillsModule } from "./skills/skills.module";
 import { SkillsService } from "./skills/skills.service";
 import { UsersModule } from "./users/users.module";
+import { OrchestratorModule } from "./utils/orhcestrator.module";
 
 @Module({
   imports: [
@@ -58,6 +59,7 @@ import { UsersModule } from "./users/users.module";
         }),
       }),
     }),
+    OrchestratorModule,
     AiModule,
     SkillsModule,
     ProjectsModule,
