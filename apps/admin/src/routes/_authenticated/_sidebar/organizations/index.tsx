@@ -15,6 +15,8 @@ import type { CommonFormValuesProps } from "@/forms/common";
 import {
   OrganizationForm,
   type OrganizationSchema,
+  organizationToForm,
+  organizationToInput,
 } from "@/forms/organization";
 import { OrganizationMultiForm } from "@/forms/organization-multi";
 import { useQueryAllPages } from "@/hooks/custom/use-query-all-pages";
@@ -70,7 +72,7 @@ function RouteComponent() {
     (data: OrganizationSchema) => {
       switch (formValues?.state) {
         case "CREATING":
-          createOneOrganization.mutate(data, {
+          createOneOrganization.mutate(organizationToInput(data), {
             onSuccess: () => {
               closeAndRefetch();
               toast.success("Organization created successfully");
@@ -81,14 +83,7 @@ function RouteComponent() {
           updateOneOrganization.mutate(
             {
               organizationId: selectedOrganizationIds[0],
-              updateOrganizationInput: {
-                category: data.category,
-                logo: data.logo,
-                name: data.name,
-                relevance: data.relevance,
-                slug: data.slug,
-                website: data.website,
-              },
+              updateOrganizationInput: organizationToInput(data),
             },
             {
               onSuccess: () => {
@@ -300,7 +295,7 @@ function RouteComponent() {
             }
             onEdit={(organization) =>
               setFormValues({
-                defaultValues: organization,
+                defaultValues: organizationToForm(organization),
                 state: "UPDATING",
                 customValues: [organization],
               })

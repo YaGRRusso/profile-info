@@ -74,13 +74,10 @@ const capitalize = (value: string) =>
 const slugFor = (name: string, index: number) =>
   `${faker.helpers.slugify(name).toLowerCase()}-${index}`;
 
-const i18n = () =>
+const i18n = (messages: Record<string, string>) =>
   LOCALES.map((locale) => ({
     locale,
-    messages: {
-      title: faker.lorem.words({ min: 8, max: 16 }),
-      description: faker.lorem.sentences({ min: 8, max: 64 }),
-    },
+    messages,
   }));
 
 const period = () => {
@@ -141,6 +138,9 @@ async function seed() {
         logo: faker.image.urlPicsumPhotos({ width: 96, height: 96 }),
         website: faker.internet.url(),
         relevance: relevance(),
+        i18n: i18n({
+          description: faker.lorem.sentences({ min: 8, max: 32 }),
+        }),
       };
     })
   );
@@ -160,7 +160,10 @@ async function seed() {
       url: faker.internet.url(),
       image: faker.image.urlPicsumPhotos(),
       skills: randomSkills(),
-      i18n: i18n(),
+      i18n: i18n({
+        title: faker.lorem.words({ min: 8, max: 16 }),
+        description: faker.lorem.sentences({ min: 8, max: 64 }),
+      }),
     }))
   );
 
@@ -173,7 +176,10 @@ async function seed() {
       relevance: relevance(),
       skills: randomSkills(),
       period: period(),
-      i18n: i18n(),
+      i18n: i18n({
+        title: faker.lorem.words({ min: 8, max: 16 }),
+        description: faker.lorem.sentences({ min: 8, max: 64 }),
+      }),
     }))
   );
 
@@ -189,7 +195,10 @@ async function seed() {
         title: type,
         value: faker.internet.url(),
       })),
-      i18n: i18n(),
+      i18n: i18n({
+        title: faker.lorem.words({ min: 8, max: 16 }),
+        description: faker.lorem.sentences({ min: 8, max: 64 }),
+      }),
     }))
   );
 
@@ -202,7 +211,10 @@ async function seed() {
       roles: buildMany(faker.number.int({ min: 1, max: 3 }), () => ({
         period: period(),
         skills: randomSkills(),
-        i18n: i18n(),
+        i18n: i18n({
+          title: faker.lorem.words({ min: 8, max: 16 }),
+          description: faker.lorem.sentences({ min: 8, max: 64 }),
+        }),
       })),
     }))
   );
@@ -211,7 +223,7 @@ async function seed() {
     name: "Admin",
     nickname: "admin",
     email: "admin@profile.info",
-    password: await hash("admin123", 8),
+    password: await hash("pass.123", 8),
     role: "ADMIN",
   });
 
@@ -225,7 +237,7 @@ async function seed() {
     users: await users.countDocuments(),
   };
 
-  console.info("admin@profile.info / admin123");
+  console.info("admin@profile.info / pass.123");
   console.info("seeded:", counts);
 
   await app.close();

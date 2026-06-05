@@ -129,11 +129,21 @@ input CreateExperienceTranslationInput {
 
 input CreateOrganizationInput {
   category: OrganizationCategory!
+  i18n: [CreateOrganizationTranslationInput!]!
   logo: String!
   name: String!
   relevance: Float
   slug: String!
   website: String!
+}
+
+input CreateOrganizationMessagesInput {
+  description: String!
+}
+
+input CreateOrganizationTranslationInput {
+  locale: String!
+  messages: CreateOrganizationMessagesInput!
 }
 
 input CreateProjectInput {
@@ -328,6 +338,7 @@ input FilterExperienceInput {
 
 input FilterOrganizationInput {
   category: OrganizationCategory
+  i18n: [CreateOrganizationTranslationInput!]
   logo: String
   name: String
   relevance: Float
@@ -441,6 +452,7 @@ enum OrganizationCategory {
 type OrganizationEntity {
   category: OrganizationCategory!
   createdAt: DateTime!
+  i18n: [OrganizationTranslationLocale!]!
   id: ID!
   logo: String!
   name: String!
@@ -448,6 +460,15 @@ type OrganizationEntity {
   slug: String!
   updatedAt: DateTime!
   website: String!
+}
+
+type OrganizationMessages {
+  description: String!
+}
+
+type OrganizationTranslationLocale {
+  locale: String!
+  messages: OrganizationMessages!
 }
 
 type PaginatedCourseEntity {
@@ -667,6 +688,7 @@ input UpdateExperienceInput {
 
 input UpdateOrganizationInput {
   category: OrganizationCategory
+  i18n: [CreateOrganizationTranslationInput!]
   logo: String
   name: String
   relevance: Float

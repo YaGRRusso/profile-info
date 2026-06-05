@@ -37,6 +37,12 @@ const findManyOrganizations = graphql(`
         category
         logo
         website
+        i18n {
+          locale
+          messages {
+            description
+          }
+        }
         relevance
         createdAt
         updatedAt
@@ -54,6 +60,12 @@ const findOneOrganizationById = graphql(`
       category
       logo
       website
+      i18n {
+        locale
+        messages {
+          description
+        }
+      }
       relevance
       createdAt
       updatedAt
@@ -70,6 +82,12 @@ const findOneOrganization = graphql(`
       category
       logo
       website
+      i18n {
+        locale
+        messages {
+          description
+        }
+      }
       relevance
       createdAt
       updatedAt
@@ -86,6 +104,12 @@ const findManyOrganizationById = graphql(`
       category
       logo
       website
+      i18n {
+        locale
+        messages {
+          description
+        }
+      }
       relevance
       createdAt
       updatedAt

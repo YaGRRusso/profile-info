@@ -150,11 +150,21 @@ export type CreateExperienceTranslationInput = {
 
 export type CreateOrganizationInput = {
   category: OrganizationCategory;
+  i18n: Array<CreateOrganizationTranslationInput>;
   logo: Scalars['String']['input'];
   name: Scalars['String']['input'];
   relevance?: InputMaybe<Scalars['Float']['input']>;
   slug: Scalars['String']['input'];
   website: Scalars['String']['input'];
+};
+
+export type CreateOrganizationMessagesInput = {
+  description: Scalars['String']['input'];
+};
+
+export type CreateOrganizationTranslationInput = {
+  locale: Scalars['String']['input'];
+  messages: CreateOrganizationMessagesInput;
 };
 
 export type CreateProjectInput = {
@@ -355,6 +365,7 @@ export type FilterExperienceInput = {
 
 export type FilterOrganizationInput = {
   category?: InputMaybe<OrganizationCategory>;
+  i18n?: InputMaybe<Array<CreateOrganizationTranslationInput>>;
   logo?: InputMaybe<Scalars['String']['input']>;
   name?: InputMaybe<Scalars['String']['input']>;
   relevance?: InputMaybe<Scalars['Float']['input']>;
@@ -711,6 +722,7 @@ export type OrganizationEntity = {
   __typename?: 'OrganizationEntity';
   category: OrganizationCategory;
   createdAt: Scalars['DateTime']['output'];
+  i18n: Array<OrganizationTranslationLocale>;
   id: Scalars['ID']['output'];
   logo: Scalars['String']['output'];
   name: Scalars['String']['output'];
@@ -718,6 +730,17 @@ export type OrganizationEntity = {
   slug: Scalars['String']['output'];
   updatedAt: Scalars['DateTime']['output'];
   website: Scalars['String']['output'];
+};
+
+export type OrganizationMessages = {
+  __typename?: 'OrganizationMessages';
+  description: Scalars['String']['output'];
+};
+
+export type OrganizationTranslationLocale = {
+  __typename?: 'OrganizationTranslationLocale';
+  locale: Scalars['String']['output'];
+  messages: OrganizationMessages;
 };
 
 export type PaginatedCourseEntity = {
@@ -1103,6 +1126,7 @@ export type UpdateExperienceInput = {
 
 export type UpdateOrganizationInput = {
   category?: InputMaybe<OrganizationCategory>;
+  i18n?: InputMaybe<Array<CreateOrganizationTranslationInput>>;
   logo?: InputMaybe<Scalars['String']['input']>;
   name?: InputMaybe<Scalars['String']['input']>;
   relevance?: InputMaybe<Scalars['Float']['input']>;
@@ -1530,28 +1554,28 @@ export type FindManyOrganizationsQueryVariables = Exact<{
 }>;
 
 
-export type FindManyOrganizationsQuery = { __typename?: 'Query', findManyOrganizations: { __typename?: 'PaginatedOrganizationEntity', found: number, nodes: Array<{ __typename?: 'OrganizationEntity', id: string, name: string, slug: string, category: OrganizationCategory, logo: string, website: string, relevance: number, createdAt: any, updatedAt: any }> } };
+export type FindManyOrganizationsQuery = { __typename?: 'Query', findManyOrganizations: { __typename?: 'PaginatedOrganizationEntity', found: number, nodes: Array<{ __typename?: 'OrganizationEntity', id: string, name: string, slug: string, category: OrganizationCategory, logo: string, website: string, relevance: number, createdAt: any, updatedAt: any, i18n: Array<{ __typename?: 'OrganizationTranslationLocale', locale: string, messages: { __typename?: 'OrganizationMessages', description: string } }> }> } };
 
 export type FindOneOrganizationByIdQueryVariables = Exact<{
   organizationId: Scalars['ID']['input'];
 }>;
 
 
-export type FindOneOrganizationByIdQuery = { __typename?: 'Query', findOneOrganizationById: { __typename?: 'OrganizationEntity', id: string, name: string, slug: string, category: OrganizationCategory, logo: string, website: string, relevance: number, createdAt: any, updatedAt: any } };
+export type FindOneOrganizationByIdQuery = { __typename?: 'Query', findOneOrganizationById: { __typename?: 'OrganizationEntity', id: string, name: string, slug: string, category: OrganizationCategory, logo: string, website: string, relevance: number, createdAt: any, updatedAt: any, i18n: Array<{ __typename?: 'OrganizationTranslationLocale', locale: string, messages: { __typename?: 'OrganizationMessages', description: string } }> } };
 
 export type FindOneOrganizationQueryVariables = Exact<{
   organizationFilters?: InputMaybe<FilterOrganizationInput>;
 }>;
 
 
-export type FindOneOrganizationQuery = { __typename?: 'Query', findOneOrganization: { __typename?: 'OrganizationEntity', id: string, name: string, slug: string, category: OrganizationCategory, logo: string, website: string, relevance: number, createdAt: any, updatedAt: any } };
+export type FindOneOrganizationQuery = { __typename?: 'Query', findOneOrganization: { __typename?: 'OrganizationEntity', id: string, name: string, slug: string, category: OrganizationCategory, logo: string, website: string, relevance: number, createdAt: any, updatedAt: any, i18n: Array<{ __typename?: 'OrganizationTranslationLocale', locale: string, messages: { __typename?: 'OrganizationMessages', description: string } }> } };
 
 export type FindManyOrganizationByIdQueryVariables = Exact<{
   organizationIds: Array<Scalars['ID']['input']> | Scalars['ID']['input'];
 }>;
 
 
-export type FindManyOrganizationByIdQuery = { __typename?: 'Query', findManyOrganizationById: Array<{ __typename?: 'OrganizationEntity', id: string, name: string, slug: string, category: OrganizationCategory, logo: string, website: string, relevance: number, createdAt: any, updatedAt: any }> };
+export type FindManyOrganizationByIdQuery = { __typename?: 'Query', findManyOrganizationById: Array<{ __typename?: 'OrganizationEntity', id: string, name: string, slug: string, category: OrganizationCategory, logo: string, website: string, relevance: number, createdAt: any, updatedAt: any, i18n: Array<{ __typename?: 'OrganizationTranslationLocale', locale: string, messages: { __typename?: 'OrganizationMessages', description: string } }> }> };
 
 export type FindManyProjectsQueryVariables = Exact<{
   projectFilters?: InputMaybe<FilterProjectInput>;
@@ -2423,6 +2447,12 @@ export const FindManyOrganizationsDocument = new TypedDocumentString(`
       category
       logo
       website
+      i18n {
+        locale
+        messages {
+          description
+        }
+      }
       relevance
       createdAt
       updatedAt
@@ -2439,6 +2469,12 @@ export const FindOneOrganizationByIdDocument = new TypedDocumentString(`
     category
     logo
     website
+    i18n {
+      locale
+      messages {
+        description
+      }
+    }
     relevance
     createdAt
     updatedAt
@@ -2454,6 +2490,12 @@ export const FindOneOrganizationDocument = new TypedDocumentString(`
     category
     logo
     website
+    i18n {
+      locale
+      messages {
+        description
+      }
+    }
     relevance
     createdAt
     updatedAt
@@ -2469,6 +2511,12 @@ export const FindManyOrganizationByIdDocument = new TypedDocumentString(`
     category
     logo
     website
+    i18n {
+      locale
+      messages {
+        description
+      }
+    }
     relevance
     createdAt
     updatedAt
