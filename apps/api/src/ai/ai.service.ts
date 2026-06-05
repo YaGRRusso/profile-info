@@ -42,7 +42,7 @@ export class AiService {
 
     if (details) {
       const resourceDetails =
-        await this.resourceDetailService.getResourceDetails(details);
+        await this.resourceDetailService.getResourceDetails(details, type);
       parsedDetails.push(...createDetails(resourceDetails));
     }
 
@@ -97,6 +97,8 @@ export class AiService {
   private async executeChatRequest(
     chatRequest: ChatRequest & { stream?: false }
   ): Promise<GenericIaEntity> {
+    // breakpoint(chatRequest);
+
     console.dir(chatRequest, { depth: null });
     const completion = await this.client.chat.send({ chatRequest });
     console.dir(completion, { depth: null });

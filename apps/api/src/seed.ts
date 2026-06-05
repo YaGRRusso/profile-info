@@ -78,8 +78,8 @@ const i18n = () =>
   LOCALES.map((locale) => ({
     locale,
     messages: {
-      title: faker.lorem.words({ min: 2, max: 4 }),
-      description: faker.lorem.sentences({ min: 2, max: 5 }),
+      title: faker.lorem.words({ min: 8, max: 16 }),
+      description: faker.lorem.sentences({ min: 8, max: 64 }),
     },
   }));
 

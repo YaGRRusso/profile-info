@@ -20,7 +20,7 @@ import { ProjectsModule } from "./projects/projects.module";
 import { SkillsModule } from "./skills/skills.module";
 import { SkillsService } from "./skills/skills.service";
 import { UsersModule } from "./users/users.module";
-import { OrchestratorModule } from "./utils/orhcestrator.module";
+import { OrchestratorModule } from "./utils/utils.module";
 
 @Module({
   imports: [
