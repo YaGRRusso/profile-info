@@ -10,6 +10,7 @@ import { TextInput } from "@/components/inputs/text";
 import { TextareaInput } from "@/components/inputs/textarea";
 import { LOCALES, LocaleEnum } from "@/consts/locales";
 import { RawSizeEnum } from "@/consts/raw-size";
+import { SLUG_REGEX } from "@/consts/regex";
 import {
   type CreateProjectInput,
   DetailInput,
@@ -24,7 +25,10 @@ import { findLabelsByIds } from "@/lib/mappers";
 import { CommonFormProps } from "./common";
 
 const projectSchema = z.object({
-  slug: z.string().min(1, "required field"),
+  slug: z
+    .string()
+    .min(1, "required field")
+    .regex(SLUG_REGEX, "invalid field format"),
   relevance: z.number().min(1, "must be a positive number"),
   skills: z.array(z.string()),
   images: z.array(z.url()),

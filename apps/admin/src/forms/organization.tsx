@@ -1,4 +1,5 @@
 import { DeepKeys, DeepValue, useForm } from "@tanstack/react-form";
+import lodash from "lodash";
 import { useCallback } from "react";
 import { toast } from "react-toastify";
 import z from "zod";
@@ -9,6 +10,7 @@ import { TextInput } from "@/components/inputs/text";
 import { TextareaInput } from "@/components/inputs/textarea";
 import { LOCALES, LocaleEnum } from "@/consts/locales";
 import { RawSizeEnum } from "@/consts/raw-size";
+import { SLUG_REGEX } from "@/consts/regex";
 import {
   CreateOrganizationInput,
   DetailInput,
@@ -21,8 +23,11 @@ import { fieldError } from "@/lib/field-error";
 import { CommonFormProps } from "./common";
 
 const organizationSchema = z.object({
+  slug: z
+    .string()
+    .min(1, "required field")
+    .regex(SLUG_REGEX, "invalid field format"),
   name: z.string().min(1, "required field"),
-  slug: z.string().min(1, "required field"),
   category: z.enum(OrganizationCategory, "required field"),
   logo: z.url(),
   website: z.url(),
@@ -202,18 +207,6 @@ export function OrganizationForm({
         form.handleSubmit();
       }}
     >
-      <Field name="name">
-        {(field) => (
-          <TextInput
-            error={fieldError(field.state.meta)}
-            label="Name"
-            name={field.name}
-            onChange={field.handleChange}
-            placeholder="Name"
-            value={field.state.value}
-          />
-        )}
-      </Field>
       <Field name="slug">
         {(field) => (
           <TextInput
@@ -223,6 +216,22 @@ export function OrganizationForm({
             onChange={field.handleChange}
             placeholder="Slug"
             value={field.state.value}
+          />
+        )}
+      </Field>
+      <Field name="name">
+        {(field) => (
+          <TextInput
+            error={fieldError(field.state.meta)}
+            label="Name"
+            name={field.name}
+            onChange={field.handleChange}
+            placeholder="Name"
+            value={
+              field.state.meta.isTouched
+                ? field.state.value
+                : lodash.startCase(form.getFieldValue("slug"))
+            }
           />
         )}
       </Field>

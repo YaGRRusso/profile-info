@@ -11,6 +11,7 @@ import { TextInput } from "@/components/inputs/text";
 import { TextareaInput } from "@/components/inputs/textarea";
 import { LOCALES, LocaleEnum } from "@/consts/locales";
 import { RawSizeEnum } from "@/consts/raw-size";
+import { SLUG_REGEX } from "@/consts/regex";
 import {
   type CreateExperienceInput,
   DetailInput,
@@ -28,7 +29,10 @@ import { findLabelsByIds } from "@/lib/mappers";
 import { CommonFormProps } from "./common";
 
 const experienceSchema = z.object({
-  slug: z.string().min(1, "required field"),
+  slug: z
+    .string()
+    .min(1, "required field")
+    .regex(SLUG_REGEX, "invalid field format"),
   organization: z.string().min(1, "required field"),
   category: z.enum(ExperienceCategory, "required field"),
   relevance: z.number().min(1, "must be a positive number"),

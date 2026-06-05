@@ -11,6 +11,7 @@ import { TextInput } from "@/components/inputs/text";
 import { TextareaInput } from "@/components/inputs/textarea";
 import { LOCALES, LocaleEnum } from "@/consts/locales";
 import { RawSizeEnum } from "@/consts/raw-size";
+import { SLUG_REGEX } from "@/consts/regex";
 import {
   type CreateEducationInput,
   DetailInput,
@@ -29,7 +30,10 @@ import { findLabelsByIds } from "@/lib/mappers";
 import { CommonFormProps } from "./common";
 
 const educationSchema = z.object({
-  slug: z.string().min(1, "required field"),
+  slug: z
+    .string()
+    .min(1, "required field")
+    .regex(SLUG_REGEX, "invalid field format"),
   organization: z.string().min(1, "required field"),
   level: z.enum(EducationLevel, "required field"),
   status: z.enum(EducationStatus, "required field"),

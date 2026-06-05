@@ -1,15 +1,20 @@
 import { useForm } from "@tanstack/react-form";
+import lodash from "lodash";
 import z from "zod";
 import { RangeInput } from "@/components/inputs/range";
 import { SelectInput } from "@/components/inputs/select";
 import { TextInput } from "@/components/inputs/text";
+import { SLUG_REGEX } from "@/consts/regex";
 import { SkillCategory } from "@/graphql/graphql";
 import { fieldError } from "@/lib/field-error";
 import { CommonFormProps } from "./common";
 
 const skillSchema = z.object({
+  slug: z
+    .string()
+    .min(1, "required field")
+    .regex(SLUG_REGEX, "invalid field format"),
   name: z.string().min(1, "required field"),
-  slug: z.string().min(1, "required field"),
   category: z.enum(SkillCategory, "required field"),
   relevance: z.number().min(1, "must be a positive number"),
 });
@@ -54,18 +59,6 @@ export function SkillForm({
         form.handleSubmit();
       }}
     >
-      <Field name="name">
-        {(field) => (
-          <TextInput
-            error={fieldError(field.state.meta)}
-            label="Name"
-            name={field.name}
-            onChange={field.handleChange}
-            placeholder="Name"
-            value={field.state.value}
-          />
-        )}
-      </Field>
       <Field name="slug">
         {(field) => (
           <TextInput
@@ -78,6 +71,23 @@ export function SkillForm({
           />
         )}
       </Field>
+      <Field name="name">
+        {(field) => (
+          <TextInput
+            error={fieldError(field.state.meta)}
+            label="Name"
+            name={field.name}
+            onChange={field.handleChange}
+            placeholder="Name"
+            value={
+              field.state.meta.isTouched
+                ? field.state.value
+                : lodash.startCase(form.getFieldValue("slug"))
+            }
+          />
+        )}
+      </Field>
+
       <Field name="category">
         {(field) => (
           <SelectInput
