@@ -11,9 +11,11 @@ import { openRouterMapper } from "./mappers/open-routes";
 import {
   ATS_SUMMARIZE_SYSTEM_PROMPT,
   createAtsSummarizeContextPrompt,
+} from "./prompts/ats-summarize";
+import {
   createTranslateContextPrompt,
   TRANSLATE_SYSTEM_PROMPT,
-} from "./prompts/ats-summarize";
+} from "./prompts/translate";
 
 @Injectable()
 export class AiService {
