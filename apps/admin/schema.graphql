@@ -419,6 +419,7 @@ type Mutation {
   removeOneSkill(skillId: ID!): SkillEntity!
   removeOneUser(userId: ID!): UserEntity!
   signIn(signInInput: SignInInput!): String!
+  summarize(summarizeInput: SummarizeInput!): GenericIaEntity!
   translate(translateInput: TranslateInput!): GenericIaEntity!
   updateManyCourses(courseIds: [ID!]!, updateCourseInput: UpdateCourseInput!): BatchEntity!
   updateManyEducations(educationIds: [ID!]!, updateEducationInput: UpdateEducationInput!): BatchEntity!
@@ -645,6 +646,12 @@ input SortUserInput {
   createdAt: SortEnum
   name: SortEnum
   updatedAt: SortEnum
+}
+
+input SummarizeInput {
+  details: [DetailInput!]
+  raw: String!
+  type: ResourceType!
 }
 
 input TranslateInput {

@@ -448,6 +448,7 @@ export type Mutation = {
   removeOneSkill: SkillEntity;
   removeOneUser: UserEntity;
   signIn: Scalars['String']['output'];
+  summarize: GenericIaEntity;
   translate: GenericIaEntity;
   updateManyCourses: BatchEntity;
   updateManyEducations: BatchEntity;
@@ -613,6 +614,11 @@ export type MutationRemoveOneUserArgs = {
 
 export type MutationSignInArgs = {
   signInInput: SignInInput;
+};
+
+
+export type MutationSummarizeArgs = {
+  summarizeInput: SummarizeInput;
 };
 
 
@@ -1082,6 +1088,12 @@ export type SortUserInput = {
   createdAt?: InputMaybe<SortEnum>;
   name?: InputMaybe<SortEnum>;
   updatedAt?: InputMaybe<SortEnum>;
+};
+
+export type SummarizeInput = {
+  details?: InputMaybe<Array<DetailInput>>;
+  raw: Scalars['String']['input'];
+  type: ResourceType;
 };
 
 export type TranslateInput = {

@@ -1,9 +1,3 @@
-export interface TranslateContextArgs {
-  raw: string;
-  sourceLanguage?: string;
-  targetLanguage: string;
-}
-
 export const TRANSLATE_SYSTEM_PROMPT = `
 # Persona
 You are a helpful assistant that translates text to the target language.
@@ -21,6 +15,12 @@ Translate the user's raw input text to the target language specified in the user
 - **NO Bullet Points or Lists:** Do NOT use dashes (\`-\`), asterisks (\`*\`), or numbers for lists. The output must consist **strictly of plain text paragraphs**.
 - **NO Conversational Text:** Return ONLY the final optimized description text. Do not include greetings, introductions, or closing remarks.
 `.trim();
+
+export interface TranslateContextArgs {
+  raw: string;
+  sourceLanguage?: string;
+  targetLanguage: string;
+}
 
 export const createTranslateContextPrompt = ({
   raw,

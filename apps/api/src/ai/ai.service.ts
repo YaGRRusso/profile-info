@@ -2,7 +2,9 @@ import { Injectable } from "@nestjs/common";
 import { OpenRouter } from "@openrouter/sdk";
 import { ChatRequest } from "@openrouter/sdk/models";
 import { ResourceDetailService } from "./details.service";
-import { AtsSummarizeInput, TranslateInput } from "./dto/ats-summarize.input";
+import { AtsSummarizeInput } from "./dto/ats-summarize.input";
+import { SummarizeInput } from "./dto/summarize.input";
+import { TranslateInput } from "./dto/translate.input";
 import { GenericIaEntity } from "./entities/ai.entity";
 import { FreeAiModels } from "./enums/model.enum";
 import { OpenRouterRole } from "./enums/role.enum";
@@ -11,11 +13,15 @@ import { openRouterMapper } from "./mappers/open-routes";
 import {
   ATS_SUMMARIZE_SYSTEM_PROMPT,
   createAtsSummarizeContextPrompt,
-} from "./prompts/ats-summarize";
+} from "./prompts/ats-summarize.prompt";
+import {
+  createSummarizeContextPrompt,
+  SUMMARIZE_SYSTEM_PROMPT,
+} from "./prompts/summarize.prompt";
 import {
   createTranslateContextPrompt,
   TRANSLATE_SYSTEM_PROMPT,
-} from "./prompts/translate";
+} from "./prompts/translate.prompt";
 
 @Injectable()
 export class AiService {
@@ -47,7 +53,7 @@ export class AiService {
     }
 
     const chatRequest: ChatRequest & { stream?: false } = {
-      model: FreeAiModels.openrouter,
+      model: FreeAiModels.google,
       messages: [
         {
           role: OpenRouterRole.SYSTEM,
@@ -68,13 +74,47 @@ export class AiService {
     return await this.executeChatRequest(chatRequest);
   }
 
+  async summarize({
+    raw,
+    type,
+    details,
+  }: SummarizeInput): Promise<GenericIaEntity> {
+    const parsedDetails = createDetails(details || []);
+
+    if (details) {
+      const resourceDetails =
+        await this.resourceDetailService.getResourceDetails(details, type);
+      parsedDetails.push(...createDetails(resourceDetails));
+    }
+
+    const chatRequest: ChatRequest & { stream?: false } = {
+      model: FreeAiModels.google,
+      messages: [
+        {
+          role: OpenRouterRole.SYSTEM,
+          content: SUMMARIZE_SYSTEM_PROMPT,
+        },
+        {
+          role: OpenRouterRole.USER,
+          content: createSummarizeContextPrompt({
+            raw,
+            type,
+            details: parsedDetails,
+          }),
+        },
+      ],
+    };
+
+    return await this.executeChatRequest(chatRequest);
+  }
+
   async translate({
     raw,
     targetLanguage,
     sourceLanguage,
   }: TranslateInput): Promise<GenericIaEntity> {
     const chatRequest: ChatRequest & { stream?: false } = {
-      model: FreeAiModels.openrouter,
+      model: FreeAiModels.google,
       messages: [
         {
           role: OpenRouterRole.SYSTEM,
