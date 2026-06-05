@@ -32,6 +32,7 @@ export class ProjectsResolver extends BaseResolver<
   @ResolveField(() => [SkillEntity])
   skills(@Parent() project: ProjectModel, @Context() ctx: Ctx) {
     const ids = project.skills?.map((id) => id.toString());
-    if (ids) return ctx.loaders.batchSkills.loadMany(ids);
+    if (!ids) return [];
+    return ctx.loaders.batchSkills.loadMany(ids);
   }
 }

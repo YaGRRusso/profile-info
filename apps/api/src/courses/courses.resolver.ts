@@ -39,6 +39,7 @@ export class CoursesResolver extends BaseResolver<
   @ResolveField(() => [SkillEntity])
   skills(@Parent() course: CourseModel, @Context() ctx: Ctx) {
     const ids = course.skills?.map((id) => id.toString());
-    if (ids) return ctx.loaders.batchSkills.loadMany(ids);
+    if (!ids) return [];
+    return ctx.loaders.batchSkills.loadMany(ids);
   }
 }

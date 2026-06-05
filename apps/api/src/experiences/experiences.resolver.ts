@@ -70,6 +70,7 @@ export class ExperienceRoleResolver {
   @ResolveField(() => [SkillEntity])
   skills(@Parent() role: ExperienceRoleModel, @Context() ctx: Ctx) {
     const ids = role.skills?.map((id) => id.toString());
-    if (ids) return ctx.loaders.batchSkills.loadMany(ids);
+    if (!ids) return [];
+    return ctx.loaders.batchSkills.loadMany(ids);
   }
 }
