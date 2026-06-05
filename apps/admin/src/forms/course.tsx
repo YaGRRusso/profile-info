@@ -23,7 +23,7 @@ import type { CourseRow } from "@/hooks/queries/courses";
 import { useFindManyOrganizations } from "@/hooks/queries/organizations";
 import { useFindManySkills } from "@/hooks/queries/skills";
 import { fieldError } from "@/lib/field-error";
-import { findLabelById, findLabelsByIds } from "@/lib/mappers";
+import { findLabelsByIds } from "@/lib/mappers";
 import { CommonFormProps } from "./common";
 
 const courseSchema = z.object({
@@ -180,14 +180,22 @@ export function CourseForm({
       if (!status) return toast.error("Status is required");
       details.push({ key: "Status", value: [status] });
 
-      const organization = findLabelById({
-        items: findManyOrganizations.data?.nodes,
-        lookupKey: "id",
-        labelKey: "name",
-        targetValue: form.getFieldValue("organization"),
-      });
+      const organization = findManyOrganizations.data?.nodes.find(
+        (org) => org.id === form.getFieldValue("organization")
+      );
       if (!organization) return toast.error("Organization is required");
-      details.push({ key: "Organization", value: [organization] });
+
+      const organizationName = organization.name;
+      details.push({ key: "Organization Name", value: [organizationName] });
+
+      const organizationDescription = organization.i18n.find(
+        (i18n) => i18n.locale === fieldGroup.locale
+      )?.messages.description;
+      if (organizationDescription)
+        details.push({
+          key: "Organization Description",
+          value: [organizationDescription],
+        });
 
       const language = fieldGroup.locale;
       if (language) details.push({ key: "Language", value: [language] });
