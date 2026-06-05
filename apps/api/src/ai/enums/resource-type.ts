@@ -5,6 +5,7 @@ export enum ResourceType {
   COURSE = "course",
   EXPERIENCE = "experience",
   EDUCATION = "education",
+  ORGANIZATION = "organization",
 }
 
 registerEnumType(ResourceType, {

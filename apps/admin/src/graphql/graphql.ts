@@ -984,6 +984,7 @@ export enum ResourceType {
   Course = 'COURSE',
   Education = 'EDUCATION',
   Experience = 'EXPERIENCE',
+  Organization = 'ORGANIZATION',
   Project = 'PROJECT'
 }
 

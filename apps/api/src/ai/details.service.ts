@@ -1,6 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { GithubService } from "@/utils/github.service";
 import { OrchestratorService } from "@/utils/orchestrator.service";
+import { WebSearchService } from "@/utils/web-search.service";
 import { DetailInput } from "./dto/detail.input";
 import { ResourceType } from "./enums/resource-type";
 
@@ -16,10 +17,16 @@ export class ResourceDetailService {
   private readonly extractors: ExtractorConfig[];
   private readonly orchestrator: OrchestratorService;
   private readonly githubService: GithubService;
+  private readonly webSearchService: WebSearchService;
 
-  constructor(orchestrator: OrchestratorService, githubService: GithubService) {
+  constructor(
+    orchestrator: OrchestratorService,
+    githubService: GithubService,
+    webSearchService: WebSearchService
+  ) {
     this.orchestrator = orchestrator;
     this.githubService = githubService;
+    this.webSearchService = webSearchService;
 
     this.extractors = [
       {
@@ -27,6 +34,12 @@ export class ResourceDetailService {
         supportedKeys: ["urls", "links", "references", "resources"],
         accepts: (url) => url.includes("github.com"),
         extract: (url) => this.githubExtractor(url),
+      },
+      {
+        supportedTypes: [ResourceType.ORGANIZATION],
+        supportedKeys: ["website", "url", "link"],
+        accepts: () => true, // accept all URLs for organization websites
+        extract: (url) => this.webSearchExtractor(url),
       },
     ];
   }
@@ -64,6 +77,16 @@ export class ResourceDetailService {
       (task) => task.extractor.extract(task.value),
       { concurrency: 5, timeoutMs: 30_000 }
     );
+  }
+
+  private async webSearchExtractor(url: string): Promise<DetailInput[]> {
+    const res = await this.webSearchService.crawl(url, {
+      instructions:
+        "Extract key information about the website and main topics.",
+    });
+    console.log(res);
+
+    return [];
   }
 
   private async githubExtractor(url: string): Promise<DetailInput[]> {
