@@ -1,4 +1,6 @@
-import { useForm } from "@tanstack/react-form";
+import { DeepKeys, DeepValue, useForm } from "@tanstack/react-form";
+import { useCallback } from "react";
+import { toast } from "react-toastify";
 import z from "zod";
 import { FieldArray } from "@/components/inputs/field-array";
 import { RangeInput } from "@/components/inputs/range";
@@ -6,10 +8,14 @@ import { SelectInput } from "@/components/inputs/select";
 import { TextInput } from "@/components/inputs/text";
 import { TextareaInput } from "@/components/inputs/textarea";
 import { LOCALES, LocaleEnum } from "@/consts/locales";
+import { RawSizeEnum } from "@/consts/raw-size";
 import {
   CreateOrganizationInput,
+  DetailInput,
   OrganizationCategory,
+  ResourceType,
 } from "@/graphql/graphql";
+import { useAtsSummarize, useTranslate } from "@/hooks/mutations/ai";
 import { OrganizationRow } from "@/hooks/queries/organizations";
 import { fieldError } from "@/lib/field-error";
 import { CommonFormProps } from "./common";
@@ -94,6 +100,9 @@ export function OrganizationForm({
   isLoading,
   state,
 }: OrganizationFormProps) {
+  const atsSummarize = useAtsSummarize();
+  const translate = useTranslate();
+
   const form = useForm({
     defaultValues: {
       name: "",
@@ -111,6 +120,77 @@ export function OrganizationForm({
     onSubmit: ({ value }) => onSubmit?.(value),
     validators: { onChange: organizationSchema },
   });
+
+  const handleAtsOptimize = useCallback(
+    async <Field extends DeepKeys<OrganizationSchema>>(
+      fieldGroup: OrganizationSchema["i18n"][number],
+      fieldName: Field,
+      fieldValue: DeepValue<OrganizationSchema, Field>
+    ) => {
+      const details: DetailInput[] = [];
+
+      const raw = fieldValue as string;
+      const type = ResourceType.Organization;
+
+      if (raw.trim().length <= RawSizeEnum.XSMALL)
+        return toast.error("Description must be at least 64 characters long");
+
+      const name = form.getFieldValue("name");
+      if (name) details.push({ key: "Name", value: [name] });
+
+      const category = form.getFieldValue("category");
+      if (category) details.push({ key: "Category", value: [category] });
+
+      const website = form.getFieldValue("website");
+      if (website) details.push({ key: "Website", value: [website] });
+
+      const language = fieldGroup.locale;
+      if (language) details.push({ key: "Language", value: [language] });
+
+      const summarized = await atsSummarize.mutateAsync({
+        raw,
+        type,
+        skills: [],
+        details,
+      });
+
+      form.setFieldValue(
+        fieldName,
+        summarized.atsSummarize.messages[0].message.content as DeepValue<
+          OrganizationSchema,
+          Field
+        >
+      );
+    },
+    [atsSummarize.mutateAsync, form.getFieldValue, form.setFieldValue]
+  );
+
+  const handleTranslate = useCallback(
+    async <Field extends DeepKeys<OrganizationSchema>>(
+      fieldGroup: OrganizationSchema["i18n"][number],
+      fieldName: Field,
+      fieldValue: DeepValue<OrganizationSchema, Field>
+    ) => {
+      const raw = fieldValue as string;
+
+      if (raw.trim().length <= RawSizeEnum.XSMALL)
+        return toast.error("Description must be at least 64 characters long");
+
+      const translated = await translate.mutateAsync({
+        raw,
+        targetLanguage: fieldGroup.locale,
+      });
+
+      form.setFieldValue(
+        fieldName,
+        translated.translate.messages[0].message.content as DeepValue<
+          OrganizationSchema,
+          Field
+        >
+      );
+    },
+    [translate.mutateAsync, form.setFieldValue]
+  );
 
   const { Field, Subscribe } = form;
 
@@ -231,25 +311,25 @@ export function OrganizationForm({
                 <Field name={`i18n[${index}].description`}>
                   {(field) => (
                     <TextareaInput
-                      // disabled={atsSummarize.isPending || translate.isPending}
+                      disabled={atsSummarize.isPending || translate.isPending}
                       error={fieldError(field.state.meta)}
                       label="Description"
                       name={field.name}
                       onChange={field.handleChange}
-                      // onOptimize={() =>
-                      //   handleAtsOptimize(
-                      //     arrayField.state.value[index],
-                      //     field.name,
-                      //     field.state.value
-                      //   )
-                      // }
-                      // onTranslate={() =>
-                      //   handleTranslate(
-                      //     arrayField.state.value[index],
-                      //     field.name,
-                      //     field.state.value
-                      //   )
-                      // }
+                      onOptimize={() =>
+                        handleAtsOptimize(
+                          arrayField.state.value[index],
+                          field.name,
+                          field.state.value
+                        )
+                      }
+                      onTranslate={() =>
+                        handleTranslate(
+                          arrayField.state.value[index],
+                          field.name,
+                          field.state.value
+                        )
+                      }
                       placeholder="Description"
                       value={field.state.value}
                     />
