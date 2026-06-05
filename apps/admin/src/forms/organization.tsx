@@ -15,7 +15,7 @@ import {
   OrganizationCategory,
   ResourceType,
 } from "@/graphql/graphql";
-import { useAtsSummarize, useTranslate } from "@/hooks/mutations/ai";
+import { useSummarize, useTranslate } from "@/hooks/mutations/ai";
 import { OrganizationRow } from "@/hooks/queries/organizations";
 import { fieldError } from "@/lib/field-error";
 import { CommonFormProps } from "./common";
@@ -100,7 +100,7 @@ export function OrganizationForm({
   isLoading,
   state,
 }: OrganizationFormProps) {
-  const atsSummarize = useAtsSummarize();
+  const summarize = useSummarize();
   const translate = useTranslate();
 
   const form = useForm({
@@ -147,22 +147,21 @@ export function OrganizationForm({
       const language = fieldGroup.locale;
       if (language) details.push({ key: "Language", value: [language] });
 
-      const summarized = await atsSummarize.mutateAsync({
+      const summarized = await summarize.mutateAsync({
         raw,
         type,
-        skills: [],
         details,
       });
 
       form.setFieldValue(
         fieldName,
-        summarized.atsSummarize.messages[0].message.content as DeepValue<
+        summarized.summarize.messages[0].message.content as DeepValue<
           OrganizationSchema,
           Field
         >
       );
     },
-    [atsSummarize.mutateAsync, form.getFieldValue, form.setFieldValue]
+    [summarize.mutateAsync, form.getFieldValue, form.setFieldValue]
   );
 
   const handleTranslate = useCallback(
@@ -311,7 +310,7 @@ export function OrganizationForm({
                 <Field name={`i18n[${index}].description`}>
                   {(field) => (
                     <TextareaInput
-                      disabled={atsSummarize.isPending || translate.isPending}
+                      disabled={summarize.isPending || translate.isPending}
                       error={fieldError(field.state.meta)}
                       label="Description"
                       name={field.name}

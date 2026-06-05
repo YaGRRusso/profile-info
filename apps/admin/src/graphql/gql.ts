@@ -16,6 +16,7 @@ import * as types from './graphql';
  */
 type Documents = {
     "\n  mutation AtsSummarize($atsSummarizeInput: AtsSummarizeInput!) {\n    atsSummarize(atsSummarizeInput: $atsSummarizeInput) {\n      messages {\n        finishReason\n        message {\n          content\n          reasoning\n          refusal\n          role\n        }\n      }\n      usage {\n        completionTokens\n        cost\n        promptTokens\n        totalTokens\n      }\n    }\n  }\n": typeof types.AtsSummarizeDocument,
+    "\n  mutation Summarize($summarizeInput: SummarizeInput!) {\n    summarize(summarizeInput: $summarizeInput) {\n      messages {\n        finishReason\n        message {\n          content\n          reasoning\n          refusal\n          role\n        }\n      }\n      usage {\n        completionTokens\n        cost\n        promptTokens\n        totalTokens\n      }\n    }\n  }\n": typeof types.SummarizeDocument,
     "\n  mutation Translate($translateInput: TranslateInput!) {\n    translate(translateInput: $translateInput) {\n      messages {\n        finishReason\n        message {\n          content\n          reasoning\n          refusal\n          role\n        }\n      }\n      usage {\n        completionTokens\n        cost\n        promptTokens\n        totalTokens\n      }\n    }\n  }\n": typeof types.TranslateDocument,
     "\n  mutation SignIn($signInInput: SignInInput!) {\n    signIn(signInInput: $signInInput)\n  }\n": typeof types.SignInDocument,
     "\n  mutation CreateOneCourse($createCourseInput: CreateCourseInput!) {\n    createOneCourse(createCourseInput: $createCourseInput) {\n      id\n      slug\n    }\n  }\n": typeof types.CreateOneCourseDocument,
@@ -78,6 +79,7 @@ type Documents = {
 };
 const documents: Documents = {
     "\n  mutation AtsSummarize($atsSummarizeInput: AtsSummarizeInput!) {\n    atsSummarize(atsSummarizeInput: $atsSummarizeInput) {\n      messages {\n        finishReason\n        message {\n          content\n          reasoning\n          refusal\n          role\n        }\n      }\n      usage {\n        completionTokens\n        cost\n        promptTokens\n        totalTokens\n      }\n    }\n  }\n": types.AtsSummarizeDocument,
+    "\n  mutation Summarize($summarizeInput: SummarizeInput!) {\n    summarize(summarizeInput: $summarizeInput) {\n      messages {\n        finishReason\n        message {\n          content\n          reasoning\n          refusal\n          role\n        }\n      }\n      usage {\n        completionTokens\n        cost\n        promptTokens\n        totalTokens\n      }\n    }\n  }\n": types.SummarizeDocument,
     "\n  mutation Translate($translateInput: TranslateInput!) {\n    translate(translateInput: $translateInput) {\n      messages {\n        finishReason\n        message {\n          content\n          reasoning\n          refusal\n          role\n        }\n      }\n      usage {\n        completionTokens\n        cost\n        promptTokens\n        totalTokens\n      }\n    }\n  }\n": types.TranslateDocument,
     "\n  mutation SignIn($signInInput: SignInInput!) {\n    signIn(signInInput: $signInInput)\n  }\n": types.SignInDocument,
     "\n  mutation CreateOneCourse($createCourseInput: CreateCourseInput!) {\n    createOneCourse(createCourseInput: $createCourseInput) {\n      id\n      slug\n    }\n  }\n": types.CreateOneCourseDocument,
@@ -143,6 +145,10 @@ const documents: Documents = {
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function graphql(source: "\n  mutation AtsSummarize($atsSummarizeInput: AtsSummarizeInput!) {\n    atsSummarize(atsSummarizeInput: $atsSummarizeInput) {\n      messages {\n        finishReason\n        message {\n          content\n          reasoning\n          refusal\n          role\n        }\n      }\n      usage {\n        completionTokens\n        cost\n        promptTokens\n        totalTokens\n      }\n    }\n  }\n"): typeof import('./graphql').AtsSummarizeDocument;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation Summarize($summarizeInput: SummarizeInput!) {\n    summarize(summarizeInput: $summarizeInput) {\n      messages {\n        finishReason\n        message {\n          content\n          reasoning\n          refusal\n          role\n        }\n      }\n      usage {\n        completionTokens\n        cost\n        promptTokens\n        totalTokens\n      }\n    }\n  }\n"): typeof import('./graphql').SummarizeDocument;
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

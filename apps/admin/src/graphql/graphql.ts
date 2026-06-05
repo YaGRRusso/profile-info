@@ -1218,6 +1218,13 @@ export type AtsSummarizeMutationVariables = Exact<{
 
 export type AtsSummarizeMutation = { __typename?: 'Mutation', atsSummarize: { __typename?: 'GenericIaEntity', messages: Array<{ __typename?: 'ChoiceEntity', finishReason?: ChatFinishReason | null, message: { __typename?: 'MessageEntity', content: string, reasoning?: string | null, refusal?: string | null, role: OpenRouterRole } }>, usage?: { __typename?: 'UsageEntity', completionTokens?: number | null, cost?: number | null, promptTokens?: number | null, totalTokens?: number | null } | null } };
 
+export type SummarizeMutationVariables = Exact<{
+  summarizeInput: SummarizeInput;
+}>;
+
+
+export type SummarizeMutation = { __typename?: 'Mutation', summarize: { __typename?: 'GenericIaEntity', messages: Array<{ __typename?: 'ChoiceEntity', finishReason?: ChatFinishReason | null, message: { __typename?: 'MessageEntity', content: string, reasoning?: string | null, refusal?: string | null, role: OpenRouterRole } }>, usage?: { __typename?: 'UsageEntity', completionTokens?: number | null, cost?: number | null, promptTokens?: number | null, totalTokens?: number | null } | null } };
+
 export type TranslateMutationVariables = Exact<{
   translateInput: TranslateInput;
 }>;
@@ -1689,6 +1696,27 @@ export const AtsSummarizeDocument = new TypedDocumentString(`
   }
 }
     `) as unknown as TypedDocumentString<AtsSummarizeMutation, AtsSummarizeMutationVariables>;
+export const SummarizeDocument = new TypedDocumentString(`
+    mutation Summarize($summarizeInput: SummarizeInput!) {
+  summarize(summarizeInput: $summarizeInput) {
+    messages {
+      finishReason
+      message {
+        content
+        reasoning
+        refusal
+        role
+      }
+    }
+    usage {
+      completionTokens
+      cost
+      promptTokens
+      totalTokens
+    }
+  }
+}
+    `) as unknown as TypedDocumentString<SummarizeMutation, SummarizeMutationVariables>;
 export const TranslateDocument = new TypedDocumentString(`
     mutation Translate($translateInput: TranslateInput!) {
   translate(translateInput: $translateInput) {

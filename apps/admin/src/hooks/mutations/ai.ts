@@ -1,6 +1,10 @@
 import { useMutation } from "@tanstack/react-query";
 import { graphql } from "@/graphql";
-import { AtsSummarizeInput, TranslateInput } from "@/graphql/graphql";
+import {
+  AtsSummarizeInput,
+  SummarizeInput,
+  TranslateInput,
+} from "@/graphql/graphql";
 import { execute } from "@/lib/execute";
 
 const atsSummarize = graphql(`
@@ -30,6 +34,36 @@ export function useAtsSummarize() {
     mutationKey: ["atsSummarize"],
     mutationFn: (atsSummarizeInput: AtsSummarizeInput) =>
       execute(atsSummarize, { atsSummarizeInput }),
+  });
+}
+
+const summarize = graphql(`
+  mutation Summarize($summarizeInput: SummarizeInput!) {
+    summarize(summarizeInput: $summarizeInput) {
+      messages {
+        finishReason
+        message {
+          content
+          reasoning
+          refusal
+          role
+        }
+      }
+      usage {
+        completionTokens
+        cost
+        promptTokens
+        totalTokens
+      }
+    }
+  }
+`);
+
+export function useSummarize() {
+  return useMutation({
+    mutationKey: ["summarize"],
+    mutationFn: (summarizeInput: SummarizeInput) =>
+      execute(summarize, { summarizeInput }),
   });
 }
 
