@@ -1,5 +1,6 @@
 import { SparkleIcon, TranslateIcon } from "@phosphor-icons/react";
 import { ComponentProps } from "react";
+import { RawSizeEnum } from "@/consts/raw-size";
 import { cn } from "@/lib/cn";
 
 export interface TextareaInputProps
@@ -46,7 +47,12 @@ export function TextareaInput({
           {onTranslate && (
             <button
               className="btn btn-xs btn-primary btn-ghost w-fit"
-              disabled={disabled || !value || !!error}
+              disabled={
+                disabled ||
+                !value ||
+                !!error ||
+                value.trim().length <= RawSizeEnum.XSMALL
+              }
               onClick={onTranslate}
               type="button"
             >
@@ -57,7 +63,12 @@ export function TextareaInput({
           {onOptimize && (
             <button
               className="btn btn-xs btn-primary btn-ghost w-fit"
-              disabled={disabled || !value || !!error}
+              disabled={
+                disabled ||
+                !value ||
+                !!error ||
+                value.trim().length <= RawSizeEnum.XSMALL
+              }
               onClick={onOptimize}
               type="button"
             >

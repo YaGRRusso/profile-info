@@ -406,11 +406,7 @@ export function CourseForm({
                 <Field name={`i18n[${index}].description`}>
                   {(field) => (
                     <TextareaInput
-                      disabled={
-                        atsSummarize.isPending ||
-                        translate.isPending ||
-                        field.state.value.trim().length <= RawSizeEnum.XSMALL
-                      }
+                      disabled={atsSummarize.isPending || translate.isPending}
                       error={fieldError(field.state.meta)}
                       label="Description"
                       name={field.name}

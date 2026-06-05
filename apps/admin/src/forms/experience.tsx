@@ -439,10 +439,7 @@ export function ExperienceForm({
                             {(field) => (
                               <TextareaInput
                                 disabled={
-                                  atsSummarize.isPending ||
-                                  translate.isPending ||
-                                  field.state.value.trim().length <=
-                                    RawSizeEnum.XSMALL
+                                  atsSummarize.isPending || translate.isPending
                                 }
                                 error={fieldError(field.state.meta)}
                                 label="Description"
