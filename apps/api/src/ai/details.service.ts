@@ -72,57 +72,75 @@ export class ResourceDetailService {
       }
     }
 
-    return await this.orchestrator.execute(
+    const results = await this.orchestrator.execute(
       tasks,
       (task) => task.extractor.extract(task.value),
       { concurrency: 5, timeoutMs: 30_000 }
     );
+
+    return results;
   }
 
   private async webSearchExtractor(url: string): Promise<DetailInput[]> {
-    const res = await this.webSearchService.crawl(url, {
-      instructions:
-        "Extract key information about the website and main topics.",
-    });
-    console.log(res);
+    const extraDetails: DetailInput[] = [];
 
-    return [];
+    const { results } = await this.webSearchService.extract([url], {
+      instructions:
+        "Identify the main objective of this page and its target audience, extract the key information and main topics. Write a summary of the information presented on the page. Ignore forms and loading issues, focus on the real content.",
+    });
+
+    if (results && results.length > 0) {
+      for (const result of results) {
+        if (result.title) {
+          extraDetails.push({
+            key: `Website (${result.url}) Title`,
+            value: [result.title],
+          });
+        }
+        extraDetails.push({
+          key: `Website (${result.url}) Scraped Summary`,
+          value: [result.rawContent],
+        });
+      }
+    }
+
+    return extraDetails;
   }
 
   private async githubExtractor(url: string): Promise<DetailInput[]> {
-    const repositoryDetails: DetailInput[] = [];
+    const extraDetails: DetailInput[] = [];
 
     const { owner, repo } = this.githubService.getRepositoryMeta(url);
 
     const { description, languages, readme, topics } =
       await this.githubService.getRepositoryData(owner, repo);
 
-    repositoryDetails.push({
+    extraDetails.push({
       key: "languages",
       value: Object.keys(languages),
     });
 
     if (description) {
-      repositoryDetails.push({
+      extraDetails.push({
         key: "description",
         value: [description],
       });
     }
 
     if (topics.length > 0) {
-      repositoryDetails.push({
+      extraDetails.push({
         key: "topics",
         value: topics,
       });
     }
 
     if (readme && typeof readme === "string") {
-      repositoryDetails.push({
+      extraDetails.push({
         key: "readme",
         value: [readme],
       });
     }
 
-    return repositoryDetails;
+    return extraDetails;
   }
 }

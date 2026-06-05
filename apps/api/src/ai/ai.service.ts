@@ -1,7 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { OpenRouter } from "@openrouter/sdk";
 import { ChatRequest } from "@openrouter/sdk/models";
-import { breakpoint } from "@/core/helpers/breakpoint.helper";
 import { ResourceDetailService } from "./details.service";
 import { AtsSummarizeInput, TranslateInput } from "./dto/ats-summarize.input";
 import { GenericIaEntity } from "./entities/ai.entity";
@@ -98,8 +97,6 @@ export class AiService {
   private async executeChatRequest(
     chatRequest: ChatRequest & { stream?: false }
   ): Promise<GenericIaEntity> {
-    breakpoint(chatRequest);
-
     console.dir(chatRequest, { depth: null });
     const completion = await this.client.chat.send({ chatRequest });
     console.dir(completion, { depth: null });

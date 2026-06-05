@@ -14,6 +14,16 @@ export async function appConfig(app: INestApplication) {
     credentials: true,
   });
 
+  // app.use(
+  //   morgan("dev", {
+  //     stream: {
+  //       write: (message: string) => {
+  //         Logger.log(message.trim(), "HTTP");
+  //       },
+  //     },
+  //   })
+  // );
+
   await app.listen(port, host);
 
   const url = await app.getUrl();

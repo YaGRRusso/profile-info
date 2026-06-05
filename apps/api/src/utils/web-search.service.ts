@@ -19,7 +19,7 @@ export class WebSearchService {
       throw new Error("TAVILY_API_KEY environment variable is not set");
     }
 
-    this.client = tavily({ apiKey: "tvly-YOUR_API_KEY" });
+    this.client = tavily({ apiKey: process.env.TAVILY_API_KEY });
   }
 
   async search(
