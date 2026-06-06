@@ -28,6 +28,7 @@
     "prod": "concurrently -c \"blue,magenta\" -n \"api,admin\" \"npm run api:prod\" \"npm run admin:prod\"",
     "build": "concurrently -c \"blue,magenta\" -n \"api,admin\" \"npm run api:build\" \"npm run admin:build\"",
     "start": "concurrently -c \"blue,magenta\" -n \"api,admin\" \"npm run api:start\" \"npm run admin:start\"",
+    "tree": "tree apps/ -I 'node_modules|dist|build|.git' -L 7 -F",
     "test": "npm run test --workspaces --if-present",
     "test:watch": "npm run test:watch --workspaces --if-present",
     "test:cov": "npm run test:cov --workspaces --if-present",
