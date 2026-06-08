@@ -6,6 +6,8 @@ import {
   ExperiencesResolver,
 } from "./experiences.resolver";
 import { ExperiencesService } from "./experiences.service";
+import { OnOrganizationDeletedListener } from "./listeners/on-organization-deleted.listener";
+import { OnSkillDeletedListener } from "./listeners/on-skill-deleted.listener";
 
 @Module({
   imports: [
@@ -13,6 +15,12 @@ import { ExperiencesService } from "./experiences.service";
       { name: ExperienceModel.name, schema: ExperienceSchema },
     ]),
   ],
-  providers: [ExperiencesResolver, ExperienceRoleResolver, ExperiencesService],
+  providers: [
+    ExperiencesResolver,
+    ExperienceRoleResolver,
+    ExperiencesService,
+    OnSkillDeletedListener,
+    OnOrganizationDeletedListener,
+  ],
 })
 export class ExperiencesModule {}

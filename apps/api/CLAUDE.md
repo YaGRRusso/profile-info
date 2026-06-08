@@ -99,6 +99,10 @@ UpdateInput, FilterInput, SortInput)` that returns an abstract resolver class
 organizationsService })` returns `batchSkills` and `batchOrganizations`
   DataLoaders (max batch 100), used in the GraphQL context.
 - `interfaces/context.interface.ts`: `Ctx` = `{ loaders, req, res }`.
+- `events/domain-events.ts`: string constants for `@nestjs/event-emitter` (e.g.
+  `skill.deleted`). Payload classes live in `<resource>/events/`. On delete,
+  services `emitAsync` before removing the document; consuming modules register
+  `OnSkillDeletedListener`-style handlers in `listeners/` to clean up references.
 - `configs/`: `app.config.ts` and `validation.config.ts` (described above).
 
 `auth/`:
@@ -256,6 +260,10 @@ Run from `apps/api/` or via the root `api:*` aliases.
 - DataLoaders exist only for skills and organizations. A new nested reference (for
   example an education's organization) will N+1 unless you add a loader and wire
   the owning service into the GraphQL factory in `app.module.ts`.
+- Deleting a skill or organization emits a domain event before the document is
+  removed. Listeners in courses/educations/experiences/projects pull skill refs;
+  courses/educations/experiences delete records that reference a removed
+  organization. Do not re-add Mongoose `pre('deleteOne')` hooks for this.
 - The startup log calls the URL "Playground", but `playground` is disabled; the
   Apollo local landing page is served at `/graphql` instead.
 - `app.controller.ts` exposes a plain REST `GET /` returning "Hello World!" used by

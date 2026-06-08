@@ -3,6 +3,7 @@ import {
   Injectable,
   NotFoundException,
 } from "@nestjs/common";
+import { EventEmitter2 } from "@nestjs/event-emitter";
 import { InjectModel } from "@nestjs/mongoose";
 import { isNil } from "lodash";
 import {
@@ -14,17 +15,20 @@ import {
   UpdateQuery,
 } from "mongoose";
 import { BatchEntity } from "@/core/entities/batch.entity";
+import { DomainEvents } from "@/core/events/domain-events";
 import { clearObject } from "@/core/helpers/object.helper";
 import { PaginatedModel } from "@/core/schemas/paginated.schema";
 import { OrganizationModel } from "@/schemas/organization.schema";
 import { CreateOrganizationInput } from "./dto/create-organization.input";
 import { UpdateOrganizationInput } from "./dto/update-organization.input";
+import { OrganizationDeletedEvent } from "./events/organization-deleted.event";
 
 @Injectable()
 export class OrganizationsService {
   constructor(
     @InjectModel(OrganizationModel.name)
-    readonly organizationModel: Model<OrganizationModel>
+    readonly organizationModel: Model<OrganizationModel>,
+    private readonly eventEmitter: EventEmitter2
   ) {}
 
   async findOneById(id: string): Promise<OrganizationModel> {
@@ -150,15 +154,33 @@ export class OrganizationsService {
   async removeOne(id: string): Promise<OrganizationModel> {
     if (!isValidObjectId(id)) throw new BadRequestException("Invalid ID");
 
-    const res = await this.organizationModel.findByIdAndDelete(id).exec();
+    const res = await this.organizationModel.findById(id).exec();
 
     if (isNil(res)) throw new NotFoundException("Not Removed");
+
+    await this.eventEmitter.emitAsync(
+      DomainEvents.organization.deleted,
+      new OrganizationDeletedEvent(res._id.toString())
+    );
+
+    await this.organizationModel.findByIdAndDelete(id).exec();
     return res;
   }
 
   async removeMany(ids: string[]): Promise<BatchEntity> {
     if (ids.some((id) => !isValidObjectId(id)))
       throw new BadRequestException("Invalid ID");
+
+    const organizations = await this.organizationModel
+      .find({ _id: { $in: ids } } as QueryFilter<OrganizationModel>)
+      .exec();
+
+    for (const organization of organizations) {
+      await this.eventEmitter.emitAsync(
+        DomainEvents.organization.deleted,
+        new OrganizationDeletedEvent(organization._id.toString())
+      );
+    }
 
     const res = await this.organizationModel
       .deleteMany({ _id: { $in: ids } } as QueryFilter<OrganizationModel>)

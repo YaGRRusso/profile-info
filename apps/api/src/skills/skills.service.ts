@@ -3,6 +3,7 @@ import {
   Injectable,
   NotFoundException,
 } from "@nestjs/common";
+import { EventEmitter2 } from "@nestjs/event-emitter";
 import { InjectModel } from "@nestjs/mongoose";
 import { isNil } from "lodash";
 import {
@@ -14,16 +15,19 @@ import {
   UpdateQuery,
 } from "mongoose";
 import { BatchEntity } from "@/core/entities/batch.entity";
+import { DomainEvents } from "@/core/events/domain-events";
 import { clearObject } from "@/core/helpers/object.helper";
 import { PaginatedModel } from "@/core/schemas/paginated.schema";
 import { SkillModel } from "@/schemas/skill.schema";
 import { CreateSkillInput } from "./dto/create-skill.input";
 import { UpdateSkillInput } from "./dto/update-skill.input";
+import { SkillDeletedEvent } from "./events/skill-deleted.event";
 
 @Injectable()
 export class SkillsService {
   constructor(
-    @InjectModel(SkillModel.name) readonly skillModel: Model<SkillModel>
+    @InjectModel(SkillModel.name) readonly skillModel: Model<SkillModel>,
+    private readonly eventEmitter: EventEmitter2
   ) {}
   async findOneById(id: string): Promise<SkillModel> {
     if (!isValidObjectId(id)) throw new BadRequestException("Invalid ID");
@@ -141,15 +145,33 @@ export class SkillsService {
   async removeOne(id: string): Promise<SkillModel> {
     if (!isValidObjectId(id)) throw new BadRequestException("Invalid ID");
 
-    const res = await this.skillModel.findByIdAndDelete(id).exec();
+    const res = await this.skillModel.findById(id).exec();
 
     if (isNil(res)) throw new NotFoundException("Not Removed");
+
+    await this.eventEmitter.emitAsync(
+      DomainEvents.skill.deleted,
+      new SkillDeletedEvent(res._id.toString())
+    );
+
+    await this.skillModel.findByIdAndDelete(id).exec();
     return res;
   }
 
   async removeMany(ids: string[]): Promise<BatchEntity> {
     if (ids.some((id) => !isValidObjectId(id)))
       throw new BadRequestException("Invalid ID");
+
+    const skills = await this.skillModel
+      .find({ _id: { $in: ids } } as QueryFilter<SkillModel>)
+      .exec();
+
+    for (const skill of skills) {
+      await this.eventEmitter.emitAsync(
+        DomainEvents.skill.deleted,
+        new SkillDeletedEvent(skill._id.toString())
+      );
+    }
 
     const res = await this.skillModel
       .deleteMany({ _id: { $in: ids } } as QueryFilter<SkillModel>)

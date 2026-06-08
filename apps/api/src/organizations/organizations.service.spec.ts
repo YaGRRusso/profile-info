@@ -1,4 +1,5 @@
 import { BadRequestException, NotFoundException } from "@nestjs/common";
+import { EventEmitter2 } from "@nestjs/event-emitter";
 import { getModelToken } from "@nestjs/mongoose";
 import { Test, TestingModule } from "@nestjs/testing";
 import mongoose, { Model } from "mongoose";
@@ -42,6 +43,12 @@ describe("OrganizationsService", () => {
             updateMany: jest.fn(),
             findByIdAndDelete: jest.fn(),
             deleteMany: jest.fn(),
+          },
+        },
+        {
+          provide: EventEmitter2,
+          useValue: {
+            emitAsync: jest.fn().mockResolvedValue([]),
           },
         },
       ],
@@ -98,6 +105,7 @@ describe("OrganizationsService", () => {
 
   describe("removeOne", () => {
     it("should return the removed document", async () => {
+      (model.findById as jest.Mock).mockReturnValue(makeExec(fakeDoc));
       (model.findByIdAndDelete as jest.Mock).mockReturnValue(makeExec(fakeDoc));
       expect(await service.removeOne(validId)).toBe(fakeDoc);
     });
@@ -111,6 +119,7 @@ describe("OrganizationsService", () => {
 
   describe("removeMany", () => {
     it("should return a BatchEntity count", async () => {
+      (model.find as jest.Mock).mockReturnValue(makeExec([fakeDoc]));
       (model.deleteMany as jest.Mock).mockReturnValue(
         makeExec({ deletedCount: 5 })
       );

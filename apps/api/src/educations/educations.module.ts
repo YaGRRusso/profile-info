@@ -3,6 +3,8 @@ import { MongooseModule } from "@nestjs/mongoose";
 import { EducationModel, EducationSchema } from "@/schemas/education.schema";
 import { EducationsResolver } from "./educations.resolver";
 import { EducationsService } from "./educations.service";
+import { OnOrganizationDeletedListener } from "./listeners/on-organization-deleted.listener";
+import { OnSkillDeletedListener } from "./listeners/on-skill-deleted.listener";
 
 @Module({
   imports: [
@@ -10,6 +12,11 @@ import { EducationsService } from "./educations.service";
       { name: EducationModel.name, schema: EducationSchema },
     ]),
   ],
-  providers: [EducationsResolver, EducationsService],
+  providers: [
+    EducationsResolver,
+    EducationsService,
+    OnSkillDeletedListener,
+    OnOrganizationDeletedListener,
+  ],
 })
 export class EducationsModule {}
