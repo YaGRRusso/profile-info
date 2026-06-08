@@ -1,6 +1,17 @@
-import { Context, Parent, ResolveField, Resolver } from "@nestjs/graphql";
+import {
+  Args,
+  Context,
+  ID,
+  Mutation,
+  Parent,
+  Query,
+  ResolveField,
+  Resolver,
+} from "@nestjs/graphql";
+import { Public } from "@/core/decorators/public-route.decorator";
+import { BatchEntity } from "@/core/entities/batch.entity";
+import { PaginationInput } from "@/core/inputs/pagination.input";
 import type { Ctx } from "@/core/interfaces/context.interface";
-import { BaseResolver } from "@/core/resolvers/base.resolver";
 import { OrganizationEntity } from "@/organizations/entities/organization.entity";
 import { CourseModel } from "@/schemas/course.schema";
 import { SkillEntity } from "@/skills/entities/skill.entity";
@@ -9,25 +20,113 @@ import { CreateCourseInput } from "./dto/create-course.input";
 import { FilterCourseInput } from "./dto/filter-course.input";
 import { SortCourseInput } from "./dto/sort-course.input";
 import { UpdateCourseInput } from "./dto/update-course.input";
-import { CourseEntity } from "./entities/course.entity";
+import { CourseEntity, PaginatedCourseEntity } from "./entities/course.entity";
 
 @Resolver(() => CourseEntity)
-export class CoursesResolver extends BaseResolver<
-  CourseModel,
-  CourseEntity,
-  CreateCourseInput,
-  UpdateCourseInput,
-  FilterCourseInput,
-  SortCourseInput
->(
-  CourseEntity,
-  CreateCourseInput,
-  UpdateCourseInput,
-  FilterCourseInput,
-  SortCourseInput
-) {
-  constructor(readonly coursesService: CoursesService) {
-    super(coursesService);
+export class CoursesResolver {
+  constructor(private readonly coursesService: CoursesService) {}
+
+  // QUERIES
+
+  @Public()
+  @Query(() => CourseEntity)
+  findOneCourseById(@Args("courseId", { type: () => ID }) courseId: string) {
+    return this.coursesService.findOneById(courseId);
+  }
+
+  @Public()
+  @Query(() => CourseEntity)
+  findOneCourse(
+    @Args("courseFilters", {
+      type: () => FilterCourseInput,
+      nullable: true,
+    })
+    courseFilters?: FilterCourseInput
+  ) {
+    return this.coursesService.findOne({ filters: courseFilters });
+  }
+
+  @Public()
+  @Query(() => [CourseEntity])
+  findManyCourseById(
+    @Args("courseIds", { type: () => [ID] }) courseIds: string[]
+  ) {
+    return this.coursesService.findManyById(courseIds);
+  }
+
+  @Public()
+  @Query(() => PaginatedCourseEntity)
+  findManyCourses(
+    @Args("courseFilters", {
+      type: () => FilterCourseInput,
+      nullable: true,
+    })
+    courseFilters?: FilterCourseInput,
+    @Args("coursePagination", {
+      type: () => PaginationInput,
+      nullable: true,
+    })
+    coursePagination?: PaginationInput,
+    @Args("courseSort", {
+      type: () => SortCourseInput,
+      nullable: true,
+    })
+    courseSort?: SortCourseInput
+  ) {
+    return this.coursesService.findMany({
+      filters: courseFilters,
+      sort: courseSort,
+      limit: coursePagination?.limit,
+      skip: coursePagination?.skip,
+    });
+  }
+
+  // MUTATIONS
+
+  @Mutation(() => CourseEntity)
+  createOneCourse(
+    @Args("createCourseInput", { type: () => CreateCourseInput })
+    createCourseInput: CreateCourseInput
+  ) {
+    return this.coursesService.createOne(createCourseInput);
+  }
+
+  @Mutation(() => [CourseEntity])
+  createManyCourses(
+    @Args("createCourseInputs", { type: () => [CreateCourseInput] })
+    createCourseInputs: CreateCourseInput[]
+  ) {
+    return this.coursesService.createMany(createCourseInputs);
+  }
+
+  @Mutation(() => CourseEntity)
+  updateOneCourse(
+    @Args("courseId", { type: () => ID }) courseId: string,
+    @Args("updateCourseInput", { type: () => UpdateCourseInput })
+    updateCourseInput: UpdateCourseInput
+  ) {
+    return this.coursesService.updateOne(courseId, updateCourseInput);
+  }
+
+  @Mutation(() => BatchEntity)
+  updateManyCourses(
+    @Args("courseIds", { type: () => [ID] }) courseIds: string[],
+    @Args("updateCourseInput", { type: () => UpdateCourseInput })
+    updateCourseInput: UpdateCourseInput
+  ) {
+    return this.coursesService.updateMany(courseIds, updateCourseInput);
+  }
+
+  @Mutation(() => CourseEntity)
+  removeOneCourse(@Args("courseId", { type: () => ID }) courseId: string) {
+    return this.coursesService.removeOne(courseId);
+  }
+
+  @Mutation(() => BatchEntity)
+  removeManyCourses(
+    @Args("courseIds", { type: () => [ID] }) courseIds: string[]
+  ) {
+    return this.coursesService.removeMany(courseIds);
   }
 
   @ResolveField(() => OrganizationEntity)

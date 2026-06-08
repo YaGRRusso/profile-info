@@ -2,6 +2,7 @@ import { Field, ObjectType } from "@nestjs/graphql";
 import { OptionalField } from "@/core/decorators/optional-field.decorator";
 import { BaseEntity } from "@/core/entities/base.entity";
 import { UrlEntity } from "@/core/entities/url.entity";
+import { createPaginatedModel } from "@/core/schemas/paginated.schema";
 
 @ObjectType()
 export class UserEntity extends BaseEntity {
@@ -38,3 +39,5 @@ export class UserEntity extends BaseEntity {
   @OptionalField(() => [UrlEntity])
   urls?: UrlEntity[];
 }
+
+export const PaginatedUserEntity = createPaginatedModel(UserEntity);

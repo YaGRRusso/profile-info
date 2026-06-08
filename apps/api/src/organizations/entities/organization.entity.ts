@@ -1,5 +1,6 @@
 import { Field, ObjectType } from "@nestjs/graphql";
 import { BaseEntity } from "@/core/entities/base.entity";
+import { createPaginatedModel } from "@/core/schemas/paginated.schema";
 import { OrganizationCategory } from "../enums/category.enum";
 
 @ObjectType()
@@ -40,3 +41,6 @@ export class OrganizationEntity extends BaseEntity {
   @Field(() => OrganizationCategory)
   category: OrganizationCategory;
 }
+
+export const PaginatedOrganizationEntity =
+  createPaginatedModel(OrganizationEntity);

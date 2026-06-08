@@ -2,6 +2,7 @@ import { Field, ObjectType } from "@nestjs/graphql";
 import { OptionalField } from "@/core/decorators/optional-field.decorator";
 import { BaseEntity } from "@/core/entities/base.entity";
 import { DateRangeEntity } from "@/core/entities/date-range.entity";
+import { createPaginatedModel } from "@/core/schemas/paginated.schema";
 import { OrganizationEntity } from "@/organizations/entities/organization.entity";
 import { SkillEntity } from "@/skills/entities/skill.entity";
 import { EducationLevel } from "../enums/level.enum";
@@ -57,3 +58,5 @@ export class EducationEntity extends BaseEntity {
   @OptionalField(() => DateRangeEntity)
   period?: DateRangeEntity;
 }
+
+export const PaginatedEducationEntity = createPaginatedModel(EducationEntity);

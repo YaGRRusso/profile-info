@@ -1,6 +1,7 @@
 import { Field, Int, ObjectType } from "@nestjs/graphql";
 import { OptionalField } from "@/core/decorators/optional-field.decorator";
 import { BaseEntity } from "@/core/entities/base.entity";
+import { createPaginatedModel } from "@/core/schemas/paginated.schema";
 import { OrganizationEntity } from "@/organizations/entities/organization.entity";
 import { SkillEntity } from "@/skills/entities/skill.entity";
 import { CourseStatus } from "../enums/status.enum";
@@ -52,3 +53,5 @@ export class CourseEntity extends BaseEntity {
   @OptionalField(() => [SkillEntity])
   skills?: SkillEntity[];
 }
+
+export const PaginatedCourseEntity = createPaginatedModel(CourseEntity);

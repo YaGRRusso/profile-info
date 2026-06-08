@@ -6,6 +6,7 @@ import {
   TranslationEntity,
 } from "@/core/entities/translation.entity";
 import { UrlEntity } from "@/core/entities/url.entity";
+import { createPaginatedModel } from "@/core/schemas/paginated.schema";
 import { SkillEntity } from "@/skills/entities/skill.entity";
 
 @ObjectType()
@@ -39,3 +40,5 @@ export class ProjectEntity extends BaseEntity {
   @OptionalField(() => [UrlEntity])
   urls?: UrlEntity[];
 }
+
+export const PaginatedProjectEntity = createPaginatedModel(ProjectEntity);
