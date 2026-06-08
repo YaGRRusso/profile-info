@@ -1,0 +1,119 @@
+---
+description: NestJS GraphQL API patterns, modules, and gotchas
+globs: apps/api/**
+alwaysApply: false
+---
+
+# @profile-info/api
+
+> Context for AI agents working in the API package. Keep it accurate; an agent will trust it.
+
+## Maintaining this rule
+
+Follow the **Maintaining project documentation** section in `project-overview.mdc`. For API-specific learnings, update this file (`api.mdc`) and, when relevant for humans, `apps/api/README.md`.
+
+## Overview
+
+The NestJS GraphQL API for profile-info. It is code-first: GraphQL types are TypeScript classes with `@ObjectType` / `@InputType` / `@Field` decorators, and the schema is generated to `src/schema.gql`. Data lives in MongoDB via Mongoose. Every operation except `signIn` requires a JWT. The admin app is the only known client.
+
+Feature modules follow the same explicit CRUD pattern: resolver methods call service methods that use the injected Mongoose model. Copy `src/skills/` as the reference implementation.
+
+## Architecture & flow
+
+Entry point `src/main.ts`:
+
+1. `NestFactory.create(AppModule)`.
+2. `validationConfig(app)` installs a global `ValidationPipe` with `stopAtFirstError: true`.
+3. `await appConfig(app)` reads `PORT` (default 8080) and `HOST` (default `0.0.0.0`), enables CORS, and starts listening.
+
+`src/app.module.ts` composition root:
+
+- `EventEmitterModule.forRoot({ global: true })`.
+- `ConfigModule.forRoot({ isGlobal: true })`.
+- `MongooseModule.forRootAsync` reads `DATABASE_URL`.
+- `GraphQLModule.forRootAsync` with `ApolloDriver`: schema at `src/schema.gql`, DataLoaders in context via `createLoaders(...)`.
+- Feature modules: `SkillsModule`, `ProjectsModule`, `UsersModule`, `AuthModule`, `CoursesModule`, `EducationsModule`, `ExperiencesModule`, `OrganizationsModule`, `DashboardModule`. `DashboardModule` is read-only aggregation only.
+
+Request flow: Apollo → `GqlAuthGuard` (unless `@Public()`) → resolver → service → Mongoose model. Nested fields use `@ResolveField` + per-request DataLoaders.
+
+## Core technologies
+
+- **@nestjs/graphql + @nestjs/apollo**: code-first schema in `src/schema.gql`.
+- **@nestjs/mongoose + mongoose**: models in `src/schemas/`, registered per feature module.
+- **@nestjs/jwt + passport**: global 8h JWT in `src/auth/`.
+- **@nestjs/event-emitter**: domain events on delete (see below).
+- **bcryptjs**: password hashing in `users/users.service.ts`.
+- **dataloader + lodash**: `core/helpers/loaders.helper.ts`.
+- **class-validator / class-transformer**: input validation via global `ValidationPipe`.
+
+## Module / directory breakdown
+
+`core/`:
+
+- `events/domain-events.ts`: event name constants (e.g. `skill.deleted`).
+- `schemas/paginated.schema.ts`: `createPaginatedModel(Entity)` for `{ found, nodes }`.
+- `schemas/base.schema.ts`, `translation.schema.ts`, `daterange.schema.ts`: shared Mongoose sub-schemas.
+- `entities/`: `BaseEntity`, batch, date-range, translation, url GraphQL types.
+- `inputs/`: pagination, sort factory, date-range, translation, url inputs.
+- `decorators/`: `@Public()`, `@CurrentUser()`, `@OptionalField()`.
+- `helpers/loaders.helper.ts`: `batchSkills`, `batchOrganizations` DataLoaders.
+- `configs/`: `app.config.ts`, `validation.config.ts`.
+
+`auth/`: global `GqlAuthGuard`, `signIn` (`@Public`) returns JWT, `getMe` returns current user.
+
+Feature modules (`skills/`, `users/`, `experiences/`, `educations/`, `courses/`, `organizations/`, `projects/`): each has `<name>.module.ts`, `<name>.resolver.ts`, `<name>.service.ts`, `entities/<name>.entity.ts`, `dto/`, often `enums/` and sometimes `listeners/` or `events/`. Mongoose model in `src/schemas/<name>.schema.ts`.
+
+Notable specifics:
+
+- `users/users.service.ts`: hashes password on create; `select("+password")` for auth.
+- `experiences/experiences.resolver.ts`: `@ResolveField` for `organization`, `skills`, sorted `roles`.
+- `skills/` and `organizations/` export their services for DataLoaders in `app.module.ts`.
+
+## Domain events (delete cascade)
+
+When a referenced resource is deleted, services emit domain events **before** removing the document (`emitAsync`):
+
+- `SkillDeletedEvent` / `skill.deleted`: listeners in courses, educations, experiences, projects `$pull` the skill id from arrays (experiences use nested `roles.skills`).
+- `OrganizationDeletedEvent` / `organization.deleted`: listeners in courses, educations, experiences `deleteMany` records referencing the org.
+
+Payload classes live in `<resource>/events/`. Listeners live in consuming modules under `listeners/` (e.g. `OnSkillDeletedListener`). Do not use Mongoose `pre('deleteOne')` hooks for this — they miss `findByIdAndDelete` / `deleteMany`.
+
+## The patterns to follow when extending
+
+Copy `src/skills/` and adapt:
+
+1. Mongoose model: `src/schemas/<name>.schema.ts` extending `BaseModel`.
+2. GraphQL entity: `<name>/entities/<name>.entity.ts` extending `BaseEntity`; export `Paginated<Name>Entity = createPaginatedModel(...)`.
+3. Inputs: `Create`, `Update` (PartialType), `Filter` (PartialType), `Sort` (SortType factory).
+4. Service: explicit CRUD methods (`findOneById`, `findMany`, `createOne`, `removeOne`, etc.) using the Mongoose model.
+5. Resolver: explicit `@Query` / `@Mutation` methods with `@Public()` on reads; wire pagination/sort/filter args like `skills.resolver.ts`.
+6. Module: `MongooseModule.forFeature`, providers, export service if needed for loaders. Import in `app.module.ts`.
+
+If other modules reference the new entity in arrays, add an `On<Name>DeletedListener` in those modules and emit the event from `removeOne` / `removeMany`.
+
+For nested `@ResolveField`, use DataLoaders from `ctx.loaders`; add new loaders in `loaders.helper.ts` and inject the service in the GraphQL factory.
+
+CRUD field names follow the skills convention: `findOneSkillById`, `findManySkills`, `createOneSkill`, etc. Check `src/schema.gql` for exact names.
+
+## Environment variables
+
+Loaded via `--env-file .env.development` / `.env.production` and `ConfigModule`. See `.env.example`.
+
+- `DATABASE_URL` (required): MongoDB URI.
+- `JWT_SECRET` (required): JWT signing secret.
+- `HOST` (optional, default `0.0.0.0`), `PORT` (optional, default `8080`).
+
+## Scripts / commands
+
+Run from `apps/api/` or via root `api:*` aliases: `dev`, `prod`, `build`, `start`, `seed`, `test`, `test:e2e`, `typecheck`, `lint`, `format`.
+
+`npm run seed`: wipes profile collections and inserts faker dev data plus admin `admin@profile.info` / `admin123`.
+
+## Gotchas & notes
+
+- Regenerate `src/schema.gql` after type changes so admin codegen stays in sync.
+- New public GraphQL fields need `@Public()` or they 401.
+- Password is `select: false` and absent from `UserEntity`; never expose it in GraphQL.
+- DataLoaders exist only for skills and organizations today.
+- Startup log says "Playground" but `playground` is disabled; Apollo landing page is at `/graphql`.
+- `app.controller.ts` exposes REST `GET /` for health/e2e smoke test.
