@@ -6,22 +6,21 @@ import { ConfigModule, ConfigService } from "@nestjs/config";
 import { EventEmitterModule } from "@nestjs/event-emitter";
 import { GraphQLModule } from "@nestjs/graphql";
 import { MongooseModule } from "@nestjs/mongoose";
-import { AiModule } from "./ai/ai.module";
 import { AppController } from "./app.controller";
 import { AppService } from "./app.service";
-import { AuthModule } from "./auth/auth.module";
-import { createLoaders } from "./core/helpers/loaders.helper";
-import { CoursesModule } from "./courses/courses.module";
-import { DashboardModule } from "./dashboard/dashboard.module";
-import { EducationsModule } from "./educations/educations.module";
-import { ExperiencesModule } from "./experiences/experiences.module";
-import { OrganizationsModule } from "./organizations/organizations.module";
-import { OrganizationsService } from "./organizations/organizations.service";
-import { ProjectsModule } from "./projects/projects.module";
-import { SkillsModule } from "./skills/skills.module";
-import { SkillsService } from "./skills/skills.service";
-import { UsersModule } from "./users/users.module";
-import { OrchestratorModule } from "./utils/utils.module";
+import { AiToolsModule } from "./modules/ai-tools/ai-tools.module";
+import { AuthModule } from "./modules/auth/auth.module";
+import { CoursesModule } from "./modules/courses/courses.module";
+import { DashboardModule } from "./modules/dashboard/dashboard.module";
+import { EducationsModule } from "./modules/educations/educations.module";
+import { ExperiencesModule } from "./modules/experiences/experiences.module";
+import { createLoaders } from "./modules/graphql/loaders.helper";
+import { OrganizationsModule } from "./modules/organizations/organizations.module";
+import { OrganizationsService } from "./modules/organizations/organizations.service";
+import { ProjectsModule } from "./modules/projects/projects.module";
+import { SkillsModule } from "./modules/skills/skills.module";
+import { SkillsService } from "./modules/skills/skills.service";
+import { UsersModule } from "./modules/users/users.module";
 
 @Module({
   imports: [
@@ -61,8 +60,7 @@ import { OrchestratorModule } from "./utils/utils.module";
         }),
       }),
     }),
-    OrchestratorModule,
-    AiModule,
+    AiToolsModule,
     SkillsModule,
     ProjectsModule,
     UsersModule,

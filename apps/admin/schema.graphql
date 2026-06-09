@@ -3,6 +3,11 @@ schema {
   mutation: Mutation
 }
 
+type AiEntity {
+  messages: [ChoiceEntity!]!
+  usage: UsageEntity
+}
+
 input AtsSummarizeInput {
   details: [DetailInput!]
   raw: String!
@@ -376,11 +381,6 @@ input FilterUserInput {
   urls: [UrlInput!]
 }
 
-type GenericIaEntity {
-  messages: [ChoiceEntity!]!
-  usage: UsageEntity
-}
-
 type MessageEntity {
   content: String!
   reasoning: String
@@ -389,7 +389,7 @@ type MessageEntity {
 }
 
 type Mutation {
-  atsSummarize(atsSummarizeInput: AtsSummarizeInput!): GenericIaEntity!
+  atsSummarize(atsSummarizeInput: AtsSummarizeInput!): AiEntity!
   createManyCourses(createCourseInputs: [CreateCourseInput!]!): [CourseEntity!]!
   createManyEducations(createEducationInputs: [CreateEducationInput!]!): [EducationEntity!]!
   createManyExperiences(createExperienceInputs: [CreateExperienceInput!]!): [ExperienceEntity!]!
@@ -419,8 +419,8 @@ type Mutation {
   removeOneSkill(skillId: ID!): SkillEntity!
   removeOneUser(userId: ID!): UserEntity!
   signIn(signInInput: SignInInput!): String!
-  summarize(summarizeInput: SummarizeInput!): GenericIaEntity!
-  translate(translateInput: TranslateInput!): GenericIaEntity!
+  summarize(summarizeInput: SummarizeInput!): AiEntity!
+  translate(translateInput: TranslateInput!): AiEntity!
   updateManyCourses(courseIds: [ID!]!, updateCourseInput: UpdateCourseInput!): BatchEntity!
   updateManyEducations(educationIds: [ID!]!, updateEducationInput: UpdateEducationInput!): BatchEntity!
   updateManyExperiences(experienceIds: [ID!]!, updateExperienceInput: UpdateExperienceInput!): BatchEntity!

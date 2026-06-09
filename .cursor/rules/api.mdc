@@ -16,7 +16,9 @@ Follow the **Maintaining project documentation** section in `project-overview.md
 
 The NestJS GraphQL API for profile-info. It is code-first: GraphQL types are TypeScript classes with `@ObjectType` / `@InputType` / `@Field` decorators, and the schema is generated to `src/schema.gql`. Data lives in MongoDB via Mongoose. Every operation except `signIn` requires a JWT. The admin app is the only known client.
 
-Feature modules follow the same explicit CRUD pattern: resolver methods call service methods that use the injected Mongoose model. Copy `src/skills/` as the reference implementation.
+The source is a modular monolith with a strict dependency rule (`modules → integrations → common` and `modules → core → common`; `common` imports nothing; `integrations` never import from `modules`). The top-level layers under `src/` are `common/` (pure TS), `core/` (cross-cutting NestJS infra), `integrations/` (external system adapters), and `modules/` (business domains).
+
+Feature modules follow the same explicit CRUD pattern: resolver methods call service methods that use the injected Mongoose model. Copy `src/modules/skills/` as the reference implementation.
 
 ## Architecture & flow
 
@@ -31,8 +33,8 @@ Entry point `src/main.ts`:
 - `EventEmitterModule.forRoot({ global: true })`.
 - `ConfigModule.forRoot({ isGlobal: true })`.
 - `MongooseModule.forRootAsync` reads `DATABASE_URL`.
-- `GraphQLModule.forRootAsync` with `ApolloDriver`: schema at `src/schema.gql`, DataLoaders in context via `createLoaders(...)`.
-- Feature modules: `SkillsModule`, `ProjectsModule`, `UsersModule`, `AuthModule`, `CoursesModule`, `EducationsModule`, `ExperiencesModule`, `OrganizationsModule`, `DashboardModule`. `DashboardModule` is read-only aggregation only.
+- `GraphQLModule.forRootAsync` with `ApolloDriver`: schema at `src/schema.gql`, DataLoaders in context via `createLoaders(...)` from `core/loaders/loaders.helper.ts`.
+- Feature modules (all under `src/modules/`): `AiToolsModule`, `SkillsModule`, `ProjectsModule`, `UsersModule`, `AuthModule`, `CoursesModule`, `EducationsModule`, `ExperiencesModule`, `OrganizationsModule`, `DashboardModule`. `DashboardModule` is read-only aggregation only.
 
 Request flow: Apollo → `GqlAuthGuard` (unless `@Public()`) → resolver → service → Mongoose model. Nested fields use `@ResolveField` + per-request DataLoaders.
 
@@ -43,31 +45,49 @@ Request flow: Apollo → `GqlAuthGuard` (unless `@Public()`) → resolver → se
 - **@nestjs/jwt + passport**: global 8h JWT in `src/auth/`.
 - **@nestjs/event-emitter**: domain events on delete (see below).
 - **bcryptjs**: password hashing in `users/users.service.ts`.
-- **dataloader + lodash**: `core/helpers/loaders.helper.ts`.
+- **dataloader + lodash**: `modules/graphql/loaders.helper.ts`.
 - **class-validator / class-transformer**: input validation via global `ValidationPipe`.
 
 ## Module / directory breakdown
 
-`core/`:
+`common/` (pure TS, no NestJS/Mongoose/GraphQL imports):
+
+- `helpers/`: `object.helper.ts` (`clearObject`), `daterange.helper.ts` (`sortDateRange`), `breakpoint.helper.ts`.
+- `execution/orchestrator.helper.ts`: `orchestrate(...)`, a concurrency-limited + timeout task runner (plain function, used by `ai-tools`).
+
+`common` holds only generic primitives — it does **not** own integration contracts. Each capability boundary owns its own port (see `integrations/`).
+
+`core/` (cross-cutting NestJS infra, domain-agnostic):
 
 - `events/domain-events.ts`: event name constants (e.g. `skill.deleted`).
 - `schemas/paginated.schema.ts`: `createPaginatedModel(Entity)` for `{ found, nodes }`.
-- `schemas/base.schema.ts`, `translation.schema.ts`, `daterange.schema.ts`: shared Mongoose sub-schemas.
+- `schemas/base.schema.ts`, `translation.schema.ts`, `daterange.schema.ts`, `url.schema.ts`: shared Mongoose sub-schemas.
 - `entities/`: `BaseEntity`, batch, date-range, translation, url GraphQL types.
 - `inputs/`: pagination, sort factory, date-range, translation, url inputs.
-- `decorators/`: `@Public()`, `@CurrentUser()`, `@OptionalField()`.
-- `helpers/loaders.helper.ts`: `batchSkills`, `batchOrganizations` DataLoaders.
+- `decorators/`: `@Public()`, `@OptionalField()`.
 - `configs/`: `app.config.ts`, `validation.config.ts`.
 
-`auth/`: global `GqlAuthGuard`, `signIn` (`@Public`) returns JWT, `getMe` returns current user.
+`integrations/` (each owns its port — an **abstract class** used as the DI token — plus neutral types; map vendor types → neutral contracts; never import from `modules`):
 
-Feature modules (`skills/`, `users/`, `experiences/`, `educations/`, `courses/`, `organizations/`, `projects/`): each has `<name>.module.ts`, `<name>.resolver.ts`, `<name>.service.ts`, `entities/<name>.entity.ts`, `dto/`, often `enums/` and sometimes `listeners/` or `events/`. Mongoose model in `src/schemas/<name>.schema.ts`.
+- `ai/`: capability boundary for AI chat. Owns `ai.provider.ts` (abstract `AiProvider`, the port/token), `ai.types.ts` (vendor-agnostic request/response shapes), and `ai.module.ts` (binds an implementation via `{ provide: AiProvider, useClass: ... }`). Vendors are nested: `ai/open-router/` holds `OpenRouterService implements AiProvider` and the mappers that translate `ChatCompletionRequest`/`ChatResult` ↔ `ai.types`. Add a new AI vendor by nesting another folder and swapping the `useClass` in `ai.module.ts`.
+- `github/`: flat (a distinct capability, not a swappable vendor). Owns `repository-metadata.provider.ts` (abstract `RepositoryMetadataProvider` + types); `GithubService extends RepositoryMetadataProvider`; `github.module.ts` binds via `useClass`.
+- `tavily/`: flat. Owns `web-content.provider.ts` (abstract `WebContentProvider` + types); `TavilyService extends WebContentProvider` (vendor `Tavily*` types stay inside the adapter); `tavily.module.ts` binds via `useClass`.
+
+DI pattern is the NestJS-idiomatic **abstract class as token**: ports are abstract classes (no `Symbol`, no `@Inject()`); modules bind `{ provide: Port, useClass: Impl }` and consumers inject the port by type. A service implementing a port `extends` it and must call `super()` in its constructor.
+
+`modules/` (business domains):
+
+- `graphql/`: `loaders.helper.ts` (DataLoaders) and `context.interface.ts` (`Ctx`). GraphQL-specific, may import feature services.
+- `auth/`: global `GqlAuthGuard`, `signIn` (`@Public`) returns JWT, `getMe` returns current user; `@CurrentUser()` decorator lives in `auth/decorators/`.
+- `ai-tools/`: AI use-cases. Owns the `AiEntity` GraphQL type and its enums (mapped from `ai.types` in `mappers/chat-result.mapper.ts`); injects the abstract ports `AiProvider`, `RepositoryMetadataProvider`, `WebContentProvider` by type. `AiToolsModule` imports `AiModule`, `GithubModule`, `TavilyModule` only for Nest DI wiring.
+- `dashboard/`: read-only aggregation via feature **services** (`count()`, `countByField()`), not other modules' Mongoose schemas.
+- CRUD feature modules (`skills/`, `users/`, `experiences/`, `educations/`, `courses/`, `organizations/`, `projects/`): each has `<name>.module.ts`, `<name>.resolver.ts`, `<name>.service.ts`, `schemas/<name>.schema.ts` (co-located Mongoose model), `entities/<name>.entity.ts`, `dto/`, often `enums/` and sometimes `listeners/` or `events/`.
 
 Notable specifics:
 
-- `users/users.service.ts`: hashes password on create; `select("+password")` for auth.
-- `experiences/experiences.resolver.ts`: `@ResolveField` for `organization`, `skills`, sorted `roles`.
-- `skills/` and `organizations/` export their services for DataLoaders in `app.module.ts`.
+- `modules/users/users.service.ts`: hashes password on create; `select("+password")` for auth.
+- `modules/experiences/experiences.resolver.ts`: `@ResolveField` for `organization`, `skills`, sorted `roles`.
+- `modules/skills/` and `modules/organizations/` export their services for DataLoaders in `app.module.ts`.
 
 ## Domain events (delete cascade)
 
@@ -76,14 +96,14 @@ When a referenced resource is deleted, services emit domain events **before** re
 - `SkillDeletedEvent` / `skill.deleted`: listeners in courses, educations, experiences, projects `$pull` the skill id from arrays (experiences use nested `roles.skills`).
 - `OrganizationDeletedEvent` / `organization.deleted`: listeners in courses, educations, experiences `deleteMany` records referencing the org.
 
-Payload classes live in `<resource>/events/`. Listeners live in consuming modules under `listeners/` (e.g. `OnSkillDeletedListener`). Do not use Mongoose `pre('deleteOne')` hooks for this — they miss `findByIdAndDelete` / `deleteMany`.
+Payload classes live in `modules/<resource>/events/`. Listeners live in consuming modules under `modules/<consumer>/listeners/` (e.g. `OnSkillDeletedListener`). Do not use Mongoose `pre('deleteOne')` hooks for this — they miss `findByIdAndDelete` / `deleteMany`.
 
 ## The patterns to follow when extending
 
-Copy `src/skills/` and adapt:
+Copy `src/modules/skills/` and adapt:
 
-1. Mongoose model: `src/schemas/<name>.schema.ts` extending `BaseModel`.
-2. GraphQL entity: `<name>/entities/<name>.entity.ts` extending `BaseEntity`; export `Paginated<Name>Entity = createPaginatedModel(...)`.
+1. Mongoose model: `src/modules/<name>/schemas/<name>.schema.ts` extending `BaseModel`.
+2. GraphQL entity: `modules/<name>/entities/<name>.entity.ts` extending `BaseEntity`; export `Paginated<Name>Entity = createPaginatedModel(...)`.
 3. Inputs: `Create`, `Update` (PartialType), `Filter` (PartialType), `Sort` (SortType factory).
 4. Service: explicit CRUD methods (`findOneById`, `findMany`, `createOne`, `removeOne`, etc.) using the Mongoose model.
 5. Resolver: explicit `@Query` / `@Mutation` methods with `@Public()` on reads; wire pagination/sort/filter args like `skills.resolver.ts`.
@@ -102,6 +122,7 @@ Loaded via `--env-file .env.development` / `.env.production` and `ConfigModule`.
 - `DATABASE_URL` (required): MongoDB URI.
 - `JWT_SECRET` (required): JWT signing secret.
 - `HOST` (optional, default `0.0.0.0`), `PORT` (optional, default `8080`).
+- `OPENROUTER_API_KEY`, `GITHUB_API_KEY`, `TAVILY_API_KEY` (required for the `ai-tools` module): the integration services read these via `ConfigService` and throw on boot if missing.
 
 ## Scripts / commands
 

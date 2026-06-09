@@ -4,13 +4,13 @@ import { getModelToken } from "@nestjs/mongoose";
 import { hash } from "bcryptjs";
 import type { Model } from "mongoose";
 import { AppModule } from "./app.module";
-import { CourseModel } from "./schemas/course.schema";
-import { EducationModel } from "./schemas/education.schema";
-import { ExperienceModel } from "./schemas/experience.schema";
-import { OrganizationModel } from "./schemas/organization.schema";
-import { ProjectModel } from "./schemas/project.schema";
-import { SkillModel } from "./schemas/skill.schema";
-import { UserModel } from "./schemas/user.schema";
+import { CourseModel } from "./modules/courses/schemas/course.schema";
+import { EducationModel } from "./modules/educations/schemas/education.schema";
+import { ExperienceModel } from "./modules/experiences/schemas/experience.schema";
+import { OrganizationModel } from "./modules/organizations/schemas/organization.schema";
+import { ProjectModel } from "./modules/projects/schemas/project.schema";
+import { SkillModel } from "./modules/skills/schemas/skill.schema";
+import { UserModel } from "./modules/users/schemas/user.schema";
 
 const URL_TYPES = [
   "github",

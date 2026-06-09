@@ -1,0 +1,186 @@
+import { BadRequestException, NotFoundException } from "@nestjs/common";
+import { getModelToken } from "@nestjs/mongoose";
+import { Test, TestingModule } from "@nestjs/testing";
+import { hash } from "bcryptjs";
+import mongoose, { Model } from "mongoose";
+import { UserModel } from "@/modules/users/schemas/user.schema";
+import { UsersService } from "./users.service";
+
+jest.mock("bcryptjs", () => ({
+  hash: jest.fn().mockResolvedValue("hashed-password"),
+}));
+
+const validId = new mongoose.Types.ObjectId().toHexString();
+
+const fakeUser = {
+  _id: validId,
+  name: "John",
+  email: "john@example.com",
+  password: "hashed-password",
+  role: "USER",
+} as unknown as UserModel;
+
+function makeExec(returnValue: unknown) {
+  return {
+    select: jest.fn().mockReturnThis(),
+    exec: jest.fn().mockResolvedValue(returnValue),
+  };
+}
+
+describe("UsersService", () => {
+  let service: UsersService;
+  let model: jest.Mocked<Model<UserModel>>;
+
+  beforeEach(async () => {
+    jest.clearAllMocks();
+
+    const module: TestingModule = await Test.createTestingModule({
+      providers: [
+        UsersService,
+        {
+          provide: getModelToken(UserModel.name),
+          useValue: {
+            findById: jest.fn(),
+            findOne: jest.fn(),
+            create: jest.fn(),
+            // inherited methods (not overridden)
+            find: jest.fn(),
+            findByIdAndUpdate: jest.fn(),
+            updateMany: jest.fn(),
+            findByIdAndDelete: jest.fn(),
+            deleteMany: jest.fn(),
+          },
+        },
+      ],
+    }).compile();
+
+    service = module.get<UsersService>(UsersService);
+    model = module.get(getModelToken(UserModel.name));
+  });
+
+  it("should be defined", () => {
+    expect(service).toBeDefined();
+  });
+
+  // ------------------------------------------------------------------ //
+  // findOneById (overridden — selects +password)
+  // ------------------------------------------------------------------ //
+
+  describe("findOneById", () => {
+    it("should return the user with password selected", async () => {
+      (model.findById as jest.Mock).mockReturnValue(makeExec(fakeUser));
+
+      const result = await service.findOneById(validId);
+      expect(result).toBe(fakeUser);
+      expect(model.findById).toHaveBeenCalledWith(validId);
+    });
+
+    it("should throw NotFoundException when user is not found", async () => {
+      (model.findById as jest.Mock).mockReturnValue(makeExec(null));
+
+      await expect(service.findOneById(validId)).rejects.toThrow(
+        NotFoundException
+      );
+    });
+  });
+
+  // ------------------------------------------------------------------ //
+  // findOne (overridden — selects +password)
+  // ------------------------------------------------------------------ //
+
+  describe("findOne", () => {
+    it("should return the user matching filters with password selected", async () => {
+      (model.findOne as jest.Mock).mockReturnValue(makeExec(fakeUser));
+
+      const result = await service.findOne({
+        filters: { email: "john@example.com" } as any,
+      });
+      expect(result).toBe(fakeUser);
+    });
+
+    it("should throw NotFoundException when no user matches", async () => {
+      (model.findOne as jest.Mock).mockReturnValue(makeExec(null));
+
+      await expect(service.findOne({})).rejects.toThrow(NotFoundException);
+    });
+  });
+
+  // ------------------------------------------------------------------ //
+  // createOne (overridden — hashes password)
+  // ------------------------------------------------------------------ //
+
+  describe("createOne", () => {
+    const createInput = {
+      name: "John",
+      nickname: "john",
+      email: "john@example.com",
+      password: "plain-pass",
+      role: "USER" as any,
+    };
+
+    it("should hash the password before creating the user", async () => {
+      (model.create as jest.Mock).mockResolvedValue(fakeUser);
+
+      const result = await service.createOne(createInput);
+
+      expect(hash).toHaveBeenCalledWith("plain-pass", 8);
+      expect(model.create).toHaveBeenCalledWith(
+        expect.objectContaining({ password: "hashed-password" })
+      );
+      expect(result).toBe(fakeUser);
+    });
+
+    it("should throw BadRequestException when create returns null", async () => {
+      (model.create as jest.Mock).mockResolvedValue(null);
+
+      await expect(service.createOne(createInput)).rejects.toThrow(
+        BadRequestException
+      );
+    });
+  });
+
+  // ------------------------------------------------------------------ //
+  // createMany (overridden — hashes passwords)
+  // ------------------------------------------------------------------ //
+
+  describe("createMany", () => {
+    const createInputs = [
+      {
+        name: "Alice",
+        nickname: "alice",
+        email: "alice@example.com",
+        password: "pass1",
+        role: "USER" as any,
+      },
+      {
+        name: "Bob",
+        nickname: "bob",
+        email: "bob@example.com",
+        password: "pass2",
+        role: "USER" as any,
+      },
+    ];
+
+    it("should hash each password before creating users", async () => {
+      (model.create as jest.Mock).mockResolvedValue([fakeUser]);
+
+      const result = await service.createMany(createInputs);
+
+      expect(hash).toHaveBeenCalledTimes(2);
+      expect(model.create).toHaveBeenCalledWith(
+        expect.arrayContaining([
+          expect.objectContaining({ password: "hashed-password" }),
+        ])
+      );
+      expect(result).toEqual([fakeUser]);
+    });
+
+    it("should throw BadRequestException when create returns null", async () => {
+      (model.create as jest.Mock).mockResolvedValue(null);
+
+      await expect(service.createMany(createInputs)).rejects.toThrow(
+        BadRequestException
+      );
+    });
+  });
+});

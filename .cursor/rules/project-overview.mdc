@@ -45,7 +45,7 @@ The auth handshake: admin calls the `signIn(signInInput: SignInInput!): String!`
 
 - **npm workspaces**: root `package.json` `workspaces: ["apps/*"]`. Orchestration scripts use `concurrently` to run both apps.
 - **NestJS 11 + Apollo GraphQL (code-first)**: `apps/api`, schema generated to `apps/api/src/schema.gql`.
-- **MongoDB + Mongoose**: `apps/api`, ODM schemas in `apps/api/src/schemas/`.
+- **MongoDB + Mongoose**: `apps/api`, ODM schemas co-located per module in `apps/api/src/modules/<name>/schemas/`.
 - **React 19 + Vite 7**: `apps/admin`.
 - **TanStack Router / Query / Table / Form**: `apps/admin`, routing, data fetching, tables, and forms respectively.
 - **GraphQL Codegen**: `apps/admin/codegen.ts` generates typed operations from the API schema file.
@@ -64,7 +64,7 @@ The auth handshake: admin calls the `signIn(signInInput: SignInInput!): String!`
 
 ## The patterns to follow when extending
 
-- Adding a profile entity to the API: copy an existing feature module (for example `apps/api/src/skills/`) and adapt. Each module has explicit resolver methods and service CRUD. See `api.mdc`.
+- Adding a profile entity to the API: copy an existing feature module (for example `apps/api/src/modules/skills/`) and adapt. Each module has explicit resolver methods and service CRUD. See `api.mdc`.
 - Adding a screen or operation to the admin: write the `.graphql`-tagged operation inside a hook in `apps/admin/src/hooks/queries/` or `hooks/mutations/`, run codegen, then consume the generated typed document. See `admin.mdc`.
 - Keep reusable admin components and hooks domain-agnostic: iterate over the data shape rather than referencing specific entity fields.
 
