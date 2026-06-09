@@ -78,7 +78,7 @@ DI pattern is the NestJS-idiomatic **abstract class as token**: ports are abstra
 
 `modules/` (business domains):
 
-- `graphql/`: `graphql.module.ts` (Apollo wiring), `compose-loaders.ts` (merges per-module loaders), `context.interface.ts` (`Ctx`). Does not own loader logic — each entity module exports its own `*LoaderService`.
+- `graphql/`: `graphql.module.ts` (single module — Apollo wiring), `loaders.service.ts` (composes per-entity loaders), `context.interface.ts` (`Ctx`). `forRootAsync` injects exported `*LoaderService` from entity modules; batching logic stays in those services.
 - `auth/`: global `GqlAuthGuard`, `signIn` (`@Public`) returns JWT, `getMe` returns current user; `@CurrentUser()` decorator lives in `auth/decorators/`.
 - `ai-tools/`: AI use-cases. Owns `AiEntity` GraphQL types, enums (`ChatRole`, `ChatFinishReason`), and mappers (`IntegrationChatResult` → `AiEntity`). `resource-detail/` orchestrates `*ExtractorService` classes. Injects `AiChatProvider`, `RepositoryMetadataProvider`, `WebContentProvider`. `AiToolsModule` imports `OpenRouterModule`, `GithubModule`, `TavilyModule`.
 - `dashboard/`: read-only aggregation via feature **services** (`count()`, `countByField()`), not other modules' Mongoose schemas.
@@ -100,7 +100,7 @@ Notable specifics:
 
 - `modules/users/users.service.ts`: hashes password on create; `findOneByEmailWithPassword` (with `select("+password")`) is auth-only — public CRUD methods never load password.
 - `modules/experiences/experiences.resolver.ts`: `@ResolveField` for `organization`, `skills`, sorted `roles`.
-- `modules/skills/` and `modules/organizations/` export `SkillsLoaderService` / `OrganizationsLoaderService`; `GraphqlModule` composes them via `composeLoaders`.
+- `modules/skills/` and `modules/organizations/` export `SkillsLoaderService` / `OrganizationsLoaderService`; `LoadersService` composes them per request.
 
 ## Domain events (delete cascade)
 
@@ -133,7 +133,7 @@ Copy `src/modules/skills/` and adapt:
 
 If other modules reference the new entity in arrays: add payload to `core/events/`, emit from `removeOne` / `removeMany`, add a service method in each consumer (e.g. `detachSkill`), and a thin listener that delegates to it.
 
-For nested `@ResolveField`, use DataLoaders from `ctx.loaders`; add a `*LoaderService` in the entity module, export it, and register it in `compose-loaders.ts` + `GraphqlModule` inject array.
+For nested `@ResolveField`, use DataLoaders from `ctx.loaders`; add a `*LoaderService` in the entity module, export it, and wire it in `LoadersService`.
 
 CRUD field names follow the skills convention: `findOneSkillById`, `findManySkills`, `createOneSkill`, etc. Check `src/schema.gql` for exact names.
 

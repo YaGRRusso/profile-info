@@ -7,12 +7,14 @@ import { OrganizationsLoaderService } from "@/modules/organizations/organization
 import { OrganizationsModule } from "@/modules/organizations/organizations.module";
 import { SkillsLoaderService } from "@/modules/skills/skills-loader.service";
 import { SkillsModule } from "@/modules/skills/skills.module";
-import { composeLoaders } from "./compose-loaders";
+import { LoadersService } from "./loaders.service";
 
 @Module({
   imports: [
+    SkillsModule,
+    OrganizationsModule,
     GraphQLModule.forRootAsync({
-      driver: ApolloDriver,
+        driver: ApolloDriver,
       imports: [SkillsModule, OrganizationsModule],
       inject: [SkillsLoaderService, OrganizationsLoaderService],
       useFactory: (
@@ -25,10 +27,10 @@ import { composeLoaders } from "./compose-loaders";
         sortSchema: true,
         playground: false,
         context: ({ req, res }) => ({
-          loaders: composeLoaders({
+          loaders: new LoadersService(
             skillsLoaderService,
-            organizationsLoaderService,
-          }),
+            organizationsLoaderService
+          ).createLoaders(),
           req,
           res,
         }),
