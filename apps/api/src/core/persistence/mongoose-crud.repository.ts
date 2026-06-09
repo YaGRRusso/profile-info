@@ -128,6 +128,11 @@ export class MongooseCrudRepository<T> {
     return { count: res.deletedCount };
   }
 
+  async existsBy(filter: QueryFilter<T>): Promise<boolean> {
+    const count = await this.model.countDocuments(filter).exec();
+    return count > 0;
+  }
+
   async count(): Promise<number> {
     return await this.model.countDocuments().exec();
   }
