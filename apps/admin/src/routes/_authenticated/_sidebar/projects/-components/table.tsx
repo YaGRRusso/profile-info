@@ -354,8 +354,8 @@ export function ProjectsTable({
             <MagnifyingGlassIcon className="opacity-md" />
             <input
               onChange={(event) => setSearchQuery(event.target.value)}
-              placeholder="Search by slug..."
-              type="text"
+              placeholder="Search by name or slug..."
+              type="search"
               value={searchQuery}
             />
           </label>

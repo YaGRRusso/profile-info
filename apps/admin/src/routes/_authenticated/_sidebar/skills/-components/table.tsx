@@ -381,7 +381,7 @@ export function SkillsTable({
             <input
               onChange={(event) => setSearchQuery(event.target.value)}
               placeholder="Search by name or slug..."
-              type="text"
+              type="search"
               value={searchQuery}
             />
           </label>
