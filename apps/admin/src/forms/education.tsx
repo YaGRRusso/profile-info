@@ -66,7 +66,9 @@ const educationSchema = z.object({
 
 export type EducationSchema = z.infer<typeof educationSchema>;
 
-export interface EducationFormProps extends CommonFormProps<EducationSchema> {}
+export interface EducationFormProps extends CommonFormProps<EducationSchema> {
+  slugsList?: string[];
+}
 
 export function educationToInput(data: EducationSchema): CreateEducationInput {
   const period =
@@ -133,6 +135,7 @@ export function EducationForm({
   onCancel,
   defaultValues,
   isDisabled,
+  slugsList,
   isLoading,
   state,
 }: EducationFormProps) {
@@ -301,7 +304,16 @@ export function EducationForm({
         form.handleSubmit();
       }}
     >
-      <Field name="slug">
+      <Field
+        name="slug"
+        validators={{
+          onChange: ({ value }) => {
+            if (slugsList?.includes(value)) {
+              return { message: "slug already exists" };
+            }
+          },
+        }}
+      >
         {(field) => (
           <TextInput
             error={fieldError(field.state.meta)}

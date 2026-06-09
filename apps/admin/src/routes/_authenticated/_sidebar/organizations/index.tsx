@@ -180,6 +180,9 @@ function RouteComponent() {
           }
           onCancel={() => setFormValues(undefined)}
           onSubmit={handleSubmit}
+          slugsList={findManyOrganizations.data?.nodes.map(
+            (organization) => organization.slug
+          )}
           state={formValues?.state}
         />
       </Modal>

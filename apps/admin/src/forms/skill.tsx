@@ -1,5 +1,6 @@
 import { useForm } from "@tanstack/react-form";
 import lodash from "lodash";
+import { useState } from "react";
 import z from "zod";
 import { RangeInput } from "@/components/inputs/range";
 import { SelectInput } from "@/components/inputs/select";
@@ -21,7 +22,9 @@ const skillSchema = z.object({
 
 export type SkillSchema = z.infer<typeof skillSchema>;
 
-export interface SkillFormProps extends CommonFormProps<SkillSchema> {}
+export interface SkillFormProps extends CommonFormProps<SkillSchema> {
+  slugsList?: string[];
+}
 
 const CATEGORY_OPTIONS = Object.values(SkillCategory).map((category) => ({
   label: category,
@@ -33,9 +36,12 @@ export function SkillForm({
   onCancel,
   defaultValues,
   isDisabled,
+  slugsList,
   isLoading,
   state,
 }: SkillFormProps) {
+  const [isNameEdited, setIsNameEdited] = useState(!!defaultValues?.name);
+
   const form = useForm({
     defaultValues: {
       name: "",
@@ -59,7 +65,23 @@ export function SkillForm({
         form.handleSubmit();
       }}
     >
-      <Field name="slug">
+      <Field
+        listeners={{
+          onChange: ({ value }) => {
+            if (!isNameEdited) {
+              form.setFieldValue("name", lodash.startCase(value));
+            }
+          },
+        }}
+        name="slug"
+        validators={{
+          onChange: ({ value }) => {
+            if (slugsList?.includes(value)) {
+              return { message: "slug already exists" };
+            }
+          },
+        }}
+      >
         {(field) => (
           <TextInput
             error={fieldError(field.state.meta)}
@@ -77,13 +99,12 @@ export function SkillForm({
             error={fieldError(field.state.meta)}
             label="Name"
             name={field.name}
-            onChange={field.handleChange}
+            onChange={(value) => {
+              setIsNameEdited(true);
+              field.handleChange(value);
+            }}
             placeholder="Name"
-            value={
-              field.state.meta.isTouched
-                ? field.state.value
-                : lodash.startCase(form.getFieldValue("slug"))
-            }
+            value={field.state.value}
           />
         )}
       </Field>

@@ -58,7 +58,9 @@ const projectSchema = z.object({
 
 export type ProjectSchema = z.infer<typeof projectSchema>;
 
-export interface ProjectFormProps extends CommonFormProps<ProjectSchema> {}
+export interface ProjectFormProps extends CommonFormProps<ProjectSchema> {
+  slugsList?: string[];
+}
 
 export function projectToInput(data: ProjectSchema): CreateProjectInput {
   return {
@@ -100,6 +102,7 @@ export function ProjectForm({
   onCancel,
   defaultValues,
   isDisabled,
+  slugsList,
   isLoading,
   state,
 }: ProjectFormProps) {
@@ -224,7 +227,16 @@ export function ProjectForm({
         form.handleSubmit();
       }}
     >
-      <Field name="slug">
+      <Field
+        name="slug"
+        validators={{
+          onChange: ({ value }) => {
+            if (slugsList?.includes(value)) {
+              return { message: "slug already exists" };
+            }
+          },
+        }}
+      >
         {(field) => (
           <TextInput
             error={fieldError(field.state.meta)}

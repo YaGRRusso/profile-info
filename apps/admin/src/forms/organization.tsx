@@ -1,6 +1,6 @@
 import { DeepKeys, DeepValue, useForm } from "@tanstack/react-form";
 import lodash from "lodash";
-import { useCallback } from "react";
+import { useCallback, useState } from "react";
 import { toast } from "react-toastify";
 import z from "zod";
 import { FieldArray } from "@/components/inputs/field-array";
@@ -52,7 +52,9 @@ const organizationSchema = z.object({
 export type OrganizationSchema = z.infer<typeof organizationSchema>;
 
 export interface OrganizationFormProps
-  extends CommonFormProps<OrganizationSchema> {}
+  extends CommonFormProps<OrganizationSchema> {
+  slugsList?: string[];
+}
 
 export function organizationToInput(
   data: OrganizationSchema
@@ -102,9 +104,12 @@ export function OrganizationForm({
   onCancel,
   defaultValues,
   isDisabled,
+  slugsList,
   isLoading,
   state,
 }: OrganizationFormProps) {
+  const [isNameEdited, setIsNameEdited] = useState(!!defaultValues?.name);
+
   const summarize = useSummarize();
   const translate = useTranslate();
 
@@ -207,7 +212,23 @@ export function OrganizationForm({
         form.handleSubmit();
       }}
     >
-      <Field name="slug">
+      <Field
+        listeners={{
+          onChange: ({ value }) => {
+            if (!isNameEdited) {
+              form.setFieldValue("name", lodash.startCase(value));
+            }
+          },
+        }}
+        name="slug"
+        validators={{
+          onChange: ({ value }) => {
+            if (slugsList?.includes(value)) {
+              return { message: "slug already exists" };
+            }
+          },
+        }}
+      >
         {(field) => (
           <TextInput
             error={fieldError(field.state.meta)}
@@ -225,13 +246,12 @@ export function OrganizationForm({
             error={fieldError(field.state.meta)}
             label="Name"
             name={field.name}
-            onChange={field.handleChange}
+            onChange={(value) => {
+              setIsNameEdited(true);
+              field.handleChange(value);
+            }}
             placeholder="Name"
-            value={
-              field.state.meta.isTouched
-                ? field.state.value
-                : lodash.startCase(form.getFieldValue("slug"))
-            }
+            value={field.state.value}
           />
         )}
       </Field>

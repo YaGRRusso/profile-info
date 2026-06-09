@@ -69,8 +69,9 @@ const experienceSchema = z.object({
 
 export type ExperienceSchema = z.infer<typeof experienceSchema>;
 
-export interface ExperienceFormProps
-  extends CommonFormProps<ExperienceSchema> {}
+export interface ExperienceFormProps extends CommonFormProps<ExperienceSchema> {
+  slugsList?: string[];
+}
 
 export function experienceToInput(
   data: ExperienceSchema
@@ -141,6 +142,7 @@ export function ExperienceForm({
   onCancel,
   defaultValues,
   isDisabled,
+  slugsList,
   isLoading,
   state,
 }: ExperienceFormProps) {
@@ -298,7 +300,16 @@ export function ExperienceForm({
         form.handleSubmit();
       }}
     >
-      <Field name="slug">
+      <Field
+        name="slug"
+        validators={{
+          onChange: ({ value }) => {
+            if (slugsList?.includes(value)) {
+              return { message: "slug already exists" };
+            }
+          },
+        }}
+      >
         {(field) => (
           <TextInput
             error={fieldError(field.state.meta)}

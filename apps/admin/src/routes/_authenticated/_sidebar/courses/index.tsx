@@ -169,6 +169,7 @@ function RouteComponent() {
           isLoading={createOneCourse.isPending || updateOneCourse.isPending}
           onCancel={() => setFormValues(undefined)}
           onSubmit={handleSubmit}
+          slugsList={findManyCourses.data?.nodes.map((course) => course.slug)}
           state={formValues?.state}
         />
       </Modal>

@@ -169,6 +169,9 @@ function RouteComponent() {
           isLoading={createOneProject.isPending || updateOneProject.isPending}
           onCancel={() => setFormValues(undefined)}
           onSubmit={handleSubmit}
+          slugsList={findManyProjects.data?.nodes.map(
+            (project) => project.slug
+          )}
           state={formValues?.state}
         />
       </Modal>

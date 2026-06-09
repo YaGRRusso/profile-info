@@ -59,7 +59,9 @@ const courseSchema = z.object({
 
 export type CourseSchema = z.infer<typeof courseSchema>;
 
-export interface CourseFormProps extends CommonFormProps<CourseSchema> {}
+export interface CourseFormProps extends CommonFormProps<CourseSchema> {
+  slugsList?: string[];
+}
 
 export function courseToInput(data: CourseSchema): CreateCourseInput {
   return {
@@ -109,6 +111,7 @@ export function CourseForm({
   onCancel,
   defaultValues,
   isDisabled,
+  slugsList,
   isLoading,
   state,
 }: CourseFormProps) {
@@ -269,7 +272,16 @@ export function CourseForm({
         form.handleSubmit();
       }}
     >
-      <Field name="slug">
+      <Field
+        name="slug"
+        validators={{
+          onChange: ({ value }) => {
+            if (slugsList?.includes(value)) {
+              return { message: "slug already exists" };
+            }
+          },
+        }}
+      >
         {(field) => (
           <TextInput
             error={fieldError(field.state.meta)}

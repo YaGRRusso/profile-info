@@ -174,6 +174,9 @@ function RouteComponent() {
           }
           onCancel={() => setFormValues(undefined)}
           onSubmit={handleSubmit}
+          slugsList={findManyEducations.data?.nodes.map(
+            (education) => education.slug
+          )}
           state={formValues?.state}
         />
       </Modal>
