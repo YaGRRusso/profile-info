@@ -5,7 +5,7 @@ const config: CodegenConfig = {
   documents: ["src/hooks/queries/*.ts", "src/hooks/mutations/*.ts"],
   ignoreNoDocuments: true,
   generates: {
-    "./src/graphql/": {
+    "./src/generated/graphql/": {
       preset: "client",
       config: {
         documentMode: "string",

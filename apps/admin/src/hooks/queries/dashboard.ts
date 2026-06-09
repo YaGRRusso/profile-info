@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { graphql } from "@/graphql";
+import { graphql } from "@/generated/graphql";
 import { execute } from "@/lib/execute";
 
 const dashboard = graphql(`

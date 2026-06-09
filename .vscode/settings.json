@@ -1,5 +1,6 @@
 {
   "material-icon-theme.activeIconPack": "nest",
+  "editor.defaultFormatter": "biomejs.biome",
   "[javascript]": {
     "editor.defaultFormatter": "biomejs.biome"
   },
@@ -25,7 +26,8 @@
     "editor.defaultFormatter": "biomejs.biome"
   },
   "files.readonlyInclude": {
-    "**/routeTree.gen.ts": true
+    "**/routeTree.gen.ts": true,
+    "**/generated/**": true
   },
   "files.watcherExclude": {
     "**/routeTree.gen.ts": true

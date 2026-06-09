@@ -1,7 +1,7 @@
 import type { UseQueryOptions } from "@tanstack/react-query";
 import { useQuery } from "@tanstack/react-query";
-import { graphql } from "@/graphql";
-import type { GetMeQuery } from "@/graphql/graphql";
+import { graphql } from "@/generated/graphql";
+import type { GetMeQuery } from "@/generated/graphql/graphql";
 import { execute } from "@/lib/execute";
 
 const getMe = graphql(`

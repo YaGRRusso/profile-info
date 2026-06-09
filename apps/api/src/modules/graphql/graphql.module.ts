@@ -3,10 +3,10 @@ import { ApolloServerPluginLandingPageLocalDefault } from "@apollo/server/plugin
 import { ApolloDriver } from "@nestjs/apollo";
 import { Module } from "@nestjs/common";
 import { GraphQLModule } from "@nestjs/graphql";
-import { OrganizationsLoaderService } from "@/modules/organizations/organizations-loader.service";
 import { OrganizationsModule } from "@/modules/organizations/organizations.module";
-import { SkillsLoaderService } from "@/modules/skills/skills-loader.service";
+import { OrganizationsLoaderService } from "@/modules/organizations/organizations-loader.service";
 import { SkillsModule } from "@/modules/skills/skills.module";
+import { SkillsLoaderService } from "@/modules/skills/skills-loader.service";
 import { LoadersService } from "./loaders.service";
 
 @Module({
@@ -14,7 +14,7 @@ import { LoadersService } from "./loaders.service";
     SkillsModule,
     OrganizationsModule,
     GraphQLModule.forRootAsync({
-        driver: ApolloDriver,
+      driver: ApolloDriver,
       imports: [SkillsModule, OrganizationsModule],
       inject: [SkillsLoaderService, OrganizationsLoaderService],
       useFactory: (

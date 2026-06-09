@@ -29,7 +29,7 @@ import {
 import { useQueryState } from "nuqs";
 import { useMemo, useState } from "react";
 import { z } from "zod";
-import { SkillCategory } from "@/graphql/graphql";
+import { SkillCategory } from "@/generated/graphql/graphql";
 import { useActiveFilters } from "@/hooks/custom/use-active-filters";
 import { usePersistedState } from "@/hooks/custom/use-persisted-state";
 import { useStableValue } from "@/hooks/custom/use-stable-value";

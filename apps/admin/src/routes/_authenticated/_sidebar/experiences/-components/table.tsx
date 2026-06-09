@@ -30,7 +30,7 @@ import { useQueryState } from "nuqs";
 import { useMemo, useState } from "react";
 import { z } from "zod";
 import { BadgeList } from "@/components/display/badge-list";
-import { ExperienceCategory } from "@/graphql/graphql";
+import { ExperienceCategory } from "@/generated/graphql/graphql";
 import { useActiveFilters } from "@/hooks/custom/use-active-filters";
 import { usePersistedState } from "@/hooks/custom/use-persisted-state";
 import { useStableValue } from "@/hooks/custom/use-stable-value";

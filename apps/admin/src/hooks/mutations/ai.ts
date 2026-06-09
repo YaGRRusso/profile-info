@@ -1,10 +1,10 @@
 import { useMutation } from "@tanstack/react-query";
-import { graphql } from "@/graphql";
+import { graphql } from "@/generated/graphql";
 import {
   AtsSummarizeInput,
   SummarizeInput,
   TranslateInput,
-} from "@/graphql/graphql";
+} from "@/generated/graphql/graphql";
 import { execute } from "@/lib/execute";
 
 const atsSummarize = graphql(`

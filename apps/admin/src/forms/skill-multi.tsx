@@ -4,7 +4,10 @@ import z from "zod";
 import { CheckboxInput } from "@/components/inputs/checkbox";
 import { RangeInput } from "@/components/inputs/range";
 import { SelectInput } from "@/components/inputs/select";
-import { SkillCategory, type UpdateSkillInput } from "@/graphql/graphql";
+import {
+  SkillCategory,
+  type UpdateSkillInput,
+} from "@/generated/graphql/graphql";
 import { fieldError } from "@/lib/field-error";
 import { CommonFormProps } from "./common";
 

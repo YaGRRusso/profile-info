@@ -5,7 +5,7 @@ import { RangeInput } from "@/components/inputs/range";
 import { SelectInput } from "@/components/inputs/select";
 import { TextInput } from "@/components/inputs/text";
 import { SLUG_REGEX } from "@/consts/regex";
-import { SkillCategory } from "@/graphql/graphql";
+import { SkillCategory } from "@/generated/graphql/graphql";
 import { fieldError } from "@/lib/field-error";
 import { CommonFormProps } from "./common";
 

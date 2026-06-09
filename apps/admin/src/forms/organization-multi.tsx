@@ -7,7 +7,7 @@ import { SelectInput } from "@/components/inputs/select";
 import {
   OrganizationCategory,
   type UpdateOrganizationInput,
-} from "@/graphql/graphql";
+} from "@/generated/graphql/graphql";
 import { fieldError } from "@/lib/field-error";
 import { CommonFormProps } from "./common";
 

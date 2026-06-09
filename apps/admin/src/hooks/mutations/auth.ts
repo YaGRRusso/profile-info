@@ -1,6 +1,6 @@
 import { useMutation } from "@tanstack/react-query";
-import { graphql } from "@/graphql";
-import type { SignInInput } from "@/graphql/graphql";
+import { graphql } from "@/generated/graphql";
+import type { SignInInput } from "@/generated/graphql/graphql";
 import { execute } from "@/lib/execute";
 
 const signIn = graphql(`

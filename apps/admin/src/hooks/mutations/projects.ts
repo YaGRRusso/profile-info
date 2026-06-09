@@ -1,6 +1,9 @@
 import { useMutation } from "@tanstack/react-query";
-import { graphql } from "@/graphql";
-import type { CreateProjectInput, UpdateProjectInput } from "@/graphql/graphql";
+import { graphql } from "@/generated/graphql";
+import type {
+  CreateProjectInput,
+  UpdateProjectInput,
+} from "@/generated/graphql/graphql";
 import { execute } from "@/lib/execute";
 
 const createOneProject = graphql(`

@@ -8,7 +8,7 @@ import {
   EducationLevel,
   EducationStatus,
   type UpdateEducationInput,
-} from "@/graphql/graphql";
+} from "@/generated/graphql/graphql";
 import { fieldError } from "@/lib/field-error";
 import { CommonFormProps } from "./common";
 

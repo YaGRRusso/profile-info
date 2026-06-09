@@ -1,6 +1,6 @@
 import type { UseQueryOptions } from "@tanstack/react-query";
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
-import { graphql } from "@/graphql";
+import { graphql } from "@/generated/graphql";
 import type {
   FilterCourseInput,
   FindManyCourseByIdQuery,
@@ -10,7 +10,7 @@ import type {
   FindOneCourseByIdQueryVariables,
   FindOneCourseQuery,
   SortCourseInput,
-} from "@/graphql/graphql";
+} from "@/generated/graphql/graphql";
 import { execute } from "@/lib/execute";
 
 const PAGE_SIZE = 50;

@@ -17,7 +17,7 @@ import {
   type CreateCourseInput,
   DetailInput,
   ResourceType,
-} from "@/graphql/graphql";
+} from "@/generated/graphql/graphql";
 import { useQueryAllPages } from "@/hooks/custom/use-query-all-pages";
 import { useAtsSummarize, useTranslate } from "@/hooks/mutations/ai";
 import type { CourseRow } from "@/hooks/queries/courses";

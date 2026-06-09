@@ -16,7 +16,7 @@ import {
   DetailInput,
   OrganizationCategory,
   ResourceType,
-} from "@/graphql/graphql";
+} from "@/generated/graphql/graphql";
 import { useSummarize, useTranslate } from "@/hooks/mutations/ai";
 import { OrganizationRow } from "@/hooks/queries/organizations";
 import { fieldError } from "@/lib/field-error";

@@ -1,4 +1,4 @@
-import { TypedDocumentString } from "@/graphql/graphql";
+import { TypedDocumentString } from "@/generated/graphql/graphql";
 import { useAuthStore } from "@/stores/auth";
 import type { GqlResponse } from "./gql";
 import { tc } from "./tc";

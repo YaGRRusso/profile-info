@@ -12,7 +12,7 @@ provides CRUD screens for the profile data. It deploys to GitHub Pages.
 - **TanStack Query**: server-state and caching. Hooks live in `src/hooks/queries/`
   and `src/hooks/mutations/`.
 - **GraphQL Codegen**: `codegen.ts` reads the API schema at `../api/src/schema.gql`
-  and generates typed documents into `src/graphql/`.
+  and generates typed documents into `src/generated/graphql/`.
 - **TanStack Table**: data tables (the skills table in `src/routes/.../skills/`).
 - **TanStack Form + Zod**: forms in `src/forms/` with schema validation.
 - **Zustand**: persisted auth and theme stores in `src/stores/`.
@@ -39,7 +39,8 @@ src/
 │   ├── queries/              # useQuery / useInfiniteQuery hooks (auth, skills, base).
 │   ├── mutations/            # useMutation hooks (auth, skills).
 │   └── custom/               # Generic helpers (debounce, query-all-pages, etc.).
-├── graphql/                  # Generated typed documents and helpers (codegen output).
+├── generated/
+│   └── graphql/              # Generated typed documents and helpers (codegen output).
 ├── forms/                    # TanStack Form + Zod forms (skill, user/login).
 ├── components/
 │   ├── display/              # Generic display components (modal, alert, data-state).

@@ -40,7 +40,7 @@ Rich forms map flat Zod schemas to nested GraphQL shapes (`i18n`, `organization`
 - **Vite 7**: `vite.config.ts`, port 5173, `base` from `VITE_BASE_PATH`.
 - **TanStack Router**: `src/routes/`, generated `routeTree.gen.ts`.
 - **TanStack Query**: hooks in `src/hooks/`.
-- **GraphQL Codegen**: `codegen.ts` → `src/graphql/` from `../api/src/schema.gql`.
+- **GraphQL Codegen**: `codegen.ts` → `src/generated/graphql/` from `../api/src/schema.gql`.
 - **GraphQL client**: `src/lib/execute.ts` (plain fetch).
 - **Zustand**: `stores/auth.ts`, `stores/theme.ts` (persisted).
 - **TanStack Form + Zod**: `src/forms/`.
@@ -51,7 +51,7 @@ Rich forms map flat Zod schemas to nested GraphQL shapes (`i18n`, `organization`
 
 - `src/lib/execute.ts`: single GraphQL transport. Helpers: `gql.ts`, `tc.ts`, `cn.ts`, `parsers.ts`, `field-error.ts`, etc.
 - `src/hooks/queries/` and `mutations/`: one file per entity; `graphql` tag must use static string literals (no interpolated fragments).
-- `src/graphql/`: codegen output — regenerate, do not edit.
+- `src/generated/graphql/`: codegen output — regenerate, do not edit.
 - `src/forms/`: entity forms + `*ToInput`/`*ToForm` mappers co-located.
 - `src/components/`: generic `display/` and `inputs/` (domain-agnostic).
 - `src/routes/`: file-based; `-components/` folders are not routes.
@@ -82,7 +82,7 @@ Keep `components/`, `hooks/custom/`, and `lib/` domain-agnostic.
 ## Gotchas & notes
 
 - Codegen reads `../api/src/schema.gql` from disk; keep it up to date after API changes.
-- `src/graphql/` and `routeTree.gen.ts` are generated.
+- `src/generated/graphql/` and `routeTree.gen.ts` are generated.
 - Do not add ad-hoc 401 handling in hooks.
 - `dev` backgrounds codegen; first start may race — run `build` once if types missing.
 - GitHub Pages: deploy copies `index.html` to `404.html`; `VITE_BASE_PATH` must match Pages subpath.

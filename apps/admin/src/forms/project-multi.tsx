@@ -3,7 +3,7 @@ import { useState } from "react";
 import z from "zod";
 import { CheckboxInput } from "@/components/inputs/checkbox";
 import { RangeInput } from "@/components/inputs/range";
-import type { UpdateProjectInput } from "@/graphql/graphql";
+import type { UpdateProjectInput } from "@/generated/graphql/graphql";
 import { fieldError } from "@/lib/field-error";
 import { CommonFormProps } from "./common";
 

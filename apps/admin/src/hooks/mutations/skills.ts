@@ -1,6 +1,9 @@
 import { useMutation } from "@tanstack/react-query";
-import { graphql } from "@/graphql";
-import type { CreateSkillInput, UpdateSkillInput } from "@/graphql/graphql";
+import { graphql } from "@/generated/graphql";
+import type {
+  CreateSkillInput,
+  UpdateSkillInput,
+} from "@/generated/graphql/graphql";
 import { execute } from "@/lib/execute";
 
 const createOneSkill = graphql(`

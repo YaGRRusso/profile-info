@@ -1,9 +1,9 @@
 import { useMutation } from "@tanstack/react-query";
-import { graphql } from "@/graphql";
+import { graphql } from "@/generated/graphql";
 import type {
   CreateExperienceInput,
   UpdateExperienceInput,
-} from "@/graphql/graphql";
+} from "@/generated/graphql/graphql";
 import { execute } from "@/lib/execute";
 
 const createOneExperience = graphql(`
