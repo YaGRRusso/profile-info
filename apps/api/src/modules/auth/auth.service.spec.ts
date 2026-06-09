@@ -1,4 +1,4 @@
-import { NotFoundException, UnauthorizedException } from "@nestjs/common";
+import { UnauthorizedException } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
 import { Test, TestingModule } from "@nestjs/testing";
 import { compare } from "bcryptjs";
@@ -90,10 +90,10 @@ describe("AuthService", () => {
     it("should throw NotFoundException when user is not found", async () => {
       (
         mockUsersService.findOneByEmailWithPassword as jest.Mock
-      ).mockRejectedValue(new NotFoundException());
+      ).mockResolvedValue(null);
 
       await expect(service.signIn(credentials)).rejects.toThrow(
-        NotFoundException
+        UnauthorizedException
       );
     });
   });

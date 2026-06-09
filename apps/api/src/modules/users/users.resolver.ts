@@ -1,6 +1,8 @@
 import { Args, ID, Mutation, Query, Resolver } from "@nestjs/graphql";
 import { Public } from "@/core/decorators/public-route.decorator";
+import { Roles } from "@/core/decorators/roles.decorator";
 import { BatchEntity } from "@/core/entities/batch.entity";
+import { UserRole } from "@/core/enums/user-role.enum";
 import { PaginationInput } from "@/core/inputs/pagination.input";
 import { CreateUserInput } from "./dto/create-user.input";
 import { FilterUserInput } from "./dto/filter-user.input";
@@ -68,6 +70,7 @@ export class UsersResolver {
 
   // MUTATIONS
 
+  @Roles(UserRole.ADMIN)
   @Mutation(() => UserEntity)
   createOneUser(
     @Args("createUserInput", { type: () => CreateUserInput })
@@ -76,6 +79,7 @@ export class UsersResolver {
     return this.usersService.createOne(createUserInput);
   }
 
+  @Roles(UserRole.ADMIN)
   @Mutation(() => [UserEntity])
   createManyUsers(
     @Args("createUserInputs", { type: () => [CreateUserInput] })
@@ -84,6 +88,7 @@ export class UsersResolver {
     return this.usersService.createMany(createUserInputs);
   }
 
+  @Roles(UserRole.ADMIN)
   @Mutation(() => UserEntity)
   updateOneUser(
     @Args("userId", { type: () => ID }) userId: string,
@@ -93,6 +98,7 @@ export class UsersResolver {
     return this.usersService.updateOne(userId, updateUserInput);
   }
 
+  @Roles(UserRole.ADMIN)
   @Mutation(() => BatchEntity)
   updateManyUsers(
     @Args("userIds", { type: () => [ID] }) userIds: string[],
@@ -102,11 +108,13 @@ export class UsersResolver {
     return this.usersService.updateMany(userIds, updateUserInput);
   }
 
+  @Roles(UserRole.ADMIN)
   @Mutation(() => UserEntity)
   removeOneUser(@Args("userId", { type: () => ID }) userId: string) {
     return this.usersService.removeOne(userId);
   }
 
+  @Roles(UserRole.ADMIN)
   @Mutation(() => BatchEntity)
   removeManyUsers(@Args("userIds", { type: () => [ID] }) userIds: string[]) {
     return this.usersService.removeMany(userIds);

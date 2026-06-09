@@ -3,6 +3,8 @@ import { EventEmitter2 } from "@nestjs/event-emitter";
 import { getModelToken } from "@nestjs/mongoose";
 import { Test, TestingModule } from "@nestjs/testing";
 import mongoose, { Model } from "mongoose";
+import { DomainEvents } from "@/core/events/domain-events";
+import { SkillDeletedEvent } from "@/core/events/skill-deleted.event";
 import { SkillModel } from "@/modules/skills/schemas/skill.schema";
 import { SkillsService } from "./skills.service";
 
@@ -22,6 +24,7 @@ function makeExec(returnValue: unknown) {
 describe("SkillsService", () => {
   let service: SkillsService;
   let model: jest.Mocked<Model<SkillModel>>;
+  let eventEmitter: jest.Mocked<Pick<EventEmitter2, "emitAsync">>;
 
   beforeEach(async () => {
     jest.clearAllMocks();
@@ -53,6 +56,7 @@ describe("SkillsService", () => {
 
     service = module.get<SkillsService>(SkillsService);
     model = module.get(getModelToken(SkillModel.name));
+    eventEmitter = module.get(EventEmitter2);
   });
 
   it("should be defined", () => {
@@ -107,6 +111,19 @@ describe("SkillsService", () => {
       expect(await service.removeOne(validId)).toBe(fakeDoc);
     });
 
+    it("should emit skill.deleted before deleting the document", async () => {
+      (model.findById as jest.Mock).mockReturnValue(makeExec(fakeDoc));
+      (model.findByIdAndDelete as jest.Mock).mockReturnValue(makeExec(fakeDoc));
+
+      await service.removeOne(validId);
+
+      expect(eventEmitter.emitAsync).toHaveBeenCalledWith(
+        DomainEvents.skill.deleted,
+        new SkillDeletedEvent(validId)
+      );
+      expect(model.findByIdAndDelete).toHaveBeenCalled();
+    });
+
     it("should throw BadRequestException for invalid ID", async () => {
       await expect(service.removeOne(invalidId)).rejects.toThrow(
         BadRequestException
@@ -121,6 +138,21 @@ describe("SkillsService", () => {
         makeExec({ deletedCount: 4 })
       );
       expect(await service.removeMany([validId])).toEqual({ count: 4 });
+    });
+
+    it("should emit skill.deleted for each skill before deleteMany", async () => {
+      (model.find as jest.Mock).mockReturnValue(makeExec([fakeDoc]));
+      (model.deleteMany as jest.Mock).mockReturnValue(
+        makeExec({ deletedCount: 1 })
+      );
+
+      await service.removeMany([validId]);
+
+      expect(eventEmitter.emitAsync).toHaveBeenCalledWith(
+        DomainEvents.skill.deleted,
+        new SkillDeletedEvent(validId)
+      );
+      expect(model.deleteMany).toHaveBeenCalled();
     });
   });
 });

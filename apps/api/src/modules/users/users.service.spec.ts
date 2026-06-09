@@ -213,4 +213,27 @@ describe("UsersService", () => {
       );
     });
   });
+
+  // ------------------------------------------------------------------ //
+  // updateOne (overridden — hashes password when provided)
+  // ------------------------------------------------------------------ //
+
+  describe("updateOne", () => {
+    it("should hash the password when updating a user", async () => {
+      (model.findByIdAndUpdate as jest.Mock).mockReturnValue(
+        makeExec(fakeUser)
+      );
+
+      await service.updateOne("507f1f77bcf86cd799439011", {
+        password: "new-pass",
+      });
+
+      expect(hash).toHaveBeenCalledWith("new-pass", 8);
+      expect(model.findByIdAndUpdate).toHaveBeenCalledWith(
+        "507f1f77bcf86cd799439011",
+        expect.objectContaining({ password: "hashed-password" }),
+        { new: true }
+      );
+    });
+  });
 });

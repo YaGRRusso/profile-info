@@ -14,13 +14,12 @@ export class AuthService {
 
   private async validate(email: string, password: string) {
     const user = await this.usersService.findOneByEmailWithPassword(email);
+    if (!user) throw new UnauthorizedException();
 
-    if (user) {
-      const match = await compare(password, user.password);
-      if (match) return user;
-    }
+    const match = await compare(password, user.password);
+    if (!match) throw new UnauthorizedException();
 
-    throw new UnauthorizedException();
+    return user;
   }
 
   async signIn({ email, password }: SignInInput) {

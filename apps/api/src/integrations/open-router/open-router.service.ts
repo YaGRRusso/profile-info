@@ -15,10 +15,10 @@ export class OpenRouterService extends AiChatProvider {
 
   constructor(config: ConfigService) {
     super();
-    const apiKey = config.get<string>("OPENROUTER_API_KEY");
+    const apiKey = config.get("OPENROUTER_API_KEY");
 
     if (!apiKey) {
-      throw new Error("OPENROUTER_API_KEY is not set in environment variables");
+      throw new Error("OPENROUTER_API_KEY is not set");
     }
 
     this.client = new OpenRouter({ apiKey });

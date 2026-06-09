@@ -10,7 +10,9 @@ import {
 } from "@nestjs/graphql";
 import { sortDateRange } from "@/common/helpers/daterange.helper";
 import { Public } from "@/core/decorators/public-route.decorator";
+import { Roles } from "@/core/decorators/roles.decorator";
 import { BatchEntity } from "@/core/entities/batch.entity";
+import { UserRole } from "@/core/enums/user-role.enum";
 import { PaginationInput } from "@/core/inputs/pagination.input";
 import {
   ExperienceModel,
@@ -93,6 +95,7 @@ export class ExperiencesResolver {
 
   // MUTATIONS
 
+  @Roles(UserRole.ADMIN)
   @Mutation(() => ExperienceEntity)
   createOneExperience(
     @Args("createExperienceInput", { type: () => CreateExperienceInput })
@@ -101,6 +104,7 @@ export class ExperiencesResolver {
     return this.experiencesService.createOne(createExperienceInput);
   }
 
+  @Roles(UserRole.ADMIN)
   @Mutation(() => [ExperienceEntity])
   createManyExperiences(
     @Args("createExperienceInputs", { type: () => [CreateExperienceInput] })
@@ -109,6 +113,7 @@ export class ExperiencesResolver {
     return this.experiencesService.createMany(createExperienceInputs);
   }
 
+  @Roles(UserRole.ADMIN)
   @Mutation(() => ExperienceEntity)
   updateOneExperience(
     @Args("experienceId", { type: () => ID }) experienceId: string,
@@ -121,6 +126,7 @@ export class ExperiencesResolver {
     );
   }
 
+  @Roles(UserRole.ADMIN)
   @Mutation(() => BatchEntity)
   updateManyExperiences(
     @Args("experienceIds", { type: () => [ID] }) experienceIds: string[],
@@ -133,6 +139,7 @@ export class ExperiencesResolver {
     );
   }
 
+  @Roles(UserRole.ADMIN)
   @Mutation(() => ExperienceEntity)
   removeOneExperience(
     @Args("experienceId", { type: () => ID }) experienceId: string
@@ -140,6 +147,7 @@ export class ExperiencesResolver {
     return this.experiencesService.removeOne(experienceId);
   }
 
+  @Roles(UserRole.ADMIN)
   @Mutation(() => BatchEntity)
   removeManyExperiences(
     @Args("experienceIds", { type: () => [ID] }) experienceIds: string[]

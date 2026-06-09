@@ -1,5 +1,12 @@
 import { Field, InputType } from "@nestjs/graphql";
-import { IsDateString, IsEmail, IsUrl } from "class-validator";
+import {
+  IsDateString,
+  IsEmail,
+  IsNotEmpty,
+  IsString,
+  IsUrl,
+  MinLength,
+} from "class-validator";
 import { OptionalField } from "@/core/decorators/optional-field.decorator";
 import { UserRole } from "@/core/enums/user-role.enum";
 import { UrlInput } from "@/core/inputs/url.input";
@@ -11,9 +18,13 @@ export class CreateUserInput {
   avatar?: string;
 
   @Field(() => String)
+  @IsString()
+  @IsNotEmpty()
   name: string;
 
   @Field(() => String)
+  @IsString()
+  @IsNotEmpty()
   nickname: string;
 
   @OptionalField(() => String)
@@ -27,6 +38,8 @@ export class CreateUserInput {
   email: string;
 
   @Field(() => String)
+  @IsString()
+  @MinLength(8)
   password: string;
 
   @OptionalField(() => String)

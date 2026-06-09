@@ -10,7 +10,7 @@ by the `@profile-info/admin` dashboard.
 - **NestJS 11**: modules, resolvers, services, DI.
 - **Apollo GraphQL (code-first)**: schema generated to `src/schema.gql`.
 - **MongoDB + Mongoose**: ODM schemas in `src/modules/<name>/schemas/`.
-- **Passport JWT**: global guard with `@Public()` opt-out.
+- **Passport JWT**: global `GqlAuthGuard` with `@Public()` opt-out and `RolesGuard` for admin-only writes.
 - **DataLoader**: batches skill and organization lookups on nested fields.
 - **Jest**: unit (`*.spec.ts`) and e2e (`test/*.e2e-spec.ts`) tests.
 
@@ -44,9 +44,31 @@ modules         ← business domains (resolvers, services, schemas)
 ### Request flow (typical)
 
 ```
-HTTP → Apollo → GqlAuthGuard → Resolver → Service → Mongoose
+HTTP → Apollo → GqlAuthGuard → RolesGuard → Resolver → Service → Mongoose
                               ↘ @ResolveField → DataLoader → Service
 ```
+
+## Security model
+
+This API backs a **public portfolio** and an **admin dashboard**.
+The threat model is intentional, not accidental:
+
+| Operation class | Auth | Who |
+|-----------------|------|-----|
+| Profile reads (`findManySkills`, `findManyExperiences`, …) | None (`@Public()`) | Anyone |
+| `signIn` | None (`@Public()`) | Anyone |
+| `getMe` | JWT | Any authenticated user |
+| `dashboard` | JWT + `ADMIN` role | Admin only |
+| All mutations (CRUD + AI) | JWT + `ADMIN` role | Admin only |
+
+**Decisions:**
+
+- Profile data is public by design — skills, experiences, projects, etc. are meant to be read without a token.
+- User queries are also public (email is exposed). Acceptable for a single-owner portfolio; do not store secrets in user fields.
+- Mutations require a valid JWT **and** `UserRole.ADMIN`. A `USER` token receives `403 Forbidden`.
+- Missing or invalid JWT on protected operations returns GraphQL error extension `code: UNAUTHENTICATED` (the admin client clears auth on this).
+- `signIn` always returns `401 Unauthorized` for invalid credentials — no email enumeration via `404`.
+- Passwords are bcrypt-hashed on create **and** update; the hash is never exposed via GraphQL (`select: false`).
 
 ### AI flow
 
@@ -125,3 +147,14 @@ npm run api:dev
 ```
 
 After GraphQL type changes, rebuild or boot the API so `src/schema.gql` regenerates, then run admin codegen (`npm run admin:build` or `npx graphql-codegen` in `apps/admin`).
+
+## Testing
+
+```bash
+npm run test          # unit tests
+npm run test:e2e      # GraphQL auth, delete cascade, health smoke
+```
+
+E2E tests use `mongodb://127.0.0.1:27017/profile-test-e2e` by default (Docker Compose MongoDB). Set `TEST_DATABASE_URL` to override. Set `USE_MEMORY_MONGO=true` for in-memory Mongo (downloads binary on first run).
+
+Seed admin credentials: `admin@profile.info` / `admin123`.

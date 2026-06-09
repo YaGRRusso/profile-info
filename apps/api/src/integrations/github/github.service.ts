@@ -14,10 +14,10 @@ export class GithubService extends RepositoryMetadataProvider {
   constructor(config: ConfigService) {
     super();
 
-    const apiKey = config.get<string>("GITHUB_API_KEY");
+    const apiKey = config.get("GITHUB_API_KEY");
 
     if (!apiKey) {
-      throw new Error("GITHUB_API_KEY is not set in environment variables");
+      throw new Error("GITHUB_API_KEY is not set");
     }
 
     this.octokit = new Octokit({ auth: apiKey });

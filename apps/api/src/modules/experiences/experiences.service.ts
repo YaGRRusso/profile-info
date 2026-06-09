@@ -1,17 +1,8 @@
-import {
-  BadRequestException,
-  Injectable,
-  NotFoundException,
-} from "@nestjs/common";
+import { Injectable } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
-import { isNil } from "lodash";
 import { AnyKeys, Model, QueryFilter, SortOrder, UpdateQuery } from "mongoose";
-import { clearObject } from "@/common/helpers/object.helper";
-import {
-  assertValidObjectId,
-  assertValidObjectIds,
-} from "@/common/helpers/object-id.helper";
 import { BatchEntity } from "@/core/entities/batch.entity";
+import { MongooseCrudRepository } from "@/core/persistence/mongoose-crud.repository";
 import { PaginatedModel } from "@/core/schemas/paginated.schema";
 import { ExperienceModel } from "@/modules/experiences/schemas/experience.schema";
 import { CreateExperienceInput } from "./dto/create-experience.input";
@@ -19,45 +10,32 @@ import { UpdateExperienceInput } from "./dto/update-experience.input";
 
 @Injectable()
 export class ExperiencesService {
+  private readonly repository: MongooseCrudRepository<ExperienceModel>;
+
   constructor(
     @InjectModel(ExperienceModel.name)
     readonly experienceModel: Model<ExperienceModel>
-  ) {}
-
-  async findOneById(id: string): Promise<ExperienceModel> {
-    assertValidObjectId(id);
-
-    const res = await this.experienceModel.findById(id).exec();
-
-    if (isNil(res)) throw new NotFoundException("Not Found");
-    return res;
+  ) {
+    this.repository = new MongooseCrudRepository(experienceModel);
   }
 
-  async findOne({
+  findOneById(id: string): Promise<ExperienceModel> {
+    return this.repository.findOneById(id);
+  }
+
+  findOne({
     filters,
   }: {
     filters?: QueryFilter<ExperienceModel>;
   }): Promise<ExperienceModel> {
-    const res = await this.experienceModel
-      .findOne(clearObject(filters) as QueryFilter<ExperienceModel>)
-      .exec();
-
-    if (isNil(res)) throw new NotFoundException("Not Found");
-    return res;
+    return this.repository.findOne({ filters });
   }
 
-  async findManyById(ids: string[]): Promise<ExperienceModel[]> {
-    assertValidObjectIds(ids);
-
-    const res = await this.experienceModel
-      .find({ _id: { $in: ids } } as QueryFilter<ExperienceModel>)
-      .exec();
-
-    if (isNil(res)) throw new NotFoundException("Not Found");
-    return res;
+  findManyById(ids: string[]): Promise<ExperienceModel[]> {
+    return this.repository.findManyById(ids);
   }
 
-  async findMany({
+  findMany({
     filters,
     sort,
     skip = 0,
@@ -68,115 +46,55 @@ export class ExperiencesService {
     limit?: number;
     skip?: number;
   }): Promise<PaginatedModel<ExperienceModel>> {
-    const nodes = await this.experienceModel
-      .find(clearObject(filters) as QueryFilter<ExperienceModel>)
-      .sort(clearObject(sort) as Record<keyof ExperienceModel, SortOrder>)
-      .skip(skip)
-      .limit(limit)
-      .exec();
-
-    const found = await this.experienceModel
-      .countDocuments(clearObject(filters) as QueryFilter<ExperienceModel>)
-      .exec();
-
-    if (isNil(nodes) || isNil(found)) throw new NotFoundException("Not Found");
-    return {
-      nodes,
-      found,
-    };
+    return this.repository.findMany({ filters, sort, skip, limit });
   }
 
-  async createOne(
-    createInput: CreateExperienceInput
-  ): Promise<ExperienceModel> {
-    const res = await this.experienceModel.create(
-      createInput as AnyKeys<ExperienceModel>
-    );
-
-    if (isNil(res)) throw new BadRequestException("Not Created");
-    return res;
+  createOne(createInput: CreateExperienceInput): Promise<ExperienceModel> {
+    return this.repository.createOne(createInput as AnyKeys<ExperienceModel>);
   }
 
-  async createMany(
+  createMany(
     createInputs: CreateExperienceInput[]
   ): Promise<ExperienceModel[]> {
-    const res = await this.experienceModel.create(
+    return this.repository.createMany(
       createInputs as AnyKeys<ExperienceModel>[]
     );
-
-    if (isNil(res)) throw new BadRequestException("Not Created");
-    return res;
   }
 
-  async updateOne(
+  updateOne(
     id: string,
     updateInput: UpdateExperienceInput
   ): Promise<ExperienceModel> {
-    assertValidObjectId(id);
-
-    const res = await this.experienceModel
-      .findByIdAndUpdate(
-        id,
-        updateInput as object as UpdateQuery<ExperienceModel>
-      )
-      .exec();
-
-    if (isNil(res)) throw new NotFoundException("Not Updated");
-    return res;
+    return this.repository.updateOne(
+      id,
+      updateInput as object as UpdateQuery<ExperienceModel>
+    );
   }
 
-  async updateMany(
+  updateMany(
     ids: string[],
     updateInput: UpdateExperienceInput
   ): Promise<BatchEntity> {
-    assertValidObjectIds(ids);
-
-    const res = await this.experienceModel
-      .updateMany(
-        { _id: { $in: ids } } as QueryFilter<ExperienceModel>,
-        updateInput as object as UpdateQuery<ExperienceModel>
-      )
-      .exec();
-
-    if (isNil(res)) throw new NotFoundException("Not Updated");
-    return { count: res.modifiedCount };
+    return this.repository.updateMany(
+      ids,
+      updateInput as object as UpdateQuery<ExperienceModel>
+    );
   }
 
-  async removeOne(id: string): Promise<ExperienceModel> {
-    assertValidObjectId(id);
-
-    const res = await this.experienceModel.findByIdAndDelete(id).exec();
-
-    if (isNil(res)) throw new NotFoundException("Not Removed");
-    return res;
+  removeOne(id: string): Promise<ExperienceModel> {
+    return this.repository.deleteOne(id);
   }
 
-  async removeMany(ids: string[]): Promise<BatchEntity> {
-    assertValidObjectIds(ids);
-
-    const res = await this.experienceModel
-      .deleteMany({ _id: { $in: ids } } as QueryFilter<ExperienceModel>)
-      .exec();
-
-    if (isNil(res)) throw new NotFoundException("Not Removed");
-    return { count: res.deletedCount };
+  removeMany(ids: string[]): Promise<BatchEntity> {
+    return this.repository.deleteMany(ids);
   }
 
-  async count(): Promise<number> {
-    return await this.experienceModel.countDocuments().exec();
+  count(): Promise<number> {
+    return this.repository.count();
   }
 
-  async countByField(
-    field: string
-  ): Promise<{ label: string; value: number }[]> {
-    const rows = await this.experienceModel.aggregate<{
-      _id: string;
-      value: number;
-    }>([
-      { $group: { _id: `$${field}`, value: { $sum: 1 } } },
-      { $sort: { value: -1 } },
-    ]);
-    return rows.map((row) => ({ label: row._id, value: row.value }));
+  countByField(field: string): Promise<{ label: string; value: number }[]> {
+    return this.repository.countByField(field);
   }
 
   async detachSkill(skillId: string): Promise<void> {

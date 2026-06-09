@@ -1,17 +1,8 @@
-import {
-  BadRequestException,
-  Injectable,
-  NotFoundException,
-} from "@nestjs/common";
+import { Injectable } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
-import { isNil } from "lodash";
 import { AnyKeys, Model, QueryFilter, SortOrder, UpdateQuery } from "mongoose";
-import { clearObject } from "@/common/helpers/object.helper";
-import {
-  assertValidObjectId,
-  assertValidObjectIds,
-} from "@/common/helpers/object-id.helper";
 import { BatchEntity } from "@/core/entities/batch.entity";
+import { MongooseCrudRepository } from "@/core/persistence/mongoose-crud.repository";
 import { PaginatedModel } from "@/core/schemas/paginated.schema";
 import { EducationModel } from "@/modules/educations/schemas/education.schema";
 import { CreateEducationInput } from "./dto/create-education.input";
@@ -19,45 +10,32 @@ import { UpdateEducationInput } from "./dto/update-education.input";
 
 @Injectable()
 export class EducationsService {
+  private readonly repository: MongooseCrudRepository<EducationModel>;
+
   constructor(
     @InjectModel(EducationModel.name)
     readonly educationModel: Model<EducationModel>
-  ) {}
-
-  async findOneById(id: string): Promise<EducationModel> {
-    assertValidObjectId(id);
-
-    const res = await this.educationModel.findById(id).exec();
-
-    if (isNil(res)) throw new NotFoundException("Not Found");
-    return res;
+  ) {
+    this.repository = new MongooseCrudRepository(educationModel);
   }
 
-  async findOne({
+  findOneById(id: string): Promise<EducationModel> {
+    return this.repository.findOneById(id);
+  }
+
+  findOne({
     filters,
   }: {
     filters?: QueryFilter<EducationModel>;
   }): Promise<EducationModel> {
-    const res = await this.educationModel
-      .findOne(clearObject(filters) as QueryFilter<EducationModel>)
-      .exec();
-
-    if (isNil(res)) throw new NotFoundException("Not Found");
-    return res;
+    return this.repository.findOne({ filters });
   }
 
-  async findManyById(ids: string[]): Promise<EducationModel[]> {
-    assertValidObjectIds(ids);
-
-    const res = await this.educationModel
-      .find({ _id: { $in: ids } } as QueryFilter<EducationModel>)
-      .exec();
-
-    if (isNil(res)) throw new NotFoundException("Not Found");
-    return res;
+  findManyById(ids: string[]): Promise<EducationModel[]> {
+    return this.repository.findManyById(ids);
   }
 
-  async findMany({
+  findMany({
     filters,
     sort,
     skip = 0,
@@ -68,100 +46,49 @@ export class EducationsService {
     limit?: number;
     skip?: number;
   }): Promise<PaginatedModel<EducationModel>> {
-    const nodes = await this.educationModel
-      .find(clearObject(filters) as QueryFilter<EducationModel>)
-      .sort(clearObject(sort) as Record<keyof EducationModel, SortOrder>)
-      .skip(skip)
-      .limit(limit)
-      .exec();
-
-    const found = await this.educationModel
-      .countDocuments(clearObject(filters) as QueryFilter<EducationModel>)
-      .exec();
-
-    if (isNil(nodes) || isNil(found)) throw new NotFoundException("Not Found");
-    return {
-      nodes,
-      found,
-    };
+    return this.repository.findMany({ filters, sort, skip, limit });
   }
 
-  async createOne(createInput: CreateEducationInput): Promise<EducationModel> {
-    const res = await this.educationModel.create(
-      createInput as AnyKeys<EducationModel>
-    );
-
-    if (isNil(res)) throw new BadRequestException("Not Created");
-    return res;
+  createOne(createInput: CreateEducationInput): Promise<EducationModel> {
+    return this.repository.createOne(createInput as AnyKeys<EducationModel>);
   }
 
-  async createMany(
-    createInputs: CreateEducationInput[]
-  ): Promise<EducationModel[]> {
-    const res = await this.educationModel.create(
+  createMany(createInputs: CreateEducationInput[]): Promise<EducationModel[]> {
+    return this.repository.createMany(
       createInputs as AnyKeys<EducationModel>[]
     );
-
-    if (isNil(res)) throw new BadRequestException("Not Created");
-    return res;
   }
 
-  async updateOne(
+  updateOne(
     id: string,
     updateInput: UpdateEducationInput
   ): Promise<EducationModel> {
-    assertValidObjectId(id);
-
-    const res = await this.educationModel
-      .findByIdAndUpdate(
-        id,
-        updateInput as object as UpdateQuery<EducationModel>
-      )
-      .exec();
-
-    if (isNil(res)) throw new NotFoundException("Not Updated");
-    return res;
+    return this.repository.updateOne(
+      id,
+      updateInput as object as UpdateQuery<EducationModel>
+    );
   }
 
-  async updateMany(
+  updateMany(
     ids: string[],
     updateInput: UpdateEducationInput
   ): Promise<BatchEntity> {
-    assertValidObjectIds(ids);
-
-    const res = await this.educationModel
-      .updateMany(
-        { _id: { $in: ids } } as QueryFilter<EducationModel>,
-        updateInput as object as UpdateQuery<EducationModel>
-      )
-      .exec();
-
-    if (isNil(res)) throw new NotFoundException("Not Updated");
-    return { count: res.modifiedCount };
+    return this.repository.updateMany(
+      ids,
+      updateInput as object as UpdateQuery<EducationModel>
+    );
   }
 
-  async removeOne(id: string): Promise<EducationModel> {
-    assertValidObjectId(id);
-
-    const res = await this.educationModel.findByIdAndDelete(id).exec();
-
-    if (isNil(res)) throw new NotFoundException("Not Removed");
-    return res;
+  removeOne(id: string): Promise<EducationModel> {
+    return this.repository.deleteOne(id);
   }
 
-  async removeMany(ids: string[]): Promise<BatchEntity> {
-    assertValidObjectIds(ids);
-
-    const res = await this.educationModel
-      .deleteMany({ _id: { $in: ids } } as QueryFilter<EducationModel>)
-      .exec();
-
-    if (isNil(res)) throw new NotFoundException("Not Removed");
-    return { count: res.deletedCount };
+  removeMany(ids: string[]): Promise<BatchEntity> {
+    return this.repository.deleteMany(ids);
   }
 
-  async count(): Promise<number> {
-    return await this.educationModel.countDocuments().exec();
+  count(): Promise<number> {
+    return this.repository.count();
   }
 
   async detachSkill(skillId: string): Promise<void> {

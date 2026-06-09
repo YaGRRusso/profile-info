@@ -1,20 +1,11 @@
-import {
-  BadRequestException,
-  Injectable,
-  NotFoundException,
-} from "@nestjs/common";
+import { Injectable } from "@nestjs/common";
 import { EventEmitter2 } from "@nestjs/event-emitter";
 import { InjectModel } from "@nestjs/mongoose";
-import { isNil } from "lodash";
 import { AnyKeys, Model, QueryFilter, SortOrder, UpdateQuery } from "mongoose";
-import { clearObject } from "@/common/helpers/object.helper";
-import {
-  assertValidObjectId,
-  assertValidObjectIds,
-} from "@/common/helpers/object-id.helper";
 import { BatchEntity } from "@/core/entities/batch.entity";
 import { DomainEvents } from "@/core/events/domain-events";
 import { OrganizationDeletedEvent } from "@/core/events/organization-deleted.event";
+import { MongooseCrudRepository } from "@/core/persistence/mongoose-crud.repository";
 import { PaginatedModel } from "@/core/schemas/paginated.schema";
 import { OrganizationModel } from "@/modules/organizations/schemas/organization.schema";
 import { CreateOrganizationInput } from "./dto/create-organization.input";
@@ -22,46 +13,33 @@ import { UpdateOrganizationInput } from "./dto/update-organization.input";
 
 @Injectable()
 export class OrganizationsService {
+  private readonly repository: MongooseCrudRepository<OrganizationModel>;
+
   constructor(
     @InjectModel(OrganizationModel.name)
     readonly organizationModel: Model<OrganizationModel>,
     private readonly eventEmitter: EventEmitter2
-  ) {}
-
-  async findOneById(id: string): Promise<OrganizationModel> {
-    assertValidObjectId(id);
-
-    const res = await this.organizationModel.findById(id).exec();
-
-    if (isNil(res)) throw new NotFoundException("Not Found");
-    return res;
+  ) {
+    this.repository = new MongooseCrudRepository(organizationModel);
   }
 
-  async findOne({
+  findOneById(id: string): Promise<OrganizationModel> {
+    return this.repository.findOneById(id);
+  }
+
+  findOne({
     filters,
   }: {
     filters?: QueryFilter<OrganizationModel>;
   }): Promise<OrganizationModel> {
-    const res = await this.organizationModel
-      .findOne(clearObject(filters) as QueryFilter<OrganizationModel>)
-      .exec();
-
-    if (isNil(res)) throw new NotFoundException("Not Found");
-    return res;
+    return this.repository.findOne({ filters });
   }
 
-  async findManyById(ids: string[]): Promise<OrganizationModel[]> {
-    assertValidObjectIds(ids);
-
-    const res = await this.organizationModel
-      .find({ _id: { $in: ids } } as QueryFilter<OrganizationModel>)
-      .exec();
-
-    if (isNil(res)) throw new NotFoundException("Not Found");
-    return res;
+  findManyById(ids: string[]): Promise<OrganizationModel[]> {
+    return this.repository.findManyById(ids);
   }
 
-  async findMany({
+  findMany({
     filters,
     sort,
     skip = 0,
@@ -72,102 +50,55 @@ export class OrganizationsService {
     limit?: number;
     skip?: number;
   }): Promise<PaginatedModel<OrganizationModel>> {
-    const nodes = await this.organizationModel
-      .find(clearObject(filters) as QueryFilter<OrganizationModel>)
-      .sort(clearObject(sort) as Record<keyof OrganizationModel, SortOrder>)
-      .skip(skip)
-      .limit(limit)
-      .exec();
-
-    const found = await this.organizationModel
-      .countDocuments(clearObject(filters) as QueryFilter<OrganizationModel>)
-      .exec();
-
-    if (isNil(nodes) || isNil(found)) throw new NotFoundException("Not Found");
-    return {
-      nodes,
-      found,
-    };
+    return this.repository.findMany({ filters, sort, skip, limit });
   }
 
-  async createOne(
-    createInput: CreateOrganizationInput
-  ): Promise<OrganizationModel> {
-    const res = await this.organizationModel.create(
-      createInput as AnyKeys<OrganizationModel>
-    );
-
-    if (isNil(res)) throw new BadRequestException("Not Created");
-    return res;
+  createOne(createInput: CreateOrganizationInput): Promise<OrganizationModel> {
+    return this.repository.createOne(createInput as AnyKeys<OrganizationModel>);
   }
 
-  async createMany(
+  createMany(
     createInputs: CreateOrganizationInput[]
   ): Promise<OrganizationModel[]> {
-    const res = await this.organizationModel.create(
+    return this.repository.createMany(
       createInputs as AnyKeys<OrganizationModel>[]
     );
-
-    if (isNil(res)) throw new BadRequestException("Not Created");
-    return res;
   }
 
-  async updateOne(
+  updateOne(
     id: string,
     updateInput: UpdateOrganizationInput
   ): Promise<OrganizationModel> {
-    assertValidObjectId(id);
-
-    const res = await this.organizationModel
-      .findByIdAndUpdate(
-        id,
-        updateInput as object as UpdateQuery<OrganizationModel>
-      )
-      .exec();
-
-    if (isNil(res)) throw new NotFoundException("Not Updated");
-    return res;
+    return this.repository.updateOne(
+      id,
+      updateInput as object as UpdateQuery<OrganizationModel>
+    );
   }
 
-  async updateMany(
+  updateMany(
     ids: string[],
     updateInput: UpdateOrganizationInput
   ): Promise<BatchEntity> {
-    assertValidObjectIds(ids);
-
-    const res = await this.organizationModel
-      .updateMany(
-        { _id: { $in: ids } } as QueryFilter<OrganizationModel>,
-        updateInput as object as UpdateQuery<OrganizationModel>
-      )
-      .exec();
-
-    if (isNil(res)) throw new NotFoundException("Not Updated");
-    return { count: res.modifiedCount };
+    return this.repository.updateMany(
+      ids,
+      updateInput as object as UpdateQuery<OrganizationModel>
+    );
   }
 
   async removeOne(id: string): Promise<OrganizationModel> {
-    assertValidObjectId(id);
-
-    const res = await this.organizationModel.findById(id).exec();
-
-    if (isNil(res)) throw new NotFoundException("Not Removed");
+    const res = await this.repository.findOneById(id);
 
     await this.eventEmitter.emitAsync(
       DomainEvents.organization.deleted,
       new OrganizationDeletedEvent(res._id.toString())
     );
 
-    await this.organizationModel.findByIdAndDelete(id).exec();
+    await this.repository.deleteOne(id);
     return res;
   }
 
   async removeMany(ids: string[]): Promise<BatchEntity> {
-    assertValidObjectIds(ids);
-
-    const organizations = await this.organizationModel
-      .find({ _id: { $in: ids } } as QueryFilter<OrganizationModel>)
-      .exec();
+    const organizations = await this.repository.findManyById(ids);
 
     for (const organization of organizations) {
       await this.eventEmitter.emitAsync(
@@ -176,15 +107,10 @@ export class OrganizationsService {
       );
     }
 
-    const res = await this.organizationModel
-      .deleteMany({ _id: { $in: ids } } as QueryFilter<OrganizationModel>)
-      .exec();
-
-    if (isNil(res)) throw new NotFoundException("Not Removed");
-    return { count: res.deletedCount };
+    return this.repository.deleteMany(ids);
   }
 
-  async count(): Promise<number> {
-    return await this.organizationModel.countDocuments().exec();
+  count(): Promise<number> {
+    return this.repository.count();
   }
 }

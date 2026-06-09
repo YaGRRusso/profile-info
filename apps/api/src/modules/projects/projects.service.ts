@@ -1,17 +1,8 @@
-import {
-  BadRequestException,
-  Injectable,
-  NotFoundException,
-} from "@nestjs/common";
+import { Injectable } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
-import { isNil } from "lodash";
 import { AnyKeys, Model, QueryFilter, SortOrder, UpdateQuery } from "mongoose";
-import { clearObject } from "@/common/helpers/object.helper";
-import {
-  assertValidObjectId,
-  assertValidObjectIds,
-} from "@/common/helpers/object-id.helper";
 import { BatchEntity } from "@/core/entities/batch.entity";
+import { MongooseCrudRepository } from "@/core/persistence/mongoose-crud.repository";
 import { PaginatedModel } from "@/core/schemas/paginated.schema";
 import { ProjectModel } from "@/modules/projects/schemas/project.schema";
 import { CreateProjectInput } from "./dto/create-project.input";
@@ -19,44 +10,31 @@ import { UpdateProjectInput } from "./dto/update-project.input";
 
 @Injectable()
 export class ProjectsService {
+  private readonly repository: MongooseCrudRepository<ProjectModel>;
+
   constructor(
     @InjectModel(ProjectModel.name) readonly projectModel: Model<ProjectModel>
-  ) {}
-
-  async findOneById(id: string): Promise<ProjectModel> {
-    assertValidObjectId(id);
-
-    const res = await this.projectModel.findById(id).exec();
-
-    if (isNil(res)) throw new NotFoundException("Not Found");
-    return res;
+  ) {
+    this.repository = new MongooseCrudRepository(projectModel);
   }
 
-  async findOne({
+  findOneById(id: string): Promise<ProjectModel> {
+    return this.repository.findOneById(id);
+  }
+
+  findOne({
     filters,
   }: {
     filters?: QueryFilter<ProjectModel>;
   }): Promise<ProjectModel> {
-    const res = await this.projectModel
-      .findOne(clearObject(filters) as QueryFilter<ProjectModel>)
-      .exec();
-
-    if (isNil(res)) throw new NotFoundException("Not Found");
-    return res;
+    return this.repository.findOne({ filters });
   }
 
-  async findManyById(ids: string[]): Promise<ProjectModel[]> {
-    assertValidObjectIds(ids);
-
-    const res = await this.projectModel
-      .find({ _id: { $in: ids } } as QueryFilter<ProjectModel>)
-      .exec();
-
-    if (isNil(res)) throw new NotFoundException("Not Found");
-    return res;
+  findManyById(ids: string[]): Promise<ProjectModel[]> {
+    return this.repository.findManyById(ids);
   }
 
-  async findMany({
+  findMany({
     filters,
     sort,
     skip = 0,
@@ -67,97 +45,47 @@ export class ProjectsService {
     limit?: number;
     skip?: number;
   }): Promise<PaginatedModel<ProjectModel>> {
-    const nodes = await this.projectModel
-      .find(clearObject(filters) as QueryFilter<ProjectModel>)
-      .sort(clearObject(sort) as Record<keyof ProjectModel, SortOrder>)
-      .skip(skip)
-      .limit(limit)
-      .exec();
-
-    const found = await this.projectModel
-      .countDocuments(clearObject(filters) as QueryFilter<ProjectModel>)
-      .exec();
-
-    if (isNil(nodes) || isNil(found)) throw new NotFoundException("Not Found");
-    return {
-      nodes,
-      found,
-    };
+    return this.repository.findMany({ filters, sort, skip, limit });
   }
 
-  async createOne(createInput: CreateProjectInput): Promise<ProjectModel> {
-    const res = await this.projectModel.create(
-      createInput as AnyKeys<ProjectModel>
-    );
-
-    if (isNil(res)) throw new BadRequestException("Not Created");
-    return res;
+  createOne(createInput: CreateProjectInput): Promise<ProjectModel> {
+    return this.repository.createOne(createInput as AnyKeys<ProjectModel>);
   }
 
-  async createMany(
-    createInputs: CreateProjectInput[]
-  ): Promise<ProjectModel[]> {
-    const res = await this.projectModel.create(
-      createInputs as AnyKeys<ProjectModel>[]
-    );
-
-    if (isNil(res)) throw new BadRequestException("Not Created");
-    return res;
+  createMany(createInputs: CreateProjectInput[]): Promise<ProjectModel[]> {
+    return this.repository.createMany(createInputs as AnyKeys<ProjectModel>[]);
   }
 
-  async updateOne(
+  updateOne(
     id: string,
     updateInput: UpdateProjectInput
   ): Promise<ProjectModel> {
-    assertValidObjectId(id);
-
-    const res = await this.projectModel
-      .findByIdAndUpdate(id, updateInput as object as UpdateQuery<ProjectModel>)
-      .exec();
-
-    if (isNil(res)) throw new NotFoundException("Not Updated");
-    return res;
+    return this.repository.updateOne(
+      id,
+      updateInput as object as UpdateQuery<ProjectModel>
+    );
   }
 
-  async updateMany(
+  updateMany(
     ids: string[],
     updateInput: UpdateProjectInput
   ): Promise<BatchEntity> {
-    assertValidObjectIds(ids);
-
-    const res = await this.projectModel
-      .updateMany(
-        { _id: { $in: ids } } as QueryFilter<ProjectModel>,
-        updateInput as object as UpdateQuery<ProjectModel>
-      )
-      .exec();
-
-    if (isNil(res)) throw new NotFoundException("Not Updated");
-    return { count: res.modifiedCount };
+    return this.repository.updateMany(
+      ids,
+      updateInput as object as UpdateQuery<ProjectModel>
+    );
   }
 
-  async removeOne(id: string): Promise<ProjectModel> {
-    assertValidObjectId(id);
-
-    const res = await this.projectModel.findByIdAndDelete(id).exec();
-
-    if (isNil(res)) throw new NotFoundException("Not Removed");
-    return res;
+  removeOne(id: string): Promise<ProjectModel> {
+    return this.repository.deleteOne(id);
   }
 
-  async removeMany(ids: string[]): Promise<BatchEntity> {
-    assertValidObjectIds(ids);
-
-    const res = await this.projectModel
-      .deleteMany({ _id: { $in: ids } } as QueryFilter<ProjectModel>)
-      .exec();
-
-    if (isNil(res)) throw new NotFoundException("Not Removed");
-    return { count: res.deletedCount };
+  removeMany(ids: string[]): Promise<BatchEntity> {
+    return this.repository.deleteMany(ids);
   }
 
-  async count(): Promise<number> {
-    return await this.projectModel.countDocuments().exec();
+  count(): Promise<number> {
+    return this.repository.count();
   }
 
   async detachSkill(skillId: string): Promise<void> {

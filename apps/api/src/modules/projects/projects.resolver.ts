@@ -9,7 +9,9 @@ import {
   Resolver,
 } from "@nestjs/graphql";
 import { Public } from "@/core/decorators/public-route.decorator";
+import { Roles } from "@/core/decorators/roles.decorator";
 import { BatchEntity } from "@/core/entities/batch.entity";
+import { UserRole } from "@/core/enums/user-role.enum";
 import { PaginationInput } from "@/core/inputs/pagination.input";
 import type { Ctx } from "@/modules/graphql/context.interface";
 import type { ProjectModel } from "@/modules/projects/schemas/project.schema";
@@ -85,6 +87,7 @@ export class ProjectsResolver {
 
   // MUTATIONS
 
+  @Roles(UserRole.ADMIN)
   @Mutation(() => ProjectEntity)
   createOneProject(
     @Args("createProjectInput", { type: () => CreateProjectInput })
@@ -93,6 +96,7 @@ export class ProjectsResolver {
     return this.projectsService.createOne(createProjectInput);
   }
 
+  @Roles(UserRole.ADMIN)
   @Mutation(() => [ProjectEntity])
   createManyProjects(
     @Args("createProjectInputs", { type: () => [CreateProjectInput] })
@@ -101,6 +105,7 @@ export class ProjectsResolver {
     return this.projectsService.createMany(createProjectInputs);
   }
 
+  @Roles(UserRole.ADMIN)
   @Mutation(() => ProjectEntity)
   updateOneProject(
     @Args("projectId", { type: () => ID }) projectId: string,
@@ -110,6 +115,7 @@ export class ProjectsResolver {
     return this.projectsService.updateOne(projectId, updateProjectInput);
   }
 
+  @Roles(UserRole.ADMIN)
   @Mutation(() => BatchEntity)
   updateManyProjects(
     @Args("projectIds", { type: () => [ID] }) projectIds: string[],
@@ -119,11 +125,13 @@ export class ProjectsResolver {
     return this.projectsService.updateMany(projectIds, updateProjectInput);
   }
 
+  @Roles(UserRole.ADMIN)
   @Mutation(() => ProjectEntity)
   removeOneProject(@Args("projectId", { type: () => ID }) projectId: string) {
     return this.projectsService.removeOne(projectId);
   }
 
+  @Roles(UserRole.ADMIN)
   @Mutation(() => BatchEntity)
   removeManyProjects(
     @Args("projectIds", { type: () => [ID] }) projectIds: string[]

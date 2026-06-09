@@ -26,8 +26,8 @@
     "admin:start": "npm run start --workspace=@profile-info/admin",
     "dev": "concurrently -c \"blue,magenta\" -n \"api,admin\" \"npm run api:dev\" \"npm run admin:dev\"",
     "prod": "concurrently -c \"blue,magenta\" -n \"api,admin\" \"npm run api:prod\" \"npm run admin:prod\"",
-    "build": "concurrently -c \"blue,magenta\" -n \"api,admin\" \"npm run api:build\" \"npm run admin:build\"",
-    "start": "concurrently -c \"blue,magenta\" -n \"api,admin\" \"npm run api:start\" \"npm run admin:start\"",
+    "build": "npm run build --workspaces --if-present",
+    "start": "npm run start --workspaces --if-present",
     "tree": "tree apps/ -I 'node_modules|dist|build|.git' -L 7 -F",
     "test": "npm run test --workspaces --if-present",
     "test:watch": "npm run test:watch --workspaces --if-present",
@@ -44,7 +44,7 @@
     "lint-staged": "^16.4.0",
     "prettier": "^3.8.3",
     "typescript": "^5.9.3",
-    "ultracite": "^7.8.1"
+    "ultracite": "^7.8.2"
   },
   "lint-staged": {
     "*.{js,jsx,ts,tsx,json,jsonc,css,scss,md,mdx}": [

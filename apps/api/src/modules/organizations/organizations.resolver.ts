@@ -1,6 +1,8 @@
 import { Args, ID, Mutation, Query, Resolver } from "@nestjs/graphql";
 import { Public } from "@/core/decorators/public-route.decorator";
+import { Roles } from "@/core/decorators/roles.decorator";
 import { BatchEntity } from "@/core/entities/batch.entity";
+import { UserRole } from "@/core/enums/user-role.enum";
 import { PaginationInput } from "@/core/inputs/pagination.input";
 import { CreateOrganizationInput } from "./dto/create-organization.input";
 import { FilterOrganizationInput } from "./dto/filter-organization.input";
@@ -75,6 +77,7 @@ export class OrganizationsResolver {
 
   // MUTATIONS
 
+  @Roles(UserRole.ADMIN)
   @Mutation(() => OrganizationEntity)
   createOneOrganization(
     @Args("createOrganizationInput", { type: () => CreateOrganizationInput })
@@ -83,6 +86,7 @@ export class OrganizationsResolver {
     return this.organizationsService.createOne(createOrganizationInput);
   }
 
+  @Roles(UserRole.ADMIN)
   @Mutation(() => [OrganizationEntity])
   createManyOrganizations(
     @Args("createOrganizationInputs", { type: () => [CreateOrganizationInput] })
@@ -91,6 +95,7 @@ export class OrganizationsResolver {
     return this.organizationsService.createMany(createOrganizationInputs);
   }
 
+  @Roles(UserRole.ADMIN)
   @Mutation(() => OrganizationEntity)
   updateOneOrganization(
     @Args("organizationId", { type: () => ID }) organizationId: string,
@@ -103,6 +108,7 @@ export class OrganizationsResolver {
     );
   }
 
+  @Roles(UserRole.ADMIN)
   @Mutation(() => BatchEntity)
   updateManyOrganizations(
     @Args("organizationIds", { type: () => [ID] }) organizationIds: string[],
@@ -115,6 +121,7 @@ export class OrganizationsResolver {
     );
   }
 
+  @Roles(UserRole.ADMIN)
   @Mutation(() => OrganizationEntity)
   removeOneOrganization(
     @Args("organizationId", { type: () => ID }) organizationId: string
@@ -122,6 +129,7 @@ export class OrganizationsResolver {
     return this.organizationsService.removeOne(organizationId);
   }
 
+  @Roles(UserRole.ADMIN)
   @Mutation(() => BatchEntity)
   removeManyOrganizations(
     @Args("organizationIds", { type: () => [ID] }) organizationIds: string[]

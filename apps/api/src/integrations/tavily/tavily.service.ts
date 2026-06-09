@@ -23,7 +23,7 @@ export class TavilyService extends WebContentProvider {
   constructor(config: ConfigService) {
     super();
 
-    const apiKey = config.get<string>("TAVILY_API_KEY");
+    const apiKey = config.get("TAVILY_API_KEY");
 
     if (!apiKey) {
       throw new Error("TAVILY_API_KEY environment variable is not set");

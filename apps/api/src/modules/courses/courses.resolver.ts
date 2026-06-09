@@ -9,7 +9,9 @@ import {
   Resolver,
 } from "@nestjs/graphql";
 import { Public } from "@/core/decorators/public-route.decorator";
+import { Roles } from "@/core/decorators/roles.decorator";
 import { BatchEntity } from "@/core/entities/batch.entity";
+import { UserRole } from "@/core/enums/user-role.enum";
 import { PaginationInput } from "@/core/inputs/pagination.input";
 import { CourseModel } from "@/modules/courses/schemas/course.schema";
 import type { Ctx } from "@/modules/graphql/context.interface";
@@ -83,6 +85,7 @@ export class CoursesResolver {
 
   // MUTATIONS
 
+  @Roles(UserRole.ADMIN)
   @Mutation(() => CourseEntity)
   createOneCourse(
     @Args("createCourseInput", { type: () => CreateCourseInput })
@@ -91,6 +94,7 @@ export class CoursesResolver {
     return this.coursesService.createOne(createCourseInput);
   }
 
+  @Roles(UserRole.ADMIN)
   @Mutation(() => [CourseEntity])
   createManyCourses(
     @Args("createCourseInputs", { type: () => [CreateCourseInput] })
@@ -99,6 +103,7 @@ export class CoursesResolver {
     return this.coursesService.createMany(createCourseInputs);
   }
 
+  @Roles(UserRole.ADMIN)
   @Mutation(() => CourseEntity)
   updateOneCourse(
     @Args("courseId", { type: () => ID }) courseId: string,
@@ -108,6 +113,7 @@ export class CoursesResolver {
     return this.coursesService.updateOne(courseId, updateCourseInput);
   }
 
+  @Roles(UserRole.ADMIN)
   @Mutation(() => BatchEntity)
   updateManyCourses(
     @Args("courseIds", { type: () => [ID] }) courseIds: string[],
@@ -117,11 +123,13 @@ export class CoursesResolver {
     return this.coursesService.updateMany(courseIds, updateCourseInput);
   }
 
+  @Roles(UserRole.ADMIN)
   @Mutation(() => CourseEntity)
   removeOneCourse(@Args("courseId", { type: () => ID }) courseId: string) {
     return this.coursesService.removeOne(courseId);
   }
 
+  @Roles(UserRole.ADMIN)
   @Mutation(() => BatchEntity)
   removeManyCourses(
     @Args("courseIds", { type: () => [ID] }) courseIds: string[]

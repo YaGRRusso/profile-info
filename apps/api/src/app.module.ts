@@ -2,8 +2,11 @@ import { Module } from "@nestjs/common";
 import { ConfigModule, ConfigService } from "@nestjs/config";
 import { EventEmitterModule } from "@nestjs/event-emitter";
 import { MongooseModule } from "@nestjs/mongoose";
+import { ThrottlerModule } from "@nestjs/throttler";
 import { AppController } from "./app.controller";
 import { AppService } from "./app.service";
+import { validateEnv } from "./core/configs/env.validation";
+import { HealthModule } from "./core/health/health.module";
 import { AiToolsModule } from "./modules/ai-tools/ai-tools.module";
 import { AuthModule } from "./modules/auth/auth.module";
 import { CoursesModule } from "./modules/courses/courses.module";
@@ -19,12 +22,16 @@ import { UsersModule } from "./modules/users/users.module";
 @Module({
   imports: [
     EventEmitterModule.forRoot({ global: true }),
-    ConfigModule.forRoot({ isGlobal: true }),
+    ConfigModule.forRoot({
+      isGlobal: true,
+      validate: validateEnv,
+    }),
+    ThrottlerModule.forRoot([{ ttl: 60_000, limit: 10 }]),
     MongooseModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: (config: ConfigService) => {
-        const uri = config.get<string>("DATABASE_URL");
+        const uri = config.get("DATABASE_URL");
         if (!uri) throw new Error("DATABASE_URL not defined");
 
         return {
@@ -35,6 +42,7 @@ import { UsersModule } from "./modules/users/users.module";
       },
     }),
     GraphqlModule,
+    HealthModule,
     AuthModule,
     SkillsModule,
     OrganizationsModule,
