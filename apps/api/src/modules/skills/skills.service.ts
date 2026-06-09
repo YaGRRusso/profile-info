@@ -6,22 +6,19 @@ import {
 import { EventEmitter2 } from "@nestjs/event-emitter";
 import { InjectModel } from "@nestjs/mongoose";
 import { isNil } from "lodash";
-import {
-  AnyKeys,
-  isValidObjectId,
-  Model,
-  QueryFilter,
-  SortOrder,
-  UpdateQuery,
-} from "mongoose";
+import { AnyKeys, Model, QueryFilter, SortOrder, UpdateQuery } from "mongoose";
 import { clearObject } from "@/common/helpers/object.helper";
+import {
+  assertValidObjectId,
+  assertValidObjectIds,
+} from "@/common/helpers/object-id.helper";
 import { BatchEntity } from "@/core/entities/batch.entity";
 import { DomainEvents } from "@/core/events/domain-events";
+import { SkillDeletedEvent } from "@/core/events/skill-deleted.event";
 import { PaginatedModel } from "@/core/schemas/paginated.schema";
 import { SkillModel } from "@/modules/skills/schemas/skill.schema";
 import { CreateSkillInput } from "./dto/create-skill.input";
 import { UpdateSkillInput } from "./dto/update-skill.input";
-import { SkillDeletedEvent } from "./events/skill-deleted.event";
 
 @Injectable()
 export class SkillsService {
@@ -30,7 +27,7 @@ export class SkillsService {
     private readonly eventEmitter: EventEmitter2
   ) {}
   async findOneById(id: string): Promise<SkillModel> {
-    if (!isValidObjectId(id)) throw new BadRequestException("Invalid ID");
+    assertValidObjectId(id);
 
     const res = await this.skillModel.findById(id).exec();
 
@@ -52,8 +49,7 @@ export class SkillsService {
   }
 
   async findManyById(ids: string[]): Promise<SkillModel[]> {
-    if (ids.some((id) => !isValidObjectId(id)))
-      throw new BadRequestException("Invalid ID");
+    assertValidObjectIds(ids);
 
     const res = await this.skillModel
       .find({ _id: { $in: ids } } as QueryFilter<SkillModel>)
@@ -114,7 +110,7 @@ export class SkillsService {
     id: string,
     updateInput: UpdateSkillInput
   ): Promise<SkillModel> {
-    if (!isValidObjectId(id)) throw new BadRequestException("Invalid ID");
+    assertValidObjectId(id);
 
     const res = await this.skillModel
       .findByIdAndUpdate(id, updateInput as object as UpdateQuery<SkillModel>)
@@ -128,8 +124,7 @@ export class SkillsService {
     ids: string[],
     updateInput: UpdateSkillInput
   ): Promise<BatchEntity> {
-    if (ids.some((id) => !isValidObjectId(id)))
-      throw new BadRequestException("Invalid ID");
+    assertValidObjectIds(ids);
 
     const res = await this.skillModel
       .updateMany(
@@ -143,7 +138,7 @@ export class SkillsService {
   }
 
   async removeOne(id: string): Promise<SkillModel> {
-    if (!isValidObjectId(id)) throw new BadRequestException("Invalid ID");
+    assertValidObjectId(id);
 
     const res = await this.skillModel.findById(id).exec();
 
@@ -159,8 +154,7 @@ export class SkillsService {
   }
 
   async removeMany(ids: string[]): Promise<BatchEntity> {
-    if (ids.some((id) => !isValidObjectId(id)))
-      throw new BadRequestException("Invalid ID");
+    assertValidObjectIds(ids);
 
     const skills = await this.skillModel
       .find({ _id: { $in: ids } } as QueryFilter<SkillModel>)

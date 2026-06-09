@@ -28,13 +28,13 @@ Entry point `src/main.ts`:
 2. `validationConfig(app)` installs a global `ValidationPipe` with `stopAtFirstError: true`.
 3. `await appConfig(app)` reads `PORT` (default 8080) and `HOST` (default `0.0.0.0`), enables CORS, and starts listening.
 
-`src/app.module.ts` composition root:
+`src/app.module.ts` composition root (ordered: infra → GraphQL → domain):
 
 - `EventEmitterModule.forRoot({ global: true })`.
 - `ConfigModule.forRoot({ isGlobal: true })`.
 - `MongooseModule.forRootAsync` reads `DATABASE_URL`.
-- `GraphQLModule.forRootAsync` with `ApolloDriver`: schema at `src/schema.gql`, DataLoaders in context via `createLoaders(...)` from `core/loaders/loaders.helper.ts`.
-- Feature modules (all under `src/modules/`): `AiToolsModule`, `SkillsModule`, `ProjectsModule`, `UsersModule`, `AuthModule`, `CoursesModule`, `EducationsModule`, `ExperiencesModule`, `OrganizationsModule`, `DashboardModule`. `DashboardModule` is read-only aggregation only.
+- `GraphqlModule` (`modules/graphql/graphql.module.ts`): wraps `GraphQLModule.forRootAsync` with `ApolloDriver`, schema at `src/schema.gql`, and per-request DataLoaders via `createLoaders(...)` from `modules/graphql/loaders.helper.ts`.
+- Feature modules: `AuthModule`, CRUD entities, `DashboardModule` (read-only aggregation), `AiToolsModule`.
 
 Request flow: Apollo → `GqlAuthGuard` (unless `@Public()`) → resolver → service → Mongoose model. Nested fields use `@ResolveField` + per-request DataLoaders.
 
@@ -52,14 +52,15 @@ Request flow: Apollo → `GqlAuthGuard` (unless `@Public()`) → resolver → se
 
 `common/` (pure TS, no NestJS/Mongoose/GraphQL imports):
 
-- `helpers/`: `object.helper.ts` (`clearObject`), `daterange.helper.ts` (`sortDateRange`), `breakpoint.helper.ts`.
+- `helpers/`: `object.helper.ts` (`clearObject`), `object-id.helper.ts` (`assertValidObjectId`, `assertValidObjectIds`), `daterange.helper.ts` (`sortDateRange`), `breakpoint.helper.ts`.
 - `execution/orchestrator.helper.ts`: `orchestrate(...)`, a concurrency-limited + timeout task runner (plain function, used by `ai-tools`).
 
 `common` holds only generic primitives — it does **not** own integration contracts. Each capability boundary owns its own port (see `integrations/`).
 
 `core/` (cross-cutting NestJS infra, domain-agnostic):
 
-- `events/domain-events.ts`: event name constants (e.g. `skill.deleted`).
+- `events/`: `domain-events.ts` (event name constants), `skill-deleted.event.ts`, `organization-deleted.event.ts` (neutral payload classes).
+- `enums/user-role.enum.ts`: shared `UserRole` enum (`USER`, `ADMIN`).
 - `schemas/paginated.schema.ts`: `createPaginatedModel(Entity)` for `{ found, nodes }`.
 - `schemas/base.schema.ts`, `translation.schema.ts`, `daterange.schema.ts`, `url.schema.ts`: shared Mongoose sub-schemas.
 - `entities/`: `BaseEntity`, batch, date-range, translation, url GraphQL types.
@@ -77,26 +78,47 @@ DI pattern is the NestJS-idiomatic **abstract class as token**: ports are abstra
 
 `modules/` (business domains):
 
-- `graphql/`: `loaders.helper.ts` (DataLoaders) and `context.interface.ts` (`Ctx`). GraphQL-specific, may import feature services.
+- `graphql/`: `graphql.module.ts` (Apollo wiring), `loaders.helper.ts` (DataLoaders), `context.interface.ts` (`Ctx`). GraphQL-specific, may import feature services.
 - `auth/`: global `GqlAuthGuard`, `signIn` (`@Public`) returns JWT, `getMe` returns current user; `@CurrentUser()` decorator lives in `auth/decorators/`.
 - `ai-tools/`: AI use-cases. Owns the `AiEntity` GraphQL type and its enums (mapped from `ai.types` in `mappers/chat-result.mapper.ts`); injects the abstract ports `AiProvider`, `RepositoryMetadataProvider`, `WebContentProvider` by type. `AiToolsModule` imports `AiModule`, `GithubModule`, `TavilyModule` only for Nest DI wiring.
 - `dashboard/`: read-only aggregation via feature **services** (`count()`, `countByField()`), not other modules' Mongoose schemas.
-- CRUD feature modules (`skills/`, `users/`, `experiences/`, `educations/`, `courses/`, `organizations/`, `projects/`): each has `<name>.module.ts`, `<name>.resolver.ts`, `<name>.service.ts`, `schemas/<name>.schema.ts` (co-located Mongoose model), `entities/<name>.entity.ts`, `dto/`, often `enums/` and sometimes `listeners/` or `events/`.
+- CRUD feature modules (`skills/`, `users/`, `experiences/`, `educations/`, `courses/`, `organizations/`, `projects/`): canonical skeleton:
+
+```
+modules/<entity>/
+├── <entity>.module.ts
+├── <entity>.resolver.ts
+├── <entity>.service.ts
+├── schemas/
+├── entities/
+├── dto/          # always *.input.ts (create, update, filter, sort)
+├── enums/        # if GraphQL enums exist for this entity
+└── listeners/    # only if consuming delete events from another domain
+```
 
 Notable specifics:
 
-- `modules/users/users.service.ts`: hashes password on create; `select("+password")` for auth.
+- `modules/users/users.service.ts`: hashes password on create; `findOneByEmailWithPassword` (with `select("+password")`) is auth-only — public CRUD methods never load password.
 - `modules/experiences/experiences.resolver.ts`: `@ResolveField` for `organization`, `skills`, sorted `roles`.
-- `modules/skills/` and `modules/organizations/` export their services for DataLoaders in `app.module.ts`.
+- `modules/skills/` and `modules/organizations/` export their services for DataLoaders in `GraphqlModule`.
 
 ## Domain events (delete cascade)
 
-When a referenced resource is deleted, services emit domain events **before** removing the document (`emitAsync`):
+When a referenced resource is deleted, emitter services fire domain events **before** removing the document (`emitAsync`). Payload classes live in `core/events/`; consumers import from `core/`, never from the emitter module.
 
-- `SkillDeletedEvent` / `skill.deleted`: listeners in courses, educations, experiences, projects `$pull` the skill id from arrays (experiences use nested `roles.skills`).
-- `OrganizationDeletedEvent` / `organization.deleted`: listeners in courses, educations, experiences `deleteMany` records referencing the org.
+Listeners are thin (`@OnEvent` + delegate to a service method). All MongoDB writes stay in the consumer's service.
 
-Payload classes live in `modules/<resource>/events/`. Listeners live in consuming modules under `modules/<consumer>/listeners/` (e.g. `OnSkillDeletedListener`). Do not use Mongoose `pre('deleteOne')` hooks for this — they miss `findByIdAndDelete` / `deleteMany`.
+| Event | Emitter | Consumer | Strategy | Service method |
+|-------|---------|----------|----------|----------------|
+| `skill.deleted` | `skills` | `projects` | `$pull` from `skills` array | `detachSkill` |
+| `skill.deleted` | `skills` | `courses` | `$pull` from `skills` array | `detachSkill` |
+| `skill.deleted` | `skills` | `educations` | `$pull` from `skills` array | `detachSkill` |
+| `skill.deleted` | `skills` | `experiences` | `$pull` from nested `roles.skills` | `detachSkill` |
+| `organization.deleted` | `organizations` | `courses` | hard `deleteMany` | `purgeByOrganization` |
+| `organization.deleted` | `organizations` | `educations` | hard `deleteMany` | `purgeByOrganization` |
+| `organization.deleted` | `organizations` | `experiences` | hard `deleteMany` | `purgeByOrganization` |
+
+Do not use Mongoose `pre('deleteOne')` hooks — they miss `findByIdAndDelete` / `deleteMany`.
 
 ## The patterns to follow when extending
 
@@ -109,9 +131,9 @@ Copy `src/modules/skills/` and adapt:
 5. Resolver: explicit `@Query` / `@Mutation` methods with `@Public()` on reads; wire pagination/sort/filter args like `skills.resolver.ts`.
 6. Module: `MongooseModule.forFeature`, providers, export service if needed for loaders. Import in `app.module.ts`.
 
-If other modules reference the new entity in arrays, add an `On<Name>DeletedListener` in those modules and emit the event from `removeOne` / `removeMany`.
+If other modules reference the new entity in arrays: add payload to `core/events/`, emit from `removeOne` / `removeMany`, add a service method in each consumer (e.g. `detachSkill`), and a thin listener that delegates to it.
 
-For nested `@ResolveField`, use DataLoaders from `ctx.loaders`; add new loaders in `loaders.helper.ts` and inject the service in the GraphQL factory.
+For nested `@ResolveField`, use DataLoaders from `ctx.loaders`; add new loaders in `loaders.helper.ts` and wire the service in `GraphqlModule`.
 
 CRUD field names follow the skills convention: `findOneSkillById`, `findManySkills`, `createOneSkill`, etc. Check `src/schema.gql` for exact names.
 

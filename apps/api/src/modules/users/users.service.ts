@@ -6,14 +6,12 @@ import {
 import { InjectModel } from "@nestjs/mongoose";
 import { hash } from "bcryptjs";
 import { isNil } from "lodash";
-import {
-  isValidObjectId,
-  Model,
-  QueryFilter,
-  SortOrder,
-  UpdateQuery,
-} from "mongoose";
+import { Model, QueryFilter, SortOrder, UpdateQuery } from "mongoose";
 import { clearObject } from "@/common/helpers/object.helper";
+import {
+  assertValidObjectId,
+  assertValidObjectIds,
+} from "@/common/helpers/object-id.helper";
 import { BatchEntity } from "@/core/entities/batch.entity";
 import { PaginatedModel } from "@/core/schemas/paginated.schema";
 import { UserModel } from "@/modules/users/schemas/user.schema";
@@ -27,7 +25,9 @@ export class UsersService {
   ) {}
 
   async findOneById(id: string): Promise<UserModel> {
-    const res = await this.userModel.findById(id).select("+password").exec();
+    assertValidObjectId(id);
+
+    const res = await this.userModel.findById(id).exec();
 
     if (isNil(res)) throw new NotFoundException("Not Found");
     return res;
@@ -40,6 +40,15 @@ export class UsersService {
   }): Promise<UserModel> {
     const res = await this.userModel
       .findOne(clearObject(filters) as QueryFilter<UserModel>)
+      .exec();
+
+    if (isNil(res)) throw new NotFoundException("Not Found");
+    return res;
+  }
+
+  async findOneByEmailWithPassword(email: string): Promise<UserModel> {
+    const res = await this.userModel
+      .findOne({ email })
       .select("+password")
       .exec();
 
@@ -48,8 +57,7 @@ export class UsersService {
   }
 
   async findManyById(ids: string[]): Promise<UserModel[]> {
-    if (ids.some((id) => !isValidObjectId(id)))
-      throw new BadRequestException("Invalid ID");
+    assertValidObjectIds(ids);
 
     const res = await this.userModel
       .find({ _id: { $in: ids } } as QueryFilter<UserModel>)
@@ -121,7 +129,7 @@ export class UsersService {
     id: string,
     updateInput: UpdateUserInput
   ): Promise<UserModel> {
-    if (!isValidObjectId(id)) throw new BadRequestException("Invalid ID");
+    assertValidObjectId(id);
 
     const res = await this.userModel
       .findByIdAndUpdate(id, updateInput as object as UpdateQuery<UserModel>)
@@ -135,8 +143,7 @@ export class UsersService {
     ids: string[],
     updateInput: UpdateUserInput
   ): Promise<BatchEntity> {
-    if (ids.some((id) => !isValidObjectId(id)))
-      throw new BadRequestException("Invalid ID");
+    assertValidObjectIds(ids);
 
     const res = await this.userModel
       .updateMany(
@@ -150,7 +157,7 @@ export class UsersService {
   }
 
   async removeOne(id: string): Promise<UserModel> {
-    if (!isValidObjectId(id)) throw new BadRequestException("Invalid ID");
+    assertValidObjectId(id);
 
     const res = await this.userModel.findByIdAndDelete(id).exec();
 
@@ -159,8 +166,7 @@ export class UsersService {
   }
 
   async removeMany(ids: string[]): Promise<BatchEntity> {
-    if (ids.some((id) => !isValidObjectId(id)))
-      throw new BadRequestException("Invalid ID");
+    assertValidObjectIds(ids);
 
     const res = await this.userModel
       .deleteMany({ _id: { $in: ids } } as QueryFilter<UserModel>)

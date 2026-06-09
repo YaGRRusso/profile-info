@@ -6,22 +6,19 @@ import {
 import { EventEmitter2 } from "@nestjs/event-emitter";
 import { InjectModel } from "@nestjs/mongoose";
 import { isNil } from "lodash";
-import {
-  AnyKeys,
-  isValidObjectId,
-  Model,
-  QueryFilter,
-  SortOrder,
-  UpdateQuery,
-} from "mongoose";
+import { AnyKeys, Model, QueryFilter, SortOrder, UpdateQuery } from "mongoose";
 import { clearObject } from "@/common/helpers/object.helper";
+import {
+  assertValidObjectId,
+  assertValidObjectIds,
+} from "@/common/helpers/object-id.helper";
 import { BatchEntity } from "@/core/entities/batch.entity";
 import { DomainEvents } from "@/core/events/domain-events";
+import { OrganizationDeletedEvent } from "@/core/events/organization-deleted.event";
 import { PaginatedModel } from "@/core/schemas/paginated.schema";
 import { OrganizationModel } from "@/modules/organizations/schemas/organization.schema";
 import { CreateOrganizationInput } from "./dto/create-organization.input";
 import { UpdateOrganizationInput } from "./dto/update-organization.input";
-import { OrganizationDeletedEvent } from "./events/organization-deleted.event";
 
 @Injectable()
 export class OrganizationsService {
@@ -32,7 +29,7 @@ export class OrganizationsService {
   ) {}
 
   async findOneById(id: string): Promise<OrganizationModel> {
-    if (!isValidObjectId(id)) throw new BadRequestException("Invalid ID");
+    assertValidObjectId(id);
 
     const res = await this.organizationModel.findById(id).exec();
 
@@ -54,8 +51,7 @@ export class OrganizationsService {
   }
 
   async findManyById(ids: string[]): Promise<OrganizationModel[]> {
-    if (ids.some((id) => !isValidObjectId(id)))
-      throw new BadRequestException("Invalid ID");
+    assertValidObjectIds(ids);
 
     const res = await this.organizationModel
       .find({ _id: { $in: ids } } as QueryFilter<OrganizationModel>)
@@ -120,7 +116,7 @@ export class OrganizationsService {
     id: string,
     updateInput: UpdateOrganizationInput
   ): Promise<OrganizationModel> {
-    if (!isValidObjectId(id)) throw new BadRequestException("Invalid ID");
+    assertValidObjectId(id);
 
     const res = await this.organizationModel
       .findByIdAndUpdate(
@@ -137,8 +133,7 @@ export class OrganizationsService {
     ids: string[],
     updateInput: UpdateOrganizationInput
   ): Promise<BatchEntity> {
-    if (ids.some((id) => !isValidObjectId(id)))
-      throw new BadRequestException("Invalid ID");
+    assertValidObjectIds(ids);
 
     const res = await this.organizationModel
       .updateMany(
@@ -152,7 +147,7 @@ export class OrganizationsService {
   }
 
   async removeOne(id: string): Promise<OrganizationModel> {
-    if (!isValidObjectId(id)) throw new BadRequestException("Invalid ID");
+    assertValidObjectId(id);
 
     const res = await this.organizationModel.findById(id).exec();
 
@@ -168,8 +163,7 @@ export class OrganizationsService {
   }
 
   async removeMany(ids: string[]): Promise<BatchEntity> {
-    if (ids.some((id) => !isValidObjectId(id)))
-      throw new BadRequestException("Invalid ID");
+    assertValidObjectIds(ids);
 
     const organizations = await this.organizationModel
       .find({ _id: { $in: ids } } as QueryFilter<OrganizationModel>)

@@ -1,7 +1,8 @@
-import { UnauthorizedException } from "@nestjs/common";
+import { NotFoundException, UnauthorizedException } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
 import { Test, TestingModule } from "@nestjs/testing";
 import { compare } from "bcryptjs";
+import { UserRole } from "@/core/enums/user-role.enum";
 import { UsersService } from "@/modules/users/users.service";
 import { AuthService } from "./auth.service";
 
@@ -13,11 +14,11 @@ const mockUser = {
   id: "user-id-123",
   email: "user@example.com",
   password: "hashed-password",
-  role: "USER",
+  role: UserRole.USER,
 };
 
 const mockUsersService: Partial<jest.Mocked<UsersService>> = {
-  findOne: jest.fn(),
+  findOneByEmailWithPassword: jest.fn(),
 };
 
 const mockJwtService: Partial<jest.Mocked<JwtService>> = {
@@ -53,16 +54,18 @@ describe("AuthService", () => {
     const credentials = { email: "user@example.com", password: "plain-pass" };
 
     it("should return a JWT token when credentials are valid", async () => {
-      (mockUsersService.findOne as jest.Mock).mockResolvedValue(mockUser);
+      (
+        mockUsersService.findOneByEmailWithPassword as jest.Mock
+      ).mockResolvedValue(mockUser);
       (compare as jest.Mock).mockResolvedValue(true);
       (mockJwtService.signAsync as jest.Mock).mockResolvedValue("jwt-token");
 
       const token = await service.signIn(credentials);
 
       expect(token).toBe("jwt-token");
-      expect(mockUsersService.findOne).toHaveBeenCalledWith({
-        filters: { email: credentials.email },
-      });
+      expect(mockUsersService.findOneByEmailWithPassword).toHaveBeenCalledWith(
+        credentials.email
+      );
       expect(compare).toHaveBeenCalledWith(
         credentials.password,
         mockUser.password
@@ -74,7 +77,9 @@ describe("AuthService", () => {
     });
 
     it("should throw UnauthorizedException when password does not match", async () => {
-      (mockUsersService.findOne as jest.Mock).mockResolvedValue(mockUser);
+      (
+        mockUsersService.findOneByEmailWithPassword as jest.Mock
+      ).mockResolvedValue(mockUser);
       (compare as jest.Mock).mockResolvedValue(false);
 
       await expect(service.signIn(credentials)).rejects.toThrow(
@@ -82,11 +87,13 @@ describe("AuthService", () => {
       );
     });
 
-    it("should throw UnauthorizedException when user is not found", async () => {
-      (mockUsersService.findOne as jest.Mock).mockResolvedValue(null);
+    it("should throw NotFoundException when user is not found", async () => {
+      (
+        mockUsersService.findOneByEmailWithPassword as jest.Mock
+      ).mockRejectedValue(new NotFoundException());
 
       await expect(service.signIn(credentials)).rejects.toThrow(
-        UnauthorizedException
+        NotFoundException
       );
     });
   });

@@ -1,5 +1,6 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import type { HydratedDocument } from "mongoose";
+import { UserRole } from "@/core/enums/user-role.enum";
 import { BaseModel } from "@/core/schemas/base.schema";
 import { UrlModel } from "@/core/schemas/url.schema";
 
@@ -32,8 +33,8 @@ export class UserModel extends BaseModel {
   @Prop({ type: String })
   address?: string;
 
-  @Prop({ type: String, default: "USER" })
-  role?: string;
+  @Prop({ type: String, enum: UserRole, default: UserRole.USER })
+  role?: UserRole;
 
   @Prop({ type: [{ type: SchemaFactory.createForClass(UrlModel) }] })
   urls?: UrlModel[];

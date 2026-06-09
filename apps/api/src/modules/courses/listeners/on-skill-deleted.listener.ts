@@ -1,22 +1,15 @@
 import { Injectable } from "@nestjs/common";
 import { OnEvent } from "@nestjs/event-emitter";
-import { InjectModel } from "@nestjs/mongoose";
-import { Model } from "mongoose";
 import { DomainEvents } from "@/core/events/domain-events";
-import { CourseModel } from "@/modules/courses/schemas/course.schema";
-import { SkillDeletedEvent } from "@/modules/skills/events/skill-deleted.event";
+import { SkillDeletedEvent } from "@/core/events/skill-deleted.event";
+import { CoursesService } from "@/modules/courses/courses.service";
 
 @Injectable()
 export class OnSkillDeletedListener {
-  constructor(
-    @InjectModel(CourseModel.name)
-    private readonly courseModel: Model<CourseModel>
-  ) {}
+  constructor(private readonly coursesService: CoursesService) {}
 
   @OnEvent(DomainEvents.skill.deleted)
   async handle({ skillId }: SkillDeletedEvent) {
-    await this.courseModel
-      .updateMany({ skills: skillId }, { $pull: { skills: skillId } })
-      .exec();
+    await this.coursesService.detachSkill(skillId);
   }
 }

@@ -5,15 +5,12 @@ import {
 } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import { isNil } from "lodash";
-import {
-  AnyKeys,
-  isValidObjectId,
-  Model,
-  QueryFilter,
-  SortOrder,
-  UpdateQuery,
-} from "mongoose";
+import { AnyKeys, Model, QueryFilter, SortOrder, UpdateQuery } from "mongoose";
 import { clearObject } from "@/common/helpers/object.helper";
+import {
+  assertValidObjectId,
+  assertValidObjectIds,
+} from "@/common/helpers/object-id.helper";
 import { BatchEntity } from "@/core/entities/batch.entity";
 import { PaginatedModel } from "@/core/schemas/paginated.schema";
 import { CourseModel } from "@/modules/courses/schemas/course.schema";
@@ -27,7 +24,7 @@ export class CoursesService {
   ) {}
 
   async findOneById(id: string): Promise<CourseModel> {
-    if (!isValidObjectId(id)) throw new BadRequestException("Invalid ID");
+    assertValidObjectId(id);
 
     const res = await this.courseModel.findById(id).exec();
 
@@ -49,8 +46,7 @@ export class CoursesService {
   }
 
   async findManyById(ids: string[]): Promise<CourseModel[]> {
-    if (ids.some((id) => !isValidObjectId(id)))
-      throw new BadRequestException("Invalid ID");
+    assertValidObjectIds(ids);
 
     const res = await this.courseModel
       .find({ _id: { $in: ids } } as QueryFilter<CourseModel>)
@@ -111,7 +107,7 @@ export class CoursesService {
     id: string,
     updateInput: UpdateCourseInput
   ): Promise<CourseModel> {
-    if (!isValidObjectId(id)) throw new BadRequestException("Invalid ID");
+    assertValidObjectId(id);
 
     const res = await this.courseModel
       .findByIdAndUpdate(id, updateInput as object as UpdateQuery<CourseModel>)
@@ -125,8 +121,7 @@ export class CoursesService {
     ids: string[],
     updateInput: UpdateCourseInput
   ): Promise<BatchEntity> {
-    if (ids.some((id) => !isValidObjectId(id)))
-      throw new BadRequestException("Invalid ID");
+    assertValidObjectIds(ids);
 
     const res = await this.courseModel
       .updateMany(
@@ -140,7 +135,7 @@ export class CoursesService {
   }
 
   async removeOne(id: string): Promise<CourseModel> {
-    if (!isValidObjectId(id)) throw new BadRequestException("Invalid ID");
+    assertValidObjectId(id);
 
     const res = await this.courseModel.findByIdAndDelete(id).exec();
 
@@ -149,8 +144,7 @@ export class CoursesService {
   }
 
   async removeMany(ids: string[]): Promise<BatchEntity> {
-    if (ids.some((id) => !isValidObjectId(id)))
-      throw new BadRequestException("Invalid ID");
+    assertValidObjectIds(ids);
 
     const res = await this.courseModel
       .deleteMany({ _id: { $in: ids } } as QueryFilter<CourseModel>)
@@ -175,5 +169,15 @@ export class CoursesService {
       { $sort: { value: -1 } },
     ]);
     return rows.map((row) => ({ label: row._id, value: row.value }));
+  }
+
+  async detachSkill(skillId: string): Promise<void> {
+    await this.courseModel
+      .updateMany({ skills: skillId }, { $pull: { skills: skillId } })
+      .exec();
+  }
+
+  async purgeByOrganization(organizationId: string): Promise<void> {
+    await this.courseModel.deleteMany({ organization: organizationId }).exec();
   }
 }

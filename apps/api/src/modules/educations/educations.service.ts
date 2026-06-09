@@ -5,15 +5,12 @@ import {
 } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import { isNil } from "lodash";
-import {
-  AnyKeys,
-  isValidObjectId,
-  Model,
-  QueryFilter,
-  SortOrder,
-  UpdateQuery,
-} from "mongoose";
+import { AnyKeys, Model, QueryFilter, SortOrder, UpdateQuery } from "mongoose";
 import { clearObject } from "@/common/helpers/object.helper";
+import {
+  assertValidObjectId,
+  assertValidObjectIds,
+} from "@/common/helpers/object-id.helper";
 import { BatchEntity } from "@/core/entities/batch.entity";
 import { PaginatedModel } from "@/core/schemas/paginated.schema";
 import { EducationModel } from "@/modules/educations/schemas/education.schema";
@@ -28,7 +25,7 @@ export class EducationsService {
   ) {}
 
   async findOneById(id: string): Promise<EducationModel> {
-    if (!isValidObjectId(id)) throw new BadRequestException("Invalid ID");
+    assertValidObjectId(id);
 
     const res = await this.educationModel.findById(id).exec();
 
@@ -50,8 +47,7 @@ export class EducationsService {
   }
 
   async findManyById(ids: string[]): Promise<EducationModel[]> {
-    if (ids.some((id) => !isValidObjectId(id)))
-      throw new BadRequestException("Invalid ID");
+    assertValidObjectIds(ids);
 
     const res = await this.educationModel
       .find({ _id: { $in: ids } } as QueryFilter<EducationModel>)
@@ -114,7 +110,7 @@ export class EducationsService {
     id: string,
     updateInput: UpdateEducationInput
   ): Promise<EducationModel> {
-    if (!isValidObjectId(id)) throw new BadRequestException("Invalid ID");
+    assertValidObjectId(id);
 
     const res = await this.educationModel
       .findByIdAndUpdate(
@@ -131,8 +127,7 @@ export class EducationsService {
     ids: string[],
     updateInput: UpdateEducationInput
   ): Promise<BatchEntity> {
-    if (ids.some((id) => !isValidObjectId(id)))
-      throw new BadRequestException("Invalid ID");
+    assertValidObjectIds(ids);
 
     const res = await this.educationModel
       .updateMany(
@@ -146,7 +141,7 @@ export class EducationsService {
   }
 
   async removeOne(id: string): Promise<EducationModel> {
-    if (!isValidObjectId(id)) throw new BadRequestException("Invalid ID");
+    assertValidObjectId(id);
 
     const res = await this.educationModel.findByIdAndDelete(id).exec();
 
@@ -155,8 +150,7 @@ export class EducationsService {
   }
 
   async removeMany(ids: string[]): Promise<BatchEntity> {
-    if (ids.some((id) => !isValidObjectId(id)))
-      throw new BadRequestException("Invalid ID");
+    assertValidObjectIds(ids);
 
     const res = await this.educationModel
       .deleteMany({ _id: { $in: ids } } as QueryFilter<EducationModel>)
@@ -168,5 +162,17 @@ export class EducationsService {
 
   async count(): Promise<number> {
     return await this.educationModel.countDocuments().exec();
+  }
+
+  async detachSkill(skillId: string): Promise<void> {
+    await this.educationModel
+      .updateMany({ skills: skillId }, { $pull: { skills: skillId } })
+      .exec();
+  }
+
+  async purgeByOrganization(organizationId: string): Promise<void> {
+    await this.educationModel
+      .deleteMany({ organization: organizationId })
+      .exec();
   }
 }

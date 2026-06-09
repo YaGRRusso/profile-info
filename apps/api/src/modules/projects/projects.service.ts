@@ -5,15 +5,12 @@ import {
 } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import { isNil } from "lodash";
-import {
-  AnyKeys,
-  isValidObjectId,
-  Model,
-  QueryFilter,
-  SortOrder,
-  UpdateQuery,
-} from "mongoose";
+import { AnyKeys, Model, QueryFilter, SortOrder, UpdateQuery } from "mongoose";
 import { clearObject } from "@/common/helpers/object.helper";
+import {
+  assertValidObjectId,
+  assertValidObjectIds,
+} from "@/common/helpers/object-id.helper";
 import { BatchEntity } from "@/core/entities/batch.entity";
 import { PaginatedModel } from "@/core/schemas/paginated.schema";
 import { ProjectModel } from "@/modules/projects/schemas/project.schema";
@@ -27,7 +24,7 @@ export class ProjectsService {
   ) {}
 
   async findOneById(id: string): Promise<ProjectModel> {
-    if (!isValidObjectId(id)) throw new BadRequestException("Invalid ID");
+    assertValidObjectId(id);
 
     const res = await this.projectModel.findById(id).exec();
 
@@ -49,8 +46,7 @@ export class ProjectsService {
   }
 
   async findManyById(ids: string[]): Promise<ProjectModel[]> {
-    if (ids.some((id) => !isValidObjectId(id)))
-      throw new BadRequestException("Invalid ID");
+    assertValidObjectIds(ids);
 
     const res = await this.projectModel
       .find({ _id: { $in: ids } } as QueryFilter<ProjectModel>)
@@ -113,7 +109,7 @@ export class ProjectsService {
     id: string,
     updateInput: UpdateProjectInput
   ): Promise<ProjectModel> {
-    if (!isValidObjectId(id)) throw new BadRequestException("Invalid ID");
+    assertValidObjectId(id);
 
     const res = await this.projectModel
       .findByIdAndUpdate(id, updateInput as object as UpdateQuery<ProjectModel>)
@@ -127,8 +123,7 @@ export class ProjectsService {
     ids: string[],
     updateInput: UpdateProjectInput
   ): Promise<BatchEntity> {
-    if (ids.some((id) => !isValidObjectId(id)))
-      throw new BadRequestException("Invalid ID");
+    assertValidObjectIds(ids);
 
     const res = await this.projectModel
       .updateMany(
@@ -142,7 +137,7 @@ export class ProjectsService {
   }
 
   async removeOne(id: string): Promise<ProjectModel> {
-    if (!isValidObjectId(id)) throw new BadRequestException("Invalid ID");
+    assertValidObjectId(id);
 
     const res = await this.projectModel.findByIdAndDelete(id).exec();
 
@@ -151,8 +146,7 @@ export class ProjectsService {
   }
 
   async removeMany(ids: string[]): Promise<BatchEntity> {
-    if (ids.some((id) => !isValidObjectId(id)))
-      throw new BadRequestException("Invalid ID");
+    assertValidObjectIds(ids);
 
     const res = await this.projectModel
       .deleteMany({ _id: { $in: ids } } as QueryFilter<ProjectModel>)
@@ -164,5 +158,11 @@ export class ProjectsService {
 
   async count(): Promise<number> {
     return await this.projectModel.countDocuments().exec();
+  }
+
+  async detachSkill(skillId: string): Promise<void> {
+    await this.projectModel
+      .updateMany({ skills: skillId }, { $pull: { skills: skillId } })
+      .exec();
   }
 }

@@ -5,15 +5,12 @@ import {
 } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import { isNil } from "lodash";
-import {
-  AnyKeys,
-  isValidObjectId,
-  Model,
-  QueryFilter,
-  SortOrder,
-  UpdateQuery,
-} from "mongoose";
+import { AnyKeys, Model, QueryFilter, SortOrder, UpdateQuery } from "mongoose";
 import { clearObject } from "@/common/helpers/object.helper";
+import {
+  assertValidObjectId,
+  assertValidObjectIds,
+} from "@/common/helpers/object-id.helper";
 import { BatchEntity } from "@/core/entities/batch.entity";
 import { PaginatedModel } from "@/core/schemas/paginated.schema";
 import { ExperienceModel } from "@/modules/experiences/schemas/experience.schema";
@@ -28,7 +25,7 @@ export class ExperiencesService {
   ) {}
 
   async findOneById(id: string): Promise<ExperienceModel> {
-    if (!isValidObjectId(id)) throw new BadRequestException("Invalid ID");
+    assertValidObjectId(id);
 
     const res = await this.experienceModel.findById(id).exec();
 
@@ -50,8 +47,7 @@ export class ExperiencesService {
   }
 
   async findManyById(ids: string[]): Promise<ExperienceModel[]> {
-    if (ids.some((id) => !isValidObjectId(id)))
-      throw new BadRequestException("Invalid ID");
+    assertValidObjectIds(ids);
 
     const res = await this.experienceModel
       .find({ _id: { $in: ids } } as QueryFilter<ExperienceModel>)
@@ -116,7 +112,7 @@ export class ExperiencesService {
     id: string,
     updateInput: UpdateExperienceInput
   ): Promise<ExperienceModel> {
-    if (!isValidObjectId(id)) throw new BadRequestException("Invalid ID");
+    assertValidObjectId(id);
 
     const res = await this.experienceModel
       .findByIdAndUpdate(
@@ -133,8 +129,7 @@ export class ExperiencesService {
     ids: string[],
     updateInput: UpdateExperienceInput
   ): Promise<BatchEntity> {
-    if (ids.some((id) => !isValidObjectId(id)))
-      throw new BadRequestException("Invalid ID");
+    assertValidObjectIds(ids);
 
     const res = await this.experienceModel
       .updateMany(
@@ -148,7 +143,7 @@ export class ExperiencesService {
   }
 
   async removeOne(id: string): Promise<ExperienceModel> {
-    if (!isValidObjectId(id)) throw new BadRequestException("Invalid ID");
+    assertValidObjectId(id);
 
     const res = await this.experienceModel.findByIdAndDelete(id).exec();
 
@@ -157,8 +152,7 @@ export class ExperiencesService {
   }
 
   async removeMany(ids: string[]): Promise<BatchEntity> {
-    if (ids.some((id) => !isValidObjectId(id)))
-      throw new BadRequestException("Invalid ID");
+    assertValidObjectIds(ids);
 
     const res = await this.experienceModel
       .deleteMany({ _id: { $in: ids } } as QueryFilter<ExperienceModel>)
@@ -183,5 +177,21 @@ export class ExperiencesService {
       { $sort: { value: -1 } },
     ]);
     return rows.map((row) => ({ label: row._id, value: row.value }));
+  }
+
+  async detachSkill(skillId: string): Promise<void> {
+    await this.experienceModel
+      .updateMany(
+        { "roles.skills": skillId },
+        { $pull: { "roles.$[roleElem].skills": skillId } },
+        { arrayFilters: [{ "roleElem.skills": skillId }] }
+      )
+      .exec();
+  }
+
+  async purgeByOrganization(organizationId: string): Promise<void> {
+    await this.experienceModel
+      .deleteMany({ organization: organizationId })
+      .exec();
   }
 }

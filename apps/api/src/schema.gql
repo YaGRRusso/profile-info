@@ -186,6 +186,7 @@ input CreateUserInput {
   nickname: String!
   password: String!
   phone: String
+  role: UserRole
   title: String
   urls: [UrlInput!]
 }
@@ -376,6 +377,7 @@ input FilterUserInput {
   nickname: String
   password: String
   phone: String
+  role: UserRole
   title: String
   urls: [UrlInput!]
 }
@@ -728,6 +730,7 @@ input UpdateUserInput {
   nickname: String
   password: String
   phone: String
+  role: UserRole
   title: String
   urls: [UrlInput!]
 }
@@ -759,8 +762,13 @@ type UserEntity {
   name: String!
   nickname: String!
   phone: String
-  role: String!
+  role: UserRole!
   title: String
   updatedAt: DateTime!
   urls: [UrlEntity!]
+}
+
+enum UserRole {
+  ADMIN
+  USER
 }

@@ -63,16 +63,22 @@ describe("UsersService", () => {
   });
 
   // ------------------------------------------------------------------ //
-  // findOneById (overridden — selects +password)
+  // findOneById
   // ------------------------------------------------------------------ //
 
   describe("findOneById", () => {
-    it("should return the user with password selected", async () => {
+    it("should return the user without password", async () => {
       (model.findById as jest.Mock).mockReturnValue(makeExec(fakeUser));
 
       const result = await service.findOneById(validId);
       expect(result).toBe(fakeUser);
       expect(model.findById).toHaveBeenCalledWith(validId);
+    });
+
+    it("should throw BadRequestException for invalid id", async () => {
+      await expect(service.findOneById("invalid")).rejects.toThrow(
+        BadRequestException
+      );
     });
 
     it("should throw NotFoundException when user is not found", async () => {
@@ -85,11 +91,11 @@ describe("UsersService", () => {
   });
 
   // ------------------------------------------------------------------ //
-  // findOne (overridden — selects +password)
+  // findOne
   // ------------------------------------------------------------------ //
 
   describe("findOne", () => {
-    it("should return the user matching filters with password selected", async () => {
+    it("should return the user matching filters", async () => {
       (model.findOne as jest.Mock).mockReturnValue(makeExec(fakeUser));
 
       const result = await service.findOne({
@@ -102,6 +108,30 @@ describe("UsersService", () => {
       (model.findOne as jest.Mock).mockReturnValue(makeExec(null));
 
       await expect(service.findOne({})).rejects.toThrow(NotFoundException);
+    });
+  });
+
+  // ------------------------------------------------------------------ //
+  // findOneByEmailWithPassword
+  // ------------------------------------------------------------------ //
+
+  describe("findOneByEmailWithPassword", () => {
+    it("should return the user with password selected", async () => {
+      (model.findOne as jest.Mock).mockReturnValue(makeExec(fakeUser));
+
+      const result =
+        await service.findOneByEmailWithPassword("john@example.com");
+
+      expect(result).toBe(fakeUser);
+      expect(model.findOne).toHaveBeenCalledWith({ email: "john@example.com" });
+    });
+
+    it("should throw NotFoundException when user is not found", async () => {
+      (model.findOne as jest.Mock).mockReturnValue(makeExec(null));
+
+      await expect(
+        service.findOneByEmailWithPassword("missing@example.com")
+      ).rejects.toThrow(NotFoundException);
     });
   });
 

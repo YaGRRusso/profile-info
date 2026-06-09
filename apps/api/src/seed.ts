@@ -4,6 +4,7 @@ import { getModelToken } from "@nestjs/mongoose";
 import { hash } from "bcryptjs";
 import type { Model } from "mongoose";
 import { AppModule } from "./app.module";
+import { UserRole } from "./core/enums/user-role.enum";
 import { CourseModel } from "./modules/courses/schemas/course.schema";
 import { EducationModel } from "./modules/educations/schemas/education.schema";
 import { ExperienceModel } from "./modules/experiences/schemas/experience.schema";
@@ -224,7 +225,7 @@ async function seed() {
     nickname: "admin",
     email: "admin@profile.info",
     password: await hash("pass.123", 8),
-    role: "ADMIN",
+    role: UserRole.ADMIN,
   });
 
   const counts = {

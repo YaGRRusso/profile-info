@@ -208,6 +208,7 @@ export type CreateUserInput = {
   nickname: Scalars['String']['input'];
   password: Scalars['String']['input'];
   phone?: InputMaybe<Scalars['String']['input']>;
+  role?: InputMaybe<UserRole>;
   title?: InputMaybe<Scalars['String']['input']>;
   urls?: InputMaybe<Array<UrlInput>>;
 };
@@ -404,6 +405,7 @@ export type FilterUserInput = {
   nickname?: InputMaybe<Scalars['String']['input']>;
   password?: InputMaybe<Scalars['String']['input']>;
   phone?: InputMaybe<Scalars['String']['input']>;
+  role?: InputMaybe<UserRole>;
   title?: InputMaybe<Scalars['String']['input']>;
   urls?: InputMaybe<Array<UrlInput>>;
 };
@@ -1171,6 +1173,7 @@ export type UpdateUserInput = {
   nickname?: InputMaybe<Scalars['String']['input']>;
   password?: InputMaybe<Scalars['String']['input']>;
   phone?: InputMaybe<Scalars['String']['input']>;
+  role?: InputMaybe<UserRole>;
   title?: InputMaybe<Scalars['String']['input']>;
   urls?: InputMaybe<Array<UrlInput>>;
 };
@@ -1205,11 +1208,16 @@ export type UserEntity = {
   name: Scalars['String']['output'];
   nickname: Scalars['String']['output'];
   phone?: Maybe<Scalars['String']['output']>;
-  role: Scalars['String']['output'];
+  role: UserRole;
   title?: Maybe<Scalars['String']['output']>;
   updatedAt: Scalars['DateTime']['output'];
   urls?: Maybe<Array<UrlEntity>>;
 };
+
+export enum UserRole {
+  Admin = 'ADMIN',
+  User = 'USER'
+}
 
 export type AtsSummarizeMutationVariables = Exact<{
   atsSummarizeInput: AtsSummarizeInput;
@@ -1464,7 +1472,7 @@ export type RemoveManySkillsMutation = { __typename?: 'Mutation', removeManySkil
 export type GetMeQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetMeQuery = { __typename?: 'Query', getMe: { __typename?: 'UserEntity', id: string, email: string, name: string, nickname: string, role: string, title?: string | null, avatar?: string | null } };
+export type GetMeQuery = { __typename?: 'Query', getMe: { __typename?: 'UserEntity', id: string, email: string, name: string, nickname: string, role: UserRole, title?: string | null, avatar?: string | null } };
 
 export type ApiStatusQueryVariables = Exact<{ [key: string]: never; }>;
 

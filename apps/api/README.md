@@ -31,7 +31,7 @@ The source is organized as a modular monolith with a strict dependency rule:
 - `modules` import `common`, `core`, and integration **modules** for DI wiring; services inject the abstract **port** by type (no `Symbol`, no `@Inject()`).
 
 - `common/` — generic, framework-agnostic TypeScript primitives (helpers, the task orchestrator). No integration contracts.
-- `core/` — cross-cutting NestJS infrastructure (configs, shared GraphQL inputs/entities, decorators).
+- `core/` — cross-cutting NestJS infrastructure (configs, shared GraphQL inputs/entities, decorators, domain event payloads, `UserRole` enum).
 - `integrations/` — adapters that own their capability port and map external APIs to neutral contracts. `ai/` is a capability boundary (port + types) with vendors nested under it (`ai/open-router/`); `github/` and `tavily/` are flat.
 - `modules/` — business domains (CRUD entities, auth, dashboard, AI tools, GraphQL loaders).
 
@@ -51,7 +51,8 @@ src/
 │   ├── entities/             # BaseEntity and shared GraphQL object types.
 │   ├── inputs/               # Pagination, sort, date-range, translation, url inputs.
 │   ├── decorators/           # @Public, @OptionalField.
-│   ├── events/domain-events.ts     # Domain event name constants.
+│   ├── events/                     # Domain event names + neutral payload classes.
+│   ├── enums/user-role.enum.ts     # Shared UserRole enum.
 │   └── configs/              # app.config (port/host/CORS), validation.config.
 ├── integrations/             # Adapters; each owns its port (abstract class) + neutral types.
 │   ├── ai/                   # AI capability boundary: AiProvider port + ai.types.
@@ -59,7 +60,7 @@ src/
 │   ├── github/               # RepositoryMetadataProvider port; GithubService implements it.
 │   └── tavily/               # WebContentProvider port; TavilyService implements it.
 └── modules/                  # Business domains.
-    ├── graphql/              # DataLoaders + GraphQL context (Ctx).
+    ├── graphql/              # GraphqlModule, DataLoaders, GraphQL context (Ctx).
     ├── ai-tools/             # AI use-cases; owns AiEntity; injects the abstract ports.
     ├── auth/                 # JWT auth: signIn (public), getMe, global guard, @CurrentUser.
     ├── dashboard/            # Read-only aggregation via feature services.
@@ -70,7 +71,7 @@ src/
     │   ├── entities/skill.entity.ts# GraphQL ObjectType.
     │   ├── enums/category.enum.ts  # SkillCategory.
     │   └── dto/                    # create / update / filter / sort inputs.
-    ├── users/                # Users; service hashes passwords (bcryptjs).
+    ├── users/                # Users; hashes passwords; auth uses findOneByEmailWithPassword.
     ├── experiences/          # Work experience; @ResolveField uses DataLoaders.
     ├── educations/           # Education history.
     ├── organizations/        # Organizations referenced by experiences/educations.

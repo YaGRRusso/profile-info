@@ -3,7 +3,7 @@ import { Public } from "@/core/decorators/public-route.decorator";
 import { BatchEntity } from "@/core/entities/batch.entity";
 import { PaginationInput } from "@/core/inputs/pagination.input";
 import { CreateSkillInput } from "./dto/create-skill.input";
-import { FilterSkillInput } from "./dto/filter-skill-input";
+import { FilterSkillInput } from "./dto/filter-skill.input";
 import { SortSkillInput } from "./dto/sort-skill.input";
 import { UpdateSkillInput } from "./dto/update-skill.input";
 import { PaginatedSkillEntity, SkillEntity } from "./entities/skill.entity";
