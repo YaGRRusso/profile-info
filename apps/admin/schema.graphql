@@ -27,6 +27,14 @@ enum ChatFinishReason {
   TOOL_CALLS
 }
 
+enum ChatRole {
+  ASSISTANT
+  DEVELOPER
+  SYSTEM
+  TOOL
+  USER
+}
+
 type ChoiceEntity {
   finishReason: ChatFinishReason
   message: MessageEntity!
@@ -387,7 +395,7 @@ type MessageEntity {
   content: String!
   reasoning: String
   refusal: String
-  role: OpenRouterRole!
+  role: ChatRole!
 }
 
 type Mutation {
@@ -437,14 +445,6 @@ type Mutation {
   updateOneProject(projectId: ID!, updateProjectInput: UpdateProjectInput!): ProjectEntity!
   updateOneSkill(skillId: ID!, updateSkillInput: UpdateSkillInput!): SkillEntity!
   updateOneUser(updateUserInput: UpdateUserInput!, userId: ID!): UserEntity!
-}
-
-enum OpenRouterRole {
-  ASSISTANT
-  DEVELOPER
-  SYSTEM
-  TOOL
-  USER
 }
 
 enum OrganizationCategory {

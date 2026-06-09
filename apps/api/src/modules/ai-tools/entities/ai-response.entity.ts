@@ -1,6 +1,6 @@
 import { Field, ObjectType } from "@nestjs/graphql";
 import { OptionalField } from "@/core/decorators/optional-field.decorator";
-import { OpenRouterRole } from "../enums/chat-role.enum";
+import { ChatRole } from "../enums/chat-role.enum";
 import { ChatFinishReason } from "../enums/finish-reason.enum";
 
 @ObjectType()
@@ -20,8 +20,8 @@ class UsageEntity {
 
 @ObjectType()
 class MessageEntity {
-  @Field(() => OpenRouterRole)
-  role: OpenRouterRole;
+  @Field(() => ChatRole)
+  role: ChatRole;
 
   @Field(() => String)
   content: string;

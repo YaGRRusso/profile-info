@@ -6,6 +6,7 @@ import {
 } from "@/modules/organizations/schemas/organization.schema";
 import { OrganizationsResolver } from "./organizations.resolver";
 import { OrganizationsService } from "./organizations.service";
+import { OrganizationsLoaderService } from "./organizations-loader.service";
 
 @Module({
   imports: [
@@ -13,7 +14,11 @@ import { OrganizationsService } from "./organizations.service";
       { name: OrganizationModel.name, schema: OrganizationSchema },
     ]),
   ],
-  providers: [OrganizationsResolver, OrganizationsService],
-  exports: [OrganizationsService],
+  providers: [
+    OrganizationsResolver,
+    OrganizationsService,
+    OrganizationsLoaderService,
+  ],
+  exports: [OrganizationsService, OrganizationsLoaderService],
 })
 export class OrganizationsModule {}

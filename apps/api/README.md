@@ -7,75 +7,89 @@ by the `@profile-info/admin` dashboard.
 
 ## Tech stack
 
-- **NestJS 11**: the application framework. Modules, resolvers, services, and DI
-  throughout `src/`.
-- **Apollo GraphQL (code-first)**: `@nestjs/graphql` + `@nestjs/apollo` in
-  `app.module.ts`. The schema is generated from TypeScript decorators to
-  `src/schema.gql`.
-- **MongoDB + Mongoose**: `@nestjs/mongoose`, ODM schemas co-located in
-  `src/modules/<name>/schemas/`, connection configured in `app.module.ts`.
-- **Passport JWT**: `src/modules/auth/`, a global guard with a `@Public()` opt-out.
-- **class-validator / class-transformer**: input validation on GraphQL inputs via
-  a global `ValidationPipe`.
-- **DataLoader**: `src/modules/graphql/loaders.helper.ts`, batches skill and
-  organization lookups to avoid N+1 queries on nested fields.
+- **NestJS 11**: modules, resolvers, services, DI.
+- **Apollo GraphQL (code-first)**: schema generated to `src/schema.gql`.
+- **MongoDB + Mongoose**: ODM schemas in `src/modules/<name>/schemas/`.
+- **Passport JWT**: global guard with `@Public()` opt-out.
+- **DataLoader**: batches skill and organization lookups on nested fields.
 - **Jest**: unit (`*.spec.ts`) and e2e (`test/*.e2e-spec.ts`) tests.
 
-## Architecture
+## Dependency map
 
-The source is organized as a modular monolith with a strict dependency rule:
+**Rule of thumb:** dependencies flow inward. Outer layers never import inner business code.
 
-- `common` imports nothing.
-- `core` imports only `common`.
-- `integrations` import only `common`; each owns its **port** (an abstract class used as the DI token) plus neutral types, and maps the external API to them. Never import from `modules`.
-- `modules` import `common`, `core`, and integration **modules** for DI wiring; services inject the abstract **port** by type (no `Symbol`, no `@Inject()`).
+```
+common          ← pure TS helpers (imports nothing)
+  ↑
+core            ← shared Nest/GraphQL/Mongoose primitives, event contracts
+  ↑
+integrations    ← external APIs; each folder = one adapter + port (abstract class)
+  ↑
+modules         ← business domains (resolvers, services, schemas)
+```
 
-- `common/` — generic, framework-agnostic TypeScript primitives (helpers, the task orchestrator). No integration contracts.
-- `core/` — cross-cutting NestJS infrastructure (configs, shared GraphQL inputs/entities, decorators, domain event payloads, `UserRole` enum).
-- `integrations/` — adapters that own their capability port and map external APIs to neutral contracts. `ai/` is a capability boundary (port + types) with vendors nested under it (`ai/open-router/`); `github/` and `tavily/` are flat.
-- `modules/` — business domains (CRUD entities, auth, dashboard, AI tools, GraphQL loaders).
+| Folder | What it is | Why it exists |
+|--------|------------|---------------|
+| **`common/`** | Framework-agnostic utilities (`clearObject`, `assertValidObjectId`, `orchestrate`). | Reusable logic without Nest/Mongoose/GraphQL coupling. |
+| **`core/`** | Cross-cutting infra: configs, decorators, shared inputs/entities, `domain-events`, `UserRole`. | Things many modules need but that are not tied to one entity. |
+| **`integrations/open-router/`** | OpenRouter adapter + AI port (`ai-chat.provider.ts`). Binds `AiChatProvider` → `OpenRouterService`; mappers translate SDK ↔ loose DTO. | SDK and port live together; `ai-tools` owns strong GraphQL types. |
+| **`integrations/github/`** | GitHub adapter for repository metadata (`RepositoryMetadataProvider`). | Same port pattern as Tavily/OpenRouter. |
+| **`integrations/tavily/`** | Tavily adapter for web content extraction (`WebContentProvider`). | Used by resource-detail extractors. |
+| **`modules/`** | Business domains. Each CRUD entity = resolver + service + schema + entity + dto. | Where profile rules and GraphQL operations live. |
+| **`modules/auth/`** | JWT guard, `signIn`, `getMe`. Global auth, not a CRUD entity. | Security cross-cut; uses `UsersService.findOneByEmailWithPassword`. |
+| **`modules/graphql/`** | `GraphqlModule` + `compose-loaders.ts`. Wires Apollo; merges loaders exported by entity modules. | Transport infra — does not implement loader batching logic. |
+| **`modules/dashboard/`** | Read-only stats; imports other modules' **services** (not Mongoose models). | Aggregation without bypassing service boundaries. |
+| **`modules/ai-tools/`** | AI use-cases (summarize, translate, ATS). Owns `AiEntity`, enums, and mappers. | Converts `IntegrationChatResult` → GraphQL; orchestrates `*ExtractorService` before calling `AiChatProvider`. |
+
+### Request flow (typical)
+
+```
+HTTP → Apollo → GqlAuthGuard → Resolver → Service → Mongoose
+                              ↘ @ResolveField → DataLoader → Service
+```
+
+### AI flow
+
+```
+Resolver → AiToolsService → AiChatProvider.chat()  [loose integration DTO]
+                         → mapChatResultToEntity()  [strong GraphQL types]
+                         ↘ ResourceDetailService → *ExtractorService → Github / Tavily ports
+```
+
+### Who imports whom
+
+| From | Can import |
+|------|------------|
+| `modules/*` | `common`, `core`, `integrations/*` **modules** (for DI); inject **ports** by type |
+| `integrations/*` | `common`, own internals |
+| `core` | `common` |
+| `common` | nothing |
+
+`integrations` **never** import from `modules`. `ai-tools` injects `AiChatProvider`, maps `IntegrationChatResult` → `AiEntity`, and does not import OpenRouter types.
 
 ## Project structure
 
 ```
 src/
-├── main.ts                   # Bootstrap: create app, validation pipe, start server.
-├── app.module.ts             # Root module: Config, Mongoose, GraphQL, feature modules.
-├── app.controller.ts         # Minimal REST GET / health route ("Hello World!").
-├── schema.gql                # Auto-generated GraphQL schema (code-first output).
-├── common/                   # Generic, framework-agnostic primitives.
-│   ├── helpers/              # object / daterange / breakpoint helpers.
-│   └── execution/orchestrator.helper.ts  # Concurrency-limited task runner.
-├── core/                     # Shared NestJS building blocks (domain-agnostic).
-│   ├── schemas/              # BaseModel, paginated/translation/daterange schemas.
-│   ├── entities/             # BaseEntity and shared GraphQL object types.
-│   ├── inputs/               # Pagination, sort, date-range, translation, url inputs.
-│   ├── decorators/           # @Public, @OptionalField.
-│   ├── events/                     # Domain event names + neutral payload classes.
-│   ├── enums/user-role.enum.ts     # Shared UserRole enum.
-│   └── configs/              # app.config (port/host/CORS), validation.config.
-├── integrations/             # Adapters; each owns its port (abstract class) + neutral types.
-│   ├── ai/                   # AI capability boundary: AiProvider port + ai.types.
-│   │   └── open-router/      # OpenRouterService implements AiProvider (SDK + mappers inside).
-│   ├── github/               # RepositoryMetadataProvider port; GithubService implements it.
-│   └── tavily/               # WebContentProvider port; TavilyService implements it.
-└── modules/                  # Business domains.
-    ├── graphql/              # GraphqlModule, DataLoaders, GraphQL context (Ctx).
-    ├── ai-tools/             # AI use-cases; owns AiEntity; injects the abstract ports.
-    ├── auth/                 # JWT auth: signIn (public), getMe, global guard, @CurrentUser.
-    ├── dashboard/            # Read-only aggregation via feature services.
-    ├── skills/               # Feature module (the canonical example to copy).
-    │   ├── skills.resolver.ts      # Explicit @Query / @Mutation methods.
-    │   ├── skills.service.ts       # Explicit CRUD over the Mongoose model.
-    │   ├── schemas/skill.schema.ts # Co-located Mongoose model.
-    │   ├── entities/skill.entity.ts# GraphQL ObjectType.
-    │   ├── enums/category.enum.ts  # SkillCategory.
-    │   └── dto/                    # create / update / filter / sort inputs.
-    ├── users/                # Users; hashes passwords; auth uses findOneByEmailWithPassword.
-    ├── experiences/          # Work experience; @ResolveField uses DataLoaders.
-    ├── educations/           # Education history.
-    ├── organizations/        # Organizations referenced by experiences/educations.
-    └── projects/             # Portfolio projects.
+├── main.ts
+├── app.module.ts             # Composition root: infra → GraphqlModule → domain modules
+├── schema.gql                # Auto-generated (commit after API type changes)
+├── common/
+├── core/
+├── integrations/
+│   ├── open-router/          # AI port + OpenRouter adapter
+│   ├── github/
+│   └── tavily/
+└── modules/
+    ├── graphql/
+    ├── auth/
+    ├── dashboard/
+    ├── skills/               # Canonical CRUD module; exports SkillsLoaderService
+    ├── ai-tools/
+    │   ├── resource-detail/  # Orchestrator + *ExtractorService per source
+    │   ├── prompts/
+    │   └── ...
+    └── ...
 ```
 
 ## Requirements
@@ -86,26 +100,28 @@ src/
 
 ## Getting started
 
-1. Install dependencies (from the repo root, installs all workspaces):
+1. Install dependencies (from the repo root):
 
 ```bash
 npm install
 ```
 
-2. Start MongoDB (from the repo root):
+2. Start MongoDB:
 
 ```bash
 npm run docker:up
 ```
 
-3. Create the env file from the example:
+3. Create the env file:
 
 ```bash
 cp .env.example .env.development
 ```
 
-4. Run the API in watch mode (from the repo root):
+4. Run the API in watch mode:
 
 ```bash
 npm run api:dev
 ```
+
+After GraphQL type changes, rebuild or boot the API so `src/schema.gql` regenerates, then run admin codegen (`npm run admin:build` or `npx graphql-codegen` in `apps/admin`).

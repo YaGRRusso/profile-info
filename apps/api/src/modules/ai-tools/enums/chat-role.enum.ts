@@ -1,6 +1,6 @@
 import { registerEnumType } from "@nestjs/graphql";
 
-export enum OpenRouterRole {
+export enum ChatRole {
   ASSISTANT = "assistant",
   DEVELOPER = "developer",
   SYSTEM = "system",
@@ -8,6 +8,6 @@ export enum OpenRouterRole {
   USER = "user",
 }
 
-registerEnumType(OpenRouterRole, {
-  name: "OpenRouterRole",
+registerEnumType(ChatRole, {
+  name: "ChatRole",
 });

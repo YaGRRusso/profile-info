@@ -1,14 +1,39 @@
-import type { ChatCompletionResult } from "@/integrations/ai/ai.types";
+import type { IntegrationChatResult } from "@/integrations/open-router/ai-chat.provider";
 import { AiEntity } from "../entities/ai-response.entity";
-import { OpenRouterRole } from "../enums/chat-role.enum";
+import { ChatRole } from "../enums/chat-role.enum";
 import { ChatFinishReason } from "../enums/finish-reason.enum";
 
-export function mapChatResultToEntity(result: ChatCompletionResult): AiEntity {
+const CHAT_ROLE_BY_VALUE: Record<string, ChatRole> = {
+  assistant: ChatRole.ASSISTANT,
+  developer: ChatRole.DEVELOPER,
+  system: ChatRole.SYSTEM,
+  tool: ChatRole.TOOL,
+  user: ChatRole.USER,
+};
+
+const CHAT_FINISH_REASON_BY_VALUE: Record<string, ChatFinishReason> = {
+  tool_calls: ChatFinishReason.TOOL_CALLS,
+  stop: ChatFinishReason.STOP,
+  length: ChatFinishReason.LENGTH,
+  content_filter: ChatFinishReason.CONTENT_FILTER,
+  error: ChatFinishReason.ERROR,
+};
+
+function mapChatRole(role: string): ChatRole {
+  return CHAT_ROLE_BY_VALUE[role] ?? ChatRole.ASSISTANT;
+}
+
+function mapFinishReason(finishReason: string | null): ChatFinishReason | null {
+  if (finishReason === null) return null;
+  return CHAT_FINISH_REASON_BY_VALUE[finishReason] ?? null;
+}
+
+export function mapChatResultToEntity(result: IntegrationChatResult): AiEntity {
   return {
     messages: result.messages.map((choice) => ({
-      finishReason: choice.finishReason as ChatFinishReason,
+      finishReason: mapFinishReason(choice.finishReason),
       message: {
-        role: choice.message.role as OpenRouterRole,
+        role: mapChatRole(choice.message.role),
         content: choice.message.content,
         reasoning: choice.message.reasoning,
         refusal: choice.message.refusal,

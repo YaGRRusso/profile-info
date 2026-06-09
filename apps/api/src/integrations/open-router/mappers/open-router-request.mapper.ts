@@ -1,8 +1,8 @@
 import { ChatRequest } from "@openrouter/sdk/models";
-import type { ChatCompletionRequest } from "../../ai.types";
+import type { IntegrationChatRequest } from "../ai-chat.provider";
 
 export function mapToOpenRouterRequest(
-  request: ChatCompletionRequest
+  request: IntegrationChatRequest
 ): ChatRequest & { stream?: false } {
   return {
     model: request.model,

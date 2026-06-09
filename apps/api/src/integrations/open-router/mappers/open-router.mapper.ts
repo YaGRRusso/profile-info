@@ -1,18 +1,14 @@
 import { ChatResult } from "@openrouter/sdk/models";
-import type {
-  ChatCompletionResult,
-  ChatFinishReason,
-  ChatRole,
-} from "../../ai.types";
+import type { IntegrationChatResult } from "../ai-chat.provider";
 
 export function mapFromOpenRouterResponse(
   result: ChatResult
-): ChatCompletionResult {
+): IntegrationChatResult {
   return {
     messages: result.choices.map((choice) => ({
-      finishReason: choice.finishReason as ChatFinishReason,
+      finishReason: choice.finishReason ?? null,
       message: {
-        role: choice.message.role as ChatRole,
+        role: choice.message.role,
         content: choice.message.content,
         reasoning: choice.message.reasoning,
         refusal: choice.message.refusal,

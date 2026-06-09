@@ -1,5 +1,5 @@
 import { Injectable } from "@nestjs/common";
-import { AiProvider } from "@/integrations/ai/ai.provider";
+import { AiChatProvider } from "@/integrations/open-router/ai-chat.provider";
 import { DEFAULT_AI_MODEL } from "./constants/default-model";
 import { AtsSummarizeInput } from "./dto/ats-summarize.input";
 import { SummarizeInput } from "./dto/summarize.input";
@@ -19,12 +19,12 @@ import {
   createTranslateContextPrompt,
   TRANSLATE_SYSTEM_PROMPT,
 } from "./prompts/translate.prompt";
-import { ResourceDetailService } from "./resource-detail.service";
+import { ResourceDetailService } from "./resource-detail/resource-detail.service";
 
 @Injectable()
 export class AiToolsService {
   constructor(
-    private readonly aiProvider: AiProvider,
+    private readonly aiChatProvider: AiChatProvider,
     private readonly resourceDetailService: ResourceDetailService
   ) {}
 
@@ -42,7 +42,7 @@ export class AiToolsService {
       parsedDetails.push(...createDetails(resourceDetails));
     }
 
-    const result = await this.aiProvider.chat({
+    const result = await this.aiChatProvider.chat({
       model: DEFAULT_AI_MODEL,
       messages: [
         { role: "system", content: ATS_SUMMARIZE_SYSTEM_PROMPT },
@@ -70,7 +70,7 @@ export class AiToolsService {
       parsedDetails.push(...createDetails(resourceDetails));
     }
 
-    const result = await this.aiProvider.chat({
+    const result = await this.aiChatProvider.chat({
       model: DEFAULT_AI_MODEL,
       messages: [
         { role: "system", content: SUMMARIZE_SYSTEM_PROMPT },
@@ -93,7 +93,7 @@ export class AiToolsService {
     targetLanguage,
     sourceLanguage,
   }: TranslateInput): Promise<AiEntity> {
-    const result = await this.aiProvider.chat({
+    const result = await this.aiChatProvider.chat({
       model: DEFAULT_AI_MODEL,
       messages: [
         { role: "system", content: TRANSLATE_SYSTEM_PROMPT },

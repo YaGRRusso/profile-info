@@ -44,6 +44,14 @@ export enum ChatFinishReason {
   ToolCalls = 'TOOL_CALLS'
 }
 
+export enum ChatRole {
+  Assistant = 'ASSISTANT',
+  Developer = 'DEVELOPER',
+  System = 'SYSTEM',
+  Tool = 'TOOL',
+  User = 'USER'
+}
+
 export type ChoiceEntity = {
   __typename?: 'ChoiceEntity';
   finishReason?: Maybe<ChatFinishReason>;
@@ -415,7 +423,7 @@ export type MessageEntity = {
   content: Scalars['String']['output'];
   reasoning?: Maybe<Scalars['String']['output']>;
   refusal?: Maybe<Scalars['String']['output']>;
-  role: OpenRouterRole;
+  role: ChatRole;
 };
 
 export type Mutation = {
@@ -711,14 +719,6 @@ export type MutationUpdateOneUserArgs = {
   updateUserInput: UpdateUserInput;
   userId: Scalars['ID']['input'];
 };
-
-export enum OpenRouterRole {
-  Assistant = 'ASSISTANT',
-  Developer = 'DEVELOPER',
-  System = 'SYSTEM',
-  Tool = 'TOOL',
-  User = 'USER'
-}
 
 export enum OrganizationCategory {
   Company = 'COMPANY',
@@ -1224,21 +1224,21 @@ export type AtsSummarizeMutationVariables = Exact<{
 }>;
 
 
-export type AtsSummarizeMutation = { __typename?: 'Mutation', atsSummarize: { __typename?: 'AiEntity', messages: Array<{ __typename?: 'ChoiceEntity', finishReason?: ChatFinishReason | null, message: { __typename?: 'MessageEntity', content: string, reasoning?: string | null, refusal?: string | null, role: OpenRouterRole } }>, usage?: { __typename?: 'UsageEntity', completionTokens?: number | null, cost?: number | null, promptTokens?: number | null, totalTokens?: number | null } | null } };
+export type AtsSummarizeMutation = { __typename?: 'Mutation', atsSummarize: { __typename?: 'AiEntity', messages: Array<{ __typename?: 'ChoiceEntity', finishReason?: ChatFinishReason | null, message: { __typename?: 'MessageEntity', content: string, reasoning?: string | null, refusal?: string | null, role: ChatRole } }>, usage?: { __typename?: 'UsageEntity', completionTokens?: number | null, cost?: number | null, promptTokens?: number | null, totalTokens?: number | null } | null } };
 
 export type SummarizeMutationVariables = Exact<{
   summarizeInput: SummarizeInput;
 }>;
 
 
-export type SummarizeMutation = { __typename?: 'Mutation', summarize: { __typename?: 'AiEntity', messages: Array<{ __typename?: 'ChoiceEntity', finishReason?: ChatFinishReason | null, message: { __typename?: 'MessageEntity', content: string, reasoning?: string | null, refusal?: string | null, role: OpenRouterRole } }>, usage?: { __typename?: 'UsageEntity', completionTokens?: number | null, cost?: number | null, promptTokens?: number | null, totalTokens?: number | null } | null } };
+export type SummarizeMutation = { __typename?: 'Mutation', summarize: { __typename?: 'AiEntity', messages: Array<{ __typename?: 'ChoiceEntity', finishReason?: ChatFinishReason | null, message: { __typename?: 'MessageEntity', content: string, reasoning?: string | null, refusal?: string | null, role: ChatRole } }>, usage?: { __typename?: 'UsageEntity', completionTokens?: number | null, cost?: number | null, promptTokens?: number | null, totalTokens?: number | null } | null } };
 
 export type TranslateMutationVariables = Exact<{
   translateInput: TranslateInput;
 }>;
 
 
-export type TranslateMutation = { __typename?: 'Mutation', translate: { __typename?: 'AiEntity', messages: Array<{ __typename?: 'ChoiceEntity', finishReason?: ChatFinishReason | null, message: { __typename?: 'MessageEntity', content: string, reasoning?: string | null, refusal?: string | null, role: OpenRouterRole } }>, usage?: { __typename?: 'UsageEntity', completionTokens?: number | null, cost?: number | null, promptTokens?: number | null, totalTokens?: number | null } | null } };
+export type TranslateMutation = { __typename?: 'Mutation', translate: { __typename?: 'AiEntity', messages: Array<{ __typename?: 'ChoiceEntity', finishReason?: ChatFinishReason | null, message: { __typename?: 'MessageEntity', content: string, reasoning?: string | null, refusal?: string | null, role: ChatRole } }>, usage?: { __typename?: 'UsageEntity', completionTokens?: number | null, cost?: number | null, promptTokens?: number | null, totalTokens?: number | null } | null } };
 
 export type SignInMutationVariables = Exact<{
   signInInput: SignInInput;

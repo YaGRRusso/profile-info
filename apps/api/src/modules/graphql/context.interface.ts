@@ -1,8 +1,8 @@
-import type { Request, Response } from "express";
-import { Loaders } from "./loaders.helper";
+import type { Request } from "express";
+import type { Loaders } from "./compose-loaders";
 
 export interface Ctx {
   loaders: Loaders;
-  req: Request;
-  res: Response;
+  req: Request & { user?: unknown };
+  res: unknown;
 }

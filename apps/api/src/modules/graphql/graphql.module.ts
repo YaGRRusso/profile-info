@@ -3,21 +3,21 @@ import { ApolloServerPluginLandingPageLocalDefault } from "@apollo/server/plugin
 import { ApolloDriver } from "@nestjs/apollo";
 import { Module } from "@nestjs/common";
 import { GraphQLModule } from "@nestjs/graphql";
+import { OrganizationsLoaderService } from "@/modules/organizations/organizations-loader.service";
 import { OrganizationsModule } from "@/modules/organizations/organizations.module";
-import { OrganizationsService } from "@/modules/organizations/organizations.service";
+import { SkillsLoaderService } from "@/modules/skills/skills-loader.service";
 import { SkillsModule } from "@/modules/skills/skills.module";
-import { SkillsService } from "@/modules/skills/skills.service";
-import { createLoaders } from "./loaders.helper";
+import { composeLoaders } from "./compose-loaders";
 
 @Module({
   imports: [
     GraphQLModule.forRootAsync({
       driver: ApolloDriver,
       imports: [SkillsModule, OrganizationsModule],
-      inject: [SkillsService, OrganizationsService],
+      inject: [SkillsLoaderService, OrganizationsLoaderService],
       useFactory: (
-        skillsService: SkillsService,
-        organizationsService: OrganizationsService
+        skillsLoaderService: SkillsLoaderService,
+        organizationsLoaderService: OrganizationsLoaderService
       ) => ({
         plugins: [ApolloServerPluginLandingPageLocalDefault()],
         autoSchemaFile: join(process.cwd(), "src/schema.gql"),
@@ -25,7 +25,10 @@ import { createLoaders } from "./loaders.helper";
         sortSchema: true,
         playground: false,
         context: ({ req, res }) => ({
-          loaders: createLoaders({ skillsService, organizationsService }),
+          loaders: composeLoaders({
+            skillsLoaderService,
+            organizationsLoaderService,
+          }),
           req,
           res,
         }),
