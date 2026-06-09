@@ -148,17 +148,17 @@ Loaded via `--env-file .env.development` / `.env.production` and `ConfigModule`.
 
 ## Scripts / commands
 
-Run from `apps/api/` or via root `api:*` aliases: `dev`, `prod`, `build`, `start`, `seed`, `test`, `test:e2e`, `typecheck`, `lint`, `format`.
+Run from `apps/api/` or via root `api:*` aliases: `dev`, `prod`, `build`, `start`, `seed`, `test`, `test:coverage`, `test:e2e`, `typecheck`, `lint`, `format`.
 
 `npm run seed`: wipes profile collections and inserts faker dev data plus admin `admin@profile.info` / `admin123`.
 
 - `GET /health`: Terminus health check with MongoDB ping.
-- E2E tests: `test/graphql.e2e-spec.ts`, `test/skill-delete-cascade.integration-spec.ts`; default DB `profile-test-e2e` on localhost Mongo.
+- Test layout: `test/config/` (Jest e2e config, setup/teardown), `test/support/` (shared helpers + `TestAppModule`), `test/e2e/`, `test/integration/`. Default DB `profile-test-e2e` on localhost Mongo; override with `TEST_DATABASE_URL` or `USE_MEMORY_MONGO=true`.
 - ADRs in `apps/api/docs/adr/`.
 
 ## Gotchas & notes
 
-- Regenerate `src/schema.gql` after type changes so admin codegen stays in sync.
+- Regenerate `src/schema.gql` after type changes so admin codegen stays in sync. E2E/integration tests use in-memory schema (`autoSchemaFile: true` when `NODE_ENV=test`) so they never overwrite the committed file — `TestAppModule` omits `AiToolsModule` and would strip AI types if it wrote to disk.
 - New public GraphQL fields need `@Public()` or they 401.
 - Password is `select: false` and absent from `UserEntity`; never expose it in GraphQL.
 - DataLoaders exist only for skills and organizations today.

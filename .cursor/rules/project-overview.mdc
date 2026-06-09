@@ -99,7 +99,7 @@ Root scripts (run from the repo root):
 - API CI: `.github/workflows/api-ci.yml` runs lint, typecheck, build, unit and e2e tests with a MongoDB service.
 - `npm run api:build` / `npm run admin:build`: build a single app.
 - `npm run api:start` / `npm run admin:start`: start a single app.
-- `npm run test`, `test:watch`, `test:cov`, `test:e2e`: delegate to workspaces that define the script.
+- `npm run test`, `test:watch`, `test:cov`, `test:coverage`, `test:e2e`: delegate to workspaces that define the script.
 - `npm run typecheck`, `npm run lint`, `npm run format`: delegate to workspaces.
 
 ## Gotchas & notes

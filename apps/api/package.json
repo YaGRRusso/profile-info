@@ -17,8 +17,9 @@
     "seed": "node --env-file=.env.development -r ts-node/register -r tsconfig-paths/register src/seed.ts",
     "test": "jest",
     "test:watch": "jest --watch",
-    "test:cov": "jest --coverage",
-    "test:e2e": "jest --config ./test/jest-e2e.json",
+    "test:coverage": "jest --coverage",
+    "test:cov": "npm run test:coverage",
+    "test:e2e": "jest --config ./test/config/jest-e2e.json",
     "typecheck": "tsc -b --noEmit",
     "lint": "biome check .",
     "format": "biome format --write ."
@@ -105,9 +106,20 @@
       ]
     },
     "collectCoverageFrom": [
-      "**/*.(t|j)s"
+      "src/**/*.ts",
+      "!src/**/*.spec.ts"
     ],
-    "coverageDirectory": "../coverage",
+    "coverageDirectory": "coverage",
+    "coverageReporters": [
+      "text-summary",
+      "text",
+      "lcov"
+    ],
+    "coveragePathIgnorePatterns": [
+      "/node_modules/",
+      "/dist/",
+      "/test/"
+    ],
     "testEnvironment": "node"
   }
 }

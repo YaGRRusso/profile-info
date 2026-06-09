@@ -1,0 +1,24 @@
+{
+  "rootDir": "../../",
+  "moduleFileExtensions": ["js", "json", "ts"],
+  "testEnvironment": "node",
+  "setupFiles": ["<rootDir>/test/config/setup-env.ts"],
+  "testTimeout": 120000,
+  "maxWorkers": 1,
+  "testMatch": [
+    "<rootDir>/test/e2e/**/*.e2e-spec.ts",
+    "<rootDir>/test/integration/**/*.integration-spec.ts"
+  ],
+  "moduleNameMapper": {
+    "^@/(.*)$": "<rootDir>/src/$1"
+  },
+  "transform": {
+    "^.+\\.(t|j)s$": [
+      "ts-jest",
+      {
+        "tsconfig": "tsconfig.test.json"
+      }
+    ]
+  },
+  "globalTeardown": "<rootDir>/test/config/global-teardown.ts"
+}

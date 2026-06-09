@@ -12,7 +12,7 @@ by the `@profile-info/admin` dashboard.
 - **MongoDB + Mongoose**: ODM schemas in `src/modules/<name>/schemas/`.
 - **Passport JWT**: global `GqlAuthGuard` with `@Public()` opt-out and `RolesGuard` for admin-only writes.
 - **DataLoader**: batches skill and organization lookups on nested fields.
-- **Jest**: unit (`*.spec.ts`) and e2e (`test/*.e2e-spec.ts`) tests.
+- **Jest**: unit (`src/**/*.spec.ts`), e2e (`test/e2e/`), and integration (`test/integration/`) tests. Coverage: `npm run test:coverage`.
 
 ## Dependency map
 
@@ -146,7 +146,7 @@ cp .env.example .env.development
 npm run api:dev
 ```
 
-After GraphQL type changes, rebuild or boot the API so `src/schema.gql` regenerates, then run admin codegen (`npm run admin:build` or `npx graphql-codegen` in `apps/admin`).
+After GraphQL type changes, rebuild or boot the API so `src/schema.gql` regenerates, then run admin codegen (`npm run admin:build` or `npx graphql-codegen` in `apps/admin`). Tests never write to this file (`NODE_ENV=test` keeps the schema in memory).
 
 ## Testing
 

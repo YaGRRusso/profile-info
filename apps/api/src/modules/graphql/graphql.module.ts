@@ -25,7 +25,10 @@ import { LoadersService } from "./loaders.service";
         organizationsLoaderService: OrganizationsLoaderService
       ) => ({
         plugins: [ApolloServerPluginLandingPageLocalDefault()],
-        autoSchemaFile: join(process.cwd(), "src/schema.gql"),
+        autoSchemaFile:
+          config.get("NODE_ENV") === "test"
+            ? true
+            : join(process.cwd(), "src/schema.gql"),
         introspection: config.get("NODE_ENV") !== "production",
         sortSchema: true,
         playground: false,
