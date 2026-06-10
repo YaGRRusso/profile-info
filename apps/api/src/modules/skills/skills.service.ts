@@ -2,7 +2,7 @@ import { Injectable } from "@nestjs/common";
 import { EventEmitter2 } from "@nestjs/event-emitter";
 import { AnyKeys, QueryFilter, SortOrder, UpdateQuery } from "mongoose";
 import { BatchEntity } from "@/core/entities/batch.entity";
-import { catchDuplicateKey } from "@/core/errors/duplicate-key.helper";
+import { assertUniqueConstraint } from "@/core/errors/duplicate-key.helper";
 import { DomainEvents } from "@/core/events/domain-events";
 import { SkillCreatedEvent } from "@/core/events/skill-created.event";
 import { SkillDeletedEvent } from "@/core/events/skill-deleted.event";
@@ -54,7 +54,7 @@ export class SkillsService {
   // --- Commands ---
 
   async createOne(createInput: CreateSkillInput): Promise<SkillModel> {
-    const skill = await catchDuplicateKey(
+    const skill = await assertUniqueConstraint(
       () => this.repository.createOne(createInput as AnyKeys<SkillModel>),
       "slug"
     );
@@ -68,14 +68,14 @@ export class SkillsService {
   }
 
   createMany(createInputs: CreateSkillInput[]): Promise<SkillModel[]> {
-    return catchDuplicateKey(
+    return assertUniqueConstraint(
       () => this.repository.createMany(createInputs as AnyKeys<SkillModel>[]),
       "slug"
     );
   }
 
   updateOne(id: string, updateInput: UpdateSkillInput): Promise<SkillModel> {
-    return catchDuplicateKey(
+    return assertUniqueConstraint(
       () =>
         this.repository.updateOne(
           id,
