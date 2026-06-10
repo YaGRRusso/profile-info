@@ -1,29 +1,25 @@
-import { ConflictException, Injectable } from "@nestjs/common";
+import { Injectable } from "@nestjs/common";
 import { EventEmitter2 } from "@nestjs/event-emitter";
-import { InjectModel } from "@nestjs/mongoose";
-import { AnyKeys, Model, QueryFilter, SortOrder, UpdateQuery } from "mongoose";
+import { AnyKeys, QueryFilter, SortOrder, UpdateQuery } from "mongoose";
 import { BatchEntity } from "@/core/entities/batch.entity";
+import { catchDuplicateKey } from "@/core/errors/duplicate-key.helper";
 import { DomainEvents } from "@/core/events/domain-events";
 import { SkillCreatedEvent } from "@/core/events/skill-created.event";
 import { SkillDeletedEvent } from "@/core/events/skill-deleted.event";
-import { MongooseCrudRepository } from "@/core/persistence/mongoose-crud.repository";
 import { PaginatedModel } from "@/core/schemas/paginated.schema";
 import { SkillModel } from "@/modules/skills/schemas/skill.schema";
 import { CreateSkillInput } from "./dto/create-skill.input";
 import { UpdateSkillInput } from "./dto/update-skill.input";
+import { SkillsRepository } from "./skills.repository";
 
 @Injectable()
 export class SkillsService {
-  private readonly repository: MongooseCrudRepository<SkillModel>;
-
   constructor(
-    @InjectModel(SkillModel.name) readonly skillModel: Model<SkillModel>,
+    private readonly repository: SkillsRepository,
     private readonly eventEmitter: EventEmitter2
-  ) {
-    this.repository = new MongooseCrudRepository(skillModel);
-  }
+  ) {}
 
-  // --- Queries (no business logic, pure delegation) ---
+  // --- Queries ---
 
   findOneById(id: string): Promise<SkillModel> {
     return this.repository.findOneById(id);
@@ -55,13 +51,12 @@ export class SkillsService {
     return this.repository.findMany({ filters, sort, skip, limit });
   }
 
-  // --- Commands (business rules enforced here) ---
+  // --- Commands ---
 
   async createOne(createInput: CreateSkillInput): Promise<SkillModel> {
-    await this.assertSlugIsUnique(createInput.slug);
-
-    const skill = await this.repository.createOne(
-      createInput as AnyKeys<SkillModel>
+    const skill = await catchDuplicateKey(
+      () => this.repository.createOne(createInput as AnyKeys<SkillModel>),
+      "slug"
     );
 
     await this.eventEmitter.emitAsync(
@@ -72,23 +67,21 @@ export class SkillsService {
     return skill;
   }
 
-  async createMany(createInputs: CreateSkillInput[]): Promise<SkillModel[]> {
-    for (const input of createInputs) {
-      await this.assertSlugIsUnique(input.slug);
-    }
-    return this.repository.createMany(createInputs as AnyKeys<SkillModel>[]);
+  createMany(createInputs: CreateSkillInput[]): Promise<SkillModel[]> {
+    return catchDuplicateKey(
+      () => this.repository.createMany(createInputs as AnyKeys<SkillModel>[]),
+      "slug"
+    );
   }
 
-  async updateOne(
-    id: string,
-    updateInput: UpdateSkillInput
-  ): Promise<SkillModel> {
-    if (updateInput.slug) {
-      await this.assertSlugIsUnique(updateInput.slug, id);
-    }
-    return this.repository.updateOne(
-      id,
-      updateInput as object as UpdateQuery<SkillModel>
+  updateOne(id: string, updateInput: UpdateSkillInput): Promise<SkillModel> {
+    return catchDuplicateKey(
+      () =>
+        this.repository.updateOne(
+          id,
+          updateInput as object as UpdateQuery<SkillModel>
+        ),
+      "slug"
     );
   }
 
@@ -127,7 +120,7 @@ export class SkillsService {
     return this.repository.deleteMany(ids);
   }
 
-  // --- Aggregation (used by Dashboard) ---
+  // --- Aggregation ---
 
   count(): Promise<number> {
     return this.repository.count();
@@ -135,21 +128,5 @@ export class SkillsService {
 
   countByField(field: string): Promise<{ label: string; value: number }[]> {
     return this.repository.countByField(field);
-  }
-
-  // --- Domain rules (private) ---
-
-  private async assertSlugIsUnique(
-    slug: string,
-    excludeId?: string
-  ): Promise<void> {
-    const filter: QueryFilter<SkillModel> = { slug } as QueryFilter<SkillModel>;
-    if (excludeId) {
-      (filter as Record<string, unknown>)._id = { $ne: excludeId };
-    }
-    const exists = await this.repository.existsBy(filter);
-    if (exists) {
-      throw new ConflictException(`Skill with slug "${slug}" already exists.`);
-    }
   }
 }

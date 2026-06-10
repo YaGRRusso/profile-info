@@ -11,6 +11,7 @@ import { DomainEvents } from "@/core/events/domain-events";
 import { SkillCreatedEvent } from "@/core/events/skill-created.event";
 import { SkillDeletedEvent } from "@/core/events/skill-deleted.event";
 import { SkillModel } from "@/modules/skills/schemas/skill.schema";
+import { SkillsRepository } from "./skills.repository";
 import { SkillsService } from "./skills.service";
 
 const validId = new mongoose.Types.ObjectId().toHexString();
@@ -30,6 +31,16 @@ function makeExec(returnValue: unknown) {
   };
 }
 
+function makeDuplicateKeyError() {
+  const error = new Error("E11000 duplicate key") as Error & {
+    code: number;
+    keyValue: Record<string, unknown>;
+  };
+  error.code = 11_000;
+  error.keyValue = { slug: "typescript" };
+  return error;
+}
+
 describe("SkillsService", () => {
   let service: SkillsService;
   let model: jest.Mocked<Model<SkillModel>>;
@@ -41,6 +52,7 @@ describe("SkillsService", () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         SkillsService,
+        SkillsRepository,
         {
           provide: getModelToken(SkillModel.name),
           useValue: {
@@ -94,21 +106,17 @@ describe("SkillsService", () => {
   });
 
   describe("createOne", () => {
-    it("should create and return the document when slug is unique", async () => {
-      (model.countDocuments as jest.Mock).mockReturnValue(makeExec(0));
+    it("should create and return the document", async () => {
       (model.create as jest.Mock).mockResolvedValue(fakeDoc);
-
       const result = await service.createOne({
         name: "TypeScript",
         slug: "typescript",
         category: "LANGUAGE" as any,
       });
-
       expect(result).toBe(fakeDoc);
     });
 
     it("should emit skill.created event after creation", async () => {
-      (model.countDocuments as jest.Mock).mockReturnValue(makeExec(0));
       (model.create as jest.Mock).mockResolvedValue(fakeDoc);
 
       await service.createOne({
@@ -123,8 +131,8 @@ describe("SkillsService", () => {
       );
     });
 
-    it("should throw ConflictException when slug already exists", async () => {
-      (model.countDocuments as jest.Mock).mockReturnValue(makeExec(1));
+    it("should throw ConflictException on duplicate slug", async () => {
+      (model.create as jest.Mock).mockRejectedValue(makeDuplicateKeyError());
 
       await expect(
         service.createOne({
@@ -133,15 +141,13 @@ describe("SkillsService", () => {
           category: "LANGUAGE" as any,
         })
       ).rejects.toThrow(ConflictException);
-
-      expect(model.create).not.toHaveBeenCalled();
     });
   });
 
   describe("updateOne", () => {
     it("should return the updated document", async () => {
       (model.findByIdAndUpdate as jest.Mock).mockReturnValue(makeExec(fakeDoc));
-      expect(await service.updateOne(validId, {})).toBe(fakeDoc);
+      expect(await service.updateOne(validId, { name: "TS" })).toBe(fakeDoc);
     });
 
     it("should throw BadRequestException for invalid ID", async () => {
@@ -150,20 +156,14 @@ describe("SkillsService", () => {
       );
     });
 
-    it("should check slug uniqueness when slug is being updated", async () => {
-      (model.countDocuments as jest.Mock).mockReturnValue(makeExec(1));
+    it("should throw ConflictException on duplicate slug during update", async () => {
+      (model.findByIdAndUpdate as jest.Mock).mockReturnValue({
+        exec: jest.fn().mockRejectedValue(makeDuplicateKeyError()),
+      });
 
       await expect(
         service.updateOne(validId, { slug: "taken-slug" })
       ).rejects.toThrow(ConflictException);
-    });
-
-    it("should skip slug check when slug is not being updated", async () => {
-      (model.findByIdAndUpdate as jest.Mock).mockReturnValue(makeExec(fakeDoc));
-
-      await service.updateOne(validId, { name: "New Name" });
-
-      expect(model.countDocuments).not.toHaveBeenCalled();
     });
   });
 
