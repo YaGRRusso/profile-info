@@ -59,7 +59,7 @@ Request flow: Apollo → `GqlAuthGuard` (unless `@Public()`) → resolver → se
 
 `core/` (cross-cutting NestJS infra, domain-agnostic):
 
-- `filters/mongo-exception.filter.ts`: global `APP_FILTER` — maps MongoDB `E11000` to `ConflictException` (409). Services do not catch duplicate-key errors; use `assertDuplicate` / `assertReferencesExist` in `common/helpers/assert.helper.ts` only when a domain-specific message is needed before writing.
+- `filters/persistence-exception.filter.ts`: global `APP_FILTER` — maps persistence errors to HTTP exceptions: Mongo `E11000`/`E11001` → 409, Mongo `121` + Mongoose `ValidationError`/`CastError` → 400, `MongooseServerSelectionError` → 503. Services do not catch these; use `assertDuplicate` / `assertReferencesExist` in `common/helpers/assert.helper.ts` only for domain-specific pre-checks.
 - `events/`: `domain-events.ts` (event name constants), `skill-deleted.event.ts`, `organization-deleted.event.ts` (neutral payload classes).
 - `enums/user-role.enum.ts`: shared `UserRole` enum (`USER`, `ADMIN`).
 - `schemas/paginated.schema.ts`: `createPaginatedModel(Entity)` for `{ found, nodes }`.

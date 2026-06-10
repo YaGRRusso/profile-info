@@ -7,7 +7,7 @@ import { ThrottlerModule } from "@nestjs/throttler";
 import { AppController } from "./app.controller";
 import { AppService } from "./app.service";
 import { validateEnv } from "./core/configs/env.validation";
-import { MongoExceptionFilter } from "./core/filters/mongo-exception.filter";
+import { PersistenceExceptionFilter } from "./core/filters/persistence-exception.filter";
 import { HealthModule } from "./core/health/health.module";
 import { AiToolsModule } from "./modules/ai-tools/ai-tools.module";
 import { AuthModule } from "./modules/auth/auth.module";
@@ -59,7 +59,7 @@ import { UsersModule } from "./modules/users/users.module";
   controllers: [AppController],
   providers: [
     AppService,
-    { provide: APP_FILTER, useClass: MongoExceptionFilter },
+    { provide: APP_FILTER, useClass: PersistenceExceptionFilter },
   ],
 })
 export class AppModule {}

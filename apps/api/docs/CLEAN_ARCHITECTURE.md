@@ -165,7 +165,7 @@ export class MongooseCrudRepository<T> {
 |---------|------|---------------------|
 | **Repository (DI)** | `SkillsRepository extends MongooseCrudRepository<T>` | Tipado, injetável, mockável em testes; se trocar banco, troca só a impl |
 | **Domain Events** | `EventEmitter2` + listeners | Desacopla cascatas (skill deletada → projetos atualizam) sem import circular |
-| **Error Handling** | `MongoExceptionFilter` (`APP_FILTER`) | Converte E11000 do Mongo em 409 globalmente; `assertDuplicate` / `assertReferencesExist` em services só para mensagens específicas |
+| **Error Handling** | `PersistenceExceptionFilter` (`APP_FILTER`) | Converte erros de Mongo/Mongoose em 4xx/503 globalmente; `assertDuplicate` / `assertReferencesExist` em services só para mensagens específicas |
 | **Port/Adapter** | `integrations/` (abstract class + impl) | Troca OpenRouter por outro LLM sem tocar nos modules |
 | **Modular Monolith** | Cada module é autocontido | Migrar para microservice = extrair o módulo inteiro |
 | **DataLoader** | Per-request batching em `graphql/` | N+1 resolvido sem cache global |
