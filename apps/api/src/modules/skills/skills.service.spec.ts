@@ -4,7 +4,6 @@ import { getModelToken } from "@nestjs/mongoose";
 import { Test, type TestingModule } from "@nestjs/testing";
 import mongoose, { type Model } from "mongoose";
 import { DomainEvents } from "@/core/events/domain-events";
-import { SkillCreatedEvent } from "@/core/events/skill-created.event";
 import { SkillDeletedEvent } from "@/core/events/skill-deleted.event";
 import { SkillModel } from "@/modules/skills/schemas/skill.schema";
 import { SkillsRepository } from "./skills.repository";
@@ -100,21 +99,6 @@ describe("SkillsService", () => {
         category: "LANGUAGE" as any,
       });
       expect(result).toBe(fakeDoc);
-    });
-
-    it("should emit skill.created event after creation", async () => {
-      (model.create as jest.Mock).mockResolvedValue(fakeDoc);
-
-      await service.createOne({
-        name: "TypeScript",
-        slug: "typescript",
-        category: "LANGUAGE" as any,
-      });
-
-      expect(eventEmitter.emitAsync).toHaveBeenCalledWith(
-        DomainEvents.skill.created,
-        new SkillCreatedEvent(validId, "typescript")
-      );
     });
   });
 

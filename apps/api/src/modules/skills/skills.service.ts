@@ -3,7 +3,6 @@ import { EventEmitter2 } from "@nestjs/event-emitter";
 import { AnyKeys, QueryFilter, SortOrder, UpdateQuery } from "mongoose";
 import { BatchEntity } from "@/core/entities/batch.entity";
 import { DomainEvents } from "@/core/events/domain-events";
-import { SkillCreatedEvent } from "@/core/events/skill-created.event";
 import { SkillDeletedEvent } from "@/core/events/skill-deleted.event";
 import { PaginatedModel } from "@/core/schemas/paginated.schema";
 import { SkillModel } from "@/modules/skills/schemas/skill.schema";
@@ -17,8 +16,6 @@ export class SkillsService {
     private readonly repository: SkillsRepository,
     private readonly eventEmitter: EventEmitter2
   ) {}
-
-  // --- Queries ---
 
   findOneById(id: string): Promise<SkillModel> {
     return this.repository.findOneById(id);
@@ -50,19 +47,8 @@ export class SkillsService {
     return this.repository.findMany({ filters, sort, skip, limit });
   }
 
-  // --- Commands ---
-
   async createOne(createInput: CreateSkillInput): Promise<SkillModel> {
-    const skill = await this.repository.createOne(
-      createInput as AnyKeys<SkillModel>
-    );
-
-    await this.eventEmitter.emitAsync(
-      DomainEvents.skill.created,
-      new SkillCreatedEvent(skill._id.toString(), skill.slug)
-    );
-
-    return skill;
+    return await this.repository.createOne(createInput as AnyKeys<SkillModel>);
   }
 
   createMany(createInputs: CreateSkillInput[]): Promise<SkillModel[]> {
@@ -110,8 +96,6 @@ export class SkillsService {
 
     return this.repository.deleteMany(ids);
   }
-
-  // --- Aggregation ---
 
   count(): Promise<number> {
     return this.repository.count();
