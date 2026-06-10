@@ -126,10 +126,7 @@ export class SkillsService {
   ) {}
 
   async createOne(input: CreateSkillInput): Promise<SkillModel> {
-    const skill = await catchDuplicateKey(          // ← Converte E11000 → 409 amigável
-      () => this.repository.createOne(input),
-      "slug"
-    );
+    const skill = await this.repository.createOne(input); // E11000 → 409 via MongoExceptionFilter
     await this.eventEmitter.emitAsync(              // ← Efeito colateral
       DomainEvents.skill.created,
       new SkillCreatedEvent(skill._id.toString(), skill.slug)
@@ -168,7 +165,7 @@ export class MongooseCrudRepository<T> {
 |---------|------|---------------------|
 | **Repository (DI)** | `SkillsRepository extends MongooseCrudRepository<T>` | Tipado, injetável, mockável em testes; se trocar banco, troca só a impl |
 | **Domain Events** | `EventEmitter2` + listeners | Desacopla cascatas (skill deletada → projetos atualizam) sem import circular |
-| **Error Handling** | `catchDuplicateKey()` em `core/errors/` | Converte E11000 do Mongo em 409 amigável sem query extra |
+| **Error Handling** | `MongoExceptionFilter` (`APP_FILTER`) | Converte E11000 do Mongo em 409 globalmente; `assertDuplicate` / `assertReferencesExist` em services só para mensagens específicas |
 | **Port/Adapter** | `integrations/` (abstract class + impl) | Troca OpenRouter por outro LLM sem tocar nos modules |
 | **Modular Monolith** | Cada module é autocontido | Migrar para microservice = extrair o módulo inteiro |
 | **DataLoader** | Per-request batching em `graphql/` | N+1 resolvido sem cache global |

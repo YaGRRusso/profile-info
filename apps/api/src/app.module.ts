@@ -1,11 +1,13 @@
 import { Module } from "@nestjs/common";
 import { ConfigModule, ConfigService } from "@nestjs/config";
+import { APP_FILTER } from "@nestjs/core";
 import { EventEmitterModule } from "@nestjs/event-emitter";
 import { MongooseModule } from "@nestjs/mongoose";
 import { ThrottlerModule } from "@nestjs/throttler";
 import { AppController } from "./app.controller";
 import { AppService } from "./app.service";
 import { validateEnv } from "./core/configs/env.validation";
+import { MongoExceptionFilter } from "./core/filters/mongo-exception.filter";
 import { HealthModule } from "./core/health/health.module";
 import { AiToolsModule } from "./modules/ai-tools/ai-tools.module";
 import { AuthModule } from "./modules/auth/auth.module";
@@ -55,6 +57,9 @@ import { UsersModule } from "./modules/users/users.module";
     AiToolsModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+    { provide: APP_FILTER, useClass: MongoExceptionFilter },
+  ],
 })
 export class AppModule {}

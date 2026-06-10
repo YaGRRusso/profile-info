@@ -52,13 +52,14 @@ Request flow: Apollo → `GqlAuthGuard` (unless `@Public()`) → resolver → se
 
 `common/` (pure TS, no NestJS/Mongoose/GraphQL imports):
 
-- `helpers/`: `object.helper.ts` (`clearObject`), `object-id.helper.ts` (`assertValidObjectId`, `assertValidObjectIds`), `daterange.helper.ts` (`sortDateRange`), `breakpoint.helper.ts`.
+- `helpers/`: `object.helper.ts` (`clearObject`), `object-id.helper.ts` (`assertValidObjectId`, `assertValidObjectIds`), `assert.helper.ts` (`assertDuplicate`, `assertReferencesExist` — optional pre-checks in services), `daterange.helper.ts` (`sortDateRange`), `breakpoint.helper.ts`.
 - `execution/orchestrator.helper.ts`: `orchestrate(...)`, a concurrency-limited + timeout task runner (plain function, used by `ai-tools`).
 
 `common` holds only generic primitives — it does **not** own integration contracts. Each capability boundary owns its own port (see `integrations/`).
 
 `core/` (cross-cutting NestJS infra, domain-agnostic):
 
+- `filters/mongo-exception.filter.ts`: global `APP_FILTER` — maps MongoDB `E11000` to `ConflictException` (409). Services do not catch duplicate-key errors; use `assertDuplicate` / `assertReferencesExist` in `common/helpers/assert.helper.ts` only when a domain-specific message is needed before writing.
 - `events/`: `domain-events.ts` (event name constants), `skill-deleted.event.ts`, `organization-deleted.event.ts` (neutral payload classes).
 - `enums/user-role.enum.ts`: shared `UserRole` enum (`USER`, `ADMIN`).
 - `schemas/paginated.schema.ts`: `createPaginatedModel(Entity)` for `{ found, nodes }`.

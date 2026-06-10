@@ -1,8 +1,4 @@
-import {
-  BadRequestException,
-  ConflictException,
-  NotFoundException,
-} from "@nestjs/common";
+import { BadRequestException, NotFoundException } from "@nestjs/common";
 import { EventEmitter2 } from "@nestjs/event-emitter";
 import { getModelToken } from "@nestjs/mongoose";
 import { Test, type TestingModule } from "@nestjs/testing";
@@ -29,16 +25,6 @@ function makeExec(returnValue: unknown) {
     limit: jest.fn().mockReturnThis(),
     exec: jest.fn().mockResolvedValue(returnValue),
   };
-}
-
-function makeDuplicateKeyError() {
-  const error = new Error("E11000 duplicate key") as Error & {
-    code: number;
-    keyValue: Record<string, unknown>;
-  };
-  error.code = 11_000;
-  error.keyValue = { slug: "typescript" };
-  return error;
 }
 
 describe("SkillsService", () => {
@@ -130,18 +116,6 @@ describe("SkillsService", () => {
         new SkillCreatedEvent(validId, "typescript")
       );
     });
-
-    it("should throw ConflictException on duplicate slug", async () => {
-      (model.create as jest.Mock).mockRejectedValue(makeDuplicateKeyError());
-
-      await expect(
-        service.createOne({
-          name: "TypeScript",
-          slug: "typescript",
-          category: "LANGUAGE" as any,
-        })
-      ).rejects.toThrow(ConflictException);
-    });
   });
 
   describe("updateOne", () => {
@@ -154,16 +128,6 @@ describe("SkillsService", () => {
       await expect(service.updateOne(invalidId, {})).rejects.toThrow(
         BadRequestException
       );
-    });
-
-    it("should throw ConflictException on duplicate slug during update", async () => {
-      (model.findByIdAndUpdate as jest.Mock).mockReturnValue({
-        exec: jest.fn().mockRejectedValue(makeDuplicateKeyError()),
-      });
-
-      await expect(
-        service.updateOne(validId, { slug: "taken-slug" })
-      ).rejects.toThrow(ConflictException);
     });
   });
 
