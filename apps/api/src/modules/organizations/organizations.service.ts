@@ -1,27 +1,21 @@
 import { Injectable } from "@nestjs/common";
 import { EventEmitter2 } from "@nestjs/event-emitter";
-import { InjectModel } from "@nestjs/mongoose";
-import { AnyKeys, Model, QueryFilter, SortOrder, UpdateQuery } from "mongoose";
+import { AnyKeys, QueryFilter, SortOrder, UpdateQuery } from "mongoose";
 import { BatchEntity } from "@/core/entities/batch.entity";
 import { DomainEvents } from "@/core/events/domain-events";
 import { OrganizationDeletedEvent } from "@/core/events/organization-deleted.event";
-import { MongooseCrudRepository } from "@/core/persistence/mongoose-crud.repository";
 import { PaginatedModel } from "@/core/schemas/paginated.schema";
 import { OrganizationModel } from "@/modules/organizations/schemas/organization.schema";
 import { CreateOrganizationInput } from "./dto/create-organization.input";
 import { UpdateOrganizationInput } from "./dto/update-organization.input";
+import { OrganizationsRepository } from "./organizations.repository";
 
 @Injectable()
 export class OrganizationsService {
-  private readonly repository: MongooseCrudRepository<OrganizationModel>;
-
   constructor(
-    @InjectModel(OrganizationModel.name)
-    readonly organizationModel: Model<OrganizationModel>,
+    private readonly repository: OrganizationsRepository,
     private readonly eventEmitter: EventEmitter2
-  ) {
-    this.repository = new MongooseCrudRepository(organizationModel);
-  }
+  ) {}
 
   findOneById(id: string): Promise<OrganizationModel> {
     return this.repository.findOneById(id);

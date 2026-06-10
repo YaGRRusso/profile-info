@@ -1,22 +1,15 @@
 import { Injectable } from "@nestjs/common";
-import { InjectModel } from "@nestjs/mongoose";
-import { AnyKeys, Model, QueryFilter, SortOrder, UpdateQuery } from "mongoose";
+import { AnyKeys, QueryFilter, SortOrder, UpdateQuery } from "mongoose";
 import { BatchEntity } from "@/core/entities/batch.entity";
-import { MongooseCrudRepository } from "@/core/persistence/mongoose-crud.repository";
 import { PaginatedModel } from "@/core/schemas/paginated.schema";
 import { ProjectModel } from "@/modules/projects/schemas/project.schema";
 import { CreateProjectInput } from "./dto/create-project.input";
 import { UpdateProjectInput } from "./dto/update-project.input";
+import { ProjectsRepository } from "./projects.repository";
 
 @Injectable()
 export class ProjectsService {
-  private readonly repository: MongooseCrudRepository<ProjectModel>;
-
-  constructor(
-    @InjectModel(ProjectModel.name) readonly projectModel: Model<ProjectModel>
-  ) {
-    this.repository = new MongooseCrudRepository(projectModel);
-  }
+  constructor(private readonly repository: ProjectsRepository) {}
 
   findOneById(id: string): Promise<ProjectModel> {
     return this.repository.findOneById(id);
@@ -88,9 +81,10 @@ export class ProjectsService {
     return this.repository.count();
   }
 
-  async detachSkill(skillId: string): Promise<void> {
-    await this.projectModel
-      .updateMany({ skills: skillId }, { $pull: { skills: skillId } })
-      .exec();
+  detachSkill(skillId: string): Promise<void> {
+    return this.repository.updateManyByFilter(
+      { skills: skillId },
+      { $pull: { skills: skillId } }
+    );
   }
 }

@@ -4,6 +4,7 @@ import { Test, TestingModule } from "@nestjs/testing";
 import { hash } from "bcryptjs";
 import mongoose, { Model } from "mongoose";
 import { UserModel } from "@/modules/users/schemas/user.schema";
+import { UsersRepository } from "./users.repository";
 import { UsersService } from "./users.service";
 
 jest.mock("bcryptjs", () => ({
@@ -37,6 +38,7 @@ describe("UsersService", () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         UsersService,
+        UsersRepository,
         {
           provide: getModelToken(UserModel.name),
           useValue: {

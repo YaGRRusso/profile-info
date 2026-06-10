@@ -1,23 +1,15 @@
 import { Injectable } from "@nestjs/common";
-import { InjectModel } from "@nestjs/mongoose";
-import { AnyKeys, Model, QueryFilter, SortOrder, UpdateQuery } from "mongoose";
+import { AnyKeys, QueryFilter, SortOrder, UpdateQuery } from "mongoose";
 import { BatchEntity } from "@/core/entities/batch.entity";
-import { MongooseCrudRepository } from "@/core/persistence/mongoose-crud.repository";
 import { PaginatedModel } from "@/core/schemas/paginated.schema";
 import { EducationModel } from "@/modules/educations/schemas/education.schema";
 import { CreateEducationInput } from "./dto/create-education.input";
 import { UpdateEducationInput } from "./dto/update-education.input";
+import { EducationsRepository } from "./educations.repository";
 
 @Injectable()
 export class EducationsService {
-  private readonly repository: MongooseCrudRepository<EducationModel>;
-
-  constructor(
-    @InjectModel(EducationModel.name)
-    readonly educationModel: Model<EducationModel>
-  ) {
-    this.repository = new MongooseCrudRepository(educationModel);
-  }
+  constructor(private readonly repository: EducationsRepository) {}
 
   findOneById(id: string): Promise<EducationModel> {
     return this.repository.findOneById(id);
@@ -91,15 +83,14 @@ export class EducationsService {
     return this.repository.count();
   }
 
-  async detachSkill(skillId: string): Promise<void> {
-    await this.educationModel
-      .updateMany({ skills: skillId }, { $pull: { skills: skillId } })
-      .exec();
+  detachSkill(skillId: string): Promise<void> {
+    return this.repository.updateManyByFilter(
+      { skills: skillId },
+      { $pull: { skills: skillId } }
+    );
   }
 
-  async purgeByOrganization(organizationId: string): Promise<void> {
-    await this.educationModel
-      .deleteMany({ organization: organizationId })
-      .exec();
+  purgeByOrganization(organizationId: string): Promise<void> {
+    return this.repository.deleteManyByFilter({ organization: organizationId });
   }
 }

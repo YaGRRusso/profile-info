@@ -1,24 +1,16 @@
-import { Injectable, NotFoundException } from "@nestjs/common";
-import { InjectModel } from "@nestjs/mongoose";
+import { Injectable } from "@nestjs/common";
 import { hash } from "bcryptjs";
-import { isNil } from "lodash";
-import { Model, QueryFilter, SortOrder, UpdateQuery } from "mongoose";
+import { QueryFilter, SortOrder, UpdateQuery } from "mongoose";
 import { BatchEntity } from "@/core/entities/batch.entity";
-import { MongooseCrudRepository } from "@/core/persistence/mongoose-crud.repository";
 import { PaginatedModel } from "@/core/schemas/paginated.schema";
 import { UserModel } from "@/modules/users/schemas/user.schema";
 import { CreateUserInput } from "./dto/create-user.input";
 import { UpdateUserInput } from "./dto/update-user.input";
+import { UsersRepository } from "./users.repository";
 
 @Injectable()
 export class UsersService {
-  private readonly repository: MongooseCrudRepository<UserModel>;
-
-  constructor(
-    @InjectModel(UserModel.name) readonly userModel: Model<UserModel>
-  ) {
-    this.repository = new MongooseCrudRepository(userModel);
-  }
+  constructor(private readonly repository: UsersRepository) {}
 
   findOneById(id: string): Promise<UserModel> {
     return this.repository.findOneById(id);
@@ -32,14 +24,8 @@ export class UsersService {
     return this.repository.findOne({ filters });
   }
 
-  async findOneByEmailWithPassword(email: string): Promise<UserModel> {
-    const res = await this.userModel
-      .findOne({ email })
-      .select("+password")
-      .exec();
-
-    if (isNil(res)) throw new NotFoundException("Not Found");
-    return res;
+  findOneByEmailWithPassword(email: string): Promise<UserModel> {
+    return this.repository.findOneByEmailWithPassword(email);
   }
 
   findManyById(ids: string[]): Promise<UserModel[]> {

@@ -1,23 +1,15 @@
 import { Injectable } from "@nestjs/common";
-import { InjectModel } from "@nestjs/mongoose";
-import { AnyKeys, Model, QueryFilter, SortOrder, UpdateQuery } from "mongoose";
+import { AnyKeys, QueryFilter, SortOrder, UpdateQuery } from "mongoose";
 import { BatchEntity } from "@/core/entities/batch.entity";
-import { MongooseCrudRepository } from "@/core/persistence/mongoose-crud.repository";
 import { PaginatedModel } from "@/core/schemas/paginated.schema";
 import { ExperienceModel } from "@/modules/experiences/schemas/experience.schema";
 import { CreateExperienceInput } from "./dto/create-experience.input";
 import { UpdateExperienceInput } from "./dto/update-experience.input";
+import { ExperiencesRepository } from "./experiences.repository";
 
 @Injectable()
 export class ExperiencesService {
-  private readonly repository: MongooseCrudRepository<ExperienceModel>;
-
-  constructor(
-    @InjectModel(ExperienceModel.name)
-    readonly experienceModel: Model<ExperienceModel>
-  ) {
-    this.repository = new MongooseCrudRepository(experienceModel);
-  }
+  constructor(private readonly repository: ExperiencesRepository) {}
 
   findOneById(id: string): Promise<ExperienceModel> {
     return this.repository.findOneById(id);
@@ -97,19 +89,15 @@ export class ExperiencesService {
     return this.repository.countByField(field);
   }
 
-  async detachSkill(skillId: string): Promise<void> {
-    await this.experienceModel
-      .updateMany(
-        { "roles.skills": skillId },
-        { $pull: { "roles.$[roleElem].skills": skillId } },
-        { arrayFilters: [{ "roleElem.skills": skillId }] }
-      )
-      .exec();
+  detachSkill(skillId: string): Promise<void> {
+    return this.repository.updateManyByFilter(
+      { "roles.skills": skillId },
+      { $pull: { "roles.$[roleElem].skills": skillId } },
+      { arrayFilters: [{ "roleElem.skills": skillId }] }
+    );
   }
 
-  async purgeByOrganization(organizationId: string): Promise<void> {
-    await this.experienceModel
-      .deleteMany({ organization: organizationId })
-      .exec();
+  purgeByOrganization(organizationId: string): Promise<void> {
+    return this.repository.deleteManyByFilter({ organization: organizationId });
   }
 }

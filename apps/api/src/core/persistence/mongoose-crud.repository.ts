@@ -16,7 +16,7 @@ import { BatchEntity } from "@/core/entities/batch.entity";
 import { PaginatedModel } from "@/core/schemas/paginated.schema";
 
 export class MongooseCrudRepository<T> {
-  constructor(private readonly model: Model<T>) {}
+  constructor(protected readonly model: Model<T>) {}
 
   async findOneById(id: string): Promise<T> {
     assertValidObjectId(id);
@@ -126,6 +126,20 @@ export class MongooseCrudRepository<T> {
 
     if (isNil(res)) throw new NotFoundException("Not Removed");
     return { count: res.deletedCount };
+  }
+
+  async updateManyByFilter(
+    filter: QueryFilter<T>,
+    update: UpdateQuery<T>,
+    options?: { arrayFilters?: Record<string, unknown>[] }
+  ): Promise<void> {
+    await this.model
+      .updateMany(clearObject(filter) as QueryFilter<T>, update, options)
+      .exec();
+  }
+
+  async deleteManyByFilter(filter: QueryFilter<T>): Promise<void> {
+    await this.model.deleteMany(clearObject(filter) as QueryFilter<T>).exec();
   }
 
   async count(): Promise<number> {
