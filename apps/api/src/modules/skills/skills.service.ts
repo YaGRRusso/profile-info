@@ -47,8 +47,8 @@ export class SkillsService {
     return this.repository.findMany({ filters, sort, skip, limit });
   }
 
-  async createOne(createInput: CreateSkillInput): Promise<SkillModel> {
-    return await this.repository.createOne(createInput as AnyKeys<SkillModel>);
+  createOne(createInput: CreateSkillInput): Promise<SkillModel> {
+    return this.repository.createOne(createInput as AnyKeys<SkillModel>);
   }
 
   createMany(createInputs: CreateSkillInput[]): Promise<SkillModel[]> {

@@ -86,15 +86,15 @@ export class OrganizationsService {
   }
 
   async removeOne(id: string): Promise<OrganizationModel> {
-    const res = await this.repository.findOneById(id);
+    const organization = await this.repository.findOneById(id);
 
     await this.eventEmitter.emitAsync(
       DomainEvents.organization.deleted,
-      new OrganizationDeletedEvent(res._id.toString())
+      new OrganizationDeletedEvent(organization._id.toString())
     );
 
     await this.repository.deleteOne(id);
-    return res;
+    return organization;
   }
 
   async removeMany(ids: string[]): Promise<BatchEntity> {
