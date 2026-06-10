@@ -1,4 +1,4 @@
-import type { Model } from "mongoose";
+import type { Model, QueryFilter, UpdateQuery } from "mongoose";
 
 /**
  * Removes a reference ID from an array field across all documents that contain it.
@@ -10,13 +10,13 @@ import type { Model } from "mongoose";
  */
 export async function detachReference<T>(
   model: Model<T>,
-  field: string,
+  field: keyof T & string,
   referenceId: string
 ): Promise<void> {
   await model
     .updateMany(
-      { [field]: referenceId } as any,
-      { $pull: { [field]: referenceId } } as any
+      { [field]: referenceId } as QueryFilter<T>,
+      { $pull: { [field]: referenceId } } as UpdateQuery<T>
     )
     .exec();
 }
@@ -26,26 +26,27 @@ export async function detachReference<T>(
  * Uses arrayFilters for targeted updates within nested arrays.
  *
  * Usage:
- *   await detachNestedReference(
- *     this.experienceModel,
- *     "roles.$[elem].skills",
- *     { "elem.skills": skillId },
- *     skillId
- *   );
+ *   await detachNestedReference(this.experienceModel, {
+ *     filter: "roles.skills",
+ *     pullPath: "roles.$[elem].skills",
+ *     arrayFilter: { "elem.skills": skillId },
+ *     referenceId: skillId,
+ *   });
  */
 export async function detachNestedReference<T>(
   model: Model<T>,
-  pullPath: string,
-  arrayFilter: Record<string, unknown>,
-  referenceId: string
+  options: {
+    filter: string;
+    pullPath: string;
+    arrayFilter: Record<string, unknown>;
+    referenceId: string;
+  }
 ): Promise<void> {
-  const filterField = pullPath.split(".$[")[0];
-
   await model
     .updateMany(
-      { [filterField]: referenceId } as any,
-      { $pull: { [pullPath]: referenceId } } as any,
-      { arrayFilters: [arrayFilter] }
+      { [options.filter]: options.referenceId } as QueryFilter<T>,
+      { $pull: { [options.pullPath]: options.referenceId } } as UpdateQuery<T>,
+      { arrayFilters: [options.arrayFilter] }
     )
     .exec();
 }

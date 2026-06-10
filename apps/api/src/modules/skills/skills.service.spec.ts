@@ -5,8 +5,8 @@ import {
 } from "@nestjs/common";
 import { EventEmitter2 } from "@nestjs/event-emitter";
 import { getModelToken } from "@nestjs/mongoose";
-import { Test, TestingModule } from "@nestjs/testing";
-import mongoose, { Model } from "mongoose";
+import { Test, type TestingModule } from "@nestjs/testing";
+import mongoose, { type Model } from "mongoose";
 import { DomainEvents } from "@/core/events/domain-events";
 import { SkillCreatedEvent } from "@/core/events/skill-created.event";
 import { SkillDeletedEvent } from "@/core/events/skill-deleted.event";

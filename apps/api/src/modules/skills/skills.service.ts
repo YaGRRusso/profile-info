@@ -2,7 +2,7 @@ import { Injectable } from "@nestjs/common";
 import { EventEmitter2 } from "@nestjs/event-emitter";
 import { AnyKeys, QueryFilter, SortOrder, UpdateQuery } from "mongoose";
 import { BatchEntity } from "@/core/entities/batch.entity";
-import { assertUniqueConstraint } from "@/core/errors/duplicate-key.helper";
+import { throwIfDuplicateKey } from "@/core/errors/mongo-errors.helper";
 import { DomainEvents } from "@/core/events/domain-events";
 import { SkillCreatedEvent } from "@/core/events/skill-created.event";
 import { SkillDeletedEvent } from "@/core/events/skill-deleted.event";
@@ -54,10 +54,14 @@ export class SkillsService {
   // --- Commands ---
 
   async createOne(createInput: CreateSkillInput): Promise<SkillModel> {
-    const skill = await assertUniqueConstraint(
-      () => this.repository.createOne(createInput as AnyKeys<SkillModel>),
-      "slug"
-    );
+    let skill: SkillModel;
+    try {
+      skill = await this.repository.createOne(
+        createInput as AnyKeys<SkillModel>
+      );
+    } catch (error) {
+      throwIfDuplicateKey(error, "slug");
+    }
 
     await this.eventEmitter.emitAsync(
       DomainEvents.skill.created,
@@ -67,22 +71,28 @@ export class SkillsService {
     return skill;
   }
 
-  createMany(createInputs: CreateSkillInput[]): Promise<SkillModel[]> {
-    return assertUniqueConstraint(
-      () => this.repository.createMany(createInputs as AnyKeys<SkillModel>[]),
-      "slug"
-    );
+  async createMany(createInputs: CreateSkillInput[]): Promise<SkillModel[]> {
+    try {
+      return await this.repository.createMany(
+        createInputs as AnyKeys<SkillModel>[]
+      );
+    } catch (error) {
+      throwIfDuplicateKey(error, "slug");
+    }
   }
 
-  updateOne(id: string, updateInput: UpdateSkillInput): Promise<SkillModel> {
-    return assertUniqueConstraint(
-      () =>
-        this.repository.updateOne(
-          id,
-          updateInput as object as UpdateQuery<SkillModel>
-        ),
-      "slug"
-    );
+  async updateOne(
+    id: string,
+    updateInput: UpdateSkillInput
+  ): Promise<SkillModel> {
+    try {
+      return await this.repository.updateOne(
+        id,
+        updateInput as object as UpdateQuery<SkillModel>
+      );
+    } catch (error) {
+      throwIfDuplicateKey(error, "slug");
+    }
   }
 
   updateMany(
