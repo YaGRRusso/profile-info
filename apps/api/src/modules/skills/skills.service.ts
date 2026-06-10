@@ -1,26 +1,21 @@
 import { Injectable } from "@nestjs/common";
 import { EventEmitter2 } from "@nestjs/event-emitter";
-import { InjectModel } from "@nestjs/mongoose";
-import { AnyKeys, Model, QueryFilter, SortOrder, UpdateQuery } from "mongoose";
+import { AnyKeys, QueryFilter, SortOrder, UpdateQuery } from "mongoose";
 import { BatchEntity } from "@/core/entities/batch.entity";
 import { DomainEvents } from "@/core/events/domain-events";
 import { SkillDeletedEvent } from "@/core/events/skill-deleted.event";
-import { MongooseCrudRepository } from "@/core/persistence/mongoose-crud.repository";
 import { PaginatedModel } from "@/core/schemas/paginated.schema";
 import { SkillModel } from "@/modules/skills/schemas/skill.schema";
 import { CreateSkillInput } from "./dto/create-skill.input";
 import { UpdateSkillInput } from "./dto/update-skill.input";
+import { SkillsRepository } from "./skills.repository";
 
 @Injectable()
 export class SkillsService {
-  private readonly repository: MongooseCrudRepository<SkillModel>;
-
   constructor(
-    @InjectModel(SkillModel.name) readonly skillModel: Model<SkillModel>,
+    private readonly repository: SkillsRepository,
     private readonly eventEmitter: EventEmitter2
-  ) {
-    this.repository = new MongooseCrudRepository(skillModel);
-  }
+  ) {}
 
   findOneById(id: string): Promise<SkillModel> {
     return this.repository.findOneById(id);
@@ -78,15 +73,15 @@ export class SkillsService {
   }
 
   async removeOne(id: string): Promise<SkillModel> {
-    const res = await this.repository.findOneById(id);
+    const skill = await this.repository.findOneById(id);
 
     await this.eventEmitter.emitAsync(
       DomainEvents.skill.deleted,
-      new SkillDeletedEvent(res._id.toString())
+      new SkillDeletedEvent(skill._id.toString())
     );
 
     await this.repository.deleteOne(id);
-    return res;
+    return skill;
   }
 
   async removeMany(ids: string[]): Promise<BatchEntity> {

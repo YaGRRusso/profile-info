@@ -4,6 +4,7 @@ import {
   ExperienceModel,
   ExperienceSchema,
 } from "@/modules/experiences/schemas/experience.schema";
+import { ExperiencesRepository } from "./experiences.repository";
 import {
   ExperienceRoleResolver,
   ExperiencesResolver,
@@ -19,6 +20,7 @@ import { OnSkillDeletedListener } from "./listeners/on-skill-deleted.listener";
     ]),
   ],
   providers: [
+    ExperiencesRepository,
     ExperiencesResolver,
     ExperienceRoleResolver,
     ExperiencesService,

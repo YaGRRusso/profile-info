@@ -5,8 +5,8 @@ import { AuthGuard } from "@nestjs/passport";
 import { Request } from "express";
 import { GraphQLError } from "graphql";
 import { Observable } from "rxjs";
+import type { GraphqlContext } from "@/core/context/graphql-context.interface";
 import { PUBLIC_KEY } from "@/core/decorators/public-route.decorator";
-import { Ctx } from "@/modules/graphql/context.interface";
 
 @Injectable()
 export class GqlAuthGuard extends AuthGuard("jwt") {
@@ -30,7 +30,7 @@ export class GqlAuthGuard extends AuthGuard("jwt") {
 
   getRequest(context: ExecutionContext): Request {
     const ctx = GqlExecutionContext.create(context);
-    return (ctx.getContext() as Ctx).req;
+    return (ctx.getContext() as GraphqlContext).req;
   }
 
   handleRequest<TUser>(err: Error | null, user: TUser): TUser {

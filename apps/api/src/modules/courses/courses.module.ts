@@ -4,6 +4,7 @@ import {
   CourseModel,
   CourseSchema,
 } from "@/modules/courses/schemas/course.schema";
+import { CoursesRepository } from "./courses.repository";
 import { CoursesResolver } from "./courses.resolver";
 import { CoursesService } from "./courses.service";
 import { OnOrganizationDeletedListener } from "./listeners/on-organization-deleted.listener";
@@ -16,6 +17,7 @@ import { OnSkillDeletedListener } from "./listeners/on-skill-deleted.listener";
     ]),
   ],
   providers: [
+    CoursesRepository,
     CoursesResolver,
     CoursesService,
     OnSkillDeletedListener,

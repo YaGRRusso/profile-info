@@ -4,6 +4,7 @@ import { getModelToken } from "@nestjs/mongoose";
 import { Test, TestingModule } from "@nestjs/testing";
 import mongoose, { Model } from "mongoose";
 import { OrganizationModel } from "@/modules/organizations/schemas/organization.schema";
+import { OrganizationsRepository } from "./organizations.repository";
 import { OrganizationsService } from "./organizations.service";
 
 const validId = new mongoose.Types.ObjectId().toHexString();
@@ -32,6 +33,7 @@ describe("OrganizationsService", () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         OrganizationsService,
+        OrganizationsRepository,
         {
           provide: getModelToken(OrganizationModel.name),
           useValue: {

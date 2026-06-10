@@ -59,6 +59,7 @@ Request flow: Apollo → `GqlAuthGuard` (unless `@Public()`) → resolver → se
 
 `core/` (cross-cutting NestJS infra, domain-agnostic):
 
+- `filters/persistence-exception.filter.ts`: global `APP_FILTER` — maps persistence errors to HTTP exceptions: Mongo `E11000`/`E11001` → 409, Mongo `121` + Mongoose `ValidationError`/`CastError` → 400, `MongooseServerSelectionError` → 503. Services do not catch these; use `assertDuplicate` / `assertReferencesExist` in `common/helpers/assert.helper.ts` only for domain-specific pre-checks.
 - `events/`: `domain-events.ts` (event name constants), `skill-deleted.event.ts`, `organization-deleted.event.ts` (neutral payload classes).
 - `enums/user-role.enum.ts`: shared `UserRole` enum (`USER`, `ADMIN`).
 - `schemas/paginated.schema.ts`: `createPaginatedModel(Entity)` for `{ found, nodes }`.
@@ -127,9 +128,10 @@ Copy `src/modules/skills/` and adapt:
 1. Mongoose model: `src/modules/<name>/schemas/<name>.schema.ts` extending `BaseModel`.
 2. GraphQL entity: `modules/<name>/entities/<name>.entity.ts` extending `BaseEntity`; export `Paginated<Name>Entity = createPaginatedModel(...)`.
 3. Inputs: `Create`, `Update` (PartialType), `Filter` (PartialType), `Sort` (SortType factory).
-4. Service: explicit CRUD methods (`findOneById`, `findMany`, `createOne`, `removeOne`, etc.). Standard Mongo operations delegate to `MongooseCrudRepository` in `core/persistence/`; keep domain logic (events, password hashing, `detachSkill`, `purgeByOrganization`) in the service. `skills.service.ts` is the reference for delete events; `users.service.ts` for password hashing.
-5. Resolver: explicit `@Query` / `@Mutation` methods with `@Public()` on reads; wire pagination/sort/filter args like `skills.resolver.ts`.
-6. Module: `MongooseModule.forFeature`, providers, export service if needed for loaders. Import in `app.module.ts`.
+4. Repository: `<entity>.repository.ts` extends `MongooseCrudRepository<T>`, registered as an `@Injectable()` provider in the module. Entity-specific queries (e.g. `UsersRepository.findOneByEmailWithPassword`) live on the repository.
+5. Service: explicit CRUD methods delegating to the repository; keep domain logic (events, password hashing, `detachSkill`, `purgeByOrganization`) in the service. Filter-based writes use `updateManyByFilter` / `deleteManyByFilter` on the base repository. `skills.service.ts` is the reference for delete events; `users.service.ts` for password hashing.
+6. Resolver: explicit `@Query` / `@Mutation` methods with `@Public()` on reads; wire pagination/sort/filter args like `skills.resolver.ts`.
+7. Module: `MongooseModule.forFeature`, providers (include repository), export service if needed for loaders. Import in `app.module.ts`.
 
 If other modules reference the new entity in arrays: add payload to `core/events/`, emit from `removeOne` / `removeMany`, add a service method in each consumer (e.g. `detachSkill`), and a thin listener that delegates to it.
 

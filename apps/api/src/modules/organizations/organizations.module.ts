@@ -4,6 +4,7 @@ import {
   OrganizationModel,
   OrganizationSchema,
 } from "@/modules/organizations/schemas/organization.schema";
+import { OrganizationsRepository } from "./organizations.repository";
 import { OrganizationsResolver } from "./organizations.resolver";
 import { OrganizationsService } from "./organizations.service";
 import { OrganizationsLoaderService } from "./organizations-loader.service";
@@ -15,6 +16,7 @@ import { OrganizationsLoaderService } from "./organizations-loader.service";
     ]),
   ],
   providers: [
+    OrganizationsRepository,
     OrganizationsResolver,
     OrganizationsService,
     OrganizationsLoaderService,

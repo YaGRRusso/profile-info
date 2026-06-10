@@ -1,16 +1,21 @@
 import { BadRequestException, NotFoundException } from "@nestjs/common";
 import { EventEmitter2 } from "@nestjs/event-emitter";
 import { getModelToken } from "@nestjs/mongoose";
-import { Test, TestingModule } from "@nestjs/testing";
-import mongoose, { Model } from "mongoose";
+import { Test, type TestingModule } from "@nestjs/testing";
+import mongoose, { type Model } from "mongoose";
 import { DomainEvents } from "@/core/events/domain-events";
 import { SkillDeletedEvent } from "@/core/events/skill-deleted.event";
 import { SkillModel } from "@/modules/skills/schemas/skill.schema";
+import { SkillsRepository } from "./skills.repository";
 import { SkillsService } from "./skills.service";
 
 const validId = new mongoose.Types.ObjectId().toHexString();
 const invalidId = "not-an-object-id";
-const fakeDoc = { _id: validId, name: "TypeScript" } as unknown as SkillModel;
+const fakeDoc = {
+  _id: validId,
+  name: "TypeScript",
+  slug: "typescript",
+} as unknown as SkillModel;
 
 function makeExec(returnValue: unknown) {
   return {
@@ -32,6 +37,7 @@ describe("SkillsService", () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         SkillsService,
+        SkillsRepository,
         {
           provide: getModelToken(SkillModel.name),
           useValue: {
@@ -39,6 +45,7 @@ describe("SkillsService", () => {
             findOne: jest.fn(),
             find: jest.fn(),
             create: jest.fn(),
+            countDocuments: jest.fn(),
             findByIdAndUpdate: jest.fn(),
             updateMany: jest.fn(),
             findByIdAndDelete: jest.fn(),
@@ -84,9 +91,13 @@ describe("SkillsService", () => {
   });
 
   describe("createOne", () => {
-    it("should return the created document", async () => {
+    it("should create and return the document", async () => {
       (model.create as jest.Mock).mockResolvedValue(fakeDoc);
-      const result = await service.createOne({ name: "TypeScript" } as any);
+      const result = await service.createOne({
+        name: "TypeScript",
+        slug: "typescript",
+        category: "LANGUAGE" as any,
+      });
       expect(result).toBe(fakeDoc);
     });
   });
@@ -94,7 +105,7 @@ describe("SkillsService", () => {
   describe("updateOne", () => {
     it("should return the updated document", async () => {
       (model.findByIdAndUpdate as jest.Mock).mockReturnValue(makeExec(fakeDoc));
-      expect(await service.updateOne(validId, {})).toBe(fakeDoc);
+      expect(await service.updateOne(validId, { name: "TS" })).toBe(fakeDoc);
     });
 
     it("should throw BadRequestException for invalid ID", async () => {

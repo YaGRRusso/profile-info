@@ -3,6 +3,7 @@ import { getModelToken } from "@nestjs/mongoose";
 import { Test, TestingModule } from "@nestjs/testing";
 import mongoose, { Model } from "mongoose";
 import { EducationModel } from "@/modules/educations/schemas/education.schema";
+import { EducationsRepository } from "./educations.repository";
 import { EducationsService } from "./educations.service";
 
 const validId = new mongoose.Types.ObjectId().toHexString();
@@ -31,6 +32,7 @@ describe("EducationsService", () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         EducationsService,
+        EducationsRepository,
         {
           provide: getModelToken(EducationModel.name),
           useValue: {
