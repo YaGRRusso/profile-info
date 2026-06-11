@@ -1,34 +1,30 @@
-import { DownloadSimpleIcon } from "@phosphor-icons/react";
-import { useState } from "react";
-import { SelectInput } from "@/components/inputs/select";
 import { LOCALES, LocaleEnum } from "@/consts/locales";
+import { downloadBlob } from "@/lib/download-blob";
 
+// TODO refactor this to use the API directly
 export function DownloadCvControl() {
-  const [locale, setLocale] = useState(LocaleEnum.ENGLISH);
-  const [isPending] = useState(false);
-
-  function handleDownload() {
-    console.log("download cv", { locale });
+  async function handleDownload(locale: LocaleEnum) {
+    const baseUrl = import.meta.env.VITE_API_URL.replace("/graphql", "");
+    const response = await fetch(`${baseUrl}/resume.pdf?locale=${locale}`);
+    const blob = await response.blob();
+    downloadBlob(blob, "resume.pdf");
   }
 
   return (
-    <div className="flex items-center gap-2">
-      <SelectInput
-        label="CV language"
-        name="cv-locale"
-        onChange={(value) => setLocale(value as LocaleEnum)}
-        options={LOCALES}
-        value={locale}
-      />
-      <button
-        className="btn btn-sm btn-soft mt-auto"
-        disabled={isPending}
-        onClick={handleDownload}
-        type="button"
-      >
-        <DownloadSimpleIcon />
+    <select
+      className="select"
+      disabled={false}
+      onChange={(event) => handleDownload(event.target.value as LocaleEnum)}
+      value=""
+    >
+      <option disabled value="">
         Download CV
-      </button>
-    </div>
+      </option>
+      {LOCALES.map((locale) => (
+        <option key={locale.value} value={locale.value}>
+          {locale.label}
+        </option>
+      ))}
+    </select>
   );
 }
