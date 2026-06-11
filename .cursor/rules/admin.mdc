@@ -30,7 +30,7 @@ Data flow: hooks call `execute(document, variables)` from `src/lib/execute.ts`. 
 Routing:
 
 - `_authenticated.tsx`: protected layout; `useGetMe()` when token exists; login page when unauthenticated.
-- `index.tsx`: dashboard via `useDashboard()` (stats + recharts).
+- `index.tsx`: dashboard via `useDashboard()` (stats + recharts) + `DownloadCvControl` (`GET /resume.pdf`).
 - `_authenticated/_sidebar/`: CRUD pages per entity with `-components/table.tsx`.
 
 Rich forms map flat Zod schemas to nested GraphQL shapes (`i18n`, `organization`, `skills`, `period`, experience `roles`).
@@ -41,7 +41,7 @@ Rich forms map flat Zod schemas to nested GraphQL shapes (`i18n`, `organization`
 - **TanStack Router**: `src/routes/`, generated `routeTree.gen.ts`.
 - **TanStack Query**: hooks in `src/hooks/`.
 - **GraphQL Codegen**: `codegen.ts` → `src/generated/graphql/` from `../api/src/schema.gql`.
-- **GraphQL client**: `src/lib/execute.ts` (plain fetch).
+- **GraphQL client**: `src/lib/execute.ts` (plain fetch). Binary downloads use `src/lib/download.ts` (`getApiBaseUrl()`, `downloadBlob()`).
 - **Zustand**: `stores/auth.ts`, `stores/theme.ts` (persisted).
 - **TanStack Form + Zod**: `src/forms/`.
 - **Tailwind v4 + DaisyUI**: `src/styles/globals.css`.

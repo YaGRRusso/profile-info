@@ -8,7 +8,7 @@ import { RangeInput } from "@/components/inputs/range";
 import { SelectInput } from "@/components/inputs/select";
 import { TextInput } from "@/components/inputs/text";
 import { TextareaInput } from "@/components/inputs/textarea";
-import { LOCALES, LocaleEnum } from "@/consts/locales";
+import { LOCALES } from "@/consts/locales";
 import { RawSizeEnum } from "@/consts/raw-size";
 import { SLUG_REGEX } from "@/consts/regex";
 import {
@@ -20,6 +20,7 @@ import {
 import { useSummarize, useTranslate } from "@/hooks/mutations/ai";
 import { OrganizationRow } from "@/hooks/queries/organizations";
 import { fieldError } from "@/lib/field-error";
+import { createEmptyI18n } from "@/lib/i18n";
 import { CommonFormProps } from "./common";
 
 const organizationSchema = z.object({
@@ -116,10 +117,7 @@ export function OrganizationForm({
       logo: "",
       website: "",
       relevance: 1,
-      i18n: [
-        { locale: LocaleEnum.PORTUGUESE, description: "" },
-        { locale: LocaleEnum.ENGLISH, description: "" },
-      ],
+      i18n: createEmptyI18n({ description: "" }),
       ...defaultValues,
     },
     onSubmit: ({ value }) => onSubmit?.(value),

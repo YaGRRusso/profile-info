@@ -32,7 +32,7 @@ src/
 │   ├── _authenticated/
 │   │   ├── _sidebar.tsx       # Sidebar/drawer shell with navigation.
 │   │   └── _sidebar/
-│   │       ├── index.tsx      # Home page.
+│   │       ├── index.tsx      # Home page (dashboard + Download CV).
 │   │       └── skills/        # Skills management page + its table component.
 │   └── -components/           # login, error, not-found pages.
 ├── hooks/
@@ -80,3 +80,7 @@ npm run api:dev
 ```bash
 npm run admin:dev
 ```
+
+### Download CV
+
+The dashboard home (`/`) includes a **Download CV** button. It fetches `GET /resume.pdf` from the API base URL (derived from `VITE_API_URL` without the `/graphql` suffix) and saves `resume.pdf` locally.

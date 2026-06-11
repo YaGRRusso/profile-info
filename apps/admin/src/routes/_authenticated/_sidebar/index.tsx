@@ -17,6 +17,7 @@ import { DataState } from "@/components/display/data-state";
 import { PageTitle } from "@/components/display/page-title";
 import { useDashboard } from "@/hooks/queries/dashboard";
 import { useAuthStore } from "@/stores/auth";
+import { DownloadCvControl } from "./-components/download-cv";
 
 export const Route = createFileRoute("/_authenticated/_sidebar/")({
   component: RouteComponent,
@@ -74,10 +75,13 @@ function RouteComponent() {
 
   return (
     <div className="flex flex-col gap-4">
-      <PageTitle
-        description="An overview of your profile data."
-        title={`Hello, ${user?.name}!`}
-      />
+      <div className="flex flex-wrap items-start justify-between gap-4">
+        <PageTitle
+          description="An overview of your profile data."
+          title={`Hello, ${user?.name}!`}
+        />
+        <DownloadCvControl />
+      </div>
 
       <DataState
         isFetching={dashboard.isFetching}

@@ -39,6 +39,7 @@ modules         ← business domains (resolvers, services, schemas)
 | **`modules/auth/`** | JWT guard, `signIn`, `getMe`. Global auth, not a CRUD entity. | Security cross-cut; uses `UsersService.findOneByEmailWithPassword`. |
 | **`modules/graphql/`** | `GraphqlModule` + `LoadersService`. Wires Apollo; composes loaders exported by entity modules. | Transport infra — batching logic stays in each `*LoaderService`. |
 | **`modules/dashboard/`** | Read-only stats; imports other modules' **services** (not Mongoose models). | Aggregation without bypassing service boundaries. |
+| **`modules/resume/`** | Aggregates profile data and renders an English PDF via `GET /resume.pdf`. Uses `pdfkit`; imports feature services like dashboard. | CV export for admin and external portfolio clients. |
 | **`modules/ai-tools/`** | AI use-cases (summarize, translate, ATS). Owns `AiEntity`, enums, and mappers. | Converts `IntegrationChatResult` → GraphQL; orchestrates `*ExtractorService` before calling `AiChatProvider`. |
 
 ### Request flow (typical)
@@ -56,6 +57,7 @@ The threat model is intentional, not accidental:
 | Operation class | Auth | Who |
 |-----------------|------|-----|
 | Profile reads (`findManySkills`, `findManyExperiences`, …) | None (`@Public()`) | Anyone |
+| `GET /resume.pdf` | None (REST; guard skips non-GraphQL) | Anyone |
 | `signIn` | None (`@Public()`) | Anyone |
 | `getMe` | JWT | Any authenticated user |
 | `dashboard` | JWT + `ADMIN` role | Admin only |
@@ -106,6 +108,7 @@ src/
     ├── graphql/
     ├── auth/
     ├── dashboard/
+    ├── resume/               # PDF export (REST GET /resume.pdf)
     ├── skills/               # Canonical CRUD module; exports SkillsLoaderService
     ├── ai-tools/
     │   ├── resource-detail/  # Orchestrator + *ExtractorService per source
@@ -148,11 +151,21 @@ npm run api:dev
 
 After GraphQL type changes, rebuild or boot the API so `src/schema.gql` regenerates, then run admin codegen (`npm run admin:build` or `npx graphql-codegen` in `apps/admin`). Tests never write to this file (`NODE_ENV=test` keeps the schema in memory).
 
+### Resume PDF export
+
+```
+GET /resume.pdf
+```
+
+Returns `application/pdf` with `Content-Disposition: attachment; filename="resume.pdf"`. Content and section labels are always in English. Aggregates the admin user's profile data (top items by `relevance`, completed educations/courses only).
+
+The admin dashboard downloads this endpoint directly (base URL derived from `VITE_API_URL` by stripping `/graphql`).
+
 ## Testing
 
 ```bash
 npm run test          # unit tests
-npm run test:e2e      # GraphQL auth, delete cascade, health smoke
+npm run test:e2e      # GraphQL auth, delete cascade, resume PDF, health smoke
 ```
 
 E2E tests use `mongodb://127.0.0.1:27017/profile-test-e2e` by default (Docker Compose MongoDB). Set `TEST_DATABASE_URL` to override. Set `USE_MEMORY_MONGO=true` for in-memory Mongo (downloads binary on first run).
