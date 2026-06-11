@@ -142,9 +142,19 @@ function RouteComponent() {
         />
         <div className="flex min-h-full is-drawer-close:w-16 is-drawer-open:w-64 flex-col items-start bg-base-200">
           <div className="flex w-full items-center gap-2 p-4">
-            <div className="avatar avatar-placeholder">
-              <div className="is-drawer-close:w-8 w-10 rounded-full bg-neutral text-neutral-content transition-all">
-                <span>{user?.name?.charAt(0)}</span>
+            <div className="avatar avatar-placeholder rounded-full bg-neutral text-neutral-content">
+              <div className="is-drawer-close:w-8 w-10 transition-all">
+                {user?.avatar ? (
+                  <img
+                    alt={user?.name}
+                    className="rounded-full"
+                    height={32}
+                    src={user?.avatar}
+                    width={32}
+                  />
+                ) : (
+                  <span>{user?.name?.charAt(0) ?? "?"}</span>
+                )}
               </div>
             </div>
             <div className="flex is-drawer-close:hidden flex-col">
