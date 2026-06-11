@@ -226,6 +226,15 @@ async function seed() {
     nickname: "admin",
     email: "admin@profile.info",
     password: await hash("pass.123", 8),
+    address: faker.location.streetAddress(),
+    avatar: faker.image.urlPicsumPhotos(),
+    birth: faker.date.past({ years: 30 }),
+    phone: faker.phone.number(),
+    title: faker.person.jobTitle(),
+    urls: faker.helpers.arrayElements(URL_TYPES).map((type) => ({
+      title: type,
+      value: faker.internet.url(),
+    })),
     role: UserRole.ADMIN,
   });
 

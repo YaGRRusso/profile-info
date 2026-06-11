@@ -1,7 +1,6 @@
 import { Type } from "@nestjs/common";
 import { Field, InputType } from "@nestjs/graphql";
-import { IsIn, IsNotEmpty, IsString } from "class-validator";
-import { SUPPORTED_CONTENT_LOCALES } from "@/common/i18n/locales";
+import { IsNotEmpty, IsString } from "class-validator";
 
 export interface TranslationInput<T> {
   locale: string;
@@ -18,7 +17,6 @@ export function createTranslationInput<T>(
     @Field(() => String)
     @IsString()
     @IsNotEmpty()
-    @IsIn([...SUPPORTED_CONTENT_LOCALES])
     locale: string;
 
     @Field(() => MessagesModel)

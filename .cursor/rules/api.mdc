@@ -53,7 +53,7 @@ Request flow: Apollo → `GqlAuthGuard` (unless `@Public()`) → resolver → se
 `common/` (pure TS, no NestJS/Mongoose/GraphQL imports):
 
 - `helpers/`: `object.helper.ts` (`clearObject`), `object-id.helper.ts` (`assertValidObjectId`, `assertValidObjectIds`), `daterange.helper.ts` (`sortDateRange`), `pick-translation.helper.ts` (`pickTranslation`), `format-period.helper.ts` (`formatPeriod`), `breakpoint.helper.ts`.
-- `i18n/locales.ts`: `Locale`, `LocaleCode`, `DEFAULT_LOCALE`, `SUPPORTED_CONTENT_LOCALES`, `DEFAULT_TRANSLATION_FALLBACKS`, `INTL_LOCALES`, `normalizeLocale`. Keep admin `consts/locales.ts` in sync manually.
+- `i18n/locales.ts`: `Locale`, `SUPPORTED_CONTENT_LOCALES`, `normalizeLocale` — app-owned copy (resume PDF, future errors). Entity `i18n[].locale` is a free string (`@IsString` + `@IsNotEmpty` only).
 - `execution/orchestrator.helper.ts`: `orchestrate(...)`, a concurrency-limited + timeout task runner (plain function, used by `ai-tools`).
 
 `common` holds only generic primitives — it does **not** own integration contracts. Each capability boundary owns its own port (see `integrations/`).

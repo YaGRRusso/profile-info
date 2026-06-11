@@ -8,6 +8,7 @@ export type LocaleCode = (typeof Locale)[keyof typeof Locale];
 
 export const DEFAULT_LOCALE: LocaleCode = Locale.EN;
 
+/** App-owned locales (resume PDF, future API copy). Not a constraint on entity i18n. */
 export const SUPPORTED_CONTENT_LOCALES = [
   Locale.EN,
   Locale.PT,
