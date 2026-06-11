@@ -7,6 +7,7 @@ import { ProfileForm, profileToForm, profileToInput } from "@/forms/profile";
 import { useUpdateMe } from "@/hooks/mutations/users";
 import { useGetMe } from "@/hooks/queries/auth";
 import { useAuthStore } from "@/stores/auth";
+import { ProfileSummary } from "./-components/profile-summary";
 
 export const Route = createFileRoute("/_authenticated/_sidebar/settings/")({
   component: RouteComponent,
@@ -27,32 +28,39 @@ function RouteComponent() {
 
       <DataState isLoading={getMe.isPending}>
         <DataState.Loading>
-          <div className="skeleton h-96 w-full max-w-xl" />
+          <div className="grid gap-6 lg:grid-cols-3">
+            <div className="skeleton h-168 lg:col-span-2" />
+            <div className="skeleton h-96" />
+          </div>
         </DataState.Loading>
 
         <DataState.Content>
           {user && (
-            <div className="w-full max-w-xl">
-              <ProfileForm
-                defaultValues={profileToForm(user)}
-                isLoading={updateMe.isPending}
-                key={formKey}
-                onSubmit={async (values) => {
-                  const updated = await updateMe.mutateAsync(
-                    profileToInput(values)
-                  );
-                  toast.success("Profile updated successfully");
-                  setUser({
-                    id: updated.updateMe.id,
-                    email: updated.updateMe.email,
-                    name: updated.updateMe.name,
-                    nickname: updated.updateMe.nickname,
-                    role: updated.updateMe.role,
-                    avatar: updated.updateMe.avatar,
-                  });
-                  setFormKey((key) => key + 1);
-                }}
-              />
+            <div className="grid items-start gap-6 lg:grid-cols-3">
+              <div className="lg:col-span-2">
+                <ProfileForm
+                  defaultValues={profileToForm(user)}
+                  isLoading={updateMe.isPending}
+                  key={formKey}
+                  onSubmit={async (values) => {
+                    const updated = await updateMe.mutateAsync(
+                      profileToInput(values)
+                    );
+                    toast.success("Profile updated successfully");
+                    setUser({
+                      id: updated.updateMe.id,
+                      email: updated.updateMe.email,
+                      name: updated.updateMe.name,
+                      nickname: updated.updateMe.nickname,
+                      role: updated.updateMe.role,
+                      avatar: updated.updateMe.avatar,
+                    });
+                    setFormKey((key) => key + 1);
+                  }}
+                />
+              </div>
+
+              <ProfileSummary user={user} />
             </div>
           )}
         </DataState.Content>

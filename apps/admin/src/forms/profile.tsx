@@ -97,185 +97,204 @@ export function ProfileForm({
 
   return (
     <form
-      className="form"
+      className="flex flex-col gap-6"
       onSubmit={(e) => {
         e.preventDefault();
         e.stopPropagation();
         form.handleSubmit();
       }}
     >
-      <div className="divider">Personal</div>
-
-      <Field name="name">
-        {(field) => (
-          <TextInput
-            error={fieldError(field.state.meta)}
-            label="Name"
-            name={field.name}
-            onChange={field.handleChange}
-            placeholder="Name"
-            value={field.state.value}
-          />
-        )}
-      </Field>
-
-      <Field name="nickname">
-        {(field) => (
-          <TextInput
-            error={fieldError(field.state.meta)}
-            label="Nickname"
-            name={field.name}
-            onChange={field.handleChange}
-            placeholder="Nickname"
-            value={field.state.value}
-          />
-        )}
-      </Field>
-
-      <Field name="title">
-        {(field) => (
-          <TextInput
-            error={fieldError(field.state.meta)}
-            label="Title"
-            name={field.name}
-            onChange={field.handleChange}
-            placeholder="Title"
-            value={field.state.value}
-          />
-        )}
-      </Field>
-
-      <Field name="avatar">
-        {(field) => (
-          <TextInput
-            error={fieldError(field.state.meta)}
-            label="Avatar URL"
-            name={field.name}
-            onChange={field.handleChange}
-            placeholder="https://example.com/avatar.png"
-            value={field.state.value}
-          />
-        )}
-      </Field>
-
-      <Field name="birth">
-        {(field) => (
-          <TextInput
-            error={fieldError(field.state.meta)}
-            label="Birth date"
-            name={field.name}
-            onChange={field.handleChange}
-            placeholder="YYYY-MM-DD"
-            type="date"
-            value={field.state.value}
-          />
-        )}
-      </Field>
-
-      <div className="divider">Contact</div>
-
-      <Field name="email">
-        {(field) => (
-          <TextInput
-            error={fieldError(field.state.meta)}
-            label="Email"
-            name={field.name}
-            onChange={field.handleChange}
-            placeholder="Email"
-            type="email"
-            value={field.state.value}
-          />
-        )}
-      </Field>
-
-      <Field name="phone">
-        {(field) => (
-          <TextInput
-            error={fieldError(field.state.meta)}
-            label="Phone"
-            name={field.name}
-            onChange={field.handleChange}
-            placeholder="Phone"
-            type="tel"
-            value={field.state.value}
-          />
-        )}
-      </Field>
-
-      <Field name="address">
-        {(field) => (
-          <TextareaInput
-            error={fieldError(field.state.meta)}
-            label="Address"
-            name={field.name}
-            onChange={field.handleChange}
-            placeholder="Address"
-            value={field.state.value}
-          />
-        )}
-      </Field>
-
-      <div className="divider">Security</div>
-
-      <Field name="password">
-        {(field) => (
-          <PasswordInput
-            error={fieldError(field.state.meta)}
-            label="New password"
-            name={field.name}
-            onChange={field.handleChange}
-            placeholder="Leave blank to keep current password"
-            value={field.state.value}
-          />
-        )}
-      </Field>
-
-      <div className="divider">Links</div>
-
-      <Field mode="array" name="urls">
-        {(arrayField) => (
-          <FieldArray
-            error={fieldError(arrayField.state.meta)}
-            label="Link"
-            onAdd={() => arrayField.pushValue({ title: "", value: "" })}
-            onRemove={(index) => arrayField.removeValue(index)}
-            values={arrayField.state.value}
-          >
-            {(index) => (
-              <>
-                <Field name={`urls[${index}].title`}>
-                  {(field) => (
-                    <TextInput
-                      error={fieldError(field.state.meta)}
-                      name={field.name}
-                      onChange={field.handleChange}
-                      placeholder="Title"
-                      value={field.state.value}
-                    />
-                  )}
-                </Field>
-                <Field name={`urls[${index}].value`}>
-                  {(field) => (
-                    <TextInput
-                      error={fieldError(field.state.meta)}
-                      name={field.name}
-                      onChange={field.handleChange}
-                      placeholder="URL"
-                      value={field.state.value}
-                    />
-                  )}
-                </Field>
-              </>
+      <section className="rounded-box bg-base-200 p-4 sm:p-6">
+        <h2 className="mb-4 font-semibold text-lg">Personal</h2>
+        <div className="grid gap-4 md:grid-cols-2">
+          <Field name="name">
+            {(field) => (
+              <TextInput
+                error={fieldError(field.state.meta)}
+                label="Name"
+                name={field.name}
+                onChange={field.handleChange}
+                placeholder="Name"
+                value={field.state.value}
+              />
             )}
-          </FieldArray>
-        )}
-      </Field>
+          </Field>
 
-      <div className="form-footer">
+          <Field name="nickname">
+            {(field) => (
+              <TextInput
+                error={fieldError(field.state.meta)}
+                label="Nickname"
+                name={field.name}
+                onChange={field.handleChange}
+                placeholder="Nickname"
+                value={field.state.value}
+              />
+            )}
+          </Field>
+
+          <Field name="title">
+            {(field) => (
+              <TextInput
+                error={fieldError(field.state.meta)}
+                label="Title"
+                name={field.name}
+                onChange={field.handleChange}
+                placeholder="Title"
+                value={field.state.value}
+              />
+            )}
+          </Field>
+
+          <Field name="birth">
+            {(field) => (
+              <TextInput
+                error={fieldError(field.state.meta)}
+                label="Birth date"
+                name={field.name}
+                onChange={field.handleChange}
+                placeholder="YYYY-MM-DD"
+                type="date"
+                value={field.state.value}
+              />
+            )}
+          </Field>
+
+          <Field name="avatar">
+            {(field) => (
+              <div className="md:col-span-2">
+                <TextInput
+                  error={fieldError(field.state.meta)}
+                  label="Avatar URL"
+                  name={field.name}
+                  onChange={field.handleChange}
+                  placeholder="https://example.com/avatar.png"
+                  value={field.state.value}
+                />
+              </div>
+            )}
+          </Field>
+        </div>
+      </section>
+
+      <section className="rounded-box bg-base-200 p-4 sm:p-6">
+        <h2 className="mb-4 font-semibold text-lg">Contact</h2>
+        <div className="grid gap-4 md:grid-cols-2">
+          <Field name="email">
+            {(field) => (
+              <TextInput
+                error={fieldError(field.state.meta)}
+                label="Email"
+                name={field.name}
+                onChange={field.handleChange}
+                placeholder="Email"
+                type="email"
+                value={field.state.value}
+              />
+            )}
+          </Field>
+
+          <Field name="phone">
+            {(field) => (
+              <TextInput
+                error={fieldError(field.state.meta)}
+                label="Phone"
+                name={field.name}
+                onChange={field.handleChange}
+                placeholder="Phone"
+                type="tel"
+                value={field.state.value}
+              />
+            )}
+          </Field>
+
+          <Field name="address">
+            {(field) => (
+              <div className="md:col-span-2">
+                <TextareaInput
+                  error={fieldError(field.state.meta)}
+                  label="Address"
+                  name={field.name}
+                  onChange={field.handleChange}
+                  placeholder="Address"
+                  value={field.state.value}
+                />
+              </div>
+            )}
+          </Field>
+        </div>
+        <div className="divider" />
+        <h2 className="mb-4 font-semibold text-lg">Security</h2>
+        <Field name="password">
+          {(field) => (
+            <PasswordInput
+              error={fieldError(field.state.meta)}
+              label="New password"
+              name={field.name}
+              onChange={field.handleChange}
+              placeholder="Password"
+              value={field.state.value}
+            />
+          )}
+        </Field>
+      </section>
+
+      <section className="rounded-box bg-base-200 p-4 sm:p-6">
+        <h2 className="mb-4 font-semibold text-lg">Links</h2>
+        <Field mode="array" name="urls">
+          {(arrayField) => (
+            <FieldArray
+              error={fieldError(arrayField.state.meta)}
+              label="Link"
+              onAdd={() => arrayField.pushValue({ title: "", value: "" })}
+              onRemove={(index) => arrayField.removeValue(index)}
+              sublevel
+              values={arrayField.state.value}
+            >
+              {(index) => (
+                <>
+                  <Field name={`urls[${index}].title`}>
+                    {(field) => (
+                      <TextInput
+                        error={fieldError(field.state.meta)}
+                        name={field.name}
+                        onChange={field.handleChange}
+                        placeholder="Title"
+                        value={field.state.value}
+                      />
+                    )}
+                  </Field>
+                  <Field name={`urls[${index}].value`}>
+                    {(field) => (
+                      <TextInput
+                        error={fieldError(field.state.meta)}
+                        name={field.name}
+                        onChange={field.handleChange}
+                        placeholder="URL"
+                        value={field.state.value}
+                      />
+                    )}
+                  </Field>
+                </>
+              )}
+            </FieldArray>
+          )}
+        </Field>
+      </section>
+
+      <div className="form-footer mt-0">
+        <button
+          className="btn btn-ghost flex-1"
+          disabled={isDisabled || isLoading}
+          onClick={() => form.reset()}
+          type="button"
+        >
+          Reset
+        </button>
         <Subscribe>
           {({ canSubmit, isSubmitting, isTouched }) => (
             <button
-              className="btn btn-soft btn-block btn-primary"
+              className="btn btn-soft btn-primary flex-1"
               disabled={
                 !canSubmit ||
                 !isTouched ||
