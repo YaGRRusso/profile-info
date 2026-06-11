@@ -1,5 +1,9 @@
 import { Injectable } from "@nestjs/common";
 import { AnyKeys, QueryFilter, SortOrder, UpdateQuery } from "mongoose";
+import {
+  labelFromI18nTitle,
+  RecentActivityRecord,
+} from "@/common/helpers/recent-activity.helper";
 import { BatchEntity } from "@/core/entities/batch.entity";
 import { PaginatedModel } from "@/core/schemas/paginated.schema";
 import { ProjectModel } from "@/modules/projects/schemas/project.schema";
@@ -79,6 +83,20 @@ export class ProjectsService {
 
   count(): Promise<number> {
     return this.repository.count();
+  }
+
+  async findRecentActivity(limit: number): Promise<RecentActivityRecord[]> {
+    const rows = await this.repository.findRecentlyUpdated(
+      limit,
+      "slug i18n updatedAt"
+    );
+    return rows.map((row) => ({
+      label: labelFromI18nTitle(
+        row.slug as string,
+        row.i18n as Parameters<typeof labelFromI18nTitle>[1]
+      ),
+      updatedAt: row.updatedAt,
+    }));
   }
 
   detachSkill(skillId: string): Promise<void> {

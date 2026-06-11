@@ -7,6 +7,7 @@ import { ProfileForm, profileToForm, profileToInput } from "@/forms/profile";
 import { useUpdateMe } from "@/hooks/mutations/users";
 import { useGetMe } from "@/hooks/queries/auth";
 import { useAuthStore } from "@/stores/auth";
+import { DownloadCvControl } from "../-components/download-cv";
 import { ProfileSummary } from "./-components/profile-summary";
 
 export const Route = createFileRoute("/_authenticated/_sidebar/settings/")({
@@ -24,7 +25,13 @@ function RouteComponent() {
 
   return (
     <div className="flex flex-col gap-4">
-      <PageTitle description="Manage your account details." title="Settings" />
+      <div className="flex flex-wrap items-start justify-between gap-4">
+        <PageTitle
+          description="Manage your account details."
+          title="Settings"
+        />
+        <DownloadCvControl />
+      </div>
 
       <DataState isLoading={getMe.isPending}>
         <DataState.Loading>

@@ -1,14 +1,8 @@
-import type { UseQueryOptions } from "@tanstack/react-query";
-import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
+import { useInfiniteQuery } from "@tanstack/react-query";
 import { graphql } from "@/generated/graphql";
 import type {
   FilterOrganizationInput,
-  FindManyOrganizationByIdQuery,
-  FindManyOrganizationByIdQueryVariables,
   FindManyOrganizationsQuery,
-  FindOneOrganizationByIdQuery,
-  FindOneOrganizationByIdQueryVariables,
-  FindOneOrganizationQuery,
   SortOrganizationInput,
 } from "@/generated/graphql/graphql";
 import { execute } from "@/lib/execute";
@@ -51,72 +45,6 @@ const findManyOrganizations = graphql(`
   }
 `);
 
-const findOneOrganizationById = graphql(`
-  query FindOneOrganizationById($organizationId: ID!) {
-    findOneOrganizationById(organizationId: $organizationId) {
-      id
-      name
-      slug
-      category
-      logo
-      website
-      i18n {
-        locale
-        messages {
-          description
-        }
-      }
-      relevance
-      createdAt
-      updatedAt
-    }
-  }
-`);
-
-const findOneOrganization = graphql(`
-  query FindOneOrganization($organizationFilters: FilterOrganizationInput) {
-    findOneOrganization(organizationFilters: $organizationFilters) {
-      id
-      name
-      slug
-      category
-      logo
-      website
-      i18n {
-        locale
-        messages {
-          description
-        }
-      }
-      relevance
-      createdAt
-      updatedAt
-    }
-  }
-`);
-
-const findManyOrganizationById = graphql(`
-  query FindManyOrganizationById($organizationIds: [ID!]!) {
-    findManyOrganizationById(organizationIds: $organizationIds) {
-      id
-      name
-      slug
-      category
-      logo
-      website
-      i18n {
-        locale
-        messages {
-          description
-        }
-      }
-      relevance
-      createdAt
-      updatedAt
-    }
-  }
-`);
-
 export function useFindManyOrganizations(
   variables?: {
     organizationFilters?: FilterOrganizationInput;
@@ -145,48 +73,6 @@ export function useFindManyOrganizations(
       found: data.pages[0]?.findManyOrganizations.found ?? 0,
       nodes: data.pages.flatMap((p) => p.findManyOrganizations.nodes),
     }),
-    ...options,
-  });
-}
-
-export function useFindOneOrganizationById(
-  variables: FindOneOrganizationByIdQueryVariables,
-  options?: Omit<
-    UseQueryOptions<FindOneOrganizationByIdQuery>,
-    "queryKey" | "queryFn"
-  >
-) {
-  return useQuery({
-    queryKey: ["findOneOrganizationById", variables],
-    queryFn: () => execute(findOneOrganizationById, variables),
-    ...options,
-  });
-}
-
-export function useFindOneOrganization(
-  variables: { organizationFilters?: FilterOrganizationInput },
-  options?: Omit<
-    UseQueryOptions<FindOneOrganizationQuery>,
-    "queryKey" | "queryFn"
-  >
-) {
-  return useQuery({
-    queryKey: ["findOneOrganization", variables],
-    queryFn: () => execute(findOneOrganization, variables),
-    ...options,
-  });
-}
-
-export function useFindManyOrganizationById(
-  variables: FindManyOrganizationByIdQueryVariables,
-  options?: Omit<
-    UseQueryOptions<FindManyOrganizationByIdQuery>,
-    "queryKey" | "queryFn"
-  >
-) {
-  return useQuery({
-    queryKey: ["findManyOrganizationById", variables],
-    queryFn: () => execute(findManyOrganizationById, variables),
     ...options,
   });
 }

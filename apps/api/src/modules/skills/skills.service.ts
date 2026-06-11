@@ -1,6 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { EventEmitter2 } from "@nestjs/event-emitter";
 import { AnyKeys, QueryFilter, SortOrder, UpdateQuery } from "mongoose";
+import { RecentActivityRecord } from "@/common/helpers/recent-activity.helper";
 import { BatchEntity } from "@/core/entities/batch.entity";
 import { DomainEvents } from "@/core/events/domain-events";
 import { SkillDeletedEvent } from "@/core/events/skill-deleted.event";
@@ -103,5 +104,16 @@ export class SkillsService {
 
   countByField(field: string): Promise<{ label: string; value: number }[]> {
     return this.repository.countByField(field);
+  }
+
+  async findRecentActivity(limit: number): Promise<RecentActivityRecord[]> {
+    const rows = await this.repository.findRecentlyUpdated(
+      limit,
+      "name updatedAt"
+    );
+    return rows.map((row) => ({
+      label: row.name as string,
+      updatedAt: row.updatedAt,
+    }));
   }
 }

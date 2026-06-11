@@ -30,7 +30,8 @@ Data flow: GraphQL hooks call `execute()` from `src/lib/execute.ts` (POST to `VI
 Routing:
 
 - `_authenticated.tsx`: protected layout; `useGetMe()` when token exists; login page when unauthenticated.
-- `index.tsx`: dashboard via `useDashboard()` (stats + recharts) + `DownloadCvControl` (`apiRequest` → `GET /resume.pdf?locale=`).
+- `index.tsx`: dashboard via `useDashboard()` (stats + recharts).
+- `_authenticated/_sidebar/settings/`: profile form + `DownloadCvControl` in page header.
 - `_authenticated/_sidebar/`: CRUD pages per entity with `-components/table.tsx`.
 - `settings/index.tsx`: inline profile form via `useGetMe()` + `useUpdateMe()` (`updateMe` mutation); syncs auth store after save.
 
@@ -46,11 +47,13 @@ Rich forms map flat Zod schemas to nested GraphQL shapes (`i18n`, `organization`
 - **Zustand**: `stores/auth.ts`, `stores/theme.ts` (persisted).
 - **TanStack Form + Zod**: `src/forms/`.
 - **Tailwind v4 + DaisyUI**: `src/styles/globals.css`.
+- **dayjs**: configured in `src/lib/dayjs.ts` (relative time, etc.).
+- **Recharts**: shared chart styling in `src/lib/chart-theme.ts` (theme colors, tooltips, axis props).
 - **nuqs**: URL state via `NuqsAdapter` in `__root.tsx`.
 
 ## Module / directory breakdown
 
-- `src/lib/execute.ts`: GraphQL transport. `src/lib/api.ts`: REST transport (`getApiOrigin`, `apiRequest`). Other helpers: `gql.ts`, `tc.ts`, `cn.ts`, `parsers.ts`, `field-error.ts`, etc.
+- `src/lib/execute.ts`: GraphQL transport. `src/lib/api.ts`: REST transport (`getApiOrigin`, `apiRequest`). Other helpers: `gql.ts`, `tc.ts`, `cn.ts`, `parsers.ts`, `field-error.ts`, `chart-theme.ts`, `dayjs.ts`, `greeting.ts`, etc.
 - `src/hooks/queries/` and `mutations/`: one file per entity; `graphql` tag must use static string literals (no interpolated fragments).
 - `src/generated/graphql/`: codegen output — regenerate, do not edit.
 - `src/forms/`: entity forms + `*ToInput`/`*ToForm` mappers co-located.

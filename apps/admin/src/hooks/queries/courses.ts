@@ -1,14 +1,8 @@
-import type { UseQueryOptions } from "@tanstack/react-query";
-import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
+import { useInfiniteQuery } from "@tanstack/react-query";
 import { graphql } from "@/generated/graphql";
 import type {
   FilterCourseInput,
-  FindManyCourseByIdQuery,
-  FindManyCourseByIdQueryVariables,
   FindManyCoursesQuery,
-  FindOneCourseByIdQuery,
-  FindOneCourseByIdQueryVariables,
-  FindOneCourseQuery,
   SortCourseInput,
 } from "@/generated/graphql/graphql";
 import { execute } from "@/lib/execute";
@@ -61,102 +55,6 @@ const findManyCourses = graphql(`
   }
 `);
 
-const findOneCourseById = graphql(`
-  query FindOneCourseById($courseId: ID!) {
-    findOneCourseById(courseId: $courseId) {
-      id
-      slug
-      status
-      relevance
-      url
-      image
-      hours
-      organization {
-        id
-        name
-        slug
-      }
-      i18n {
-        locale
-        messages {
-          title
-          description
-        }
-      }
-      skills {
-        id
-        name
-      }
-      createdAt
-      updatedAt
-    }
-  }
-`);
-
-const findOneCourse = graphql(`
-  query FindOneCourse($courseFilters: FilterCourseInput) {
-    findOneCourse(courseFilters: $courseFilters) {
-      id
-      slug
-      status
-      relevance
-      url
-      image
-      hours
-      organization {
-        id
-        name
-        slug
-      }
-      i18n {
-        locale
-        messages {
-          title
-          description
-        }
-      }
-      skills {
-        id
-        name
-      }
-      createdAt
-      updatedAt
-    }
-  }
-`);
-
-const findManyCourseById = graphql(`
-  query FindManyCourseById($courseIds: [ID!]!) {
-    findManyCourseById(courseIds: $courseIds) {
-      id
-      slug
-      status
-      relevance
-      url
-      image
-      hours
-      organization {
-        id
-        name
-        slug
-      }
-      i18n {
-        locale
-        messages {
-          title
-          description
-        }
-      }
-      skills {
-        id
-        name
-      }
-      createdAt
-      updatedAt
-    }
-  }
-`);
-
 export function useFindManyCourses(
   variables?: {
     courseFilters?: FilterCourseInput;
@@ -185,45 +83,6 @@ export function useFindManyCourses(
       found: data.pages[0]?.findManyCourses.found ?? 0,
       nodes: data.pages.flatMap((p) => p.findManyCourses.nodes),
     }),
-    ...options,
-  });
-}
-
-export function useFindOneCourseById(
-  variables: FindOneCourseByIdQueryVariables,
-  options?: Omit<
-    UseQueryOptions<FindOneCourseByIdQuery>,
-    "queryKey" | "queryFn"
-  >
-) {
-  return useQuery({
-    queryKey: ["findOneCourseById", variables],
-    queryFn: () => execute(findOneCourseById, variables),
-    ...options,
-  });
-}
-
-export function useFindOneCourse(
-  variables: { courseFilters?: FilterCourseInput },
-  options?: Omit<UseQueryOptions<FindOneCourseQuery>, "queryKey" | "queryFn">
-) {
-  return useQuery({
-    queryKey: ["findOneCourse", variables],
-    queryFn: () => execute(findOneCourse, variables),
-    ...options,
-  });
-}
-
-export function useFindManyCourseById(
-  variables: FindManyCourseByIdQueryVariables,
-  options?: Omit<
-    UseQueryOptions<FindManyCourseByIdQuery>,
-    "queryKey" | "queryFn"
-  >
-) {
-  return useQuery({
-    queryKey: ["findManyCourseById", variables],
-    queryFn: () => execute(findManyCourseById, variables),
     ...options,
   });
 }

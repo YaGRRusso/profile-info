@@ -30,43 +30,43 @@ const MENU_SECTIONS: MenuSection[] = [
     label: "Navigation",
     items: [
       {
-        icon: <HouseIcon size={24} />,
+        icon: <HouseIcon size={24} weight="duotone" />,
         label: "Home",
         to: "/",
         type: "link",
       },
       {
-        icon: <PackageIcon size={24} />,
+        icon: <PackageIcon size={24} weight="duotone" />,
         label: "Skills",
         to: "/skills",
         type: "link",
       },
       {
-        icon: <CertificateIcon size={24} />,
+        icon: <CertificateIcon size={24} weight="duotone" />,
         label: "Courses",
         to: "/courses",
         type: "link",
       },
       {
-        icon: <GraduationCapIcon size={24} />,
+        icon: <GraduationCapIcon size={24} weight="duotone" />,
         label: "Educations",
         to: "/educations",
         type: "link",
       },
       {
-        icon: <BuildingsIcon size={24} />,
+        icon: <BuildingsIcon size={24} weight="duotone" />,
         label: "Organizations",
         to: "/organizations",
         type: "link",
       },
       {
-        icon: <RocketLaunchIcon size={24} />,
+        icon: <RocketLaunchIcon size={24} weight="duotone" />,
         label: "Projects",
         to: "/projects",
         type: "link",
       },
       {
-        icon: <BriefcaseIcon size={24} />,
+        icon: <BriefcaseIcon size={24} weight="duotone" />,
         label: "Experiences",
         to: "/experiences",
         type: "link",
@@ -142,7 +142,7 @@ function RouteComponent() {
           htmlFor="drawer"
         />
         <div className="flex min-h-full is-drawer-close:w-16 is-drawer-open:w-64 flex-col items-start bg-base-200">
-          <div className="flex w-full items-center gap-2 p-4">
+          <div className="flex w-full items-center gap-2 p-4 pb-2">
             <Avatar
               avatar={user?.avatar}
               className="is-drawer-close:size-8 is-drawer-open:size-10"

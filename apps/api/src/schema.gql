@@ -199,6 +199,21 @@ input CreateUserInput {
   urls: [UrlInput!]
 }
 
+type DashboardActivityItem {
+  label: String!
+  type: DashboardActivityType!
+  updatedAt: DateTime!
+}
+
+enum DashboardActivityType {
+  COURSE
+  EDUCATION
+  EXPERIENCE
+  ORGANIZATION
+  PROJECT
+  SKILL
+}
+
 type DashboardCount {
   label: String!
   value: Int!
@@ -207,6 +222,7 @@ type DashboardCount {
 type DashboardEntity {
   coursesByStatus: [DashboardCount!]!
   experiencesByCategory: [DashboardCount!]!
+  recentActivity: [DashboardActivityItem!]!
   skillsByCategory: [DashboardCount!]!
   totals: DashboardTotals!
 }
