@@ -1,7 +1,15 @@
 import { Injectable } from "@nestjs/common";
 import PDFDocument from "pdfkit";
+import {
+  filterHeaderLinks,
+  formatLinkTitle,
+} from "./helpers/filter-header-links.helper";
+import { formatSkillCategoryLabel } from "./helpers/format-skill-category.helper";
 import { resolveResumeLabels } from "./resume.labels";
+import { RESUME_PDF_THEME } from "./resume.pdf-theme";
 import type { ResumeDocumentData } from "./types/resume-document.type";
+
+const theme = RESUME_PDF_THEME;
 
 @Injectable()
 export class ResumePdfService {
@@ -48,46 +56,94 @@ export class ResumePdfService {
 
   private renderHeader(pdf: PDFKit.PDFDocument, document: ResumeDocumentData) {
     const { header } = document;
+    const { colors, fonts, spacing } = theme;
 
-    pdf.font("Helvetica-Bold").fontSize(22).text(header.name);
-    pdf.moveDown(0.3);
+    const headerLeft = pdf.page.margins.left;
+
+    pdf
+      .font("Helvetica-Bold")
+      .fontSize(fonts.headerName)
+      .fillColor(colors.accent)
+      .text(header.name);
+
+    const nameBottom = pdf.y;
+    pdf
+      .moveTo(headerLeft, nameBottom + 4)
+      .lineTo(headerLeft + 72, nameBottom + 4)
+      .strokeColor(colors.accentSoft)
+      .lineWidth(2)
+      .stroke();
+
+    pdf.moveDown(0.5);
 
     if (header.title) {
       pdf
         .font("Helvetica")
-        .fontSize(12)
-        .fillColor("#444444")
+        .fontSize(fonts.headerSubtitle)
+        .fillColor(colors.muted)
         .text(header.title);
-      pdf.moveDown(0.5);
+      pdf.moveDown(0.55);
     }
 
-    pdf.fillColor("#000000");
-
-    const contactParts = [
-      header.email,
-      header.phone,
-      ...header.urls.map(({ title, value }) => `${title}: ${value}`),
-    ].filter(Boolean);
+    const contactParts = [header.email, header.phone].filter(Boolean);
 
     if (contactParts.length) {
-      pdf.font("Helvetica").fontSize(9).text(contactParts.join("  ·  "));
-      pdf.moveDown(1);
+      pdf
+        .font("Helvetica")
+        .fontSize(fonts.bodySmall)
+        .fillColor(colors.body)
+        .text(contactParts.join("  ·  "));
+      pdf.moveDown(0.3);
     }
+
+    const links = filterHeaderLinks(header.urls);
+
+    if (links.length) {
+      for (const [index, link] of links.entries()) {
+        if (index > 0) {
+          pdf
+            .font("Helvetica")
+            .fontSize(fonts.bodySmall)
+            .fillColor(colors.muted)
+            .text("  ·  ", { continued: true });
+        }
+
+        pdf
+          .font("Helvetica-Bold")
+          .fontSize(fonts.bodySmall)
+          .fillColor(colors.accentSoft)
+          .text(`${formatLinkTitle(link.title)}: `, { continued: true });
+
+        pdf
+          .font("Helvetica")
+          .fillColor(colors.link)
+          .text(link.value, { continued: index < links.length - 1 });
+      }
+
+      this.resetBodyStyle(pdf);
+      pdf.moveDown(0.2);
+    }
+
+    pdf.moveDown(spacing.afterHeader);
   }
 
   private renderSectionTitle(pdf: PDFKit.PDFDocument, title: string) {
-    pdf.moveDown(0.5);
+    const { colors, fonts, spacing } = theme;
+
+    pdf.moveDown(spacing.beforeSection);
     pdf
       .font("Helvetica-Bold")
-      .fontSize(11)
-      .fillColor("#000000")
+      .fontSize(fonts.section)
+      .fillColor(colors.accent)
       .text(title.toUpperCase());
+    const sectionLineY = pdf.y;
     pdf
-      .moveTo(pdf.x, pdf.y)
-      .lineTo(pdf.page.width - pdf.page.margins.right, pdf.y)
-      .strokeColor("#cccccc")
+      .moveTo(pdf.page.margins.left, sectionLineY)
+      .lineTo(pdf.page.width - pdf.page.margins.right, sectionLineY)
+      .strokeColor(colors.rule)
+      .lineWidth(1)
       .stroke();
-    pdf.moveDown(0.4);
+    pdf.moveDown(spacing.afterSectionTitle);
   }
 
   private renderSkillGroups(
@@ -97,14 +153,26 @@ export class ResumePdfService {
   ) {
     if (!document.skills.length) return;
 
+    const { colors, fonts, spacing } = theme;
+
     this.renderSectionTitle(pdf, title);
 
-    for (const group of document.skills) {
+    for (const [index, group] of document.skills.entries()) {
       pdf
         .font("Helvetica-Bold")
-        .fontSize(9)
-        .text(`${group.category}: `, { continued: true });
-      pdf.font("Helvetica").text(group.skills.join(", "));
+        .fontSize(fonts.bodySmall)
+        .fillColor(colors.accentSoft)
+        .text(`${formatSkillCategoryLabel(group.category)}: `, {
+          continued: true,
+        });
+      pdf
+        .font("Helvetica")
+        .fillColor(colors.body)
+        .text(group.skills.join(", "));
+
+      if (index < document.skills.length - 1) {
+        pdf.moveDown(spacing.afterSkillGroup);
+      }
     }
   }
 
@@ -115,24 +183,30 @@ export class ResumePdfService {
   ) {
     if (!document.experiences.length) return;
 
+    const { colors, fonts, spacing } = theme;
+
     this.renderSectionTitle(pdf, title);
 
     for (const experience of document.experiences) {
       for (const role of experience.roles) {
-        this.ensureSpace(pdf, 60);
+        this.ensureSpace(pdf, 72);
 
-        const headline = [experience.organization, role.title, role.period]
-          .filter(Boolean)
-          .join("  ·  ");
+        pdf
+          .font("Helvetica-Bold")
+          .fontSize(fonts.roleTitle)
+          .fillColor(colors.text)
+          .text(role.title);
 
-        pdf.font("Helvetica-Bold").fontSize(10).text(headline);
+        this.renderMetaLine(pdf, [experience.organization, role.period]);
+
+        pdf.moveDown(0.25);
         pdf
           .font("Helvetica")
-          .fontSize(9)
-          .fillColor("#333333")
-          .text(role.description, { align: "justify" });
-        pdf.fillColor("#000000");
-        pdf.moveDown(0.4);
+          .fontSize(fonts.body)
+          .fillColor(colors.body)
+          .text(role.description);
+        this.resetBodyStyle(pdf);
+        pdf.moveDown(spacing.afterExperienceRole);
       }
     }
   }
@@ -144,17 +218,32 @@ export class ResumePdfService {
   ) {
     if (!document.educations.length) return;
 
+    const { colors, fonts, spacing } = theme;
+
     this.renderSectionTitle(pdf, title);
 
     for (const education of document.educations) {
-      this.ensureSpace(pdf, 30);
+      this.ensureSpace(pdf, education.description ? 56 : 36);
 
-      const line = [education.title, education.organization, education.period]
-        .filter(Boolean)
-        .join("  ·  ");
+      pdf
+        .font("Helvetica-Bold")
+        .fontSize(fonts.body)
+        .fillColor(colors.text)
+        .text(education.title);
 
-      pdf.font("Helvetica").fontSize(9).text(line);
-      pdf.moveDown(0.2);
+      this.renderMetaLine(pdf, [education.organization, education.period]);
+
+      if (education.description) {
+        pdf.moveDown(0.25);
+        pdf
+          .font("Helvetica")
+          .fontSize(fonts.body)
+          .fillColor(colors.body)
+          .text(education.description);
+        this.resetBodyStyle(pdf);
+      }
+
+      pdf.moveDown(spacing.afterEducation);
     }
   }
 
@@ -166,22 +255,27 @@ export class ResumePdfService {
   ) {
     if (!document.certifications.length) return;
 
+    const { colors, fonts, spacing } = theme;
+
     this.renderSectionTitle(pdf, title);
 
     for (const certification of document.certifications) {
-      this.ensureSpace(pdf, 30);
+      this.ensureSpace(pdf, 36);
+
+      pdf
+        .font("Helvetica-Bold")
+        .fontSize(fonts.body)
+        .fillColor(colors.text)
+        .text(certification.title);
 
       const hoursLabel =
         certification.hours === undefined
           ? undefined
           : formatHours(certification.hours);
 
-      const line = [certification.title, certification.organization, hoursLabel]
-        .filter(Boolean)
-        .join("  ·  ");
+      this.renderMetaLine(pdf, [certification.organization, hoursLabel]);
 
-      pdf.font("Helvetica").fontSize(9).text(line);
-      pdf.moveDown(0.2);
+      pdf.moveDown(spacing.afterEducation);
     }
   }
 
@@ -192,14 +286,17 @@ export class ResumePdfService {
   ) {
     if (!document.projects.length) return;
 
+    const { colors, fonts, spacing } = theme;
+
     this.renderSectionTitle(pdf, title);
 
     for (const project of document.projects) {
-      this.ensureSpace(pdf, 40);
+      this.ensureSpace(pdf, 48);
 
       pdf
         .font("Helvetica-Bold")
-        .fontSize(9)
+        .fontSize(fonts.body)
+        .fillColor(colors.text)
         .text(project.title, {
           continued: Boolean(project.url),
         });
@@ -207,21 +304,40 @@ export class ResumePdfService {
       if (project.url) {
         pdf
           .font("Helvetica")
-          .fontSize(8)
-          .fillColor("#444444")
+          .fontSize(fonts.bodySmall)
+          .fillColor(colors.link)
           .text(` (${project.url})`);
-        pdf.fillColor("#000000");
       }
 
-      pdf.moveDown(0.1);
+      pdf.moveDown(0.2);
       pdf
         .font("Helvetica")
-        .fontSize(9)
-        .fillColor("#333333")
-        .text(project.description, { align: "justify" });
-      pdf.fillColor("#000000");
-      pdf.moveDown(0.3);
+        .fontSize(fonts.body)
+        .fillColor(colors.body)
+        .text(project.description);
+      this.resetBodyStyle(pdf);
+      pdf.moveDown(spacing.afterProject);
     }
+  }
+
+  private renderMetaLine(
+    pdf: PDFKit.PDFDocument,
+    parts: Array<string | undefined>
+  ) {
+    const meta = parts.filter(Boolean).join("  ·  ");
+    if (!meta) return;
+
+    const { colors, fonts } = theme;
+
+    pdf
+      .font("Helvetica")
+      .fontSize(fonts.bodySmall)
+      .fillColor(colors.muted)
+      .text(meta);
+  }
+
+  private resetBodyStyle(pdf: PDFKit.PDFDocument) {
+    pdf.font("Helvetica").fillColor(theme.colors.text);
   }
 
   private ensureSpace(pdf: PDFKit.PDFDocument, height: number) {

@@ -30,6 +30,7 @@ export interface ResumeExperience {
 }
 
 export interface ResumeEducation {
+  description?: string;
   organization: string;
   period?: string;
   title: string;

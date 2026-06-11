@@ -2,6 +2,7 @@ import { Injectable, NotFoundException } from "@nestjs/common";
 import { sortDateRange } from "@/common/helpers/daterange.helper";
 import { formatPeriod } from "@/common/helpers/format-period.helper";
 import { pickTranslation } from "@/common/helpers/pick-translation.helper";
+import { truncateText } from "@/common/helpers/truncate-text.helper";
 import { DEFAULT_LOCALE, type LocaleCode } from "@/common/i18n/locales";
 import { UserRole } from "@/core/enums/user-role.enum";
 import { CoursesService } from "@/modules/courses/courses.service";
@@ -27,11 +28,6 @@ import type {
 function toIdString(value: unknown): string | undefined {
   if (!value) return;
   return String(value);
-}
-
-function truncateText(text: string, maxLength: number): string {
-  if (text.length <= maxLength) return text;
-  return `${text.slice(0, maxLength - 3).trimEnd()}...`;
 }
 
 @Injectable()
@@ -200,11 +196,17 @@ export class ResumeService {
         String(education.organization ?? "")
       );
 
+      const description = truncateText(
+        translation.messages.description,
+        RESUME_LIMITS.descriptionMaxLength
+      );
+
       return [
         {
           title: translation.messages.title,
           organization: organization?.name ?? "Unknown organization",
           period: formatPeriod(education.period, locale),
+          description: description || undefined,
         },
       ];
     });
