@@ -12,6 +12,7 @@ import {
 } from "@phosphor-icons/react";
 import { createFileRoute, Outlet } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
+import { Avatar } from "@/components/display/avatar";
 import { useDebounce } from "@/hooks/custom/use-debounce";
 import { useMediaQuery } from "@/hooks/custom/use-media-query";
 import { useAuthStore } from "@/stores/auth";
@@ -142,21 +143,11 @@ function RouteComponent() {
         />
         <div className="flex min-h-full is-drawer-close:w-16 is-drawer-open:w-64 flex-col items-start bg-base-200">
           <div className="flex w-full items-center gap-2 p-4">
-            <div className="avatar avatar-placeholder rounded-full bg-neutral text-neutral-content">
-              <div className="is-drawer-close:w-8 w-10 transition-all">
-                {user?.avatar ? (
-                  <img
-                    alt={user?.name}
-                    className="rounded-full"
-                    height={32}
-                    src={user?.avatar}
-                    width={32}
-                  />
-                ) : (
-                  <span>{user?.name?.charAt(0) ?? "?"}</span>
-                )}
-              </div>
-            </div>
+            <Avatar
+              avatar={user?.avatar}
+              className="is-drawer-close:size-8 is-drawer-open:size-10"
+              name={user?.name}
+            />
             <div className="flex is-drawer-close:hidden flex-col">
               <strong className="line-clamp-1 text-sm">{user?.name}</strong>
               <p className="line-clamp-1 text-xs opacity-md">{user?.role}</p>

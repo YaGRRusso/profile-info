@@ -1,3 +1,4 @@
+import { Avatar } from "@/components/display/avatar";
 import { PROFILE_SETTINGS_FORM_ID } from "@/forms/profile";
 import type { GetMeQuery } from "@/generated/graphql/graphql";
 import { toDateInput } from "@/lib/date";
@@ -32,17 +33,11 @@ export function ProfileSummary({ isLoading, user }: ProfileSummaryProps) {
   return (
     <aside className="flex flex-col gap-4 rounded-box bg-base-200 p-6 lg:sticky lg:top-16 lg:self-start">
       <div className="flex flex-col items-center gap-3 text-center">
-        <div className="avatar avatar-placeholder">
-          {user.avatar ? (
-            <div className="w-24 rounded-full">
-              <img alt={user.name} height={96} src={user.avatar} width={96} />
-            </div>
-          ) : (
-            <div className="w-24 rounded-full bg-neutral text-neutral-content">
-              <span className="text-3xl">{user.name.charAt(0)}</span>
-            </div>
-          )}
-        </div>
+        <Avatar
+          avatar={user?.avatar}
+          className="size-24 text-3xl"
+          name={user.name}
+        />
         <div className="flex flex-col gap-1">
           <strong className="text-lg">{user.name}</strong>
           <span className="text-sm opacity-70">@{user.nickname}</span>
