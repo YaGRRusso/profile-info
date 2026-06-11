@@ -1,20 +1,16 @@
 import { LOCALES, LocaleEnum } from "@/consts/locales";
-import { downloadBlob } from "@/lib/download-blob";
+import { useDownloadResume } from "@/hooks/mutations/resume";
 
-// TODO refactor this to use the API directly
 export function DownloadCvControl() {
-  async function handleDownload(locale: LocaleEnum) {
-    const baseUrl = import.meta.env.VITE_API_URL.replace("/graphql", "");
-    const response = await fetch(`${baseUrl}/resume.pdf?locale=${locale}`);
-    const blob = await response.blob();
-    downloadBlob(blob, "resume.pdf");
-  }
+  const downloadResume = useDownloadResume();
 
   return (
     <select
       className="select"
-      disabled={false}
-      onChange={(event) => handleDownload(event.target.value as LocaleEnum)}
+      disabled={downloadResume.isPending}
+      onChange={(event) =>
+        downloadResume.mutate(event.target.value as LocaleEnum)
+      }
       value=""
     >
       <option disabled value="">

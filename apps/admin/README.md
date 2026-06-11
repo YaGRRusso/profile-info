@@ -83,4 +83,4 @@ npm run admin:dev
 
 ### Download CV
 
-The dashboard home (`/`) includes a **Download CV** button. It fetches `GET /resume.pdf` from the API base URL (derived from `VITE_API_URL` without the `/graphql` suffix) and saves `resume.pdf` locally.
+The dashboard home (`/`) includes a **Download CV** select. It uses `useDownloadResume()` from `hooks/queries/resume.ts` (`GET /resume.pdf?locale=`).
