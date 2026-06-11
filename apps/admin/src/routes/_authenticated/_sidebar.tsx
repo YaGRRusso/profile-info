@@ -2,6 +2,7 @@ import {
   BriefcaseIcon,
   BuildingsIcon,
   CertificateIcon,
+  GearIcon,
   GraduationCapIcon,
   HouseIcon,
   ListIcon,
@@ -71,6 +72,12 @@ const MENU_SECTIONS: MenuSection[] = [
   {
     label: "Actions",
     items: [
+      {
+        icon: <GearIcon size={24} weight="fill" />,
+        label: "Settings",
+        to: "/settings",
+        type: "link",
+      },
       {
         icon: <SignOutIcon size={24} weight="fill" />,
         label: "Sign Out",

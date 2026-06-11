@@ -437,6 +437,7 @@ type Mutation {
   updateManyProjects(projectIds: [ID!]!, updateProjectInput: UpdateProjectInput!): BatchEntity!
   updateManySkills(skillIds: [ID!]!, updateSkillInput: UpdateSkillInput!): BatchEntity!
   updateManyUsers(updateUserInput: UpdateUserInput!, userIds: [ID!]!): BatchEntity!
+  updateMe(updateMeInput: UpdateMeInput!): UserEntity!
   updateOneCourse(courseId: ID!, updateCourseInput: UpdateCourseInput!): CourseEntity!
   updateOneEducation(educationId: ID!, updateEducationInput: UpdateEducationInput!): EducationEntity!
   updateOneExperience(experienceId: ID!, updateExperienceInput: UpdateExperienceInput!): ExperienceEntity!
@@ -693,6 +694,19 @@ input UpdateExperienceInput {
   relevance: Float
   roles: [CreateExperienceRoleInput!]
   slug: String
+}
+
+input UpdateMeInput {
+  address: String
+  avatar: String
+  birth: String
+  email: String
+  name: String
+  nickname: String
+  password: String
+  phone: String
+  title: String
+  urls: [UrlInput!]
 }
 
 input UpdateOrganizationInput {

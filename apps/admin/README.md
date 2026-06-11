@@ -33,15 +33,16 @@ src/
 │   │   ├── _sidebar.tsx       # Sidebar/drawer shell with navigation.
 │   │   └── _sidebar/
 │   │       ├── index.tsx      # Home page (dashboard + Download CV).
+│   │       ├── settings/      # Account settings (profile update via updateMe).
 │   │       └── skills/        # Skills management page + its table component.
 │   └── -components/           # login, error, not-found pages.
 ├── hooks/
 │   ├── queries/              # useQuery / useInfiniteQuery hooks (auth, skills, base).
-│   ├── mutations/            # useMutation hooks (auth, skills).
+│   ├── mutations/            # useMutation hooks (auth, skills, users).
 │   └── custom/               # Generic helpers (debounce, query-all-pages, etc.).
 ├── generated/
 │   └── graphql/              # Generated typed documents and helpers (codegen output).
-├── forms/                    # TanStack Form + Zod forms (skill, user/login).
+├── forms/                    # TanStack Form + Zod forms (skill, user/login, profile).
 ├── components/
 │   ├── display/              # Generic display components (modal, alert, data-state).
 │   └── inputs/               # Generic input components (text, password, select, ...).
@@ -84,3 +85,7 @@ npm run admin:dev
 ### Download CV
 
 The dashboard home (`/`) includes a **Download CV** select. It uses `useDownloadResume()` from `hooks/queries/resume.ts` (`GET /resume.pdf?locale=`).
+
+### Account settings
+
+The **Settings** page (`/settings`) loads the authenticated user via `useGetMe()` and saves changes with `useUpdateMe()` (`updateMe` mutation). After a successful save, it invalidates `getMe` and updates the persisted auth store so the sidebar reflects the new name/avatar.

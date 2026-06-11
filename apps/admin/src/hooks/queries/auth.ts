@@ -14,6 +14,13 @@ const getMe = graphql(`
       role
       title
       avatar
+      phone
+      birth
+      address
+      urls {
+        title
+        value
+      }
     }
   }
 `);

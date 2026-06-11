@@ -467,6 +467,7 @@ export type Mutation = {
   updateManyProjects: BatchEntity;
   updateManySkills: BatchEntity;
   updateManyUsers: BatchEntity;
+  updateMe: UserEntity;
   updateOneCourse: CourseEntity;
   updateOneEducation: EducationEntity;
   updateOneExperience: ExperienceEntity;
@@ -676,6 +677,11 @@ export type MutationUpdateManySkillsArgs = {
 export type MutationUpdateManyUsersArgs = {
   updateUserInput: UpdateUserInput;
   userIds: Array<Scalars['ID']['input']>;
+};
+
+
+export type MutationUpdateMeArgs = {
+  updateMeInput: UpdateMeInput;
 };
 
 
@@ -1138,6 +1144,19 @@ export type UpdateExperienceInput = {
   slug?: InputMaybe<Scalars['String']['input']>;
 };
 
+export type UpdateMeInput = {
+  address?: InputMaybe<Scalars['String']['input']>;
+  avatar?: InputMaybe<Scalars['String']['input']>;
+  birth?: InputMaybe<Scalars['String']['input']>;
+  email?: InputMaybe<Scalars['String']['input']>;
+  name?: InputMaybe<Scalars['String']['input']>;
+  nickname?: InputMaybe<Scalars['String']['input']>;
+  password?: InputMaybe<Scalars['String']['input']>;
+  phone?: InputMaybe<Scalars['String']['input']>;
+  title?: InputMaybe<Scalars['String']['input']>;
+  urls?: InputMaybe<Array<UrlInput>>;
+};
+
 export type UpdateOrganizationInput = {
   category?: InputMaybe<OrganizationCategory>;
   i18n?: InputMaybe<Array<CreateOrganizationMessagesInputTranslationInput>>;
@@ -1469,10 +1488,17 @@ export type RemoveManySkillsMutationVariables = Exact<{
 
 export type RemoveManySkillsMutation = { __typename?: 'Mutation', removeManySkills: { __typename?: 'BatchEntity', count: number } };
 
+export type UpdateMeMutationVariables = Exact<{
+  updateMeInput: UpdateMeInput;
+}>;
+
+
+export type UpdateMeMutation = { __typename?: 'Mutation', updateMe: { __typename?: 'UserEntity', id: string, email: string, name: string, nickname: string, role: UserRole, title?: string | null, avatar?: string | null, phone?: string | null, birth?: string | null, address?: string | null, urls?: Array<{ __typename?: 'UrlEntity', title: string, value: string }> | null } };
+
 export type GetMeQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetMeQuery = { __typename?: 'Query', getMe: { __typename?: 'UserEntity', id: string, email: string, name: string, nickname: string, role: UserRole, title?: string | null, avatar?: string | null } };
+export type GetMeQuery = { __typename?: 'Query', getMe: { __typename?: 'UserEntity', id: string, email: string, name: string, nickname: string, role: UserRole, title?: string | null, avatar?: string | null, phone?: string | null, birth?: string | null, address?: string | null, urls?: Array<{ __typename?: 'UrlEntity', title: string, value: string }> | null } };
 
 export type ApiStatusQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -2015,6 +2041,26 @@ export const RemoveManySkillsDocument = new TypedDocumentString(`
   }
 }
     `) as unknown as TypedDocumentString<RemoveManySkillsMutation, RemoveManySkillsMutationVariables>;
+export const UpdateMeDocument = new TypedDocumentString(`
+    mutation UpdateMe($updateMeInput: UpdateMeInput!) {
+  updateMe(updateMeInput: $updateMeInput) {
+    id
+    email
+    name
+    nickname
+    role
+    title
+    avatar
+    phone
+    birth
+    address
+    urls {
+      title
+      value
+    }
+  }
+}
+    `) as unknown as TypedDocumentString<UpdateMeMutation, UpdateMeMutationVariables>;
 export const GetMeDocument = new TypedDocumentString(`
     query GetMe {
   getMe {
@@ -2025,6 +2071,13 @@ export const GetMeDocument = new TypedDocumentString(`
     role
     title
     avatar
+    phone
+    birth
+    address
+    urls {
+      title
+      value
+    }
   }
 }
     `) as unknown as TypedDocumentString<GetMeQuery, GetMeQueryVariables>;
