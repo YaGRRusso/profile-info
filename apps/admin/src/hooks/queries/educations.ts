@@ -1,14 +1,8 @@
-import type { UseQueryOptions } from "@tanstack/react-query";
-import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
+import { useInfiniteQuery } from "@tanstack/react-query";
 import { graphql } from "@/generated/graphql";
 import type {
   FilterEducationInput,
-  FindManyEducationByIdQuery,
-  FindManyEducationByIdQueryVariables,
   FindManyEducationsQuery,
-  FindOneEducationByIdQuery,
-  FindOneEducationByIdQueryVariables,
-  FindOneEducationQuery,
   SortEducationInput,
 } from "@/generated/graphql/graphql";
 import { execute } from "@/lib/execute";
@@ -65,114 +59,6 @@ const findManyEducations = graphql(`
   }
 `);
 
-const findOneEducationById = graphql(`
-  query FindOneEducationById($educationId: ID!) {
-    findOneEducationById(educationId: $educationId) {
-      id
-      slug
-      level
-      status
-      relevance
-      url
-      image
-      organization {
-        id
-        name
-        slug
-      }
-      i18n {
-        locale
-        messages {
-          title
-          description
-        }
-      }
-      skills {
-        id
-        name
-      }
-      period {
-        from
-        to
-      }
-      createdAt
-      updatedAt
-    }
-  }
-`);
-
-const findOneEducation = graphql(`
-  query FindOneEducation($educationFilters: FilterEducationInput) {
-    findOneEducation(educationFilters: $educationFilters) {
-      id
-      slug
-      level
-      status
-      relevance
-      url
-      image
-      organization {
-        id
-        name
-        slug
-      }
-      i18n {
-        locale
-        messages {
-          title
-          description
-        }
-      }
-      skills {
-        id
-        name
-      }
-      period {
-        from
-        to
-      }
-      createdAt
-      updatedAt
-    }
-  }
-`);
-
-const findManyEducationById = graphql(`
-  query FindManyEducationById($educationIds: [ID!]!) {
-    findManyEducationById(educationIds: $educationIds) {
-      id
-      slug
-      level
-      status
-      relevance
-      url
-      image
-      organization {
-        id
-        name
-        slug
-      }
-      i18n {
-        locale
-        messages {
-          title
-          description
-        }
-      }
-      skills {
-        id
-        name
-      }
-      period {
-        from
-        to
-      }
-      createdAt
-      updatedAt
-    }
-  }
-`);
-
 export function useFindManyEducations(
   variables?: {
     educationFilters?: FilterEducationInput;
@@ -201,45 +87,6 @@ export function useFindManyEducations(
       found: data.pages[0]?.findManyEducations.found ?? 0,
       nodes: data.pages.flatMap((p) => p.findManyEducations.nodes),
     }),
-    ...options,
-  });
-}
-
-export function useFindOneEducationById(
-  variables: FindOneEducationByIdQueryVariables,
-  options?: Omit<
-    UseQueryOptions<FindOneEducationByIdQuery>,
-    "queryKey" | "queryFn"
-  >
-) {
-  return useQuery({
-    queryKey: ["findOneEducationById", variables],
-    queryFn: () => execute(findOneEducationById, variables),
-    ...options,
-  });
-}
-
-export function useFindOneEducation(
-  variables: { educationFilters?: FilterEducationInput },
-  options?: Omit<UseQueryOptions<FindOneEducationQuery>, "queryKey" | "queryFn">
-) {
-  return useQuery({
-    queryKey: ["findOneEducation", variables],
-    queryFn: () => execute(findOneEducation, variables),
-    ...options,
-  });
-}
-
-export function useFindManyEducationById(
-  variables: FindManyEducationByIdQueryVariables,
-  options?: Omit<
-    UseQueryOptions<FindManyEducationByIdQuery>,
-    "queryKey" | "queryFn"
-  >
-) {
-  return useQuery({
-    queryKey: ["findManyEducationById", variables],
-    queryFn: () => execute(findManyEducationById, variables),
     ...options,
   });
 }

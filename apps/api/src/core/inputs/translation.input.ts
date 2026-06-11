@@ -1,5 +1,6 @@
 import { Type } from "@nestjs/common";
 import { Field, InputType } from "@nestjs/graphql";
+import { IsNotEmpty, IsString } from "class-validator";
 
 export interface TranslationInput<T> {
   locale: string;
@@ -14,6 +15,8 @@ export function createTranslationInput<T>(
   @InputType(`${name}TranslationInput`, { isAbstract: true })
   class TranslationInputClass {
     @Field(() => String)
+    @IsString()
+    @IsNotEmpty()
     locale: string;
 
     @Field(() => MessagesModel)

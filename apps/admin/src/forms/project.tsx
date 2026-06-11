@@ -8,7 +8,7 @@ import { RangeInput } from "@/components/inputs/range";
 import { SelectInput } from "@/components/inputs/select";
 import { TextInput } from "@/components/inputs/text";
 import { TextareaInput } from "@/components/inputs/textarea";
-import { LOCALES, LocaleEnum } from "@/consts/locales";
+import { LOCALES } from "@/consts/locales";
 import { RawSizeEnum } from "@/consts/raw-size";
 import { SLUG_REGEX } from "@/consts/regex";
 import {
@@ -21,6 +21,7 @@ import { useAtsSummarize, useTranslate } from "@/hooks/mutations/ai";
 import type { ProjectRow } from "@/hooks/queries/projects";
 import { useFindManySkills } from "@/hooks/queries/skills";
 import { fieldError } from "@/lib/field-error";
+import { createEmptyI18n } from "@/lib/i18n";
 import { findLabelsByIds } from "@/lib/mappers";
 import { CommonFormProps } from "./common";
 
@@ -124,10 +125,7 @@ export function ProjectForm({
       skills: [] as string[],
       images: [] as string[],
       urls: [] as { title: string; value: string }[],
-      i18n: [
-        { locale: LocaleEnum.PORTUGUESE, title: "", description: "" },
-        { locale: LocaleEnum.ENGLISH, title: "", description: "" },
-      ],
+      i18n: createEmptyI18n({ title: "", description: "" }),
       ...defaultValues,
     },
     onSubmit: ({ value }) => onSubmit?.(value),

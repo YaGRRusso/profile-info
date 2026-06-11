@@ -25,6 +25,11 @@ const dashboard = graphql(`
         label
         value
       }
+      recentActivity {
+        type
+        label
+        updatedAt
+      }
     }
   }
 `);

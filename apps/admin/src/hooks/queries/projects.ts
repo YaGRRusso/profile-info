@@ -1,14 +1,8 @@
-import type { UseQueryOptions } from "@tanstack/react-query";
-import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
+import { useInfiniteQuery } from "@tanstack/react-query";
 import { graphql } from "@/generated/graphql";
 import type {
   FilterProjectInput,
-  FindManyProjectByIdQuery,
-  FindManyProjectByIdQueryVariables,
   FindManyProjectsQuery,
-  FindOneProjectByIdQuery,
-  FindOneProjectByIdQueryVariables,
-  FindOneProjectQuery,
   SortProjectInput,
 } from "@/generated/graphql/graphql";
 import { execute } from "@/lib/execute";
@@ -57,90 +51,6 @@ const findManyProjects = graphql(`
   }
 `);
 
-const findOneProjectById = graphql(`
-  query FindOneProjectById($projectId: ID!) {
-    findOneProjectById(projectId: $projectId) {
-      id
-      slug
-      relevance
-      images
-      urls {
-        title
-        value
-      }
-      i18n {
-        locale
-        messages {
-          title
-          description
-        }
-      }
-      skills {
-        id
-        name
-      }
-      createdAt
-      updatedAt
-    }
-  }
-`);
-
-const findOneProject = graphql(`
-  query FindOneProject($projectFilters: FilterProjectInput) {
-    findOneProject(projectFilters: $projectFilters) {
-      id
-      slug
-      relevance
-      images
-      urls {
-        title
-        value
-      }
-      i18n {
-        locale
-        messages {
-          title
-          description
-        }
-      }
-      skills {
-        id
-        name
-      }
-      createdAt
-      updatedAt
-    }
-  }
-`);
-
-const findManyProjectById = graphql(`
-  query FindManyProjectById($projectIds: [ID!]!) {
-    findManyProjectById(projectIds: $projectIds) {
-      id
-      slug
-      relevance
-      images
-      urls {
-        title
-        value
-      }
-      i18n {
-        locale
-        messages {
-          title
-          description
-        }
-      }
-      skills {
-        id
-        name
-      }
-      createdAt
-      updatedAt
-    }
-  }
-`);
-
 export function useFindManyProjects(
   variables?: {
     projectFilters?: FilterProjectInput;
@@ -169,45 +79,6 @@ export function useFindManyProjects(
       found: data.pages[0]?.findManyProjects.found ?? 0,
       nodes: data.pages.flatMap((p) => p.findManyProjects.nodes),
     }),
-    ...options,
-  });
-}
-
-export function useFindOneProjectById(
-  variables: FindOneProjectByIdQueryVariables,
-  options?: Omit<
-    UseQueryOptions<FindOneProjectByIdQuery>,
-    "queryKey" | "queryFn"
-  >
-) {
-  return useQuery({
-    queryKey: ["findOneProjectById", variables],
-    queryFn: () => execute(findOneProjectById, variables),
-    ...options,
-  });
-}
-
-export function useFindOneProject(
-  variables: { projectFilters?: FilterProjectInput },
-  options?: Omit<UseQueryOptions<FindOneProjectQuery>, "queryKey" | "queryFn">
-) {
-  return useQuery({
-    queryKey: ["findOneProject", variables],
-    queryFn: () => execute(findOneProject, variables),
-    ...options,
-  });
-}
-
-export function useFindManyProjectById(
-  variables: FindManyProjectByIdQueryVariables,
-  options?: Omit<
-    UseQueryOptions<FindManyProjectByIdQuery>,
-    "queryKey" | "queryFn"
-  >
-) {
-  return useQuery({
-    queryKey: ["findManyProjectById", variables],
-    queryFn: () => execute(findManyProjectById, variables),
     ...options,
   });
 }

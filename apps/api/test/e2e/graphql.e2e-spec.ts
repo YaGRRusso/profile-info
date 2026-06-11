@@ -125,6 +125,45 @@ describe("GraphQL (e2e)", () => {
     expect(response.errors?.[0]?.message).toContain("Insufficient permissions");
   });
 
+  it("should return UNAUTHENTICATED when calling updateMe without a token", async () => {
+    const response = await graphqlRequest(app, {
+      query: `
+        mutation UpdateMe($updateMeInput: UpdateMeInput!) {
+          updateMe(updateMeInput: $updateMeInput) {
+            id
+          }
+        }
+      `,
+      variables: {
+        updateMeInput: { phone: "+5511999999999" },
+      },
+    });
+
+    expect(response.errors?.[0]?.extensions?.code).toBe("UNAUTHENTICATED");
+  });
+
+  it("should allow authenticated users to update their own profile via updateMe", async () => {
+    const response = await graphqlRequest<{
+      updateMe: { id: string; phone: string };
+    }>(app, {
+      query: `
+        mutation UpdateMe($updateMeInput: UpdateMeInput!) {
+          updateMe(updateMeInput: $updateMeInput) {
+            id
+            phone
+          }
+        }
+      `,
+      variables: {
+        updateMeInput: { phone: "+5511999999999" },
+      },
+      token: userToken,
+    });
+
+    expect(response.errors).toBeUndefined();
+    expect(response.data?.updateMe.phone).toBe("+5511999999999");
+  });
+
   it("should allow admin to create a skill", async () => {
     const response = await graphqlRequest<{
       createOneSkill: { id: string; name: string };

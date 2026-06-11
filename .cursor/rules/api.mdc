@@ -34,9 +34,9 @@ Entry point `src/main.ts`:
 - `ConfigModule.forRoot({ isGlobal: true })`.
 - `MongooseModule.forRootAsync` reads `DATABASE_URL`.
 - `GraphqlModule` (`modules/graphql/graphql.module.ts`): wraps `GraphQLModule.forRootAsync` with `ApolloDriver`, schema at `src/schema.gql`, and per-request DataLoaders via `createLoaders(...)` from `modules/graphql/loaders.helper.ts`.
-- Feature modules: `AuthModule`, CRUD entities, `DashboardModule` (read-only aggregation), `AiToolsModule`.
+- Feature modules: `AuthModule`, CRUD entities, `DashboardModule` (read-only aggregation), `ResumeModule` (PDF export), `AiToolsModule`.
 
-Request flow: Apollo → `GqlAuthGuard` (unless `@Public()`) → resolver → service → Mongoose model. Nested fields use `@ResolveField` + per-request DataLoaders.
+Request flow: Apollo → `GqlAuthGuard` (unless `@Public()`) → resolver → service → Mongoose model. Nested fields use `@ResolveField` + per-request DataLoaders. REST routes (e.g. `GET /resume.pdf`) skip `GqlAuthGuard` when `context.getType() !== "graphql"`.
 
 ## Core technologies
 
@@ -52,7 +52,8 @@ Request flow: Apollo → `GqlAuthGuard` (unless `@Public()`) → resolver → se
 
 `common/` (pure TS, no NestJS/Mongoose/GraphQL imports):
 
-- `helpers/`: `object.helper.ts` (`clearObject`), `object-id.helper.ts` (`assertValidObjectId`, `assertValidObjectIds`), `daterange.helper.ts` (`sortDateRange`), `breakpoint.helper.ts`.
+- `helpers/`: `object.helper.ts` (`clearObject`), `object-id.helper.ts` (`assertValidObjectId`, `assertValidObjectIds`), `daterange.helper.ts` (`sortDateRange`), `pick-translation.helper.ts` (`pickTranslation`), `format-period.helper.ts` (`formatPeriod`), `breakpoint.helper.ts`.
+- `i18n/locales.ts`: `Locale`, `SUPPORTED_CONTENT_LOCALES`, `normalizeLocale` — app-owned copy (resume PDF, future errors). Entity `i18n[].locale` is a free string (`@IsString` + `@IsNotEmpty` only).
 - `execution/orchestrator.helper.ts`: `orchestrate(...)`, a concurrency-limited + timeout task runner (plain function, used by `ai-tools`).
 
 `common` holds only generic primitives — it does **not** own integration contracts. Each capability boundary owns its own port (see `integrations/`).
@@ -80,9 +81,10 @@ DI pattern is the NestJS-idiomatic **abstract class as token**: ports are abstra
 `modules/` (business domains):
 
 - `graphql/`: `graphql.module.ts` (single module — Apollo wiring), `loaders.service.ts` (composes per-entity loaders), `context.interface.ts` (`Ctx`). `forRootAsync` injects exported `*LoaderService` from entity modules; batching logic stays in those services.
-- `auth/`: global `GqlAuthGuard` (JWT + `UNAUTHENTICATED` GraphQL extension) and `RolesGuard` (`@Roles(ADMIN)` on mutations/dashboard). `signIn` (`@Public`) returns JWT; `getMe` returns current user; `@CurrentUser()` decorator lives in `auth/decorators/`. Profile reads are `@Public()`; all mutations require `ADMIN`.
+- `auth/`: global `GqlAuthGuard` (JWT + `UNAUTHENTICATED` GraphQL extension) and `RolesGuard` (`@Roles(ADMIN)` on mutations/dashboard). `signIn` (`@Public`) returns JWT; `getMe` returns current user; `updateMe` lets any authenticated user update their own profile (no `role` in input); `@CurrentUser()` decorator lives in `auth/decorators/`. Profile reads are `@Public()`; entity CRUD mutations require `ADMIN`.
 - `ai-tools/`: AI use-cases. Owns `AiEntity` GraphQL types, enums (`ChatRole`, `ChatFinishReason`), and mappers (`IntegrationChatResult` → `AiEntity`). `resource-detail/` orchestrates `*ExtractorService` classes. Injects `AiChatProvider`, `RepositoryMetadataProvider`, `WebContentProvider`. `AiToolsModule` imports `OpenRouterModule`, `GithubModule`, `TavilyModule`.
 - `dashboard/`: read-only aggregation via feature **services** (`count()`, `countByField()`), not other modules' Mongoose schemas.
+- `resume/`: `ResumeService` aggregates profile data (top by `relevance`, completed educations/courses); skills use top `skillsPerCategory` per category (empty categories omitted). PDF export via `GET /resume.pdf?locale=` (`normalizeLocale`, `pickTranslation`, `formatPeriod`, `resolveResumeLabels` in `resume.labels.ts`). Filename is always `resume.pdf`. Uses first `ADMIN` user as profile owner; org refs resolved via `OrganizationsService.findManyById`. PDF rendering: generic `common/pdf/pdf-context.ts`; resume styling in `resume.pdf-theme.ts` (`textStyles`, `spacing`); section renderers under `resume/pdf/`; `ResumePdfService` only boots PDFKit and calls `renderResumeDocument`.
 - CRUD feature modules (`skills/`, `users/`, `experiences/`, `educations/`, `courses/`, `organizations/`, `projects/`): canonical skeleton:
 
 ```

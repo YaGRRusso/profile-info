@@ -10,6 +10,10 @@ import {
 } from "class-validator";
 import { OptionalField } from "@/core/decorators/optional-field.decorator";
 import { DateRangeInput } from "@/core/inputs/date-range.input";
+import {
+  createTranslationInput,
+  TranslationInput,
+} from "@/core/inputs/translation.input";
 import { ExperienceCategory } from "../enums/category.enum";
 
 @InputType()
@@ -25,26 +29,17 @@ export class CreateExperienceMessagesInput {
   description: string;
 }
 
-@InputType()
-export class CreateExperienceTranslationInput {
-  @Field(() => String)
-  @IsString()
-  @IsNotEmpty()
-  locale: string;
-
-  @Field(() => CreateExperienceMessagesInput)
-  @ValidateNested()
-  @Type(() => CreateExperienceMessagesInput)
-  messages: CreateExperienceMessagesInput;
-}
+const ExperienceTranslationInput = createTranslationInput(
+  CreateExperienceMessagesInput
+);
 
 @InputType()
 export class CreateExperienceRoleInput {
-  @Field(() => [CreateExperienceTranslationInput])
+  @Field(() => [ExperienceTranslationInput])
   @IsArray()
   @ValidateNested({ each: true })
-  @Type(() => CreateExperienceTranslationInput)
-  i18n: CreateExperienceTranslationInput[];
+  @Type(() => ExperienceTranslationInput)
+  i18n: TranslationInput<CreateExperienceMessagesInput>[];
 
   @OptionalField(() => DateRangeInput)
   period?: DateRangeInput;

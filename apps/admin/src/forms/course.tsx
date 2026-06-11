@@ -9,7 +9,7 @@ import { RangeInput } from "@/components/inputs/range";
 import { SelectInput } from "@/components/inputs/select";
 import { TextInput } from "@/components/inputs/text";
 import { TextareaInput } from "@/components/inputs/textarea";
-import { LOCALES, LocaleEnum } from "@/consts/locales";
+import { LOCALES } from "@/consts/locales";
 import { RawSizeEnum } from "@/consts/raw-size";
 import { SLUG_REGEX } from "@/consts/regex";
 import {
@@ -24,6 +24,7 @@ import type { CourseRow } from "@/hooks/queries/courses";
 import { useFindManyOrganizations } from "@/hooks/queries/organizations";
 import { useFindManySkills } from "@/hooks/queries/skills";
 import { fieldError } from "@/lib/field-error";
+import { createEmptyI18n, pickTranslation } from "@/lib/i18n";
 import { findLabelsByIds } from "@/lib/mappers";
 import { CommonFormProps } from "./common";
 
@@ -143,10 +144,7 @@ export function CourseForm({
       image: "",
       hours: 0,
       skills: [] as string[],
-      i18n: [
-        { locale: LocaleEnum.PORTUGUESE, title: "", description: "" },
-        { locale: LocaleEnum.ENGLISH, title: "", description: "" },
-      ],
+      i18n: createEmptyI18n({ title: "", description: "" }),
       ...defaultValues,
     },
     onSubmit: ({ value }) => onSubmit?.(value),
@@ -195,8 +193,9 @@ export function CourseForm({
       const organizationName = organization.name;
       details.push({ key: "Organization Name", value: [organizationName] });
 
-      const organizationDescription = organization.i18n.find(
-        (i18n) => i18n.locale === fieldGroup.locale
+      const organizationDescription = pickTranslation(
+        organization.i18n,
+        fieldGroup.locale
       )?.messages.description;
       if (organizationDescription)
         details.push({

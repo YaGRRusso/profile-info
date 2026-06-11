@@ -6,6 +6,16 @@ export type GqlErrorCode =
   | "INTERNAL_SERVER_ERROR"
   | (string & {});
 
+export class GqlClientError extends Error {
+  readonly code?: GqlErrorCode;
+
+  constructor(message: string, code?: GqlErrorCode) {
+    super(message);
+    this.name = "GqlClientError";
+    this.code = code;
+  }
+}
+
 export interface GqlError {
   extensions?: {
     code?: GqlErrorCode;

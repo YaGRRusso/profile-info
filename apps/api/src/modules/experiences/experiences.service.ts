@@ -1,5 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { AnyKeys, QueryFilter, SortOrder, UpdateQuery } from "mongoose";
+import { RecentActivityRecord } from "@/common/helpers/recent-activity.helper";
 import { BatchEntity } from "@/core/entities/batch.entity";
 import { PaginatedModel } from "@/core/schemas/paginated.schema";
 import { ExperienceModel } from "@/modules/experiences/schemas/experience.schema";
@@ -87,6 +88,23 @@ export class ExperiencesService {
 
   countByField(field: string): Promise<{ label: string; value: number }[]> {
     return this.repository.countByField(field);
+  }
+
+  async findRecentActivity(limit: number): Promise<RecentActivityRecord[]> {
+    const rows = await this.repository.findRecentlyUpdated(
+      limit,
+      "slug roles updatedAt"
+    );
+    return rows.map((row) => {
+      const roles = row.roles as
+        | Array<{ i18n?: Array<{ messages?: { title?: string } }> }>
+        | undefined;
+      const title = roles?.[0]?.i18n?.[0]?.messages?.title;
+      return {
+        label: title ?? (row.slug as string),
+        updatedAt: row.updatedAt,
+      };
+    });
   }
 
   detachSkill(skillId: string): Promise<void> {

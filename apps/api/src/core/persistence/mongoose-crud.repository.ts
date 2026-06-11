@@ -155,4 +155,21 @@ export class MongooseCrudRepository<T> {
     ]);
     return rows.map((row) => ({ label: row._id, value: row.value }));
   }
+
+  async findRecentlyUpdated(
+    limit: number,
+    projection: string
+  ): Promise<Array<Record<string, unknown> & { updatedAt: Date }>> {
+    const rows = await this.model
+      .find()
+      .sort({ updatedAt: -1 as SortOrder })
+      .limit(limit)
+      .select(projection)
+      .lean()
+      .exec();
+
+    return rows as unknown as Array<
+      Record<string, unknown> & { updatedAt: Date }
+    >;
+  }
 }

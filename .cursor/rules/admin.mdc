@@ -20,20 +20,22 @@ The admin dashboard for profile-info: a React 19 + Vite SPA that authenticates a
 
 Entry point `src/main.tsx`:
 
-- `QueryClient` with `MutationCache.onError` → `toast.error`; queries: `refetchOnWindowFocus: false`, `retryDelay: 60s`.
+- `QueryClient` with `QueryCache.onError` and `MutationCache.onError` → `toast.error`; queries: `refetchOnWindowFocus: false`, `retryDelay: 60s`, no retry on `GqlClientError`.
 - Auth store subscription: token set → null clears `queryClient`.
 - Router from `routeTree.gen.ts` with `basepath: import.meta.env.BASE_URL`.
 - `QueryClientProvider` > `ToastContainer` + `RouterProvider`.
 
-Data flow: hooks call `execute(document, variables)` from `src/lib/execute.ts`. Reads JWT from auth store, POSTs to `VITE_API_URL`, on `UNAUTHENTICATED` calls `clearAuth()` before throwing. 401 handling is centralized in `execute` + store subscription.
+Data flow: GraphQL hooks call `execute()` from `src/lib/execute.ts` (POST to `VITE_API_URL`). REST/binary endpoints use `apiRequest()` from `src/lib/api.ts` (`getApiOrigin()` strips the `/graphql` suffix from `VITE_API_URL`). JWT is attached on both when present; GraphQL `UNAUTHENTICATED` clears auth via `execute` + store subscription.
 
 Routing:
 
 - `_authenticated.tsx`: protected layout; `useGetMe()` when token exists; login page when unauthenticated.
 - `index.tsx`: dashboard via `useDashboard()` (stats + recharts).
+- `_authenticated/_sidebar/settings/`: profile form + `DownloadCvControl` in page header.
 - `_authenticated/_sidebar/`: CRUD pages per entity with `-components/table.tsx`.
+- `settings/index.tsx`: inline profile form via `useGetMe()` + `useUpdateMe()` (`updateMe` mutation); syncs auth store after save.
 
-Rich forms map flat Zod schemas to nested GraphQL shapes (`i18n`, `organization`, `skills`, `period`, experience `roles`).
+Rich forms map flat Zod schemas to nested GraphQL shapes (`i18n`, `organization`, `skills`, `period`, experience `roles`). Profile settings uses `forms/profile.tsx` (`profileToForm` / `profileToInput`).
 
 ## Core technologies
 
@@ -41,15 +43,17 @@ Rich forms map flat Zod schemas to nested GraphQL shapes (`i18n`, `organization`
 - **TanStack Router**: `src/routes/`, generated `routeTree.gen.ts`.
 - **TanStack Query**: hooks in `src/hooks/`.
 - **GraphQL Codegen**: `codegen.ts` → `src/generated/graphql/` from `../api/src/schema.gql`.
-- **GraphQL client**: `src/lib/execute.ts` (plain fetch).
+- **GraphQL client**: `src/lib/execute.ts` (GraphQL POST). **REST client**: `src/lib/api.ts` (`getApiOrigin`, `apiRequest`). Binary saves use `src/lib/download-blob.ts` (`downloadBlob`).
 - **Zustand**: `stores/auth.ts`, `stores/theme.ts` (persisted).
 - **TanStack Form + Zod**: `src/forms/`.
 - **Tailwind v4 + DaisyUI**: `src/styles/globals.css`.
+- **dayjs**: configured in `src/lib/dayjs.ts` (relative time, etc.).
+- **Recharts**: shared chart styling in `src/lib/chart-theme.ts` (theme colors, tooltips, axis props).
 - **nuqs**: URL state via `NuqsAdapter` in `__root.tsx`.
 
 ## Module / directory breakdown
 
-- `src/lib/execute.ts`: single GraphQL transport. Helpers: `gql.ts`, `tc.ts`, `cn.ts`, `parsers.ts`, `field-error.ts`, etc.
+- `src/lib/execute.ts`: GraphQL transport. `src/lib/api.ts`: REST transport (`getApiOrigin`, `apiRequest`). Other helpers: `gql.ts`, `tc.ts`, `cn.ts`, `parsers.ts`, `field-error.ts`, `chart-theme.ts`, `dayjs.ts`, `greeting.ts`, etc.
 - `src/hooks/queries/` and `mutations/`: one file per entity; `graphql` tag must use static string literals (no interpolated fragments).
 - `src/generated/graphql/`: codegen output — regenerate, do not edit.
 - `src/forms/`: entity forms + `*ToInput`/`*ToForm` mappers co-located.
@@ -63,6 +67,8 @@ Adding a GraphQL operation:
 1. Define operation with `graphql` tag in `hooks/queries/` or `hooks/mutations/`.
 2. Regenerate via `npm run dev` (watch) or `npm run build`; once: `npx graphql-codegen --config codegen.ts`.
 3. Wrap in `useQuery` / `useInfiniteQuery` / `useMutation` calling `execute`. Follow `useFindManySkills` for infinite pagination.
+
+REST reads (e.g. resume PDF): `hooks/queries/resume.ts` — `fetchResumePdf` via `apiRequest`, user-triggered download via `useDownloadResume` (`useMutation`).
 
 Adding a form: copy `src/forms/skill.tsx` (Zod + TanStack Form + generic inputs).
 

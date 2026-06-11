@@ -1,4 +1,5 @@
 import { Field, Int, ObjectType } from "@nestjs/graphql";
+import { DashboardActivityType } from "../enums/activity-type.enum";
 
 @ObjectType()
 export class DashboardCount {
@@ -31,6 +32,18 @@ export class DashboardTotals {
 }
 
 @ObjectType()
+export class DashboardActivityItem {
+  @Field(() => DashboardActivityType)
+  type: DashboardActivityType;
+
+  @Field(() => String)
+  label: string;
+
+  @Field(() => Date)
+  updatedAt: Date;
+}
+
+@ObjectType()
 export class DashboardEntity {
   @Field(() => DashboardTotals)
   totals: DashboardTotals;
@@ -43,4 +56,7 @@ export class DashboardEntity {
 
   @Field(() => [DashboardCount])
   coursesByStatus: DashboardCount[];
+
+  @Field(() => [DashboardActivityItem])
+  recentActivity: DashboardActivityItem[];
 }

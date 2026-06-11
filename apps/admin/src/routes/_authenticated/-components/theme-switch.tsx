@@ -17,10 +17,10 @@ export function ThemeSwitch() {
   const { theme, setTheme } = useThemeStore();
 
   return (
-    <div className="join mb-4 is-drawer-close:hidden w-full rounded px-4">
+    <div className="join my-2 is-drawer-close:hidden w-full rounded px-2">
       {THEME_OPTIONS.map((option) => (
         <label
-          className="btn btn-sm join-item has-checked:btn-primary flex-1"
+          className="btn btn-sm join-item has-checked:btn-neutral flex-1"
           key={option.value}
         >
           <input

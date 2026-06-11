@@ -12,6 +12,7 @@ import { ExperiencesModule } from "@/modules/experiences/experiences.module";
 import { GraphqlModule } from "@/modules/graphql/graphql.module";
 import { OrganizationsModule } from "@/modules/organizations/organizations.module";
 import { ProjectsModule } from "@/modules/projects/projects.module";
+import { ResumeModule } from "@/modules/resume/resume.module";
 import { SkillsModule } from "@/modules/skills/skills.module";
 import { UsersModule } from "@/modules/users/users.module";
 
@@ -43,6 +44,7 @@ import { UsersModule } from "@/modules/users/users.module";
     CoursesModule,
     ProjectsModule,
     DashboardModule,
+    ResumeModule,
   ],
   controllers: [AppController],
   providers: [AppService],

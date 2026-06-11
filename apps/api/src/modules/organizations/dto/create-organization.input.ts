@@ -9,6 +9,10 @@ import {
   ValidateNested,
 } from "class-validator";
 import { OptionalField } from "@/core/decorators/optional-field.decorator";
+import {
+  createTranslationInput,
+  TranslationInput,
+} from "@/core/inputs/translation.input";
 import { OrganizationCategory } from "../enums/category.enum";
 
 @InputType()
@@ -19,18 +23,9 @@ export class CreateOrganizationMessagesInput {
   description: string;
 }
 
-@InputType()
-export class CreateOrganizationTranslationInput {
-  @Field(() => String)
-  @IsString()
-  @IsNotEmpty()
-  locale: string;
-
-  @Field(() => CreateOrganizationMessagesInput)
-  @ValidateNested()
-  @Type(() => CreateOrganizationMessagesInput)
-  messages: CreateOrganizationMessagesInput;
-}
+const OrganizationTranslationInput = createTranslationInput(
+  CreateOrganizationMessagesInput
+);
 
 @InputType()
 export class CreateOrganizationInput {
@@ -55,11 +50,11 @@ export class CreateOrganizationInput {
   @IsUrl()
   logo: string;
 
-  @Field(() => [CreateOrganizationTranslationInput])
+  @Field(() => [OrganizationTranslationInput])
   @IsArray()
   @ValidateNested({ each: true })
-  @Type(() => CreateOrganizationTranslationInput)
-  i18n: CreateOrganizationTranslationInput[];
+  @Type(() => OrganizationTranslationInput)
+  i18n: TranslationInput<CreateOrganizationMessagesInput>[];
 
   @Field(() => OrganizationCategory)
   @IsEnum(OrganizationCategory)
