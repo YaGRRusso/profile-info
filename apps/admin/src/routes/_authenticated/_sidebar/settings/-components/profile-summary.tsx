@@ -1,9 +1,11 @@
+import { PROFILE_SETTINGS_FORM_ID } from "@/forms/profile";
 import type { GetMeQuery } from "@/generated/graphql/graphql";
 import { toDateInput } from "@/lib/date";
 
 type ProfileUser = GetMeQuery["getMe"];
 
 interface ProfileSummaryProps {
+  isLoading?: boolean;
   user: ProfileUser;
 }
 
@@ -24,7 +26,7 @@ function SummaryItem({
   );
 }
 
-export function ProfileSummary({ user }: ProfileSummaryProps) {
+export function ProfileSummary({ isLoading, user }: ProfileSummaryProps) {
   const birth = toDateInput(user.birth);
 
   return (
@@ -61,6 +63,15 @@ export function ProfileSummary({ user }: ProfileSummaryProps) {
         <SummaryItem label="Birth date" value={birth || undefined} />
         <SummaryItem label="Address" value={user.address} />
       </div>
+
+      <button
+        className="btn btn-soft btn-primary btn-block max-lg:hidden"
+        disabled={isLoading}
+        form={PROFILE_SETTINGS_FORM_ID}
+        type="submit"
+      >
+        Save changes
+      </button>
     </aside>
   );
 }

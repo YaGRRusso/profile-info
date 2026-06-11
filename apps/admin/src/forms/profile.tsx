@@ -32,6 +32,8 @@ const profileSchema = z.object({
 
 export type ProfileSchema = z.infer<typeof profileSchema>;
 
+export const PROFILE_SETTINGS_FORM_ID = "profile-settings-form";
+
 export interface ProfileFormProps extends CommonFormProps<ProfileSchema> {}
 
 type GetMeUser = GetMeQuery["getMe"];
@@ -98,6 +100,7 @@ export function ProfileForm({
   return (
     <form
       className="flex flex-col gap-6"
+      id={PROFILE_SETTINGS_FORM_ID}
       onSubmit={(e) => {
         e.preventDefault();
         e.stopPropagation();
@@ -284,7 +287,7 @@ export function ProfileForm({
 
       <div className="form-footer mt-0">
         <button
-          className="btn btn-ghost flex-1"
+          className="btn btn-ghost btn-block"
           disabled={isDisabled || isLoading}
           onClick={() => form.reset()}
           type="button"
@@ -294,7 +297,7 @@ export function ProfileForm({
         <Subscribe>
           {({ canSubmit, isSubmitting, isTouched }) => (
             <button
-              className="btn btn-soft btn-primary flex-1"
+              className="btn btn-soft btn-primary flex-1 lg:hidden"
               disabled={
                 !canSubmit ||
                 !isTouched ||

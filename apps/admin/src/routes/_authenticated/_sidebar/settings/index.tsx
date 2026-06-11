@@ -60,7 +60,7 @@ function RouteComponent() {
                 />
               </div>
 
-              <ProfileSummary user={user} />
+              <ProfileSummary isLoading={updateMe.isPending} user={user} />
             </div>
           )}
         </DataState.Content>
