@@ -39,7 +39,7 @@ modules         ← business domains (resolvers, services, schemas)
 | **`modules/auth/`** | JWT guard, `signIn`, `getMe`. Global auth, not a CRUD entity. | Security cross-cut; uses `UsersService.findOneByEmailWithPassword`. |
 | **`modules/graphql/`** | `GraphqlModule` + `LoadersService`. Wires Apollo; composes loaders exported by entity modules. | Transport infra — batching logic stays in each `*LoaderService`. |
 | **`modules/dashboard/`** | Read-only stats; imports other modules' **services** (not Mongoose models). | Aggregation without bypassing service boundaries. |
-| **`modules/resume/`** | Aggregates profile data and renders an English PDF via `GET /resume.pdf`. Uses `pdfkit`; imports feature services like dashboard. | CV export for admin and external portfolio clients. |
+| **`modules/resume/`** | Aggregates profile data and renders a PDF via `GET /resume.pdf?locale=`. Uses `pdfkit`; imports feature services like dashboard. | CV export for admin and external portfolio clients. |
 | **`modules/ai-tools/`** | AI use-cases (summarize, translate, ATS). Owns `AiEntity`, enums, and mappers. | Converts `IntegrationChatResult` → GraphQL; orchestrates `*ExtractorService` before calling `AiChatProvider`. |
 
 ### Request flow (typical)
@@ -154,10 +154,10 @@ After GraphQL type changes, rebuild or boot the API so `src/schema.gql` regenera
 ### Resume PDF export
 
 ```
-GET /resume.pdf
+GET /resume.pdf?locale=en|pt|es
 ```
 
-Returns `application/pdf` with `Content-Disposition: attachment; filename="resume.pdf"`. Content and section labels are always in English. Aggregates the admin user's profile data (top items by `relevance`, completed educations/courses only).
+Returns `application/pdf` with `Content-Disposition: attachment; filename="resume.pdf"`. Optional `locale` query (defaults to `en`; invalid values fall back to `en`). Section labels come from `resume.labels.ts`; content uses `pickTranslation` for entity i18n. Aggregates the admin user's profile data (top items by `relevance`, completed educations/courses only).
 
 The admin dashboard downloads this endpoint directly (base URL derived from `VITE_API_URL` by stripping `/graphql`).
 

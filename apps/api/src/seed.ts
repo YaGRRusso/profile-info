@@ -4,6 +4,7 @@ import { getModelToken } from "@nestjs/mongoose";
 import { hash } from "bcryptjs";
 import type { Model } from "mongoose";
 import { AppModule } from "./app.module";
+import { Locale } from "./common/i18n/locales";
 import { UserRole } from "./core/enums/user-role.enum";
 import { CourseModel } from "./modules/courses/schemas/course.schema";
 import { EducationModel } from "./modules/educations/schemas/education.schema";
@@ -65,7 +66,7 @@ const EXPERIENCE_CATEGORIES = [
   "FREELANCE",
   "VOLUNTEER",
 ];
-const LOCALES = ["en", "pt"];
+const SEED_LOCALES = [Locale.EN, Locale.PT];
 
 const relevance = () => faker.number.int({ min: 1, max: 5 });
 
@@ -76,7 +77,7 @@ const slugFor = (name: string, index: number) =>
   `${faker.helpers.slugify(name).toLowerCase()}-${index}`;
 
 const i18n = (messages: Record<string, string>) =>
-  LOCALES.map((locale) => ({
+  SEED_LOCALES.map((locale) => ({
     locale,
     messages,
   }));

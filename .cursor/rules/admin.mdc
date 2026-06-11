@@ -30,7 +30,7 @@ Data flow: hooks call `execute(document, variables)` from `src/lib/execute.ts`. 
 Routing:
 
 - `_authenticated.tsx`: protected layout; `useGetMe()` when token exists; login page when unauthenticated.
-- `index.tsx`: dashboard via `useDashboard()` (stats + recharts) + `DownloadCvControl` (`GET /resume.pdf`).
+- `index.tsx`: dashboard via `useDashboard()` (stats + recharts) + `DownloadCvControl` (locale select + `GET /resume.pdf?locale=`; download wired later).
 - `_authenticated/_sidebar/`: CRUD pages per entity with `-components/table.tsx`.
 
 Rich forms map flat Zod schemas to nested GraphQL shapes (`i18n`, `organization`, `skills`, `period`, experience `roles`).

@@ -53,7 +53,7 @@ Request flow: Apollo → `GqlAuthGuard` (unless `@Public()`) → resolver → se
 `common/` (pure TS, no NestJS/Mongoose/GraphQL imports):
 
 - `helpers/`: `object.helper.ts` (`clearObject`), `object-id.helper.ts` (`assertValidObjectId`, `assertValidObjectIds`), `daterange.helper.ts` (`sortDateRange`), `pick-translation.helper.ts` (`pickTranslation`), `format-period.helper.ts` (`formatPeriod`), `breakpoint.helper.ts`.
-- `i18n/locales.ts`: `Locale`, `LocaleCode`, `DEFAULT_LOCALE`, `SUPPORTED_CONTENT_LOCALES`, `DEFAULT_TRANSLATION_FALLBACKS`, `normalizeLocale`. Keep admin `consts/locales.ts` in sync manually.
+- `i18n/locales.ts`: `Locale`, `LocaleCode`, `DEFAULT_LOCALE`, `SUPPORTED_CONTENT_LOCALES`, `DEFAULT_TRANSLATION_FALLBACKS`, `INTL_LOCALES`, `normalizeLocale`. Keep admin `consts/locales.ts` in sync manually.
 - `execution/orchestrator.helper.ts`: `orchestrate(...)`, a concurrency-limited + timeout task runner (plain function, used by `ai-tools`).
 
 `common` holds only generic primitives — it does **not** own integration contracts. Each capability boundary owns its own port (see `integrations/`).
@@ -84,7 +84,7 @@ DI pattern is the NestJS-idiomatic **abstract class as token**: ports are abstra
 - `auth/`: global `GqlAuthGuard` (JWT + `UNAUTHENTICATED` GraphQL extension) and `RolesGuard` (`@Roles(ADMIN)` on mutations/dashboard). `signIn` (`@Public`) returns JWT; `getMe` returns current user; `@CurrentUser()` decorator lives in `auth/decorators/`. Profile reads are `@Public()`; all mutations require `ADMIN`.
 - `ai-tools/`: AI use-cases. Owns `AiEntity` GraphQL types, enums (`ChatRole`, `ChatFinishReason`), and mappers (`IntegrationChatResult` → `AiEntity`). `resource-detail/` orchestrates `*ExtractorService` classes. Injects `AiChatProvider`, `RepositoryMetadataProvider`, `WebContentProvider`. `AiToolsModule` imports `OpenRouterModule`, `GithubModule`, `TavilyModule`.
 - `dashboard/`: read-only aggregation via feature **services** (`count()`, `countByField()`), not other modules' Mongoose schemas.
-- `resume/`: `ResumeService` aggregates profile data (top by `relevance`, completed educations/courses); skills use top `skillsPerCategory` per category (empty categories omitted). English-only export via `GET /resume.pdf` (`buildResume(DEFAULT_LOCALE)`, `pickTranslation`, `formatPeriod`, `resolveResumeCopy`). Uses first `ADMIN` user as profile owner; org refs resolved via `OrganizationsService.findManyById`.
+- `resume/`: `ResumeService` aggregates profile data (top by `relevance`, completed educations/courses); skills use top `skillsPerCategory` per category (empty categories omitted). PDF export via `GET /resume.pdf?locale=` (`normalizeLocale`, `pickTranslation`, `formatPeriod`, `resolveResumeLabels` in `resume.labels.ts`). Filename is always `resume.pdf`. Uses first `ADMIN` user as profile owner; org refs resolved via `OrganizationsService.findManyById`.
 - CRUD feature modules (`skills/`, `users/`, `experiences/`, `educations/`, `courses/`, `organizations/`, `projects/`): canonical skeleton:
 
 ```

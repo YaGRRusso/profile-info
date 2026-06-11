@@ -11,6 +11,10 @@ import {
 } from "class-validator";
 import { OptionalField } from "@/core/decorators/optional-field.decorator";
 import { DateRangeInput } from "@/core/inputs/date-range.input";
+import {
+  createTranslationInput,
+  TranslationInput,
+} from "@/core/inputs/translation.input";
 import { CourseStatus } from "../enums/status.enum";
 
 @InputType()
@@ -26,18 +30,9 @@ export class CreateCourseMessagesInput {
   description: string;
 }
 
-@InputType()
-export class CreateCourseTranslationInput {
-  @Field(() => String)
-  @IsString()
-  @IsNotEmpty()
-  locale: string;
-
-  @Field(() => CreateCourseMessagesInput)
-  @ValidateNested()
-  @Type(() => CreateCourseMessagesInput)
-  messages: CreateCourseMessagesInput;
-}
+const CourseTranslationInput = createTranslationInput(
+  CreateCourseMessagesInput
+);
 
 @InputType()
 export class CreateCourseInput {
@@ -68,11 +63,11 @@ export class CreateCourseInput {
   @OptionalField(() => Int)
   hours?: number;
 
-  @Field(() => [CreateCourseTranslationInput])
+  @Field(() => [CourseTranslationInput])
   @IsArray()
   @ValidateNested({ each: true })
-  @Type(() => CreateCourseTranslationInput)
-  i18n: CreateCourseTranslationInput[];
+  @Type(() => CourseTranslationInput)
+  i18n: TranslationInput<CreateCourseMessagesInput>[];
 
   @OptionalField(() => DateRangeInput)
   period?: DateRangeInput;
