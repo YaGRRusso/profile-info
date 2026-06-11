@@ -11,6 +11,9 @@ import {
   SignOutIcon,
 } from "@phosphor-icons/react";
 import { createFileRoute, Outlet } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
+import { useDebounce } from "@/hooks/custom/use-debounce";
+import { useMediaQuery } from "@/hooks/custom/use-media-query";
 import { useAuthStore } from "@/stores/auth";
 import { MenuAction, type MenuActionProps } from "./-components/menu-action";
 import { MenuLink, type MenuLinkProps } from "./-components/menu-link";
@@ -26,43 +29,43 @@ const MENU_SECTIONS: MenuSection[] = [
     label: "Navigation",
     items: [
       {
-        icon: <HouseIcon size={24} weight="fill" />,
+        icon: <HouseIcon size={24} />,
         label: "Home",
         to: "/",
         type: "link",
       },
       {
-        icon: <PackageIcon size={24} weight="fill" />,
+        icon: <PackageIcon size={24} />,
         label: "Skills",
         to: "/skills",
         type: "link",
       },
       {
-        icon: <CertificateIcon size={24} weight="fill" />,
+        icon: <CertificateIcon size={24} />,
         label: "Courses",
         to: "/courses",
         type: "link",
       },
       {
-        icon: <GraduationCapIcon size={24} weight="fill" />,
+        icon: <GraduationCapIcon size={24} />,
         label: "Educations",
         to: "/educations",
         type: "link",
       },
       {
-        icon: <BuildingsIcon size={24} weight="fill" />,
+        icon: <BuildingsIcon size={24} />,
         label: "Organizations",
         to: "/organizations",
         type: "link",
       },
       {
-        icon: <RocketLaunchIcon size={24} weight="fill" />,
+        icon: <RocketLaunchIcon size={24} />,
         label: "Projects",
         to: "/projects",
         type: "link",
       },
       {
-        icon: <BriefcaseIcon size={24} weight="fill" />,
+        icon: <BriefcaseIcon size={24} />,
         label: "Experiences",
         to: "/experiences",
         type: "link",
@@ -73,13 +76,13 @@ const MENU_SECTIONS: MenuSection[] = [
     label: "Actions",
     items: [
       {
-        icon: <GearIcon size={24} weight="fill" />,
+        icon: <GearIcon size={24} />,
         label: "Settings",
         to: "/settings",
         type: "link",
       },
       {
-        icon: <SignOutIcon size={24} weight="fill" />,
+        icon: <SignOutIcon size={24} />,
         label: "Sign Out",
         onClick: () => useAuthStore.getState().clearAuth(),
         type: "action",
@@ -92,12 +95,30 @@ export const Route = createFileRoute("/_authenticated/_sidebar")({
   component: RouteComponent,
 });
 
+const LG_MEDIA_QUERY = "(min-width: 1024px)";
+const DRAWER_SYNC_DEBOUNCE_MS = 100;
+
 function RouteComponent() {
   const { user } = useAuthStore();
+  const isLg = useMediaQuery(LG_MEDIA_QUERY);
+  const isLgDebounced = useDebounce(isLg, DRAWER_SYNC_DEBOUNCE_MS);
+  const [drawerExpanded, setDrawerExpanded] = useState(isLg);
+
+  useEffect(() => {
+    setDrawerExpanded((current) =>
+      current === isLgDebounced ? current : isLgDebounced
+    );
+  }, [isLgDebounced]);
 
   return (
     <div className="drawer lg:drawer-open">
-      <input className="drawer-toggle" id="drawer" type="checkbox" />
+      <input
+        checked={drawerExpanded}
+        className="drawer-toggle"
+        id="drawer"
+        onChange={(event) => setDrawerExpanded(event.target.checked)}
+        type="checkbox"
+      />
       <div className="drawer-content">
         <nav className="navbar sticky top-0 z-30 w-full gap-2 bg-base bg-base-100">
           <label
