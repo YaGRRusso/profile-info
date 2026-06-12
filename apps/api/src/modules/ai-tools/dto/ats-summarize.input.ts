@@ -1,6 +1,7 @@
-import { Field, InputType } from "@nestjs/graphql";
+import { InputType } from "@nestjs/graphql";
 import { IsArray, IsEnum, IsNotEmpty, IsString } from "class-validator";
 import { OptionalField } from "@/core/decorators/optional-field.decorator";
+import { RequiredField } from "@/core/decorators/required-field.decorator";
 import { ResourceType } from "../enums/resource-type";
 import { DetailInput } from "./detail.input";
 
@@ -9,17 +10,17 @@ export class AtsSummarizeInput {
   @OptionalField(() => [DetailInput])
   details?: DetailInput[];
 
-  @Field(() => String)
+  @RequiredField(() => String)
   @IsString()
   @IsNotEmpty()
   raw: string;
 
-  @Field(() => [String])
+  @RequiredField(() => [String])
   @IsArray()
   @IsString({ each: true })
   skills: string[];
 
-  @Field(() => ResourceType)
+  @RequiredField(() => ResourceType)
   @IsEnum(ResourceType)
   type: ResourceType;
 }

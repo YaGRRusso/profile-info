@@ -1,4 +1,4 @@
-import { Field, InputType } from "@nestjs/graphql";
+import { InputType } from "@nestjs/graphql";
 import { Type } from "class-transformer";
 import {
   IsArray,
@@ -9,6 +9,7 @@ import {
   ValidateNested,
 } from "class-validator";
 import { OptionalField } from "@/core/decorators/optional-field.decorator";
+import { RequiredField } from "@/core/decorators/required-field.decorator";
 import {
   createTranslationInput,
   TranslationInput,
@@ -17,7 +18,7 @@ import { OrganizationCategory } from "../enums/category.enum";
 
 @InputType()
 export class CreateOrganizationMessagesInput {
-  @Field(() => String)
+  @RequiredField(() => String)
   @IsString()
   @IsNotEmpty()
   description: string;
@@ -32,31 +33,31 @@ export class CreateOrganizationInput {
   @OptionalField(() => Number)
   relevance?: number;
 
-  @Field(() => String)
+  @RequiredField(() => String)
   @IsString()
   @IsNotEmpty()
   slug: string;
 
-  @Field(() => String)
+  @RequiredField(() => String)
   @IsString()
   @IsNotEmpty()
   name: string;
 
-  @Field(() => String)
+  @RequiredField(() => String)
   @IsUrl()
   website: string;
 
-  @Field(() => String)
+  @RequiredField(() => String)
   @IsUrl()
   logo: string;
 
-  @Field(() => [OrganizationTranslationInput])
+  @RequiredField(() => [OrganizationTranslationInput])
   @IsArray()
   @ValidateNested({ each: true })
   @Type(() => OrganizationTranslationInput)
   i18n: TranslationInput<CreateOrganizationMessagesInput>[];
 
-  @Field(() => OrganizationCategory)
+  @RequiredField(() => OrganizationCategory)
   @IsEnum(OrganizationCategory)
   category: OrganizationCategory;
 }

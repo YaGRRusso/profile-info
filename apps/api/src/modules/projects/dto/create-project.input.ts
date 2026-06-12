@@ -1,4 +1,4 @@
-import { Field, InputType } from "@nestjs/graphql";
+import { InputType } from "@nestjs/graphql";
 import { Type } from "class-transformer";
 import {
   IsArray,
@@ -8,6 +8,7 @@ import {
   ValidateNested,
 } from "class-validator";
 import { OptionalField } from "@/core/decorators/optional-field.decorator";
+import { RequiredField } from "@/core/decorators/required-field.decorator";
 import {
   createTranslationInput,
   TranslationInput,
@@ -16,12 +17,12 @@ import { UrlInput } from "@/core/inputs/url.input";
 
 @InputType()
 export class CreateProjectMessagesInput {
-  @Field(() => String)
+  @RequiredField(() => String)
   @IsString()
   @IsNotEmpty()
   title: string;
 
-  @Field(() => String)
+  @RequiredField(() => String)
   @IsString()
   @IsNotEmpty()
   description: string;
@@ -36,7 +37,7 @@ export class CreateProjectInput {
   @OptionalField(() => Number)
   relevance?: number;
 
-  @Field(() => String)
+  @RequiredField(() => String)
   @IsString()
   @IsNotEmpty()
   slug: string;
@@ -48,7 +49,7 @@ export class CreateProjectInput {
   @OptionalField(() => [String])
   skills?: string[];
 
-  @Field(() => [ProjectTranslationInput])
+  @RequiredField(() => [ProjectTranslationInput])
   @IsArray()
   @ValidateNested({ each: true })
   @Type(() => ProjectTranslationInput)

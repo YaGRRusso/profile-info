@@ -67,7 +67,7 @@ Request flow: Apollo → `GqlAuthGuard` (unless `@Public()`) → resolver → se
 - `schemas/base.schema.ts`, `translation.schema.ts`, `daterange.schema.ts`, `url.schema.ts`: shared Mongoose sub-schemas.
 - `entities/`: `BaseEntity`, batch, date-range, translation, url GraphQL types.
 - `inputs/`: pagination, sort factory, date-range, translation, url inputs.
-- `decorators/`: `@Public()`, `@OptionalField()`.
+- `decorators/`: `@Public()`, `@RequiredField()`, `@OptionalField()`.
 - `configs/`: `app.config.ts`, `validation.config.ts`.
 
 `integrations/` (each owns its port — an **abstract class** used as the DI token — plus neutral types; map vendor types → neutral contracts; never import from `modules`):
@@ -162,7 +162,7 @@ Run from `apps/api/` or via root `api:*` aliases: `dev`, `prod`, `build`, `start
 
 ## Gotchas & notes
 
-- `ValidationPipe` has `whitelist: true`: in `@InputType` classes, pair every `@Field` with a `class-validator` decorator (`@Is*`, `@Allow`, or `@OptionalField`) — bare `@Field` is silently dropped at runtime.
+- `ValidationPipe` has `whitelist: true`: on `@InputType`, use `@RequiredField()` / `@OptionalField()` — never bare `@Field` (silently dropped). Both exist mainly to register the property with `class-validator` for whitelist; `@RequiredField` uses `@IsDefined()`, `@OptionalField` uses `@IsOptional()`. Stack `@Is*` when you need format validation.
 - Regenerate `src/schema.gql` after type changes so admin codegen stays in sync. E2E/integration tests use in-memory schema (`autoSchemaFile: true` when `NODE_ENV=test`) so they never overwrite the committed file — `TestAppModule` omits `AiToolsModule` and would strip AI types if it wrote to disk.
 - New public GraphQL fields need `@Public()` or they 401.
 - Password is `select: false` and absent from `UserEntity`; never expose it in GraphQL.

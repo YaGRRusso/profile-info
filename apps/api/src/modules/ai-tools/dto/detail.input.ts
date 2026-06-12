@@ -1,14 +1,15 @@
-import { Field, InputType } from "@nestjs/graphql";
+import { InputType } from "@nestjs/graphql";
 import { IsArray, IsNotEmpty, IsString } from "class-validator";
+import { RequiredField } from "@/core/decorators/required-field.decorator";
 
 @InputType()
 export class DetailInput {
-  @Field(() => String)
+  @RequiredField(() => String)
   @IsString()
   @IsNotEmpty()
   key: string;
 
-  @Field(() => [String])
+  @RequiredField(() => [String])
   @IsArray()
   @IsString({ each: true })
   value: string[];

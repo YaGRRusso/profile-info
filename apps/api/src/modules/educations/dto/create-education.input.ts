@@ -1,4 +1,4 @@
-import { Field, InputType } from "@nestjs/graphql";
+import { InputType } from "@nestjs/graphql";
 import { Type } from "class-transformer";
 import {
   IsArray,
@@ -10,6 +10,7 @@ import {
   ValidateNested,
 } from "class-validator";
 import { OptionalField } from "@/core/decorators/optional-field.decorator";
+import { RequiredField } from "@/core/decorators/required-field.decorator";
 import { DateRangeInput } from "@/core/inputs/date-range.input";
 import {
   createTranslationInput,
@@ -20,12 +21,12 @@ import { EducationStatus } from "../enums/status.enum";
 
 @InputType()
 export class CreateEducationMessagesInput {
-  @Field(() => String)
+  @RequiredField(() => String)
   @IsString()
   @IsNotEmpty()
   title: string;
 
-  @Field(() => String)
+  @RequiredField(() => String)
   @IsString()
   @IsNotEmpty()
   description: string;
@@ -40,20 +41,20 @@ export class CreateEducationInput {
   @OptionalField(() => Number)
   relevance?: number;
 
-  @Field(() => String)
+  @RequiredField(() => String)
   @IsString()
   @IsNotEmpty()
   slug: string;
 
-  @Field(() => String)
+  @RequiredField(() => String)
   @IsMongoId()
   organization: string;
 
-  @Field(() => EducationLevel)
+  @RequiredField(() => EducationLevel)
   @IsEnum(EducationLevel)
   level: EducationLevel;
 
-  @Field(() => EducationStatus)
+  @RequiredField(() => EducationStatus)
   @IsEnum(EducationStatus)
   status: EducationStatus;
 
@@ -65,7 +66,7 @@ export class CreateEducationInput {
   @IsUrl()
   image?: string;
 
-  @Field(() => [EducationTranslationInput])
+  @RequiredField(() => [EducationTranslationInput])
   @IsArray()
   @ValidateNested({ each: true })
   @Type(() => EducationTranslationInput)

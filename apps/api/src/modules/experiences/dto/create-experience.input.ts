@@ -1,4 +1,4 @@
-import { Field, InputType } from "@nestjs/graphql";
+import { InputType } from "@nestjs/graphql";
 import { Type } from "class-transformer";
 import {
   IsArray,
@@ -9,6 +9,7 @@ import {
   ValidateNested,
 } from "class-validator";
 import { OptionalField } from "@/core/decorators/optional-field.decorator";
+import { RequiredField } from "@/core/decorators/required-field.decorator";
 import { DateRangeInput } from "@/core/inputs/date-range.input";
 import {
   createTranslationInput,
@@ -18,12 +19,12 @@ import { ExperienceCategory } from "../enums/category.enum";
 
 @InputType()
 export class CreateExperienceMessagesInput {
-  @Field(() => String)
+  @RequiredField(() => String)
   @IsString()
   @IsNotEmpty()
   title: string;
 
-  @Field(() => String)
+  @RequiredField(() => String)
   @IsString()
   @IsNotEmpty()
   description: string;
@@ -35,7 +36,7 @@ const ExperienceTranslationInput = createTranslationInput(
 
 @InputType()
 export class CreateExperienceRoleInput {
-  @Field(() => [ExperienceTranslationInput])
+  @RequiredField(() => [ExperienceTranslationInput])
   @IsArray()
   @ValidateNested({ each: true })
   @Type(() => ExperienceTranslationInput)
@@ -53,20 +54,20 @@ export class CreateExperienceInput {
   @OptionalField(() => Number)
   relevance?: number;
 
-  @Field(() => String)
+  @RequiredField(() => String)
   @IsString()
   @IsNotEmpty()
   slug: string;
 
-  @Field(() => String)
+  @RequiredField(() => String)
   @IsMongoId()
   organization: string;
 
-  @Field(() => ExperienceCategory)
+  @RequiredField(() => ExperienceCategory)
   @IsEnum(ExperienceCategory)
   category: ExperienceCategory;
 
-  @Field(() => [CreateExperienceRoleInput])
+  @RequiredField(() => [CreateExperienceRoleInput])
   @IsArray()
   @ValidateNested({ each: true })
   @Type(() => CreateExperienceRoleInput)
