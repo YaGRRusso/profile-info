@@ -21,6 +21,7 @@ import { useSummarize, useTranslate } from "@/hooks/mutations/ai";
 import { OrganizationRow } from "@/hooks/queries/organizations";
 import { fieldError } from "@/lib/field-error";
 import { createEmptyI18n } from "@/lib/i18n";
+import { isSlugTaken } from "@/lib/slug";
 import { CommonFormProps } from "./common";
 
 const organizationSchema = z.object({
@@ -221,7 +222,7 @@ export function OrganizationForm({
         name="slug"
         validators={{
           onChange: ({ value }) => {
-            if (slugsList?.includes(value)) {
+            if (isSlugTaken(value, slugsList, defaultValues?.slug)) {
               return { message: "slug already exists" };
             }
           },

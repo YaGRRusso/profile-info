@@ -8,6 +8,7 @@ import { TextInput } from "@/components/inputs/text";
 import { SLUG_REGEX } from "@/consts/regex";
 import { SkillCategory } from "@/generated/graphql/graphql";
 import { fieldError } from "@/lib/field-error";
+import { isSlugTaken } from "@/lib/slug";
 import { CommonFormProps } from "./common";
 
 const skillSchema = z.object({
@@ -76,7 +77,7 @@ export function SkillForm({
         name="slug"
         validators={{
           onChange: ({ value }) => {
-            if (slugsList?.includes(value)) {
+            if (isSlugTaken(value, slugsList, defaultValues?.slug)) {
               return { message: "slug already exists" };
             }
           },

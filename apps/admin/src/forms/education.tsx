@@ -28,6 +28,7 @@ import { toDateInput, toIsoDate } from "@/lib/date";
 import { fieldError } from "@/lib/field-error";
 import { createEmptyI18n, pickTranslation } from "@/lib/i18n";
 import { findLabelsByIds } from "@/lib/mappers";
+import { isSlugTaken } from "@/lib/slug";
 import { CommonFormProps } from "./common";
 
 const educationSchema = z.object({
@@ -307,7 +308,7 @@ export function EducationForm({
         name="slug"
         validators={{
           onChange: ({ value }) => {
-            if (slugsList?.includes(value)) {
+            if (isSlugTaken(value, slugsList, defaultValues?.slug)) {
               return { message: "slug already exists" };
             }
           },
