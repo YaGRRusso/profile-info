@@ -25,7 +25,7 @@ Feature modules follow the same explicit CRUD pattern: resolver methods call ser
 Entry point `src/main.ts`:
 
 1. `NestFactory.create(AppModule)`.
-2. `validationConfig(app)` installs a global `ValidationPipe` with `stopAtFirstError: true`.
+2. `validationConfig(app)` installs a global `ValidationPipe` with `whitelist: true`, `transform: true`, and `stopAtFirstError: true`.
 3. `await appConfig(app)` reads `PORT` (default 8080) and `HOST` (default `0.0.0.0`), enables CORS, and starts listening.
 
 `src/app.module.ts` composition root (ordered: infra → GraphQL → domain):
@@ -162,6 +162,7 @@ Run from `apps/api/` or via root `api:*` aliases: `dev`, `prod`, `build`, `start
 
 ## Gotchas & notes
 
+- `ValidationPipe` has `whitelist: true`: in `@InputType` classes, pair every `@Field` with a `class-validator` decorator (`@Is*`, `@Allow`, or `@OptionalField`) — bare `@Field` is silently dropped at runtime.
 - Regenerate `src/schema.gql` after type changes so admin codegen stays in sync. E2E/integration tests use in-memory schema (`autoSchemaFile: true` when `NODE_ENV=test`) so they never overwrite the committed file — `TestAppModule` omits `AiToolsModule` and would strip AI types if it wrote to disk.
 - New public GraphQL fields need `@Public()` or they 401.
 - Password is `select: false` and absent from `UserEntity`; never expose it in GraphQL.

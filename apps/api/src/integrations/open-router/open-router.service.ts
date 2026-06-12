@@ -26,7 +26,10 @@ export class OpenRouterService extends AiChatProvider {
 
   async chat(request: IntegrationChatRequest): Promise<IntegrationChatResult> {
     const chatRequest = openRouterRequestMapper(request);
+
+    console.dir(chatRequest, { depth: null });
     const completion = await this.client.chat.send({ chatRequest });
+    console.dir(completion, { depth: null });
 
     if (!completion) throw new Error("No completion received from OpenRouter");
     return openRouterResultMapper(completion);
