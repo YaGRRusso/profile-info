@@ -1,7 +1,7 @@
 import { ChatResult } from "@openrouter/sdk/models";
 import type { IntegrationChatResult } from "../ai-chat.provider";
 
-export function mapFromOpenRouterResponse(
+export function openRouterResultMapper(
   result: ChatResult
 ): IntegrationChatResult {
   return {

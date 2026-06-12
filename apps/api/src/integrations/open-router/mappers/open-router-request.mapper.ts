@@ -1,7 +1,7 @@
 import { ChatRequest } from "@openrouter/sdk/models";
 import type { IntegrationChatRequest } from "../ai-chat.provider";
 
-export function mapToOpenRouterRequest(
+export function openRouterRequestMapper(
   request: IntegrationChatRequest
 ): ChatRequest & { stream?: false } {
   return {

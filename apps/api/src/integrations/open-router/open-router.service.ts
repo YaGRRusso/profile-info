@@ -6,8 +6,8 @@ import {
   type IntegrationChatRequest,
   type IntegrationChatResult,
 } from "./ai-chat.provider";
-import { mapFromOpenRouterResponse } from "./mappers/open-router.mapper";
-import { mapToOpenRouterRequest } from "./mappers/open-router-request.mapper";
+import { openRouterRequestMapper } from "./mappers/open-router-request.mapper";
+import { openRouterResultMapper } from "./mappers/open-router-result.mapper";
 
 @Injectable()
 export class OpenRouterService extends AiChatProvider {
@@ -25,10 +25,10 @@ export class OpenRouterService extends AiChatProvider {
   }
 
   async chat(request: IntegrationChatRequest): Promise<IntegrationChatResult> {
-    const chatRequest = mapToOpenRouterRequest(request);
+    const chatRequest = openRouterRequestMapper(request);
     const completion = await this.client.chat.send({ chatRequest });
 
     if (!completion) throw new Error("No completion received from OpenRouter");
-    return mapFromOpenRouterResponse(completion);
+    return openRouterResultMapper(completion);
   }
 }
