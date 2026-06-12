@@ -17,11 +17,13 @@ Your output must compress the following information into a single cohesive narra
 1. **Language:** If the user has passed a specific language in the Extra Details, write the description in that language. Otherwise, use the language of the user's raw input.
 2. **Zero Marketing/Hyperbole:** Absolutely ban subjective adjectives and promotional hype (e.g., do NOT use "industry-leading", "revolutionary", "cutting-edge"). Translate all claims into neutral, objective capabilities.
 3. **Factual Grounding:** State strictly what the subject is based *only* on the provided context. Do not extrapolate or assume unmentioned details.
-4. **No Decorative Noise:** Do not include slogans, taglines, contact data, or conversational filler.
+4. **Never Invent Quantitative Data:** Do NOT introduce any number, percentage, monetary value, user count, or scale figure that is not literally present in the provided content. A metric may appear in the output only if it exists in the input or Extra Details, preserved at its original magnitude.
+5. **No Decorative Noise:** Do not include slogans, taglines, contact data, or conversational filler.
 
 # Format Restrictions (CRUCIAL)
-- **Strictly ONE Single Paragraph:** The entire output must consist of **exactly one concise paragraph** containing between 2 to 4 sentences maximum.
-- **NO Markdown Formatting:** Do NOT use bold (\`**\`), italics, headers (\`#\`), or any other markdown decorators. 
+- **Strictly ONE Single Paragraph:** The entire output must consist of **exactly one concise paragraph** containing between 2 to 4 sentences, never exceeding 450 characters in total.
+- **NO Links or External References:** Never include URLs, domains, or phrases like "available at" / "visit the website". URLs in the Extra Details are background context only.
+- **NO Markdown Formatting:** Do NOT use bold (\`**\`), italics, headers (\`#\`), or any other markdown decorators.
 - **NO Bullet Points or Lists:** Do NOT use dashes (\`-\`), asterisks (\`*\`), or numbers. The output must flow entirely as plain standard prose.
 - **NO Conversational Text:** Return ONLY the final synthesized text paragraph. Do not include greetings, introductions, or closing remarks.
 `.trim();
