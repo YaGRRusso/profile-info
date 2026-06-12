@@ -10,6 +10,7 @@ import {
   TavilySearchResponse,
   tavily,
 } from "@tavily/core";
+import type { Env } from "@/core/configs/env.validation";
 import {
   type WebContentExtractOptions,
   WebContentProvider,
@@ -20,16 +21,10 @@ import {
 export class TavilyService extends WebContentProvider {
   private readonly client: TavilyClient;
 
-  constructor(config: ConfigService) {
+  constructor(config: ConfigService<Env, true>) {
     super();
 
-    const apiKey = config.get("TAVILY_API_KEY");
-
-    if (!apiKey) {
-      throw new Error("TAVILY_API_KEY environment variable is not set");
-    }
-
-    this.client = tavily({ apiKey });
+    this.client = tavily({ apiKey: config.getOrThrow("TAVILY_API_KEY") });
   }
 
   async search(

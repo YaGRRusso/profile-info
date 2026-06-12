@@ -23,16 +23,11 @@ import { UsersModule } from "@/modules/users/users.module";
     MongooseModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
-      useFactory: (config: ConfigService) => {
-        const uri = config.get("DATABASE_URL");
-        if (!uri) throw new Error("DATABASE_URL not defined");
-
-        return {
-          uri,
-          serverSelectionTimeoutMS: 3000,
-          connectTimeoutMS: 3000,
-        };
-      },
+      useFactory: (config: ConfigService) => ({
+        uri: config.getOrThrow("DATABASE_URL"),
+        serverSelectionTimeoutMS: 3000,
+        connectTimeoutMS: 3000,
+      }),
     }),
     GraphqlModule,
     AuthModule,

@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { parseCommaSeparatedList } from "@/common/helpers/parse-comma-separated-list.helper";
 
 export const envSchema = z.object({
   DATABASE_URL: z.string().min(1),
@@ -9,6 +10,13 @@ export const envSchema = z.object({
     .enum(["development", "production", "test"])
     .default("development"),
   OPENROUTER_API_KEY: z.string().min(1),
+  OPENROUTER_AI_MODELS: z
+    .string()
+    .min(1)
+    .transform(parseCommaSeparatedList)
+    .refine((models) => models.length > 0, {
+      message: "At least one model is required",
+    }),
   GITHUB_API_KEY: z.string().min(1),
   TAVILY_API_KEY: z.string().min(1),
 });

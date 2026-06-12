@@ -1,6 +1,5 @@
 import { Injectable } from "@nestjs/common";
 import { AiChatProvider } from "@/integrations/open-router/ai-chat.provider";
-import { DEFAULT_AI_MODEL } from "./constants/default-model";
 import { AtsSummarizeInput } from "./dto/ats-summarize.input";
 import { SummarizeInput } from "./dto/summarize.input";
 import { TranslateInput } from "./dto/translate.input";
@@ -43,7 +42,6 @@ export class AiToolsService {
     }
 
     const result = await this.aiChatProvider.chat({
-      model: DEFAULT_AI_MODEL,
       messages: [
         { role: "system", content: ATS_SUMMARIZE_SYSTEM_PROMPT },
         {
@@ -71,7 +69,6 @@ export class AiToolsService {
     }
 
     const result = await this.aiChatProvider.chat({
-      model: DEFAULT_AI_MODEL,
       messages: [
         { role: "system", content: SUMMARIZE_SYSTEM_PROMPT },
         {
@@ -94,7 +91,6 @@ export class AiToolsService {
     sourceLanguage,
   }: TranslateInput): Promise<AiEntity> {
     const result = await this.aiChatProvider.chat({
-      model: DEFAULT_AI_MODEL,
       messages: [
         { role: "system", content: TRANSLATE_SYSTEM_PROMPT },
         {

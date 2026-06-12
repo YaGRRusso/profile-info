@@ -1,6 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { Octokit } from "@octokit/rest";
+import type { Env } from "@/core/configs/env.validation";
 import {
   type RepositoryData,
   RepositoryMetadataProvider,
@@ -11,16 +12,12 @@ import {
 export class GithubService extends RepositoryMetadataProvider {
   private readonly octokit: Octokit;
 
-  constructor(config: ConfigService) {
+  constructor(config: ConfigService<Env, true>) {
     super();
 
-    const apiKey = config.get("GITHUB_API_KEY");
-
-    if (!apiKey) {
-      throw new Error("GITHUB_API_KEY is not set");
-    }
-
-    this.octokit = new Octokit({ auth: apiKey });
+    this.octokit = new Octokit({
+      auth: config.getOrThrow("GITHUB_API_KEY"),
+    });
   }
 
   getRepositoryMeta(path: string): RepositoryOwnerRepo {

@@ -6,7 +6,7 @@ import { MongooseModule } from "@nestjs/mongoose";
 import { ThrottlerModule } from "@nestjs/throttler";
 import { AppController } from "./app.controller";
 import { AppService } from "./app.service";
-import { validateEnv } from "./core/configs/env.validation";
+import { type Env, validateEnv } from "./core/configs/env.validation";
 import { PersistenceExceptionFilter } from "./core/filters/persistence-exception.filter";
 import { HealthModule } from "./core/health/health.module";
 import { AiToolsModule } from "./modules/ai-tools/ai-tools.module";
@@ -33,16 +33,11 @@ import { UsersModule } from "./modules/users/users.module";
     MongooseModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
-      useFactory: (config: ConfigService) => {
-        const uri = config.get("DATABASE_URL");
-        if (!uri) throw new Error("DATABASE_URL not defined");
-
-        return {
-          uri,
-          serverSelectionTimeoutMS: 3000,
-          connectTimeoutMS: 3000,
-        };
-      },
+      useFactory: (config: ConfigService<Env, true>) => ({
+        uri: config.getOrThrow("DATABASE_URL"),
+        serverSelectionTimeoutMS: 3000,
+        connectTimeoutMS: 3000,
+      }),
     }),
     GraphqlModule,
     HealthModule,

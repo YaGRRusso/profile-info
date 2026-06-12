@@ -1,6 +1,5 @@
 export interface IntegrationChatRequest {
   messages: Array<{ role: string; content: string }>;
-  model: string;
 }
 
 export interface IntegrationChatMessage {

@@ -3,6 +3,7 @@ import { ConfigModule, ConfigService } from "@nestjs/config";
 import { APP_GUARD } from "@nestjs/core";
 import { JwtModule } from "@nestjs/jwt";
 import { PassportModule } from "@nestjs/passport";
+import type { Env } from "@/core/configs/env.validation";
 import { UsersModule } from "@/modules/users/users.module";
 import { GqlAuthGuard } from "./auth.guard";
 import { AuthResolver } from "./auth.resolver";
@@ -18,16 +19,10 @@ import { RolesGuard } from "./roles.guard";
       global: true,
       imports: [ConfigModule],
       inject: [ConfigService],
-      useFactory: (config: ConfigService) => {
-        const secret = config.get("JWT_SECRET");
-        if (!secret)
-          throw new Error("JWT_SECRET environment variable is not defined");
-
-        return {
-          secret,
-          signOptions: { expiresIn: "8h" },
-        };
-      },
+      useFactory: (config: ConfigService<Env, true>) => ({
+        secret: config.getOrThrow("JWT_SECRET"),
+        signOptions: { expiresIn: "8h" },
+      }),
     }),
   ],
   providers: [
