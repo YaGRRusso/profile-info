@@ -50,15 +50,15 @@ export function Modal({
             {children}
           </div>
           <div className="flex flex-wrap-reverse items-center gap-2 p-4">
-            {actions?.map((action, index) => (
+            {actions?.map(({ className, icon, label, ...action }, index) => (
               <button
-                className={cn("btn flex-1", action.className)}
+                className={cn("btn flex-1", className)}
                 key={index}
-                onClick={action.onClick}
                 type="button"
+                {...action}
               >
-                {action.icon}
-                {action.label}
+                {icon}
+                {label}
               </button>
             ))}
           </div>
