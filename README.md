@@ -32,7 +32,7 @@ The admin is a client of the API. It talks to the API over GraphQL at the URL in
 bash setup.sh
 ```
 
-2. Install dependencies for all workspaces:
+2. Install dependencies for all workspaces (also generates Cursor rules from `agents/` into `.cursor/rules/`):
 
 ```bash
 npm install

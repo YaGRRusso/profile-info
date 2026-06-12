@@ -1,16 +1,12 @@
----
-description: NestJS GraphQL API patterns, modules, and gotchas
-globs: apps/api/**
-alwaysApply: false
----
-
 # @profile-info/api
 
 > Context for AI agents working in the API package. Keep it accurate; an agent will trust it.
 
 ## Maintaining this rule
 
-Follow the **Maintaining project documentation** section in `project-overview.mdc`. For API-specific learnings, update this file (`api.mdc`) and, when relevant for humans, `apps/api/README.md`.
+Follow **Maintaining project documentation** in `agents/overview.md`. Update this file,
+run `npm run sync:cursor-rules`, and update `apps/api/README.md` when setup or
+run changes.
 
 ## Overview
 
@@ -111,15 +107,13 @@ When a referenced resource is deleted, emitter services fire domain events **bef
 
 Listeners are thin (`@OnEvent` + delegate to a service method). All MongoDB writes stay in the consumer's service.
 
-| Event | Emitter | Consumer | Strategy | Service method |
-|-------|---------|----------|----------|----------------|
-| `skill.deleted` | `skills` | `projects` | `$pull` from `skills` array | `detachSkill` |
-| `skill.deleted` | `skills` | `courses` | `$pull` from `skills` array | `detachSkill` |
-| `skill.deleted` | `skills` | `educations` | `$pull` from `skills` array | `detachSkill` |
-| `skill.deleted` | `skills` | `experiences` | `$pull` from nested `roles.skills` | `detachSkill` |
-| `organization.deleted` | `organizations` | `courses` | hard `deleteMany` | `purgeByOrganization` |
-| `organization.deleted` | `organizations` | `educations` | hard `deleteMany` | `purgeByOrganization` |
-| `organization.deleted` | `organizations` | `experiences` | hard `deleteMany` | `purgeByOrganization` |
+- `skill.deleted` (`skills` → `projects`): `$pull` from `skills` array via `detachSkill`
+- `skill.deleted` (`skills` → `courses`): `$pull` from `skills` array via `detachSkill`
+- `skill.deleted` (`skills` → `educations`): `$pull` from `skills` array via `detachSkill`
+- `skill.deleted` (`skills` → `experiences`): `$pull` from nested `roles.skills` via `detachSkill`
+- `organization.deleted` (`organizations` → `courses`): hard `deleteMany` via `purgeByOrganization`
+- `organization.deleted` (`organizations` → `educations`): hard `deleteMany` via `purgeByOrganization`
+- `organization.deleted` (`organizations` → `experiences`): hard `deleteMany` via `purgeByOrganization`
 
 Do not use Mongoose `pre('deleteOne')` hooks — they miss `findByIdAndDelete` / `deleteMany`.
 

@@ -1,0 +1,15 @@
+rules:
+  - source: overview.md
+    target: overview.mdc
+    description: "Monorepo overview, architecture, scripts, and conventions"
+    alwaysApply: true
+
+  - source: api.md
+    target: api.mdc
+    description: "NestJS GraphQL API patterns, modules, and gotchas"
+    globs: apps/api/**
+
+  - source: admin.md
+    target: admin.mdc
+    description: "React admin dashboard patterns, hooks, forms, and routing"
+    globs: apps/admin/**

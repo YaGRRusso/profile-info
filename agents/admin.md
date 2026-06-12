@@ -1,16 +1,12 @@
----
-description: React admin dashboard patterns, hooks, forms, and routing
-globs: apps/admin/**
-alwaysApply: false
----
-
 # @profile-info/admin
 
 > Context for AI agents working in the admin package. Keep it accurate; an agent will trust it.
 
 ## Maintaining this rule
 
-Follow the **Maintaining project documentation** section in `project-overview.mdc`. For admin-specific learnings, update this file (`admin.mdc`) and, when relevant for humans, `apps/admin/README.md`.
+Follow **Maintaining project documentation** in `agents/overview.md`. Update this file,
+run `npm run sync:cursor-rules`, and update `apps/admin/README.md` when setup or
+run changes.
 
 ## Overview
 
