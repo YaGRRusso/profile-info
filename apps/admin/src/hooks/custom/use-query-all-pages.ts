@@ -5,14 +5,33 @@ export function useQueryAllPages<TData, TError>(
   query: UseInfiniteQueryResult<TData, TError>,
   enabled = true
 ): UseInfiniteQueryResult<TData, TError> {
+  const {
+    fetchNextPage,
+    hasNextPage,
+    isFetching,
+    isFetchingNextPage,
+    isSuccess,
+  } = query;
+
   useEffect(() => {
-    if (enabled && query.hasNextPage && !query.isFetchingNextPage)
-      query.fetchNextPage();
+    if (
+      !enabled ||
+      !isSuccess ||
+      !hasNextPage ||
+      isFetchingNextPage ||
+      isFetching
+    ) {
+      return;
+    }
+
+    fetchNextPage();
   }, [
     enabled,
-    query.hasNextPage,
-    query.isFetchingNextPage,
-    query.fetchNextPage,
+    isSuccess,
+    hasNextPage,
+    isFetchingNextPage,
+    isFetching,
+    fetchNextPage,
   ]);
 
   return query;

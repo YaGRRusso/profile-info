@@ -27,6 +27,7 @@ const queryClient = new QueryClient({
   }),
   defaultOptions: {
     queries: {
+      staleTime: Number.POSITIVE_INFINITY,
       refetchOnWindowFocus: false,
       retryDelay: 1000 * 60,
       retry: (failureCount, error) => {
