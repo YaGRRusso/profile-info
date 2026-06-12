@@ -8,13 +8,15 @@ When you learn something relevant and specific (a non-obvious architecture detai
 
 **Where to update:**
 
-- Repo-wide → `agents/overview.md`, then run `npm run sync:cursor-rules`
-- Human onboarding → `README.md` (when setup/run changes)
-- API package → `agents/api.md`, then sync
+- Repo-wide → `agents/overview.md`
+- Human onboarding → `README.md` (when setup/run changes; keep the brief AI context
+  section accurate)
+- API package → `agents/api.md`
 - API onboarding → `apps/api/README.md` (when setup/run changes)
-- Admin package → `agents/admin.md`, then sync
+- Admin package → `agents/admin.md`
 - Admin onboarding → `apps/admin/README.md` (when setup/run changes)
 - `AGENTS.md` → only when agent files are added or renamed
+- Local IDE adapter (Cursor: `.cursor/rules/*.mdc`, gitignored) → when router paths or globs change
 
 Keep edits small and section-local. Update scoped agent files and matching README when setup, run, or extension changes.
 
@@ -53,8 +55,9 @@ The auth handshake: admin calls the `signIn(signInInput: SignInInput!): String!`
 
 - `apps/api/`: the GraphQL API. See `agents/api.md` for CRUD modules, auth, DataLoaders, and domain events.
 - `apps/admin/`: the React dashboard. See `agents/admin.md` for routing, hooks, the GraphQL client, and the form pattern.
-- `agents/`: portable AI context (this file plus scoped `api.md` and `admin.md`). Cursor rules are generated locally to `.cursor/rules/*.mdc` (gitignored) via `npm run sync:cursor-rules` (also runs on `npm install`).
-- `scripts/`: repo automation (`setup.sh` for Ubuntu bootstrap, `sync-cursor-rules.sh` to generate Cursor rules from `agents/`).
+- `agents/`: portable AI context (this file plus scoped `api.md` and `admin.md`). Shared by every IDE and LLM.
+- `.cursor/rules/` (optional, local, gitignored): thin Cursor routers that instruct the IDE to read `AGENTS.md` and `agents/*.md`. Other tools may use an equivalent local adapter; it is not part of the shared repo.
+- `scripts/`: repo automation (`setup.sh` for Ubuntu bootstrap).
 - `docker-compose.yml`: MongoDB 7 service `db` on port 27017, named volume `profile`. The `api` service is present but commented out.
 - `.github/workflows/deploy.yml`: builds the admin and deploys it to GitHub Pages.
 - `biome.jsonc`, `tsconfig.base.json`: shared tooling config.
@@ -68,7 +71,8 @@ The auth handshake: admin calls the `signIn(signInInput: SignInInput!): String!`
 ## Conventions & standards
 
 - Formatting and linting: Biome configured through `ultracite` presets in `biome.jsonc` (`ultracite/biome/core`, `.../nestjs`, `.../jest`). Run `npm run lint` and `npm run format`. Generated GraphQL artifacts are excluded from Biome.
-- Git hooks: husky `pre-commit` runs `npx lint-staged`, which runs `npx ultracite fix` on staged source files. Configured in root `package.json` `lint-staged`.
+- Git hooks: husky `pre-commit` runs `npx lint-staged` (Ultracite on staged files).
+  Configured in root `package.json` `lint-staged`.
 - Types: `tsconfig.base.json` sets `strictNullChecks: true` (not full `strict`). The API package loosens `noImplicitAny` and `strictBindCallApply` to `false`.
 - Naming: files and folders are kebab-case; suffixes signal role (`*.resolver.ts`, `*.service.ts`, `*.schema.ts`, `*.entity.ts`, `*.input.ts`).
 - Code artifacts (names, comments, files) are written in English even though project discussion may be in Portuguese.
@@ -93,17 +97,18 @@ Root scripts (run from the repo root):
 - `npm run docker:up` / `npm run docker:down`: start / stop MongoDB via Compose (uses `sudo docker compose`).
 - `npm run api:dev` / `npm run admin:dev`: run a single app in watch mode.
 - `npm run api:seed`: wipe and repopulate MongoDB with a coherent dev dataset (admin `admin@profile.info` / `admin123`). See `apps/api/src/seed.ts`.
-- API CI: `.github/workflows/api-ci.yml` runs lint, typecheck, build, unit and e2e tests with a MongoDB service.
+- CI (`.github/workflows/deploy.yml`): builds the admin and deploys to GitHub Pages on push to `main`.
 - `npm run api:build` / `npm run admin:build`: build a single app.
 - `npm run api:start` / `npm run admin:start`: start a single app.
-- `npm run test`, `test:watch`, `test:cov`, `test:coverage`, `test:e2e`: delegate to workspaces that define the script.
+- `npm run test`, `test:watch`, `test:cov`, `test:coverage`, `test:e2e`: delegate to workspaces (API package includes unit and e2e tests; run locally).
 - `npm run typecheck`, `npm run lint`, `npm run format`: delegate to workspaces.
 
 ## Gotchas & notes
 
-- `.cursor/` is gitignored. Edit `agents/*.md` only; run `npm run sync:cursor-rules` after changes (or rely on `postinstall` after a fresh clone). Do not commit `.cursor/rules/*.mdc`.
+- Edit `agents/*.md` for all context changes. `.cursor/` is gitignored: Cursor users
+  maintain thin local routers that point at `agents/`; other devs do the same for
+  their IDE if needed. No shared sync script.
 - `apps/api/src/schema.gql` is auto-generated by the API at boot/build, but it is committed to git and is the input the admin's codegen reads. After changing API types, regenerate it (build or run the API) so the admin codegen sees the change.
 - `docker:up` / `docker:down` shell out to `sudo docker compose`. On a setup where the user is in the `docker` group, the `sudo` may be unnecessary.
 - The Compose file defines only MongoDB; the `api` service block is commented out, so the API runs on the host (via `npm run dev`), not in a container.
 - CI deploys only the admin (to GitHub Pages), not the API. The API has no deploy pipeline in this repo.
-- The husky `pre-commit` keeps an older, fully commented-out stash-based formatting approach below the active `npx lint-staged` line; only the active line runs.

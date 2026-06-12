@@ -14,8 +14,6 @@
   ],
   "scripts": {
     "setup": "bash scripts/setup.sh",
-    "sync:cursor-rules": "bash scripts/sync-cursor-rules.sh",
-    "postinstall": "npm run sync:cursor-rules",
     "prepare": "husky || true",
     "docker:up": "sudo docker compose up",
     "docker:down": "sudo docker compose down",

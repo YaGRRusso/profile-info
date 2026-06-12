@@ -4,9 +4,8 @@
 
 ## Maintaining this rule
 
-Follow **Maintaining project documentation** in `agents/overview.md`. Update this file,
-run `npm run sync:cursor-rules`, and update `apps/admin/README.md` when setup or
-run changes.
+Follow **Maintaining project documentation** in `agents/overview.md`. Update this file
+and update `apps/admin/README.md` when setup or run changes.
 
 ## Overview
 

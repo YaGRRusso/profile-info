@@ -18,6 +18,16 @@ React 19 + Vite single-page admin dashboard that signs in against the API and ma
 
 The admin is a client of the API. It talks to the API over GraphQL at the URL in `VITE_API_URL`. The API is code-first, so it generates its schema to `apps/api/src/schema.gql`, and the admin runs GraphQL Codegen against that local file to produce typed operations. Because the schema is a file on disk, codegen does not need the API running. Authentication flows one way: the admin calls the `signIn` mutation, stores the returned JWT, and sends it as a Bearer token on every request.
 
+## AI context
+
+This repo ships machine-readable documentation for AI coding assistants (`AGENTS.md`
+and the `agents/` folder). You do not need to maintain it by hand: those files
+describe how the project works and instruct assistants to update the context
+in-session when they learn something worth keeping. If you use Cursor, thin routers
+in `.cursor/rules/` (local, gitignored) point the IDE at these files; other tools
+use their own local adapter the same way. Start from `AGENTS.md` if you want an
+overview.
+
 ## Requirements
 
 - Node >= 22
@@ -32,7 +42,7 @@ The admin is a client of the API. It talks to the API over GraphQL at the URL in
 bash scripts/setup.sh
 ```
 
-2. Install dependencies for all workspaces (also generates Cursor rules from `agents/` into `.cursor/rules/`):
+2. Install dependencies:
 
 ```bash
 npm install

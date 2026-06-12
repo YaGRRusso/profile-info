@@ -19,6 +19,7 @@ workspaces monorepo with a NestJS GraphQL API and a React admin dashboard.
 
 ## Maintaining documentation
 
-Update `agents/*.md`, run `npm run sync:cursor-rules`. Follow **Maintaining
-project documentation** in `agents/overview.md`. Change this router only when agent
-files are added or renamed.
+Update `agents/*.md`. Follow **Maintaining project documentation** in
+`agents/overview.md`. Change this router only when agent files are added or renamed.
+Cursor users: keep local `.cursor/rules/` routers in sync when paths or globs change
+(`.cursor/` is gitignored).
