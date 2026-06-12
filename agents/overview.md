@@ -54,7 +54,7 @@ The auth handshake: admin calls the `signIn(signInInput: SignInInput!): String!`
 - `apps/api/`: the GraphQL API. See `agents/api.md` for CRUD modules, auth, DataLoaders, and domain events.
 - `apps/admin/`: the React dashboard. See `agents/admin.md` for routing, hooks, the GraphQL client, and the form pattern.
 - `agents/`: portable AI context (this file plus scoped `api.md` and `admin.md`). Cursor rules are generated locally to `.cursor/rules/*.mdc` (gitignored) via `npm run sync:cursor-rules` (also runs on `npm install`).
-- `setup.sh`: idempotent Ubuntu bootstrap (git, curl, nvm, Node 22, npm 11, Docker).
+- `scripts/`: repo automation (`setup.sh` for Ubuntu bootstrap, `sync-cursor-rules.sh` to generate Cursor rules from `agents/`).
 - `docker-compose.yml`: MongoDB 7 service `db` on port 27017, named volume `profile`. The `api` service is present but commented out.
 - `.github/workflows/deploy.yml`: builds the admin and deploys it to GitHub Pages.
 - `biome.jsonc`, `tsconfig.base.json`: shared tooling config.
@@ -85,7 +85,7 @@ The root has no env file of its own. Each app reads its own. Full per-app catalo
 
 Root scripts (run from the repo root):
 
-- `npm run setup`: runs `bash setup.sh` to install required tooling.
+- `npm run setup`: runs `bash scripts/setup.sh` to install required tooling.
 - `npm run dev`: runs API and admin together in watch mode via `concurrently`.
 - `npm run build`: builds both apps.
 - `npm run start`: starts both apps in their production-start mode.

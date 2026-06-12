@@ -29,7 +29,7 @@ The admin is a client of the API. It talks to the API over GraphQL at the URL in
 1. Install the required tooling (idempotent, installs only what is missing):
 
 ```bash
-bash setup.sh
+bash scripts/setup.sh
 ```
 
 2. Install dependencies for all workspaces (also generates Cursor rules from `agents/` into `.cursor/rules/`):
