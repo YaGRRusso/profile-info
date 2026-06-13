@@ -352,7 +352,7 @@ export function SkillsTable({
             type="button"
           >
             <PencilIcon />
-            <span>Update Selected</span>
+            <span>Update Selected ({selected.length})</span>
           </button>
           <button
             className="btn btn-ghost btn-sm"
@@ -361,7 +361,7 @@ export function SkillsTable({
             type="button"
           >
             <EyeIcon />
-            <span>View Selected</span>
+            <span>View Selected ({selected.length})</span>
           </button>
           <button
             className="btn btn-ghost btn-sm btn-error"
@@ -370,7 +370,7 @@ export function SkillsTable({
             type="button"
           >
             <TrashSimpleIcon />
-            <span>Remove Selected</span>
+            <span>Remove Selected ({selected.length})</span>
           </button>
         </div>
       </div>
