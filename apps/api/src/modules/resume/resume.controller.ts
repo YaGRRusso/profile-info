@@ -1,14 +1,18 @@
 import { Controller, Get, Header, Query, StreamableFile } from "@nestjs/common";
 import { normalizeLocale } from "@/common/i18n/locales";
 import { Public } from "@/core/decorators/public-route.decorator";
+import { PdfRenderService } from "@/core/pdf/pdf-render.service";
+import {
+  createResumePdfOptions,
+  renderResumeDocument,
+} from "./pdf/render-document";
 import { ResumeService } from "./resume.service";
-import { ResumePdfService } from "./resume-pdf.service";
 
 @Controller()
 export class ResumeController {
   constructor(
     private readonly resumeService: ResumeService,
-    private readonly resumePdfService: ResumePdfService
+    private readonly pdfRenderService: PdfRenderService
   ) {}
 
   @Get("resume.pdf")
@@ -17,7 +21,10 @@ export class ResumeController {
   async download(@Query("locale") localeQuery?: string) {
     const locale = normalizeLocale(localeQuery);
     const document = await this.resumeService.buildResume(locale);
-    const buffer = await this.resumePdfService.render(document);
+    const buffer = await this.pdfRenderService.render(
+      (pdf) => renderResumeDocument(pdf, document),
+      createResumePdfOptions(document)
+    );
 
     return new StreamableFile(buffer, {
       disposition: 'attachment; filename="resume.pdf"',

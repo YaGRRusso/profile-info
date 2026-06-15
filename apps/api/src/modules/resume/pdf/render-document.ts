@@ -1,19 +1,19 @@
+import { PdfContext } from "@/common/pdf/pdf-context";
 import { resolveResumeLabels } from "../const/resume-labels.const";
 import type { ResumeDocumentData } from "../types/resume-document.type";
-import { renderCertifications } from "./render-certifications";
-import { renderEducations } from "./render-education";
-import { renderExperiences } from "./render-experience";
-import { renderHeader } from "./render-header";
-import { renderProjects } from "./render-projects";
-import { renderSkills } from "./render-skills";
-import { ResumePdfContext } from "./resume-pdf.context";
+import { renderCertifications } from "./sections/render-certifications";
+import { renderEducations } from "./sections/render-education";
+import { renderExperiences } from "./sections/render-experience";
+import { renderHeader } from "./sections/render-header";
+import { renderProjects } from "./sections/render-projects";
+import { renderSkills } from "./sections/render-skills";
 
 export function renderResumeDocument(
   pdf: PDFKit.PDFDocument,
   document: ResumeDocumentData
 ): void {
   const labels = resolveResumeLabels(document.locale);
-  const ctx = new ResumePdfContext(pdf);
+  const ctx = new PdfContext(pdf);
 
   renderHeader(ctx, document);
   renderSkills(ctx, document, labels.sections.skills);
@@ -26,4 +26,17 @@ export function renderResumeDocument(
     labels.formatHours
   );
   renderProjects(ctx, document, labels.sections.projects);
+}
+
+export function createResumePdfOptions(
+  document: ResumeDocumentData
+): PDFKit.PDFDocumentOptions {
+  return {
+    size: "A4",
+    margin: 50,
+    info: {
+      Title: `${document.header.name} - CV`,
+      Author: document.header.name,
+    },
+  };
 }

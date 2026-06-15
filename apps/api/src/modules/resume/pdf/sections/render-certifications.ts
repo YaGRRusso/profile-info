@@ -1,10 +1,10 @@
-import type { ResumeDocumentData } from "../types/resume-document.type";
-import { renderEntryBlock } from "./render-entry-block";
-import { renderSection } from "./render-section";
-import type { ResumePdfContext } from "./resume-pdf.context";
+import { renderEntryBlock } from "@/common/pdf/layout/render-entry-block";
+import { renderSection } from "@/common/pdf/layout/render-section";
+import type { PdfContext } from "@/common/pdf/pdf-context";
+import type { ResumeDocumentData } from "../../types/resume-document.type";
 
 export function renderCertifications(
-  ctx: ResumePdfContext,
+  ctx: PdfContext,
   document: ResumeDocumentData,
   title: string,
   formatHours: (hours: number) => string
@@ -22,7 +22,6 @@ export function renderCertifications(
         title: certification.title,
         meta: [certification.organization, hoursLabel],
         minHeight: 36,
-        gap: "afterEducation",
       });
     },
   });

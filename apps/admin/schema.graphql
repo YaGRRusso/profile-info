@@ -398,6 +398,7 @@ input FilterUserInput {
   address: String
   avatar: String
   birth: String
+  description: String
   email: String
   name: String
   nickname: String
@@ -758,6 +759,7 @@ input UpdateUserInput {
   address: String
   avatar: String
   birth: String
+  description: String
   email: String
   name: String
   nickname: String

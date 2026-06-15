@@ -1,49 +1,65 @@
-import type {
-  PdfSectionTitleConfig,
-  PdfTextStyle,
-} from "./pdf-text-style.type";
+import { DEFAULT_PDF_THEME } from "./default-pdf-theme";
+import type { PdfSpacingKey } from "./pdf-spacing";
+import type { PdfTextStyle } from "./pdf-text-style.type";
+import type { PdfTextStyleKey, PdfTheme } from "./pdf-theme.type";
 
 type PdfTextOptions = PDFKit.Mixins.TextOptions;
 
 export class PdfContext {
   constructor(
     readonly document: PDFKit.PDFDocument,
-    private readonly defaultStyle: PdfTextStyle
+    readonly theme: PdfTheme = DEFAULT_PDF_THEME
   ) {}
 
-  text(style: PdfTextStyle, content: string, options?: PdfTextOptions): this {
-    this.document
-      .font(style.font)
-      .fontSize(style.size)
-      .fillColor(style.color)
-      .text(content, options);
-
-    return this;
+  text(
+    styleKey: PdfTextStyleKey,
+    content: string,
+    options?: PdfTextOptions
+  ): this {
+    return this.textStyle(this.theme.textStyles[styleKey], content, options);
   }
 
   metaLine(
     parts: Array<string | undefined>,
-    style: PdfTextStyle,
-    separator = " · "
+    styleKey: PdfTextStyleKey = "meta"
   ): this {
-    const meta = parts.filter(Boolean).join(separator);
+    const meta = parts.filter(Boolean).join(" · ");
     if (!meta) return this;
 
-    return this.text(style, meta);
+    return this.text(styleKey, meta);
   }
 
-  sectionTitle(title: string, config: PdfSectionTitleConfig): this {
-    this.gap(config.beforeGap);
-    this.text(config.titleStyle, title);
+  sectionTitle(title: string): this {
+    const { colors } = this.theme;
+    const normalizedTitle =
+      this.theme.sectionTitleCase === "upper" ? title.toUpperCase() : title;
+
+    this.gap("xl");
+    this.text("sectionTitle", normalizedTitle);
 
     const lineY = this.document.y;
     this.horizontalRule({
-      color: config.ruleColor,
-      width: config.ruleWidth ?? 1,
+      color: colors.rule,
+      width: 1,
       y: lineY,
     });
 
-    return this.gap(config.afterGap);
+    return this.gap("lg");
+  }
+
+  inlinePair(
+    labelStyleKey: PdfTextStyleKey,
+    label: string,
+    valueStyleKey: PdfTextStyleKey,
+    value: string,
+    options?: { valueContinued?: boolean }
+  ): this {
+    this.text(labelStyleKey, label, { continued: true });
+    this.text(valueStyleKey, value, {
+      continued: options?.valueContinued,
+    });
+
+    return this;
   }
 
   horizontalRule(options: {
@@ -83,8 +99,8 @@ export class PdfContext {
     return this;
   }
 
-  gap(lines: number): this {
-    this.document.moveDown(lines);
+  gap(spacingKey: PdfSpacingKey): this {
+    this.document.moveDown(this.theme.spacing[spacingKey]);
     return this;
   }
 
@@ -99,9 +115,23 @@ export class PdfContext {
   }
 
   applyDefaultStyle(): this {
+    const style = this.theme.textStyles[this.theme.defaultTextStyle];
+
+    this.document.font(style.font).fillColor(style.color);
+
+    return this;
+  }
+
+  private textStyle(
+    style: PdfTextStyle,
+    content: string,
+    options?: PdfTextOptions
+  ): this {
     this.document
-      .font(this.defaultStyle.font)
-      .fillColor(this.defaultStyle.color);
+      .font(style.font)
+      .fontSize(style.size)
+      .fillColor(style.color)
+      .text(content, options);
 
     return this;
   }

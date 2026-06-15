@@ -58,6 +58,7 @@ Full diagram and field detail: `apps/api/docs/ER_MODEL.md`.
 
 - `helpers/`: `object.helper.ts` (`clearObject`), `object-id.helper.ts` (`assertValidObjectId`, `assertValidObjectIds`), `daterange.helper.ts` (`sortDateRange`), `pick-translation.helper.ts` (`pickTranslation`), `format-period.helper.ts` (`formatPeriod`), `breakpoint.helper.ts`.
 - `i18n/locales.ts`: `Locale`, `SUPPORTED_CONTENT_LOCALES`, `normalizeLocale` — app-owned copy (resume PDF, future errors). Entity `i18n[].locale` is a free string (`@IsString` + `@IsNotEmpty` only).
+- `pdf/`: domain-agnostic PDFKit layer — `PdfContext`, `DEFAULT_PDF_THEME`, `PDF_SPACING` scale (`xs`–`block`), layout primitives in `layout/` (`renderSection`, `renderEntryBlock`, `renderLabeledLinks`).
 - `execution/orchestrator.helper.ts`: `orchestrate(...)`, a concurrency-limited + timeout task runner (plain function, used by `ai-tools`).
 
 `common` holds only generic primitives — it does **not** own integration contracts. Each capability boundary owns its own port (see `integrations/`).
@@ -73,6 +74,7 @@ Full diagram and field detail: `apps/api/docs/ER_MODEL.md`.
 - `inputs/`: pagination, sort factory, date-range, translation, url inputs.
 - `decorators/`: `@Public()`, `@RequiredField()`, `@OptionalField()`.
 - `configs/`: `app.config.ts`, `validation.config.ts`.
+- `pdf/`: cross-cutting PDF infra — `PdfRenderService` (PDFKit document lifecycle → `Buffer`), `PdfModule`. Rendering primitives (context, theme, layout) live in `common/pdf/`. Import `PdfModule` from use-case modules that export PDFs.
 
 `integrations/` (each owns its port — an **abstract class** used as the DI token — plus neutral types; map vendor types → neutral contracts; never import from `modules`):
 
@@ -88,7 +90,7 @@ DI pattern is the NestJS-idiomatic **abstract class as token**: ports are abstra
 - `auth/`: global `GqlAuthGuard` (JWT + `UNAUTHENTICATED` GraphQL extension) and `RolesGuard` (`@Roles(ADMIN)` on mutations/dashboard). `signIn` (`@Public`) returns JWT; `getMe` returns current user; `updateMe` lets any authenticated user update their own profile (no `role` in input); `@CurrentUser()` decorator lives in `auth/decorators/`. Profile reads are `@Public()`; entity CRUD mutations require `ADMIN`.
 - `ai-tools/`: AI use-cases. Owns `AiEntity` GraphQL types, enums (`ChatRole`, `ChatFinishReason`), and mappers (`IntegrationChatResult` → `AiEntity`). `resource-detail/` orchestrates `*ExtractorService` classes. Injects `AiChatProvider`, `RepositoryMetadataProvider`, `WebContentProvider`. `AiToolsModule` imports `OpenRouterModule`, `GithubModule`, `TavilyModule`.
 - `dashboard/`: read-only aggregation via feature **services** (`count()`, `countByField()`), not other modules' Mongoose schemas.
-- `resume/`: `ResumeService` aggregates profile data (top by `relevance`, completed educations/courses); skills use top `skillsPerCategory` per category (empty categories omitted). PDF export via `GET /resume.pdf?locale=` (`normalizeLocale`, `pickTranslation`, `formatPeriod`, `resolveResumeLabels` in `resume.labels.ts`). Filename is always `resume.pdf`. Uses first `ADMIN` user as profile owner; org refs resolved via `OrganizationsService.findManyById`. PDF rendering: generic `common/pdf/pdf-context.ts`; resume styling in `resume.pdf-theme.ts` (`textStyles`, `spacing`); section renderers under `resume/pdf/`; `ResumePdfService` only boots PDFKit and calls `renderResumeDocument`.
+- `resume/`: `ResumeService` aggregates profile data (top by `relevance`, completed educations/courses); skills use top `skillsPerCategory` per category (empty categories omitted). PDF export via `GET /resume.pdf?locale=` (`normalizeLocale`, `pickTranslation`, `formatPeriod`, `resolveResumeLabels` in `resume.labels.ts`). Filename is always `resume.pdf`. Uses first `ADMIN` user as profile owner; org refs resolved via `OrganizationsService.findManyById`. CV-specific rendering in `resume/pdf/` (`renderResumeDocument`, section renderers); uses `PdfRenderService` from `core/pdf/PdfModule`.
 - CRUD feature modules (`skills/`, `users/`, `experiences/`, `educations/`, `courses/`, `organizations/`, `projects/`): canonical skeleton:
 
 ```

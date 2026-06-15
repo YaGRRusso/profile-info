@@ -426,6 +426,7 @@ export type FilterUserInput = {
   address?: InputMaybe<Scalars['String']['input']>;
   avatar?: InputMaybe<Scalars['String']['input']>;
   birth?: InputMaybe<Scalars['String']['input']>;
+  description?: InputMaybe<Scalars['String']['input']>;
   email?: InputMaybe<Scalars['String']['input']>;
   name?: InputMaybe<Scalars['String']['input']>;
   nickname?: InputMaybe<Scalars['String']['input']>;
@@ -1206,6 +1207,7 @@ export type UpdateUserInput = {
   address?: InputMaybe<Scalars['String']['input']>;
   avatar?: InputMaybe<Scalars['String']['input']>;
   birth?: InputMaybe<Scalars['String']['input']>;
+  description?: InputMaybe<Scalars['String']['input']>;
   email?: InputMaybe<Scalars['String']['input']>;
   name?: InputMaybe<Scalars['String']['input']>;
   nickname?: InputMaybe<Scalars['String']['input']>;

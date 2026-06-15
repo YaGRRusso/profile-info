@@ -1,4 +1,5 @@
 import { Module } from "@nestjs/common";
+import { PdfModule } from "@/core/pdf/pdf.module";
 import { CoursesModule } from "@/modules/courses/courses.module";
 import { EducationsModule } from "@/modules/educations/educations.module";
 import { ExperiencesModule } from "@/modules/experiences/experiences.module";
@@ -8,10 +9,10 @@ import { SkillsModule } from "@/modules/skills/skills.module";
 import { UsersModule } from "@/modules/users/users.module";
 import { ResumeController } from "./resume.controller";
 import { ResumeService } from "./resume.service";
-import { ResumePdfService } from "./resume-pdf.service";
 
 @Module({
   imports: [
+    PdfModule,
     UsersModule,
     SkillsModule,
     ExperiencesModule,
@@ -21,6 +22,6 @@ import { ResumePdfService } from "./resume-pdf.service";
     OrganizationsModule,
   ],
   controllers: [ResumeController],
-  providers: [ResumeService, ResumePdfService],
+  providers: [ResumeService],
 })
 export class ResumeModule {}

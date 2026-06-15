@@ -3,11 +3,3 @@ export interface PdfTextStyle {
   font: string;
   size: number;
 }
-
-export interface PdfSectionTitleConfig {
-  afterGap: number;
-  beforeGap: number;
-  ruleColor: string;
-  ruleWidth?: number;
-  titleStyle: PdfTextStyle;
-}
