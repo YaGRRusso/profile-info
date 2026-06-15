@@ -1,7 +1,12 @@
-import { renderEntryBlock } from "@/common/pdf/layout/render-entry-block";
-import { renderSection } from "@/common/pdf/layout/render-section";
+import {
+  entryBlockSectionHandlers,
+  renderSection,
+} from "@/common/pdf/layout/render-section";
 import type { PdfContext } from "@/common/pdf/pdf-context";
-import type { ResumeDocumentData } from "../../types/resume-document.type";
+import type {
+  ResumeDocumentData,
+  ResumeEducation,
+} from "../../types/resume-document.type";
 
 export function renderEducations(
   ctx: PdfContext,
@@ -11,13 +16,10 @@ export function renderEducations(
   renderSection(ctx, {
     items: document.educations,
     title,
-    renderItem: (context, education) => {
-      renderEntryBlock(context, {
-        title: education.title,
-        meta: [education.organization, education.period],
-        description: education.description,
-        minHeight: education.description ? 56 : 36,
-      });
-    },
+    ...entryBlockSectionHandlers<ResumeEducation>((education) => ({
+      title: education.title,
+      meta: [education.organization, education.period],
+      description: education.description,
+    })),
   });
 }

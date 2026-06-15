@@ -1,5 +1,7 @@
-import { renderEntryBlock } from "@/common/pdf/layout/render-entry-block";
-import { renderSection } from "@/common/pdf/layout/render-section";
+import {
+  entryBlockSectionHandlers,
+  renderSection,
+} from "@/common/pdf/layout/render-section";
 import type { PdfContext } from "@/common/pdf/pdf-context";
 import type {
   ResumeDocumentData,
@@ -28,13 +30,12 @@ export function renderExperiences(
   renderSection(ctx, {
     items: flattenExperienceRoles(document.experiences),
     title,
-    renderItem: (context, { experience, role }) => {
-      renderEntryBlock(context, {
+    ...entryBlockSectionHandlers<ExperienceRoleEntry>(
+      ({ experience, role }) => ({
         title: role.title,
         meta: [experience.organization, role.period],
         description: role.description,
-        minHeight: 72,
-      });
-    },
+      })
+    ),
   });
 }

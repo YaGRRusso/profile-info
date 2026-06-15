@@ -47,6 +47,41 @@ export class PdfContext {
     return this.gap("lg");
   }
 
+  measureSectionTitleHeight(title: string): number {
+    const normalizedTitle =
+      this.theme.sectionTitleCase === "upper" ? title.toUpperCase() : title;
+
+    return (
+      this.measureGapHeight("xl", "sectionTitle") +
+      this.measureTextHeight("sectionTitle", normalizedTitle) +
+      1 +
+      this.measureGapHeight("lg", "sectionTitle")
+    );
+  }
+
+  measureInlinePairHeight(
+    labelStyleKey: PdfTextStyleKey,
+    label: string,
+    valueStyleKey: PdfTextStyleKey,
+    value: string
+  ): number {
+    const contentWidth = this.contentWidth();
+    const labelWidth = this.measureTextWidth(labelStyleKey, label);
+    const valueWidth = this.measureTextWidth(valueStyleKey, value);
+
+    if (labelWidth + valueWidth <= contentWidth) {
+      return Math.max(
+        this.measureLineHeight(labelStyleKey),
+        this.measureLineHeight(valueStyleKey)
+      );
+    }
+
+    return (
+      this.measureTextHeight(labelStyleKey, label) +
+      this.measureTextHeight(valueStyleKey, value)
+    );
+  }
+
   inlinePair(
     labelStyleKey: PdfTextStyleKey,
     label: string,
@@ -104,6 +139,60 @@ export class PdfContext {
     return this;
   }
 
+  contentWidth(): number {
+    const { margins, width } = this.document.page;
+
+    return width - margins.left - margins.right;
+  }
+
+  measureTextHeight(
+    styleKey: PdfTextStyleKey,
+    content: string,
+    options?: { width?: number }
+  ): number {
+    this.applyTextStyle(this.theme.textStyles[styleKey]);
+
+    return this.document.heightOfString(content, {
+      width: options?.width ?? this.contentWidth(),
+    });
+  }
+
+  measureTextWidth(styleKey: PdfTextStyleKey, content: string): number {
+    this.applyTextStyle(this.theme.textStyles[styleKey]);
+
+    return this.document.widthOfString(content);
+  }
+
+  measureLineHeight(styleKey: PdfTextStyleKey): number {
+    this.applyTextStyle(this.theme.textStyles[styleKey]);
+
+    return this.document.currentLineHeight(true);
+  }
+
+  measureGapHeight(
+    spacingKey: PdfSpacingKey,
+    lineStyleKey: PdfTextStyleKey = this.theme.defaultTextStyle
+  ): number {
+    return (
+      this.theme.spacing[spacingKey] * this.measureLineHeight(lineStyleKey)
+    );
+  }
+
+  pageContentHeight(): number {
+    const { height, margins } = this.document.page;
+
+    return height - margins.top - margins.bottom;
+  }
+
+  ensureBlockFits(blockHeight: number, keepTogetherHeight: number): this {
+    const spaceNeeded =
+      blockHeight <= this.pageContentHeight()
+        ? blockHeight
+        : keepTogetherHeight;
+
+    return this.ensureSpace(spaceNeeded);
+  }
+
   ensureSpace(height: number): this {
     const bottom =
       this.document.page.height - this.document.page.margins.bottom;
@@ -122,16 +211,17 @@ export class PdfContext {
     return this;
   }
 
+  private applyTextStyle(style: PdfTextStyle): void {
+    this.document.font(style.font).fontSize(style.size);
+  }
+
   private textStyle(
     style: PdfTextStyle,
     content: string,
     options?: PdfTextOptions
   ): this {
-    this.document
-      .font(style.font)
-      .fontSize(style.size)
-      .fillColor(style.color)
-      .text(content, options);
+    this.applyTextStyle(style);
+    this.document.fillColor(style.color).text(content, options);
 
     return this;
   }

@@ -11,6 +11,16 @@ export function renderSkills(
   renderSection(ctx, {
     items: document.skills,
     title,
+    measureItem: (context, group) => {
+      const lineHeight = context.measureInlinePairHeight(
+        "label",
+        `${formatSkillCategoryLabel(group.category)}: `,
+        "body",
+        group.skills.join(", ")
+      );
+
+      return { block: lineHeight, header: lineHeight };
+    },
     renderItem: (context, group) => {
       context.inlinePair(
         "label",
