@@ -60,5 +60,11 @@ export function renderHeader(
     ctx.gapLines(0.2);
   }
 
+  if (header.description) {
+    ctx.gapLines(0.45);
+    ctx.text("body", header.description);
+    ctx.reset();
+  }
+
   ctx.gap("afterHeader");
 }

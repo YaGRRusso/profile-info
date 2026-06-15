@@ -116,6 +116,9 @@ export class ResumeService {
       title: user.title,
       email: user.email,
       phone: user.phone,
+      description: user.description
+        ? truncateText(user.description, RESUME_LIMITS.descriptionMaxLength)
+        : undefined,
       urls: (user.urls ?? []).map(({ title, value }) => ({ title, value })),
     };
 

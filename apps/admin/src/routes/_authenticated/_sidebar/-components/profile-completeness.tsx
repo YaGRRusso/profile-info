@@ -5,6 +5,7 @@ type ProfileUser = GetMeQuery["getMe"];
 
 const PROFILE_FIELDS: Array<(user: ProfileUser) => boolean> = [
   (user) => Boolean(user.title?.trim()),
+  (user) => Boolean(user.description?.trim()),
   (user) => Boolean(user.phone?.trim()),
   (user) => Boolean(user.birth),
   (user) => Boolean(user.address?.trim()),

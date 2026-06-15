@@ -53,6 +53,7 @@ export function ProfileSummary({ isLoading, user }: ProfileSummaryProps) {
 
       <div className="flex flex-col gap-4">
         <SummaryItem label="Title" value={user.title} />
+        <SummaryItem label="Description" value={user.description} />
         <SummaryItem label="Email" value={user.email} />
         <SummaryItem label="Phone" value={user.phone} />
         <SummaryItem label="Birth date" value={birth || undefined} />

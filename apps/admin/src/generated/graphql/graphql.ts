@@ -211,6 +211,7 @@ export type CreateUserInput = {
   address?: InputMaybe<Scalars['String']['input']>;
   avatar?: InputMaybe<Scalars['String']['input']>;
   birth?: InputMaybe<Scalars['String']['input']>;
+  description?: InputMaybe<Scalars['String']['input']>;
   email: Scalars['String']['input'];
   name: Scalars['String']['input'];
   nickname: Scalars['String']['input'];
@@ -1165,6 +1166,7 @@ export type UpdateMeInput = {
   address?: InputMaybe<Scalars['String']['input']>;
   avatar?: InputMaybe<Scalars['String']['input']>;
   birth?: InputMaybe<Scalars['String']['input']>;
+  description?: InputMaybe<Scalars['String']['input']>;
   email?: InputMaybe<Scalars['String']['input']>;
   name?: InputMaybe<Scalars['String']['input']>;
   nickname?: InputMaybe<Scalars['String']['input']>;
@@ -1239,6 +1241,7 @@ export type UserEntity = {
   avatar?: Maybe<Scalars['String']['output']>;
   birth?: Maybe<Scalars['String']['output']>;
   createdAt: Scalars['DateTime']['output'];
+  description?: Maybe<Scalars['String']['output']>;
   email: Scalars['String']['output'];
   id: Scalars['ID']['output'];
   name: Scalars['String']['output'];
@@ -1510,12 +1513,12 @@ export type UpdateMeMutationVariables = Exact<{
 }>;
 
 
-export type UpdateMeMutation = { __typename?: 'Mutation', updateMe: { __typename?: 'UserEntity', id: string, email: string, name: string, nickname: string, role: UserRole, title?: string | null, avatar?: string | null, phone?: string | null, birth?: string | null, address?: string | null, urls?: Array<{ __typename?: 'UrlEntity', title: string, value: string }> | null } };
+export type UpdateMeMutation = { __typename?: 'Mutation', updateMe: { __typename?: 'UserEntity', id: string, email: string, name: string, nickname: string, role: UserRole, title?: string | null, avatar?: string | null, phone?: string | null, birth?: string | null, address?: string | null, description?: string | null, urls?: Array<{ __typename?: 'UrlEntity', title: string, value: string }> | null } };
 
 export type GetMeQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetMeQuery = { __typename?: 'Query', getMe: { __typename?: 'UserEntity', id: string, email: string, name: string, nickname: string, role: UserRole, title?: string | null, avatar?: string | null, phone?: string | null, birth?: string | null, address?: string | null, urls?: Array<{ __typename?: 'UrlEntity', title: string, value: string }> | null } };
+export type GetMeQuery = { __typename?: 'Query', getMe: { __typename?: 'UserEntity', id: string, email: string, name: string, nickname: string, role: UserRole, title?: string | null, avatar?: string | null, phone?: string | null, birth?: string | null, address?: string | null, description?: string | null, urls?: Array<{ __typename?: 'UrlEntity', title: string, value: string }> | null } };
 
 export type FindManyCoursesQueryVariables = Exact<{
   courseFilters?: InputMaybe<FilterCourseInput>;
@@ -1940,6 +1943,7 @@ export const UpdateMeDocument = new TypedDocumentString(`
     phone
     birth
     address
+    description
     urls {
       title
       value
@@ -1960,6 +1964,7 @@ export const GetMeDocument = new TypedDocumentString(`
     phone
     birth
     address
+    description
     urls {
       title
       value

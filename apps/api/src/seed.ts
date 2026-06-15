@@ -231,6 +231,7 @@ async function seed() {
     birth: faker.date.past({ years: 30 }),
     phone: faker.phone.number(),
     title: faker.person.jobTitle(),
+    description: faker.lorem.paragraphs({ min: 1, max: 2 }),
     urls: faker.helpers.arrayElements(URL_TYPES).map((type) => ({
       title: type,
       value: faker.internet.url(),

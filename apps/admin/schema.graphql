@@ -190,6 +190,7 @@ input CreateUserInput {
   address: String
   avatar: String
   birth: String
+  description: String
   email: String!
   name: String!
   nickname: String!
@@ -717,6 +718,7 @@ input UpdateMeInput {
   address: String
   avatar: String
   birth: String
+  description: String
   email: String
   name: String
   nickname: String
@@ -788,6 +790,7 @@ type UserEntity {
   avatar: String
   birth: String
   createdAt: DateTime!
+  description: String
   email: String!
   id: ID!
   name: String!

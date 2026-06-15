@@ -33,6 +33,9 @@ export class UserModel extends BaseModel {
   @Prop({ type: String })
   address?: string;
 
+  @Prop({ type: String })
+  description?: string;
+
   @Prop({ type: String, enum: UserRole, default: UserRole.USER })
   role?: UserRole;
 

@@ -16,6 +16,7 @@ const updateMe = graphql(`
       phone
       birth
       address
+      description
       urls {
         title
         value

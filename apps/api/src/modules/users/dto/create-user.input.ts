@@ -50,6 +50,9 @@ export class CreateUserInput {
   @OptionalField(() => String)
   address?: string;
 
+  @OptionalField(() => String)
+  description?: string;
+
   @OptionalField(() => UserRole)
   role?: UserRole;
 

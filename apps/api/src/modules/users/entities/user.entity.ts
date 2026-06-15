@@ -34,6 +34,9 @@ export class UserEntity extends BaseEntity {
   @OptionalField(() => String)
   address?: string;
 
+  @OptionalField(() => String)
+  description?: string;
+
   @Field(() => UserRole, { defaultValue: UserRole.USER })
   role?: UserRole;
 

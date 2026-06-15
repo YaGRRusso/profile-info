@@ -6,6 +6,7 @@ export interface ResumeContactLink {
 }
 
 export interface ResumeHeader {
+  description?: string;
   email: string;
   name: string;
   phone?: string;

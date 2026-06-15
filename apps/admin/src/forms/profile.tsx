@@ -23,6 +23,7 @@ const profileSchema = z.object({
   avatar: z.union([z.literal(""), z.url("invalid url")]),
   birth: z.union([z.literal(""), z.string("invalid date")]),
   address: z.string(),
+  description: z.string(),
   urls: z.array(urlSchema),
   password: z.union([
     z.literal(""),
@@ -48,6 +49,7 @@ export function profileToForm(user: GetMeUser): Partial<ProfileSchema> {
     avatar: user.avatar ?? "",
     birth: toDateInput(user.birth),
     address: user.address ?? "",
+    description: user.description ?? "",
     urls: (user.urls ?? []).map((url) => ({
       title: url.title,
       value: url.value,
@@ -66,6 +68,7 @@ export function profileToInput(data: ProfileSchema): UpdateMeInput {
     avatar: data.avatar || undefined,
     birth: toIsoDate(data.birth),
     address: data.address || undefined,
+    description: data.description || undefined,
     urls: data.urls.length ? data.urls : undefined,
     password: data.password || undefined,
   };
@@ -87,6 +90,7 @@ export function ProfileForm({
       avatar: "",
       birth: "",
       address: "",
+      description: "",
       urls: [] as ProfileSchema["urls"],
       password: "",
       ...defaultValues,
@@ -146,6 +150,21 @@ export function ProfileForm({
                 placeholder="Title"
                 value={field.state.value}
               />
+            )}
+          </Field>
+
+          <Field name="description">
+            {(field) => (
+              <div className="md:col-span-2">
+                <TextareaInput
+                  error={fieldError(field.state.meta)}
+                  label="Description"
+                  name={field.name}
+                  onChange={field.handleChange}
+                  placeholder="Professional summary for your resume"
+                  value={field.state.value}
+                />
+              </div>
             )}
           </Field>
 
