@@ -65,7 +65,8 @@ export function RecentActivity({ items }: RecentActivityProps) {
                 <div className="flex-1">
                   <span className="block truncate">{item.label}</span>
                   <span className="text-xs opacity-md">
-                    {formatActivityType(item.type)} ·{" "}
+                    {formatActivityType(item.type)}
+                    {" · "}
                     {formatRelativeTime(item.updatedAt)}
                   </span>
                 </div>

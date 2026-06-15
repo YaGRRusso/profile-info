@@ -13,8 +13,8 @@ import { OrganizationModel } from "@/modules/organizations/schemas/organization.
 import { ProjectsService } from "@/modules/projects/projects.service";
 import { SkillsService } from "@/modules/skills/skills.service";
 import { UsersService } from "@/modules/users/users.service";
+import { RESUME_LIMITS } from "./const/resume-limits.const";
 import { selectResumeSkillGroups } from "./helpers/select-skill-groups.helper";
-import { RESUME_LIMITS } from "./resume.constants";
 import type {
   ResumeCertification,
   ResumeDocumentData,

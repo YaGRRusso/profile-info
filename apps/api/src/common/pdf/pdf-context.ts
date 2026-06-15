@@ -24,7 +24,7 @@ export class PdfContext {
   metaLine(
     parts: Array<string | undefined>,
     style: PdfTextStyle,
-    separator = "  ·  "
+    separator = " · "
   ): this {
     const meta = parts.filter(Boolean).join(separator);
     if (!meta) return this;

@@ -35,7 +35,7 @@ export function renderHeader(
   const contactParts = [header.email, header.phone].filter(Boolean);
 
   if (contactParts.length) {
-    ctx.text("contact", contactParts.join("  ·  "));
+    ctx.text("contact", contactParts.join(" · "));
     ctx.gapLines(0.3);
   }
 
@@ -44,7 +44,7 @@ export function renderHeader(
   if (links.length) {
     for (const [index, link] of links.entries()) {
       if (index > 0) {
-        ctx.text("separator", "  ·  ", { continued: true });
+        ctx.text("separator", " · ", { continued: true });
       }
 
       ctx.text("label", `${formatLinkTitle(link.title)}: `, {

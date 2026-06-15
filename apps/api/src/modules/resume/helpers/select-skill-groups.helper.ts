@@ -1,6 +1,6 @@
 import { groupBy, orderBy } from "lodash";
 import type { SkillModel } from "@/modules/skills/schemas/skill.schema";
-import { RESUME_LIMITS } from "../resume.constants";
+import { RESUME_LIMITS } from "../const/resume-limits.const";
 import type { ResumeSkillGroup } from "../types/resume-document.type";
 
 export function selectResumeSkillGroups(

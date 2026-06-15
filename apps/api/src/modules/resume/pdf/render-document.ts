@@ -1,4 +1,4 @@
-import { resolveResumeLabels } from "../resume.labels";
+import { resolveResumeLabels } from "../const/resume-labels.const";
 import type { ResumeDocumentData } from "../types/resume-document.type";
 import { renderCertifications } from "./render-certifications";
 import { renderEducations } from "./render-education";

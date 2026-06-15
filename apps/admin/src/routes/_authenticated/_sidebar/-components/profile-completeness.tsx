@@ -69,7 +69,8 @@ export function ProfileCompleteness({ user }: ProfileCompletenessProps) {
       <div className="flex flex-col">
         <span className="font-semibold text-sm">Profile completeness</span>
         <Link className="link link-hover text-xs opacity-md" to="/settings">
-          Fill in your settings · {profileCompleteness}%
+          Fill in your settings{" · "}
+          {profileCompleteness}%
         </Link>
       </div>
     </div>
