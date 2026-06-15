@@ -16,7 +16,9 @@ import {
   ResourceType,
   type UpdateMeInput,
 } from "@/generated/graphql/graphql";
-import { useSummarize, useTranslate } from "@/hooks/mutations/ai";
+import { useQueryAllPages } from "@/hooks/custom/use-query-all-pages";
+import { useAtsSummarize, useTranslate } from "@/hooks/mutations/ai";
+import { useFindManySkills } from "@/hooks/queries/skills";
 import { toDateInput, toIsoDate } from "@/lib/date";
 import { fieldError } from "@/lib/field-error";
 import { createEmptyI18n } from "@/lib/i18n";
@@ -123,7 +125,10 @@ export function ProfileForm({
   isDisabled,
   isLoading,
 }: ProfileFormProps) {
-  const summarize = useSummarize();
+  const findManySkills = useFindManySkills();
+  useQueryAllPages(findManySkills);
+
+  const atsSummarize = useAtsSummarize();
   const translate = useTranslate();
 
   const form = useForm({
@@ -144,7 +149,7 @@ export function ProfileForm({
     validators: { onChange: profileSchema },
   });
 
-  const handleSummarize = useCallback(
+  const handleAtsOptimize = useCallback(
     async <Field extends DeepKeys<ProfileSchema>>(
       fieldGroup: ProfileSchema["i18n"][number],
       fieldName: Field,
@@ -158,6 +163,12 @@ export function ProfileForm({
       if (raw.trim().length <= RawSizeEnum.XSMALL)
         return toast.error("Description must be at least 64 characters long");
 
+      const skills = [...(findManySkills.data?.nodes ?? [])]
+        .sort((a, b) => b.relevance - a.relevance)
+        .slice(0, 32)
+        .map((skill) => skill.name);
+      if (!skills.length) return toast.error("At least one skill is required");
+
       const name = form.getFieldValue("name");
       if (name) details.push({ key: "Name", value: [name] });
 
@@ -167,21 +178,27 @@ export function ProfileForm({
       const language = fieldGroup.locale;
       if (language) details.push({ key: "Language", value: [language] });
 
-      const summarized = await summarize.mutateAsync({
+      const summarized = await atsSummarize.mutateAsync({
         raw,
         type,
+        skills,
         details,
       });
 
       form.setFieldValue(
         fieldName,
-        summarized.summarize.messages[0].message.content as DeepValue<
+        summarized.atsSummarize.messages[0].message.content as DeepValue<
           ProfileSchema,
           Field
         >
       );
     },
-    [summarize.mutateAsync, form.getFieldValue, form.setFieldValue]
+    [
+      atsSummarize.mutateAsync,
+      findManySkills.data?.nodes,
+      form.getFieldValue,
+      form.setFieldValue,
+    ]
   );
 
   const handleTranslate = useCallback(
@@ -327,13 +344,15 @@ export function ProfileForm({
                     <Field name={`i18n[${index}].description`}>
                       {(field) => (
                         <TextareaInput
-                          disabled={summarize.isPending || translate.isPending}
+                          disabled={
+                            atsSummarize.isPending || translate.isPending
+                          }
                           error={fieldError(field.state.meta)}
                           label="Description"
                           name={field.name}
                           onChange={field.handleChange}
                           onOptimize={() =>
-                            handleSummarize(
+                            handleAtsOptimize(
                               arrayField.state.value[index],
                               field.name,
                               field.state.value

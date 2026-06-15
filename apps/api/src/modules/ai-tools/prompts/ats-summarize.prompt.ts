@@ -35,9 +35,10 @@ Fabricating data is strictly forbidden and unethical. Every fact in the output m
 
 const LENGTH_BUDGETS: Record<string, string> = {
   experience: "between 350 and 700 characters (3 to 6 sentences)",
-  project: "between 250 and 600 characters (2 to 5 sentences)",
+  project: "between 300 and 600 characters (2 to 5 sentences)",
   education: "between 200 and 400 characters (2 to 3 sentences)",
   course: "between 150 and 300 characters (1 to 3 sentences)",
+  user: "between 300 and 600 characters (3 to 4 sentences)",
 };
 
 const DEFAULT_LENGTH_BUDGET = "at most 600 characters (up to 5 sentences)";
@@ -54,11 +55,13 @@ export const createAtsSummarizeContextPrompt = ({
   raw,
   skills,
   type,
-}: AtsSumarizeContextArgs) =>
-  `
+}: AtsSumarizeContextArgs) => {
+  const normalizedType = type.toLowerCase();
+
+  return `
 # Resource Context
 - Type: ${type}
-- Skills: ${skills.join(", ")}
+- Skills (prioritize for keyword integration; do not let this list displace facts from the raw input): ${skills.join(", ")}
 
 # Extra Details:
 ${compact(details)
@@ -66,7 +69,7 @@ ${compact(details)
   .join("\n")}
 
 # Output Constraints
-- Length: ${LENGTH_BUDGETS[type.toLowerCase()] ?? DEFAULT_LENGTH_BUDGET}. This is a hard limit — never exceed it.
+- Length: ${LENGTH_BUDGETS[normalizedType] ?? DEFAULT_LENGTH_BUDGET}. This is a hard limit — never exceed it.
 
 ---
 
@@ -77,3 +80,4 @@ ${raw}
 
 Rewrite the content above into an ATS-optimized description, strictly following the Factual Grounding and Output Restrictions rules.
 `.trim();
+};

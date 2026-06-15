@@ -1,4 +1,3 @@
-import { useAutoAnimate } from "@formkit/auto-animate/react";
 import {
   ArrowDownIcon,
   ArrowUpIcon,
@@ -33,10 +32,8 @@ export function FieldArray({
   sublevel,
   values,
 }: FieldArrayProps) {
-  const [parent] = useAutoAnimate();
-
   return (
-    <div ref={parent}>
+    <div>
       <div className="fieldset gap-2" key={JSON.stringify(values)}>
         {!values.length && (
           <Alert
