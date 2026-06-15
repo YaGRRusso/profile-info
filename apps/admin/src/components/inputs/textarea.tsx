@@ -33,13 +33,14 @@ export function TextareaInput({
   return (
     <fieldset className="fieldset">
       {label && <legend className="fieldset-legend">{label}</legend>}
-      <label className="textarea flex w-full cursor-text flex-col gap-2">
+      <label
+        className={cn(
+          "textarea flex w-full cursor-text flex-col gap-2",
+          error && "textarea-error"
+        )}
+      >
         <textarea
-          className={cn(
-            "max-h-96 min-h-24 resize-y",
-            error && "input-error",
-            className
-          )}
+          className={cn("max-h-96 min-h-24 resize-y", className)}
           disabled={disabled}
           onChange={(event) => onChange?.(event.target.value)}
           placeholder={placeholder}
@@ -57,12 +58,12 @@ export function TextareaInput({
           {props.maxLength ? props.maxLength : <InfinityIcon weight="bold" />}
         </span>
       </label>
-      <div className="flex flex-wrap items-center justify-between gap-4">
+      <div className="scrollbar-thin flex items-center justify-between gap-x-4 overflow-auto">
         {error && <p className="label text-error">{error}</p>}
         <div className="ml-auto flex items-center gap-1">
           {onTranslate && (
             <button
-              className="btn btn-xs btn-primary btn-ghost w-fit"
+              className="btn btn-xs btn-primary btn-ghost"
               disabled={
                 disabled ||
                 !value ||
@@ -78,7 +79,7 @@ export function TextareaInput({
           )}
           {onOptimize && (
             <button
-              className="btn btn-xs btn-primary btn-ghost w-fit"
+              className="btn btn-xs btn-primary btn-ghost"
               disabled={
                 disabled ||
                 !value ||

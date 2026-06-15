@@ -32,7 +32,7 @@ export function PageTitle({
         <p className="opacity-md">{description}</p>
       </div>
       {actions && (
-        <div className="scrollbar-hidden flex items-center gap-2 overflow-auto">
+        <div className="scrollbar-thin flex items-center gap-2 overflow-auto">
           {actions.map(({ className, icon, label, ...action }, index) => (
             <button
               className={cn("btn", className)}

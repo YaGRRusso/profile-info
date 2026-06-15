@@ -20,7 +20,7 @@
   }
 }
 
-@utility scrollbar-hidden {
+@utility scrollbar-thin {
   -ms-overflow-style: none;
   scrollbar-width: none;
 

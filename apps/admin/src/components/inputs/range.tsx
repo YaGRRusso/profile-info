@@ -41,7 +41,7 @@ export function RangeInput({
     <fieldset className="fieldset">
       {label && <legend className="fieldset-legend">{label}</legend>}
       <input
-        className={cn("range w-full", className)}
+        className={cn("range w-full", error && "range-error", className)}
         max={max}
         min={min}
         onChange={(event) => onChange?.(event.target.valueAsNumber)}
