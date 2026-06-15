@@ -171,3 +171,8 @@ npm run test:e2e      # GraphQL auth, delete cascade, resume PDF, health smoke
 E2E tests use `mongodb://127.0.0.1:27017/profile-test-e2e` by default (Docker Compose MongoDB). Set `TEST_DATABASE_URL` to override. Set `USE_MEMORY_MONGO=true` for in-memory Mongo (downloads binary on first run).
 
 Seed admin credentials: `admin@profile.info` / `admin123`.
+
+## Further reading
+
+- `docs/ER_MODEL.md`: MongoDB entity-relationship diagram and delete behavior
+- `docs/CLEAN_ARCHITECTURE.md`: dependency rules and layer breakdown

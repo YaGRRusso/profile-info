@@ -5,7 +5,8 @@
 ## Maintaining this rule
 
 Follow **Maintaining project documentation** in `agents/overview.md`. Update this file
-and update `apps/api/README.md` when setup or run changes.
+and update `apps/api/README.md` when setup or run changes. Update `apps/api/docs/ER_MODEL.md`
+when schemas, references, or delete behavior change.
 
 ## Overview
 
@@ -32,6 +33,14 @@ Entry point `src/main.ts`:
 - Feature modules: `AuthModule`, CRUD entities, `DashboardModule` (read-only aggregation), `ResumeModule` (PDF export), `AiToolsModule`.
 
 Request flow: Apollo → `GqlAuthGuard` (unless `@Public()`) → resolver → service → Mongoose model. Nested fields use `@ResolveField` + per-request DataLoaders. REST routes (e.g. `GET /resume.pdf`) skip `GqlAuthGuard` when `context.getType() !== "graphql"`.
+
+## Data model (ER)
+
+Full diagram and field detail: `apps/api/docs/ER_MODEL.md`.
+
+- MongoDB via Mongoose; seven top-level collections (User, Skill, Organization, Experience, Education, Course, Project).
+- Organization is referenced by Experience, Education, and Course; Skill is referenced by arrays on Education, Course, Project, and nested Experience roles.
+- Deletes use domain events (`skill.deleted`, `organization.deleted`) for detach and purge; see ER doc for behavior.
 
 ## Core technologies
 

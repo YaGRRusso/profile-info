@@ -6,6 +6,10 @@
 
 When you learn something relevant and specific (a non-obvious architecture detail, a user preference, a useful command, or a pitfall), **proactively update project docs in the same session**. Be selective: only record what would be valuable in a future session. Do not note generic or obvious things, do not restate what the code already makes plain, and do not duplicate content across files.
 
+**Schema changes:** editing a Mongoose/Prisma/TypeORM model or migration also requires
+updating `apps/api/docs/ER_MODEL.md` (diagram, entity list, reference notation, delete
+notes) before ending the session.
+
 **Where to update:**
 
 - Repo-wide → `agents/overview.md`
@@ -13,6 +17,7 @@ When you learn something relevant and specific (a non-obvious architecture detai
   section accurate)
 - API package → `agents/api.md`
 - API onboarding → `apps/api/README.md` (when setup/run changes)
+- API persistence model → `apps/api/docs/ER_MODEL.md` (when entities, refs, or delete behavior change)
 - Admin package → `agents/admin.md`
 - Admin onboarding → `apps/admin/README.md` (when setup/run changes)
 - `AGENTS.md` → only when agent files are added or renamed
