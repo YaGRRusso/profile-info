@@ -13,7 +13,7 @@ export function useDownloadResume() {
     mutationKey: ["resume", "download"],
     mutationFn: async (locale: LocaleEnum) => {
       const blob = await fetchResumePdf(locale);
-      downloadBlob(blob, "resume.pdf");
+      downloadBlob(blob, `resume-${locale}.pdf`);
     },
   });
 }
