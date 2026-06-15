@@ -6,6 +6,24 @@ import { UserRole } from "@/core/enums/user-role.enum";
 import { createPaginatedModel } from "@/core/schemas/paginated.schema";
 
 @ObjectType()
+export class UserMessages {
+  @OptionalField(() => String)
+  title?: string;
+
+  @OptionalField(() => String)
+  description?: string;
+}
+
+@ObjectType()
+export class UserTranslationLocale {
+  @Field(() => String)
+  locale: string;
+
+  @Field(() => UserMessages)
+  messages: UserMessages;
+}
+
+@ObjectType()
 export class UserEntity extends BaseEntity {
   @OptionalField(() => String)
   avatar?: string;
@@ -15,9 +33,6 @@ export class UserEntity extends BaseEntity {
 
   @Field(() => String)
   nickname: string;
-
-  @OptionalField(() => String)
-  title?: string;
 
   @OptionalField(() => String)
   phone?: string;
@@ -34,8 +49,8 @@ export class UserEntity extends BaseEntity {
   @OptionalField(() => String)
   address?: string;
 
-  @OptionalField(() => String)
-  description?: string;
+  @OptionalField(() => [UserTranslationLocale])
+  i18n?: UserTranslationLocale[];
 
   @Field(() => UserRole, { defaultValue: UserRole.USER })
   role?: UserRole;

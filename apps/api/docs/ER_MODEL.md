@@ -27,7 +27,7 @@ erDiagram
     string nickname UK
     string email UK
     string role
-    string description
+    object i18n "embed"
   }
   UrlEmbed {
     string title
@@ -117,8 +117,8 @@ which collection is pointed at.
 - **Source:** `src/modules/users/schemas/user.schema.ts`
 - **Key fields:** `name`, `nickname` (unique), `email` (unique), `password` (required,
   `select: false`, not exposed in API), `role` (enum), `title`, `phone`, `avatar`,
-  `birth`, `address`, `description`
-- **Embedded:** `urls[]` (`UrlEmbed`: `title`, `value`)
+  `birth`, `address`, `i18n[]` (embed: `locale`, `messages.title`, `messages.description`)
+- **Embedded:** `urls[]` (`UrlEmbed`: `title`, `value`), `i18n[]` translations
 - **References:** none
 
 ### Skill (`skills`)

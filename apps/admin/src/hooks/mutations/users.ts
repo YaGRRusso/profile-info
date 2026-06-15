@@ -11,12 +11,17 @@ const updateMe = graphql(`
       name
       nickname
       role
-      title
       avatar
       phone
       birth
       address
-      description
+      i18n {
+        locale
+        messages {
+          title
+          description
+        }
+      }
       urls {
         title
         value

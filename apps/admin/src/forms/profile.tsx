@@ -1,13 +1,25 @@
-import { useForm } from "@tanstack/react-form";
+import { DeepKeys, DeepValue, useForm } from "@tanstack/react-form";
+import { useCallback } from "react";
+import { toast } from "react-toastify";
 import z from "zod";
 import { FieldArray } from "@/components/inputs/field-array";
 import { PasswordInput } from "@/components/inputs/password";
+import { SelectInput } from "@/components/inputs/select";
 import { TextInput } from "@/components/inputs/text";
 import { TextareaInput } from "@/components/inputs/textarea";
+import { LOCALES } from "@/consts/locales";
 import { PLACEHOLDERS } from "@/consts/placeholders";
-import type { GetMeQuery, UpdateMeInput } from "@/generated/graphql/graphql";
+import { RawSizeEnum } from "@/consts/raw-size";
+import type { GetMeQuery } from "@/generated/graphql/graphql";
+import {
+  DetailInput,
+  ResourceType,
+  type UpdateMeInput,
+} from "@/generated/graphql/graphql";
+import { useSummarize, useTranslate } from "@/hooks/mutations/ai";
 import { toDateInput, toIsoDate } from "@/lib/date";
 import { fieldError } from "@/lib/field-error";
+import { createEmptyI18n } from "@/lib/i18n";
 import { CommonFormProps } from "./common";
 
 const urlSchema = z.object({
@@ -19,12 +31,25 @@ const profileSchema = z.object({
   name: z.string().min(1, "required field"),
   nickname: z.string().min(1, "required field"),
   email: z.email("invalid email"),
-  title: z.string(),
   phone: z.string(),
   avatar: z.union([z.literal(""), z.url("invalid url")]),
   birth: z.union([z.literal(""), z.string("invalid date")]),
   address: z.string(),
-  description: z.string(),
+  i18n: z
+    .array(
+      z.object({
+        locale: z.string().min(1, "required field"),
+        title: z.string(),
+        description: z.string(),
+      })
+    )
+    .refine(
+      (items) => {
+        const locales = items.map((item) => item.locale);
+        return new Set(locales).size === locales.length;
+      },
+      { message: "locales must be unique" }
+    ),
   urls: z.array(urlSchema),
   password: z.union([
     z.literal(""),
@@ -45,12 +70,17 @@ export function profileToForm(user: GetMeUser): Partial<ProfileSchema> {
     name: user.name,
     nickname: user.nickname,
     email: user.email,
-    title: user.title ?? "",
     phone: user.phone ?? "",
     avatar: user.avatar ?? "",
     birth: toDateInput(user.birth),
     address: user.address ?? "",
-    description: user.description ?? "",
+    i18n: user.i18n?.length
+      ? user.i18n.map((translation) => ({
+          locale: translation.locale,
+          title: translation.messages.title ?? "",
+          description: translation.messages.description ?? "",
+        }))
+      : createEmptyI18n({ title: "", description: "" }),
     urls: (user.urls ?? []).map((url) => ({
       title: url.title,
       value: url.value,
@@ -60,16 +90,28 @@ export function profileToForm(user: GetMeUser): Partial<ProfileSchema> {
 }
 
 export function profileToInput(data: ProfileSchema): UpdateMeInput {
+  const i18n = data.i18n
+    .filter(
+      (translation) =>
+        translation.title.trim() || translation.description.trim()
+    )
+    .map((translation) => ({
+      locale: translation.locale,
+      messages: {
+        title: translation.title || undefined,
+        description: translation.description || undefined,
+      },
+    }));
+
   return {
     name: data.name,
     nickname: data.nickname,
     email: data.email,
-    title: data.title || undefined,
     phone: data.phone || undefined,
     avatar: data.avatar || undefined,
     birth: toIsoDate(data.birth),
     address: data.address || undefined,
-    description: data.description || undefined,
+    i18n: i18n.length ? i18n : undefined,
     urls: data.urls.length ? data.urls : undefined,
     password: data.password || undefined,
   };
@@ -81,17 +123,19 @@ export function ProfileForm({
   isDisabled,
   isLoading,
 }: ProfileFormProps) {
+  const summarize = useSummarize();
+  const translate = useTranslate();
+
   const form = useForm({
     defaultValues: {
       name: "",
       nickname: "",
       email: "",
-      title: "",
       phone: "",
       avatar: "",
       birth: "",
       address: "",
-      description: "",
+      i18n: createEmptyI18n({ title: "", description: "" }),
       urls: [] as ProfileSchema["urls"],
       password: "",
       ...defaultValues,
@@ -99,6 +143,73 @@ export function ProfileForm({
     onSubmit: ({ value }) => onSubmit?.(value),
     validators: { onChange: profileSchema },
   });
+
+  const handleSummarize = useCallback(
+    async <Field extends DeepKeys<ProfileSchema>>(
+      fieldGroup: ProfileSchema["i18n"][number],
+      fieldName: Field,
+      fieldValue: DeepValue<ProfileSchema, Field>
+    ) => {
+      const details: DetailInput[] = [];
+
+      const raw = fieldValue as string;
+      const type = ResourceType.User;
+
+      if (raw.trim().length <= RawSizeEnum.XSMALL)
+        return toast.error("Description must be at least 64 characters long");
+
+      const name = form.getFieldValue("name");
+      if (name) details.push({ key: "Name", value: [name] });
+
+      const title = fieldGroup.title;
+      if (title) details.push({ key: "Title", value: [title] });
+
+      const language = fieldGroup.locale;
+      if (language) details.push({ key: "Language", value: [language] });
+
+      const summarized = await summarize.mutateAsync({
+        raw,
+        type,
+        details,
+      });
+
+      form.setFieldValue(
+        fieldName,
+        summarized.summarize.messages[0].message.content as DeepValue<
+          ProfileSchema,
+          Field
+        >
+      );
+    },
+    [summarize.mutateAsync, form.getFieldValue, form.setFieldValue]
+  );
+
+  const handleTranslate = useCallback(
+    async <Field extends DeepKeys<ProfileSchema>>(
+      fieldGroup: ProfileSchema["i18n"][number],
+      fieldName: Field,
+      fieldValue: DeepValue<ProfileSchema, Field>
+    ) => {
+      const raw = fieldValue as string;
+
+      if (raw.trim().length <= RawSizeEnum.XSMALL)
+        return toast.error("Description must be at least 64 characters long");
+
+      const translated = await translate.mutateAsync({
+        raw,
+        targetLanguage: fieldGroup.locale,
+      });
+
+      form.setFieldValue(
+        fieldName,
+        translated.translate.messages[0].message.content as DeepValue<
+          ProfileSchema,
+          Field
+        >
+      );
+    },
+    [translate.mutateAsync, form.setFieldValue]
+  );
 
   const { Field, Subscribe } = form;
 
@@ -141,34 +252,6 @@ export function ProfileForm({
             )}
           </Field>
 
-          <Field name="title">
-            {(field) => (
-              <TextInput
-                error={fieldError(field.state.meta)}
-                label="Title"
-                name={field.name}
-                onChange={field.handleChange}
-                placeholder={PLACEHOLDERS.title}
-                value={field.state.value}
-              />
-            )}
-          </Field>
-
-          <Field name="description">
-            {(field) => (
-              <div className="md:col-span-2">
-                <TextareaInput
-                  error={fieldError(field.state.meta)}
-                  label="Description"
-                  name={field.name}
-                  onChange={field.handleChange}
-                  placeholder={PLACEHOLDERS.profileDescription}
-                  value={field.state.value}
-                />
-              </div>
-            )}
-          </Field>
-
           <Field name="birth">
             {(field) => (
               <TextInput
@@ -185,16 +268,92 @@ export function ProfileForm({
 
           <Field name="avatar">
             {(field) => (
-              <div className="md:col-span-2">
-                <TextInput
-                  error={fieldError(field.state.meta)}
-                  label="Avatar URL"
-                  name={field.name}
-                  onChange={field.handleChange}
-                  placeholder={PLACEHOLDERS.avatarUrl}
-                  value={field.state.value}
-                />
-              </div>
+              <TextInput
+                error={fieldError(field.state.meta)}
+                label="Avatar URL"
+                name={field.name}
+                onChange={field.handleChange}
+                placeholder={PLACEHOLDERS.avatarUrl}
+                value={field.state.value}
+              />
+            )}
+          </Field>
+        </div>
+
+        <div className="mt-4">
+          <Field mode="array" name="i18n">
+            {(arrayField) => (
+              <FieldArray
+                error={fieldError(arrayField.state.meta)}
+                label="Translation"
+                onAdd={() =>
+                  arrayField.pushValue({
+                    locale: "",
+                    title: "",
+                    description: "",
+                  })
+                }
+                onRemove={(index) => arrayField.removeValue(index)}
+                sublevel
+                values={arrayField.state.value}
+              >
+                {(index) => (
+                  <>
+                    <Field name={`i18n[${index}].locale`}>
+                      {(field) => (
+                        <SelectInput
+                          error={fieldError(field.state.meta)}
+                          label="Locale"
+                          name={field.name}
+                          onChange={field.handleChange}
+                          options={LOCALES}
+                          placeholder={PLACEHOLDERS.chooseLanguage}
+                          value={field.state.value}
+                        />
+                      )}
+                    </Field>
+                    <Field name={`i18n[${index}].title`}>
+                      {(field) => (
+                        <TextInput
+                          error={fieldError(field.state.meta)}
+                          label="Title"
+                          name={field.name}
+                          onChange={field.handleChange}
+                          placeholder={PLACEHOLDERS.title}
+                          value={field.state.value}
+                        />
+                      )}
+                    </Field>
+                    <Field name={`i18n[${index}].description`}>
+                      {(field) => (
+                        <TextareaInput
+                          disabled={summarize.isPending || translate.isPending}
+                          error={fieldError(field.state.meta)}
+                          label="Description"
+                          name={field.name}
+                          onChange={field.handleChange}
+                          onOptimize={() =>
+                            handleSummarize(
+                              arrayField.state.value[index],
+                              field.name,
+                              field.state.value
+                            )
+                          }
+                          onTranslate={() =>
+                            handleTranslate(
+                              arrayField.state.value[index],
+                              field.name,
+                              field.state.value
+                            )
+                          }
+                          placeholder={PLACEHOLDERS.profileDescription}
+                          value={field.state.value}
+                        />
+                      )}
+                    </Field>
+                  </>
+                )}
+              </FieldArray>
             )}
           </Field>
         </div>

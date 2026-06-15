@@ -211,15 +211,24 @@ export type CreateUserInput = {
   address?: InputMaybe<Scalars['String']['input']>;
   avatar?: InputMaybe<Scalars['String']['input']>;
   birth?: InputMaybe<Scalars['String']['input']>;
-  description?: InputMaybe<Scalars['String']['input']>;
   email: Scalars['String']['input'];
+  i18n?: InputMaybe<Array<CreateUserMessagesInputTranslationInput>>;
   name: Scalars['String']['input'];
   nickname: Scalars['String']['input'];
   password: Scalars['String']['input'];
   phone?: InputMaybe<Scalars['String']['input']>;
   role?: InputMaybe<UserRole>;
-  title?: InputMaybe<Scalars['String']['input']>;
   urls?: InputMaybe<Array<UrlInput>>;
+};
+
+export type CreateUserMessagesInput = {
+  description?: InputMaybe<Scalars['String']['input']>;
+  title?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type CreateUserMessagesInputTranslationInput = {
+  locale: Scalars['String']['input'];
+  messages: CreateUserMessagesInput;
 };
 
 export type DashboardActivityItem = {
@@ -426,14 +435,13 @@ export type FilterUserInput = {
   address?: InputMaybe<Scalars['String']['input']>;
   avatar?: InputMaybe<Scalars['String']['input']>;
   birth?: InputMaybe<Scalars['String']['input']>;
-  description?: InputMaybe<Scalars['String']['input']>;
   email?: InputMaybe<Scalars['String']['input']>;
+  i18n?: InputMaybe<Array<CreateUserMessagesInputTranslationInput>>;
   name?: InputMaybe<Scalars['String']['input']>;
   nickname?: InputMaybe<Scalars['String']['input']>;
   password?: InputMaybe<Scalars['String']['input']>;
   phone?: InputMaybe<Scalars['String']['input']>;
   role?: InputMaybe<UserRole>;
-  title?: InputMaybe<Scalars['String']['input']>;
   urls?: InputMaybe<Array<UrlInput>>;
 };
 
@@ -1041,7 +1049,8 @@ export enum ResourceType {
   Education = 'EDUCATION',
   Experience = 'EXPERIENCE',
   Organization = 'ORGANIZATION',
-  Project = 'PROJECT'
+  Project = 'PROJECT',
+  User = 'USER'
 }
 
 export type SignInInput = {
@@ -1167,13 +1176,12 @@ export type UpdateMeInput = {
   address?: InputMaybe<Scalars['String']['input']>;
   avatar?: InputMaybe<Scalars['String']['input']>;
   birth?: InputMaybe<Scalars['String']['input']>;
-  description?: InputMaybe<Scalars['String']['input']>;
   email?: InputMaybe<Scalars['String']['input']>;
+  i18n?: InputMaybe<Array<CreateUserMessagesInputTranslationInput>>;
   name?: InputMaybe<Scalars['String']['input']>;
   nickname?: InputMaybe<Scalars['String']['input']>;
   password?: InputMaybe<Scalars['String']['input']>;
   phone?: InputMaybe<Scalars['String']['input']>;
-  title?: InputMaybe<Scalars['String']['input']>;
   urls?: InputMaybe<Array<UrlInput>>;
 };
 
@@ -1207,14 +1215,13 @@ export type UpdateUserInput = {
   address?: InputMaybe<Scalars['String']['input']>;
   avatar?: InputMaybe<Scalars['String']['input']>;
   birth?: InputMaybe<Scalars['String']['input']>;
-  description?: InputMaybe<Scalars['String']['input']>;
   email?: InputMaybe<Scalars['String']['input']>;
+  i18n?: InputMaybe<Array<CreateUserMessagesInputTranslationInput>>;
   name?: InputMaybe<Scalars['String']['input']>;
   nickname?: InputMaybe<Scalars['String']['input']>;
   password?: InputMaybe<Scalars['String']['input']>;
   phone?: InputMaybe<Scalars['String']['input']>;
   role?: InputMaybe<UserRole>;
-  title?: InputMaybe<Scalars['String']['input']>;
   urls?: InputMaybe<Array<UrlInput>>;
 };
 
@@ -1243,22 +1250,33 @@ export type UserEntity = {
   avatar?: Maybe<Scalars['String']['output']>;
   birth?: Maybe<Scalars['String']['output']>;
   createdAt: Scalars['DateTime']['output'];
-  description?: Maybe<Scalars['String']['output']>;
   email: Scalars['String']['output'];
+  i18n?: Maybe<Array<UserTranslationLocale>>;
   id: Scalars['ID']['output'];
   name: Scalars['String']['output'];
   nickname: Scalars['String']['output'];
   phone?: Maybe<Scalars['String']['output']>;
   role: UserRole;
-  title?: Maybe<Scalars['String']['output']>;
   updatedAt: Scalars['DateTime']['output'];
   urls?: Maybe<Array<UrlEntity>>;
+};
+
+export type UserMessages = {
+  __typename?: 'UserMessages';
+  description?: Maybe<Scalars['String']['output']>;
+  title?: Maybe<Scalars['String']['output']>;
 };
 
 export enum UserRole {
   Admin = 'ADMIN',
   User = 'USER'
 }
+
+export type UserTranslationLocale = {
+  __typename?: 'UserTranslationLocale';
+  locale: Scalars['String']['output'];
+  messages: UserMessages;
+};
 
 export type AtsSummarizeMutationVariables = Exact<{
   atsSummarizeInput: AtsSummarizeInput;
@@ -1515,12 +1533,12 @@ export type UpdateMeMutationVariables = Exact<{
 }>;
 
 
-export type UpdateMeMutation = { __typename?: 'Mutation', updateMe: { __typename?: 'UserEntity', id: string, email: string, name: string, nickname: string, role: UserRole, title?: string | null, avatar?: string | null, phone?: string | null, birth?: string | null, address?: string | null, description?: string | null, urls?: Array<{ __typename?: 'UrlEntity', title: string, value: string }> | null } };
+export type UpdateMeMutation = { __typename?: 'Mutation', updateMe: { __typename?: 'UserEntity', id: string, email: string, name: string, nickname: string, role: UserRole, avatar?: string | null, phone?: string | null, birth?: string | null, address?: string | null, i18n?: Array<{ __typename?: 'UserTranslationLocale', locale: string, messages: { __typename?: 'UserMessages', title?: string | null, description?: string | null } }> | null, urls?: Array<{ __typename?: 'UrlEntity', title: string, value: string }> | null } };
 
 export type GetMeQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetMeQuery = { __typename?: 'Query', getMe: { __typename?: 'UserEntity', id: string, email: string, name: string, nickname: string, role: UserRole, title?: string | null, avatar?: string | null, phone?: string | null, birth?: string | null, address?: string | null, description?: string | null, urls?: Array<{ __typename?: 'UrlEntity', title: string, value: string }> | null } };
+export type GetMeQuery = { __typename?: 'Query', getMe: { __typename?: 'UserEntity', id: string, email: string, name: string, nickname: string, role: UserRole, avatar?: string | null, phone?: string | null, birth?: string | null, address?: string | null, i18n?: Array<{ __typename?: 'UserTranslationLocale', locale: string, messages: { __typename?: 'UserMessages', title?: string | null, description?: string | null } }> | null, urls?: Array<{ __typename?: 'UrlEntity', title: string, value: string }> | null } };
 
 export type FindManyCoursesQueryVariables = Exact<{
   courseFilters?: InputMaybe<FilterCourseInput>;
@@ -1940,12 +1958,17 @@ export const UpdateMeDocument = new TypedDocumentString(`
     name
     nickname
     role
-    title
     avatar
     phone
     birth
     address
-    description
+    i18n {
+      locale
+      messages {
+        title
+        description
+      }
+    }
     urls {
       title
       value
@@ -1961,12 +1984,17 @@ export const GetMeDocument = new TypedDocumentString(`
     name
     nickname
     role
-    title
     avatar
     phone
     birth
     address
-    description
+    i18n {
+      locale
+      messages {
+        title
+        description
+      }
+    }
     urls {
       title
       value

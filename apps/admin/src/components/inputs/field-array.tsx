@@ -49,7 +49,7 @@ export function FieldArray({
           <div
             className={cn(
               "flex flex-col gap-2 rounded-md bg-base-200",
-              sublevel ? "bg-base-100 p-2" : "p-4"
+              sublevel ? "bg-base-100 p-4" : "p-4"
             )}
             key={index}
           >

@@ -29,6 +29,12 @@ function SummaryItem({
 
 export function ProfileSummary({ isLoading, user }: ProfileSummaryProps) {
   const birth = toDateInput(user.birth);
+  const translation = user.i18n?.find(
+    (entry) =>
+      entry.messages.title?.trim() || entry.messages.description?.trim()
+  );
+  const title = translation?.messages.title;
+  const description = translation?.messages.description;
 
   return (
     <aside className="flex flex-col gap-4 rounded-box bg-base-200 p-6 lg:sticky lg:top-16 lg:self-start">
@@ -52,8 +58,8 @@ export function ProfileSummary({ isLoading, user }: ProfileSummaryProps) {
       <div className="divider my-0" />
 
       <div className="flex flex-col gap-4">
-        <SummaryItem label="Title" value={user.title} />
-        <SummaryItem label="Description" value={user.description} />
+        <SummaryItem label="Title" value={title} />
+        <SummaryItem label="Description" value={description} />
         <SummaryItem label="Email" value={user.email} />
         <SummaryItem label="Phone" value={user.phone} />
         <SummaryItem label="Birth date" value={birth || undefined} />

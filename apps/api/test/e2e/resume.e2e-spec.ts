@@ -32,7 +32,15 @@ describe("ResumeController (e2e)", () => {
       email: "admin@profile.info",
       password: "pass.123",
       role: UserRole.ADMIN,
-      title: "Software Engineer",
+      i18n: [
+        {
+          locale: "en",
+          messages: {
+            title: "Software Engineer",
+            description: "Backend developer",
+          },
+        },
+      ],
     });
 
     await skillsService.createOne({

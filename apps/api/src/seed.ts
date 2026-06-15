@@ -280,8 +280,22 @@ async function seed() {
     avatar: faker.image.urlPicsumPhotos(),
     birth: faker.date.past({ years: 30 }),
     phone: faker.phone.number(),
-    title: faker.person.jobTitle(),
-    description: faker.lorem.paragraphs({ min: 1, max: 2 }),
+    i18n: [
+      {
+        locale: "en",
+        messages: {
+          title: faker.person.jobTitle(),
+          description: faker.lorem.paragraphs({ min: 1, max: 2 }),
+        },
+      },
+      {
+        locale: "pt",
+        messages: {
+          title: faker.person.jobTitle(),
+          description: faker.lorem.paragraphs({ min: 1, max: 2 }),
+        },
+      },
+    ],
     urls: faker.helpers.arrayElements(URL_TYPES).map((type) => ({
       title: type,
       value: faker.internet.url(),

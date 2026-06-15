@@ -1,16 +1,34 @@
 import { InputType } from "@nestjs/graphql";
+import { Type } from "class-transformer";
 import {
+  IsArray,
   IsDateString,
   IsEmail,
   IsNotEmpty,
   IsString,
   IsUrl,
   MinLength,
+  ValidateNested,
 } from "class-validator";
 import { OptionalField } from "@/core/decorators/optional-field.decorator";
 import { RequiredField } from "@/core/decorators/required-field.decorator";
 import { UserRole } from "@/core/enums/user-role.enum";
+import {
+  createTranslationInput,
+  TranslationInput,
+} from "@/core/inputs/translation.input";
 import { UrlInput } from "@/core/inputs/url.input";
+
+@InputType()
+export class CreateUserMessagesInput {
+  @OptionalField(() => String)
+  title?: string;
+
+  @OptionalField(() => String)
+  description?: string;
+}
+
+const UserTranslationInput = createTranslationInput(CreateUserMessagesInput);
 
 @InputType()
 export class CreateUserInput {
@@ -27,9 +45,6 @@ export class CreateUserInput {
   @IsString()
   @IsNotEmpty()
   nickname: string;
-
-  @OptionalField(() => String)
-  title?: string;
 
   @OptionalField(() => String)
   phone?: string;
@@ -50,8 +65,11 @@ export class CreateUserInput {
   @OptionalField(() => String)
   address?: string;
 
-  @OptionalField(() => String)
-  description?: string;
+  @OptionalField(() => [UserTranslationInput])
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => UserTranslationInput)
+  i18n?: TranslationInput<CreateUserMessagesInput>[];
 
   @OptionalField(() => UserRole)
   role?: UserRole;

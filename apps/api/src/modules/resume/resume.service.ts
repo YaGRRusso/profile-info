@@ -111,13 +111,18 @@ export class ResumeService {
       ])
     );
 
+    const userTranslation = pickTranslation(user.i18n, locale);
+
     const header: ResumeHeader = {
       name: user.name,
-      title: user.title,
+      title: userTranslation?.messages.title,
       email: user.email,
       phone: user.phone,
-      description: user.description
-        ? truncateText(user.description, RESUME_LIMITS.descriptionMaxLength)
+      description: userTranslation?.messages.description
+        ? truncateText(
+            userTranslation.messages.description,
+            RESUME_LIMITS.descriptionMaxLength
+          )
         : undefined,
       urls: (user.urls ?? []).map(({ title, value }) => ({ title, value })),
     };

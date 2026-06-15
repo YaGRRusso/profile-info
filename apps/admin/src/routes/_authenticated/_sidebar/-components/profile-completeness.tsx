@@ -4,8 +4,14 @@ import type { GetMeQuery } from "@/generated/graphql/graphql";
 type ProfileUser = GetMeQuery["getMe"];
 
 const PROFILE_FIELDS: Array<(user: ProfileUser) => boolean> = [
-  (user) => Boolean(user.title?.trim()),
-  (user) => Boolean(user.description?.trim()),
+  (user) =>
+    Boolean(
+      user.i18n?.some((translation) => translation.messages.title?.trim())
+    ),
+  (user) =>
+    Boolean(
+      user.i18n?.some((translation) => translation.messages.description?.trim())
+    ),
   (user) => Boolean(user.phone?.trim()),
   (user) => Boolean(user.birth),
   (user) => Boolean(user.address?.trim()),

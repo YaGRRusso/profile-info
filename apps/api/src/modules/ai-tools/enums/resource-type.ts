@@ -6,6 +6,7 @@ export enum ResourceType {
   EXPERIENCE = "experience",
   EDUCATION = "education",
   ORGANIZATION = "organization",
+  USER = "user",
 }
 
 registerEnumType(ResourceType, {
