@@ -9,6 +9,7 @@ import { SelectInput } from "@/components/inputs/select";
 import { TextInput } from "@/components/inputs/text";
 import { TextareaInput } from "@/components/inputs/textarea";
 import { LOCALES } from "@/consts/locales";
+import { PLACEHOLDERS } from "@/consts/placeholders";
 import { RawSizeEnum } from "@/consts/raw-size";
 import { SLUG_REGEX } from "@/consts/regex";
 import {
@@ -234,7 +235,7 @@ export function OrganizationForm({
             label="Slug"
             name={field.name}
             onChange={field.handleChange}
-            placeholder="Slug"
+            placeholder={PLACEHOLDERS.slug}
             value={field.state.value}
           />
         )}
@@ -249,7 +250,7 @@ export function OrganizationForm({
               setIsNameEdited(true);
               field.handleChange(value);
             }}
-            placeholder="Name"
+            placeholder={PLACEHOLDERS.organizationName}
             value={field.state.value}
           />
         )}
@@ -264,7 +265,7 @@ export function OrganizationForm({
               field.handleChange(value as OrganizationCategory)
             }
             options={CATEGORY_OPTIONS}
-            placeholder="Category"
+            placeholder={PLACEHOLDERS.chooseCategory}
             value={field.state.value}
           />
         )}
@@ -276,7 +277,7 @@ export function OrganizationForm({
             label="Logo"
             name={field.name}
             onChange={field.handleChange}
-            placeholder="Logo URL"
+            placeholder={PLACEHOLDERS.logoUrl}
             value={field.state.value}
           />
         )}
@@ -288,7 +289,7 @@ export function OrganizationForm({
             label="Website"
             name={field.name}
             onChange={field.handleChange}
-            placeholder="Website URL"
+            placeholder={PLACEHOLDERS.websiteUrl}
             value={field.state.value}
           />
         )}
@@ -303,7 +304,6 @@ export function OrganizationForm({
             min={1}
             name={field.name}
             onChange={field.handleChange}
-            placeholder="Relevance"
             ruler
             step={1}
             value={field.state.value}
@@ -330,7 +330,7 @@ export function OrganizationForm({
                       name={field.name}
                       onChange={field.handleChange}
                       options={LOCALES}
-                      placeholder="Locale"
+                      placeholder={PLACEHOLDERS.chooseLanguage}
                       value={field.state.value}
                     />
                   )}
@@ -357,7 +357,7 @@ export function OrganizationForm({
                           field.state.value
                         )
                       }
-                      placeholder="Description"
+                      placeholder={PLACEHOLDERS.organizationDescription}
                       value={field.state.value}
                     />
                   )}

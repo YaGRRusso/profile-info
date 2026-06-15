@@ -4,6 +4,7 @@ import { FieldArray } from "@/components/inputs/field-array";
 import { PasswordInput } from "@/components/inputs/password";
 import { TextInput } from "@/components/inputs/text";
 import { TextareaInput } from "@/components/inputs/textarea";
+import { PLACEHOLDERS } from "@/consts/placeholders";
 import type { GetMeQuery, UpdateMeInput } from "@/generated/graphql/graphql";
 import { toDateInput, toIsoDate } from "@/lib/date";
 import { fieldError } from "@/lib/field-error";
@@ -121,7 +122,7 @@ export function ProfileForm({
                 label="Name"
                 name={field.name}
                 onChange={field.handleChange}
-                placeholder="Name"
+                placeholder={PLACEHOLDERS.name}
                 value={field.state.value}
               />
             )}
@@ -134,7 +135,7 @@ export function ProfileForm({
                 label="Nickname"
                 name={field.name}
                 onChange={field.handleChange}
-                placeholder="Nickname"
+                placeholder={PLACEHOLDERS.nickname}
                 value={field.state.value}
               />
             )}
@@ -147,7 +148,7 @@ export function ProfileForm({
                 label="Title"
                 name={field.name}
                 onChange={field.handleChange}
-                placeholder="Title"
+                placeholder={PLACEHOLDERS.title}
                 value={field.state.value}
               />
             )}
@@ -161,7 +162,7 @@ export function ProfileForm({
                   label="Description"
                   name={field.name}
                   onChange={field.handleChange}
-                  placeholder="Professional summary for your resume"
+                  placeholder={PLACEHOLDERS.profileDescription}
                   value={field.state.value}
                 />
               </div>
@@ -190,7 +191,7 @@ export function ProfileForm({
                   label="Avatar URL"
                   name={field.name}
                   onChange={field.handleChange}
-                  placeholder="https://example.com/avatar.png"
+                  placeholder={PLACEHOLDERS.avatarUrl}
                   value={field.state.value}
                 />
               </div>
@@ -209,7 +210,7 @@ export function ProfileForm({
                 label="Email"
                 name={field.name}
                 onChange={field.handleChange}
-                placeholder="Email"
+                placeholder={PLACEHOLDERS.email}
                 type="email"
                 value={field.state.value}
               />
@@ -223,7 +224,7 @@ export function ProfileForm({
                 label="Phone"
                 name={field.name}
                 onChange={field.handleChange}
-                placeholder="Phone"
+                placeholder={PLACEHOLDERS.phone}
                 type="tel"
                 value={field.state.value}
               />
@@ -238,7 +239,7 @@ export function ProfileForm({
                   label="Address"
                   name={field.name}
                   onChange={field.handleChange}
-                  placeholder="Address"
+                  placeholder={PLACEHOLDERS.address}
                   value={field.state.value}
                 />
               </div>
@@ -254,7 +255,7 @@ export function ProfileForm({
               label="New password"
               name={field.name}
               onChange={field.handleChange}
-              placeholder="Password"
+              placeholder={PLACEHOLDERS.newPassword}
               value={field.state.value}
             />
           )}
@@ -281,7 +282,7 @@ export function ProfileForm({
                         error={fieldError(field.state.meta)}
                         name={field.name}
                         onChange={field.handleChange}
-                        placeholder="Title"
+                        placeholder={PLACEHOLDERS.linkTitle}
                         value={field.state.value}
                       />
                     )}
@@ -292,7 +293,7 @@ export function ProfileForm({
                         error={fieldError(field.state.meta)}
                         name={field.name}
                         onChange={field.handleChange}
-                        placeholder="URL"
+                        placeholder={PLACEHOLDERS.linkUrl}
                         value={field.state.value}
                       />
                     )}

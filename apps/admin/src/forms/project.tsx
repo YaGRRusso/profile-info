@@ -9,6 +9,7 @@ import { SelectInput } from "@/components/inputs/select";
 import { TextInput } from "@/components/inputs/text";
 import { TextareaInput } from "@/components/inputs/textarea";
 import { LOCALES } from "@/consts/locales";
+import { PLACEHOLDERS } from "@/consts/placeholders";
 import { RawSizeEnum } from "@/consts/raw-size";
 import { SLUG_REGEX } from "@/consts/regex";
 import {
@@ -242,7 +243,7 @@ export function ProjectForm({
             label="Slug"
             name={field.name}
             onChange={field.handleChange}
-            placeholder="Slug"
+            placeholder={PLACEHOLDERS.slug}
             value={field.state.value}
           />
         )}
@@ -257,7 +258,6 @@ export function ProjectForm({
             min={1}
             name={field.name}
             onChange={field.handleChange}
-            placeholder="Relevance"
             ruler
             step={1}
             value={field.state.value}
@@ -271,7 +271,7 @@ export function ProjectForm({
             label="Skills"
             onChange={field.handleChange}
             options={skillOptions}
-            placeholder="Select skills"
+            placeholder={PLACEHOLDERS.searchSkills}
             value={field.state.value}
           />
         )}
@@ -295,7 +295,7 @@ export function ProjectForm({
                     error={fieldError(field.state.meta)}
                     name={field.name}
                     onChange={field.handleChange}
-                    placeholder="Image URL"
+                    placeholder={PLACEHOLDERS.imageUrl}
                     value={field.state.value}
                   />
                 )}
@@ -324,7 +324,7 @@ export function ProjectForm({
                       error={fieldError(field.state.meta)}
                       name={field.name}
                       onChange={field.handleChange}
-                      placeholder="Title"
+                      placeholder={PLACEHOLDERS.linkTitle}
                       value={field.state.value}
                     />
                   )}
@@ -335,7 +335,7 @@ export function ProjectForm({
                       error={fieldError(field.state.meta)}
                       name={field.name}
                       onChange={field.handleChange}
-                      placeholder="URL"
+                      placeholder={PLACEHOLDERS.linkUrl}
                       value={field.state.value}
                     />
                   )}
@@ -369,7 +369,7 @@ export function ProjectForm({
                       name={field.name}
                       onChange={field.handleChange}
                       options={LOCALES}
-                      placeholder="Locale"
+                      placeholder={PLACEHOLDERS.chooseLanguage}
                       value={field.state.value}
                     />
                   )}
@@ -381,7 +381,7 @@ export function ProjectForm({
                       label="Title"
                       name={field.name}
                       onChange={field.handleChange}
-                      placeholder="Title"
+                      placeholder={PLACEHOLDERS.projectTitle}
                       value={field.state.value}
                     />
                   )}
@@ -408,7 +408,7 @@ export function ProjectForm({
                           field.state.value
                         )
                       }
-                      placeholder="Description"
+                      placeholder={PLACEHOLDERS.projectDescription}
                       value={field.state.value}
                     />
                   )}

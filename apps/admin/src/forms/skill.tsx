@@ -5,6 +5,7 @@ import z from "zod";
 import { RangeInput } from "@/components/inputs/range";
 import { SelectInput } from "@/components/inputs/select";
 import { TextInput } from "@/components/inputs/text";
+import { PLACEHOLDERS } from "@/consts/placeholders";
 import { SLUG_REGEX } from "@/consts/regex";
 import { SkillCategory } from "@/generated/graphql/graphql";
 import { fieldError } from "@/lib/field-error";
@@ -89,7 +90,7 @@ export function SkillForm({
             label="Slug"
             name={field.name}
             onChange={field.handleChange}
-            placeholder="Slug"
+            placeholder={PLACEHOLDERS.slug}
             value={field.state.value}
           />
         )}
@@ -104,7 +105,7 @@ export function SkillForm({
               setIsNameEdited(true);
               field.handleChange(value);
             }}
-            placeholder="Name"
+            placeholder={PLACEHOLDERS.skillName}
             value={field.state.value}
           />
         )}
@@ -118,7 +119,7 @@ export function SkillForm({
             name={field.name}
             onChange={(value) => field.handleChange(value as SkillCategory)}
             options={CATEGORY_OPTIONS}
-            placeholder="Category"
+            placeholder={PLACEHOLDERS.chooseCategory}
             value={field.state.value}
           />
         )}
@@ -133,7 +134,6 @@ export function SkillForm({
             min={1}
             name={field.name}
             onChange={field.handleChange}
-            placeholder="Relevance"
             ruler
             step={1}
             value={field.state.value}

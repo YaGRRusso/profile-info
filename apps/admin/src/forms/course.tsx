@@ -10,6 +10,7 @@ import { SelectInput } from "@/components/inputs/select";
 import { TextInput } from "@/components/inputs/text";
 import { TextareaInput } from "@/components/inputs/textarea";
 import { LOCALES } from "@/consts/locales";
+import { PLACEHOLDERS } from "@/consts/placeholders";
 import { RawSizeEnum } from "@/consts/raw-size";
 import { SLUG_REGEX } from "@/consts/regex";
 import {
@@ -288,7 +289,7 @@ export function CourseForm({
             label="Slug"
             name={field.name}
             onChange={field.handleChange}
-            placeholder="Slug"
+            placeholder={PLACEHOLDERS.slug}
             value={field.state.value}
           />
         )}
@@ -302,7 +303,7 @@ export function CourseForm({
             name={field.name}
             onChange={field.handleChange}
             options={organizationOptions}
-            placeholder="Organization"
+            placeholder={PLACEHOLDERS.chooseOrganization}
             value={field.state.value}
           />
         )}
@@ -315,7 +316,7 @@ export function CourseForm({
             name={field.name}
             onChange={(value) => field.handleChange(value as CourseStatus)}
             options={STATUS_OPTIONS}
-            placeholder="Status"
+            placeholder={PLACEHOLDERS.chooseStatus}
             value={field.state.value}
           />
         )}
@@ -327,7 +328,7 @@ export function CourseForm({
             label="URL"
             name={field.name}
             onChange={field.handleChange}
-            placeholder="URL"
+            placeholder={PLACEHOLDERS.certificateUrl}
             value={field.state.value}
           />
         )}
@@ -339,7 +340,7 @@ export function CourseForm({
             label="Image"
             name={field.name}
             onChange={field.handleChange}
-            placeholder="Image"
+            placeholder={PLACEHOLDERS.imageUrl}
             value={field.state.value}
           />
         )}
@@ -352,7 +353,7 @@ export function CourseForm({
             min={0}
             name={field.name}
             onChange={field.handleChange}
-            placeholder="Hours"
+            placeholder={PLACEHOLDERS.hours}
             value={field.state.value}
           />
         )}
@@ -367,7 +368,6 @@ export function CourseForm({
             min={1}
             name={field.name}
             onChange={field.handleChange}
-            placeholder="Relevance"
             ruler
             step={1}
             value={field.state.value}
@@ -381,7 +381,7 @@ export function CourseForm({
             label="Skills"
             onChange={field.handleChange}
             options={skillOptions}
-            placeholder="Select skills"
+            placeholder={PLACEHOLDERS.searchSkills}
             value={field.state.value}
           />
         )}
@@ -410,7 +410,7 @@ export function CourseForm({
                       name={field.name}
                       onChange={field.handleChange}
                       options={LOCALES}
-                      placeholder="Locale"
+                      placeholder={PLACEHOLDERS.chooseLanguage}
                       value={field.state.value}
                     />
                   )}
@@ -422,7 +422,7 @@ export function CourseForm({
                       label="Title"
                       name={field.name}
                       onChange={field.handleChange}
-                      placeholder="Title"
+                      placeholder={PLACEHOLDERS.courseTitle}
                       value={field.state.value}
                     />
                   )}
@@ -449,7 +449,7 @@ export function CourseForm({
                           field.state.value
                         )
                       }
-                      placeholder="Description"
+                      placeholder={PLACEHOLDERS.courseDescription}
                       value={field.state.value}
                     />
                   )}

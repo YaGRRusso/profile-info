@@ -2,6 +2,7 @@ import { useForm } from "@tanstack/react-form";
 import z from "zod";
 import { PasswordInput } from "@/components/inputs/password";
 import { TextInput } from "@/components/inputs/text";
+import { PLACEHOLDERS } from "@/consts/placeholders";
 import { fieldError } from "@/lib/field-error";
 import { CommonFormProps } from "./common";
 
@@ -51,7 +52,7 @@ export function UserForm({
             label="Email"
             name={field.name}
             onChange={field.handleChange}
-            placeholder="Email"
+            placeholder={PLACEHOLDERS.email}
             type="email"
             value={field.state.value}
           />
@@ -64,7 +65,7 @@ export function UserForm({
             label="Password"
             name={field.name}
             onChange={field.handleChange}
-            placeholder="Password"
+            placeholder={PLACEHOLDERS.password}
             value={field.state.value}
           />
         )}

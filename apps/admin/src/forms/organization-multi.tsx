@@ -4,6 +4,7 @@ import z from "zod";
 import { CheckboxInput } from "@/components/inputs/checkbox";
 import { RangeInput } from "@/components/inputs/range";
 import { SelectInput } from "@/components/inputs/select";
+import { PLACEHOLDERS } from "@/consts/placeholders";
 import {
   OrganizationCategory,
   type UpdateOrganizationInput,
@@ -79,7 +80,7 @@ export function OrganizationMultiForm({
               field.handleChange(value as OrganizationCategory)
             }
             options={CATEGORY_OPTIONS}
-            placeholder="Category"
+            placeholder={PLACEHOLDERS.chooseCategory}
             value={field.state.value}
           />
         )}
@@ -104,7 +105,6 @@ export function OrganizationMultiForm({
             min={1}
             name={field.name}
             onChange={field.handleChange}
-            placeholder="Relevance"
             ruler
             step={1}
             value={field.state.value}

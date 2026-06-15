@@ -4,6 +4,7 @@ import z from "zod";
 import { CheckboxInput } from "@/components/inputs/checkbox";
 import { RangeInput } from "@/components/inputs/range";
 import { SelectInput } from "@/components/inputs/select";
+import { PLACEHOLDERS } from "@/consts/placeholders";
 import {
   EducationLevel,
   EducationStatus,
@@ -85,7 +86,7 @@ export function EducationMultiForm({
             name={field.name}
             onChange={(value) => field.handleChange(value as EducationLevel)}
             options={LEVEL_OPTIONS}
-            placeholder="Level"
+            placeholder={PLACEHOLDERS.chooseLevel}
             value={field.state.value}
           />
         )}
@@ -108,7 +109,7 @@ export function EducationMultiForm({
             name={field.name}
             onChange={(value) => field.handleChange(value as EducationStatus)}
             options={STATUS_OPTIONS}
-            placeholder="Status"
+            placeholder={PLACEHOLDERS.chooseStatus}
             value={field.state.value}
           />
         )}
@@ -133,7 +134,6 @@ export function EducationMultiForm({
             min={1}
             name={field.name}
             onChange={field.handleChange}
-            placeholder="Relevance"
             ruler
             step={1}
             value={field.state.value}
