@@ -58,7 +58,7 @@ export function TextareaInput({
           {props.maxLength ? props.maxLength : <InfinityIcon weight="bold" />}
         </span>
       </label>
-      <div className="scrollbar-thin flex items-center justify-between gap-x-4 overflow-auto">
+      <div className="scrollbar-thin flex items-center justify-between gap-x-4 overflow-x-auto">
         {error && <p className="label text-error">{error}</p>}
         <div className="ml-auto flex items-center gap-1">
           {onTranslate && (

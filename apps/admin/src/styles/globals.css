@@ -29,6 +29,24 @@
   }
 }
 
+@layer base {
+  html {
+    @apply scrollbar-thin;
+  }
+}
+
+@layer base {
+  @media (max-width: 640px), (pointer: coarse) {
+    :root:has(
+        :is(.modal-open, .modal[open], .modal:target),
+        .drawer-toggle:checked
+      ) {
+      --page-scroll-gutter: unset;
+      scrollbar-gutter: unset !important;
+    }
+  }
+}
+
 @utility opacity-sm {
   opacity: 0.4;
 }
