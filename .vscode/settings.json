@@ -4,33 +4,6 @@
   "files.associations": {
     "*.css": "tailwindcss"
   },
-  "[javascript]": {
-    "editor.defaultFormatter": "biomejs.biome"
-  },
-  "[typescript]": {
-    "editor.defaultFormatter": "biomejs.biome"
-  },
-  "[javascriptreact]": {
-    "editor.defaultFormatter": "biomejs.biome"
-  },
-  "[typescriptreact]": {
-    "editor.defaultFormatter": "biomejs.biome"
-  },
-  "[json]": {
-    "editor.defaultFormatter": "biomejs.biome"
-  },
-  "[jsonc]": {
-    "editor.defaultFormatter": "biomejs.biome"
-  },
-  "[css]": {
-    "editor.defaultFormatter": "biomejs.biome"
-  },
-  "[tailwindcss]": {
-    "editor.defaultFormatter": "biomejs.biome"
-  },
-  "[graphql]": {
-    "editor.defaultFormatter": "biomejs.biome"
-  },
   "files.readonlyInclude": {
     "**/routeTree.gen.ts": true,
     "**/generated/**": true
