@@ -90,7 +90,7 @@ export class EducationsResolver {
 
   // MUTATIONS
 
-  @Roles(UserRole.ADMIN)
+  @Roles(UserRole.SUPER_ADMIN)
   @Mutation(() => EducationEntity)
   createOneEducation(
     @Args("createEducationInput", { type: () => CreateEducationInput })
@@ -99,7 +99,7 @@ export class EducationsResolver {
     return this.educationsService.createOne(createEducationInput);
   }
 
-  @Roles(UserRole.ADMIN)
+  @Roles(UserRole.SUPER_ADMIN)
   @Mutation(() => [EducationEntity])
   createManyEducations(
     @Args("createEducationInputs", { type: () => [CreateEducationInput] })
@@ -108,7 +108,7 @@ export class EducationsResolver {
     return this.educationsService.createMany(createEducationInputs);
   }
 
-  @Roles(UserRole.ADMIN)
+  @Roles(UserRole.SUPER_ADMIN)
   @Mutation(() => EducationEntity)
   updateOneEducation(
     @Args("educationId", { type: () => ID }) educationId: string,
@@ -118,7 +118,7 @@ export class EducationsResolver {
     return this.educationsService.updateOne(educationId, updateEducationInput);
   }
 
-  @Roles(UserRole.ADMIN)
+  @Roles(UserRole.SUPER_ADMIN)
   @Mutation(() => BatchEntity)
   updateManyEducations(
     @Args("educationIds", { type: () => [ID] }) educationIds: string[],
@@ -131,7 +131,7 @@ export class EducationsResolver {
     );
   }
 
-  @Roles(UserRole.ADMIN)
+  @Roles(UserRole.SUPER_ADMIN)
   @Mutation(() => EducationEntity)
   removeOneEducation(
     @Args("educationId", { type: () => ID }) educationId: string
@@ -139,7 +139,7 @@ export class EducationsResolver {
     return this.educationsService.removeOne(educationId);
   }
 
-  @Roles(UserRole.ADMIN)
+  @Roles(UserRole.SUPER_ADMIN)
   @Mutation(() => BatchEntity)
   removeManyEducations(
     @Args("educationIds", { type: () => [ID] }) educationIds: string[]

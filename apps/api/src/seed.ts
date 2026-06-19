@@ -300,7 +300,7 @@ async function seed() {
       title: type,
       value: faker.internet.url(),
     })),
-    role: UserRole.ADMIN,
+    role: UserRole.SUPER_ADMIN,
   });
 
   const counts = {

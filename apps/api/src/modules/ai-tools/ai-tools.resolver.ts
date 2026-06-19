@@ -16,7 +16,7 @@ import { GqlThrottlerGuard } from "./gql-throttler.guard";
 export class AiToolsResolver {
   constructor(private readonly aiToolsService: AiToolsService) {}
 
-  @Roles(UserRole.ADMIN)
+  @Roles(UserRole.SUPER_ADMIN)
   @Mutation(() => AiEntity)
   atsSummarize(
     @Args("atsSummarizeInput", { type: () => AtsSummarizeInput })
@@ -25,7 +25,7 @@ export class AiToolsResolver {
     return this.aiToolsService.atsSummarize(atsSummarizeInput);
   }
 
-  @Roles(UserRole.ADMIN)
+  @Roles(UserRole.SUPER_ADMIN)
   @Mutation(() => AiEntity)
   summarize(
     @Args("summarizeInput", { type: () => SummarizeInput })
@@ -34,7 +34,7 @@ export class AiToolsResolver {
     return this.aiToolsService.summarize(summarizeInput);
   }
 
-  @Roles(UserRole.ADMIN)
+  @Roles(UserRole.SUPER_ADMIN)
   @Mutation(() => AiEntity)
   translate(
     @Args("translateInput", { type: () => TranslateInput })

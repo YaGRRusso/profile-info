@@ -45,7 +45,7 @@ describe("Dashboard (e2e)", () => {
       nickname: "admin",
       email: "admin@profile.info",
       password: "pass.123",
-      role: UserRole.ADMIN,
+      role: UserRole.SUPER_ADMIN,
     });
 
     const adminSignIn = await graphqlRequest<{ signIn: string }>(app, {

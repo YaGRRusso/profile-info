@@ -1268,7 +1268,7 @@ export type UserMessages = {
 };
 
 export enum UserRole {
-  Admin = 'ADMIN',
+  SuperAdmin = 'SUPER_ADMIN',
   User = 'USER'
 }
 

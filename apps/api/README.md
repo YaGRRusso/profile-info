@@ -60,14 +60,14 @@ The threat model is intentional, not accidental:
 | `GET /resume.pdf` | None (REST; guard skips non-GraphQL) | Anyone |
 | `signIn` | None (`@Public()`) | Anyone |
 | `getMe` | JWT | Any authenticated user |
-| `dashboard` | JWT + `ADMIN` role | Admin only |
-| All mutations (CRUD + AI) | JWT + `ADMIN` role | Admin only |
+| `dashboard` | JWT + `SUPER_ADMIN` role | Super admin only |
+| All mutations (CRUD + AI) | JWT + `SUPER_ADMIN` role | Super admin only |
 
 **Decisions:**
 
 - Profile data is public by design — skills, experiences, projects, etc. are meant to be read without a token.
 - User queries are also public (email is exposed). Acceptable for a single-owner portfolio; do not store secrets in user fields.
-- Mutations require a valid JWT **and** `UserRole.ADMIN`. A `USER` token receives `403 Forbidden`.
+- Mutations require a valid JWT **and** `UserRole.SUPER_ADMIN`. A `USER` token receives `403 Forbidden`.
 - Missing or invalid JWT on protected operations returns GraphQL error extension `code: UNAUTHENTICATED` (the admin client clears auth on this).
 - `signIn` always returns `401 Unauthorized` for invalid credentials — no email enumeration via `404`.
 - Passwords are bcrypt-hashed on create **and** update; the hash is never exposed via GraphQL (`select: false`).

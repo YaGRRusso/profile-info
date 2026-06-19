@@ -816,7 +816,7 @@ type UserMessages {
 }
 
 enum UserRole {
-  ADMIN
+  SUPER_ADMIN
   USER
 }
 

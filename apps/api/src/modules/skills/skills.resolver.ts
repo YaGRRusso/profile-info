@@ -72,7 +72,7 @@ export class SkillsResolver {
 
   // MUTATIONS
 
-  @Roles(UserRole.ADMIN)
+  @Roles(UserRole.SUPER_ADMIN)
   @Mutation(() => SkillEntity)
   createOneSkill(
     @Args("createSkillInput", { type: () => CreateSkillInput })
@@ -81,7 +81,7 @@ export class SkillsResolver {
     return this.skillsService.createOne(createSkillInput);
   }
 
-  @Roles(UserRole.ADMIN)
+  @Roles(UserRole.SUPER_ADMIN)
   @Mutation(() => [SkillEntity])
   createManySkills(
     @Args("createSkillInputs", { type: () => [CreateSkillInput] })
@@ -90,7 +90,7 @@ export class SkillsResolver {
     return this.skillsService.createMany(createSkillInputs);
   }
 
-  @Roles(UserRole.ADMIN)
+  @Roles(UserRole.SUPER_ADMIN)
   @Mutation(() => SkillEntity)
   updateOneSkill(
     @Args("skillId", { type: () => ID }) skillId: string,
@@ -100,7 +100,7 @@ export class SkillsResolver {
     return this.skillsService.updateOne(skillId, updateSkillInput);
   }
 
-  @Roles(UserRole.ADMIN)
+  @Roles(UserRole.SUPER_ADMIN)
   @Mutation(() => BatchEntity)
   updateManySkills(
     @Args("skillIds", { type: () => [ID] }) skillIds: string[],
@@ -110,13 +110,13 @@ export class SkillsResolver {
     return this.skillsService.updateMany(skillIds, updateSkillInput);
   }
 
-  @Roles(UserRole.ADMIN)
+  @Roles(UserRole.SUPER_ADMIN)
   @Mutation(() => SkillEntity)
   removeOneSkill(@Args("skillId", { type: () => ID }) skillId: string) {
     return this.skillsService.removeOne(skillId);
   }
 
-  @Roles(UserRole.ADMIN)
+  @Roles(UserRole.SUPER_ADMIN)
   @Mutation(() => BatchEntity)
   removeManySkills(@Args("skillIds", { type: () => [ID] }) skillIds: string[]) {
     return this.skillsService.removeMany(skillIds);

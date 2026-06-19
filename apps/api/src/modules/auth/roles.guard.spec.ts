@@ -52,20 +52,20 @@ describe("RolesGuard", () => {
     );
   });
 
-  it("should allow admin users when ADMIN role is required", () => {
+  it("should allow super admin users when SUPER_ADMIN role is required", () => {
     (reflector.getAllAndOverride as jest.Mock).mockImplementation((key) => {
-      if (key === ROLES_KEY) return [UserRole.ADMIN];
+      if (key === ROLES_KEY) return [UserRole.SUPER_ADMIN];
       return;
     });
 
-    expect(guard.canActivate(createContext({ role: UserRole.ADMIN }))).toBe(
-      true
-    );
+    expect(
+      guard.canActivate(createContext({ role: UserRole.SUPER_ADMIN }))
+    ).toBe(true);
   });
 
-  it("should forbid non-admin users when ADMIN role is required", () => {
+  it("should forbid non-super-admin users when SUPER_ADMIN role is required", () => {
     (reflector.getAllAndOverride as jest.Mock).mockImplementation((key) => {
-      if (key === ROLES_KEY) return [UserRole.ADMIN];
+      if (key === ROLES_KEY) return [UserRole.SUPER_ADMIN];
       return;
     });
 

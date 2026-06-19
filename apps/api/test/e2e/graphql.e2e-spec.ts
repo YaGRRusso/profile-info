@@ -40,7 +40,7 @@ describe("GraphQL (e2e)", () => {
       nickname: "admin",
       email: "admin@profile.info",
       password: "pass.123",
-      role: UserRole.ADMIN,
+      role: UserRole.SUPER_ADMIN,
     });
 
     await usersService.createOne({

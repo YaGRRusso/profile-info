@@ -85,7 +85,7 @@ export class CoursesResolver {
 
   // MUTATIONS
 
-  @Roles(UserRole.ADMIN)
+  @Roles(UserRole.SUPER_ADMIN)
   @Mutation(() => CourseEntity)
   createOneCourse(
     @Args("createCourseInput", { type: () => CreateCourseInput })
@@ -94,7 +94,7 @@ export class CoursesResolver {
     return this.coursesService.createOne(createCourseInput);
   }
 
-  @Roles(UserRole.ADMIN)
+  @Roles(UserRole.SUPER_ADMIN)
   @Mutation(() => [CourseEntity])
   createManyCourses(
     @Args("createCourseInputs", { type: () => [CreateCourseInput] })
@@ -103,7 +103,7 @@ export class CoursesResolver {
     return this.coursesService.createMany(createCourseInputs);
   }
 
-  @Roles(UserRole.ADMIN)
+  @Roles(UserRole.SUPER_ADMIN)
   @Mutation(() => CourseEntity)
   updateOneCourse(
     @Args("courseId", { type: () => ID }) courseId: string,
@@ -113,7 +113,7 @@ export class CoursesResolver {
     return this.coursesService.updateOne(courseId, updateCourseInput);
   }
 
-  @Roles(UserRole.ADMIN)
+  @Roles(UserRole.SUPER_ADMIN)
   @Mutation(() => BatchEntity)
   updateManyCourses(
     @Args("courseIds", { type: () => [ID] }) courseIds: string[],
@@ -123,13 +123,13 @@ export class CoursesResolver {
     return this.coursesService.updateMany(courseIds, updateCourseInput);
   }
 
-  @Roles(UserRole.ADMIN)
+  @Roles(UserRole.SUPER_ADMIN)
   @Mutation(() => CourseEntity)
   removeOneCourse(@Args("courseId", { type: () => ID }) courseId: string) {
     return this.coursesService.removeOne(courseId);
   }
 
-  @Roles(UserRole.ADMIN)
+  @Roles(UserRole.SUPER_ADMIN)
   @Mutation(() => BatchEntity)
   removeManyCourses(
     @Args("courseIds", { type: () => [ID] }) courseIds: string[]

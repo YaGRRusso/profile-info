@@ -95,7 +95,7 @@ export class ExperiencesResolver {
 
   // MUTATIONS
 
-  @Roles(UserRole.ADMIN)
+  @Roles(UserRole.SUPER_ADMIN)
   @Mutation(() => ExperienceEntity)
   createOneExperience(
     @Args("createExperienceInput", { type: () => CreateExperienceInput })
@@ -104,7 +104,7 @@ export class ExperiencesResolver {
     return this.experiencesService.createOne(createExperienceInput);
   }
 
-  @Roles(UserRole.ADMIN)
+  @Roles(UserRole.SUPER_ADMIN)
   @Mutation(() => [ExperienceEntity])
   createManyExperiences(
     @Args("createExperienceInputs", { type: () => [CreateExperienceInput] })
@@ -113,7 +113,7 @@ export class ExperiencesResolver {
     return this.experiencesService.createMany(createExperienceInputs);
   }
 
-  @Roles(UserRole.ADMIN)
+  @Roles(UserRole.SUPER_ADMIN)
   @Mutation(() => ExperienceEntity)
   updateOneExperience(
     @Args("experienceId", { type: () => ID }) experienceId: string,
@@ -126,7 +126,7 @@ export class ExperiencesResolver {
     );
   }
 
-  @Roles(UserRole.ADMIN)
+  @Roles(UserRole.SUPER_ADMIN)
   @Mutation(() => BatchEntity)
   updateManyExperiences(
     @Args("experienceIds", { type: () => [ID] }) experienceIds: string[],
@@ -139,7 +139,7 @@ export class ExperiencesResolver {
     );
   }
 
-  @Roles(UserRole.ADMIN)
+  @Roles(UserRole.SUPER_ADMIN)
   @Mutation(() => ExperienceEntity)
   removeOneExperience(
     @Args("experienceId", { type: () => ID }) experienceId: string
@@ -147,7 +147,7 @@ export class ExperiencesResolver {
     return this.experiencesService.removeOne(experienceId);
   }
 
-  @Roles(UserRole.ADMIN)
+  @Roles(UserRole.SUPER_ADMIN)
   @Mutation(() => BatchEntity)
   removeManyExperiences(
     @Args("experienceIds", { type: () => [ID] }) experienceIds: string[]

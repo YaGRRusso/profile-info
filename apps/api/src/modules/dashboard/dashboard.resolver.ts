@@ -8,7 +8,7 @@ import { DashboardEntity } from "./entities/dashboard.entity";
 export class DashboardResolver {
   constructor(readonly dashboardService: DashboardService) {}
 
-  @Roles(UserRole.ADMIN)
+  @Roles(UserRole.SUPER_ADMIN)
   @Query(() => DashboardEntity)
   dashboard() {
     return this.dashboardService.getDashboard();

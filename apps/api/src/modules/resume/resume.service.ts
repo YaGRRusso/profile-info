@@ -46,7 +46,7 @@ export class ResumeService {
     locale: LocaleCode = DEFAULT_LOCALE
   ): Promise<ResumeDocumentData> {
     const { nodes: users } = await this.usersService.findMany({
-      filters: { role: UserRole.ADMIN },
+      filters: { role: UserRole.SUPER_ADMIN },
       limit: 1,
     });
 

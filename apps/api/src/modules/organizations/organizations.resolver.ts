@@ -77,7 +77,7 @@ export class OrganizationsResolver {
 
   // MUTATIONS
 
-  @Roles(UserRole.ADMIN)
+  @Roles(UserRole.SUPER_ADMIN)
   @Mutation(() => OrganizationEntity)
   createOneOrganization(
     @Args("createOrganizationInput", { type: () => CreateOrganizationInput })
@@ -86,7 +86,7 @@ export class OrganizationsResolver {
     return this.organizationsService.createOne(createOrganizationInput);
   }
 
-  @Roles(UserRole.ADMIN)
+  @Roles(UserRole.SUPER_ADMIN)
   @Mutation(() => [OrganizationEntity])
   createManyOrganizations(
     @Args("createOrganizationInputs", { type: () => [CreateOrganizationInput] })
@@ -95,7 +95,7 @@ export class OrganizationsResolver {
     return this.organizationsService.createMany(createOrganizationInputs);
   }
 
-  @Roles(UserRole.ADMIN)
+  @Roles(UserRole.SUPER_ADMIN)
   @Mutation(() => OrganizationEntity)
   updateOneOrganization(
     @Args("organizationId", { type: () => ID }) organizationId: string,
@@ -108,7 +108,7 @@ export class OrganizationsResolver {
     );
   }
 
-  @Roles(UserRole.ADMIN)
+  @Roles(UserRole.SUPER_ADMIN)
   @Mutation(() => BatchEntity)
   updateManyOrganizations(
     @Args("organizationIds", { type: () => [ID] }) organizationIds: string[],
@@ -121,7 +121,7 @@ export class OrganizationsResolver {
     );
   }
 
-  @Roles(UserRole.ADMIN)
+  @Roles(UserRole.SUPER_ADMIN)
   @Mutation(() => OrganizationEntity)
   removeOneOrganization(
     @Args("organizationId", { type: () => ID }) organizationId: string
@@ -129,7 +129,7 @@ export class OrganizationsResolver {
     return this.organizationsService.removeOne(organizationId);
   }
 
-  @Roles(UserRole.ADMIN)
+  @Roles(UserRole.SUPER_ADMIN)
   @Mutation(() => BatchEntity)
   removeManyOrganizations(
     @Args("organizationIds", { type: () => [ID] }) organizationIds: string[]
