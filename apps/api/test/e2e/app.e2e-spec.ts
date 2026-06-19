@@ -2,16 +2,11 @@ import { INestApplication } from "@nestjs/common";
 import request from "supertest";
 import { App } from "supertest/types";
 import { createTestApp } from "../support/create-test-app";
-import { startTestMongo } from "../support/mongo-memory";
-import { applyTestEnv } from "../support/test-env";
 
 describe("AppController (e2e)", () => {
   let app: INestApplication<App> | undefined;
 
   beforeAll(async () => {
-    const mongo = await startTestMongo();
-    applyTestEnv(mongo.uri);
-
     const testApp = await createTestApp();
     app = testApp.app;
   });

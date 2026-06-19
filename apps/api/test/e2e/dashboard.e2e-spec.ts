@@ -14,8 +14,6 @@ import { UsersService } from "@/modules/users/users.service";
 import { clearTestDatabase } from "../support/clear-test-database";
 import { createTestApp } from "../support/create-test-app";
 import { graphqlRequest } from "../support/graphql-request";
-import { startTestMongo } from "../support/mongo-memory";
-import { applyTestEnv } from "../support/test-env";
 
 describe("Dashboard (e2e)", () => {
   let app: INestApplication<App>;
@@ -27,9 +25,6 @@ describe("Dashboard (e2e)", () => {
   let organizationsService: OrganizationsService;
 
   beforeAll(async () => {
-    const mongo = await startTestMongo();
-    applyTestEnv(mongo.uri);
-
     const testApp = await createTestApp();
     app = testApp.app;
     await clearTestDatabase(testApp.module);

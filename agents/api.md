@@ -161,7 +161,7 @@ Run from `apps/api/` or via root `api:*` aliases: `dev`, `prod`, `build`, `start
 `npm run seed`: wipes profile collections and inserts faker dev data plus admin `admin@profile.info` / `admin123`.
 
 - `GET /health`: Terminus health check with MongoDB ping.
-- Test layout: `test/config/` (Jest e2e config, setup/teardown), `test/support/` (shared helpers + `TestAppModule`), `test/e2e/`, `test/integration/`. Default DB `profile-test-e2e` on localhost Mongo; override with `TEST_DATABASE_URL` or `USE_MEMORY_MONGO=true`.
+- Test layout: `test/config/` (Jest e2e config, setup/teardown), `test/support/` (shared helpers + `TestAppModule`), `test/e2e/`, `test/integration/`. Default DB `profile-test-e2e` on localhost Mongo; override with `TEST_DATABASE_URL` or `USE_MEMORY_MONGO=true` (in-memory Mongo starts in `globalSetup` and stops in `globalTeardown` — do not start it inside test `beforeAll`, or Jest will hang). E2e `globalSetup`/`globalTeardown` wipe `.cache/mongodb-data` and `.cache/test-mongo.json` each run (binaries in `.cache/mongodb-binaries` and Jest cache in `.cache/jest-e2e` are kept).
 - ADRs in `apps/api/docs/adr/`. Multi-tenant: `001-multi-tenant-migration.md` (backend core + API tokens, branch `feat/multi-tenant`; implement in 7 lots, one at a time). Deferred work: `backlog.md`.
 
 ## Gotchas & notes

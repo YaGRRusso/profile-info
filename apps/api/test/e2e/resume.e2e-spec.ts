@@ -7,8 +7,6 @@ import { SkillsService } from "@/modules/skills/skills.service";
 import { UsersService } from "@/modules/users/users.service";
 import { clearTestDatabase } from "../support/clear-test-database";
 import { createTestApp } from "../support/create-test-app";
-import { startTestMongo } from "../support/mongo-memory";
-import { applyTestEnv } from "../support/test-env";
 
 const PDF_CONTENT_TYPE = /application\/pdf/;
 
@@ -16,9 +14,6 @@ describe("ResumeController (e2e)", () => {
   let app: INestApplication<App> | undefined;
 
   beforeAll(async () => {
-    const mongo = await startTestMongo();
-    applyTestEnv(mongo.uri);
-
     const testApp = await createTestApp();
     app = testApp.app;
     await clearTestDatabase(testApp.module);

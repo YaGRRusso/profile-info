@@ -8,8 +8,6 @@ import { SkillCategory } from "@/modules/skills/enums/category.enum";
 import { SkillsService } from "@/modules/skills/skills.service";
 import { clearTestDatabase } from "../support/clear-test-database";
 import { createTestApp } from "../support/create-test-app";
-import { startTestMongo } from "../support/mongo-memory";
-import { applyTestEnv } from "../support/test-env";
 
 describe("Skill delete cascade (integration)", () => {
   let app: INestApplication<App> | undefined;
@@ -18,9 +16,6 @@ describe("Skill delete cascade (integration)", () => {
   let organizationsService: OrganizationsService;
 
   beforeAll(async () => {
-    const mongo = await startTestMongo();
-    applyTestEnv(mongo.uri);
-
     const testApp = await createTestApp();
     app = testApp.app;
     await clearTestDatabase(testApp.module);

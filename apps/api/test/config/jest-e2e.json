@@ -1,7 +1,9 @@
 {
   "rootDir": "../../",
+  "cacheDirectory": "<rootDir>/.cache/jest-e2e",
   "moduleFileExtensions": ["js", "json", "ts"],
   "testEnvironment": "node",
+  "globalSetup": "<rootDir>/test/config/global-setup.ts",
   "setupFiles": ["<rootDir>/test/config/setup-env.ts"],
   "testTimeout": 120000,
   "maxWorkers": 1,
