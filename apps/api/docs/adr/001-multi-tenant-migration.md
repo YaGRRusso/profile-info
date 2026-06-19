@@ -1,10 +1,11 @@
-# ADR 001: Multi-tenant migration
+# ADR 001: Multi-tenant core & portfolio auth
 
 | Field | Value |
 |-------|-------|
 | **Status** | Proposed |
 | **Date** | 2026-06-19 |
 | **Branch** | `feat/multi-tenant` |
+| **Deliverable** | 1 PR — merge to `main` with coordinated portfolio client update |
 
 ## Context
 
@@ -22,20 +23,31 @@ The goal is to evolve into a **multi-tenant** platform where each registered use
 owns a private portfolio (experiences, educations, courses, projects) while
 sharing a global catalog (skills, organizations) moderated by a platform operator.
 
+The portfolio (public site) must authenticate without exposing write credentials.
+Session JWTs are for the admin panel; portfolio integrations use **API tokens with
+`QUERY` permission only** — never the same token that can mutate data.
+
+User-submitted catalog changes (suggestions, moderation, local overrides) are
+**out of scope** for this ADR. See [ADR 002](./002-collaborative-public-catalog.md).
+
 ### Constraints
 
 - **Breaking changes are acceptable** during development on `feat/multi-tenant`.
-  The public portfolio client will be updated only after the full migration lands
-  on `main`. No external users depend on the API yet (single production user).
+  The portfolio client is updated in the **same release** as this ADR's merge to
+  `main`. No external users depend on the API yet (single production user).
 - **No formal data migration scripts** for now — the sole production user will be
   backfilled manually in MongoDB.
-- **Admin UI is out of scope** for early phases; validation happens via GraphQL
-  sandbox and automated tests.
-- **Each implementation phase ships with seeds**: 2 regular users + 1 super admin,
-  each with isolated private data.
+- **Admin UI is out of scope**; validation happens via GraphQL sandbox and
+  automated tests.
+- **One PR per ADR.** Implementation happens incrementally on the feature branch
+  (small steps per session); the PR opens only when this ADR's Definition of Done
+  is met.
+- **Seeds:** 2 regular users + 1 super admin, each with isolated private data and
+  at least one `QUERY` API token (phase 3).
 
-### Non-goals (for this migration)
+### Non-goals (this ADR)
 
+- User-submitted skill/organization requests and moderation ([ADR 002](./002-collaborative-public-catalog.md)).
 - Team / organization accounts (B2B tenants with multiple members).
 - Billing, custom domains, or per-tenant infrastructure.
 - Admin-panel changes (deferred until API is stable).
@@ -47,16 +59,16 @@ sharing a global catalog (skills, organizations) moderated by a platform operato
 ### 1. Tenant model
 
 **A tenant is a `User`.** Each user owns their private entities. There is no
-separate `Tenant` collection in the first iteration.
+separate `Tenant` collection in this iteration.
 
 ```
-Platform layer     →  GlobalSkill, GlobalOrganization, moderation queue
-Tenant layer       →  User + private entities + local catalog overrides
+Platform layer     →  Skill, Organization (global catalog, SUPER_ADMIN mutates)
+Tenant layer       →  User + private entities (ownerId-scoped)
 Public consumer    →  API token (QUERY scope) for portfolio sites
 ```
 
-This keeps the model simple. If teams are needed later, introduce `tenantId` on
-private entities without changing the global catalog design.
+If teams are needed later, introduce `tenantId` on private entities without
+changing the global catalog design.
 
 ### 2. Role model
 
@@ -64,8 +76,8 @@ Replace the implicit single-admin model with explicit platform roles:
 
 | Role | Scope |
 |------|-------|
-| `USER` | Own private entities; read global catalog; manage own API tokens; submit public-entity requests |
-| `SUPER_ADMIN` | Full platform access: all tenants, global catalog mutations, request moderation |
+| `USER` | Own private entities; read global catalog; manage own API tokens |
+| `SUPER_ADMIN` | Full platform access: all tenants, global catalog mutations |
 
 The existing `ADMIN` role is **renamed to `SUPER_ADMIN`**. Seeds and guards are
 updated accordingly. The current production admin user becomes the first
@@ -90,8 +102,7 @@ updated accordingly. The current production admin user becomes the first
 
 - Remain global collections (no `ownerId` on the canonical document).
 - All authenticated `USER`s can **query** the global catalog.
-- Only `SUPER_ADMIN` can **mutate** the canonical catalog directly (phase 2).
-- Phase 4 introduces user-submitted requests and local overrides (see below).
+- Only `SUPER_ADMIN` can **mutate** the canonical catalog directly.
 
 #### User profile
 
@@ -120,7 +131,8 @@ Two credential types coexist:
 - Permissions (enum):
   - `QUERY` — read operations for the token owner's tenant data + global catalog
   - `MUTATE` — write operations for the token owner's private entities
-- Portfolio tokens should be issued with `QUERY` only.
+- Portfolio tokens **must** be issued with `QUERY` only — the public site must
+  never embed a token that can mutate data.
 - Guard resolves credential → `RequestContext` with `{ userId, role, permissions }`.
 
 `signIn` continues to return a session JWT with full user permissions (no
@@ -152,70 +164,22 @@ Authorization rules:
 Implement filtering at the **repository/service layer**, not only in resolvers,
 to prevent accidental data leaks.
 
-### 6. Public catalog collaboration (phase 4)
+### 6. Domain events
 
-Users can propose new global skills/organizations or edits to existing ones.
+Events remain the delete-cascade mechanism. In this ADR there are no local
+catalog overrides ([ADR 002](./002-collaborative-public-catalog.md)); behavior
+stays global but must remain **multi-tenant safe**:
 
-#### Data structures
+| Event | Behavior |
+|-------|----------|
+| `skill.deleted` | `$pull` skill ID from all private entities that reference it (all tenants) |
+| `organization.deleted` | `deleteMany` on all private entities referencing the org (all tenants); super-admin action |
 
-```
-GlobalSkill / GlobalOrganization     ← canonical, slug unique globally
-PublicEntityRequest                ← approval queue (CREATE | UPDATE)
-TenantCatalogOverride              ← per-user local version of a global entity
-```
+Emit events **before** delete (unchanged). Listeners stay thin. A
+`SUPER_ADMIN` deleting a global org or skill affects every tenant that
+references it — that is intentional for the canonical catalog.
 
-#### Request lifecycle
-
-1. User submits a create or update request.
-2. Request enters `PENDING` state.
-3. `SUPER_ADMIN` reviews a list of requests grouped by target entity.
-4. Admin **approves one** request or **rejects all**.
-
-#### Local overrides
-
-- While pending (or if rejected), the user's version is visible **only to that
-  user** via `TenantCatalogOverride`.
-- Private entities reference skill/org IDs the user effectively sees (override
-  ID or global ID — resolved at read time: `override ?? global`).
-
-#### Global merge with exceptions
-
-When admin approves a global rename (e.g. `React` → `ReactJS`):
-
-1. Update the canonical document.
-2. Run a reference migration for all tenants **except** those with an active
-   local override on that entity.
-3. Tenants whose override matched the new canonical value drop their override
-   (dedup).
-4. Tenants with a different local override keep it until they accept the global
-   change or admin forces resolution.
-
-#### Conflict example
-
-| User | Request |
-|------|---------|
-| A | `React` → `React` (keep) |
-| B | `React` → `Angular` |
-| C | `React` → `ReactJS` |
-
-Admin approves C:
-
-- Global `React` becomes `ReactJS`.
-- All references migrate to `ReactJS` except users A and B (local overrides).
-- User C's override is removed (now matches global).
-
-### 7. Domain events
-
-Events remain the delete-cascade mechanism. Scope changes:
-
-| Event | Current behavior | New behavior |
-|-------|------------------|--------------|
-| `skill.deleted` | `$pull` from all owners | `$pull` from all owners **without** a local override on that skill; override tenants handled separately |
-| `organization.deleted` | `deleteMany` on all dependent private entities | `deleteMany` only on private entities referencing the global org **and** without a local org override; super-admin action |
-
-Emit events **before** delete (unchanged). Listeners stay thin.
-
-### 8. Peripheral modules
+### 7. Peripheral modules
 
 | Module | Change |
 |--------|--------|
@@ -224,17 +188,17 @@ Emit events **before** delete (unchanged). Listeners stay thin.
 | `ai-tools` | Scope to authenticated user's private entities (or super-admin). |
 | `users` | Remove public reads; portfolio access via API token. |
 
-### 9. Seeds and testing
+### 8. Seeds and testing
 
-Each phase updates `src/seed.ts`:
+`src/seed.ts` after all phases:
 
 - 1 × `SUPER_ADMIN` (`super@profile.info`)
 - 2 × `USER` (`user-a@profile.info`, `user-b@profile.info`)
 - Distinct private entities per user (overlapping slugs allowed across users).
 - Shared global skills/organizations.
-- At least 1 API token per user in phase 3+.
+- At least 1 `QUERY` API token per user (plaintext shown once in seed output).
 
-**Tenant isolation tests** are a CI gate from phase 1 onward:
+**Tenant isolation tests** are a CI gate from phase 1a onward:
 
 - User A cannot read/update/delete user B's private entities.
 - API token with `QUERY` cannot mutate.
@@ -242,11 +206,29 @@ Each phase updates `src/seed.ts`:
 
 ---
 
+## Definition of Done (merge gate)
+
+This ADR is complete when **all** of the following are true:
+
+1. **Admin multi-tenant:** each `USER` CRUDs only their portfolio; `SUPER_ADMIN`
+   sees all tenants and mutates the global catalog.
+2. **Auth everywhere:** no `@Public()` except `signIn`; unauthenticated → 401.
+3. **API tokens:** CRUD via GraphQL; guard accepts `Bearer <api-token>`;
+   `QUERY` / `MUTATE` enforced.
+4. **Portfolio path:** documented `QUERY`-only token flow; seed includes example
+   token per user.
+5. **Tests:** tenant isolation + token permission tests pass in CI.
+6. **Docs:** `ER_MODEL.md` and `agents/api.md` updated.
+7. **Portfolio client:** updated in the same release to send `Authorization:
+   Bearer <query-token>` on all API calls (no session JWT, no `MUTATE` token in
+   the public bundle).
+
+---
+
 ## Migration phases
 
-Work happens entirely on `feat/multi-tenant` until the full migration is complete
-and the portfolio client is updated. Merge to `main` is a single coordinated
-release.
+Work happens on `feat/multi-tenant`. Merge to `main` is a **single coordinated
+release** with the portfolio client.
 
 ```mermaid
 flowchart TD
@@ -254,42 +236,44 @@ flowchart TD
     P1[Phase 1 — Private tenancy]
     P2[Phase 2 — Public catalog auth]
     P3[Phase 3 — API tokens]
-    P4[Phase 4 — Collaborative catalog]
 
-    P0 --> P1 --> P2 --> P3 --> P4
+    P0 --> P1 --> P2 --> P3
 ```
+
+Phases 0–3 ship in **one PR** for this ADR. Implementation order below is for
+**incremental work on the branch** (one Cursor session per step; ~8–25 files each).
 
 ### Phase 0 — Foundation
 
-| Deliverable | Done when |
-|-------------|-----------|
-| This ADR accepted | Document reviewed |
-| `SUPER_ADMIN` role replaces `ADMIN` | Enum, guards, seeds updated |
-| `RequestContext` type + guard plumbing | Context available in resolvers/services |
-| `ownerId` field on private schemas (nullable) | Schema compiles |
-| Compound index `{ ownerId, slug }` on private collections | Index created |
-| Seeds: 2 users + 1 super admin | `npm run api:seed` succeeds |
+| Step | Deliverable | Done when |
+|------|-------------|-----------|
+| 0a | `SUPER_ADMIN` role replaces `ADMIN` | Enum, guards, seeds, specs updated |
+| 0b | `RequestContext` type + guard plumbing | Context available in resolvers/services |
+| 0b | `ownerId` on private schemas (nullable) | Schema compiles |
+| 0b | Compound index `{ ownerId, slug }` on private collections | Index created |
+| 0b | Seeds: 2 users + 1 super admin | `npm run api:seed` succeeds |
 
 ### Phase 1 — Private tenancy
 
-| Deliverable | Done when |
-|-------------|-----------|
-| `ownerId` required on create; backfilled in prod manually | No orphan private docs |
-| All private queries filter by `ownerId` | Isolation tests pass |
-| `USER` can CRUD own private entities | Sandbox verified per user |
-| `SUPER_ADMIN` bypass on all private data | Admin sees all tenants |
-| Remove `@Public()` from private entity resolvers | Unauthenticated → 401 |
-| `resume`, `dashboard`, `ai-tools` scoped to tenant | No global aggregation |
-| Update `ER_MODEL.md` | Docs in sync |
+| Step | Deliverable | Done when |
+|------|-------------|-----------|
+| 1a | **Experience** — `ownerId` end-to-end | First tenant isolation e2e test passes |
+| 1b | **Education** — same pattern | Isolation holds for education |
+| 1c | **Course** — same pattern | Isolation holds for course |
+| 1d | **Project** — same pattern | Isolation holds for project |
+| 1e | `resume`, `dashboard` scoped to tenant | No global aggregation |
+| 1f | `ai-tools`, `users` reads scoped | No public user reads |
+| — | `ownerId` required on create; prod backfill manual | No orphan private docs |
+| — | Remove `@Public()` from private entity resolvers | Unauthenticated → 401 |
+| — | Update `ER_MODEL.md` | Docs in sync |
 
 ### Phase 2 — Public catalog authorization
 
-| Deliverable | Done when |
-|-------------|-----------|
-| Skills/organizations queries require auth | 401 without token |
-| Skills/organizations mutations require `SUPER_ADMIN` | USER cannot mutate global catalog |
-| Review domain event scope | Deletes don't leak across override model (prep for phase 4) |
-| Seeds include shared global catalog | Both users see same skills |
+| Step | Deliverable | Done when |
+|------|-------------|-----------|
+| 2a | **Skills** — queries require auth; mutations `SUPER_ADMIN` | USER cannot mutate skills |
+| 2b | **Organizations** — same + domain event review | Deletes remain multi-tenant safe |
+| — | Seeds include shared global catalog | Both users see same skills/orgs |
 
 ### Phase 3 — API tokens
 
@@ -299,19 +283,21 @@ flowchart TD
 | Auth guard accepts `Authorization: Bearer <api-token>` | Token resolves to owner context |
 | Permission enforcement (`QUERY` / `MUTATE`) | Tests pass |
 | Remove remaining `@Public()` (except `signIn`) | All routes authenticated |
-| Portfolio-ready read path documented | ADR + seed example token |
+| Seed: `QUERY` token per user | Sandbox + portfolio integration ready |
 
-### Phase 4 — Collaborative catalog
+---
 
-| Deliverable | Done when |
-|-------------|-----------|
-| `PublicEntityRequest` model + GraphQL API | Users submit; admin lists |
-| `TenantCatalogOverride` model | Local version visible only to owner |
-| Admin approve/reject flow | Request lifecycle complete |
-| Global merge with override exceptions | Reference migration works |
-| Dedup on merge | Override removed when matching global |
-| Domain events respect overrides | Delete/rename safe |
-| Full seed scenario for moderation | Sandbox demo ready |
+## Portfolio migration checklist
+
+Part of the merge gate (Definition of Done §7):
+
+1. User creates a token with **`QUERY` permission only** (admin or seed).
+2. Portfolio client sends `Authorization: Bearer <token>` on every GraphQL query.
+3. **No `MUTATE` token** in frontend bundles, env vars committed to the public
+   repo, or browser-accessible storage.
+4. `GET /resume.pdf` (if used) authenticated via `QUERY` token or documented
+   alternative.
+5. Portfolio deployed in the **same release** as API merge to `main`.
 
 ---
 
@@ -341,40 +327,12 @@ ownerId: ObjectId; // ref User, required, indexed
 }
 ```
 
-### PublicEntityRequest (new collection, phase 4)
-
-```typescript
-{
-  type: 'CREATE' | 'UPDATE';
-  entityKind: 'SKILL' | 'ORGANIZATION';
-  targetId?: ObjectId;     // set for UPDATE
-  proposedPayload: object;
-  submittedBy: ObjectId;   // ref User
-  status: 'PENDING' | 'APPROVED' | 'REJECTED';
-  reviewedBy?: ObjectId;
-  reviewedAt?: Date;
-}
-```
-
-### TenantCatalogOverride (new collection, phase 4)
-
-```typescript
-{
-  userId: ObjectId;
-  entityKind: 'SKILL' | 'ORGANIZATION';
-  globalId: ObjectId;    // ref canonical entity
-  overridePayload: object;
-  requestId?: ObjectId;  // link to originating request
-}
-// unique: { userId, entityKind, globalId }
-```
-
 ---
 
 ## Permission matrix
 
 | Action | USER (session) | SUPER_ADMIN | API token QUERY | API token MUTATE |
-|--------|------------------|-------------|-----------------|------------------|
+|--------|----------------|-------------|-----------------|------------------|
 | Sign in | ✓ | ✓ | — | — |
 | Read own private entities | ✓ | ✓ | ✓ | ✓ |
 | Read other's private entities | ✗ | ✓ | ✗ | ✗ |
@@ -382,10 +340,10 @@ ownerId: ObjectId; // ref User, required, indexed
 | Mutate other's private entities | ✗ | ✓ | ✗ | ✗ |
 | Read global catalog | ✓ | ✓ | ✓ | ✓ |
 | Mutate global catalog (direct) | ✗ | ✓ | ✗ | ✗ |
-| Submit public-entity request | ✓ | ✓ | ✗ | ✗ |
-| Moderate requests | ✗ | ✓ | ✗ | ✗ |
 | Manage own API tokens | ✓ | ✓ | ✗ | ✗ |
 | Manage users | ✗ | ✓ | ✗ | ✗ |
+
+Submit/moderate catalog requests → [ADR 002](./002-collaborative-public-catalog.md).
 
 ---
 
@@ -394,33 +352,33 @@ ownerId: ObjectId; // ref User, required, indexed
 ### Positive
 
 - Clear tenant isolation boundary (`ownerId`) enables safe multi-user operation.
-- API tokens decouple portfolio auth from admin sessions.
-- Collaborative catalog avoids uncontrolled skill/org duplication.
-- Phased delivery on a long-lived branch reduces risk of partial production state.
+- API tokens decouple portfolio auth from admin sessions; `QUERY`-only tokens
+  avoid exposing write credentials on public sites.
+- Phased implementation on a long-lived branch; single deliverable PR per ADR.
 
 ### Negative / risks
 
 | Risk | Mitigation |
 |------|------------|
 | IDOR if filter omitted in one resolver | Repository-level enforcement + isolation test suite |
-| Phase 4 complexity (overrides + merge) | Design collections in phase 0; implement last |
-| Global slug conflicts on concurrent requests | Admin groups requests by target; dedup rules |
-| `organization.deleted` cascade | Explicit scoping; never purge another tenant's data without ref |
-| Breaking portfolio during development | Accepted; client updated before `main` merge |
-| API token leakage in browser DevTools | `QUERY`-only tokens; rate limiting (future) |
+| Large PR (~90–120 files) | Incremental steps on branch; one session per step |
+| `organization.deleted` cascade affects all tenants | Intentional for canonical catalog; document super-admin impact |
+| Breaking portfolio during development | Accepted on feature branch; client updated before `main` merge |
+| API token leakage in browser DevTools | `QUERY`-only tokens in portfolio; rate limiting (future) |
 
 ### Follow-ups (post-merge)
 
+- [ADR 002](./002-collaborative-public-catalog.md) — collaborative catalog.
 - Rate limiting per API token.
 - Token rotation and audit log.
-- Admin UI for moderation queue.
-- Portfolio client migration to API tokens.
+- Admin UI for multi-tenant + token management.
 - Consider `tenantId` abstraction if team accounts are needed.
 
 ---
 
 ## References
 
-- `apps/api/docs/ER_MODEL.md` — current persistence model
+- [ADR 002](./002-collaborative-public-catalog.md) — user-submitted catalog changes
+- `apps/api/docs/ER_MODEL.md` — persistence model
 - `agents/api.md` — API package context
 - `apps/api/docs/CLEAN_ARCHITECTURE.md` — module layering and dependency rules
