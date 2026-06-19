@@ -1,11 +1,11 @@
-# ADR 001: Multi-tenant core & portfolio auth
+# ADR 001: Multi-tenant core & API tokens
 
 | Field | Value |
 |-------|-------|
 | **Status** | Proposed |
 | **Date** | 2026-06-19 |
 | **Branch** | `feat/multi-tenant` |
-| **Deliverable** | 1 PR — merge to `main` with coordinated portfolio client update |
+| **Deliverable** | 1 PR — backend only; merge when Definition of Done is met |
 
 ## Context
 
@@ -19,38 +19,36 @@
 - Domain events (`skill.deleted`, `organization.deleted`) operate globally across
   the entire database.
 
-The goal is to evolve into a **multi-tenant** platform where each registered user
+The goal is to evolve the **API** into a multi-tenant backend where each user
 owns a private portfolio (experiences, educations, courses, projects) while
 sharing a global catalog (skills, organizations) moderated by a platform operator.
 
-The portfolio (public site) must authenticate without exposing write credentials.
-Session JWTs are for the admin panel; portfolio integrations use **API tokens with
-`QUERY` permission only** — never the same token that can mutate data.
+Public consumers (portfolio sites) authenticate via **API tokens** with separate
+permissions (`QUERY` / `MUTATE`) so read-only integrations never need a token that
+can write.
 
-User-submitted catalog changes (suggestions, moderation, local overrides) are
-**out of scope** for this ADR. See [ADR 002](./002-collaborative-public-catalog.md).
+**Scope of this ADR: backend only.** Admin panel, portfolio client, and test-suite
+overhaul are out of scope — see [backlog](./backlog.md).
 
 ### Constraints
 
-- **Breaking changes are acceptable** during development on `feat/multi-tenant`.
-  The portfolio client is updated in the **same release** as this ADR's merge to
-  `main`. No external users depend on the API yet (single production user).
-- **No formal data migration scripts** for now — the sole production user will be
-  backfilled manually in MongoDB.
-- **Admin UI is out of scope**; validation happens via GraphQL sandbox and
-  automated tests.
-- **One PR per ADR.** Implementation happens incrementally on the feature branch
-  (small steps per session); the PR opens only when this ADR's Definition of Done
-  is met.
-- **Seeds:** 2 regular users + 1 super admin, each with isolated private data and
-  at least one `QUERY` API token (phase 3).
+- **Breaking changes are acceptable** on `feat/multi-tenant`. No external users
+  depend on the API yet (single production user). Production data can be wiped and
+  re-seeded; **seeds must work** (`npm run api:seed`).
+- **No data migration scripts** — prefer a clean database over hours debugging
+  legacy state.
+- **One PR for this ADR.** Implement incrementally on the feature branch (small
+  steps per session); open the PR when Definition of Done is met.
+- **Seeds:** 2 regular users + 1 super admin, isolated private data, shared global
+  catalog, at least one `QUERY` API token per user (phase 3).
 
 ### Non-goals (this ADR)
 
-- User-submitted skill/organization requests and moderation ([ADR 002](./002-collaborative-public-catalog.md)).
-- Team / organization accounts (B2B tenants with multiple members).
-- Billing, custom domains, or per-tenant infrastructure.
-- Admin-panel changes (deferred until API is stable).
+- Admin panel or portfolio client changes.
+- User self-registration (accounts created manually for now).
+- Collaborative catalog (user-submitted skill/org requests).
+- Team accounts, billing, custom domains.
+- Formal production migration runbooks.
 
 ---
 
@@ -58,33 +56,30 @@ User-submitted catalog changes (suggestions, moderation, local overrides) are
 
 ### 1. Tenant model
 
-**A tenant is a `User`.** Each user owns their private entities. There is no
-separate `Tenant` collection in this iteration.
+**A tenant is a `User`.** Each user owns their private entities. No separate
+`Tenant` collection.
 
 ```
 Platform layer     →  Skill, Organization (global catalog, SUPER_ADMIN mutates)
 Tenant layer       →  User + private entities (ownerId-scoped)
-Public consumer    →  API token (QUERY scope) for portfolio sites
+Public consumer    →  API token (typically QUERY) for read integrations
 ```
-
-If teams are needed later, introduce `tenantId` on private entities without
-changing the global catalog design.
 
 ### 2. Role model
 
-Replace the implicit single-admin model with explicit platform roles:
-
 | Role | Scope |
 |------|-------|
-| `USER` | Own private entities; read global catalog; manage own API tokens |
-| `SUPER_ADMIN` | Full platform access: all tenants, global catalog mutations |
+| `USER` | Own private portfolio; read global catalog; own dashboard & AI tools (session JWT); manage own API tokens (session JWT) |
+| `SUPER_ADMIN` | Platform operator: global catalog mutations; read/write any tenant's private entities by explicit ID; **does not maintain a personal portfolio** |
 
-The existing `ADMIN` role is **renamed to `SUPER_ADMIN`**. Seeds and guards are
-updated accordingly. The current production admin user becomes the first
-`SUPER_ADMIN`.
+`ADMIN` is **renamed to `SUPER_ADMIN`**. Seeds and guards updated accordingly.
 
 `USER` gains mutation rights on **their own private entities** (today only
 `ADMIN` can mutate anything).
+
+`SUPER_ADMIN` is not a portfolio user — the operator uses a regular `USER`
+account for their own profile and reserves `SUPER_ADMIN` for system-wide
+management (catalog, supporting other tenants).
 
 ### 3. Entity classification
 
@@ -92,143 +87,201 @@ updated accordingly. The current production admin user becomes the first
 
 `Experience`, `Education`, `Course`, `Project`
 
-- Add required `ownerId: ObjectId` (ref → `User`).
-- Queries and mutations are scoped to `ownerId`, except `SUPER_ADMIN` bypass.
-- `slug` uniqueness becomes **compound**: `{ ownerId: 1, slug: 1 }` unique.
+- Required `ownerId: ObjectId` (ref → `User`).
+- **`USER`:** `ownerId` injected by the service from `ctx.userId` — never from input.
+- **`SUPER_ADMIN`:** on **create**, `ownerId` is **required in input** (always
+  targets another user's portfolio; the operator does not create private entities
+  for themselves). On read/update/delete, operates by explicit entity ID with no
+  tenant filter.
+- `slug` uniqueness: compound `{ ownerId: 1, slug: 1 }` unique.
 
 #### Public catalog (platform-scoped)
 
 `Skill`, `Organization`
 
-- Remain global collections (no `ownerId` on the canonical document).
-- All authenticated `USER`s can **query** the global catalog.
-- Only `SUPER_ADMIN` can **mutate** the canonical catalog directly.
+- Global collections (no `ownerId` on canonical documents).
+- Authenticated callers can **query**.
+- Only `SUPER_ADMIN` can **mutate** directly.
 
 #### User profile
 
-`User` is neither fully private nor catalog:
+- `getMe` works with session JWT and API token `QUERY` (returns the token
+  owner's profile, including email — acceptable for portfolio use).
+- `updateMe` remains self-service for session JWT only (not API tokens).
+- `SUPER_ADMIN` retains full user CRUD.
+- Other user listing/detail queries require session JWT (not API tokens).
 
-- Authenticated users can read global user listings as needed for admin flows.
-- Portfolio-facing reads resolve through the API-token auth path (phase 3).
-- `updateMe` remains self-service; `SUPER_ADMIN` retains full user CRUD.
+### 4. Authorization pattern
 
-### 4. Authentication model
+Replace the blanket `@Roles(ADMIN)` on private-entity mutations with
+**ownership + role** checks.
 
-Remove `@Public()` from entity operations. **All GraphQL operations require
-authentication**, except `signIn`.
+#### Resolver responsibility
 
-Two credential types coexist:
+The resolver is the **entry point** for auth context:
+
+1. Obtain `RequestContext` from the auth guard (`@CurrentUser()` / dedicated
+   decorator).
+2. Pass `RequestContext` as the **first argument** to every service method that
+   touches tenant-scoped or role-gated data.
+3. Remove `@Roles(ADMIN)` from private-entity mutations and from `dashboard` /
+   `ai-tools` (any authenticated user calls them).
+4. Keep `@Roles(SUPER_ADMIN)` on global catalog mutations and user CRUD (or
+   equivalent check in service).
+
+The resolver does **not** duplicate per-entity ownership logic — it only forwards
+context.
+
+#### Service responsibility
+
+Services stay unified (no separate “admin service” vs “user service”). Each method
+receives `RequestContext` and derives filters:
+
+```typescript
+function tenantFilter(ctx: RequestContext): { ownerId?: ObjectId } {
+  if (ctx.isSuperAdmin) return {};
+  return { ownerId: ctx.userId };
+}
+```
+
+| Operation | `USER` / API token | `SUPER_ADMIN` (session JWT) |
+|-----------|-------------------|----------------------------|
+| List / find | Merge `tenantFilter` into query | No `ownerId` filter (sees all tenants) |
+| Create | `ownerId = ctx.userId` (injected) | `ownerId` from input (required; targets another user) |
+| Update / delete by ID | Load with `tenantFilter` first → 404 if not owner | By explicit ID, no tenant filter |
+| Batch update / delete | Each ID must pass `tenantFilter` | Unfiltered |
+
+**IDOR rule (USER only):** guessing another tenant's ID returns **404** (not 403),
+because the query includes `ownerId` and finds nothing.
+
+#### API token permission checks
+
+Enforced in the guard or a thin permissions layer before the resolver:
+
+- `QUERY` — portfolio reads only: `getMe`, private-entity queries, global catalog
+  queries. No `dashboard`, no `ai-tools`, no user CRUD, no token management.
+- `MUTATE` — private-entity writes only (not global catalog, not token CRUD, not
+  `dashboard` / `ai-tools`).
+- Session JWT — full access for the user's role (no permission enum).
+
+API tokens cannot manage other API tokens — only a logged-in user via session JWT
+creates/revokes tokens (admin panel; front out of scope).
+
+### 5. `ownerId` rules
+
+| Caller | Create | Read / update / delete |
+|--------|--------|------------------------|
+| `USER` | Service sets `ownerId = ctx.userId` | `tenantFilter(ctx)` on every op (incl. batch) |
+| API token | Same as `USER` (scoped to token owner) | Same as `USER` |
+| `SUPER_ADMIN` | `ownerId` **required in create input** | No `ownerId` filter; operate by explicit ID |
+
+- `USER` and API tokens: `ownerId` is **not** an accepted input field on create
+  (injection only). Filter inputs must not let `USER` override tenant scope.
+- `SUPER_ADMIN` may pass `ownerId` on create only; the service rejects create
+  without it.
+
+### 6. Authentication model
+
+#### GraphQL
+
+All GraphQL operations require authentication **except `signIn`**.
+
+#### REST (exceptions)
+
+| Route | Auth |
+|-------|------|
+| `GET /health` | Public (ops) |
+| `GET /resume.pdf` | Fully public; `userId` query param selects whose resume to build. Anyone with a valid user ID can download — acceptable for now. |
+
+Token-based REST auth is deferred — see [backlog](./backlog.md).
+
+#### Two credential types (GraphQL)
 
 | Credential | Use case | Lifetime |
 |------------|----------|----------|
-| **Session JWT** | Admin panel login (`signIn`) | Short (current: 8h) |
-| **API token** | Portfolio / public integrations | User-chosen expiry (including none) |
+| **Session JWT** | Admin panel (`signIn`) | Short (current: 8h) |
+| **API token** | Portfolio / integrations | User-chosen expiry (including none) |
 
-#### API tokens
+#### API token format and guard resolution
 
-- Stored hashed (never persist plaintext after creation).
-- Belong to the creating user (tenant scope).
-- Permissions (enum):
-  - `QUERY` — read operations for the token owner's tenant data + global catalog
-  - `MUTATE` — write operations for the token owner's private entities
-- Portfolio tokens **must** be issued with `QUERY` only — the public site must
-  never embed a token that can mutate data.
-- Guard resolves credential → `RequestContext` with `{ userId, role, permissions }`.
+Industry-standard pattern for JWT + opaque API tokens sharing `Authorization: Bearer`:
 
-`signIn` continues to return a session JWT with full user permissions (no
-separate token permission flags on JWT).
+1. **Prefix:** secrets start with `pi_` (profile-info). Example:
+   `pi_a1b2c3d4e5f6…` (prefix + 32 random bytes as base64url).
+2. **Storage:** persist only a **bcrypt hash** of the full secret; plaintext
+   returned **once** on create (GraphQL field on the create mutation response).
+3. **Guard resolution order:**
+   - Extract Bearer token.
+   - If token starts with `pi_` → look up by hash, build `RequestContext` with
+     `permissions` from the stored record.
+   - Else → existing JWT validation (`passport-jwt`).
 
-### 5. Request context and authorization
+JWTs contain dots (`header.payload.signature`); prefixed opaque tokens are
+unambiguous — no double-decode attempts.
 
-Introduce a `RequestContext` (or equivalent) populated by the auth guard:
+**Deferred:** `lastUsedAt`, per-user token limits, rotation UI — see [backlog](./backlog.md).
 
 ```typescript
 interface RequestContext {
   userId: string;
   role: UserRole;
-  permissions?: ApiTokenPermission[]; // absent for session JWT (= full access)
+  permissions?: ApiTokenPermission[]; // absent for session JWT
   isSuperAdmin: boolean;
 }
 ```
 
-Authorization rules:
+### 7. Domain events
 
-1. **Private reads/writes** — filter by `ownerId === context.userId`, unless
-   `isSuperAdmin`.
-2. **Global catalog reads** — any authenticated caller; API tokens with `QUERY`.
-3. **Global catalog writes** — `SUPER_ADMIN` only (direct mutations).
-4. **API token writes** — require `MUTATE` permission + ownership check.
-5. **IDOR prevention** — every `findOneById`, `updateOne`, `removeOne`, and
-   DataLoader batch must apply tenant filters; never trust client-supplied IDs alone.
-
-Implement filtering at the **repository/service layer**, not only in resolvers,
-to prevent accidental data leaks.
-
-### 6. Domain events
-
-Events remain the delete-cascade mechanism. In this ADR there are no local
-catalog overrides ([ADR 002](./002-collaborative-public-catalog.md)); behavior
-stays global but must remain **multi-tenant safe**:
+Global catalog deletes affect all tenants that reference the entity — intentional.
 
 | Event | Behavior |
 |-------|----------|
-| `skill.deleted` | `$pull` skill ID from all private entities that reference it (all tenants) |
-| `organization.deleted` | `deleteMany` on all private entities referencing the org (all tenants); super-admin action |
+| `skill.deleted` | `$pull` skill ID from all private entities that reference it |
+| `organization.deleted` | `deleteMany` on all private entities referencing the org |
 
-Emit events **before** delete (unchanged). Listeners stay thin. A
-`SUPER_ADMIN` deleting a global org or skill affects every tenant that
-references it — that is intentional for the canonical catalog.
+Emit **before** delete (unchanged). Listeners stay thin.
 
-### 7. Peripheral modules
+### 8. Peripheral modules
 
 | Module | Change |
 |--------|--------|
-| `resume` | Require auth; resolve profile from `RequestContext` (or explicit `userId` for super-admin). Remove "first ADMIN" heuristic. `GET /resume.pdf` requires API token or session JWT. |
-| `dashboard` | Scope counts to `ownerId`; super-admin gets platform-wide dashboard. |
-| `ai-tools` | Scope to authenticated user's private entities (or super-admin). |
-| `users` | Remove public reads; portfolio access via API token. |
+| `resume` | `buildResume(userId)` — stop "first ADMIN" heuristic. `GET /resume.pdf?userId=&locale=` stays `@Public()`. |
+| `dashboard` | Session JWT only. Pass `RequestContext`; scope counts to `ownerId`. `SUPER_ADMIN` sees platform-wide totals. |
+| `ai-tools` | Session JWT only. Any `USER` or `SUPER_ADMIN` (no paid plan gate yet). |
+| `users` | Remove `@Public()` from reads; `SUPER_ADMIN` for user CRUD mutations. |
 
-### 8. Seeds and testing
+### 9. Seeds and testing
 
-`src/seed.ts` after all phases:
+Minimum CI gate from phase 1a:
 
-- 1 × `SUPER_ADMIN` (`super@profile.info`)
-- 2 × `USER` (`user-a@profile.info`, `user-b@profile.info`)
-- Distinct private entities per user (overlapping slugs allowed across users).
-- Shared global skills/organizations.
-- At least 1 `QUERY` API token per user (plaintext shown once in seed output).
-
-**Tenant isolation tests** are a CI gate from phase 1a onward:
-
-- User A cannot read/update/delete user B's private entities.
+- User A cannot read/update/delete User B's private entities (by ID or batch).
 - API token with `QUERY` cannot mutate.
 - Non-`SUPER_ADMIN` cannot mutate global catalog.
+
+Full test-suite overhaul is deferred — see [backlog](./backlog.md).
 
 ---
 
 ## Definition of Done (merge gate)
 
-This ADR is complete when **all** of the following are true:
+Backend only:
 
-1. **Admin multi-tenant:** each `USER` CRUDs only their portfolio; `SUPER_ADMIN`
-   sees all tenants and mutates the global catalog.
-2. **Auth everywhere:** no `@Public()` except `signIn`; unauthenticated → 401.
-3. **API tokens:** CRUD via GraphQL; guard accepts `Bearer <api-token>`;
-   `QUERY` / `MUTATE` enforced.
-4. **Portfolio path:** documented `QUERY`-only token flow; seed includes example
-   token per user.
-5. **Tests:** tenant isolation + token permission tests pass in CI.
-6. **Docs:** `ER_MODEL.md` and `agents/api.md` updated.
-7. **Portfolio client:** updated in the same release to send `Authorization:
-   Bearer <query-token>` on all API calls (no session JWT, no `MUTATE` token in
-   the public bundle).
+1. Each `USER` CRUDs only their private entities; `SUPER_ADMIN` manages any
+   tenant's private entities (create with `ownerId` in input) and mutates global catalog.
+2. GraphQL: no `@Public()` except `signIn`; unauthenticated → 401.
+3. `GET /health` and `GET /resume.pdf?userId=` remain fully public.
+4. API tokens: CRUD via session JWT only; `pi_` prefix + hash storage; guard
+   resolves JWT vs token; `QUERY` / `MUTATE` enforced per permission matrix.
+5. `USER`: `ownerId` injected; `SUPER_ADMIN` create requires `ownerId` in input.
+6. `npm run api:seed` produces 2 users + 1 super admin + sample tokens + isolated data.
+7. Tenant isolation + token permission tests pass.
+8. `ER_MODEL.md` updated.
 
 ---
 
 ## Migration phases
 
-Work happens on `feat/multi-tenant`. Merge to `main` is a **single coordinated
-release** with the portfolio client.
+One PR for this ADR. Incremental steps on the branch (~8–25 files per session).
 
 ```mermaid
 flowchart TD
@@ -240,89 +293,66 @@ flowchart TD
     P0 --> P1 --> P2 --> P3
 ```
 
-Phases 0–3 ship in **one PR** for this ADR. Implementation order below is for
-**incremental work on the branch** (one Cursor session per step; ~8–25 files each).
-
 ### Phase 0 — Foundation
 
 | Step | Deliverable | Done when |
 |------|-------------|-----------|
-| 0a | `SUPER_ADMIN` role replaces `ADMIN` | Enum, guards, seeds, specs updated |
-| 0b | `RequestContext` type + guard plumbing | Context available in resolvers/services |
-| 0b | `ownerId` on private schemas (nullable) | Schema compiles |
-| 0b | Compound index `{ ownerId, slug }` on private collections | Index created |
+| 0a | `SUPER_ADMIN` replaces `ADMIN` | Enum, guards, seeds, specs |
+| 0b | `RequestContext` + guard plumbing | Context in resolvers/services |
+| 0b | `ownerId` on private schemas (nullable) + compound slug index | Schema compiles |
 | 0b | Seeds: 2 users + 1 super admin | `npm run api:seed` succeeds |
 
 ### Phase 1 — Private tenancy
 
 | Step | Deliverable | Done when |
 |------|-------------|-----------|
-| 1a | **Experience** — `ownerId` end-to-end | First tenant isolation e2e test passes |
-| 1b | **Education** — same pattern | Isolation holds for education |
-| 1c | **Course** — same pattern | Isolation holds for course |
-| 1d | **Project** — same pattern | Isolation holds for project |
-| 1e | `resume`, `dashboard` scoped to tenant | No global aggregation |
-| 1f | `ai-tools`, `users` reads scoped | No public user reads |
-| — | `ownerId` required on create; prod backfill manual | No orphan private docs |
-| — | Remove `@Public()` from private entity resolvers | Unauthenticated → 401 |
+| 1a | **Experience** — context → service → `tenantFilter`; `ownerId` on create input (SUPER_ADMIN only) | First isolation test |
+| 1b–1d | **Education, Course, Project** — same pattern | Isolation per entity |
+| 1e | `resume` (`userId` param), `dashboard` scoped | No global aggregation |
+| 1f | `ai-tools`, `users` reads authenticated | No public user reads |
+| — | `ownerId` required on create; remove `@Public()` on private GraphQL | 401 without token |
 | — | Update `ER_MODEL.md` | Docs in sync |
 
 ### Phase 2 — Public catalog authorization
 
 | Step | Deliverable | Done when |
 |------|-------------|-----------|
-| 2a | **Skills** — queries require auth; mutations `SUPER_ADMIN` | USER cannot mutate skills |
-| 2b | **Organizations** — same + domain event review | Deletes remain multi-tenant safe |
-| — | Seeds include shared global catalog | Both users see same skills/orgs |
+| 2a | **Skills** — auth on reads; `SUPER_ADMIN` on mutations | USER cannot mutate |
+| 2b | **Organizations** — same | Domain events unchanged |
+| — | Shared global catalog in seeds | Both users see same skills/orgs |
 
 ### Phase 3 — API tokens
 
 | Deliverable | Done when |
 |-------------|-----------|
-| `ApiToken` collection (hashed secret, permissions, expiry) | CRUD via GraphQL |
-| Auth guard accepts `Authorization: Bearer <api-token>` | Token resolves to owner context |
-| Permission enforcement (`QUERY` / `MUTATE`) | Tests pass |
-| Remove remaining `@Public()` (except `signIn`) | All routes authenticated |
-| Seed: `QUERY` token per user | Sandbox + portfolio integration ready |
+| `ApiToken` collection + GraphQL CRUD | Create returns plaintext once |
+| Guard: `pi_` prefix → hash lookup; else JWT | Both credential types work |
+| `QUERY` / `MUTATE` enforcement | Tests pass |
+| Remove remaining GraphQL `@Public()` (except `signIn`) | All GraphQL routes authenticated |
+| Seed: `QUERY` token per user | Documented in seed output |
 
 ---
 
-## Portfolio migration checklist
+## Data model changes
 
-Part of the merge gate (Definition of Done §7):
-
-1. User creates a token with **`QUERY` permission only** (admin or seed).
-2. Portfolio client sends `Authorization: Bearer <token>` on every GraphQL query.
-3. **No `MUTATE` token** in frontend bundles, env vars committed to the public
-   repo, or browser-accessible storage.
-4. `GET /resume.pdf` (if used) authenticated via `QUERY` token or documented
-   alternative.
-5. Portfolio deployed in the **same release** as API merge to `main`.
-
----
-
-## Data model changes (summary)
-
-### Private entities (Experience, Education, Course, Project)
+### Private entities
 
 ```typescript
-// Added field
-ownerId: ObjectId; // ref User, required, indexed
-
-// Index change
-{ ownerId: 1, slug: 1 } // unique (replaces global slug unique)
+ownerId: ObjectId; // ref User, required
+// USER: service-injected on create
+// SUPER_ADMIN: required in create input
+// unique: { ownerId: 1, slug: 1 }
 ```
 
 ### ApiToken (new collection)
 
 ```typescript
 {
-  userId: ObjectId;        // ref User, indexed
-  name: string;            // user label, e.g. "Portfolio production"
+  userId: ObjectId;
+  name: string;
   hashedSecret: string;
   permissions: ('QUERY' | 'MUTATE')[];
-  expiresAt?: Date;       // null = no expiry
-  lastUsedAt?: Date;
+  expiresAt?: Date;
   createdAt, updatedAt;
 }
 ```
@@ -331,19 +361,24 @@ ownerId: ObjectId; // ref User, required, indexed
 
 ## Permission matrix
 
-| Action | USER (session) | SUPER_ADMIN | API token QUERY | API token MUTATE |
-|--------|----------------|-------------|-----------------|------------------|
+| Action | USER (session) | SUPER_ADMIN (session) | API token QUERY | API token MUTATE |
+|--------|----------------|----------------------|-----------------|------------------|
 | Sign in | ✓ | ✓ | — | — |
+| `getMe` | ✓ | ✓ | ✓ | ✗ |
 | Read own private entities | ✓ | ✓ | ✓ | ✓ |
 | Read other's private entities | ✗ | ✓ | ✗ | ✗ |
-| Mutate own private entities | ✓ | ✓ | ✗ | ✓ |
-| Mutate other's private entities | ✗ | ✓ | ✗ | ✗ |
+| Mutate own private entities | ✓ | ✗ | ✗ | ✓ |
+| Mutate other's private entities | ✗ | ✓ (`ownerId` on create) | ✗ | ✗ |
 | Read global catalog | ✓ | ✓ | ✓ | ✓ |
-| Mutate global catalog (direct) | ✗ | ✓ | ✗ | ✗ |
+| Mutate global catalog | ✗ | ✓ | ✗ | ✗ |
+| Dashboard | ✓ | ✓ | ✗ | ✗ |
+| AI tools | ✓ | ✓ | ✗ | ✗ |
 | Manage own API tokens | ✓ | ✓ | ✗ | ✗ |
+| `updateMe` | ✓ | ✓ | ✗ | ✗ |
 | Manage users | ✗ | ✓ | ✗ | ✗ |
 
-Submit/moderate catalog requests → [ADR 002](./002-collaborative-public-catalog.md).
+`SUPER_ADMIN` does not mutate a personal portfolio — row "Mutate own private
+entities" is intentionally ✗ (operator has no portfolio data).
 
 ---
 
@@ -351,34 +386,24 @@ Submit/moderate catalog requests → [ADR 002](./002-collaborative-public-catalo
 
 ### Positive
 
-- Clear tenant isolation boundary (`ownerId`) enables safe multi-user operation.
-- API tokens decouple portfolio auth from admin sessions; `QUERY`-only tokens
-  avoid exposing write credentials on public sites.
-- Phased implementation on a long-lived branch; single deliverable PR per ADR.
+- Single service layer with `tenantFilter` — no duplicated admin/user code paths.
+- Prefixed API tokens avoid JWT ambiguity without extra headers.
+- Backend-first delivery; frontends can catch up after API stabilizes.
 
 ### Negative / risks
 
 | Risk | Mitigation |
 |------|------------|
-| IDOR if filter omitted in one resolver | Repository-level enforcement + isolation test suite |
-| Large PR (~90–120 files) | Incremental steps on branch; one session per step |
-| `organization.deleted` cascade affects all tenants | Intentional for canonical catalog; document super-admin impact |
-| Breaking portfolio during development | Accepted on feature branch; client updated before `main` merge |
-| API token leakage in browser DevTools | `QUERY`-only tokens in portfolio; rate limiting (future) |
-
-### Follow-ups (post-merge)
-
-- [ADR 002](./002-collaborative-public-catalog.md) — collaborative catalog.
-- Rate limiting per API token.
-- Token rotation and audit log.
-- Admin UI for multi-tenant + token management.
-- Consider `tenantId` abstraction if team accounts are needed.
+| IDOR on batch ops | `tenantFilter` on every ID in `*ManyById` / `updateMany` / `removeMany` |
+| Large PR | Incremental steps on branch |
+| `resume.pdf` public with `userId` | Anyone can download any user's PDF if they know the ID — acceptable for now; see [backlog](./backlog.md) |
+| CORS fixed to one origin | `*` or [backlog](./backlog.md) when second tenant has own domain |
 
 ---
 
 ## References
 
-- [ADR 002](./002-collaborative-public-catalog.md) — user-submitted catalog changes
-- `apps/api/docs/ER_MODEL.md` — persistence model
-- `agents/api.md` — API package context
-- `apps/api/docs/CLEAN_ARCHITECTURE.md` — module layering and dependency rules
+- [backlog](./backlog.md) — deferred work after ADR 001
+- `apps/api/docs/ER_MODEL.md`
+- `agents/api.md`
+- `apps/api/docs/CLEAN_ARCHITECTURE.md`
