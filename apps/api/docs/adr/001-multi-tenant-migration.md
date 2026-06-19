@@ -37,8 +37,10 @@ overhaul are out of scope — see [backlog](./backlog.md).
   re-seeded; **seeds must work** (`npm run api:seed`).
 - **No data migration scripts** — prefer a clean database over hours debugging
   legacy state.
-- **One PR for this ADR.** Implement incrementally on the feature branch (small
-  steps per session); open the PR when Definition of Done is met.
+- **One PR for this ADR.** Work ships in **implementation lots** on the feature
+  branch (see [Implementation lots](#implementation-lots)); do not start the next
+  lot until the current lot's gate passes. Target **≤ ~35 files changed per lot**
+  to keep review and IDE sessions safe.
 - **Seeds:** 2 regular users + 1 super admin, isolated private data, shared global
   catalog, at least one `QUERY` API token per user (phase 3).
 
@@ -279,57 +281,170 @@ Backend only:
 
 ---
 
-## Migration phases
+## Implementation lots
 
-One PR for this ADR. Incremental steps on the branch (~8–25 files per session).
+**Rules**
+
+1. **One lot at a time.** Finish the current lot completely before starting the next.
+2. **Gate before moving on:** automated checks green + manual checklist done (below).
+3. **Lot size:** aim for ≤ ~35 files per lot (~15–25 is ideal). If a lot grows
+   beyond that during implementation, split it before continuing.
+4. **Branch hygiene:** one commit (or a small commit series) per lot on
+   `feat/multi-tenant`; open the ADR PR only when all lots are done.
+5. **Do not** implement catalog auth, API tokens, or peripheral modules while
+   still on an earlier lot — avoids half-migrated state and giant diffs.
+
+Phases 0–3 map to **7 lots**. Lots 1–2 establish the pattern; lots 3–4 repeat it
+for the remaining private entities in pairs (not one entity per session — not
+everything at once either).
 
 ```mermaid
 flowchart TD
-    P0[Phase 0 — Foundation]
-    P1[Phase 1 — Private tenancy]
-    P2[Phase 2 — Public catalog auth]
-    P3[Phase 3 — API tokens]
+    L0[Lot 0 — Role rename]
+    L1[Lot 1 — Foundation]
+    L2[Lot 2 — Private: Experience + Education]
+    L3[Lot 3 — Private: Course + Project]
+    L4[Lot 4 — Peripheral modules]
+    L5[Lot 5 — Catalog auth]
+    L6[Lot 6 — API tokens + ER_MODEL]
 
-    P0 --> P1 --> P2 --> P3
+    L0 --> L1 --> L2 --> L3 --> L4 --> L5 --> L6
 ```
 
-### Phase 0 — Foundation
+### Lot 0 — Role rename
 
-| Step | Deliverable | Done when |
-|------|-------------|-----------|
-| 0a | `SUPER_ADMIN` replaces `ADMIN` | Enum, guards, seeds, specs |
-| 0b | `RequestContext` + guard plumbing | Context in resolvers/services |
-| 0b | `ownerId` on private schemas (nullable) + compound slug index | Schema compiles |
-| 0b | Seeds: 2 users + 1 super admin | `npm run api:seed` succeeds |
+| | |
+|---|---|
+| **Scope** | `ADMIN` → `SUPER_ADMIN` in enum, guards, specs, seed, e2e fixtures |
+| **~Files** | 8–12 |
+| **Out of scope** | `ownerId`, `RequestContext`, tenancy |
 
-### Phase 1 — Private tenancy
+**Automated gate:** `npm run lint` · `npm run api:test` (existing suite green with renamed role)
 
-| Step | Deliverable | Done when |
-|------|-------------|-----------|
-| 1a | **Experience** — context → service → `tenantFilter`; `ownerId` on create input (SUPER_ADMIN only) | First isolation test |
-| 1b–1d | **Education, Course, Project** — same pattern | Isolation per entity |
-| 1e | `resume` (`userId` param), `dashboard` scoped | No global aggregation |
-| 1f | `ai-tools`, `users` reads authenticated | No public user reads |
-| — | `ownerId` required on create; remove `@Public()` on private GraphQL | 401 without token |
-| — | Update `ER_MODEL.md` | Docs in sync |
+**Manual gate (GraphQL sandbox):**
+- [ ] `signIn` as super admin seed user → JWT works
+- [ ] `signIn` as regular user → JWT works
+- [ ] Mutation that still requires old admin role now requires `SUPER_ADMIN`
 
-### Phase 2 — Public catalog authorization
+---
 
-| Step | Deliverable | Done when |
-|------|-------------|-----------|
-| 2a | **Skills** — auth on reads; `SUPER_ADMIN` on mutations | USER cannot mutate |
-| 2b | **Organizations** — same | Domain events unchanged |
-| — | Shared global catalog in seeds | Both users see same skills/orgs |
+### Lot 1 — Foundation
 
-### Phase 3 — API tokens
+| | |
+|---|---|
+| **Scope** | `RequestContext` type + decorator; pass context from resolvers (plumbing only — private services may accept but not enforce yet); `ownerId` nullable on 4 private schemas + compound `{ ownerId, slug }` index; seed: 2 `USER` + 1 `SUPER_ADMIN` with distinct credentials |
+| **~Files** | 12–18 |
+| **Out of scope** | Tenant filters, removing `@Public()`, API tokens |
 
-| Deliverable | Done when |
-|-------------|-----------|
-| `ApiToken` collection + GraphQL CRUD | Create returns plaintext once |
-| Guard: `pi_` prefix → hash lookup; else JWT | Both credential types work |
-| `QUERY` / `MUTATE` enforcement | Tests pass |
-| Remove remaining GraphQL `@Public()` (except `signIn`) | All GraphQL routes authenticated |
-| Seed: `QUERY` token per user | Documented in seed output |
+**Automated gate:** `npm run lint` · `npm run api:seed` · `npm run api:test`
+
+**Manual gate:**
+- [ ] `getMe` returns correct role per seed user
+- [ ] App boots; GraphQL playground loads
+- [ ] Private collections have `ownerId` field (inspect Mongo or seed output)
+
+---
+
+### Lot 2 — Private tenancy (Experience + Education)
+
+| | |
+|---|---|
+| **Scope** | Full `tenantFilter` pattern for **Experience** and **Education**: resolver passes `RequestContext` → service; `ownerId` injected on create (`USER`); `ownerId` required in create input (`SUPER_ADMIN`); remove `@Public()` on both resolvers; **first tenant isolation e2e tests** |
+| **~Files** | 20–30 |
+| **Out of scope** | Course, Project, resume, dashboard, catalog, tokens |
+
+**Automated gate:** `npm run lint` · `npm run api:test` · new/updated e2e: User A cannot read/update/delete User B's experience or education (by ID and batch)
+
+**Manual gate (sandbox, two user tokens):**
+- [ ] User A creates experience → only A lists/sees it
+- [ ] User B `findOneExperienceById` with A's ID → error / not found
+- [ ] Unauthenticated query on experience → `UNAUTHENTICATED`
+- [ ] Super admin creates education with `ownerId` for user A → A sees it, B does not
+
+---
+
+### Lot 3 — Private tenancy (Course + Project)
+
+| | |
+|---|---|
+| **Scope** | Same pattern as lot 2 for **Course** and **Project**; extend isolation e2e to cover both |
+| **~Files** | 20–30 |
+| **Out of scope** | Peripheral modules, catalog, tokens |
+
+**Automated gate:** `npm run lint` · `npm run api:test` · isolation tests cover all 4 private entity types
+
+**Manual gate:**
+- [ ] User A / B isolation holds for course and project
+- [ ] `ownerId` required on create (no orphan docs without owner)
+- [ ] Overlapping slugs across users on same entity type work (compound unique index)
+
+---
+
+### Lot 4 — Peripheral modules
+
+| | |
+|---|---|
+| **Scope** | `resume` — `buildResume(userId)`, public `GET /resume.pdf?userId=`; `dashboard` — session JWT, scoped to `ownerId` (super admin: platform-wide); `ai-tools` — session JWT, any `USER`; `users` — remove `@Public()` on reads |
+| **~Files** | 12–20 |
+| **Out of scope** | Skills/orgs auth changes, API tokens |
+
+**Automated gate:** `npm run lint` · `npm run api:test` · update `resume.e2e-spec.ts` / `dashboard.e2e-spec.ts` as needed for new auth/scoping
+
+**Manual gate:**
+- [ ] `GET /resume.pdf?userId=<seed-user-a>` returns PDF; wrong/missing user handled
+- [ ] Dashboard counts differ per user; super admin sees aggregate
+- [ ] `findManyUsers` without token → `UNAUTHENTICATED`
+- [ ] AI mutation works as `USER` with session JWT
+
+---
+
+### Lot 5 — Catalog auth
+
+| | |
+|---|---|
+| **Scope** | **Skills** + **Organizations**: auth on all queries; mutations `SUPER_ADMIN` only; domain events unchanged; seeds include shared global catalog for both users |
+| **~Files** | 14–22 |
+| **Out of scope** | API tokens, removing `@Public()` from users if not done in lot 4 |
+
+**Automated gate:** `npm run lint` · `npm run api:test` · e2e: USER cannot `createOneSkill`; unauthenticated skill query → `UNAUTHENTICATED`
+
+**Manual gate:**
+- [ ] Both users read same skill list after seed
+- [ ] User `createOneSkill` → forbidden
+- [ ] Super admin `createOneSkill` → success
+
+---
+
+### Lot 6 — API tokens + docs
+
+| | |
+|---|---|
+| **Scope** | `ApiToken` module (CRUD, `pi_` prefix, bcrypt hash, plaintext once on create); guard resolves `pi_` vs JWT; `QUERY` / `MUTATE` enforcement per permission matrix; remove remaining GraphQL `@Public()` (except `signIn`); seed: `QUERY` token per user; update `ER_MODEL.md` |
+| **~Files** | 25–35 |
+| **Out of scope** | Frontends, full test overhaul ([backlog](./backlog.md)) |
+
+**Automated gate:** `npm run lint` · `npm run api:test` · e2e: `QUERY` token reads own data + `getMe`; `QUERY` cannot mutate; `MUTATE` cannot call `getMe` / dashboard / AI; token CRUD requires session JWT
+
+**Manual gate:**
+- [ ] Create token in sandbox → plaintext shown once; subsequent list shows no secret
+- [ ] `Authorization: Bearer pi_…` resolves to token owner context
+- [ ] `Authorization: Bearer <jwt>` still works
+- [ ] `npm run api:seed` prints sample `QUERY` token per user
+
+**ADR complete** when lot 6 gate passes and [Definition of Done](#definition-of-done-merge-gate) is satisfied.
+
+---
+
+## Migration phases (summary)
+
+High-level grouping of the lots above:
+
+| Phase | Lots |
+|-------|------|
+| 0 — Foundation | 0, 1 |
+| 1 — Private tenancy | 2, 3, 4 |
+| 2 — Catalog auth | 5 |
+| 3 — API tokens | 6 |
 
 ---
 
@@ -395,7 +510,7 @@ entities" is intentionally ✗ (operator has no portfolio data).
 | Risk | Mitigation |
 |------|------------|
 | IDOR on batch ops | `tenantFilter` on every ID in `*ManyById` / `updateMany` / `removeMany` |
-| Large PR | Incremental steps on branch |
+| Large PR | Seven implementation lots; gate per lot; ≤ ~35 files each |
 | `resume.pdf` public with `userId` | Anyone can download any user's PDF if they know the ID — acceptable for now; see [backlog](./backlog.md) |
 | CORS fixed to one origin | `*` or [backlog](./backlog.md) when second tenant has own domain |
 

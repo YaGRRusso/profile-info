@@ -162,7 +162,7 @@ Run from `apps/api/` or via root `api:*` aliases: `dev`, `prod`, `build`, `start
 
 - `GET /health`: Terminus health check with MongoDB ping.
 - Test layout: `test/config/` (Jest e2e config, setup/teardown), `test/support/` (shared helpers + `TestAppModule`), `test/e2e/`, `test/integration/`. Default DB `profile-test-e2e` on localhost Mongo; override with `TEST_DATABASE_URL` or `USE_MEMORY_MONGO=true`.
-- ADRs in `apps/api/docs/adr/`. Multi-tenant: `001-multi-tenant-migration.md` (backend core + API tokens, branch `feat/multi-tenant`). Deferred work: `backlog.md`.
+- ADRs in `apps/api/docs/adr/`. Multi-tenant: `001-multi-tenant-migration.md` (backend core + API tokens, branch `feat/multi-tenant`; implement in 7 lots, one at a time). Deferred work: `backlog.md`.
 
 ## Gotchas & notes
 
