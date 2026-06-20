@@ -8,6 +8,7 @@ import {
 } from "@/core/schemas/translation.schema";
 import { OrganizationModel } from "@/modules/organizations/schemas/organization.schema";
 import { SkillModel } from "@/modules/skills/schemas/skill.schema";
+import { UserModel } from "@/modules/users/schemas/user.schema";
 
 @Schema({ _id: false })
 export class EducationMessagesModel {
@@ -23,8 +24,16 @@ export class EducationModel extends BaseModel {
   @Prop({ type: Number, required: true, default: 0 })
   relevance: number;
 
-  @Prop({ type: String, required: true, unique: true })
+  @Prop({ type: String, required: true })
   slug: string;
+
+  @Prop({
+    type: mongoose.Schema.Types.ObjectId,
+    ref: UserModel.name,
+    required: true,
+    index: true,
+  })
+  ownerId: mongoose.Types.ObjectId | string;
 
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: OrganizationModel.name })
   organization?: (mongoose.Types.ObjectId | string) | string;
@@ -77,3 +86,4 @@ export class EducationModel extends BaseModel {
 
 export type EducationDocument = HydratedDocument<EducationModel>;
 export const EducationSchema = SchemaFactory.createForClass(EducationModel);
+EducationSchema.index({ ownerId: 1, slug: 1 }, { unique: true });

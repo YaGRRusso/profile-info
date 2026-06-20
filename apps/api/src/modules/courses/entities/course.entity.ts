@@ -1,4 +1,4 @@
-import { Field, Int, ObjectType } from "@nestjs/graphql";
+import { Field, ID, Int, ObjectType } from "@nestjs/graphql";
 import { OptionalField } from "@/core/decorators/optional-field.decorator";
 import { BaseEntity } from "@/core/entities/base.entity";
 import { createPaginatedModel } from "@/core/schemas/paginated.schema";
@@ -31,6 +31,9 @@ export class CourseEntity extends BaseEntity {
 
   @Field(() => String)
   slug: string;
+
+  @Field(() => ID)
+  ownerId: string;
 
   @Field(() => OrganizationEntity)
   organization: OrganizationEntity;

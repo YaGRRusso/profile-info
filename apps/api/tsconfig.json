@@ -12,6 +12,9 @@
     "noImplicitAny": false,
     "strictBindCallApply": false,
     "noFallthroughCasesInSwitch": false,
-    "paths": { "@/*": ["src/*"] }
+    "paths": {
+      "@/*": ["src/*"],
+      "@test/*": ["test/*"]
+    }
   }
 }

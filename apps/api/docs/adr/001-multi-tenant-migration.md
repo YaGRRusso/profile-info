@@ -141,10 +141,22 @@ receives `RequestContext` and derives filters:
 
 ```typescript
 function tenantFilter(ctx: RequestContext): { ownerId?: ObjectId } {
-  if (ctx.isSuperAdmin) return {};
+  if (isSuperAdmin(ctx)) return {};
   return { ownerId: ctx.userId };
 }
+
+/** Caller filters first; tenant scope last so USER cannot override ownerId. */
+function mergeScopingFilters<T extends Record<string, unknown>>(
+  userFilters: T | undefined,
+  ctx: RequestContext
+): T & { ownerId?: ObjectId } {
+  return { ...userFilters, ...tenantFilter(ctx) };
+}
 ```
+
+For `USER` and API tokens, **always** spread `tenantFilter(ctx)` **after** any
+client-supplied filters so `ownerId` from the request can never widen or override
+tenant scope.
 
 | Operation | `USER` / API token | `SUPER_ADMIN` (session JWT) |
 |-----------|-------------------|----------------------------|
@@ -160,27 +172,46 @@ because the query includes `ownerId` and finds nothing.
 
 Enforced in the guard or a thin permissions layer before the resolver:
 
-- `QUERY` — portfolio reads only: `getMe`, private-entity queries, global catalog
-  queries. No `dashboard`, no `ai-tools`, no user CRUD, no token management.
+- `QUERY` — portfolio reads: `getMe`, private-entity queries, global catalog queries.
+  No `dashboard`, no `ai-tools`, no user CRUD, no token management.
 - `MUTATE` — private-entity writes only (not global catalog, not token CRUD, not
-  `dashboard` / `ai-tools`).
+  `dashboard` / `ai-tools`, not `getMe`).
+- **Combined `QUERY` + `MUTATE`** on one token — allowed in storage (`permissions[]`).
+  Typical tokens use a single permission; both together act as a “full portfolio”
+  credential (read + write for the token owner). Permission checks use
+  `permissions.includes(required)` per operation.
 - Session JWT — full access for the user's role (no permission enum).
+
+**Why `MUTATE`-only tokens cannot call `getMe`:** write-only integrations do not need
+profile reads — the token is already bound to one user. Read the portfolio via entity
+queries, or issue a `QUERY` token (or a combined `QUERY` + `MUTATE` token) when the
+integration also needs profile metadata.
 
 API tokens cannot manage other API tokens — only a logged-in user via session JWT
 creates/revokes tokens (admin panel; front out of scope).
 
 ### 5. `ownerId` rules
 
-| Caller | Create | Read / update / delete |
-|--------|--------|------------------------|
-| `USER` | Service sets `ownerId = ctx.userId` | `tenantFilter(ctx)` on every op (incl. batch) |
-| API token | Same as `USER` (scoped to token owner) | Same as `USER` |
-| `SUPER_ADMIN` | `ownerId` **required in create input** | No `ownerId` filter; operate by explicit ID |
+| Caller | Create | Update | Read / delete |
+|--------|--------|--------|---------------|
+| `USER` | Service sets `ownerId = ctx.userId` | **`ownerId` immutable** — strip from payload | `tenantFilter(ctx)` on every op (incl. batch) |
+| API token | Same as `USER` | Same as `USER` | Same as `USER` |
+| `SUPER_ADMIN` | `ownerId` **required in create input** | **`ownerId` immutable** — no reassignment | No `ownerId` filter; operate by explicit ID |
 
 - `USER` and API tokens: `ownerId` is **not** an accepted input field on create
-  (injection only). Filter inputs must not let `USER` override tenant scope.
-- `SUPER_ADMIN` may pass `ownerId` on create only; the service rejects create
-  without it.
+  (injection only).
+- `SUPER_ADMIN` may pass `ownerId` on create only; the service rejects create without it.
+- **No owner transfer on update** (any role). To move data between tenants: delete under
+  the wrong owner and recreate under the correct owner (see [backlog](./backlog.md) if
+  bulk transfer is ever needed).
+
+#### Filter inputs
+
+Filter DTOs use **`PartialType(PickType(Create*Input, [...]))`** — an explicit whitelist
+of filterable fields. Never `PartialType(Create*Input)` wholesale (that would inherit
+future create-only fields like `ownerId`). **`ownerId` is never a filter field**; tenant
+scope comes only from `RequestContext` via `mergeScopingFilters`. `FilterUserInput`
+excludes `password`.
 
 ### 6. Authentication model
 
@@ -215,7 +246,7 @@ Industry-standard pattern for JWT + opaque API tokens sharing `Authorization: Be
 3. **Guard resolution order:**
    - Extract Bearer token.
    - If token starts with `pi_` → look up by hash, build `RequestContext` with
-     `permissions` from the stored record.
+     `credentialKind: 'api_token'` and `permissions` from the stored record.
    - Else → existing JWT validation (`passport-jwt`).
 
 JWTs contain dots (`header.payload.signature`); prefixed opaque tokens are
@@ -224,12 +255,21 @@ unambiguous — no double-decode attempts.
 **Deferred:** `lastUsedAt`, per-user token limits, rotation UI — see [backlog](./backlog.md).
 
 ```typescript
-interface RequestContext {
-  userId: string;
-  role: UserRole;
-  permissions?: ApiTokenPermission[]; // absent for session JWT
-  isSuperAdmin: boolean;
-}
+type RequestContext =
+  | {
+      userId: string;
+      role: UserRole;
+      credentialKind: "session";
+    }
+  | {
+      userId: string;
+      role: UserRole;
+      credentialKind: "api_token";
+      permissions: ApiTokenPermission[]; // one or both per token
+    };
+
+// Role and credential checks live in helpers (e.g. isSuperAdmin(ctx), isSession(ctx),
+// isApiToken(ctx), hasPermission(ctx, ApiTokenPermission.QUERY)).
 ```
 
 ### 7. Domain events
@@ -239,7 +279,8 @@ Global catalog deletes affect all tenants that reference the entity — intentio
 | Event | Behavior |
 |-------|----------|
 | `skill.deleted` | `$pull` skill ID from all private entities that reference it |
-| `organization.deleted` | `deleteMany` on all private entities referencing the org |
+| `organization.deleted` | `deleteMany` on all private entities referencing the org (all tenants) |
+| `user.deleted` | `deleteMany` on all private entities with that `ownerId`; `deleteMany` on `ApiToken` for that `userId`. **`SUPER_ADMIN` users cannot be deleted** (lot 7). |
 
 Emit **before** delete (unchanged). Listeners stay thin.
 
@@ -274,10 +315,11 @@ Backend only:
 3. `GET /health` and `GET /resume.pdf?userId=` remain fully public.
 4. API tokens: CRUD via session JWT only; `pi_` prefix + hash storage; guard
    resolves JWT vs token; `QUERY` / `MUTATE` enforced per permission matrix.
-5. `USER`: `ownerId` injected; `SUPER_ADMIN` create requires `ownerId` in input.
+5. `USER`: `ownerId` injected on create; immutable on update; `SUPER_ADMIN` create requires `ownerId` in input.
 6. `npm run api:seed` produces 2 users + 1 super admin + sample tokens + isolated data.
 7. Tenant isolation + token permission tests pass.
-8. `ER_MODEL.md` updated.
+8. `ER_MODEL.md` reflects tenancy, cascade deletes, and `ApiToken`.
+9. `SUPER_ADMIN` cannot be deleted; deleting a `USER` cascades private data + tokens.
 
 ---
 
@@ -294,7 +336,7 @@ Backend only:
 5. **Do not** implement catalog auth, API tokens, or peripheral modules while
    still on an earlier lot — avoids half-migrated state and giant diffs.
 
-Phases 0–3 map to **7 lots**. Lots 1–2 establish the pattern; lots 3–4 repeat it
+Phases 0–3 map to **8 lots**. Lots 1–2 establish the pattern; lots 3–4 repeat it
 for the remaining private entities in pairs (not one entity per session — not
 everything at once either).
 
@@ -306,9 +348,10 @@ flowchart TD
     L3[Lot 3 — Private: Course + Project]
     L4[Lot 4 — Peripheral modules]
     L5[Lot 5 — Catalog auth]
-    L6[Lot 6 — API tokens + ER_MODEL]
+    L6[Lot 6 — API tokens]
+    L7[Lot 7 — User cascade delete]
 
-    L0 --> L1 --> L2 --> L3 --> L4 --> L5 --> L6
+    L0 --> L1 --> L2 --> L3 --> L4 --> L5 --> L6 --> L7
 ```
 
 ### Lot 0 — Role rename
@@ -332,7 +375,7 @@ flowchart TD
 
 | | |
 |---|---|
-| **Scope** | `RequestContext` type + decorator; pass context from resolvers (plumbing only — private services may accept but not enforce yet); `ownerId` nullable on 4 private schemas + compound `{ ownerId, slug }` index; seed: 2 `USER` + 1 `SUPER_ADMIN` with distinct credentials |
+| **Scope** | `RequestContext` type + decorator; pass context from resolvers (plumbing only — private services may accept but not enforce yet); required `ownerId` on 4 private schemas + compound `{ ownerId, slug }` index; seed: 2 `USER` + 1 `SUPER_ADMIN` with distinct credentials; **filter DTOs → `PartialType(PickType(...))` whitelist** (no `password` on user filter) |
 | **~Files** | 12–18 |
 | **Out of scope** | Tenant filters, removing `@Public()`, API tokens |
 
@@ -419,7 +462,7 @@ flowchart TD
 
 | | |
 |---|---|
-| **Scope** | `ApiToken` module (CRUD, `pi_` prefix, bcrypt hash, plaintext once on create); guard resolves `pi_` vs JWT; `QUERY` / `MUTATE` enforcement per permission matrix; remove remaining GraphQL `@Public()` (except `signIn`); seed: `QUERY` token per user; update `ER_MODEL.md` |
+| **Scope** | `ApiToken` module (CRUD, `pi_` prefix, bcrypt hash, plaintext once on create); guard resolves `pi_` vs JWT; `QUERY` / `MUTATE` enforcement per permission matrix (including combined permissions); remove remaining GraphQL `@Public()` (except `signIn`); seed: `QUERY` token per user |
 | **~Files** | 25–35 |
 | **Out of scope** | Frontends, full test overhaul ([backlog](./backlog.md)) |
 
@@ -431,7 +474,24 @@ flowchart TD
 - [ ] `Authorization: Bearer <jwt>` still works
 - [ ] `npm run api:seed` prints sample `QUERY` token per user
 
-**ADR complete** when lot 6 gate passes and [Definition of Done](#definition-of-done-merge-gate) is satisfied.
+**ADR complete** when lot 7 gate passes and [Definition of Done](#definition-of-done-merge-gate) is satisfied.
+
+---
+
+### Lot 7 — User cascade delete
+
+| | |
+|---|---|
+| **Scope** | `user.deleted` domain event; listeners delete all private entities with matching `ownerId` and all `ApiToken` rows for that user; **`removeOneUser` / `removeManyUsers` reject `SUPER_ADMIN`** targets; e2e: delete USER removes their courses/experiences/etc.; cannot delete super admin |
+| **~Files** | 12–18 |
+| **Out of scope** | Soft delete, owner transfer mutation |
+
+**Automated gate:** `npm run lint` · `npm run api:test` · e2e/integration: USER delete cascades private data + tokens; SUPER_ADMIN delete → forbidden
+
+**Manual gate:**
+- [ ] Seed user A deleted → A's private entities gone; B's unchanged
+- [ ] Attempt delete super admin → error
+- [ ] No orphan private docs with dangling `ownerId` after user delete
 
 ---
 
@@ -445,6 +505,7 @@ High-level grouping of the lots above:
 | 1 — Private tenancy | 2, 3, 4 |
 | 2 — Catalog auth | 5 |
 | 3 — API tokens | 6 |
+| 4 — Lifecycle | 7 |
 
 ---
 
@@ -466,7 +527,7 @@ ownerId: ObjectId; // ref User, required
   userId: ObjectId;
   name: string;
   hashedSecret: string;
-  permissions: ('QUERY' | 'MUTATE')[];
+  permissions: ('QUERY' | 'MUTATE')[]; // one or both per token
   expiresAt?: Date;
   createdAt, updatedAt;
 }
@@ -493,7 +554,11 @@ ownerId: ObjectId; // ref User, required
 | Manage users | ✗ | ✓ | ✗ | ✗ |
 
 `SUPER_ADMIN` does not mutate a personal portfolio — row "Mutate own private
-entities" is intentionally ✗ (operator has no portfolio data).
+entities" is intentionally ✗. The platform operator keeps a separate `USER` account
+for their own profile; the `SUPER_ADMIN` role is for catalog and tenant support only.
+
+**API token with both `QUERY` and `MUTATE`:** full portfolio access for the token
+owner (union of the QUERY and MUTATE columns, including `getMe` + writes).
 
 ---
 
@@ -510,7 +575,7 @@ entities" is intentionally ✗ (operator has no portfolio data).
 | Risk | Mitigation |
 |------|------------|
 | IDOR on batch ops | `tenantFilter` on every ID in `*ManyById` / `updateMany` / `removeMany` |
-| Large PR | Seven implementation lots; gate per lot; ≤ ~35 files each |
+| Large PR | Eight implementation lots; gate per lot; ≤ ~35 files each |
 | `resume.pdf` public with `userId` | Anyone can download any user's PDF if they know the ID — acceptable for now; see [backlog](./backlog.md) |
 | CORS fixed to one origin | `*` or [backlog](./backlog.md) when second tenant has own domain |
 

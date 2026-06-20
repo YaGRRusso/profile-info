@@ -66,6 +66,7 @@ export type CourseEntity = {
   id: Scalars['ID']['output'];
   image?: Maybe<Scalars['String']['output']>;
   organization: OrganizationEntity;
+  ownerId: Scalars['ID']['output'];
   relevance: Scalars['Float']['output'];
   skills?: Maybe<Array<SkillEntity>>;
   slug: Scalars['String']['output'];
@@ -296,6 +297,7 @@ export type EducationEntity = {
   image?: Maybe<Scalars['String']['output']>;
   level: EducationLevel;
   organization: OrganizationEntity;
+  ownerId: Scalars['ID']['output'];
   period?: Maybe<DateRangeEntity>;
   relevance: Scalars['Float']['output'];
   skills?: Maybe<Array<SkillEntity>>;
@@ -345,6 +347,7 @@ export type ExperienceEntity = {
   createdAt: Scalars['DateTime']['output'];
   id: Scalars['ID']['output'];
   organization: OrganizationEntity;
+  ownerId: Scalars['ID']['output'];
   relevance: Scalars['Float']['output'];
   roles: Array<ExperienceRole>;
   skills?: Maybe<Array<SkillEntity>>;
@@ -439,7 +442,6 @@ export type FilterUserInput = {
   i18n?: InputMaybe<Array<CreateUserMessagesInputTranslationInput>>;
   name?: InputMaybe<Scalars['String']['input']>;
   nickname?: InputMaybe<Scalars['String']['input']>;
-  password?: InputMaybe<Scalars['String']['input']>;
   phone?: InputMaybe<Scalars['String']['input']>;
   role?: InputMaybe<UserRole>;
   urls?: InputMaybe<Array<UrlInput>>;
@@ -837,6 +839,7 @@ export type ProjectEntity = {
   i18n: Array<ProjectMessagesTranslationEntity>;
   id: Scalars['ID']['output'];
   images?: Maybe<Array<Scalars['String']['output']>>;
+  ownerId: Scalars['ID']['output'];
   relevance: Scalars['Float']['output'];
   skills?: Maybe<Array<SkillEntity>>;
   slug: Scalars['String']['output'];

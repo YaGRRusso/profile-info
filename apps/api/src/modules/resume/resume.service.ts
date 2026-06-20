@@ -63,21 +63,21 @@ export class ResumeService {
       this.skillsService.findMany({
         sort: { relevance: -1 },
       }),
-      this.experiencesService.findMany({
+      this.experiencesService.findMany(null, {
         sort: { relevance: -1 },
         limit: RESUME_LIMITS.experiences,
       }),
-      this.educationsService.findMany({
+      this.educationsService.findMany(null, {
         filters: { status: "COMPLETE" },
         sort: { relevance: -1 },
         limit: RESUME_LIMITS.educations,
       }),
-      this.coursesService.findMany({
+      this.coursesService.findMany(null, {
         filters: { status: "COMPLETE" },
         sort: { relevance: -1 },
         limit: RESUME_LIMITS.certifications,
       }),
-      this.projectsService.findMany({
+      this.projectsService.findMany(null, {
         sort: { relevance: -1 },
         limit: RESUME_LIMITS.projects,
       }),

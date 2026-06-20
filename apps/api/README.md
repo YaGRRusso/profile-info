@@ -172,7 +172,7 @@ E2E tests use `mongodb://127.0.0.1:27017/profile-test-e2e` by default (Docker Co
 
 See **`test/README.md`** for Jest lifecycle, folder layout, database modes, and troubleshooting.
 
-Seed admin credentials: `admin@profile.info` / `admin123`.
+Seed credentials: `alice@profile.info` / `alice.pass`, `bob@profile.info` / `bob.pass` (USER), `admin@profile.info` / `pass.123` (SUPER_ADMIN).
 
 ## Further reading
 

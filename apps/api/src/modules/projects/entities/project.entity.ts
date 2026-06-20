@@ -1,4 +1,4 @@
-import { Field, ObjectType } from "@nestjs/graphql";
+import { Field, ID, ObjectType } from "@nestjs/graphql";
 import { OptionalField } from "@/core/decorators/optional-field.decorator";
 import { BaseEntity } from "@/core/entities/base.entity";
 import {
@@ -27,6 +27,9 @@ export class ProjectEntity extends BaseEntity {
 
   @Field(() => String)
   slug: string;
+
+  @Field(() => ID)
+  ownerId: string;
 
   @OptionalField(() => [String])
   images?: string[];

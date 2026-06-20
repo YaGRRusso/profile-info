@@ -8,11 +8,13 @@ import {
   ResolveField,
   Resolver,
 } from "@nestjs/graphql";
+import type { RequestContext } from "@/core/context/request-context.interface";
 import { Public } from "@/core/decorators/public-route.decorator";
 import { Roles } from "@/core/decorators/roles.decorator";
 import { BatchEntity } from "@/core/entities/batch.entity";
 import { UserRole } from "@/core/enums/user-role.enum";
 import { PaginationInput } from "@/core/inputs/pagination.input";
+import { CurrentRequestContext } from "@/modules/auth/decorators/current-request-context.decorator";
 import type { Ctx } from "@/modules/graphql/context.interface";
 import type { ProjectModel } from "@/modules/projects/schemas/project.schema";
 import { SkillEntity } from "@/modules/skills/entities/skill.entity";
@@ -35,7 +37,7 @@ export class ProjectsResolver {
   @Public()
   @Query(() => ProjectEntity)
   findOneProjectById(@Args("projectId", { type: () => ID }) projectId: string) {
-    return this.projectsService.findOneById(projectId);
+    return this.projectsService.findOneById(null, projectId);
   }
 
   @Public()
@@ -47,7 +49,7 @@ export class ProjectsResolver {
     })
     projectFilters?: FilterProjectInput
   ) {
-    return this.projectsService.findOne({ filters: projectFilters });
+    return this.projectsService.findOne(null, { filters: projectFilters });
   }
 
   @Public()
@@ -55,7 +57,7 @@ export class ProjectsResolver {
   findManyProjectById(
     @Args("projectIds", { type: () => [ID] }) projectIds: string[]
   ) {
-    return this.projectsService.findManyById(projectIds);
+    return this.projectsService.findManyById(null, projectIds);
   }
 
   @Public()
@@ -77,7 +79,7 @@ export class ProjectsResolver {
     })
     projectSort?: SortProjectInput
   ) {
-    return this.projectsService.findMany({
+    return this.projectsService.findMany(null, {
       filters: projectFilters,
       sort: projectSort,
       limit: projectPagination?.limit,
@@ -90,53 +92,61 @@ export class ProjectsResolver {
   @Roles(UserRole.SUPER_ADMIN)
   @Mutation(() => ProjectEntity)
   createOneProject(
+    @CurrentRequestContext() ctx: RequestContext,
     @Args("createProjectInput", { type: () => CreateProjectInput })
     createProjectInput: CreateProjectInput
   ) {
-    return this.projectsService.createOne(createProjectInput);
+    return this.projectsService.createOne(ctx, createProjectInput);
   }
 
   @Roles(UserRole.SUPER_ADMIN)
   @Mutation(() => [ProjectEntity])
   createManyProjects(
+    @CurrentRequestContext() ctx: RequestContext,
     @Args("createProjectInputs", { type: () => [CreateProjectInput] })
     createProjectInputs: CreateProjectInput[]
   ) {
-    return this.projectsService.createMany(createProjectInputs);
+    return this.projectsService.createMany(ctx, createProjectInputs);
   }
 
   @Roles(UserRole.SUPER_ADMIN)
   @Mutation(() => ProjectEntity)
   updateOneProject(
+    @CurrentRequestContext() ctx: RequestContext,
     @Args("projectId", { type: () => ID }) projectId: string,
     @Args("updateProjectInput", { type: () => UpdateProjectInput })
     updateProjectInput: UpdateProjectInput
   ) {
-    return this.projectsService.updateOne(projectId, updateProjectInput);
+    return this.projectsService.updateOne(ctx, projectId, updateProjectInput);
   }
 
   @Roles(UserRole.SUPER_ADMIN)
   @Mutation(() => BatchEntity)
   updateManyProjects(
+    @CurrentRequestContext() ctx: RequestContext,
     @Args("projectIds", { type: () => [ID] }) projectIds: string[],
     @Args("updateProjectInput", { type: () => UpdateProjectInput })
     updateProjectInput: UpdateProjectInput
   ) {
-    return this.projectsService.updateMany(projectIds, updateProjectInput);
+    return this.projectsService.updateMany(ctx, projectIds, updateProjectInput);
   }
 
   @Roles(UserRole.SUPER_ADMIN)
   @Mutation(() => ProjectEntity)
-  removeOneProject(@Args("projectId", { type: () => ID }) projectId: string) {
-    return this.projectsService.removeOne(projectId);
+  removeOneProject(
+    @CurrentRequestContext() ctx: RequestContext,
+    @Args("projectId", { type: () => ID }) projectId: string
+  ) {
+    return this.projectsService.removeOne(ctx, projectId);
   }
 
   @Roles(UserRole.SUPER_ADMIN)
   @Mutation(() => BatchEntity)
   removeManyProjects(
+    @CurrentRequestContext() ctx: RequestContext,
     @Args("projectIds", { type: () => [ID] }) projectIds: string[]
   ) {
-    return this.projectsService.removeMany(projectIds);
+    return this.projectsService.removeMany(ctx, projectIds);
   }
 
   @ResolveField(() => [SkillEntity])

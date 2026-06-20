@@ -1,6 +1,7 @@
 import { BadRequestException, NotFoundException } from "@nestjs/common";
 import { getModelToken } from "@nestjs/mongoose";
 import { Test, TestingModule } from "@nestjs/testing";
+import { testRequestContext } from "@test/fixtures/request-context";
 import mongoose, { Model } from "mongoose";
 import { ProjectModel } from "@/modules/projects/schemas/project.schema";
 import { ProjectsRepository } from "./projects.repository";
@@ -8,6 +9,7 @@ import { ProjectsService } from "./projects.service";
 
 const validId = new mongoose.Types.ObjectId().toHexString();
 const invalidId = "not-an-object-id";
+const ctx = testRequestContext();
 const fakeDoc = {
   _id: validId,
   title: "My Project",
@@ -60,18 +62,18 @@ describe("ProjectsService", () => {
   describe("findOneById", () => {
     it("should return the project document", async () => {
       (model.findById as jest.Mock).mockReturnValue(makeExec(fakeDoc));
-      expect(await service.findOneById(validId)).toBe(fakeDoc);
+      expect(await service.findOneById(ctx, validId)).toBe(fakeDoc);
     });
 
     it("should throw BadRequestException for invalid ID", async () => {
-      await expect(service.findOneById(invalidId)).rejects.toThrow(
+      await expect(service.findOneById(ctx, invalidId)).rejects.toThrow(
         BadRequestException
       );
     });
 
     it("should throw NotFoundException when not found", async () => {
       (model.findById as jest.Mock).mockReturnValue(makeExec(null));
-      await expect(service.findOneById(validId)).rejects.toThrow(
+      await expect(service.findOneById(ctx, validId)).rejects.toThrow(
         NotFoundException
       );
     });
@@ -80,7 +82,9 @@ describe("ProjectsService", () => {
   describe("createOne", () => {
     it("should return the created document", async () => {
       (model.create as jest.Mock).mockResolvedValue(fakeDoc);
-      const result = await service.createOne({ title: "My Project" } as any);
+      const result = await service.createOne(ctx, {
+        title: "My Project",
+      } as any);
       expect(result).toBe(fakeDoc);
     });
   });
@@ -88,11 +92,11 @@ describe("ProjectsService", () => {
   describe("updateOne", () => {
     it("should return the updated document", async () => {
       (model.findByIdAndUpdate as jest.Mock).mockReturnValue(makeExec(fakeDoc));
-      expect(await service.updateOne(validId, {})).toBe(fakeDoc);
+      expect(await service.updateOne(ctx, validId, {})).toBe(fakeDoc);
     });
 
     it("should throw BadRequestException for invalid ID", async () => {
-      await expect(service.updateOne(invalidId, {})).rejects.toThrow(
+      await expect(service.updateOne(ctx, invalidId, {})).rejects.toThrow(
         BadRequestException
       );
     });
@@ -101,11 +105,11 @@ describe("ProjectsService", () => {
   describe("removeOne", () => {
     it("should return the removed document", async () => {
       (model.findByIdAndDelete as jest.Mock).mockReturnValue(makeExec(fakeDoc));
-      expect(await service.removeOne(validId)).toBe(fakeDoc);
+      expect(await service.removeOne(ctx, validId)).toBe(fakeDoc);
     });
 
     it("should throw BadRequestException for invalid ID", async () => {
-      await expect(service.removeOne(invalidId)).rejects.toThrow(
+      await expect(service.removeOne(ctx, invalidId)).rejects.toThrow(
         BadRequestException
       );
     });
@@ -116,7 +120,7 @@ describe("ProjectsService", () => {
       (model.deleteMany as jest.Mock).mockReturnValue(
         makeExec({ deletedCount: 3 })
       );
-      expect(await service.removeMany([validId])).toEqual({ count: 3 });
+      expect(await service.removeMany(ctx, [validId])).toEqual({ count: 3 });
     });
   });
 });

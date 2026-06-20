@@ -67,7 +67,9 @@ Full diagram and field detail: `apps/api/docs/ER_MODEL.md`.
 
 - `filters/persistence-exception.filter.ts`: global `APP_FILTER` — maps persistence errors to HTTP exceptions: Mongo `E11000`/`E11001` → 409, Mongo `121` + Mongoose `ValidationError`/`CastError` → 400, `MongooseServerSelectionError` → 503. Services do not catch these; use `assertDuplicate` / `assertReferencesExist` in `common/helpers/assert.helper.ts` only for domain-specific pre-checks.
 - `events/`: `domain-events.ts` (event name constants), `skill-deleted.event.ts`, `organization-deleted.event.ts` (neutral payload classes).
+- `enums/credential-kind.enum.ts`: shared `CredentialKind` enum (`SESSION`, `API_TOKEN`).
 - `enums/user-role.enum.ts`: shared `UserRole` enum (`USER`, `SUPER_ADMIN`).
+- `enums/api-token-permission.enum.ts`: shared `ApiTokenPermission` enum (`QUERY`, `MUTATE`).
 - `schemas/paginated.schema.ts`: `createPaginatedModel(Entity)` for `{ found, nodes }`.
 - `schemas/base.schema.ts`, `translation.schema.ts`, `daterange.schema.ts`, `url.schema.ts`: shared Mongoose sub-schemas.
 - `entities/`: `BaseEntity`, batch, date-range, translation, url GraphQL types.
@@ -87,7 +89,7 @@ DI pattern is the NestJS-idiomatic **abstract class as token**: ports are abstra
 `modules/` (business domains):
 
 - `graphql/`: `graphql.module.ts` (single module — Apollo wiring), `loaders.service.ts` (composes per-entity loaders), `context.interface.ts` (`Ctx`). `forRootAsync` injects exported `*LoaderService` from entity modules; batching logic stays in those services.
-- `auth/`: global `GqlAuthGuard` (JWT + `UNAUTHENTICATED` GraphQL extension) and `RolesGuard` (`@Roles(SUPER_ADMIN)` on mutations/dashboard). `signIn` (`@Public`) returns JWT; `getMe` returns current user; `updateMe` lets any authenticated user update their own profile (no `role` in input); `@CurrentUser()` decorator lives in `auth/decorators/`. Profile reads are `@Public()`; entity CRUD mutations require `SUPER_ADMIN`.
+- `auth/`: global `GqlAuthGuard` (JWT + `UNAUTHENTICATED` GraphQL extension) and `RolesGuard` (`@Roles(SUPER_ADMIN)` on mutations/dashboard). `signIn` (`@Public`) returns JWT; `getMe` returns current user; `updateMe` lets any authenticated user update their own profile (no `role` in input); `@CurrentUser()` decorator lives in `auth/decorators/`. `@CurrentRequestContext()` builds a session `RequestContext` (`credentialKind: SESSION`) from the JWT user via `toRequestContext()`; API tokens (future) use `toApiTokenRequestContext()` with `credentialKind: API_TOKEN`. Helpers: `isSession(ctx)`, `isApiToken(ctx)`, `isSuperAdmin(ctx)`, `hasPermission(ctx, ApiTokenPermission.QUERY)`. Private-entity resolvers pass context to services (plumbing only until lot 2 enforces `tenantFilter`). Profile reads are `@Public()`; entity CRUD mutations require `SUPER_ADMIN`.
 - `ai-tools/`: AI use-cases. Owns `AiEntity` GraphQL types, enums (`ChatRole`, `ChatFinishReason`), and mappers (`IntegrationChatResult` → `AiEntity`). `resource-detail/` orchestrates `*ExtractorService` classes. Injects `AiChatProvider`, `RepositoryMetadataProvider`, `WebContentProvider`. `AiToolsModule` imports `OpenRouterModule`, `GithubModule`, `TavilyModule`.
 - `dashboard/`: read-only aggregation via feature **services** (`count()`, `countByField()`), not other modules' Mongoose schemas.
 - `resume/`: `ResumeService` aggregates profile data (top by `relevance`, completed educations/courses); skills use top `skillsPerCategory` per category (empty categories omitted). PDF export via `GET /resume.pdf?locale=` (`normalizeLocale`, `pickTranslation`, `formatPeriod`, `resolveResumeLabels` in `resume.labels.ts`). Filename is always `resume.pdf`. Uses first `SUPER_ADMIN` user as profile owner; org refs resolved via `OrganizationsService.findManyById`. CV-specific rendering in `resume/pdf/` (`renderResumeDocument`, section renderers); uses `PdfRenderService` from `core/pdf/PdfModule`.
@@ -133,7 +135,7 @@ Copy `src/modules/skills/` and adapt:
 
 1. Mongoose model: `src/modules/<name>/schemas/<name>.schema.ts` extending `BaseModel`.
 2. GraphQL entity: `modules/<name>/entities/<name>.entity.ts` extending `BaseEntity`; export `Paginated<Name>Entity = createPaginatedModel(...)`.
-3. Inputs: `Create`, `Update` (PartialType), `Filter` (PartialType), `Sort` (SortType factory).
+3. Inputs: `Create`, `Update` (PartialType), `Filter` (`PartialType(PickType(Create, [...]))` — explicit whitelist; never `PartialType(Create)` wholesale), `Sort` (SortType factory).
 4. Repository: `<entity>.repository.ts` extends `MongooseCrudRepository<T>`, registered as an `@Injectable()` provider in the module. Entity-specific queries (e.g. `UsersRepository.findOneByEmailWithPassword`) live on the repository.
 5. Service: explicit CRUD methods delegating to the repository; keep domain logic (events, password hashing, `detachSkill`, `purgeByOrganization`) in the service. Filter-based writes use `updateManyByFilter` / `deleteManyByFilter` on the base repository. `skills.service.ts` is the reference for delete events; `users.service.ts` for password hashing.
 6. Resolver: explicit `@Query` / `@Mutation` methods with `@Public()` on reads; wire pagination/sort/filter args like `skills.resolver.ts`.
@@ -158,11 +160,11 @@ Loaded via `--env-file .env.development` / `.env.production` and `ConfigModule`.
 
 Run from `apps/api/` or via root `api:*` aliases: `dev`, `prod`, `build`, `start`, `seed`, `test`, `test:coverage`, `test:e2e`, `typecheck`, `lint`, `format`.
 
-`npm run seed`: wipes profile collections and inserts faker dev data plus admin `admin@profile.info` / `admin123`.
+`npm run seed`: wipes profile collections and inserts faker dev data plus `alice@profile.info` / `alice.pass`, `bob@profile.info` / `bob.pass` (USER), and `admin@profile.info` / `pass.123` (SUPER_ADMIN).
 
 - `GET /health`: Terminus health check with MongoDB ping.
-- Test layout: `test/config/` (Jest e2e config, setup/teardown), `test/support/` (shared helpers + `TestAppModule`), `test/e2e/`, `test/integration/`. Default DB `profile-test-e2e` on localhost Mongo; override with `TEST_DATABASE_URL` or `USE_MEMORY_MONGO=true` (in-memory Mongo starts in `globalSetup` and stops in `globalTeardown` — do not start it inside test `beforeAll`, or Jest will hang). E2e `globalSetup`/`globalTeardown` wipe `.cache/mongodb-data` and `.cache/test-mongo.json` each run (binaries in `.cache/mongodb-binaries` and Jest cache in `.cache/jest-e2e` are kept).
-- ADRs in `apps/api/docs/adr/`. Multi-tenant: `001-multi-tenant-migration.md` (backend core + API tokens, branch `feat/multi-tenant`; implement in 7 lots, one at a time). Deferred work: `backlog.md`.
+- Test layout: `test/fixtures/` (shared builders — import `@test/fixtures/…` from unit specs), `test/config/` (Jest e2e config, setup/teardown), `test/support/` (Nest bootstrap + `TestAppModule`), `test/e2e/`, `test/integration/`. Path aliases: `@/*` → `src/`, `@test/*` → `test/` (Jest + `tsconfig.json`).
+- ADRs in `apps/api/docs/adr/`. Multi-tenant: `001-multi-tenant-migration.md` (backend core + API tokens, branch `feat/multi-tenant`; implement in 8 lots, one at a time). Deferred work: `backlog.md`.
 
 ## Gotchas & notes
 

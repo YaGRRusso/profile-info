@@ -16,12 +16,14 @@ npm run test:e2e   # e2e + integration (this folder)
 test/
 ├── config/           # Jest wiring (lifecycle hooks, env)
 ├── e2e/              # HTTP / GraphQL smoke tests (*.e2e-spec.ts)
+├── fixtures/         # test data builders (import via @test/fixtures/…)
 ├── integration/      # service-level tests (*.integration-spec.ts)
-└── support/          # shared helpers (app bootstrap, DB, requests)
+└── support/          # Nest bootstrap, DB, HTTP helpers (e2e/integration only)
 ```
 
 | Path | Role |
 |------|------|
+| `fixtures/` | Pure builders/fakes shared by unit specs (`src/**/*.spec.ts`) and e2e. Import with `@test/fixtures/…` — not shipped in production. |
 | `config/jest-e2e.json` | Jest config **only** for e2e/integration |
 | `config/global-setup.ts` | Runs once before all suites (Mongo in-memory, cache cleanup) |
 | `config/global-teardown.ts` | Runs once after all suites (stop Mongo, cache cleanup) |
@@ -31,6 +33,17 @@ test/
 | `support/test-env.ts` | Fake secrets and `NODE_ENV=test` |
 | `support/clear-test-database.ts` | `dropDatabase()` between suites when needed |
 | `support/graphql-request.ts` | Helper for GraphQL HTTP calls |
+
+### Import aliases
+
+| Alias | Maps to | Use in |
+|-------|---------|--------|
+| `@/*` | `src/*` | Production code and tests |
+| `@test/*` | `test/*` | Tests only — fixtures and (from e2e) support helpers |
+
+Unit specs under `src/**/*.spec.ts` import shared builders from `@test/fixtures/…`
+instead of relative paths into `test/`. Fixtures may import production types via `@/`
+but are never compiled into the Nest app (`sourceRoot` is `src/` only).
 
 ---
 

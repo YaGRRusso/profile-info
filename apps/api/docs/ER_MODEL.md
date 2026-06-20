@@ -7,8 +7,9 @@
 
 - **Store:** MongoDB
 - **ORM / layer:** Mongoose (`@nestjs/mongoose`)
-- **Top-level entities:** User, Skill, Organization, Experience, Education, Course, Project
+- **Top-level entities:** User, Skill, Organization, Experience, Education, Course, Project, ApiToken (planned — ADR 001 lot 6)
 - **Schema sources:** `apps/api/src/modules/*/schemas/`, `apps/api/src/core/schemas/`
+- **Tenancy:** A tenant is a `User`. Private entities (`Experience`, `Education`, `Course`, `Project`) require `ownerId` → `User`. Global catalog (`Skill`, `Organization`) has no `ownerId`.
 
 ## Diagram
 
@@ -42,7 +43,8 @@ erDiagram
   }
   Experience {
     ObjectId _id PK
-    string slug UK
+    ObjectId ownerId FK
+    string slug "UK per owner"
     ObjectId organization FK
     object roles "embed"
   }
@@ -53,7 +55,8 @@ erDiagram
   }
   Education {
     ObjectId _id PK
-    string slug UK
+    ObjectId ownerId FK
+    string slug "UK per owner"
     ObjectId organization FK
     ObjectId skills FK "array"
     string level
@@ -61,7 +64,8 @@ erDiagram
   }
   Course {
     ObjectId _id PK
-    string slug UK
+    ObjectId ownerId FK
+    string slug "UK per owner"
     ObjectId organization FK
     ObjectId skills FK "array"
     string status
@@ -69,7 +73,8 @@ erDiagram
   }
   Project {
     ObjectId _id PK
-    string slug UK
+    ObjectId ownerId FK
+    string slug "UK per owner"
     ObjectId skills FK "array"
     string images "array"
   }
@@ -79,7 +84,18 @@ erDiagram
     string name
     string category
   }
+  ApiToken {
+    ObjectId _id PK
+    ObjectId userId FK
+    string hashedSecret
+    string permissions "QUERY MUTATE"
+  }
   User ||--o{ UrlEmbed : urls
+  User ||--o{ Experience : ownerId
+  User ||--o{ Education : ownerId
+  User ||--o{ Course : ownerId
+  User ||--o{ Project : ownerId
+  User ||--o{ ApiToken : userId
   Project ||--o{ UrlEmbed : urls
   Organization ||--o{ Experience : organization
   Organization ||--o{ Education : organization
@@ -106,6 +122,8 @@ Both are MongoDB `ObjectId` references. The FK always lives on the document that
   owner block.
 - **Experience:** `organization FK` is on the root document; `skills` only on embedded
   `ExperienceRole`, so the Skill edge attaches to `ExperienceRole`, not `Experience`.
+- **Private entities:** `ownerId` → `User` (required). Slug uniqueness is compound
+  `{ ownerId, slug }`, not global.
 
 The `ObjectId … FK` lines inside entity blocks are the stored refs; Mermaid edges show
 which collection is pointed at.
@@ -116,17 +134,20 @@ which collection is pointed at.
 
 - **Source:** `src/modules/users/schemas/user.schema.ts`
 - **Key fields:** `name`, `nickname` (unique), `email` (unique), `password` (required,
-  `select: false`, not exposed in API), `role` (enum), `title`, `phone`, `avatar`,
-  `birth`, `address`, `i18n[]` (embed: `locale`, `messages.title`, `messages.description`)
+  `select: false`, not exposed in API), `role` (enum: `USER`, `SUPER_ADMIN`), `phone`,
+  `avatar`, `birth`, `address`, `i18n[]` (embed: `locale`, `messages.title`,
+  `messages.description`)
 - **Embedded:** `urls[]` (`UrlEmbed`: `title`, `value`), `i18n[]` translations
-- **References:** none
+- **References:** none (tenant root; referenced by private entities and `ApiToken`)
+- **Delete:** `SUPER_ADMIN` accounts cannot be deleted. Deleting a `USER` cascades to
+  their private entities and API tokens (ADR 001 lot 7).
 
 ### Skill (`skills`)
 
 - **Source:** `src/modules/skills/schemas/skill.schema.ts`
 - **Key fields:** `slug` (unique), `name`, `category` (enum, indexed), `relevance`
 - **Embedded:** none
-- **References:** none (referenced by other entities)
+- **References:** none (global catalog; referenced by private entities)
 
 ### Organization (`organizations`)
 
@@ -134,37 +155,46 @@ which collection is pointed at.
 - **Key fields:** `slug` (unique), `name`, `website`, `logo`, `category` (enum, indexed),
   `relevance`, `i18n[]` (embed: `locale`, `messages.description`)
 - **Embedded:** `i18n[]` translations
-- **References:** none (referenced by Experience, Education, Course)
+- **References:** none (global catalog; referenced by Experience, Education, Course)
 
 ### Experience (`experiences`)
 
 - **Source:** `src/modules/experiences/schemas/experience.schema.ts`
-- **Key fields:** `slug` (unique), `category` (enum, indexed), `relevance`
+- **Key fields:** `ownerId` (required, ref → User), `slug` (unique per owner via
+  `{ ownerId, slug }` index), `category` (enum, indexed), `relevance`
 - **Embedded:** `roles[]` (`ExperienceRole`: `i18n[]`, `period`, `skills[]`)
-- **References:** `organization` → Organization (optional ObjectId)
+- **References:** `ownerId` → User; `organization` → Organization (optional ObjectId)
 
 ### Education (`educations`)
 
 - **Source:** `src/modules/educations/schemas/education.schema.ts`
-- **Key fields:** `slug` (unique), `level` (enum, indexed), `status` (enum, indexed),
-  `url`, `image`, `relevance`, `period`, `i18n[]`
+- **Key fields:** `ownerId` (required), `slug` (unique per owner), `level` (enum,
+  indexed), `status` (enum, indexed), `url`, `image`, `relevance`, `period`, `i18n[]`
 - **Embedded:** `i18n[]` translations, `period` (`DateRange`: `from`, `to`)
-- **References:** `organization` → Organization; `skills[]` → Skill
+- **References:** `ownerId` → User; `organization` → Organization; `skills[]` → Skill
 
 ### Course (`courses`)
 
 - **Source:** `src/modules/courses/schemas/course.schema.ts`
-- **Key fields:** `slug` (unique), `status` (enum, indexed), `url`, `image`, `hours`,
-  `relevance`, `period`, `i18n[]`
+- **Key fields:** `ownerId` (required), `slug` (unique per owner), `status` (enum,
+  indexed), `url`, `image`, `hours`, `relevance`, `period`, `i18n[]`
 - **Embedded:** `i18n[]` translations, `period`
-- **References:** `organization` → Organization; `skills[]` → Skill
+- **References:** `ownerId` → User; `organization` → Organization; `skills[]` → Skill
 
 ### Project (`projects`)
 
 - **Source:** `src/modules/projects/schemas/project.schema.ts`
-- **Key fields:** `slug` (unique), `relevance`, `images[]`, `i18n[]`
+- **Key fields:** `ownerId` (required), `slug` (unique per owner), `relevance`,
+  `images[]`, `i18n[]`
 - **Embedded:** `i18n[]` translations, `urls[]` (`UrlEmbed`)
-- **References:** `skills[]` → Skill
+- **References:** `ownerId` → User; `skills[]` → Skill
+
+### ApiToken (`api_tokens`) — planned (ADR 001 lot 6)
+
+- **Key fields:** `userId` (ref → User), `name`, `hashedSecret`, `permissions[]`
+  (`QUERY`, `MUTATE` — one or both), optional `expiresAt`
+- **References:** `userId` → User
+- **Delete:** cascade when parent `User` is deleted (lot 7)
 
 ## Shared value objects
 
@@ -177,21 +207,36 @@ which collection is pointed at.
 
 ## Relationships summary
 
-1. Experience, Education, Course optionally reference **one** Organization (`organization`:
+1. **User** owns many **Experience**, **Education**, **Course**, **Project** via required
+   `ownerId`. Same slug may exist on different users (compound unique index).
+2. Experience, Education, Course optionally reference **one** Organization (`organization`:
    scalar `ObjectId`).
-2. Education, Course, Project, and embedded Experience roles reference **many** Skills
+3. Education, Course, Project, and embedded Experience roles reference **many** Skills
    (`skills`: `ObjectId[]`). Same skill `_id` can appear on multiple owners (many-to-many).
-3. User and Project embed URL pairs; no separate `urls` collection.
-4. Experience embeds an ordered list of roles; each role embeds its own i18n, period, and
+4. User and Project embed URL pairs; no separate `urls` collection.
+5. Experience embeds an ordered list of roles; each role embeds its own i18n, period, and
    `skills[]`.
+6. **ApiToken** belongs to one **User** (session JWT manages token CRUD).
 
 ## Delete and lifecycle notes
 
 - `skill.deleted` event: consumers `$pull` skill refs from Project, Course, Education,
   and nested Experience role arrays (`detachSkill`).
 - `organization.deleted` event: hard `deleteMany` on Course, Education, Experience tied
-  to that organization (`purgeByOrganization`).
+  to that organization **across all tenants** (`purgeByOrganization`) — intentional;
+  softer detach is [backlog](./adr/backlog.md).
+- `user.deleted` event (lot 7): `deleteMany` on all private entities with matching
+  `ownerId`; `deleteMany` on `ApiToken` for that `userId`. **`SUPER_ADMIN` users cannot
+  be deleted.**
+- Private entity updates never change `ownerId` — transfer is delete + recreate (see
+  [backlog](./adr/backlog.md)).
 - No Mongoose `pre('deleteOne')` hooks; deletes go through services that emit events first.
+
+## GraphQL filter inputs
+
+Filter `*Input` types use `PartialType(PickType(Create*Input, [...]))` — an explicit
+whitelist of filterable fields. **`ownerId` is never filterable** (tenant scope comes
+from `RequestContext`, not client filters). `FilterUserInput` excludes `password`.
 
 ## Maintaining this file
 

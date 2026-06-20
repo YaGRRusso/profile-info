@@ -7,6 +7,7 @@ import {
 } from "@/core/schemas/translation.schema";
 import { UrlModel } from "@/core/schemas/url.schema";
 import { SkillModel } from "@/modules/skills/schemas/skill.schema";
+import { UserModel } from "@/modules/users/schemas/user.schema";
 
 @Schema({ _id: false })
 export class ProjectMessagesModel {
@@ -22,8 +23,16 @@ export class ProjectModel extends BaseModel {
   @Prop({ type: Number, required: true, default: 0 })
   relevance: number;
 
-  @Prop({ type: String, required: true, unique: true })
+  @Prop({ type: String, required: true })
   slug: string;
+
+  @Prop({
+    type: mongoose.Schema.Types.ObjectId,
+    ref: UserModel.name,
+    required: true,
+    index: true,
+  })
+  ownerId: mongoose.Types.ObjectId | string;
 
   @Prop({ type: [String] })
   images: string[];
@@ -45,3 +54,4 @@ export class ProjectModel extends BaseModel {
 
 export type ProjectDocument = HydratedDocument<ProjectModel>;
 export const ProjectSchema = SchemaFactory.createForClass(ProjectModel);
+ProjectSchema.index({ ownerId: 1, slug: 1 }, { unique: true });

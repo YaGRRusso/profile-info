@@ -1,6 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { AnyKeys, QueryFilter, SortOrder, UpdateQuery } from "mongoose";
 import { RecentActivityRecord } from "@/common/helpers/recent-activity.helper";
+import type { RequestContext } from "@/core/context/request-context.interface";
 import { BatchEntity } from "@/core/entities/batch.entity";
 import { PaginatedModel } from "@/core/schemas/paginated.schema";
 import { ExperienceModel } from "@/modules/experiences/schemas/experience.schema";
@@ -12,41 +13,57 @@ import { ExperiencesRepository } from "./experiences.repository";
 export class ExperiencesService {
   constructor(private readonly repository: ExperiencesRepository) {}
 
-  findOneById(id: string): Promise<ExperienceModel> {
+  findOneById(
+    _ctx: RequestContext | null,
+    id: string
+  ): Promise<ExperienceModel> {
     return this.repository.findOneById(id);
   }
 
-  findOne({
-    filters,
-  }: {
-    filters?: QueryFilter<ExperienceModel>;
-  }): Promise<ExperienceModel> {
+  findOne(
+    _ctx: RequestContext | null,
+    {
+      filters,
+    }: {
+      filters?: QueryFilter<ExperienceModel>;
+    }
+  ): Promise<ExperienceModel> {
     return this.repository.findOne({ filters });
   }
 
-  findManyById(ids: string[]): Promise<ExperienceModel[]> {
+  findManyById(
+    _ctx: RequestContext | null,
+    ids: string[]
+  ): Promise<ExperienceModel[]> {
     return this.repository.findManyById(ids);
   }
 
-  findMany({
-    filters,
-    sort,
-    skip = 0,
-    limit = 50,
-  }: {
-    filters?: QueryFilter<ExperienceModel>;
-    sort?: Partial<Record<keyof ExperienceModel, SortOrder>>;
-    limit?: number;
-    skip?: number;
-  }): Promise<PaginatedModel<ExperienceModel>> {
+  findMany(
+    _ctx: RequestContext | null,
+    {
+      filters,
+      sort,
+      skip = 0,
+      limit = 50,
+    }: {
+      filters?: QueryFilter<ExperienceModel>;
+      sort?: Partial<Record<keyof ExperienceModel, SortOrder>>;
+      limit?: number;
+      skip?: number;
+    }
+  ): Promise<PaginatedModel<ExperienceModel>> {
     return this.repository.findMany({ filters, sort, skip, limit });
   }
 
-  createOne(createInput: CreateExperienceInput): Promise<ExperienceModel> {
+  createOne(
+    _ctx: RequestContext | null,
+    createInput: CreateExperienceInput
+  ): Promise<ExperienceModel> {
     return this.repository.createOne(createInput as AnyKeys<ExperienceModel>);
   }
 
   createMany(
+    _ctx: RequestContext | null,
     createInputs: CreateExperienceInput[]
   ): Promise<ExperienceModel[]> {
     return this.repository.createMany(
@@ -55,6 +72,7 @@ export class ExperiencesService {
   }
 
   updateOne(
+    _ctx: RequestContext | null,
     id: string,
     updateInput: UpdateExperienceInput
   ): Promise<ExperienceModel> {
@@ -65,6 +83,7 @@ export class ExperiencesService {
   }
 
   updateMany(
+    _ctx: RequestContext | null,
     ids: string[],
     updateInput: UpdateExperienceInput
   ): Promise<BatchEntity> {
@@ -74,11 +93,11 @@ export class ExperiencesService {
     );
   }
 
-  removeOne(id: string): Promise<ExperienceModel> {
+  removeOne(_ctx: RequestContext | null, id: string): Promise<ExperienceModel> {
     return this.repository.deleteOne(id);
   }
 
-  removeMany(ids: string[]): Promise<BatchEntity> {
+  removeMany(_ctx: RequestContext | null, ids: string[]): Promise<BatchEntity> {
     return this.repository.deleteMany(ids);
   }
 

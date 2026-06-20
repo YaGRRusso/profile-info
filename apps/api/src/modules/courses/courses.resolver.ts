@@ -8,11 +8,13 @@ import {
   ResolveField,
   Resolver,
 } from "@nestjs/graphql";
+import type { RequestContext } from "@/core/context/request-context.interface";
 import { Public } from "@/core/decorators/public-route.decorator";
 import { Roles } from "@/core/decorators/roles.decorator";
 import { BatchEntity } from "@/core/entities/batch.entity";
 import { UserRole } from "@/core/enums/user-role.enum";
 import { PaginationInput } from "@/core/inputs/pagination.input";
+import { CurrentRequestContext } from "@/modules/auth/decorators/current-request-context.decorator";
 import { CourseModel } from "@/modules/courses/schemas/course.schema";
 import type { Ctx } from "@/modules/graphql/context.interface";
 import { OrganizationEntity } from "@/modules/organizations/entities/organization.entity";
@@ -33,7 +35,7 @@ export class CoursesResolver {
   @Public()
   @Query(() => CourseEntity)
   findOneCourseById(@Args("courseId", { type: () => ID }) courseId: string) {
-    return this.coursesService.findOneById(courseId);
+    return this.coursesService.findOneById(null, courseId);
   }
 
   @Public()
@@ -45,7 +47,7 @@ export class CoursesResolver {
     })
     courseFilters?: FilterCourseInput
   ) {
-    return this.coursesService.findOne({ filters: courseFilters });
+    return this.coursesService.findOne(null, { filters: courseFilters });
   }
 
   @Public()
@@ -53,7 +55,7 @@ export class CoursesResolver {
   findManyCourseById(
     @Args("courseIds", { type: () => [ID] }) courseIds: string[]
   ) {
-    return this.coursesService.findManyById(courseIds);
+    return this.coursesService.findManyById(null, courseIds);
   }
 
   @Public()
@@ -75,7 +77,7 @@ export class CoursesResolver {
     })
     courseSort?: SortCourseInput
   ) {
-    return this.coursesService.findMany({
+    return this.coursesService.findMany(null, {
       filters: courseFilters,
       sort: courseSort,
       limit: coursePagination?.limit,
@@ -88,53 +90,61 @@ export class CoursesResolver {
   @Roles(UserRole.SUPER_ADMIN)
   @Mutation(() => CourseEntity)
   createOneCourse(
+    @CurrentRequestContext() ctx: RequestContext,
     @Args("createCourseInput", { type: () => CreateCourseInput })
     createCourseInput: CreateCourseInput
   ) {
-    return this.coursesService.createOne(createCourseInput);
+    return this.coursesService.createOne(ctx, createCourseInput);
   }
 
   @Roles(UserRole.SUPER_ADMIN)
   @Mutation(() => [CourseEntity])
   createManyCourses(
+    @CurrentRequestContext() ctx: RequestContext,
     @Args("createCourseInputs", { type: () => [CreateCourseInput] })
     createCourseInputs: CreateCourseInput[]
   ) {
-    return this.coursesService.createMany(createCourseInputs);
+    return this.coursesService.createMany(ctx, createCourseInputs);
   }
 
   @Roles(UserRole.SUPER_ADMIN)
   @Mutation(() => CourseEntity)
   updateOneCourse(
+    @CurrentRequestContext() ctx: RequestContext,
     @Args("courseId", { type: () => ID }) courseId: string,
     @Args("updateCourseInput", { type: () => UpdateCourseInput })
     updateCourseInput: UpdateCourseInput
   ) {
-    return this.coursesService.updateOne(courseId, updateCourseInput);
+    return this.coursesService.updateOne(ctx, courseId, updateCourseInput);
   }
 
   @Roles(UserRole.SUPER_ADMIN)
   @Mutation(() => BatchEntity)
   updateManyCourses(
+    @CurrentRequestContext() ctx: RequestContext,
     @Args("courseIds", { type: () => [ID] }) courseIds: string[],
     @Args("updateCourseInput", { type: () => UpdateCourseInput })
     updateCourseInput: UpdateCourseInput
   ) {
-    return this.coursesService.updateMany(courseIds, updateCourseInput);
+    return this.coursesService.updateMany(ctx, courseIds, updateCourseInput);
   }
 
   @Roles(UserRole.SUPER_ADMIN)
   @Mutation(() => CourseEntity)
-  removeOneCourse(@Args("courseId", { type: () => ID }) courseId: string) {
-    return this.coursesService.removeOne(courseId);
+  removeOneCourse(
+    @CurrentRequestContext() ctx: RequestContext,
+    @Args("courseId", { type: () => ID }) courseId: string
+  ) {
+    return this.coursesService.removeOne(ctx, courseId);
   }
 
   @Roles(UserRole.SUPER_ADMIN)
   @Mutation(() => BatchEntity)
   removeManyCourses(
+    @CurrentRequestContext() ctx: RequestContext,
     @Args("courseIds", { type: () => [ID] }) courseIds: string[]
   ) {
-    return this.coursesService.removeMany(courseIds);
+    return this.coursesService.removeMany(ctx, courseIds);
   }
 
   @ResolveField(() => OrganizationEntity)

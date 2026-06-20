@@ -4,6 +4,7 @@ import {
   labelFromI18nTitle,
   RecentActivityRecord,
 } from "@/common/helpers/recent-activity.helper";
+import type { RequestContext } from "@/core/context/request-context.interface";
 import { BatchEntity } from "@/core/entities/batch.entity";
 import { PaginatedModel } from "@/core/schemas/paginated.schema";
 import { ProjectModel } from "@/modules/projects/schemas/project.schema";
@@ -15,45 +16,61 @@ import { ProjectsRepository } from "./projects.repository";
 export class ProjectsService {
   constructor(private readonly repository: ProjectsRepository) {}
 
-  findOneById(id: string): Promise<ProjectModel> {
+  findOneById(_ctx: RequestContext | null, id: string): Promise<ProjectModel> {
     return this.repository.findOneById(id);
   }
 
-  findOne({
-    filters,
-  }: {
-    filters?: QueryFilter<ProjectModel>;
-  }): Promise<ProjectModel> {
+  findOne(
+    _ctx: RequestContext | null,
+    {
+      filters,
+    }: {
+      filters?: QueryFilter<ProjectModel>;
+    }
+  ): Promise<ProjectModel> {
     return this.repository.findOne({ filters });
   }
 
-  findManyById(ids: string[]): Promise<ProjectModel[]> {
+  findManyById(
+    _ctx: RequestContext | null,
+    ids: string[]
+  ): Promise<ProjectModel[]> {
     return this.repository.findManyById(ids);
   }
 
-  findMany({
-    filters,
-    sort,
-    skip = 0,
-    limit = 50,
-  }: {
-    filters?: QueryFilter<ProjectModel>;
-    sort?: Partial<Record<keyof ProjectModel, SortOrder>>;
-    limit?: number;
-    skip?: number;
-  }): Promise<PaginatedModel<ProjectModel>> {
+  findMany(
+    _ctx: RequestContext | null,
+    {
+      filters,
+      sort,
+      skip = 0,
+      limit = 50,
+    }: {
+      filters?: QueryFilter<ProjectModel>;
+      sort?: Partial<Record<keyof ProjectModel, SortOrder>>;
+      limit?: number;
+      skip?: number;
+    }
+  ): Promise<PaginatedModel<ProjectModel>> {
     return this.repository.findMany({ filters, sort, skip, limit });
   }
 
-  createOne(createInput: CreateProjectInput): Promise<ProjectModel> {
+  createOne(
+    _ctx: RequestContext | null,
+    createInput: CreateProjectInput
+  ): Promise<ProjectModel> {
     return this.repository.createOne(createInput as AnyKeys<ProjectModel>);
   }
 
-  createMany(createInputs: CreateProjectInput[]): Promise<ProjectModel[]> {
+  createMany(
+    _ctx: RequestContext | null,
+    createInputs: CreateProjectInput[]
+  ): Promise<ProjectModel[]> {
     return this.repository.createMany(createInputs as AnyKeys<ProjectModel>[]);
   }
 
   updateOne(
+    _ctx: RequestContext | null,
     id: string,
     updateInput: UpdateProjectInput
   ): Promise<ProjectModel> {
@@ -64,6 +81,7 @@ export class ProjectsService {
   }
 
   updateMany(
+    _ctx: RequestContext | null,
     ids: string[],
     updateInput: UpdateProjectInput
   ): Promise<BatchEntity> {
@@ -73,11 +91,11 @@ export class ProjectsService {
     );
   }
 
-  removeOne(id: string): Promise<ProjectModel> {
+  removeOne(_ctx: RequestContext | null, id: string): Promise<ProjectModel> {
     return this.repository.deleteOne(id);
   }
 
-  removeMany(ids: string[]): Promise<BatchEntity> {
+  removeMany(_ctx: RequestContext | null, ids: string[]): Promise<BatchEntity> {
     return this.repository.deleteMany(ids);
   }
 

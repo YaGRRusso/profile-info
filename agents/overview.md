@@ -101,7 +101,7 @@ Root scripts (run from the repo root):
 - `npm run prod`: runs both apps in their `prod` mode.
 - `npm run docker:up` / `npm run docker:down`: start / stop MongoDB via Compose (uses `sudo docker compose`).
 - `npm run api:dev` / `npm run admin:dev`: run a single app in watch mode.
-- `npm run api:seed`: wipe and repopulate MongoDB with a coherent dev dataset (admin `admin@profile.info` / `admin123`). See `apps/api/src/seed.ts`.
+- `npm run api:seed`: wipe and repopulate MongoDB with a coherent dev dataset (`alice@profile.info` / `alice.pass`, `bob@profile.info` / `bob.pass`, `admin@profile.info` / `pass.123`). See `apps/api/src/seed.ts`.
 - CI (`.github/workflows/deploy.yml`): builds the admin and deploys to GitHub Pages on push to `main`.
 - `npm run api:build` / `npm run admin:build`: build a single app.
 - `npm run api:start` / `npm run admin:start`: start a single app.

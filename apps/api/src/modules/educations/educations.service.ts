@@ -4,6 +4,7 @@ import {
   labelFromI18nTitle,
   RecentActivityRecord,
 } from "@/common/helpers/recent-activity.helper";
+import type { RequestContext } from "@/core/context/request-context.interface";
 import { BatchEntity } from "@/core/entities/batch.entity";
 import { PaginatedModel } from "@/core/schemas/paginated.schema";
 import { EducationModel } from "@/modules/educations/schemas/education.schema";
@@ -15,47 +16,66 @@ import { EducationsRepository } from "./educations.repository";
 export class EducationsService {
   constructor(private readonly repository: EducationsRepository) {}
 
-  findOneById(id: string): Promise<EducationModel> {
+  findOneById(
+    _ctx: RequestContext | null,
+    id: string
+  ): Promise<EducationModel> {
     return this.repository.findOneById(id);
   }
 
-  findOne({
-    filters,
-  }: {
-    filters?: QueryFilter<EducationModel>;
-  }): Promise<EducationModel> {
+  findOne(
+    _ctx: RequestContext | null,
+    {
+      filters,
+    }: {
+      filters?: QueryFilter<EducationModel>;
+    }
+  ): Promise<EducationModel> {
     return this.repository.findOne({ filters });
   }
 
-  findManyById(ids: string[]): Promise<EducationModel[]> {
+  findManyById(
+    _ctx: RequestContext | null,
+    ids: string[]
+  ): Promise<EducationModel[]> {
     return this.repository.findManyById(ids);
   }
 
-  findMany({
-    filters,
-    sort,
-    skip = 0,
-    limit = 50,
-  }: {
-    filters?: QueryFilter<EducationModel>;
-    sort?: Partial<Record<keyof EducationModel, SortOrder>>;
-    limit?: number;
-    skip?: number;
-  }): Promise<PaginatedModel<EducationModel>> {
+  findMany(
+    _ctx: RequestContext | null,
+    {
+      filters,
+      sort,
+      skip = 0,
+      limit = 50,
+    }: {
+      filters?: QueryFilter<EducationModel>;
+      sort?: Partial<Record<keyof EducationModel, SortOrder>>;
+      limit?: number;
+      skip?: number;
+    }
+  ): Promise<PaginatedModel<EducationModel>> {
     return this.repository.findMany({ filters, sort, skip, limit });
   }
 
-  createOne(createInput: CreateEducationInput): Promise<EducationModel> {
+  createOne(
+    _ctx: RequestContext | null,
+    createInput: CreateEducationInput
+  ): Promise<EducationModel> {
     return this.repository.createOne(createInput as AnyKeys<EducationModel>);
   }
 
-  createMany(createInputs: CreateEducationInput[]): Promise<EducationModel[]> {
+  createMany(
+    _ctx: RequestContext | null,
+    createInputs: CreateEducationInput[]
+  ): Promise<EducationModel[]> {
     return this.repository.createMany(
       createInputs as AnyKeys<EducationModel>[]
     );
   }
 
   updateOne(
+    _ctx: RequestContext | null,
     id: string,
     updateInput: UpdateEducationInput
   ): Promise<EducationModel> {
@@ -66,6 +86,7 @@ export class EducationsService {
   }
 
   updateMany(
+    _ctx: RequestContext | null,
     ids: string[],
     updateInput: UpdateEducationInput
   ): Promise<BatchEntity> {
@@ -75,11 +96,11 @@ export class EducationsService {
     );
   }
 
-  removeOne(id: string): Promise<EducationModel> {
+  removeOne(_ctx: RequestContext | null, id: string): Promise<EducationModel> {
     return this.repository.deleteOne(id);
   }
 
-  removeMany(ids: string[]): Promise<BatchEntity> {
+  removeMany(_ctx: RequestContext | null, ids: string[]): Promise<BatchEntity> {
     return this.repository.deleteMany(ids);
   }
 

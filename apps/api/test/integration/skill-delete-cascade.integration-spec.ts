@@ -1,11 +1,13 @@
 import { INestApplication } from "@nestjs/common";
 import { App } from "supertest/types";
+import { UserRole } from "@/core/enums/user-role.enum";
 import { CoursesService } from "@/modules/courses/courses.service";
 import { CourseStatus } from "@/modules/courses/enums/status.enum";
 import { OrganizationCategory } from "@/modules/organizations/enums/category.enum";
 import { OrganizationsService } from "@/modules/organizations/organizations.service";
 import { SkillCategory } from "@/modules/skills/enums/category.enum";
 import { SkillsService } from "@/modules/skills/skills.service";
+import { UsersService } from "@/modules/users/users.service";
 import { clearTestDatabase } from "../support/clear-test-database";
 import { createTestApp } from "../support/create-test-app";
 
@@ -30,6 +32,15 @@ describe("Skill delete cascade (integration)", () => {
   });
 
   it("should detach a deleted skill from courses", async () => {
+    const usersService = app!.get(UsersService);
+    const owner = await usersService.createOne({
+      name: "Owner",
+      nickname: "owner",
+      email: "owner@profile.info",
+      password: "owner.123",
+      role: UserRole.USER,
+    });
+
     const organization = await organizationsService.createOne({
       slug: "acme-corp",
       name: "Acme Corp",
@@ -50,8 +61,9 @@ describe("Skill delete cascade (integration)", () => {
       category: SkillCategory.LANGUAGE,
     });
 
-    const course = await coursesService.createOne({
+    const course = await coursesService.createOne(null, {
       slug: "typescript-course",
+      ownerId: owner._id.toString(),
       organization: organization._id.toString(),
       status: CourseStatus.COMPLETE,
       i18n: [
@@ -73,6 +85,7 @@ describe("Skill delete cascade (integration)", () => {
     await skillsService.removeOne(skill._id.toString());
 
     const updatedCourse = await coursesService.findOneById(
+      null,
       course._id.toString()
     );
 

@@ -56,7 +56,7 @@ describe("Dashboard (e2e)", () => {
 
     adminToken = adminSignIn.data?.signIn ?? "";
 
-    await usersService.createOne({
+    const user = await usersService.createOne({
       name: "User",
       nickname: "user",
       email: "user@profile.info",
@@ -92,8 +92,9 @@ describe("Dashboard (e2e)", () => {
       category: SkillCategory.BACKEND,
     });
 
-    await coursesService.createOne({
+    await coursesService.createOne(null, {
       slug: "dashboard-course-complete",
+      ownerId: user._id.toString(),
       organization: organization._id.toString(),
       status: CourseStatus.COMPLETE,
       i18n: [
@@ -104,8 +105,9 @@ describe("Dashboard (e2e)", () => {
       ],
     });
 
-    await coursesService.createOne({
+    await coursesService.createOne(null, {
       slug: "dashboard-course-progress",
+      ownerId: user._id.toString(),
       organization: organization._id.toString(),
       status: CourseStatus.IN_PROGRESS,
       i18n: [
@@ -116,8 +118,9 @@ describe("Dashboard (e2e)", () => {
       ],
     });
 
-    await educationsService.createOne({
+    await educationsService.createOne(null, {
       slug: "dashboard-education",
+      ownerId: user._id.toString(),
       organization: organization._id.toString(),
       level: EducationLevel.BACHELOR,
       status: EducationStatus.COMPLETE,

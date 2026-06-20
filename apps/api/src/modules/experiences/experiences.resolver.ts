@@ -9,11 +9,13 @@ import {
   Resolver,
 } from "@nestjs/graphql";
 import { sortDateRange } from "@/common/helpers/daterange.helper";
+import type { RequestContext } from "@/core/context/request-context.interface";
 import { Public } from "@/core/decorators/public-route.decorator";
 import { Roles } from "@/core/decorators/roles.decorator";
 import { BatchEntity } from "@/core/entities/batch.entity";
 import { UserRole } from "@/core/enums/user-role.enum";
 import { PaginationInput } from "@/core/inputs/pagination.input";
+import { CurrentRequestContext } from "@/modules/auth/decorators/current-request-context.decorator";
 import {
   ExperienceModel,
   ExperienceRoleModel,
@@ -43,7 +45,7 @@ export class ExperiencesResolver {
   findOneExperienceById(
     @Args("experienceId", { type: () => ID }) experienceId: string
   ) {
-    return this.experiencesService.findOneById(experienceId);
+    return this.experiencesService.findOneById(null, experienceId);
   }
 
   @Public()
@@ -55,7 +57,9 @@ export class ExperiencesResolver {
     })
     experienceFilters?: FilterExperienceInput
   ) {
-    return this.experiencesService.findOne({ filters: experienceFilters });
+    return this.experiencesService.findOne(null, {
+      filters: experienceFilters,
+    });
   }
 
   @Public()
@@ -63,7 +67,7 @@ export class ExperiencesResolver {
   findManyExperienceById(
     @Args("experienceIds", { type: () => [ID] }) experienceIds: string[]
   ) {
-    return this.experiencesService.findManyById(experienceIds);
+    return this.experiencesService.findManyById(null, experienceIds);
   }
 
   @Public()
@@ -85,7 +89,7 @@ export class ExperiencesResolver {
     })
     experienceSort?: SortExperienceInput
   ) {
-    return this.experiencesService.findMany({
+    return this.experiencesService.findMany(null, {
       filters: experienceFilters,
       sort: experienceSort,
       limit: experiencePagination?.limit,
@@ -98,29 +102,33 @@ export class ExperiencesResolver {
   @Roles(UserRole.SUPER_ADMIN)
   @Mutation(() => ExperienceEntity)
   createOneExperience(
+    @CurrentRequestContext() ctx: RequestContext,
     @Args("createExperienceInput", { type: () => CreateExperienceInput })
     createExperienceInput: CreateExperienceInput
   ) {
-    return this.experiencesService.createOne(createExperienceInput);
+    return this.experiencesService.createOne(ctx, createExperienceInput);
   }
 
   @Roles(UserRole.SUPER_ADMIN)
   @Mutation(() => [ExperienceEntity])
   createManyExperiences(
+    @CurrentRequestContext() ctx: RequestContext,
     @Args("createExperienceInputs", { type: () => [CreateExperienceInput] })
     createExperienceInputs: CreateExperienceInput[]
   ) {
-    return this.experiencesService.createMany(createExperienceInputs);
+    return this.experiencesService.createMany(ctx, createExperienceInputs);
   }
 
   @Roles(UserRole.SUPER_ADMIN)
   @Mutation(() => ExperienceEntity)
   updateOneExperience(
+    @CurrentRequestContext() ctx: RequestContext,
     @Args("experienceId", { type: () => ID }) experienceId: string,
     @Args("updateExperienceInput", { type: () => UpdateExperienceInput })
     updateExperienceInput: UpdateExperienceInput
   ) {
     return this.experiencesService.updateOne(
+      ctx,
       experienceId,
       updateExperienceInput
     );
@@ -129,11 +137,13 @@ export class ExperiencesResolver {
   @Roles(UserRole.SUPER_ADMIN)
   @Mutation(() => BatchEntity)
   updateManyExperiences(
+    @CurrentRequestContext() ctx: RequestContext,
     @Args("experienceIds", { type: () => [ID] }) experienceIds: string[],
     @Args("updateExperienceInput", { type: () => UpdateExperienceInput })
     updateExperienceInput: UpdateExperienceInput
   ) {
     return this.experiencesService.updateMany(
+      ctx,
       experienceIds,
       updateExperienceInput
     );
@@ -142,17 +152,19 @@ export class ExperiencesResolver {
   @Roles(UserRole.SUPER_ADMIN)
   @Mutation(() => ExperienceEntity)
   removeOneExperience(
+    @CurrentRequestContext() ctx: RequestContext,
     @Args("experienceId", { type: () => ID }) experienceId: string
   ) {
-    return this.experiencesService.removeOne(experienceId);
+    return this.experiencesService.removeOne(ctx, experienceId);
   }
 
   @Roles(UserRole.SUPER_ADMIN)
   @Mutation(() => BatchEntity)
   removeManyExperiences(
+    @CurrentRequestContext() ctx: RequestContext,
     @Args("experienceIds", { type: () => [ID] }) experienceIds: string[]
   ) {
-    return this.experiencesService.removeMany(experienceIds);
+    return this.experiencesService.removeMany(ctx, experienceIds);
   }
 
   @ResolveField(() => [ExperienceRole])

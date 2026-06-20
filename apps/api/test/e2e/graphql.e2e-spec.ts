@@ -20,6 +20,7 @@ describe("GraphQL (e2e)", () => {
   let organizationsService: OrganizationsService;
   let experiencesService: ExperiencesService;
   let skillsService: SkillsService;
+  let portfolioUserId: string;
 
   beforeAll(async () => {
     const testApp = await createTestApp();
@@ -38,13 +39,14 @@ describe("GraphQL (e2e)", () => {
       role: UserRole.SUPER_ADMIN,
     });
 
-    await usersService.createOne({
+    const user = await usersService.createOne({
       name: "User",
       nickname: "user",
       email: "user@profile.info",
       password: "user.123",
       role: UserRole.USER,
     });
+    portfolioUserId = user._id.toString();
 
     const adminSignIn = await graphqlRequest<{ signIn: string }>(app, {
       query: `
@@ -200,8 +202,9 @@ describe("GraphQL (e2e)", () => {
       ],
     });
 
-    const experience = await experiencesService.createOne({
+    const experience = await experiencesService.createOne(null, {
       slug: "nested-experience",
+      ownerId: portfolioUserId,
       organization: organization._id.toString(),
       category: ExperienceCategory.FULL_TIME,
       roles: [

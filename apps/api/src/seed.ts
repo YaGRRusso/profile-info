@@ -141,6 +141,49 @@ function buildMany<T>(count: number, build: (index: number) => T) {
   return Array.from({ length: count }, (_, index) => build(index));
 }
 
+async function buildSeedUser(
+  users: Model<UserModel>,
+  data: {
+    name: string;
+    nickname: string;
+    email: string;
+    password: string;
+    role: UserRole;
+  }
+) {
+  return users.create({
+    name: data.name,
+    nickname: data.nickname,
+    email: data.email,
+    password: await hash(data.password, 8),
+    role: data.role,
+    address: faker.location.streetAddress(),
+    avatar: faker.image.urlPicsumPhotos(),
+    birth: faker.date.past({ years: 30 }),
+    phone: faker.phone.number(),
+    i18n: [
+      {
+        locale: "en",
+        messages: {
+          title: faker.person.jobTitle(),
+          description: faker.lorem.paragraphs({ min: 1, max: 2 }),
+        },
+      },
+      {
+        locale: "pt",
+        messages: {
+          title: faker.person.jobTitle(),
+          description: faker.lorem.paragraphs({ min: 1, max: 2 }),
+        },
+      },
+    ],
+    urls: faker.helpers.arrayElements(URL_TYPES).map((type) => ({
+      title: type,
+      value: faker.internet.url(),
+    })),
+  });
+}
+
 async function seed() {
   const app = await NestFactory.createApplicationContext(AppModule, {
     logger: ["error", "warn"],
@@ -202,8 +245,36 @@ async function seed() {
   const randomSkills = () =>
     faker.helpers.arrayElements(skillIds, { min: 3, max: 9 });
 
+  const [userAlice, userBob] = await Promise.all([
+    buildSeedUser(users, {
+      name: "Alice",
+      nickname: "alice",
+      email: "alice@profile.info",
+      password: "alice.pass",
+      role: UserRole.USER,
+    }),
+    buildSeedUser(users, {
+      name: "Bob",
+      nickname: "bob",
+      email: "bob@profile.info",
+      password: "bob.pass",
+      role: UserRole.USER,
+    }),
+    buildSeedUser(users, {
+      name: "Admin",
+      nickname: "admin",
+      email: "admin@profile.info",
+      password: "pass.123",
+      role: UserRole.SUPER_ADMIN,
+    }),
+  ]);
+
+  const ownerForIndex = (index: number) =>
+    index % 2 === 0 ? userAlice._id : userBob._id;
+
   await courses.create(
     buildMany(8, (index) => ({
+      ownerId: ownerForIndex(index),
       slug: slugFor(faker.company.catchPhrase(), index),
       organization: randomOrganization(),
       status: faker.helpers.arrayElement(STATUSES),
@@ -221,6 +292,7 @@ async function seed() {
 
   await educations.create(
     buildMany(4, (index) => ({
+      ownerId: ownerForIndex(index),
       slug: slugFor(faker.company.catchPhrase(), index),
       organization: randomOrganization(),
       level: faker.helpers.arrayElement(EDUCATION_LEVELS),
@@ -237,6 +309,7 @@ async function seed() {
 
   await projects.create(
     buildMany(8, (index) => ({
+      ownerId: ownerForIndex(index),
       slug: slugFor(faker.commerce.productName(), index),
       relevance: relevance(),
       images: faker.helpers.multiple(() => faker.image.url(), {
@@ -256,6 +329,7 @@ async function seed() {
 
   await experiences.create(
     buildMany(6, (index) => ({
+      ownerId: ownerForIndex(index),
       slug: slugFor(faker.person.jobTitle(), index),
       organization: randomOrganization(),
       category: faker.helpers.arrayElement(EXPERIENCE_CATEGORIES),
@@ -271,38 +345,6 @@ async function seed() {
     }))
   );
 
-  await users.create({
-    name: "Admin",
-    nickname: "admin",
-    email: "admin@profile.info",
-    password: await hash("pass.123", 8),
-    address: faker.location.streetAddress(),
-    avatar: faker.image.urlPicsumPhotos(),
-    birth: faker.date.past({ years: 30 }),
-    phone: faker.phone.number(),
-    i18n: [
-      {
-        locale: "en",
-        messages: {
-          title: faker.person.jobTitle(),
-          description: faker.lorem.paragraphs({ min: 1, max: 2 }),
-        },
-      },
-      {
-        locale: "pt",
-        messages: {
-          title: faker.person.jobTitle(),
-          description: faker.lorem.paragraphs({ min: 1, max: 2 }),
-        },
-      },
-    ],
-    urls: faker.helpers.arrayElements(URL_TYPES).map((type) => ({
-      title: type,
-      value: faker.internet.url(),
-    })),
-    role: UserRole.SUPER_ADMIN,
-  });
-
   const counts = {
     skills: await skills.countDocuments(),
     organizations: await organizations.countDocuments(),
@@ -313,7 +355,9 @@ async function seed() {
     users: await users.countDocuments(),
   };
 
-  console.info("admin@profile.info / pass.123");
+  console.info("alice@profile.info / alice.pass (USER)");
+  console.info("bob@profile.info / bob.pass (USER)");
+  console.info("admin@profile.info / pass.123 (SUPER_ADMIN)");
   console.info("seeded:", counts);
 
   await app.close();

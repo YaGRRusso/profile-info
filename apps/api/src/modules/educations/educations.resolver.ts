@@ -8,11 +8,13 @@ import {
   ResolveField,
   Resolver,
 } from "@nestjs/graphql";
+import type { RequestContext } from "@/core/context/request-context.interface";
 import { Public } from "@/core/decorators/public-route.decorator";
 import { Roles } from "@/core/decorators/roles.decorator";
 import { BatchEntity } from "@/core/entities/batch.entity";
 import { UserRole } from "@/core/enums/user-role.enum";
 import { PaginationInput } from "@/core/inputs/pagination.input";
+import { CurrentRequestContext } from "@/modules/auth/decorators/current-request-context.decorator";
 import { EducationModel } from "@/modules/educations/schemas/education.schema";
 import type { Ctx } from "@/modules/graphql/context.interface";
 import { OrganizationEntity } from "@/modules/organizations/entities/organization.entity";
@@ -38,7 +40,7 @@ export class EducationsResolver {
   findOneEducationById(
     @Args("educationId", { type: () => ID }) educationId: string
   ) {
-    return this.educationsService.findOneById(educationId);
+    return this.educationsService.findOneById(null, educationId);
   }
 
   @Public()
@@ -50,7 +52,7 @@ export class EducationsResolver {
     })
     educationFilters?: FilterEducationInput
   ) {
-    return this.educationsService.findOne({ filters: educationFilters });
+    return this.educationsService.findOne(null, { filters: educationFilters });
   }
 
   @Public()
@@ -58,7 +60,7 @@ export class EducationsResolver {
   findManyEducationById(
     @Args("educationIds", { type: () => [ID] }) educationIds: string[]
   ) {
-    return this.educationsService.findManyById(educationIds);
+    return this.educationsService.findManyById(null, educationIds);
   }
 
   @Public()
@@ -80,7 +82,7 @@ export class EducationsResolver {
     })
     educationSort?: SortEducationInput
   ) {
-    return this.educationsService.findMany({
+    return this.educationsService.findMany(null, {
       filters: educationFilters,
       sort: educationSort,
       limit: educationPagination?.limit,
@@ -93,39 +95,48 @@ export class EducationsResolver {
   @Roles(UserRole.SUPER_ADMIN)
   @Mutation(() => EducationEntity)
   createOneEducation(
+    @CurrentRequestContext() ctx: RequestContext,
     @Args("createEducationInput", { type: () => CreateEducationInput })
     createEducationInput: CreateEducationInput
   ) {
-    return this.educationsService.createOne(createEducationInput);
+    return this.educationsService.createOne(ctx, createEducationInput);
   }
 
   @Roles(UserRole.SUPER_ADMIN)
   @Mutation(() => [EducationEntity])
   createManyEducations(
+    @CurrentRequestContext() ctx: RequestContext,
     @Args("createEducationInputs", { type: () => [CreateEducationInput] })
     createEducationInputs: CreateEducationInput[]
   ) {
-    return this.educationsService.createMany(createEducationInputs);
+    return this.educationsService.createMany(ctx, createEducationInputs);
   }
 
   @Roles(UserRole.SUPER_ADMIN)
   @Mutation(() => EducationEntity)
   updateOneEducation(
+    @CurrentRequestContext() ctx: RequestContext,
     @Args("educationId", { type: () => ID }) educationId: string,
     @Args("updateEducationInput", { type: () => UpdateEducationInput })
     updateEducationInput: UpdateEducationInput
   ) {
-    return this.educationsService.updateOne(educationId, updateEducationInput);
+    return this.educationsService.updateOne(
+      ctx,
+      educationId,
+      updateEducationInput
+    );
   }
 
   @Roles(UserRole.SUPER_ADMIN)
   @Mutation(() => BatchEntity)
   updateManyEducations(
+    @CurrentRequestContext() ctx: RequestContext,
     @Args("educationIds", { type: () => [ID] }) educationIds: string[],
     @Args("updateEducationInput", { type: () => UpdateEducationInput })
     updateEducationInput: UpdateEducationInput
   ) {
     return this.educationsService.updateMany(
+      ctx,
       educationIds,
       updateEducationInput
     );
@@ -134,17 +145,19 @@ export class EducationsResolver {
   @Roles(UserRole.SUPER_ADMIN)
   @Mutation(() => EducationEntity)
   removeOneEducation(
+    @CurrentRequestContext() ctx: RequestContext,
     @Args("educationId", { type: () => ID }) educationId: string
   ) {
-    return this.educationsService.removeOne(educationId);
+    return this.educationsService.removeOne(ctx, educationId);
   }
 
   @Roles(UserRole.SUPER_ADMIN)
   @Mutation(() => BatchEntity)
   removeManyEducations(
+    @CurrentRequestContext() ctx: RequestContext,
     @Args("educationIds", { type: () => [ID] }) educationIds: string[]
   ) {
-    return this.educationsService.removeMany(educationIds);
+    return this.educationsService.removeMany(ctx, educationIds);
   }
 
   @ResolveField(() => OrganizationEntity)

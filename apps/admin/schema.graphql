@@ -47,6 +47,7 @@ type CourseEntity {
   id: ID!
   image: String
   organization: OrganizationEntity!
+  ownerId: ID!
   relevance: Float!
   skills: [SkillEntity!]
   slug: String!
@@ -274,6 +275,7 @@ type EducationEntity {
   image: String
   level: EducationLevel!
   organization: OrganizationEntity!
+  ownerId: ID!
   period: DateRangeEntity
   relevance: Float!
   skills: [SkillEntity!]
@@ -320,6 +322,7 @@ type ExperienceEntity {
   createdAt: DateTime!
   id: ID!
   organization: OrganizationEntity!
+  ownerId: ID!
   relevance: Float!
   roles: [ExperienceRole!]!
   skills: [SkillEntity!]
@@ -411,7 +414,6 @@ input FilterUserInput {
   i18n: [CreateUserMessagesInputTranslationInput!]
   name: String
   nickname: String
-  password: String
   phone: String
   role: UserRole
   urls: [UrlInput!]
@@ -547,6 +549,7 @@ type ProjectEntity {
   i18n: [ProjectMessagesTranslationEntity!]!
   id: ID!
   images: [String!]
+  ownerId: ID!
   relevance: Float!
   skills: [SkillEntity!]
   slug: String!
