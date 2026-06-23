@@ -52,9 +52,7 @@ export class OrganizationsService {
     return this.repository.createOne(createInput as AnyKeys<OrganizationModel>);
   }
 
-  createMany(
-    createInputs: CreateOrganizationInput[]
-  ): Promise<OrganizationModel[]> {
+  createMany(createInputs: CreateOrganizationInput[]): Promise<BatchEntity> {
     return this.repository.createMany(
       createInputs as AnyKeys<OrganizationModel>[]
     );
@@ -64,7 +62,7 @@ export class OrganizationsService {
     id: string,
     updateInput: UpdateOrganizationInput
   ): Promise<OrganizationModel> {
-    return this.repository.updateOne(
+    return this.repository.updateOneById(
       id,
       updateInput as object as UpdateQuery<OrganizationModel>
     );
@@ -74,7 +72,7 @@ export class OrganizationsService {
     ids: string[],
     updateInput: UpdateOrganizationInput
   ): Promise<BatchEntity> {
-    return this.repository.updateMany(
+    return this.repository.updateManyById(
       ids,
       updateInput as object as UpdateQuery<OrganizationModel>
     );
@@ -88,7 +86,7 @@ export class OrganizationsService {
       new OrganizationDeletedEvent(organization._id.toString())
     );
 
-    await this.repository.deleteOne(id);
+    await this.repository.deleteOneById(id);
     return organization;
   }
 
@@ -102,15 +100,15 @@ export class OrganizationsService {
       );
     }
 
-    return this.repository.deleteMany(ids);
+    return this.repository.deleteManyById(ids);
   }
 
   count(): Promise<number> {
-    return this.repository.count();
+    return this.repository.stats.count();
   }
 
   async findRecentActivity(limit: number): Promise<RecentActivityRecord[]> {
-    const rows = await this.repository.findRecentlyUpdated(
+    const rows = await this.repository.stats.findRecentlyUpdated(
       limit,
       "name updatedAt"
     );

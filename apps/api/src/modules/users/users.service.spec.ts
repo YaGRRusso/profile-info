@@ -204,7 +204,7 @@ describe("UsersService", () => {
           expect.objectContaining({ password: "hashed-password" }),
         ])
       );
-      expect(result).toEqual([fakeUser]);
+      expect(result).toEqual({ succeeded: 1, failed: 1 });
     });
 
     it("should throw BadRequestException when create returns null", async () => {
@@ -234,7 +234,7 @@ describe("UsersService", () => {
       expect(model.findByIdAndUpdate).toHaveBeenCalledWith(
         "507f1f77bcf86cd799439011",
         expect.objectContaining({ password: "hashed-password" }),
-        { new: true }
+        { new: true, runValidators: true }
       );
     });
   });

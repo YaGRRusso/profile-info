@@ -87,7 +87,7 @@ export class OrganizationsResolver {
   }
 
   @Roles(UserRole.SUPER_ADMIN)
-  @Mutation(() => [OrganizationEntity])
+  @Mutation(() => BatchEntity)
   createManyOrganizations(
     @Args("createOrganizationInputs", { type: () => [CreateOrganizationInput] })
     createOrganizationInputs: CreateOrganizationInput[]

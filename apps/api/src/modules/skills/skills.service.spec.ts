@@ -146,9 +146,12 @@ describe("SkillsService", () => {
     it("should return a BatchEntity count", async () => {
       (model.find as jest.Mock).mockReturnValue(makeExec([fakeDoc]));
       (model.deleteMany as jest.Mock).mockReturnValue(
-        makeExec({ deletedCount: 4 })
+        makeExec({ deletedCount: 1 })
       );
-      expect(await service.removeMany([validId])).toEqual({ count: 4 });
+      expect(await service.removeMany([validId])).toEqual({
+        succeeded: 1,
+        failed: 0,
+      });
     });
 
     it("should emit skill.deleted for each skill before deleteMany", async () => {

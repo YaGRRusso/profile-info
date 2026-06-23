@@ -82,7 +82,7 @@ export class SkillsResolver {
   }
 
   @Roles(UserRole.SUPER_ADMIN)
-  @Mutation(() => [SkillEntity])
+  @Mutation(() => BatchEntity)
   createManySkills(
     @Args("createSkillInputs", { type: () => [CreateSkillInput] })
     createSkillInputs: CreateSkillInput[]

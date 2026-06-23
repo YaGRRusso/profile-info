@@ -56,7 +56,7 @@ export class UsersService {
     });
   }
 
-  async createMany(createUserInputs: CreateUserInput[]): Promise<UserModel[]> {
+  async createMany(createUserInputs: CreateUserInput[]): Promise<BatchEntity> {
     const inputs = await Promise.all(
       createUserInputs.map(async ({ password, ...createUserInput }) => ({
         ...createUserInput,
@@ -72,7 +72,7 @@ export class UsersService {
     updateInput: UpdateUserInput
   ): Promise<UserModel> {
     const update = await this.buildUpdateQuery(updateInput);
-    return this.repository.updateOne(id, update);
+    return this.repository.updateOneById(id, update);
   }
 
   async updateMany(
@@ -80,15 +80,15 @@ export class UsersService {
     updateInput: UpdateUserInput
   ): Promise<BatchEntity> {
     const update = await this.buildUpdateQuery(updateInput);
-    return this.repository.updateMany(ids, update);
+    return this.repository.updateManyById(ids, update);
   }
 
   removeOne(id: string): Promise<UserModel> {
-    return this.repository.deleteOne(id);
+    return this.repository.deleteOneById(id);
   }
 
   removeMany(ids: string[]): Promise<BatchEntity> {
-    return this.repository.deleteMany(ids);
+    return this.repository.deleteManyById(ids);
   }
 
   private async buildUpdateQuery(

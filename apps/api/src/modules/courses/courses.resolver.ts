@@ -98,7 +98,7 @@ export class CoursesResolver {
   }
 
   @Roles(UserRole.SUPER_ADMIN)
-  @Mutation(() => [CourseEntity])
+  @Mutation(() => BatchEntity)
   createManyCourses(
     @CurrentRequestContext() ctx: RequestContext,
     @Args("createCourseInputs", { type: () => [CreateCourseInput] })

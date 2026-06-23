@@ -80,7 +80,7 @@ export class UsersResolver {
   }
 
   @Roles(UserRole.SUPER_ADMIN)
-  @Mutation(() => [UserEntity])
+  @Mutation(() => BatchEntity)
   createManyUsers(
     @Args("createUserInputs", { type: () => [CreateUserInput] })
     createUserInputs: CreateUserInput[]

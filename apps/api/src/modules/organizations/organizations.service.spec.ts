@@ -123,9 +123,12 @@ describe("OrganizationsService", () => {
     it("should return a BatchEntity count", async () => {
       (model.find as jest.Mock).mockReturnValue(makeExec([fakeDoc]));
       (model.deleteMany as jest.Mock).mockReturnValue(
-        makeExec({ deletedCount: 5 })
+        makeExec({ deletedCount: 1 })
       );
-      expect(await service.removeMany([validId])).toEqual({ count: 5 });
+      expect(await service.removeMany([validId])).toEqual({
+        succeeded: 1,
+        failed: 0,
+      });
     });
   });
 });

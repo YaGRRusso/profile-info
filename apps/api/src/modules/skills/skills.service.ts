@@ -52,12 +52,12 @@ export class SkillsService {
     return this.repository.createOne(createInput as AnyKeys<SkillModel>);
   }
 
-  createMany(createInputs: CreateSkillInput[]): Promise<SkillModel[]> {
+  createMany(createInputs: CreateSkillInput[]): Promise<BatchEntity> {
     return this.repository.createMany(createInputs as AnyKeys<SkillModel>[]);
   }
 
   updateOne(id: string, updateInput: UpdateSkillInput): Promise<SkillModel> {
-    return this.repository.updateOne(
+    return this.repository.updateOneById(
       id,
       updateInput as object as UpdateQuery<SkillModel>
     );
@@ -67,7 +67,7 @@ export class SkillsService {
     ids: string[],
     updateInput: UpdateSkillInput
   ): Promise<BatchEntity> {
-    return this.repository.updateMany(
+    return this.repository.updateManyById(
       ids,
       updateInput as object as UpdateQuery<SkillModel>
     );
@@ -81,7 +81,7 @@ export class SkillsService {
       new SkillDeletedEvent(skill._id.toString())
     );
 
-    await this.repository.deleteOne(id);
+    await this.repository.deleteOneById(id);
     return skill;
   }
 
@@ -95,19 +95,19 @@ export class SkillsService {
       );
     }
 
-    return this.repository.deleteMany(ids);
+    return this.repository.deleteManyById(ids);
   }
 
   count(): Promise<number> {
-    return this.repository.count();
+    return this.repository.stats.count();
   }
 
   countByField(field: string): Promise<{ label: string; value: number }[]> {
-    return this.repository.countByField(field);
+    return this.repository.stats.countByField(field);
   }
 
   async findRecentActivity(limit: number): Promise<RecentActivityRecord[]> {
-    const rows = await this.repository.findRecentlyUpdated(
+    const rows = await this.repository.stats.findRecentlyUpdated(
       limit,
       "name updatedAt"
     );

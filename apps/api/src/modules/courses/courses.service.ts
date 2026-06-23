@@ -62,11 +62,13 @@ export class CoursesService {
     return this.repository.createOne(createInput as AnyKeys<CourseModel>);
   }
 
-  createMany(
+  async createMany(
     _ctx: RequestContext | null,
     createInputs: CreateCourseInput[]
-  ): Promise<CourseModel[]> {
-    return this.repository.createMany(createInputs as AnyKeys<CourseModel>[]);
+  ): Promise<BatchEntity> {
+    return await this.repository.createMany(
+      createInputs as AnyKeys<CourseModel>[]
+    );
   }
 
   updateOne(
@@ -74,41 +76,44 @@ export class CoursesService {
     id: string,
     updateInput: UpdateCourseInput
   ): Promise<CourseModel> {
-    return this.repository.updateOne(
+    return this.repository.updateOneById(
       id,
       updateInput as object as UpdateQuery<CourseModel>
     );
   }
 
-  updateMany(
+  async updateMany(
     _ctx: RequestContext | null,
     ids: string[],
     updateInput: UpdateCourseInput
   ): Promise<BatchEntity> {
-    return this.repository.updateMany(
+    return await this.repository.updateManyById(
       ids,
       updateInput as object as UpdateQuery<CourseModel>
     );
   }
 
   removeOne(_ctx: RequestContext | null, id: string): Promise<CourseModel> {
-    return this.repository.deleteOne(id);
+    return this.repository.deleteOneById(id);
   }
 
-  removeMany(_ctx: RequestContext | null, ids: string[]): Promise<BatchEntity> {
-    return this.repository.deleteMany(ids);
+  async removeMany(
+    _ctx: RequestContext | null,
+    ids: string[]
+  ): Promise<BatchEntity> {
+    return await this.repository.deleteManyById(ids);
   }
 
   count(): Promise<number> {
-    return this.repository.count();
+    return this.repository.stats.count();
   }
 
   countByField(field: string): Promise<{ label: string; value: number }[]> {
-    return this.repository.countByField(field);
+    return this.repository.stats.countByField(field);
   }
 
   async findRecentActivity(limit: number): Promise<RecentActivityRecord[]> {
-    const rows = await this.repository.findRecentlyUpdated(
+    const rows = await this.repository.stats.findRecentlyUpdated(
       limit,
       "slug i18n updatedAt"
     );
@@ -121,14 +126,14 @@ export class CoursesService {
     }));
   }
 
-  detachSkill(skillId: string): Promise<void> {
-    return this.repository.updateManyByFilter(
+  async detachSkill(skillId: string): Promise<void> {
+    await this.repository.updateMany(
       { skills: skillId },
       { $pull: { skills: skillId } }
     );
   }
 
-  purgeByOrganization(organizationId: string): Promise<void> {
-    return this.repository.deleteManyByFilter({ organization: organizationId });
+  async purgeByOrganization(organizationId: string): Promise<void> {
+    await this.repository.deleteMany({ organization: organizationId });
   }
 }
