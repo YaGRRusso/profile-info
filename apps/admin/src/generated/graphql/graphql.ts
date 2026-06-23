@@ -33,7 +33,8 @@ export type AtsSummarizeInput = {
 
 export type BatchEntity = {
   __typename?: 'BatchEntity';
-  count: Scalars['Int']['output'];
+  failed: Scalars['Int']['output'];
+  succeeded: Scalars['Int']['output'];
 };
 
 export enum ChatFinishReason {
@@ -458,13 +459,13 @@ export type MessageEntity = {
 export type Mutation = {
   __typename?: 'Mutation';
   atsSummarize: AiEntity;
-  createManyCourses: Array<CourseEntity>;
-  createManyEducations: Array<EducationEntity>;
-  createManyExperiences: Array<ExperienceEntity>;
-  createManyOrganizations: Array<OrganizationEntity>;
-  createManyProjects: Array<ProjectEntity>;
-  createManySkills: Array<SkillEntity>;
-  createManyUsers: Array<UserEntity>;
+  createManyCourses: BatchEntity;
+  createManyEducations: BatchEntity;
+  createManyExperiences: BatchEntity;
+  createManyOrganizations: BatchEntity;
+  createManyProjects: BatchEntity;
+  createManySkills: BatchEntity;
+  createManyUsers: BatchEntity;
   createOneCourse: CourseEntity;
   createOneEducation: EducationEntity;
   createOneExperience: ExperienceEntity;
@@ -1330,7 +1331,7 @@ export type UpdateManyCoursesMutationVariables = Exact<{
 }>;
 
 
-export type UpdateManyCoursesMutation = { __typename?: 'Mutation', updateManyCourses: { __typename?: 'BatchEntity', count: number } };
+export type UpdateManyCoursesMutation = { __typename?: 'Mutation', updateManyCourses: { __typename?: 'BatchEntity', succeeded: number, failed: number } };
 
 export type RemoveOneCourseMutationVariables = Exact<{
   courseId: Scalars['ID']['input'];
@@ -1344,7 +1345,7 @@ export type RemoveManyCoursesMutationVariables = Exact<{
 }>;
 
 
-export type RemoveManyCoursesMutation = { __typename?: 'Mutation', removeManyCourses: { __typename?: 'BatchEntity', count: number } };
+export type RemoveManyCoursesMutation = { __typename?: 'Mutation', removeManyCourses: { __typename?: 'BatchEntity', succeeded: number, failed: number } };
 
 export type CreateOneEducationMutationVariables = Exact<{
   createEducationInput: CreateEducationInput;
@@ -1367,7 +1368,7 @@ export type UpdateManyEducationsMutationVariables = Exact<{
 }>;
 
 
-export type UpdateManyEducationsMutation = { __typename?: 'Mutation', updateManyEducations: { __typename?: 'BatchEntity', count: number } };
+export type UpdateManyEducationsMutation = { __typename?: 'Mutation', updateManyEducations: { __typename?: 'BatchEntity', succeeded: number, failed: number } };
 
 export type RemoveOneEducationMutationVariables = Exact<{
   educationId: Scalars['ID']['input'];
@@ -1381,7 +1382,7 @@ export type RemoveManyEducationsMutationVariables = Exact<{
 }>;
 
 
-export type RemoveManyEducationsMutation = { __typename?: 'Mutation', removeManyEducations: { __typename?: 'BatchEntity', count: number } };
+export type RemoveManyEducationsMutation = { __typename?: 'Mutation', removeManyEducations: { __typename?: 'BatchEntity', succeeded: number, failed: number } };
 
 export type CreateOneExperienceMutationVariables = Exact<{
   createExperienceInput: CreateExperienceInput;
@@ -1404,7 +1405,7 @@ export type UpdateManyExperiencesMutationVariables = Exact<{
 }>;
 
 
-export type UpdateManyExperiencesMutation = { __typename?: 'Mutation', updateManyExperiences: { __typename?: 'BatchEntity', count: number } };
+export type UpdateManyExperiencesMutation = { __typename?: 'Mutation', updateManyExperiences: { __typename?: 'BatchEntity', succeeded: number, failed: number } };
 
 export type RemoveOneExperienceMutationVariables = Exact<{
   experienceId: Scalars['ID']['input'];
@@ -1418,7 +1419,7 @@ export type RemoveManyExperiencesMutationVariables = Exact<{
 }>;
 
 
-export type RemoveManyExperiencesMutation = { __typename?: 'Mutation', removeManyExperiences: { __typename?: 'BatchEntity', count: number } };
+export type RemoveManyExperiencesMutation = { __typename?: 'Mutation', removeManyExperiences: { __typename?: 'BatchEntity', succeeded: number, failed: number } };
 
 export type CreateOneOrganizationMutationVariables = Exact<{
   createOrganizationInput: CreateOrganizationInput;
@@ -1441,7 +1442,7 @@ export type UpdateManyOrganizationsMutationVariables = Exact<{
 }>;
 
 
-export type UpdateManyOrganizationsMutation = { __typename?: 'Mutation', updateManyOrganizations: { __typename?: 'BatchEntity', count: number } };
+export type UpdateManyOrganizationsMutation = { __typename?: 'Mutation', updateManyOrganizations: { __typename?: 'BatchEntity', succeeded: number, failed: number } };
 
 export type RemoveOneOrganizationMutationVariables = Exact<{
   organizationId: Scalars['ID']['input'];
@@ -1455,7 +1456,7 @@ export type RemoveManyOrganizationsMutationVariables = Exact<{
 }>;
 
 
-export type RemoveManyOrganizationsMutation = { __typename?: 'Mutation', removeManyOrganizations: { __typename?: 'BatchEntity', count: number } };
+export type RemoveManyOrganizationsMutation = { __typename?: 'Mutation', removeManyOrganizations: { __typename?: 'BatchEntity', succeeded: number, failed: number } };
 
 export type CreateOneProjectMutationVariables = Exact<{
   createProjectInput: CreateProjectInput;
@@ -1478,7 +1479,7 @@ export type UpdateManyProjectsMutationVariables = Exact<{
 }>;
 
 
-export type UpdateManyProjectsMutation = { __typename?: 'Mutation', updateManyProjects: { __typename?: 'BatchEntity', count: number } };
+export type UpdateManyProjectsMutation = { __typename?: 'Mutation', updateManyProjects: { __typename?: 'BatchEntity', succeeded: number, failed: number } };
 
 export type RemoveOneProjectMutationVariables = Exact<{
   projectId: Scalars['ID']['input'];
@@ -1492,7 +1493,7 @@ export type RemoveManyProjectsMutationVariables = Exact<{
 }>;
 
 
-export type RemoveManyProjectsMutation = { __typename?: 'Mutation', removeManyProjects: { __typename?: 'BatchEntity', count: number } };
+export type RemoveManyProjectsMutation = { __typename?: 'Mutation', removeManyProjects: { __typename?: 'BatchEntity', succeeded: number, failed: number } };
 
 export type CreateOneSkillMutationVariables = Exact<{
   createSkillInput: CreateSkillInput;
@@ -1515,7 +1516,7 @@ export type UpdateManySkillsMutationVariables = Exact<{
 }>;
 
 
-export type UpdateManySkillsMutation = { __typename?: 'Mutation', updateManySkills: { __typename?: 'BatchEntity', count: number } };
+export type UpdateManySkillsMutation = { __typename?: 'Mutation', updateManySkills: { __typename?: 'BatchEntity', succeeded: number, failed: number } };
 
 export type RemoveOneSkillMutationVariables = Exact<{
   skillId: Scalars['ID']['input'];
@@ -1529,7 +1530,7 @@ export type RemoveManySkillsMutationVariables = Exact<{
 }>;
 
 
-export type RemoveManySkillsMutation = { __typename?: 'Mutation', removeManySkills: { __typename?: 'BatchEntity', count: number } };
+export type RemoveManySkillsMutation = { __typename?: 'Mutation', removeManySkills: { __typename?: 'BatchEntity', succeeded: number, failed: number } };
 
 export type UpdateMeMutationVariables = Exact<{
   updateMeInput: UpdateMeInput;
@@ -1708,7 +1709,8 @@ export const UpdateOneCourseDocument = new TypedDocumentString(`
 export const UpdateManyCoursesDocument = new TypedDocumentString(`
     mutation UpdateManyCourses($courseIds: [ID!]!, $updateCourseInput: UpdateCourseInput!) {
   updateManyCourses(courseIds: $courseIds, updateCourseInput: $updateCourseInput) {
-    count
+    succeeded
+    failed
   }
 }
     `) as unknown as TypedDocumentString<UpdateManyCoursesMutation, UpdateManyCoursesMutationVariables>;
@@ -1723,7 +1725,8 @@ export const RemoveOneCourseDocument = new TypedDocumentString(`
 export const RemoveManyCoursesDocument = new TypedDocumentString(`
     mutation RemoveManyCourses($courseIds: [ID!]!) {
   removeManyCourses(courseIds: $courseIds) {
-    count
+    succeeded
+    failed
   }
 }
     `) as unknown as TypedDocumentString<RemoveManyCoursesMutation, RemoveManyCoursesMutationVariables>;
@@ -1752,7 +1755,8 @@ export const UpdateManyEducationsDocument = new TypedDocumentString(`
     educationIds: $educationIds
     updateEducationInput: $updateEducationInput
   ) {
-    count
+    succeeded
+    failed
   }
 }
     `) as unknown as TypedDocumentString<UpdateManyEducationsMutation, UpdateManyEducationsMutationVariables>;
@@ -1767,7 +1771,8 @@ export const RemoveOneEducationDocument = new TypedDocumentString(`
 export const RemoveManyEducationsDocument = new TypedDocumentString(`
     mutation RemoveManyEducations($educationIds: [ID!]!) {
   removeManyEducations(educationIds: $educationIds) {
-    count
+    succeeded
+    failed
   }
 }
     `) as unknown as TypedDocumentString<RemoveManyEducationsMutation, RemoveManyEducationsMutationVariables>;
@@ -1796,7 +1801,8 @@ export const UpdateManyExperiencesDocument = new TypedDocumentString(`
     experienceIds: $experienceIds
     updateExperienceInput: $updateExperienceInput
   ) {
-    count
+    succeeded
+    failed
   }
 }
     `) as unknown as TypedDocumentString<UpdateManyExperiencesMutation, UpdateManyExperiencesMutationVariables>;
@@ -1811,7 +1817,8 @@ export const RemoveOneExperienceDocument = new TypedDocumentString(`
 export const RemoveManyExperiencesDocument = new TypedDocumentString(`
     mutation RemoveManyExperiences($experienceIds: [ID!]!) {
   removeManyExperiences(experienceIds: $experienceIds) {
-    count
+    succeeded
+    failed
   }
 }
     `) as unknown as TypedDocumentString<RemoveManyExperiencesMutation, RemoveManyExperiencesMutationVariables>;
@@ -1840,7 +1847,8 @@ export const UpdateManyOrganizationsDocument = new TypedDocumentString(`
     organizationIds: $organizationIds
     updateOrganizationInput: $updateOrganizationInput
   ) {
-    count
+    succeeded
+    failed
   }
 }
     `) as unknown as TypedDocumentString<UpdateManyOrganizationsMutation, UpdateManyOrganizationsMutationVariables>;
@@ -1855,7 +1863,8 @@ export const RemoveOneOrganizationDocument = new TypedDocumentString(`
 export const RemoveManyOrganizationsDocument = new TypedDocumentString(`
     mutation RemoveManyOrganizations($organizationIds: [ID!]!) {
   removeManyOrganizations(organizationIds: $organizationIds) {
-    count
+    succeeded
+    failed
   }
 }
     `) as unknown as TypedDocumentString<RemoveManyOrganizationsMutation, RemoveManyOrganizationsMutationVariables>;
@@ -1881,7 +1890,8 @@ export const UpdateManyProjectsDocument = new TypedDocumentString(`
     projectIds: $projectIds
     updateProjectInput: $updateProjectInput
   ) {
-    count
+    succeeded
+    failed
   }
 }
     `) as unknown as TypedDocumentString<UpdateManyProjectsMutation, UpdateManyProjectsMutationVariables>;
@@ -1896,7 +1906,8 @@ export const RemoveOneProjectDocument = new TypedDocumentString(`
 export const RemoveManyProjectsDocument = new TypedDocumentString(`
     mutation RemoveManyProjects($projectIds: [ID!]!) {
   removeManyProjects(projectIds: $projectIds) {
-    count
+    succeeded
+    failed
   }
 }
     `) as unknown as TypedDocumentString<RemoveManyProjectsMutation, RemoveManyProjectsMutationVariables>;
@@ -1929,7 +1940,8 @@ export const UpdateOneSkillDocument = new TypedDocumentString(`
 export const UpdateManySkillsDocument = new TypedDocumentString(`
     mutation UpdateManySkills($skillIds: [ID!]!, $updateSkillInput: UpdateSkillInput!) {
   updateManySkills(skillIds: $skillIds, updateSkillInput: $updateSkillInput) {
-    count
+    succeeded
+    failed
   }
 }
     `) as unknown as TypedDocumentString<UpdateManySkillsMutation, UpdateManySkillsMutationVariables>;
@@ -1949,7 +1961,8 @@ export const RemoveOneSkillDocument = new TypedDocumentString(`
 export const RemoveManySkillsDocument = new TypedDocumentString(`
     mutation RemoveManySkills($skillIds: [ID!]!) {
   removeManySkills(skillIds: $skillIds) {
-    count
+    succeeded
+    failed
   }
 }
     `) as unknown as TypedDocumentString<RemoveManySkillsMutation, RemoveManySkillsMutationVariables>;

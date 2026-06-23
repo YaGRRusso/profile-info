@@ -114,7 +114,7 @@ function RouteComponent() {
           onSuccess: (data) => {
             closeAndRefetch();
             toast.success(
-              `${data.removeManyProjects.count} projects deleted successfully`
+              `${data.removeManyProjects.succeeded} projects deleted successfully`
             );
           },
         });
@@ -192,7 +192,7 @@ function RouteComponent() {
                 onSuccess: (data) => {
                   closeAndRefetch();
                   toast.success(
-                    `${data.updateManyProjects.count} projects updated successfully`
+                    `${data.updateManyProjects.succeeded} projects updated successfully`
                   );
                 },
               }

@@ -40,7 +40,8 @@ const updateManySkills = graphql(`
     $updateSkillInput: UpdateSkillInput!
   ) {
     updateManySkills(skillIds: $skillIds, updateSkillInput: $updateSkillInput) {
-      count
+      succeeded
+      failed
     }
   }
 `);
@@ -62,7 +63,8 @@ const removeOneSkill = graphql(`
 const removeManySkills = graphql(`
   mutation RemoveManySkills($skillIds: [ID!]!) {
     removeManySkills(skillIds: $skillIds) {
-      count
+      succeeded
+      failed
     }
   }
 `);

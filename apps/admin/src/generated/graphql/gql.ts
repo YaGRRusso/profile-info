@@ -21,34 +21,34 @@ type Documents = {
     "\n  mutation SignIn($signInInput: SignInInput!) {\n    signIn(signInInput: $signInInput)\n  }\n": typeof types.SignInDocument,
     "\n  mutation CreateOneCourse($createCourseInput: CreateCourseInput!) {\n    createOneCourse(createCourseInput: $createCourseInput) {\n      id\n      slug\n    }\n  }\n": typeof types.CreateOneCourseDocument,
     "\n  mutation UpdateOneCourse(\n    $courseId: ID!\n    $updateCourseInput: UpdateCourseInput!\n  ) {\n    updateOneCourse(courseId: $courseId, updateCourseInput: $updateCourseInput) {\n      id\n      slug\n    }\n  }\n": typeof types.UpdateOneCourseDocument,
-    "\n  mutation UpdateManyCourses(\n    $courseIds: [ID!]!\n    $updateCourseInput: UpdateCourseInput!\n  ) {\n    updateManyCourses(\n      courseIds: $courseIds\n      updateCourseInput: $updateCourseInput\n    ) {\n      count\n    }\n  }\n": typeof types.UpdateManyCoursesDocument,
+    "\n  mutation UpdateManyCourses(\n    $courseIds: [ID!]!\n    $updateCourseInput: UpdateCourseInput!\n  ) {\n    updateManyCourses(\n      courseIds: $courseIds\n      updateCourseInput: $updateCourseInput\n    ) {\n      succeeded\n      failed\n    }\n  }\n": typeof types.UpdateManyCoursesDocument,
     "\n  mutation RemoveOneCourse($courseId: ID!) {\n    removeOneCourse(courseId: $courseId) {\n      id\n      slug\n    }\n  }\n": typeof types.RemoveOneCourseDocument,
-    "\n  mutation RemoveManyCourses($courseIds: [ID!]!) {\n    removeManyCourses(courseIds: $courseIds) {\n      count\n    }\n  }\n": typeof types.RemoveManyCoursesDocument,
+    "\n  mutation RemoveManyCourses($courseIds: [ID!]!) {\n    removeManyCourses(courseIds: $courseIds) {\n      succeeded\n      failed\n    }\n  }\n": typeof types.RemoveManyCoursesDocument,
     "\n  mutation CreateOneEducation($createEducationInput: CreateEducationInput!) {\n    createOneEducation(createEducationInput: $createEducationInput) {\n      id\n      slug\n    }\n  }\n": typeof types.CreateOneEducationDocument,
     "\n  mutation UpdateOneEducation(\n    $educationId: ID!\n    $updateEducationInput: UpdateEducationInput!\n  ) {\n    updateOneEducation(\n      educationId: $educationId\n      updateEducationInput: $updateEducationInput\n    ) {\n      id\n      slug\n    }\n  }\n": typeof types.UpdateOneEducationDocument,
-    "\n  mutation UpdateManyEducations(\n    $educationIds: [ID!]!\n    $updateEducationInput: UpdateEducationInput!\n  ) {\n    updateManyEducations(\n      educationIds: $educationIds\n      updateEducationInput: $updateEducationInput\n    ) {\n      count\n    }\n  }\n": typeof types.UpdateManyEducationsDocument,
+    "\n  mutation UpdateManyEducations(\n    $educationIds: [ID!]!\n    $updateEducationInput: UpdateEducationInput!\n  ) {\n    updateManyEducations(\n      educationIds: $educationIds\n      updateEducationInput: $updateEducationInput\n    ) {\n      succeeded\n      failed\n    }\n  }\n": typeof types.UpdateManyEducationsDocument,
     "\n  mutation RemoveOneEducation($educationId: ID!) {\n    removeOneEducation(educationId: $educationId) {\n      id\n      slug\n    }\n  }\n": typeof types.RemoveOneEducationDocument,
-    "\n  mutation RemoveManyEducations($educationIds: [ID!]!) {\n    removeManyEducations(educationIds: $educationIds) {\n      count\n    }\n  }\n": typeof types.RemoveManyEducationsDocument,
+    "\n  mutation RemoveManyEducations($educationIds: [ID!]!) {\n    removeManyEducations(educationIds: $educationIds) {\n      succeeded\n      failed\n    }\n  }\n": typeof types.RemoveManyEducationsDocument,
     "\n  mutation CreateOneExperience($createExperienceInput: CreateExperienceInput!) {\n    createOneExperience(createExperienceInput: $createExperienceInput) {\n      id\n      slug\n    }\n  }\n": typeof types.CreateOneExperienceDocument,
     "\n  mutation UpdateOneExperience(\n    $experienceId: ID!\n    $updateExperienceInput: UpdateExperienceInput!\n  ) {\n    updateOneExperience(\n      experienceId: $experienceId\n      updateExperienceInput: $updateExperienceInput\n    ) {\n      id\n      slug\n    }\n  }\n": typeof types.UpdateOneExperienceDocument,
-    "\n  mutation UpdateManyExperiences(\n    $experienceIds: [ID!]!\n    $updateExperienceInput: UpdateExperienceInput!\n  ) {\n    updateManyExperiences(\n      experienceIds: $experienceIds\n      updateExperienceInput: $updateExperienceInput\n    ) {\n      count\n    }\n  }\n": typeof types.UpdateManyExperiencesDocument,
+    "\n  mutation UpdateManyExperiences(\n    $experienceIds: [ID!]!\n    $updateExperienceInput: UpdateExperienceInput!\n  ) {\n    updateManyExperiences(\n      experienceIds: $experienceIds\n      updateExperienceInput: $updateExperienceInput\n    ) {\n      succeeded\n      failed\n    }\n  }\n": typeof types.UpdateManyExperiencesDocument,
     "\n  mutation RemoveOneExperience($experienceId: ID!) {\n    removeOneExperience(experienceId: $experienceId) {\n      id\n      slug\n    }\n  }\n": typeof types.RemoveOneExperienceDocument,
-    "\n  mutation RemoveManyExperiences($experienceIds: [ID!]!) {\n    removeManyExperiences(experienceIds: $experienceIds) {\n      count\n    }\n  }\n": typeof types.RemoveManyExperiencesDocument,
+    "\n  mutation RemoveManyExperiences($experienceIds: [ID!]!) {\n    removeManyExperiences(experienceIds: $experienceIds) {\n      succeeded\n      failed\n    }\n  }\n": typeof types.RemoveManyExperiencesDocument,
     "\n  mutation CreateOneOrganization(\n    $createOrganizationInput: CreateOrganizationInput!\n  ) {\n    createOneOrganization(createOrganizationInput: $createOrganizationInput) {\n      id\n      slug\n    }\n  }\n": typeof types.CreateOneOrganizationDocument,
     "\n  mutation UpdateOneOrganization(\n    $organizationId: ID!\n    $updateOrganizationInput: UpdateOrganizationInput!\n  ) {\n    updateOneOrganization(\n      organizationId: $organizationId\n      updateOrganizationInput: $updateOrganizationInput\n    ) {\n      id\n      slug\n    }\n  }\n": typeof types.UpdateOneOrganizationDocument,
-    "\n  mutation UpdateManyOrganizations(\n    $organizationIds: [ID!]!\n    $updateOrganizationInput: UpdateOrganizationInput!\n  ) {\n    updateManyOrganizations(\n      organizationIds: $organizationIds\n      updateOrganizationInput: $updateOrganizationInput\n    ) {\n      count\n    }\n  }\n": typeof types.UpdateManyOrganizationsDocument,
+    "\n  mutation UpdateManyOrganizations(\n    $organizationIds: [ID!]!\n    $updateOrganizationInput: UpdateOrganizationInput!\n  ) {\n    updateManyOrganizations(\n      organizationIds: $organizationIds\n      updateOrganizationInput: $updateOrganizationInput\n    ) {\n      succeeded\n      failed\n    }\n  }\n": typeof types.UpdateManyOrganizationsDocument,
     "\n  mutation RemoveOneOrganization($organizationId: ID!) {\n    removeOneOrganization(organizationId: $organizationId) {\n      id\n      slug\n    }\n  }\n": typeof types.RemoveOneOrganizationDocument,
-    "\n  mutation RemoveManyOrganizations($organizationIds: [ID!]!) {\n    removeManyOrganizations(organizationIds: $organizationIds) {\n      count\n    }\n  }\n": typeof types.RemoveManyOrganizationsDocument,
+    "\n  mutation RemoveManyOrganizations($organizationIds: [ID!]!) {\n    removeManyOrganizations(organizationIds: $organizationIds) {\n      succeeded\n      failed\n    }\n  }\n": typeof types.RemoveManyOrganizationsDocument,
     "\n  mutation CreateOneProject($createProjectInput: CreateProjectInput!) {\n    createOneProject(createProjectInput: $createProjectInput) {\n      id\n      slug\n    }\n  }\n": typeof types.CreateOneProjectDocument,
     "\n  mutation UpdateOneProject(\n    $projectId: ID!\n    $updateProjectInput: UpdateProjectInput!\n  ) {\n    updateOneProject(\n      projectId: $projectId\n      updateProjectInput: $updateProjectInput\n    ) {\n      id\n      slug\n    }\n  }\n": typeof types.UpdateOneProjectDocument,
-    "\n  mutation UpdateManyProjects(\n    $projectIds: [ID!]!\n    $updateProjectInput: UpdateProjectInput!\n  ) {\n    updateManyProjects(\n      projectIds: $projectIds\n      updateProjectInput: $updateProjectInput\n    ) {\n      count\n    }\n  }\n": typeof types.UpdateManyProjectsDocument,
+    "\n  mutation UpdateManyProjects(\n    $projectIds: [ID!]!\n    $updateProjectInput: UpdateProjectInput!\n  ) {\n    updateManyProjects(\n      projectIds: $projectIds\n      updateProjectInput: $updateProjectInput\n    ) {\n      succeeded\n      failed\n    }\n  }\n": typeof types.UpdateManyProjectsDocument,
     "\n  mutation RemoveOneProject($projectId: ID!) {\n    removeOneProject(projectId: $projectId) {\n      id\n      slug\n    }\n  }\n": typeof types.RemoveOneProjectDocument,
-    "\n  mutation RemoveManyProjects($projectIds: [ID!]!) {\n    removeManyProjects(projectIds: $projectIds) {\n      count\n    }\n  }\n": typeof types.RemoveManyProjectsDocument,
+    "\n  mutation RemoveManyProjects($projectIds: [ID!]!) {\n    removeManyProjects(projectIds: $projectIds) {\n      succeeded\n      failed\n    }\n  }\n": typeof types.RemoveManyProjectsDocument,
     "\n  mutation CreateOneSkill($createSkillInput: CreateSkillInput!) {\n    createOneSkill(createSkillInput: $createSkillInput) {\n      id\n      name\n      slug\n      category\n      relevance\n      createdAt\n      updatedAt\n    }\n  }\n": typeof types.CreateOneSkillDocument,
     "\n  mutation UpdateOneSkill($skillId: ID!, $updateSkillInput: UpdateSkillInput!) {\n    updateOneSkill(skillId: $skillId, updateSkillInput: $updateSkillInput) {\n      id\n      name\n      slug\n      category\n      relevance\n      createdAt\n      updatedAt\n    }\n  }\n": typeof types.UpdateOneSkillDocument,
-    "\n  mutation UpdateManySkills(\n    $skillIds: [ID!]!\n    $updateSkillInput: UpdateSkillInput!\n  ) {\n    updateManySkills(skillIds: $skillIds, updateSkillInput: $updateSkillInput) {\n      count\n    }\n  }\n": typeof types.UpdateManySkillsDocument,
+    "\n  mutation UpdateManySkills(\n    $skillIds: [ID!]!\n    $updateSkillInput: UpdateSkillInput!\n  ) {\n    updateManySkills(skillIds: $skillIds, updateSkillInput: $updateSkillInput) {\n      succeeded\n      failed\n    }\n  }\n": typeof types.UpdateManySkillsDocument,
     "\n  mutation RemoveOneSkill($skillId: ID!) {\n    removeOneSkill(skillId: $skillId) {\n      id\n      name\n      slug\n      category\n      relevance\n      createdAt\n      updatedAt\n    }\n  }\n": typeof types.RemoveOneSkillDocument,
-    "\n  mutation RemoveManySkills($skillIds: [ID!]!) {\n    removeManySkills(skillIds: $skillIds) {\n      count\n    }\n  }\n": typeof types.RemoveManySkillsDocument,
+    "\n  mutation RemoveManySkills($skillIds: [ID!]!) {\n    removeManySkills(skillIds: $skillIds) {\n      succeeded\n      failed\n    }\n  }\n": typeof types.RemoveManySkillsDocument,
     "\n  mutation UpdateMe($updateMeInput: UpdateMeInput!) {\n    updateMe(updateMeInput: $updateMeInput) {\n      id\n      email\n      name\n      nickname\n      role\n      avatar\n      phone\n      birth\n      address\n      i18n {\n        locale\n        messages {\n          title\n          description\n        }\n      }\n      urls {\n        title\n        value\n      }\n    }\n  }\n": typeof types.UpdateMeDocument,
     "\n  query GetMe {\n    getMe {\n      id\n      email\n      name\n      nickname\n      role\n      avatar\n      phone\n      birth\n      address\n      i18n {\n        locale\n        messages {\n          title\n          description\n        }\n      }\n      urls {\n        title\n        value\n      }\n    }\n  }\n": typeof types.GetMeDocument,
     "\n  query FindManyCourses(\n    $courseFilters: FilterCourseInput\n    $coursePagination: PaginationInput\n    $courseSort: SortCourseInput\n  ) {\n    findManyCourses(\n      courseFilters: $courseFilters\n      coursePagination: $coursePagination\n      courseSort: $courseSort\n    ) {\n      found\n      nodes {\n        id\n        slug\n        status\n        relevance\n        url\n        image\n        hours\n        organization {\n          id\n          name\n          slug\n        }\n        i18n {\n          locale\n          messages {\n            title\n            description\n          }\n        }\n        skills {\n          id\n          name\n        }\n        createdAt\n        updatedAt\n      }\n    }\n  }\n": typeof types.FindManyCoursesDocument,
@@ -66,34 +66,34 @@ const documents: Documents = {
     "\n  mutation SignIn($signInInput: SignInInput!) {\n    signIn(signInInput: $signInInput)\n  }\n": types.SignInDocument,
     "\n  mutation CreateOneCourse($createCourseInput: CreateCourseInput!) {\n    createOneCourse(createCourseInput: $createCourseInput) {\n      id\n      slug\n    }\n  }\n": types.CreateOneCourseDocument,
     "\n  mutation UpdateOneCourse(\n    $courseId: ID!\n    $updateCourseInput: UpdateCourseInput!\n  ) {\n    updateOneCourse(courseId: $courseId, updateCourseInput: $updateCourseInput) {\n      id\n      slug\n    }\n  }\n": types.UpdateOneCourseDocument,
-    "\n  mutation UpdateManyCourses(\n    $courseIds: [ID!]!\n    $updateCourseInput: UpdateCourseInput!\n  ) {\n    updateManyCourses(\n      courseIds: $courseIds\n      updateCourseInput: $updateCourseInput\n    ) {\n      count\n    }\n  }\n": types.UpdateManyCoursesDocument,
+    "\n  mutation UpdateManyCourses(\n    $courseIds: [ID!]!\n    $updateCourseInput: UpdateCourseInput!\n  ) {\n    updateManyCourses(\n      courseIds: $courseIds\n      updateCourseInput: $updateCourseInput\n    ) {\n      succeeded\n      failed\n    }\n  }\n": types.UpdateManyCoursesDocument,
     "\n  mutation RemoveOneCourse($courseId: ID!) {\n    removeOneCourse(courseId: $courseId) {\n      id\n      slug\n    }\n  }\n": types.RemoveOneCourseDocument,
-    "\n  mutation RemoveManyCourses($courseIds: [ID!]!) {\n    removeManyCourses(courseIds: $courseIds) {\n      count\n    }\n  }\n": types.RemoveManyCoursesDocument,
+    "\n  mutation RemoveManyCourses($courseIds: [ID!]!) {\n    removeManyCourses(courseIds: $courseIds) {\n      succeeded\n      failed\n    }\n  }\n": types.RemoveManyCoursesDocument,
     "\n  mutation CreateOneEducation($createEducationInput: CreateEducationInput!) {\n    createOneEducation(createEducationInput: $createEducationInput) {\n      id\n      slug\n    }\n  }\n": types.CreateOneEducationDocument,
     "\n  mutation UpdateOneEducation(\n    $educationId: ID!\n    $updateEducationInput: UpdateEducationInput!\n  ) {\n    updateOneEducation(\n      educationId: $educationId\n      updateEducationInput: $updateEducationInput\n    ) {\n      id\n      slug\n    }\n  }\n": types.UpdateOneEducationDocument,
-    "\n  mutation UpdateManyEducations(\n    $educationIds: [ID!]!\n    $updateEducationInput: UpdateEducationInput!\n  ) {\n    updateManyEducations(\n      educationIds: $educationIds\n      updateEducationInput: $updateEducationInput\n    ) {\n      count\n    }\n  }\n": types.UpdateManyEducationsDocument,
+    "\n  mutation UpdateManyEducations(\n    $educationIds: [ID!]!\n    $updateEducationInput: UpdateEducationInput!\n  ) {\n    updateManyEducations(\n      educationIds: $educationIds\n      updateEducationInput: $updateEducationInput\n    ) {\n      succeeded\n      failed\n    }\n  }\n": types.UpdateManyEducationsDocument,
     "\n  mutation RemoveOneEducation($educationId: ID!) {\n    removeOneEducation(educationId: $educationId) {\n      id\n      slug\n    }\n  }\n": types.RemoveOneEducationDocument,
-    "\n  mutation RemoveManyEducations($educationIds: [ID!]!) {\n    removeManyEducations(educationIds: $educationIds) {\n      count\n    }\n  }\n": types.RemoveManyEducationsDocument,
+    "\n  mutation RemoveManyEducations($educationIds: [ID!]!) {\n    removeManyEducations(educationIds: $educationIds) {\n      succeeded\n      failed\n    }\n  }\n": types.RemoveManyEducationsDocument,
     "\n  mutation CreateOneExperience($createExperienceInput: CreateExperienceInput!) {\n    createOneExperience(createExperienceInput: $createExperienceInput) {\n      id\n      slug\n    }\n  }\n": types.CreateOneExperienceDocument,
     "\n  mutation UpdateOneExperience(\n    $experienceId: ID!\n    $updateExperienceInput: UpdateExperienceInput!\n  ) {\n    updateOneExperience(\n      experienceId: $experienceId\n      updateExperienceInput: $updateExperienceInput\n    ) {\n      id\n      slug\n    }\n  }\n": types.UpdateOneExperienceDocument,
-    "\n  mutation UpdateManyExperiences(\n    $experienceIds: [ID!]!\n    $updateExperienceInput: UpdateExperienceInput!\n  ) {\n    updateManyExperiences(\n      experienceIds: $experienceIds\n      updateExperienceInput: $updateExperienceInput\n    ) {\n      count\n    }\n  }\n": types.UpdateManyExperiencesDocument,
+    "\n  mutation UpdateManyExperiences(\n    $experienceIds: [ID!]!\n    $updateExperienceInput: UpdateExperienceInput!\n  ) {\n    updateManyExperiences(\n      experienceIds: $experienceIds\n      updateExperienceInput: $updateExperienceInput\n    ) {\n      succeeded\n      failed\n    }\n  }\n": types.UpdateManyExperiencesDocument,
     "\n  mutation RemoveOneExperience($experienceId: ID!) {\n    removeOneExperience(experienceId: $experienceId) {\n      id\n      slug\n    }\n  }\n": types.RemoveOneExperienceDocument,
-    "\n  mutation RemoveManyExperiences($experienceIds: [ID!]!) {\n    removeManyExperiences(experienceIds: $experienceIds) {\n      count\n    }\n  }\n": types.RemoveManyExperiencesDocument,
+    "\n  mutation RemoveManyExperiences($experienceIds: [ID!]!) {\n    removeManyExperiences(experienceIds: $experienceIds) {\n      succeeded\n      failed\n    }\n  }\n": types.RemoveManyExperiencesDocument,
     "\n  mutation CreateOneOrganization(\n    $createOrganizationInput: CreateOrganizationInput!\n  ) {\n    createOneOrganization(createOrganizationInput: $createOrganizationInput) {\n      id\n      slug\n    }\n  }\n": types.CreateOneOrganizationDocument,
     "\n  mutation UpdateOneOrganization(\n    $organizationId: ID!\n    $updateOrganizationInput: UpdateOrganizationInput!\n  ) {\n    updateOneOrganization(\n      organizationId: $organizationId\n      updateOrganizationInput: $updateOrganizationInput\n    ) {\n      id\n      slug\n    }\n  }\n": types.UpdateOneOrganizationDocument,
-    "\n  mutation UpdateManyOrganizations(\n    $organizationIds: [ID!]!\n    $updateOrganizationInput: UpdateOrganizationInput!\n  ) {\n    updateManyOrganizations(\n      organizationIds: $organizationIds\n      updateOrganizationInput: $updateOrganizationInput\n    ) {\n      count\n    }\n  }\n": types.UpdateManyOrganizationsDocument,
+    "\n  mutation UpdateManyOrganizations(\n    $organizationIds: [ID!]!\n    $updateOrganizationInput: UpdateOrganizationInput!\n  ) {\n    updateManyOrganizations(\n      organizationIds: $organizationIds\n      updateOrganizationInput: $updateOrganizationInput\n    ) {\n      succeeded\n      failed\n    }\n  }\n": types.UpdateManyOrganizationsDocument,
     "\n  mutation RemoveOneOrganization($organizationId: ID!) {\n    removeOneOrganization(organizationId: $organizationId) {\n      id\n      slug\n    }\n  }\n": types.RemoveOneOrganizationDocument,
-    "\n  mutation RemoveManyOrganizations($organizationIds: [ID!]!) {\n    removeManyOrganizations(organizationIds: $organizationIds) {\n      count\n    }\n  }\n": types.RemoveManyOrganizationsDocument,
+    "\n  mutation RemoveManyOrganizations($organizationIds: [ID!]!) {\n    removeManyOrganizations(organizationIds: $organizationIds) {\n      succeeded\n      failed\n    }\n  }\n": types.RemoveManyOrganizationsDocument,
     "\n  mutation CreateOneProject($createProjectInput: CreateProjectInput!) {\n    createOneProject(createProjectInput: $createProjectInput) {\n      id\n      slug\n    }\n  }\n": types.CreateOneProjectDocument,
     "\n  mutation UpdateOneProject(\n    $projectId: ID!\n    $updateProjectInput: UpdateProjectInput!\n  ) {\n    updateOneProject(\n      projectId: $projectId\n      updateProjectInput: $updateProjectInput\n    ) {\n      id\n      slug\n    }\n  }\n": types.UpdateOneProjectDocument,
-    "\n  mutation UpdateManyProjects(\n    $projectIds: [ID!]!\n    $updateProjectInput: UpdateProjectInput!\n  ) {\n    updateManyProjects(\n      projectIds: $projectIds\n      updateProjectInput: $updateProjectInput\n    ) {\n      count\n    }\n  }\n": types.UpdateManyProjectsDocument,
+    "\n  mutation UpdateManyProjects(\n    $projectIds: [ID!]!\n    $updateProjectInput: UpdateProjectInput!\n  ) {\n    updateManyProjects(\n      projectIds: $projectIds\n      updateProjectInput: $updateProjectInput\n    ) {\n      succeeded\n      failed\n    }\n  }\n": types.UpdateManyProjectsDocument,
     "\n  mutation RemoveOneProject($projectId: ID!) {\n    removeOneProject(projectId: $projectId) {\n      id\n      slug\n    }\n  }\n": types.RemoveOneProjectDocument,
-    "\n  mutation RemoveManyProjects($projectIds: [ID!]!) {\n    removeManyProjects(projectIds: $projectIds) {\n      count\n    }\n  }\n": types.RemoveManyProjectsDocument,
+    "\n  mutation RemoveManyProjects($projectIds: [ID!]!) {\n    removeManyProjects(projectIds: $projectIds) {\n      succeeded\n      failed\n    }\n  }\n": types.RemoveManyProjectsDocument,
     "\n  mutation CreateOneSkill($createSkillInput: CreateSkillInput!) {\n    createOneSkill(createSkillInput: $createSkillInput) {\n      id\n      name\n      slug\n      category\n      relevance\n      createdAt\n      updatedAt\n    }\n  }\n": types.CreateOneSkillDocument,
     "\n  mutation UpdateOneSkill($skillId: ID!, $updateSkillInput: UpdateSkillInput!) {\n    updateOneSkill(skillId: $skillId, updateSkillInput: $updateSkillInput) {\n      id\n      name\n      slug\n      category\n      relevance\n      createdAt\n      updatedAt\n    }\n  }\n": types.UpdateOneSkillDocument,
-    "\n  mutation UpdateManySkills(\n    $skillIds: [ID!]!\n    $updateSkillInput: UpdateSkillInput!\n  ) {\n    updateManySkills(skillIds: $skillIds, updateSkillInput: $updateSkillInput) {\n      count\n    }\n  }\n": types.UpdateManySkillsDocument,
+    "\n  mutation UpdateManySkills(\n    $skillIds: [ID!]!\n    $updateSkillInput: UpdateSkillInput!\n  ) {\n    updateManySkills(skillIds: $skillIds, updateSkillInput: $updateSkillInput) {\n      succeeded\n      failed\n    }\n  }\n": types.UpdateManySkillsDocument,
     "\n  mutation RemoveOneSkill($skillId: ID!) {\n    removeOneSkill(skillId: $skillId) {\n      id\n      name\n      slug\n      category\n      relevance\n      createdAt\n      updatedAt\n    }\n  }\n": types.RemoveOneSkillDocument,
-    "\n  mutation RemoveManySkills($skillIds: [ID!]!) {\n    removeManySkills(skillIds: $skillIds) {\n      count\n    }\n  }\n": types.RemoveManySkillsDocument,
+    "\n  mutation RemoveManySkills($skillIds: [ID!]!) {\n    removeManySkills(skillIds: $skillIds) {\n      succeeded\n      failed\n    }\n  }\n": types.RemoveManySkillsDocument,
     "\n  mutation UpdateMe($updateMeInput: UpdateMeInput!) {\n    updateMe(updateMeInput: $updateMeInput) {\n      id\n      email\n      name\n      nickname\n      role\n      avatar\n      phone\n      birth\n      address\n      i18n {\n        locale\n        messages {\n          title\n          description\n        }\n      }\n      urls {\n        title\n        value\n      }\n    }\n  }\n": types.UpdateMeDocument,
     "\n  query GetMe {\n    getMe {\n      id\n      email\n      name\n      nickname\n      role\n      avatar\n      phone\n      birth\n      address\n      i18n {\n        locale\n        messages {\n          title\n          description\n        }\n      }\n      urls {\n        title\n        value\n      }\n    }\n  }\n": types.GetMeDocument,
     "\n  query FindManyCourses(\n    $courseFilters: FilterCourseInput\n    $coursePagination: PaginationInput\n    $courseSort: SortCourseInput\n  ) {\n    findManyCourses(\n      courseFilters: $courseFilters\n      coursePagination: $coursePagination\n      courseSort: $courseSort\n    ) {\n      found\n      nodes {\n        id\n        slug\n        status\n        relevance\n        url\n        image\n        hours\n        organization {\n          id\n          name\n          slug\n        }\n        i18n {\n          locale\n          messages {\n            title\n            description\n          }\n        }\n        skills {\n          id\n          name\n        }\n        createdAt\n        updatedAt\n      }\n    }\n  }\n": types.FindManyCoursesDocument,
@@ -132,7 +132,7 @@ export function graphql(source: "\n  mutation UpdateOneCourse(\n    $courseId: I
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function graphql(source: "\n  mutation UpdateManyCourses(\n    $courseIds: [ID!]!\n    $updateCourseInput: UpdateCourseInput!\n  ) {\n    updateManyCourses(\n      courseIds: $courseIds\n      updateCourseInput: $updateCourseInput\n    ) {\n      count\n    }\n  }\n"): typeof import('./graphql').UpdateManyCoursesDocument;
+export function graphql(source: "\n  mutation UpdateManyCourses(\n    $courseIds: [ID!]!\n    $updateCourseInput: UpdateCourseInput!\n  ) {\n    updateManyCourses(\n      courseIds: $courseIds\n      updateCourseInput: $updateCourseInput\n    ) {\n      succeeded\n      failed\n    }\n  }\n"): typeof import('./graphql').UpdateManyCoursesDocument;
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
@@ -140,7 +140,7 @@ export function graphql(source: "\n  mutation RemoveOneCourse($courseId: ID!) {\
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function graphql(source: "\n  mutation RemoveManyCourses($courseIds: [ID!]!) {\n    removeManyCourses(courseIds: $courseIds) {\n      count\n    }\n  }\n"): typeof import('./graphql').RemoveManyCoursesDocument;
+export function graphql(source: "\n  mutation RemoveManyCourses($courseIds: [ID!]!) {\n    removeManyCourses(courseIds: $courseIds) {\n      succeeded\n      failed\n    }\n  }\n"): typeof import('./graphql').RemoveManyCoursesDocument;
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
@@ -152,7 +152,7 @@ export function graphql(source: "\n  mutation UpdateOneEducation(\n    $educatio
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function graphql(source: "\n  mutation UpdateManyEducations(\n    $educationIds: [ID!]!\n    $updateEducationInput: UpdateEducationInput!\n  ) {\n    updateManyEducations(\n      educationIds: $educationIds\n      updateEducationInput: $updateEducationInput\n    ) {\n      count\n    }\n  }\n"): typeof import('./graphql').UpdateManyEducationsDocument;
+export function graphql(source: "\n  mutation UpdateManyEducations(\n    $educationIds: [ID!]!\n    $updateEducationInput: UpdateEducationInput!\n  ) {\n    updateManyEducations(\n      educationIds: $educationIds\n      updateEducationInput: $updateEducationInput\n    ) {\n      succeeded\n      failed\n    }\n  }\n"): typeof import('./graphql').UpdateManyEducationsDocument;
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
@@ -160,7 +160,7 @@ export function graphql(source: "\n  mutation RemoveOneEducation($educationId: I
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function graphql(source: "\n  mutation RemoveManyEducations($educationIds: [ID!]!) {\n    removeManyEducations(educationIds: $educationIds) {\n      count\n    }\n  }\n"): typeof import('./graphql').RemoveManyEducationsDocument;
+export function graphql(source: "\n  mutation RemoveManyEducations($educationIds: [ID!]!) {\n    removeManyEducations(educationIds: $educationIds) {\n      succeeded\n      failed\n    }\n  }\n"): typeof import('./graphql').RemoveManyEducationsDocument;
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
@@ -172,7 +172,7 @@ export function graphql(source: "\n  mutation UpdateOneExperience(\n    $experie
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function graphql(source: "\n  mutation UpdateManyExperiences(\n    $experienceIds: [ID!]!\n    $updateExperienceInput: UpdateExperienceInput!\n  ) {\n    updateManyExperiences(\n      experienceIds: $experienceIds\n      updateExperienceInput: $updateExperienceInput\n    ) {\n      count\n    }\n  }\n"): typeof import('./graphql').UpdateManyExperiencesDocument;
+export function graphql(source: "\n  mutation UpdateManyExperiences(\n    $experienceIds: [ID!]!\n    $updateExperienceInput: UpdateExperienceInput!\n  ) {\n    updateManyExperiences(\n      experienceIds: $experienceIds\n      updateExperienceInput: $updateExperienceInput\n    ) {\n      succeeded\n      failed\n    }\n  }\n"): typeof import('./graphql').UpdateManyExperiencesDocument;
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
@@ -180,7 +180,7 @@ export function graphql(source: "\n  mutation RemoveOneExperience($experienceId:
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function graphql(source: "\n  mutation RemoveManyExperiences($experienceIds: [ID!]!) {\n    removeManyExperiences(experienceIds: $experienceIds) {\n      count\n    }\n  }\n"): typeof import('./graphql').RemoveManyExperiencesDocument;
+export function graphql(source: "\n  mutation RemoveManyExperiences($experienceIds: [ID!]!) {\n    removeManyExperiences(experienceIds: $experienceIds) {\n      succeeded\n      failed\n    }\n  }\n"): typeof import('./graphql').RemoveManyExperiencesDocument;
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
@@ -192,7 +192,7 @@ export function graphql(source: "\n  mutation UpdateOneOrganization(\n    $organ
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function graphql(source: "\n  mutation UpdateManyOrganizations(\n    $organizationIds: [ID!]!\n    $updateOrganizationInput: UpdateOrganizationInput!\n  ) {\n    updateManyOrganizations(\n      organizationIds: $organizationIds\n      updateOrganizationInput: $updateOrganizationInput\n    ) {\n      count\n    }\n  }\n"): typeof import('./graphql').UpdateManyOrganizationsDocument;
+export function graphql(source: "\n  mutation UpdateManyOrganizations(\n    $organizationIds: [ID!]!\n    $updateOrganizationInput: UpdateOrganizationInput!\n  ) {\n    updateManyOrganizations(\n      organizationIds: $organizationIds\n      updateOrganizationInput: $updateOrganizationInput\n    ) {\n      succeeded\n      failed\n    }\n  }\n"): typeof import('./graphql').UpdateManyOrganizationsDocument;
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
@@ -200,7 +200,7 @@ export function graphql(source: "\n  mutation RemoveOneOrganization($organizatio
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function graphql(source: "\n  mutation RemoveManyOrganizations($organizationIds: [ID!]!) {\n    removeManyOrganizations(organizationIds: $organizationIds) {\n      count\n    }\n  }\n"): typeof import('./graphql').RemoveManyOrganizationsDocument;
+export function graphql(source: "\n  mutation RemoveManyOrganizations($organizationIds: [ID!]!) {\n    removeManyOrganizations(organizationIds: $organizationIds) {\n      succeeded\n      failed\n    }\n  }\n"): typeof import('./graphql').RemoveManyOrganizationsDocument;
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
@@ -212,7 +212,7 @@ export function graphql(source: "\n  mutation UpdateOneProject(\n    $projectId:
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function graphql(source: "\n  mutation UpdateManyProjects(\n    $projectIds: [ID!]!\n    $updateProjectInput: UpdateProjectInput!\n  ) {\n    updateManyProjects(\n      projectIds: $projectIds\n      updateProjectInput: $updateProjectInput\n    ) {\n      count\n    }\n  }\n"): typeof import('./graphql').UpdateManyProjectsDocument;
+export function graphql(source: "\n  mutation UpdateManyProjects(\n    $projectIds: [ID!]!\n    $updateProjectInput: UpdateProjectInput!\n  ) {\n    updateManyProjects(\n      projectIds: $projectIds\n      updateProjectInput: $updateProjectInput\n    ) {\n      succeeded\n      failed\n    }\n  }\n"): typeof import('./graphql').UpdateManyProjectsDocument;
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
@@ -220,7 +220,7 @@ export function graphql(source: "\n  mutation RemoveOneProject($projectId: ID!) 
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function graphql(source: "\n  mutation RemoveManyProjects($projectIds: [ID!]!) {\n    removeManyProjects(projectIds: $projectIds) {\n      count\n    }\n  }\n"): typeof import('./graphql').RemoveManyProjectsDocument;
+export function graphql(source: "\n  mutation RemoveManyProjects($projectIds: [ID!]!) {\n    removeManyProjects(projectIds: $projectIds) {\n      succeeded\n      failed\n    }\n  }\n"): typeof import('./graphql').RemoveManyProjectsDocument;
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
@@ -232,7 +232,7 @@ export function graphql(source: "\n  mutation UpdateOneSkill($skillId: ID!, $upd
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function graphql(source: "\n  mutation UpdateManySkills(\n    $skillIds: [ID!]!\n    $updateSkillInput: UpdateSkillInput!\n  ) {\n    updateManySkills(skillIds: $skillIds, updateSkillInput: $updateSkillInput) {\n      count\n    }\n  }\n"): typeof import('./graphql').UpdateManySkillsDocument;
+export function graphql(source: "\n  mutation UpdateManySkills(\n    $skillIds: [ID!]!\n    $updateSkillInput: UpdateSkillInput!\n  ) {\n    updateManySkills(skillIds: $skillIds, updateSkillInput: $updateSkillInput) {\n      succeeded\n      failed\n    }\n  }\n"): typeof import('./graphql').UpdateManySkillsDocument;
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
@@ -240,7 +240,7 @@ export function graphql(source: "\n  mutation RemoveOneSkill($skillId: ID!) {\n 
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function graphql(source: "\n  mutation RemoveManySkills($skillIds: [ID!]!) {\n    removeManySkills(skillIds: $skillIds) {\n      count\n    }\n  }\n"): typeof import('./graphql').RemoveManySkillsDocument;
+export function graphql(source: "\n  mutation RemoveManySkills($skillIds: [ID!]!) {\n    removeManySkills(skillIds: $skillIds) {\n      succeeded\n      failed\n    }\n  }\n"): typeof import('./graphql').RemoveManySkillsDocument;
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

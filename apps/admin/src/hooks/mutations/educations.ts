@@ -39,7 +39,8 @@ const updateManyEducations = graphql(`
       educationIds: $educationIds
       updateEducationInput: $updateEducationInput
     ) {
-      count
+      succeeded
+      failed
     }
   }
 `);
@@ -56,7 +57,8 @@ const removeOneEducation = graphql(`
 const removeManyEducations = graphql(`
   mutation RemoveManyEducations($educationIds: [ID!]!) {
     removeManyEducations(educationIds: $educationIds) {
-      count
+      succeeded
+      failed
     }
   }
 `);

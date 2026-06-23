@@ -121,7 +121,7 @@ function RouteComponent() {
           onSuccess: (data) => {
             closeAndRefetch();
             toast.success(
-              `${data.removeManyOrganizations.count} organizations deleted successfully`
+              `${data.removeManyOrganizations.succeeded} organizations deleted successfully`
             );
           },
         });
@@ -206,7 +206,7 @@ function RouteComponent() {
                 onSuccess: (data) => {
                   closeAndRefetch();
                   toast.success(
-                    `${data.updateManyOrganizations.count} organizations updated successfully`
+                    `${data.updateManyOrganizations.succeeded} organizations updated successfully`
                   );
                 },
               }

@@ -114,7 +114,7 @@ function RouteComponent() {
           onSuccess: (data) => {
             closeAndRefetch();
             toast.success(
-              `${data.removeManySkills.count} skills deleted successfully`
+              `${data.removeManySkills.succeeded} skills deleted successfully`
             );
           },
         });
@@ -190,7 +190,7 @@ function RouteComponent() {
                 onSuccess: (data) => {
                   closeAndRefetch();
                   toast.success(
-                    `${data.updateManySkills.count} skills updated successfully`
+                    `${data.updateManySkills.succeeded} skills updated successfully`
                   );
                 },
               }

@@ -36,7 +36,8 @@ const updateManyCourses = graphql(`
       courseIds: $courseIds
       updateCourseInput: $updateCourseInput
     ) {
-      count
+      succeeded
+      failed
     }
   }
 `);
@@ -53,7 +54,8 @@ const removeOneCourse = graphql(`
 const removeManyCourses = graphql(`
   mutation RemoveManyCourses($courseIds: [ID!]!) {
     removeManyCourses(courseIds: $courseIds) {
-      count
+      succeeded
+      failed
     }
   }
 `);

@@ -119,7 +119,7 @@ function RouteComponent() {
           onSuccess: (data) => {
             closeAndRefetch();
             toast.success(
-              `${data.removeManyExperiences.count} experiences deleted successfully`
+              `${data.removeManyExperiences.succeeded} experiences deleted successfully`
             );
           },
         });
@@ -199,7 +199,7 @@ function RouteComponent() {
                 onSuccess: (data) => {
                   closeAndRefetch();
                   toast.success(
-                    `${data.updateManyExperiences.count} experiences updated successfully`
+                    `${data.updateManyExperiences.succeeded} experiences updated successfully`
                   );
                 },
               }

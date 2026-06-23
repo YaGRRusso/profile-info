@@ -16,7 +16,8 @@ input AtsSummarizeInput {
 }
 
 type BatchEntity {
-  count: Int!
+  failed: Int!
+  succeeded: Int!
 }
 
 enum ChatFinishReason {
@@ -428,13 +429,13 @@ type MessageEntity {
 
 type Mutation {
   atsSummarize(atsSummarizeInput: AtsSummarizeInput!): AiEntity!
-  createManyCourses(createCourseInputs: [CreateCourseInput!]!): [CourseEntity!]!
-  createManyEducations(createEducationInputs: [CreateEducationInput!]!): [EducationEntity!]!
-  createManyExperiences(createExperienceInputs: [CreateExperienceInput!]!): [ExperienceEntity!]!
-  createManyOrganizations(createOrganizationInputs: [CreateOrganizationInput!]!): [OrganizationEntity!]!
-  createManyProjects(createProjectInputs: [CreateProjectInput!]!): [ProjectEntity!]!
-  createManySkills(createSkillInputs: [CreateSkillInput!]!): [SkillEntity!]!
-  createManyUsers(createUserInputs: [CreateUserInput!]!): [UserEntity!]!
+  createManyCourses(createCourseInputs: [CreateCourseInput!]!): BatchEntity!
+  createManyEducations(createEducationInputs: [CreateEducationInput!]!): BatchEntity!
+  createManyExperiences(createExperienceInputs: [CreateExperienceInput!]!): BatchEntity!
+  createManyOrganizations(createOrganizationInputs: [CreateOrganizationInput!]!): BatchEntity!
+  createManyProjects(createProjectInputs: [CreateProjectInput!]!): BatchEntity!
+  createManySkills(createSkillInputs: [CreateSkillInput!]!): BatchEntity!
+  createManyUsers(createUserInputs: [CreateUserInput!]!): BatchEntity!
   createOneCourse(createCourseInput: CreateCourseInput!): CourseEntity!
   createOneEducation(createEducationInput: CreateEducationInput!): EducationEntity!
   createOneExperience(createExperienceInput: CreateExperienceInput!): ExperienceEntity!

@@ -41,7 +41,8 @@ const updateManyOrganizations = graphql(`
       organizationIds: $organizationIds
       updateOrganizationInput: $updateOrganizationInput
     ) {
-      count
+      succeeded
+      failed
     }
   }
 `);
@@ -58,7 +59,8 @@ const removeOneOrganization = graphql(`
 const removeManyOrganizations = graphql(`
   mutation RemoveManyOrganizations($organizationIds: [ID!]!) {
     removeManyOrganizations(organizationIds: $organizationIds) {
-      count
+      succeeded
+      failed
     }
   }
 `);
