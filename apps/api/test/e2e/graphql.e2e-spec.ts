@@ -1,6 +1,7 @@
 import { INestApplication } from "@nestjs/common";
 import { App } from "supertest/types";
 import { UserRole } from "@/core/enums/user-role.enum";
+import { CreateExperienceInput } from "@/modules/experiences/dto/create-experience.input";
 import { ExperienceCategory } from "@/modules/experiences/enums/category.enum";
 import { ExperiencesService } from "@/modules/experiences/experiences.service";
 import { OrganizationCategory } from "@/modules/organizations/enums/category.enum";
@@ -220,7 +221,7 @@ describe("GraphQL (e2e)", () => {
           ],
         },
       ],
-    });
+    } as CreateExperienceInput & { ownerId: string });
 
     await skillsService.createOne({
       slug: "loader-skill",

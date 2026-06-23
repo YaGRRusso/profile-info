@@ -100,7 +100,7 @@ export class ProjectsResolver {
   }
 
   @Roles(UserRole.SUPER_ADMIN)
-  @Mutation(() => [ProjectEntity])
+  @Mutation(() => BatchEntity)
   createManyProjects(
     @CurrentRequestContext() ctx: RequestContext,
     @Args("createProjectInputs", { type: () => [CreateProjectInput] })

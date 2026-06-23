@@ -2,7 +2,9 @@ import { INestApplication } from "@nestjs/common";
 import { App } from "supertest/types";
 import { UserRole } from "@/core/enums/user-role.enum";
 import { CoursesService } from "@/modules/courses/courses.service";
+import { CreateCourseInput } from "@/modules/courses/dto/create-course.input";
 import { CourseStatus } from "@/modules/courses/enums/status.enum";
+import { CreateEducationInput } from "@/modules/educations/dto/create-education.input";
 import { EducationsService } from "@/modules/educations/educations.service";
 import { EducationLevel } from "@/modules/educations/enums/level.enum";
 import { EducationStatus } from "@/modules/educations/enums/status.enum";
@@ -103,7 +105,7 @@ describe("Dashboard (e2e)", () => {
           messages: { title: "Complete Course", description: "Done" },
         },
       ],
-    });
+    } as CreateCourseInput & { ownerId: string });
 
     await coursesService.createOne(null, {
       slug: "dashboard-course-progress",
@@ -116,7 +118,7 @@ describe("Dashboard (e2e)", () => {
           messages: { title: "Progress Course", description: "Ongoing" },
         },
       ],
-    });
+    } as CreateCourseInput & { ownerId: string });
 
     await educationsService.createOne(null, {
       slug: "dashboard-education",
@@ -130,7 +132,7 @@ describe("Dashboard (e2e)", () => {
           messages: { title: "Bachelor Degree", description: "CS" },
         },
       ],
-    });
+    } as CreateEducationInput & { ownerId: string });
   });
 
   afterAll(async () => {

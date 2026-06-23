@@ -68,7 +68,7 @@ export class EducationsService {
   createMany(
     _ctx: RequestContext | null,
     createInputs: CreateEducationInput[]
-  ): Promise<EducationModel[]> {
+  ): Promise<BatchEntity> {
     return this.repository.createMany(
       createInputs as AnyKeys<EducationModel>[]
     );
@@ -79,7 +79,7 @@ export class EducationsService {
     id: string,
     updateInput: UpdateEducationInput
   ): Promise<EducationModel> {
-    return this.repository.updateOne(
+    return this.repository.updateOneById(
       id,
       updateInput as object as UpdateQuery<EducationModel>
     );
@@ -90,26 +90,26 @@ export class EducationsService {
     ids: string[],
     updateInput: UpdateEducationInput
   ): Promise<BatchEntity> {
-    return this.repository.updateMany(
+    return this.repository.updateManyById(
       ids,
       updateInput as object as UpdateQuery<EducationModel>
     );
   }
 
   removeOne(_ctx: RequestContext | null, id: string): Promise<EducationModel> {
-    return this.repository.deleteOne(id);
+    return this.repository.deleteOneById(id);
   }
 
   removeMany(_ctx: RequestContext | null, ids: string[]): Promise<BatchEntity> {
-    return this.repository.deleteMany(ids);
+    return this.repository.deleteManyById(ids);
   }
 
   count(): Promise<number> {
-    return this.repository.count();
+    return this.repository.stats.count();
   }
 
   async findRecentActivity(limit: number): Promise<RecentActivityRecord[]> {
-    const rows = await this.repository.findRecentlyUpdated(
+    const rows = await this.repository.stats.findRecentlyUpdated(
       limit,
       "slug i18n updatedAt"
     );
@@ -122,14 +122,14 @@ export class EducationsService {
     }));
   }
 
-  detachSkill(skillId: string): Promise<void> {
-    return this.repository.updateManyByFilter(
+  async detachSkill(skillId: string): Promise<void> {
+    await this.repository.updateMany(
       { skills: skillId },
       { $pull: { skills: skillId } }
     );
   }
 
-  purgeByOrganization(organizationId: string): Promise<void> {
-    return this.repository.deleteManyByFilter({ organization: organizationId });
+  async purgeByOrganization(organizationId: string): Promise<void> {
+    await this.repository.deleteMany({ organization: organizationId });
   }
 }

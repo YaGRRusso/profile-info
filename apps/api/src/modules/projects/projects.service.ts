@@ -65,7 +65,7 @@ export class ProjectsService {
   createMany(
     _ctx: RequestContext | null,
     createInputs: CreateProjectInput[]
-  ): Promise<ProjectModel[]> {
+  ): Promise<BatchEntity> {
     return this.repository.createMany(createInputs as AnyKeys<ProjectModel>[]);
   }
 
@@ -74,7 +74,7 @@ export class ProjectsService {
     id: string,
     updateInput: UpdateProjectInput
   ): Promise<ProjectModel> {
-    return this.repository.updateOne(
+    return this.repository.updateOneById(
       id,
       updateInput as object as UpdateQuery<ProjectModel>
     );
@@ -85,26 +85,26 @@ export class ProjectsService {
     ids: string[],
     updateInput: UpdateProjectInput
   ): Promise<BatchEntity> {
-    return this.repository.updateMany(
+    return this.repository.updateManyById(
       ids,
       updateInput as object as UpdateQuery<ProjectModel>
     );
   }
 
   removeOne(_ctx: RequestContext | null, id: string): Promise<ProjectModel> {
-    return this.repository.deleteOne(id);
+    return this.repository.deleteOneById(id);
   }
 
   removeMany(_ctx: RequestContext | null, ids: string[]): Promise<BatchEntity> {
-    return this.repository.deleteMany(ids);
+    return this.repository.deleteManyById(ids);
   }
 
   count(): Promise<number> {
-    return this.repository.count();
+    return this.repository.stats.count();
   }
 
   async findRecentActivity(limit: number): Promise<RecentActivityRecord[]> {
-    const rows = await this.repository.findRecentlyUpdated(
+    const rows = await this.repository.stats.findRecentlyUpdated(
       limit,
       "slug i18n updatedAt"
     );
@@ -117,8 +117,8 @@ export class ProjectsService {
     }));
   }
 
-  detachSkill(skillId: string): Promise<void> {
-    return this.repository.updateManyByFilter(
+  async detachSkill(skillId: string): Promise<void> {
+    await this.repository.updateMany(
       { skills: skillId },
       { $pull: { skills: skillId } }
     );

@@ -103,7 +103,7 @@ export class EducationsResolver {
   }
 
   @Roles(UserRole.SUPER_ADMIN)
-  @Mutation(() => [EducationEntity])
+  @Mutation(() => BatchEntity)
   createManyEducations(
     @CurrentRequestContext() ctx: RequestContext,
     @Args("createEducationInputs", { type: () => [CreateEducationInput] })

@@ -2,6 +2,7 @@ import { INestApplication } from "@nestjs/common";
 import { App } from "supertest/types";
 import { UserRole } from "@/core/enums/user-role.enum";
 import { CoursesService } from "@/modules/courses/courses.service";
+import { CreateCourseInput } from "@/modules/courses/dto/create-course.input";
 import { CourseStatus } from "@/modules/courses/enums/status.enum";
 import { OrganizationCategory } from "@/modules/organizations/enums/category.enum";
 import { OrganizationsService } from "@/modules/organizations/organizations.service";
@@ -76,7 +77,7 @@ describe("Skill delete cascade (integration)", () => {
         },
       ],
       skills: [skill._id.toString()],
-    });
+    } as CreateCourseInput & { ownerId: string });
 
     expect(course.skills?.map((id) => id.toString())).toContain(
       skill._id.toString()

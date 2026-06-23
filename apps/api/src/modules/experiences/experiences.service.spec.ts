@@ -120,7 +120,10 @@ describe("ExperiencesService", () => {
       (model.deleteMany as jest.Mock).mockReturnValue(
         makeExec({ deletedCount: 1 })
       );
-      expect(await service.removeMany(ctx, [validId])).toEqual({ count: 1 });
+      expect(await service.removeMany(ctx, [validId])).toEqual({
+        succeeded: 1,
+        failed: 0,
+      });
     });
   });
 });

@@ -9,10 +9,16 @@ import { AppService } from "./app.service";
 import { type Env, validateEnv } from "./core/configs/env.validation";
 import { PersistenceExceptionFilter } from "./core/filters/persistence-exception.filter";
 import { HealthModule } from "./core/health/health.module";
+import { AiToolsModule } from "./modules/ai-tools/ai-tools.module";
 import { AuthModule } from "./modules/auth/auth.module";
 import { CoursesModule } from "./modules/courses/courses.module";
+import { DashboardModule } from "./modules/dashboard/dashboard.module";
+import { EducationsModule } from "./modules/educations/educations.module";
+import { ExperiencesModule } from "./modules/experiences/experiences.module";
 import { GraphqlModule } from "./modules/graphql/graphql.module";
 import { OrganizationsModule } from "./modules/organizations/organizations.module";
+import { ProjectsModule } from "./modules/projects/projects.module";
+import { ResumeModule } from "./modules/resume/resume.module";
 import { SkillsModule } from "./modules/skills/skills.module";
 import { UsersModule } from "./modules/users/users.module";
 
@@ -39,13 +45,13 @@ import { UsersModule } from "./modules/users/users.module";
     SkillsModule,
     OrganizationsModule,
     UsersModule,
-    // ExperiencesModule,
-    // EducationsModule,
+    ExperiencesModule,
+    EducationsModule,
     CoursesModule,
-    // ProjectsModule,
-    // DashboardModule,
-    // ResumeModule,
-    // AiToolsModule,
+    ProjectsModule,
+    DashboardModule,
+    ResumeModule,
+    AiToolsModule,
   ],
   controllers: [AppController],
   providers: [

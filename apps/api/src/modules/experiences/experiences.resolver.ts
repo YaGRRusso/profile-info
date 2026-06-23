@@ -110,7 +110,7 @@ export class ExperiencesResolver {
   }
 
   @Roles(UserRole.SUPER_ADMIN)
-  @Mutation(() => [ExperienceEntity])
+  @Mutation(() => BatchEntity)
   createManyExperiences(
     @CurrentRequestContext() ctx: RequestContext,
     @Args("createExperienceInputs", { type: () => [CreateExperienceInput] })
