@@ -1,6 +1,7 @@
 import { createFileRoute, Outlet } from "@tanstack/react-router";
 import { useEffect } from "react";
 import { DataState } from "@/components/display/data-state";
+import { useAuthHydrated } from "@/hooks/custom/use-auth-hydrated";
 import { useGetMe } from "@/hooks/queries/auth";
 import { useAuthStore } from "@/stores/auth";
 import { Login } from "./-components/login";
@@ -10,9 +11,13 @@ export const Route = createFileRoute("/_authenticated")({
 });
 
 function RouteComponent() {
+  const hydrated = useAuthHydrated();
   const { token, setUser } = useAuthStore();
 
-  const getMe = useGetMe({ enabled: !!token, retry: false });
+  const getMe = useGetMe({
+    enabled: !!hydrated && !!token,
+    retry: false,
+  });
   const user = getMe.data?.getMe;
 
   useEffect(() => {
@@ -31,6 +36,10 @@ function RouteComponent() {
       });
     }
   }, [user, setUser]);
+
+  if (!token) {
+    return <Login />;
+  }
 
   return (
     <DataState

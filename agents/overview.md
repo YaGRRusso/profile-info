@@ -88,6 +88,16 @@ Applies to naming, APIs, types, migrations, and refactors across the whole repo 
 
 Agents and humans: if a proposal has a “quick” and a “right” option, default to **right** and document the choice in `agents/*.md` when it affects future work.
 
+### Debug before refactor
+
+When **one** endpoint or module fails but siblings with the same pattern work, treat it as an **environment or stale-runtime** hypothesis first — not a missing abstraction.
+
+1. Restart the affected dev process (API `nr dev`, not only admin HMR).
+2. Reproduce on a clean process; compare with a working sibling (e.g. courses vs educations).
+3. Change code only if the failure survives that.
+
+See **NestJS GraphQL resolver hot-reload** in `agents/api.md` for a concrete example (`toTenantScope` / `userId` null on a single `findMany*`).
+
 ## Conventions & standards
 
 - Formatting and linting: Biome configured through `ultracite` presets in `biome.jsonc` (`ultracite/biome/core`, `.../nestjs`, `.../jest`). Run `npm run lint` and `npm run format`. Generated GraphQL artifacts are excluded from Biome.

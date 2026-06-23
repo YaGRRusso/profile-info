@@ -24,7 +24,7 @@ Data flow: GraphQL hooks call `execute()` from `src/lib/execute.ts` (POST to `VI
 
 Routing:
 
-- `_authenticated.tsx`: protected layout; `useGetMe()` when token exists; login page when unauthenticated.
+- `_authenticated.tsx`: protected layout; waits for auth store hydration, then `useGetMe()` when a token exists. Child routes mount only after session is valid — queries do not gate auth themselves. Login when unauthenticated.
 - `index.tsx`: dashboard via `useDashboard()` (stats + recharts).
 - `_authenticated/_sidebar/settings/`: profile form + `DownloadCvControl` in page header.
 - `_authenticated/_sidebar/`: CRUD pages per entity with `-components/table.tsx`.

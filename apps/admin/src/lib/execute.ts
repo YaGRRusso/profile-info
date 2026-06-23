@@ -18,6 +18,7 @@ export async function execute<Result, Variables>(
     Accept: "application/graphql-response+json",
   };
 
+  const hadToken = Boolean(token);
   if (token) headers.Authorization = `Bearer ${token}`;
 
   const response = await tc(
@@ -39,7 +40,7 @@ export async function execute<Result, Variables>(
     const isUnauthorized = errors.some(
       (e) => e.extensions?.code === "UNAUTHENTICATED"
     );
-    if (isUnauthorized) useAuthStore.getState().clearAuth();
+    if (isUnauthorized && hadToken) useAuthStore.getState().clearAuth();
     throw new GqlClientError(
       errors[0].message ?? "an error occurred",
       errors[0].extensions?.code
