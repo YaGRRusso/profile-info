@@ -48,8 +48,11 @@ type CourseEntity {
   id: ID!
   image: String
   organization: OrganizationEntity!
+  organizationId: ID!
+  owner: UserEntity!
   ownerId: ID!
   relevance: Float!
+  skillIds: [ID!]
   skills: [SkillEntity!]
   slug: String!
   status: CourseStatus!
@@ -276,9 +279,12 @@ type EducationEntity {
   image: String
   level: EducationLevel!
   organization: OrganizationEntity!
+  organizationId: ID!
+  owner: UserEntity!
   ownerId: ID!
   period: DateRangeEntity
   relevance: Float!
+  skillIds: [ID!]
   skills: [SkillEntity!]
   slug: String!
   status: EducationStatus!
@@ -323,6 +329,8 @@ type ExperienceEntity {
   createdAt: DateTime!
   id: ID!
   organization: OrganizationEntity!
+  organizationId: ID!
+  owner: UserEntity!
   ownerId: ID!
   relevance: Float!
   roles: [ExperienceRole!]!
@@ -339,6 +347,7 @@ type ExperienceMessages {
 type ExperienceRole {
   i18n: [ExperienceTranslationLocale!]!
   period: DateRangeEntity
+  skillIds: [ID!]
   skills: [SkillEntity!]
 }
 
@@ -550,8 +559,10 @@ type ProjectEntity {
   i18n: [ProjectMessagesTranslationEntity!]!
   id: ID!
   images: [String!]
+  owner: UserEntity!
   ownerId: ID!
   relevance: Float!
+  skillIds: [ID!]
   skills: [SkillEntity!]
   slug: String!
   updatedAt: DateTime!

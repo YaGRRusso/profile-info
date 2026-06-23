@@ -5,6 +5,7 @@ import { DateRangeEntity } from "@/core/entities/date-range.entity";
 import { createPaginatedModel } from "@/core/schemas/paginated.schema";
 import { OrganizationEntity } from "@/modules/organizations/entities/organization.entity";
 import { SkillEntity } from "@/modules/skills/entities/skill.entity";
+import { UserEntity } from "@/modules/users/entities/user.entity";
 import { EducationLevel } from "../enums/level.enum";
 import { EducationStatus } from "../enums/status.enum";
 
@@ -37,6 +38,12 @@ export class EducationEntity extends BaseEntity {
   @Field(() => ID)
   ownerId: string;
 
+  @Field(() => UserEntity)
+  owner: UserEntity;
+
+  @Field(() => ID)
+  organizationId: string;
+
   @Field(() => OrganizationEntity)
   organization: OrganizationEntity;
 
@@ -54,6 +61,9 @@ export class EducationEntity extends BaseEntity {
 
   @Field(() => [EducationTranslationLocale])
   i18n: EducationTranslationLocale[];
+
+  @OptionalField(() => [ID])
+  skillIds?: string[];
 
   @OptionalField(() => [SkillEntity])
   skills?: SkillEntity[];

@@ -4,12 +4,13 @@ import { UserModel, UserSchema } from "@/modules/users/schemas/user.schema";
 import { UsersRepository } from "./users.repository";
 import { UsersResolver } from "./users.resolver";
 import { UsersService } from "./users.service";
+import { UsersLoaderService } from "./users-loader.service";
 
 @Module({
   imports: [
     MongooseModule.forFeature([{ name: UserModel.name, schema: UserSchema }]),
   ],
-  providers: [UsersRepository, UsersResolver, UsersService],
-  exports: [UsersService],
+  providers: [UsersRepository, UsersResolver, UsersService, UsersLoaderService],
+  exports: [UsersService, UsersLoaderService],
 })
 export class UsersModule {}

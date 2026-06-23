@@ -10,7 +10,7 @@
 - **Top-level entities:** User, Skill, Organization, Experience, Education, Course, Project, ApiToken (planned — ADR 001 lot 6)
 - **Schema sources:** `apps/api/src/modules/*/schemas/`, `apps/api/src/core/schemas/`
 - **Tenancy:** A tenant is a `User`. Private entities (`Experience`, `Education`, `Course`, `Project`) require `ownerId` → `User`. Global catalog (`Skill`, `Organization`) has no `ownerId`.
-- **FK naming (Mongo):** every stored reference uses an explicit `*Id` / `*Ids` suffix (`ownerId`, `organizationId`, `skillIds`). GraphQL output resolves related entities (`organization`, `skills`) via `@ResolveField` + DataLoaders — not Mongoose `.populate()`.
+- **FK naming (Mongo):** every stored reference uses an explicit `*Id` / `*Ids` suffix (`ownerId`, `organizationId`, `skillIds`). GraphQL output resolves related entities (`owner`, `organization`, `skills`) via `@ResolveField` + DataLoaders — FK scalars are not exposed on output types.
 
 ## Diagram
 
@@ -123,8 +123,8 @@ Both are MongoDB `ObjectId` references. The FK always lives on the document that
 - **Private entities:** `ownerId` → `User` (required). Slug uniqueness is compound
   `{ ownerId, slug }`, not global.
 
-GraphQL exposes resolved `organization` and `skills` objects on output; create/update
-inputs use `organizationId` and `skillIds`.
+GraphQL exposes resolved `owner`, `organization`, and `skills` objects on output; create/update
+inputs use `organizationId` and `skillIds` (no `ownerId` — injected from context).
 
 ## Entities
 

@@ -5,6 +5,7 @@ import { DateRangeEntity } from "@/core/entities/date-range.entity";
 import { createPaginatedModel } from "@/core/schemas/paginated.schema";
 import { OrganizationEntity } from "@/modules/organizations/entities/organization.entity";
 import { SkillEntity } from "@/modules/skills/entities/skill.entity";
+import { UserEntity } from "@/modules/users/entities/user.entity";
 import { ExperienceCategory } from "../enums/category.enum";
 
 @ObjectType()
@@ -33,6 +34,9 @@ export class ExperienceRole {
   @OptionalField(() => DateRangeEntity)
   period?: DateRangeEntity;
 
+  @OptionalField(() => [ID])
+  skillIds?: string[];
+
   @OptionalField(() => [SkillEntity])
   skills?: SkillEntity[];
 }
@@ -47,6 +51,12 @@ export class ExperienceEntity extends BaseEntity {
 
   @Field(() => ID)
   ownerId: string;
+
+  @Field(() => UserEntity)
+  owner: UserEntity;
+
+  @Field(() => ID)
+  organizationId: string;
 
   @Field(() => OrganizationEntity)
   organization: OrganizationEntity;

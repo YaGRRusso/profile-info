@@ -16,6 +16,7 @@ import { CourseModel } from "@/modules/courses/schemas/course.schema";
 import type { Ctx } from "@/modules/graphql/context.interface";
 import { OrganizationEntity } from "@/modules/organizations/entities/organization.entity";
 import { SkillEntity } from "@/modules/skills/entities/skill.entity";
+import { UserEntity } from "@/modules/users/entities/user.entity";
 import { CoursesService } from "./courses.service";
 import { CreateCourseInput } from "./dto/create-course.input";
 import { FilterCourseInput } from "./dto/filter-course.input";
@@ -138,6 +139,12 @@ export class CoursesResolver {
     @Args("courseIds", { type: () => [ID] }) courseIds: string[]
   ) {
     return this.coursesService.removeMany(ctx, courseIds);
+  }
+
+  @ResolveField(() => UserEntity)
+  owner(@Parent() course: CourseModel, @Context() ctx: Ctx) {
+    if (!course?.ownerId) return null;
+    return ctx.loaders.batchUsers.load(course.ownerId.toString());
   }
 
   @ResolveField(() => OrganizationEntity)

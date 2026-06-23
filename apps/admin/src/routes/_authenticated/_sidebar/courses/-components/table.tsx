@@ -87,7 +87,7 @@ const DATE_OPTIONS: { value: string; label: string }[] = [
 ];
 
 const RESTRICTED_COLUMNS: RestrictedColumns = {
-  [UserRole.SuperAdmin]: ["ownerId"],
+  [UserRole.SuperAdmin]: ["owner"],
 };
 
 const columnHelper = createColumnHelper<CourseRow>();
@@ -135,12 +135,13 @@ const getColumns = (
   columnHelper.accessor("slug", {
     header: "Slug",
   }),
-  columnHelper.accessor("ownerId", {
-    header: "Owner ID",
+  columnHelper.accessor((row) => row.owner?.nickname ?? "", {
+    id: "owner",
+    header: "Owner",
     enableGlobalFilter: false,
     enableSorting: false,
     cell: (data) => (
-      <span className="font-mono text-xs">{data.getValue()}</span>
+      <span className="badge badge-soft badge-sm">{data.getValue()}</span>
     ),
   }),
   columnHelper.accessor((row) => row.organization?.name ?? "", {

@@ -10,20 +10,29 @@ import { OrganizationsModule } from "@/modules/organizations/organizations.modul
 import { OrganizationsLoaderService } from "@/modules/organizations/organizations-loader.service";
 import { SkillsModule } from "@/modules/skills/skills.module";
 import { SkillsLoaderService } from "@/modules/skills/skills-loader.service";
+import { UsersModule } from "@/modules/users/users.module";
+import { UsersLoaderService } from "@/modules/users/users-loader.service";
 import { LoadersService } from "./loaders.service";
 
 @Module({
   imports: [
     SkillsModule,
     OrganizationsModule,
+    UsersModule,
     GraphQLModule.forRootAsync<ApolloDriverConfig>({
       driver: ApolloDriver,
-      imports: [ConfigModule, SkillsModule, OrganizationsModule],
-      inject: [ConfigService, SkillsLoaderService, OrganizationsLoaderService],
+      imports: [ConfigModule, SkillsModule, OrganizationsModule, UsersModule],
+      inject: [
+        ConfigService,
+        SkillsLoaderService,
+        OrganizationsLoaderService,
+        UsersLoaderService,
+      ],
       useFactory: (
         config: ConfigService<Env, true>,
         skillsLoaderService: SkillsLoaderService,
-        organizationsLoaderService: OrganizationsLoaderService
+        organizationsLoaderService: OrganizationsLoaderService,
+        usersLoaderService: UsersLoaderService
       ) => {
         const nodeEnv = config.getOrThrow("NODE_ENV");
 
@@ -48,7 +57,8 @@ import { LoadersService } from "./loaders.service";
           context: ({ req, res }) => ({
             loaders: new LoadersService(
               skillsLoaderService,
-              organizationsLoaderService
+              organizationsLoaderService,
+              usersLoaderService
             ).createLoaders(),
             req,
             res,

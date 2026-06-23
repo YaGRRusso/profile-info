@@ -8,6 +8,7 @@ import {
 import { UrlEntity } from "@/core/entities/url.entity";
 import { createPaginatedModel } from "@/core/schemas/paginated.schema";
 import { SkillEntity } from "@/modules/skills/entities/skill.entity";
+import { UserEntity } from "@/modules/users/entities/user.entity";
 
 @ObjectType()
 export class ProjectMessages {
@@ -31,8 +32,14 @@ export class ProjectEntity extends BaseEntity {
   @Field(() => ID)
   ownerId: string;
 
+  @Field(() => UserEntity)
+  owner: UserEntity;
+
   @OptionalField(() => [String])
   images?: string[];
+
+  @OptionalField(() => [ID])
+  skillIds?: string[];
 
   @OptionalField(() => [SkillEntity])
   skills?: SkillEntity[];

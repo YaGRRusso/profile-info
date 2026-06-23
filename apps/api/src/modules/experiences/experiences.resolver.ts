@@ -23,6 +23,7 @@ import {
 import type { Ctx } from "@/modules/graphql/context.interface";
 import { OrganizationEntity } from "@/modules/organizations/entities/organization.entity";
 import { SkillEntity } from "@/modules/skills/entities/skill.entity";
+import { UserEntity } from "@/modules/users/entities/user.entity";
 import { CreateExperienceInput } from "./dto/create-experience.input";
 import { FilterExperienceInput } from "./dto/filter-experience.input";
 import { SortExperienceInput } from "./dto/sort-experience.input";
@@ -165,6 +166,12 @@ export class ExperiencesResolver {
     @Args("experienceIds", { type: () => [ID] }) experienceIds: string[]
   ) {
     return this.experiencesService.removeMany(ctx, experienceIds);
+  }
+
+  @ResolveField(() => UserEntity)
+  owner(@Parent() experience: ExperienceModel, @Context() ctx: Ctx) {
+    if (!experience?.ownerId) return null;
+    return ctx.loaders.batchUsers.load(experience.ownerId.toString());
   }
 
   @ResolveField(() => [ExperienceRole])

@@ -18,6 +18,7 @@ import { CurrentRequestContext } from "@/modules/auth/decorators/current-request
 import type { Ctx } from "@/modules/graphql/context.interface";
 import type { ProjectModel } from "@/modules/projects/schemas/project.schema";
 import { SkillEntity } from "@/modules/skills/entities/skill.entity";
+import { UserEntity } from "@/modules/users/entities/user.entity";
 import { CreateProjectInput } from "./dto/create-project.input";
 import { FilterProjectInput } from "./dto/filter-project.input";
 import { SortProjectInput } from "./dto/sort-project.input";
@@ -147,6 +148,12 @@ export class ProjectsResolver {
     @Args("projectIds", { type: () => [ID] }) projectIds: string[]
   ) {
     return this.projectsService.removeMany(ctx, projectIds);
+  }
+
+  @ResolveField(() => UserEntity)
+  owner(@Parent() project: ProjectModel, @Context() ctx: Ctx) {
+    if (!project?.ownerId) return null;
+    return ctx.loaders.batchUsers.load(project.ownerId.toString());
   }
 
   @ResolveField(() => [SkillEntity])

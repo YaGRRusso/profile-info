@@ -27,12 +27,20 @@ const findManyCourses = graphql(`
       nodes {
         id
         slug
-        ownerId
         status
         relevance
         url
         image
         hours
+        owner {
+          id
+          nickname
+          name
+          role
+          email
+          phone
+          avatar
+        }
         organization {
           id
           name

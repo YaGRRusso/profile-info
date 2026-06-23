@@ -19,6 +19,7 @@ import { EducationModel } from "@/modules/educations/schemas/education.schema";
 import type { Ctx } from "@/modules/graphql/context.interface";
 import { OrganizationEntity } from "@/modules/organizations/entities/organization.entity";
 import { SkillEntity } from "@/modules/skills/entities/skill.entity";
+import { UserEntity } from "@/modules/users/entities/user.entity";
 import { CreateEducationInput } from "./dto/create-education.input";
 import { FilterEducationInput } from "./dto/filter-education.input";
 import { SortEducationInput } from "./dto/sort-education.input";
@@ -158,6 +159,12 @@ export class EducationsResolver {
     @Args("educationIds", { type: () => [ID] }) educationIds: string[]
   ) {
     return this.educationsService.removeMany(ctx, educationIds);
+  }
+
+  @ResolveField(() => UserEntity)
+  owner(@Parent() education: EducationModel, @Context() ctx: Ctx) {
+    if (!education?.ownerId) return null;
+    return ctx.loaders.batchUsers.load(education.ownerId.toString());
   }
 
   @ResolveField(() => OrganizationEntity)

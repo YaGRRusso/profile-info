@@ -4,6 +4,7 @@ import { BaseEntity } from "@/core/entities/base.entity";
 import { createPaginatedModel } from "@/core/schemas/paginated.schema";
 import { OrganizationEntity } from "@/modules/organizations/entities/organization.entity";
 import { SkillEntity } from "@/modules/skills/entities/skill.entity";
+import { UserEntity } from "@/modules/users/entities/user.entity";
 import { CourseStatus } from "../enums/status.enum";
 
 @ObjectType()
@@ -35,6 +36,12 @@ export class CourseEntity extends BaseEntity {
   @Field(() => ID)
   ownerId: string;
 
+  @Field(() => UserEntity)
+  owner: UserEntity;
+
+  @Field(() => ID)
+  organizationId: string;
+
   @Field(() => OrganizationEntity)
   organization: OrganizationEntity;
 
@@ -52,6 +59,9 @@ export class CourseEntity extends BaseEntity {
 
   @Field(() => [CourseTranslationLocale])
   i18n: CourseTranslationLocale[];
+
+  @OptionalField(() => [ID])
+  skillIds?: string[];
 
   @OptionalField(() => [SkillEntity])
   skills?: SkillEntity[];

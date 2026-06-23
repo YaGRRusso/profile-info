@@ -67,8 +67,11 @@ export type CourseEntity = {
   id: Scalars['ID']['output'];
   image?: Maybe<Scalars['String']['output']>;
   organization: OrganizationEntity;
+  organizationId: Scalars['ID']['output'];
+  owner: UserEntity;
   ownerId: Scalars['ID']['output'];
   relevance: Scalars['Float']['output'];
+  skillIds?: Maybe<Array<Scalars['ID']['output']>>;
   skills?: Maybe<Array<SkillEntity>>;
   slug: Scalars['String']['output'];
   status: CourseStatus;
@@ -298,9 +301,12 @@ export type EducationEntity = {
   image?: Maybe<Scalars['String']['output']>;
   level: EducationLevel;
   organization: OrganizationEntity;
+  organizationId: Scalars['ID']['output'];
+  owner: UserEntity;
   ownerId: Scalars['ID']['output'];
   period?: Maybe<DateRangeEntity>;
   relevance: Scalars['Float']['output'];
+  skillIds?: Maybe<Array<Scalars['ID']['output']>>;
   skills?: Maybe<Array<SkillEntity>>;
   slug: Scalars['String']['output'];
   status: EducationStatus;
@@ -348,6 +354,8 @@ export type ExperienceEntity = {
   createdAt: Scalars['DateTime']['output'];
   id: Scalars['ID']['output'];
   organization: OrganizationEntity;
+  organizationId: Scalars['ID']['output'];
+  owner: UserEntity;
   ownerId: Scalars['ID']['output'];
   relevance: Scalars['Float']['output'];
   roles: Array<ExperienceRole>;
@@ -366,6 +374,7 @@ export type ExperienceRole = {
   __typename?: 'ExperienceRole';
   i18n: Array<ExperienceTranslationLocale>;
   period?: Maybe<DateRangeEntity>;
+  skillIds?: Maybe<Array<Scalars['ID']['output']>>;
   skills?: Maybe<Array<SkillEntity>>;
 };
 
@@ -840,8 +849,10 @@ export type ProjectEntity = {
   i18n: Array<ProjectMessagesTranslationEntity>;
   id: Scalars['ID']['output'];
   images?: Maybe<Array<Scalars['String']['output']>>;
+  owner: UserEntity;
   ownerId: Scalars['ID']['output'];
   relevance: Scalars['Float']['output'];
+  skillIds?: Maybe<Array<Scalars['ID']['output']>>;
   skills?: Maybe<Array<SkillEntity>>;
   slug: Scalars['String']['output'];
   updatedAt: Scalars['DateTime']['output'];
@@ -1551,7 +1562,7 @@ export type FindManyCoursesQueryVariables = Exact<{
 }>;
 
 
-export type FindManyCoursesQuery = { __typename?: 'Query', findManyCourses: { __typename?: 'PaginatedCourseEntity', found: number, nodes: Array<{ __typename?: 'CourseEntity', id: string, slug: string, ownerId: string, status: CourseStatus, relevance: number, url?: string | null, image?: string | null, hours?: number | null, createdAt: any, updatedAt: any, organization: { __typename?: 'OrganizationEntity', id: string, name: string, slug: string }, i18n: Array<{ __typename?: 'CourseTranslationLocale', locale: string, messages: { __typename?: 'CourseMessages', title: string, description: string } }>, skills?: Array<{ __typename?: 'SkillEntity', id: string, name: string }> | null }> } };
+export type FindManyCoursesQuery = { __typename?: 'Query', findManyCourses: { __typename?: 'PaginatedCourseEntity', found: number, nodes: Array<{ __typename?: 'CourseEntity', id: string, slug: string, status: CourseStatus, relevance: number, url?: string | null, image?: string | null, hours?: number | null, createdAt: any, updatedAt: any, owner: { __typename?: 'UserEntity', id: string, nickname: string, name: string, role: UserRole, email: string, phone?: string | null, avatar?: string | null }, organization: { __typename?: 'OrganizationEntity', id: string, name: string, slug: string }, i18n: Array<{ __typename?: 'CourseTranslationLocale', locale: string, messages: { __typename?: 'CourseMessages', title: string, description: string } }>, skills?: Array<{ __typename?: 'SkillEntity', id: string, name: string }> | null }> } };
 
 export type DashboardQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -2029,12 +2040,20 @@ export const FindManyCoursesDocument = new TypedDocumentString(`
     nodes {
       id
       slug
-      ownerId
       status
       relevance
       url
       image
       hours
+      owner {
+        id
+        nickname
+        name
+        role
+        email
+        phone
+        avatar
+      }
       organization {
         id
         name
