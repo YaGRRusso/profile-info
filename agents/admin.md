@@ -63,7 +63,7 @@ Adding a GraphQL operation:
 2. Regenerate via `npm run dev` (watch) or `npm run build`; once: `npx graphql-codegen --config codegen.ts`.
 3. Wrap in `useQuery` / `useInfiniteQuery` / `useMutation` calling `execute`. Follow `useFindManySkills` for infinite pagination.
 
-REST reads (e.g. resume PDF): `hooks/queries/resume.ts` — `fetchResumePdf` via `apiRequest`, user-triggered download via `useDownloadResume` (`useMutation`).
+REST reads (e.g. resume PDF): `hooks/mutations/resume.ts` — `fetchResumePdf(locale, userId)` via `apiRequest`, user-triggered download via `useDownloadResume` (`useMutation`; `userId` from auth store).
 
 Adding a form: copy `src/forms/skill.tsx` (Zod + TanStack Form + generic inputs).
 

@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from "@nestjs/common";
+import { Injectable } from "@nestjs/common";
 import { sortDateRange } from "@/common/helpers/daterange.helper";
 import { formatPeriod } from "@/common/helpers/format-period.helper";
 import { pickTranslation } from "@/common/helpers/pick-translation.helper";
@@ -44,19 +44,14 @@ export class ResumeService {
   ) {}
 
   async buildResume(
+    userId: string,
     locale: LocaleCode = DEFAULT_LOCALE
   ): Promise<ResumeDocumentData> {
-    const { nodes: users } = await this.usersService.findMany({
-      filters: { role: UserRole.SUPER_ADMIN },
-      limit: 1,
-    });
-
-    const user = users[0];
-    if (!user) throw new NotFoundException("Profile user not found");
+    const user = await this.usersService.findOneById(userId);
 
     const ctx = toSessionAuthContext({
       id: user._id.toString(),
-      role: user.role ?? UserRole.USER,
+      role: UserRole.USER,
     });
 
     const [

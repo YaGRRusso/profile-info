@@ -39,7 +39,7 @@ modules         ← business domains (resolvers, services, schemas)
 | **`modules/auth/`** | JWT guard, `signIn`, `getMe`. Global auth, not a CRUD entity. | Security cross-cut; uses `UsersService.findOneByEmailWithPassword`. |
 | **`modules/graphql/`** | `GraphqlModule` + `LoadersService`. Wires Apollo; composes loaders exported by entity modules. | Transport infra — batching logic stays in each `*LoaderService`. |
 | **`modules/dashboard/`** | Read-only stats; imports other modules' **services** (not Mongoose models). | Aggregation without bypassing service boundaries. |
-| **`modules/resume/`** | Aggregates profile data and renders a PDF via `GET /resume.pdf?locale=`. Uses `pdfkit`; imports feature services like dashboard. | CV export for admin and external portfolio clients. |
+| **`modules/resume/`** | Aggregates a user's profile data and renders a PDF via `GET /resume.pdf?userId=&locale=`. Uses `pdfkit`; imports feature services like dashboard. | CV export for admin and external portfolio clients. |
 | **`modules/ai-tools/`** | AI use-cases (summarize, translate, ATS). Owns `AiEntity`, enums, and mappers. | Converts `IntegrationChatResult` → GraphQL; orchestrates `*ExtractorService` before calling `AiChatProvider`. |
 
 ### Request flow (typical)
@@ -58,17 +58,18 @@ The threat model is intentional, not accidental:
 |-----------------|------|-----|
 | Catalog reads (`findManySkills`, `findManyOrganizations`, `findManyUsers`) | JWT | Authenticated users |
 | Private entity reads (`findManyCourses`, …) | JWT + `@Auth()` | Tenant-scoped |
-| `GET /resume.pdf` | None (REST; guard skips non-GraphQL) | Anyone |
+| `GET /resume.pdf?userId=` | None (REST; `@Public()`) | Anyone with profile owner id |
 | `signIn` | None (`@Public()`) | Anyone |
-| `getMe` | JWT | Any authenticated user |
-| `dashboard` | JWT + `SUPER_ADMIN` role | Super admin only |
-| All mutations (CRUD + AI) | JWT + `SUPER_ADMIN` role | Super admin only |
+| `getMe` / `updateMe` | JWT | Any authenticated user |
+| `dashboard` | JWT + `@Auth()` | USER (own data) / `SUPER_ADMIN` (cross-tenant) |
+| AI mutations (`atsSummarize`, `summarize`, `translate`) | JWT | Any authenticated user |
+| Catalog / user CRUD mutations | JWT + `SUPER_ADMIN` | Super admin only |
+| Private entity CRUD mutations | JWT + `@Auth()` | Tenant-scoped (`USER` own data; `SUPER_ADMIN` by explicit ID) |
 
 **Decisions:**
 
-- Profile data is public by design — skills, experiences, projects, etc. are meant to be read without a token.
-- User queries are also public (email is exposed). Acceptable for a single-owner portfolio; do not store secrets in user fields.
-- Mutations require a valid JWT **and** `UserRole.SUPER_ADMIN`. A `USER` token receives `403 Forbidden`.
+- Private portfolio data requires JWT; `USER` sees only `ownerId === ctx.userId` (404 on wrong ID).
+- Catalog reads require JWT (phase 5a); mutations remain `SUPER_ADMIN`.
 - Missing or invalid JWT on protected operations returns GraphQL error extension `code: UNAUTHENTICATED` (the admin client clears auth on this).
 - `signIn` always returns `401 Unauthorized` for invalid credentials — no email enumeration via `404`.
 - Passwords are bcrypt-hashed on create **and** update; the hash is never exposed via GraphQL (`select: false`).
@@ -156,10 +157,10 @@ After GraphQL type changes, rebuild or boot the API so `src/schema.gql` regenera
 ### Resume PDF export
 
 ```
-GET /resume.pdf?locale=en|pt|es
+GET /resume.pdf?userId=<id>&locale=en|pt|es
 ```
 
-Returns `application/pdf` with `Content-Disposition: attachment; filename="resume.pdf"`. Optional `locale` query (defaults to `en`; invalid values fall back to `en`). Section labels come from `resume.labels.ts`; content uses `pickTranslation` for entity i18n. Aggregates the admin user's profile data (top items by `relevance`, completed educations/courses only).
+Returns `application/pdf` with `Content-Disposition: attachment; filename="resume.pdf"`. Required `userId` query (Mongo ObjectId). Optional `locale` (defaults to `en`; invalid values fall back to `en`). Section labels come from `resume.labels.ts`; content uses `pickTranslation` for entity i18n. Aggregates the requested user's profile data (top items by `relevance`, completed educations/courses only). Private entities are owner-scoped to `userId` even when the profile owner is `SUPER_ADMIN`.
 
 The admin dashboard downloads this endpoint directly (base URL derived from `VITE_API_URL` by stripping `/graphql`).
 

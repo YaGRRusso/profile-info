@@ -84,7 +84,7 @@ npm run admin:dev
 
 ### Download CV
 
-The dashboard home (`/`) includes a **Download CV** select. It uses `useDownloadResume()` from `hooks/queries/resume.ts` (`GET /resume.pdf?locale=`).
+The dashboard home (`/`) includes a **Download CV** select. It uses `useDownloadResume()` from `hooks/mutations/resume.ts` (`GET /resume.pdf?userId=&locale=`).
 
 ### Account settings
 

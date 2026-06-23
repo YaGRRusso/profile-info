@@ -8,7 +8,7 @@
 
 ## Where we are
 
-**Current phase: 5b — Peripheral modules** (phase **5a** complete).
+**Current phase: 5c — API tokens** (phase **5b** complete).
 
 | Phase | Scope | State |
 |-------|--------|-------|
@@ -18,8 +18,8 @@
 | **3** | **Education** | Done |
 | **4** | **Project** | Done |
 | **5a** | Catalog & user reads (auth on `skills`, `organizations`, `users` queries) | Done |
-| **5b** | Peripheral modules (`resume`, `dashboard`, `ai-tools`) | **Next** |
-| **5c** | API tokens (collection, guard, CRUD, permission e2e) | Pending |
+| **5b** | Peripheral modules (`resume`, `dashboard`, `ai-tools`) | Done |
+| **5c** | API tokens (collection, guard, CRUD, permission e2e) | **Next** |
 | **5d** | `user.deleted` cascade + seed tokens | Pending |
 
 - Seed: Alice, Bob (`USER`) + Admin (`SUPER_ADMIN`); private data alternates `ownerId`.
@@ -219,9 +219,9 @@ Token CRUD requires session JWT. See [Permission matrix](#permission-matrix).
 
 | Module | Target | Current repo |
 |--------|--------|--------------|
-| `resume` | `buildResume(userId)`; `GET /resume.pdf?userId=` stays public | Legacy: picks first `SUPER_ADMIN` user |
+| `resume` | `buildResume(userId)`; `GET /resume.pdf?userId=` stays public | Done |
 | `dashboard` | Session JWT; counts scoped to `ownerId` (`SUPER_ADMIN`: platform-wide) | `@Roles(SUPER_ADMIN)` only; global counts |
-| `ai-tools` | Session JWT; any authenticated user | `@Roles(SUPER_ADMIN)` only |
+| `ai-tools` | Session JWT; any authenticated user | Done |
 | `users` | Auth on reads; `SUPER_ADMIN` for user CRUD | Reads require JWT; mutations `SUPER_ADMIN` |
 | `skills` / `organizations` | Auth on reads; `SUPER_ADMIN` for mutations | Reads require JWT; mutations `SUPER_ADMIN` |
 
@@ -326,8 +326,8 @@ migrate. Each has its own gate; do not batch unrelated concerns.
 | Module | Work | State |
 |--------|------|-------|
 | `dashboard` | `@Auth() ctx`; private stats via `tenantStats`; catalog stats global; USER + SUPER_ADMIN | Done |
-| `resume` | `buildResume(userId)`; keep `GET /resume.pdf?userId=` public | Pending |
-| `ai-tools` | Any authenticated user (drop `@Roles(SUPER_ADMIN)`) | Pending |
+| `resume` | `buildResume(userId)`; `GET /resume.pdf?userId=` stays public | Done |
+| `ai-tools` | Any authenticated user (drop `@Roles(SUPER_ADMIN)`) | Done |
 
 **Why separate:** each module has different scoping rules; dashboard touches all
 entities' `count()` / stats.

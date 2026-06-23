@@ -12,6 +12,7 @@ const PDF_CONTENT_TYPE = /application\/pdf/;
 
 describe("ResumeController (e2e)", () => {
   let app: INestApplication<App> | undefined;
+  let profileUserId: string;
 
   beforeAll(async () => {
     const testApp = await createTestApp();
@@ -21,7 +22,7 @@ describe("ResumeController (e2e)", () => {
     const usersService = testApp.module.get(UsersService);
     const skillsService = testApp.module.get(SkillsService);
 
-    await usersService.createOne({
+    const profileUser = await usersService.createOne({
       name: "Admin User",
       nickname: "admin",
       email: "admin@profile.info",
@@ -37,6 +38,7 @@ describe("ResumeController (e2e)", () => {
         },
       ],
     });
+    profileUserId = profileUser._id.toString();
 
     await skillsService.createOne({
       name: "TypeScript",
@@ -50,9 +52,30 @@ describe("ResumeController (e2e)", () => {
     await app?.close();
   });
 
+  it("/resume.pdf (GET) requires userId", async () => {
+    await request(app!.getHttpServer())
+      .get("/resume.pdf")
+      .expect(400)
+      .expect((response) => {
+        expect(response.body.message).toContain("userId is required");
+      });
+  });
+
+  it("/resume.pdf (GET) rejects invalid userId", async () => {
+    await request(app!.getHttpServer())
+      .get("/resume.pdf?userId=not-an-object-id")
+      .expect(400);
+  });
+
+  it("/resume.pdf (GET) returns 404 for unknown userId", async () => {
+    await request(app!.getHttpServer())
+      .get("/resume.pdf?userId=507f1f77bcf86cd799439011")
+      .expect(404);
+  });
+
   it("/resume.pdf (GET) returns a PDF attachment", async () => {
     const response = await request(app!.getHttpServer())
-      .get("/resume.pdf")
+      .get(`/resume.pdf?userId=${profileUserId}`)
       .expect(200)
       .expect("Content-Type", PDF_CONTENT_TYPE)
       .expect("Content-Disposition", 'attachment; filename="resume.pdf"');
@@ -62,7 +85,7 @@ describe("ResumeController (e2e)", () => {
 
   it("/resume.pdf?locale=pt (GET) returns a PDF attachment", async () => {
     const response = await request(app!.getHttpServer())
-      .get("/resume.pdf?locale=pt")
+      .get(`/resume.pdf?userId=${profileUserId}&locale=pt`)
       .expect(200)
       .expect("Content-Type", PDF_CONTENT_TYPE)
       .expect("Content-Disposition", 'attachment; filename="resume.pdf"');
@@ -72,7 +95,7 @@ describe("ResumeController (e2e)", () => {
 
   it("/resume.pdf?locale=invalid (GET) falls back to default locale", async () => {
     await request(app!.getHttpServer())
-      .get("/resume.pdf?locale=invalid")
+      .get(`/resume.pdf?userId=${profileUserId}&locale=invalid`)
       .expect(200)
       .expect("Content-Type", PDF_CONTENT_TYPE);
   });

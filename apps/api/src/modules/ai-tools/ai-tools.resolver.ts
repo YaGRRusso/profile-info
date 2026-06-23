@@ -1,8 +1,6 @@
 import { UseGuards } from "@nestjs/common";
 import { Args, Mutation, Resolver } from "@nestjs/graphql";
 import { Throttle } from "@nestjs/throttler";
-import { Roles } from "@/core/decorators/roles.decorator";
-import { UserRole } from "@/core/enums/user-role.enum";
 import { AiToolsService } from "./ai-tools.service";
 import { AtsSummarizeInput } from "./dto/ats-summarize.input";
 import { SummarizeInput } from "./dto/summarize.input";
@@ -16,7 +14,6 @@ import { GqlThrottlerGuard } from "./gql-throttler.guard";
 export class AiToolsResolver {
   constructor(private readonly aiToolsService: AiToolsService) {}
 
-  @Roles(UserRole.SUPER_ADMIN)
   @Mutation(() => AiEntity)
   atsSummarize(
     @Args("atsSummarizeInput", { type: () => AtsSummarizeInput })
@@ -25,7 +22,6 @@ export class AiToolsResolver {
     return this.aiToolsService.atsSummarize(atsSummarizeInput);
   }
 
-  @Roles(UserRole.SUPER_ADMIN)
   @Mutation(() => AiEntity)
   summarize(
     @Args("summarizeInput", { type: () => SummarizeInput })
@@ -34,7 +30,6 @@ export class AiToolsResolver {
     return this.aiToolsService.summarize(summarizeInput);
   }
 
-  @Roles(UserRole.SUPER_ADMIN)
   @Mutation(() => AiEntity)
   translate(
     @Args("translateInput", { type: () => TranslateInput })
