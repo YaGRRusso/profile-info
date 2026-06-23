@@ -2,11 +2,11 @@ import { Injectable, NotFoundException } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import { isNil } from "lodash";
 import { Model } from "mongoose";
-import { MongooseCrudRepository } from "@/core/persistence/mongoose-crud.repository";
+import { CrudRepository } from "@/core/persistence/repositories/crud.repository";
 import { UserModel } from "./schemas/user.schema";
 
 @Injectable()
-export class UsersRepository extends MongooseCrudRepository<UserModel> {
+export class UsersRepository extends CrudRepository<UserModel> {
   constructor(@InjectModel(UserModel.name) userModel: Model<UserModel>) {
     super(userModel);
   }

@@ -1,11 +1,11 @@
 import { Injectable } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import { Model } from "mongoose";
-import { MongooseCrudRepository } from "@/core/persistence/mongoose-crud.repository";
+import { CrudRepository } from "@/core/persistence/repositories/crud.repository";
 import { ExperienceModel } from "./schemas/experience.schema";
 
 @Injectable()
-export class ExperiencesRepository extends MongooseCrudRepository<ExperienceModel> {
+export class ExperiencesRepository extends CrudRepository<ExperienceModel> {
   constructor(
     @InjectModel(ExperienceModel.name) experienceModel: Model<ExperienceModel>
   ) {

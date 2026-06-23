@@ -1,11 +1,11 @@
 import { Injectable } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import { Model } from "mongoose";
-import { MongooseCrudRepository } from "@/core/persistence/mongoose-crud.repository";
+import { CrudRepository } from "@/core/persistence/repositories/crud.repository";
 import { OrganizationModel } from "./schemas/organization.schema";
 
 @Injectable()
-export class OrganizationsRepository extends MongooseCrudRepository<OrganizationModel> {
+export class OrganizationsRepository extends CrudRepository<OrganizationModel> {
   constructor(
     @InjectModel(OrganizationModel.name)
     organizationModel: Model<OrganizationModel>
