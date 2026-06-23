@@ -1,10 +1,10 @@
-import { testRequestContext } from "@test/fixtures/request-context";
+import { testAuthContext } from "@test/fixtures/auth-context";
 import { UserRole } from "@/core/enums/user-role.enum";
-import { toTenantScope } from "./request-context.helper";
+import { toTenantScope } from "./auth-context.helper";
 
 describe("toTenantScope", () => {
   it("scopes to the caller userId for regular users", () => {
-    const ctx = testRequestContext({ userId: "user-a" });
+    const ctx = testAuthContext({ userId: "user-a" });
 
     expect(toTenantScope(ctx)).toEqual({
       userId: "user-a",
@@ -13,7 +13,7 @@ describe("toTenantScope", () => {
   });
 
   it("allows cross-tenant access for super admins", () => {
-    const ctx = testRequestContext({ role: UserRole.SUPER_ADMIN });
+    const ctx = testAuthContext({ role: UserRole.SUPER_ADMIN });
 
     expect(toTenantScope(ctx)).toEqual({
       userId: ctx.userId,

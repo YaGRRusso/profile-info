@@ -8,13 +8,13 @@ import {
   ResolveField,
   Resolver,
 } from "@nestjs/graphql";
-import type { RequestContext } from "@/core/context/request-context.interface";
+import type { AuthContext } from "@/core/context/auth-context.interface";
 import { Public } from "@/core/decorators/public-route.decorator";
 import { Roles } from "@/core/decorators/roles.decorator";
 import { BatchEntity } from "@/core/entities/batch.entity";
 import { UserRole } from "@/core/enums/user-role.enum";
 import { PaginationInput } from "@/core/inputs/pagination.input";
-import { CurrentRequestContext } from "@/modules/auth/decorators/current-request-context.decorator";
+import { Auth } from "@/modules/auth/decorators/auth-context.decorator";
 import { EducationModel } from "@/modules/educations/schemas/education.schema";
 import type { Ctx } from "@/modules/graphql/context.interface";
 import { OrganizationEntity } from "@/modules/organizations/entities/organization.entity";
@@ -96,7 +96,7 @@ export class EducationsResolver {
   @Roles(UserRole.SUPER_ADMIN)
   @Mutation(() => EducationEntity)
   createOneEducation(
-    @CurrentRequestContext() ctx: RequestContext,
+    @Auth() ctx: AuthContext,
     @Args("createEducationInput", { type: () => CreateEducationInput })
     createEducationInput: CreateEducationInput
   ) {
@@ -106,7 +106,7 @@ export class EducationsResolver {
   @Roles(UserRole.SUPER_ADMIN)
   @Mutation(() => BatchEntity)
   createManyEducations(
-    @CurrentRequestContext() ctx: RequestContext,
+    @Auth() ctx: AuthContext,
     @Args("createEducationInputs", { type: () => [CreateEducationInput] })
     createEducationInputs: CreateEducationInput[]
   ) {
@@ -116,7 +116,7 @@ export class EducationsResolver {
   @Roles(UserRole.SUPER_ADMIN)
   @Mutation(() => EducationEntity)
   updateOneEducation(
-    @CurrentRequestContext() ctx: RequestContext,
+    @Auth() ctx: AuthContext,
     @Args("educationId", { type: () => ID }) educationId: string,
     @Args("updateEducationInput", { type: () => UpdateEducationInput })
     updateEducationInput: UpdateEducationInput
@@ -131,7 +131,7 @@ export class EducationsResolver {
   @Roles(UserRole.SUPER_ADMIN)
   @Mutation(() => BatchEntity)
   updateManyEducations(
-    @CurrentRequestContext() ctx: RequestContext,
+    @Auth() ctx: AuthContext,
     @Args("educationIds", { type: () => [ID] }) educationIds: string[],
     @Args("updateEducationInput", { type: () => UpdateEducationInput })
     updateEducationInput: UpdateEducationInput
@@ -146,7 +146,7 @@ export class EducationsResolver {
   @Roles(UserRole.SUPER_ADMIN)
   @Mutation(() => EducationEntity)
   removeOneEducation(
-    @CurrentRequestContext() ctx: RequestContext,
+    @Auth() ctx: AuthContext,
     @Args("educationId", { type: () => ID }) educationId: string
   ) {
     return this.educationsService.removeOne(ctx, educationId);
@@ -155,7 +155,7 @@ export class EducationsResolver {
   @Roles(UserRole.SUPER_ADMIN)
   @Mutation(() => BatchEntity)
   removeManyEducations(
-    @CurrentRequestContext() ctx: RequestContext,
+    @Auth() ctx: AuthContext,
     @Args("educationIds", { type: () => [ID] }) educationIds: string[]
   ) {
     return this.educationsService.removeMany(ctx, educationIds);

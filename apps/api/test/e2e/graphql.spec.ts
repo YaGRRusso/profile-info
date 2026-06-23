@@ -1,7 +1,7 @@
 import { INestApplication } from "@nestjs/common";
+import { testAuthContext } from "@test/fixtures/auth-context";
 import { App } from "supertest/types";
 import { UserRole } from "@/core/enums/user-role.enum";
-import { CreateExperienceInput } from "@/modules/experiences/dto/create-experience.input";
 import { ExperienceCategory } from "@/modules/experiences/enums/category.enum";
 import { ExperiencesService } from "@/modules/experiences/experiences.service";
 import { OrganizationCategory } from "@/modules/organizations/enums/category.enum";
@@ -188,7 +188,7 @@ describe("GraphQL (e2e)", () => {
     expect(response.data?.createOneSkill.name).toBe("NestJS");
   });
 
-  it("should resolve nested organization via DataLoader on public read", async () => {
+  it("should resolve nested organization via DataLoader on authenticated read", async () => {
     const organization = await organizationsService.createOne({
       slug: "nested-org",
       name: "Nested Org",
@@ -203,9 +203,10 @@ describe("GraphQL (e2e)", () => {
       ],
     });
 
-    const experience = await experiencesService.createOne(null, {
+    const portfolioCtx = testAuthContext({ userId: portfolioUserId });
+
+    const experience = await experiencesService.createOne(portfolioCtx, {
       slug: "nested-experience",
-      ownerId: portfolioUserId,
       organizationId: organization._id.toString(),
       category: ExperienceCategory.FULL_TIME,
       roles: [
@@ -221,7 +222,7 @@ describe("GraphQL (e2e)", () => {
           ],
         },
       ],
-    } as CreateExperienceInput & { ownerId: string });
+    });
 
     await skillsService.createOne({
       slug: "loader-skill",
@@ -247,6 +248,7 @@ describe("GraphQL (e2e)", () => {
         }
       `,
       variables: { experienceId: experience._id.toString() },
+      token: userToken,
     });
 
     expect(response.errors).toBeUndefined();

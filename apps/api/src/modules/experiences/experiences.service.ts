@@ -1,7 +1,8 @@
 import { Injectable } from "@nestjs/common";
 import { AnyKeys, QueryFilter, SortOrder, UpdateQuery } from "mongoose";
 import { RecentActivityRecord } from "@/common/helpers/recent-activity.helper";
-import type { RequestContext } from "@/core/context/request-context.interface";
+import { toTenantScope } from "@/core/context/auth-context.helper";
+import type { AuthContext } from "@/core/context/auth-context.interface";
 import { BatchEntity } from "@/core/entities/batch.entity";
 import { PaginatedModel } from "@/core/schemas/paginated.schema";
 import { ExperienceModel } from "@/modules/experiences/schemas/experience.schema";
@@ -13,33 +14,27 @@ import { ExperiencesRepository } from "./experiences.repository";
 export class ExperiencesService {
   constructor(private readonly repository: ExperiencesRepository) {}
 
-  findOneById(
-    _ctx: RequestContext | null,
-    id: string
-  ): Promise<ExperienceModel> {
-    return this.repository.findOneById(id);
+  findOneById(ctx: AuthContext, id: string): Promise<ExperienceModel> {
+    return this.repository.tenant.findOneById(toTenantScope(ctx), id);
   }
 
   findOne(
-    _ctx: RequestContext | null,
+    ctx: AuthContext,
     {
       filters,
     }: {
       filters?: QueryFilter<ExperienceModel>;
     }
   ): Promise<ExperienceModel> {
-    return this.repository.findOne({ filters });
+    return this.repository.tenant.findOne(toTenantScope(ctx), { filters });
   }
 
-  findManyById(
-    _ctx: RequestContext | null,
-    ids: string[]
-  ): Promise<ExperienceModel[]> {
-    return this.repository.findManyById(ids);
+  findManyById(ctx: AuthContext, ids: string[]): Promise<ExperienceModel[]> {
+    return this.repository.tenant.findManyById(toTenantScope(ctx), ids);
   }
 
   findMany(
-    _ctx: RequestContext | null,
+    ctx: AuthContext,
     {
       filters,
       sort,
@@ -52,53 +47,74 @@ export class ExperiencesService {
       skip?: number;
     }
   ): Promise<PaginatedModel<ExperienceModel>> {
-    return this.repository.findMany({ filters, sort, skip, limit });
+    return this.repository.tenant.findMany(toTenantScope(ctx), {
+      filters,
+      sort,
+      skip,
+      limit,
+    });
   }
 
-  createOne(
-    _ctx: RequestContext | null,
+  async createOne(
+    ctx: AuthContext,
     createInput: CreateExperienceInput
   ): Promise<ExperienceModel> {
-    return this.repository.createOne(createInput as AnyKeys<ExperienceModel>);
+    const scope = toTenantScope(ctx);
+
+    return await this.repository.tenant.createOne(
+      scope,
+      this.toCreatePayload(createInput)
+    );
   }
 
-  createMany(
-    _ctx: RequestContext | null,
+  async createMany(
+    ctx: AuthContext,
     createInputs: CreateExperienceInput[]
   ): Promise<BatchEntity> {
-    return this.repository.createMany(
-      createInputs as AnyKeys<ExperienceModel>[]
-    );
+    const scope = toTenantScope(ctx);
+    const payloads = createInputs.map((input) => this.toCreatePayload(input));
+
+    return await this.repository.tenant.createMany(scope, payloads);
   }
 
   updateOne(
-    _ctx: RequestContext | null,
+    ctx: AuthContext,
     id: string,
     updateInput: UpdateExperienceInput
   ): Promise<ExperienceModel> {
-    return this.repository.updateOneById(
+    const scope = toTenantScope(ctx);
+
+    return this.repository.tenant.updateOneById(
+      scope,
       id,
-      updateInput as object as UpdateQuery<ExperienceModel>
+      this.toUpdatePayload(updateInput)
     );
   }
 
-  updateMany(
-    _ctx: RequestContext | null,
+  async updateMany(
+    ctx: AuthContext,
     ids: string[],
     updateInput: UpdateExperienceInput
   ): Promise<BatchEntity> {
-    return this.repository.updateManyById(
+    const scope = toTenantScope(ctx);
+
+    return await this.repository.tenant.updateManyById(
+      scope,
       ids,
-      updateInput as object as UpdateQuery<ExperienceModel>
+      this.toUpdatePayload(updateInput)
     );
   }
 
-  removeOne(_ctx: RequestContext | null, id: string): Promise<ExperienceModel> {
-    return this.repository.deleteOneById(id);
+  removeOne(ctx: AuthContext, id: string): Promise<ExperienceModel> {
+    const scope = toTenantScope(ctx);
+
+    return this.repository.tenant.deleteOneById(scope, id);
   }
 
-  removeMany(_ctx: RequestContext | null, ids: string[]): Promise<BatchEntity> {
-    return this.repository.deleteManyById(ids);
+  async removeMany(ctx: AuthContext, ids: string[]): Promise<BatchEntity> {
+    const scope = toTenantScope(ctx);
+
+    return await this.repository.tenant.deleteManyById(scope, ids);
   }
 
   count(): Promise<number> {
@@ -136,5 +152,25 @@ export class ExperiencesService {
 
   async purgeByOrganization(organizationId: string): Promise<void> {
     await this.repository.deleteMany({ organizationId });
+  }
+
+  private toCreatePayload(
+    input: CreateExperienceInput
+  ): AnyKeys<ExperienceModel> {
+    const { ownerId: _, ...rest } = input as CreateExperienceInput & {
+      ownerId?: string;
+    };
+
+    return rest as AnyKeys<ExperienceModel>;
+  }
+
+  private toUpdatePayload(
+    updateInput: UpdateExperienceInput
+  ): UpdateQuery<ExperienceModel> {
+    const { ownerId: _, ...rest } = updateInput as UpdateExperienceInput & {
+      ownerId?: string;
+    };
+
+    return rest as UpdateQuery<ExperienceModel>;
   }
 }

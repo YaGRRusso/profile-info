@@ -8,15 +8,14 @@
 
 ## Where we are
 
-**Current phase: 2 — Experience** (entity migration **1 of 4** complete). Cross-cutting
-is **phases 5a–5d** after entities — not a single step.
+**Current phase: 3 — Education** (entity migration **2 of 4** complete).
 
 | Phase | Scope | State |
 |-------|--------|-------|
-| **0** | Shared foundation (`RequestContext`, `core/persistence/`, schemas) | Done |
+| **0** | Shared foundation (`AuthContext`, `core/persistence/`, schemas) | Done |
 | **1** | **Course** — reference private entity | Done |
-| **2** | **Experience** — replicate Course checklist | **Next** |
-| **3** | Education | Pending |
+| **2** | **Experience** — replicate Course checklist | Done |
+| **3** | **Education** | **Next** |
 | **4** | Project | Pending |
 | **5a** | Catalog & user reads (auth on `skills`, `organizations`, `users` queries) | Pending |
 | **5b** | Peripheral modules (`resume`, `dashboard`, `ai-tools`) | Pending |
@@ -69,7 +68,7 @@ its turn.
 3. **One entity at a time.** **Course** is the reference implementation. Copy it
    verbatim for Experience → Education → Project.
 4. **Foundation is shared; behavior is per-entity.** `core/persistence/`,
-   `RequestContext`, and schema `ownerId` are done once. Tenant enforcement ships
+   `AuthContext`, and schema `ownerId` are done once. Tenant enforcement ships
    entity-by-entity with tests per entity.
 5. **No data migration scripts.** Wipe and re-seed (`npm run seed`).
 
@@ -111,7 +110,7 @@ Applies to `Experience`, `Education`, `Course`, `Project`:
 | Batch ops | Each ID tenant-scoped; partial `{ succeeded, failed }` OK |
 | GraphQL reads & mutations | **No `@Public()`**; **no `@Roles(SUPER_ADMIN)`** on private CRUD (tenancy replaces role gate) |
 | GraphQL output | Scalars `ownerId`, `organizationId`, `skillIds` from document; objects `owner`, `organization`, `skills` via `@ResolveField` |
-| Service API | Every CRUD method: `(ctx: RequestContext, …)` — `ctx` is **required** |
+| Service API | Every CRUD method: `(ctx: AuthContext, …)` — `ctx` is **required** |
 | Cascades | `detachSkill`, `purgeByOrganization` use raw `CrudRepository` `updateMany` / `deleteMany` (global, no tenant filter) |
 
 **IDOR:** wrong tenant's ID → **404**, not 403.
@@ -157,10 +156,10 @@ Global catalog repos extend `CrudRepository` only (+ `stats` if needed).
 { userId: ctx.userId, crossTenant: isSuperAdmin(ctx) }
 ```
 
-### 5. Request context
+### 5. Auth context
 
 ```typescript
-type RequestContext =
+type AuthContext =
   | { userId: string; role: UserRole; credentialKind: "session" }
   | {
       userId: string;
@@ -170,12 +169,12 @@ type RequestContext =
     };
 ```
 
-Helpers: `toRequestContext`, `toApiTokenRequestContext`, `toTenantScope`,
+Helpers: `toSessionAuthContext`, `toApiTokenAuthContext`, `toTenantScope`,
 `isSuperAdmin`, `isSession`, `isApiToken`, `hasPermission`.
 
 Types and helpers exist; **API token guard and CRUD are phase 5**.
 
-**Resolver → service:** `@CurrentRequestContext() ctx: RequestContext` on every
+**Resolver → service:** `@Auth() ctx: AuthContext` on every
 private-entity operation. The resolver does not implement ownership logic.
 
 **Service → repository:** `repository.tenant.*(toTenantScope(ctx), …)` for all
@@ -249,7 +248,7 @@ Do **not** start phase N+1 until phase N passes its [entity gate](#entity-gate).
 | `SUPER_ADMIN` rename | Done |
 | `ownerId` on private schemas + `{ ownerId, slug }` unique index | Done |
 | Catalog FKs `organizationId` / `skillIds` on private schemas | Done |
-| `RequestContext` + helpers (incl. API token types) | Done |
+| `AuthContext` + helpers (incl. API token types) | Done |
 | `core/persistence/` (`CrudRepository`, `StatsRepository`, `TenantScopedRepository`) | Done |
 | All repos extend `CrudRepository`; services use `*OneById` / `BatchCount` | Done |
 | `BatchEntity { succeeded, failed }` | Done |
@@ -262,7 +261,7 @@ Do **not** start phase N+1 until phase N passes its [entity gate](#entity-gate).
 |-------|-------|
 | `CoursesRepository.tenant` | Done |
 | `CoursesService` — required `ctx`, `repository.tenant.*`, strip `ownerId` on write | Done |
-| `CoursesResolver` — no `@Public()`, `@CurrentRequestContext()` on all ops, `@ResolveField` for `owner` / `organization` / `skills` | Done |
+| `CoursesResolver` — no `@Public()`, `@Auth()` on all ops, `@ResolveField` for `owner` / `organization` / `skills` | Done |
 | `CourseEntity` — output scalars + resolved objects | Done |
 | Unit tests (`courses.service.spec.ts`, `tenant-scoped.repository.spec.ts`) | Done |
 | E2e isolation (`test/e2e/courses.spec.ts`) | Done |
@@ -270,28 +269,33 @@ Do **not** start phase N+1 until phase N passes its [entity gate](#entity-gate).
 **Known deferrals to phase 5:** `CoursesService.count()` / dashboard stats remain
 global until dashboard is tenant-scoped.
 
-### Phase 2 — Experience ⏳ **(current)**
+### Phase 2 — Experience ✅
+
+| Layer | State |
+|-------|-------|
+| `ExperiencesRepository.tenant` | Done |
+| `ExperiencesService` — required `ctx`, `repository.tenant.*`, strip `ownerId` on write | Done |
+| `ExperiencesResolver` — no `@Public()`, no `@Roles` on private CRUD | Done |
+| `@ResolveField` owner / organization / skills | Done |
+| Unit tests (`experiences.service.spec.ts`) | Done |
+| E2e isolation (`test/e2e/experiences.spec.ts`) | Done |
+
+### Phase 3 — Education ⏳ **(current)**
 
 | Layer | State |
 |-------|-------|
 | Schema `ownerId` + indexes | Done (data only) |
-| `ExperiencesRepository.tenant` | **Not started** |
-| `ExperiencesService` tenant CRUD | **Legacy** (`ctx \| null`, raw repo) |
-| `ExperiencesResolver` | **Legacy** — queries `@Public()`; mutations `@Roles(SUPER_ADMIN)` |
+| `EducationsRepository.tenant` | **Not started** |
+| `EducationsService` tenant CRUD | **Legacy** (`ctx \| null`, raw repo) |
+| `EducationsResolver` | **Legacy** — queries `@Public()`; mutations `@Roles(SUPER_ADMIN)` |
 | `@ResolveField` owner / organization / skills | Done (GraphQL shape only) |
 | E2e tenant isolation | **Not started** |
 
-**Work:** copy Course files layer-by-layer; remove `@Public()` and `@Roles` from
-private CRUD; add `test/e2e/experiences.spec.ts`.
-
-### Phase 3 — Education
-
-Same checklist as Experience. Today: same legacy gap as Experience (public reads,
-`SUPER_ADMIN` mutations, no `tenant` wrapper).
+**Work:** copy Course / Experience pattern; add `test/e2e/educations.spec.ts`.
 
 ### Phase 4 — Project
 
-Same checklist. No `organizationId` on schema. Today: same legacy gap.
+Same checklist. No `organizationId` on schema. Today: same legacy gap as Education was before phase 3.
 
 ### Phase 5 — Cross-cutting (split)
 
@@ -363,8 +367,8 @@ Use this gate for Experience, Education, and Project.
 | Layer | Done when |
 |-------|-----------|
 | **Repository** | `readonly tenant = new TenantScopedRepository(this)` |
-| **Service** | All CRUD via `repository.tenant.*`; `ctx: RequestContext` required; payload helpers strip `ownerId` |
-| **Resolver** | No `@Public()` on queries or mutations; no `@Roles(SUPER_ADMIN)` on private CRUD; `@CurrentRequestContext() ctx` everywhere |
+| **Service** | All CRUD via `repository.tenant.*`; `ctx: AuthContext` required; payload helpers strip `ownerId` |
+| **Resolver** | No `@Public()` on queries or mutations; no `@Roles(SUPER_ADMIN)` on private CRUD; `@Auth() ctx: AuthContext` everywhere |
 | **GraphQL entity** | `ownerId` + `owner`; `organizationId` + `organization` where applicable; `skillIds` + `skills` where applicable |
 | **Tests** | Unit specs for scoped CRUD; e2e: 401 unauthenticated, A≠B isolation, super-admin cross-tenant read by ID |
 | **Seed** | No change needed if `ownerId` already alternates users |
@@ -381,7 +385,8 @@ Use this gate for Experience, Education, and Project.
 - [ ] Super admin finds A's ID by explicit ID → success
 - [ ] Overlapping slugs across users on same entity type work
 
-**Course:** all manual checks done. **Experience / Education / Project:** pending.
+**Course:** all manual checks done. **Experience:** all manual checks done.
+**Education / Project:** pending.
 
 ---
 

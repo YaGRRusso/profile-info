@@ -1,7 +1,7 @@
 import { BadRequestException, NotFoundException } from "@nestjs/common";
 import { getModelToken } from "@nestjs/mongoose";
 import { Test, TestingModule } from "@nestjs/testing";
-import { testRequestContext } from "@test/fixtures/request-context";
+import { testAuthContext } from "@test/fixtures/auth-context";
 import mongoose, { Model } from "mongoose";
 import { UserRole } from "@/core/enums/user-role.enum";
 import { CourseModel } from "@/modules/courses/schemas/course.schema";
@@ -11,7 +11,7 @@ import { CoursesService } from "./courses.service";
 const validId = new mongoose.Types.ObjectId().toHexString();
 const invalidId = "not-an-object-id";
 const ownerId = "507f1f77bcf86cd799439011";
-const ctx = testRequestContext({ userId: ownerId });
+const ctx = testAuthContext({ userId: ownerId });
 const fakeDoc = {
   _id: validId,
   ownerId,
@@ -104,7 +104,7 @@ describe("CoursesService", () => {
     });
 
     it("should inject ownerId from context for super admins", async () => {
-      const superAdminCtx = testRequestContext({
+      const superAdminCtx = testAuthContext({
         role: UserRole.SUPER_ADMIN,
         userId: ownerId,
       });

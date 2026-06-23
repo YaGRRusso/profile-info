@@ -4,7 +4,7 @@ import {
   labelFromI18nTitle,
   RecentActivityRecord,
 } from "@/common/helpers/recent-activity.helper";
-import type { RequestContext } from "@/core/context/request-context.interface";
+import type { AuthContext } from "@/core/context/auth-context.interface";
 import { BatchEntity } from "@/core/entities/batch.entity";
 import { PaginatedModel } from "@/core/schemas/paginated.schema";
 import { EducationModel } from "@/modules/educations/schemas/education.schema";
@@ -16,15 +16,12 @@ import { EducationsRepository } from "./educations.repository";
 export class EducationsService {
   constructor(private readonly repository: EducationsRepository) {}
 
-  findOneById(
-    _ctx: RequestContext | null,
-    id: string
-  ): Promise<EducationModel> {
+  findOneById(_ctx: AuthContext | null, id: string): Promise<EducationModel> {
     return this.repository.findOneById(id);
   }
 
   findOne(
-    _ctx: RequestContext | null,
+    _ctx: AuthContext | null,
     {
       filters,
     }: {
@@ -35,14 +32,14 @@ export class EducationsService {
   }
 
   findManyById(
-    _ctx: RequestContext | null,
+    _ctx: AuthContext | null,
     ids: string[]
   ): Promise<EducationModel[]> {
     return this.repository.findManyById(ids);
   }
 
   findMany(
-    _ctx: RequestContext | null,
+    _ctx: AuthContext | null,
     {
       filters,
       sort,
@@ -59,14 +56,14 @@ export class EducationsService {
   }
 
   createOne(
-    _ctx: RequestContext | null,
+    _ctx: AuthContext | null,
     createInput: CreateEducationInput
   ): Promise<EducationModel> {
     return this.repository.createOne(createInput as AnyKeys<EducationModel>);
   }
 
   createMany(
-    _ctx: RequestContext | null,
+    _ctx: AuthContext | null,
     createInputs: CreateEducationInput[]
   ): Promise<BatchEntity> {
     return this.repository.createMany(
@@ -75,7 +72,7 @@ export class EducationsService {
   }
 
   updateOne(
-    _ctx: RequestContext | null,
+    _ctx: AuthContext | null,
     id: string,
     updateInput: UpdateEducationInput
   ): Promise<EducationModel> {
@@ -86,7 +83,7 @@ export class EducationsService {
   }
 
   updateMany(
-    _ctx: RequestContext | null,
+    _ctx: AuthContext | null,
     ids: string[],
     updateInput: UpdateEducationInput
   ): Promise<BatchEntity> {
@@ -96,11 +93,11 @@ export class EducationsService {
     );
   }
 
-  removeOne(_ctx: RequestContext | null, id: string): Promise<EducationModel> {
+  removeOne(_ctx: AuthContext | null, id: string): Promise<EducationModel> {
     return this.repository.deleteOneById(id);
   }
 
-  removeMany(_ctx: RequestContext | null, ids: string[]): Promise<BatchEntity> {
+  removeMany(_ctx: AuthContext | null, ids: string[]): Promise<BatchEntity> {
     return this.repository.deleteManyById(ids);
   }
 

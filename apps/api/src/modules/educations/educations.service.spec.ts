@@ -1,7 +1,7 @@
 import { BadRequestException, NotFoundException } from "@nestjs/common";
 import { getModelToken } from "@nestjs/mongoose";
 import { Test, TestingModule } from "@nestjs/testing";
-import { testRequestContext } from "@test/fixtures/request-context";
+import { testAuthContext } from "@test/fixtures/auth-context";
 import mongoose, { Model } from "mongoose";
 import { EducationModel } from "@/modules/educations/schemas/education.schema";
 import { EducationsRepository } from "./educations.repository";
@@ -9,7 +9,7 @@ import { EducationsService } from "./educations.service";
 
 const validId = new mongoose.Types.ObjectId().toHexString();
 const invalidId = "not-an-object-id";
-const ctx = testRequestContext();
+const ctx = testAuthContext();
 const fakeDoc = {
   _id: validId,
   title: "BSc Computer Science",

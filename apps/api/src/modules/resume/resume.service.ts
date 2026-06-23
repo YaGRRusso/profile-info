@@ -4,7 +4,7 @@ import { formatPeriod } from "@/common/helpers/format-period.helper";
 import { pickTranslation } from "@/common/helpers/pick-translation.helper";
 import { truncateText } from "@/common/helpers/truncate-text.helper";
 import { DEFAULT_LOCALE, type LocaleCode } from "@/common/i18n/locales";
-import { toRequestContext } from "@/core/context/request-context.helper";
+import { toSessionAuthContext } from "@/core/context/auth-context.helper";
 import { UserRole } from "@/core/enums/user-role.enum";
 import { CoursesService } from "@/modules/courses/courses.service";
 import { EducationsService } from "@/modules/educations/educations.service";
@@ -54,7 +54,7 @@ export class ResumeService {
     const user = users[0];
     if (!user) throw new NotFoundException("Profile user not found");
 
-    const portfolioCtx = toRequestContext({
+    const ctx = toSessionAuthContext({
       id: user._id.toString(),
       role: user.role ?? UserRole.USER,
     });
@@ -69,21 +69,21 @@ export class ResumeService {
       this.skillsService.findMany({
         sort: { relevance: -1 },
       }),
-      this.experiencesService.findMany(null, {
+      this.experiencesService.findMany(ctx, {
         sort: { relevance: -1 },
         limit: RESUME_LIMITS.experiences,
       }),
-      this.educationsService.findMany(null, {
+      this.educationsService.findMany(ctx, {
         filters: { status: "COMPLETE" },
         sort: { relevance: -1 },
         limit: RESUME_LIMITS.educations,
       }),
-      this.coursesService.findMany(portfolioCtx, {
+      this.coursesService.findMany(ctx, {
         filters: { status: "COMPLETE" },
         sort: { relevance: -1 },
         limit: RESUME_LIMITS.certifications,
       }),
-      this.projectsService.findMany(null, {
+      this.projectsService.findMany(ctx, {
         sort: { relevance: -1 },
         limit: RESUME_LIMITS.projects,
       }),

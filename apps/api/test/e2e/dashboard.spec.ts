@@ -1,5 +1,5 @@
 import { INestApplication } from "@nestjs/common";
-import { testRequestContext } from "@test/fixtures/request-context";
+import { testAuthContext } from "@test/fixtures/auth-context";
 import { App } from "supertest/types";
 import { UserRole } from "@/core/enums/user-role.enum";
 import { CoursesService } from "@/modules/courses/courses.service";
@@ -95,7 +95,7 @@ describe("Dashboard (e2e)", () => {
       category: SkillCategory.BACKEND,
     });
 
-    const userCtx = testRequestContext({ userId: user._id.toString() });
+    const userCtx = testAuthContext({ userId: user._id.toString() });
 
     await coursesService.createOne(userCtx, {
       slug: "dashboard-course-complete",

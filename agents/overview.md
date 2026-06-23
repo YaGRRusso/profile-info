@@ -73,6 +73,21 @@ The auth handshake: admin calls the `signIn(signInInput: SignInInput!): String!`
 - Adding a screen or operation to the admin: write the `.graphql`-tagged operation inside a hook in `apps/admin/src/hooks/queries/` or `hooks/mutations/`, run codegen, then consume the generated typed document. See `agents/admin.md`.
 - Keep reusable admin components and hooks domain-agnostic: iterate over the data shape rather than referencing specific entity fields.
 
+## Engineering principles (non-negotiable)
+
+### Long-term over short-term
+
+**Never optimize for the smallest diff today at the cost of clarity or correctness tomorrow.**
+
+Applies to naming, APIs, types, migrations, and refactors across the whole repo (API, admin, docs, agent context):
+
+- Choose names and shapes that still make sense when the next auth mode, tenant rule, or entity lands — not aliases you plan to rename later.
+- Avoid transitional cruft (`CurrentX`, `*Legacy`, `*V2`, “minimal rename now, proper rename later”) unless there is an explicit, time-boxed migration window.
+- When the right fix touches types, decorators, services, tests, and docs together, **do it once** — do not ship a shortcut knowing a fuller change is imminent.
+- Prefer semantic precision over convention copied from elsewhere (e.g. `@Auth()` + `AuthContext` for the authenticated caller, distinct from GraphQL `@Context()` for loaders).
+
+Agents and humans: if a proposal has a “quick” and a “right” option, default to **right** and document the choice in `agents/*.md` when it affects future work.
+
 ## Conventions & standards
 
 - Formatting and linting: Biome configured through `ultracite` presets in `biome.jsonc` (`ultracite/biome/core`, `.../nestjs`, `.../jest`). Run `npm run lint` and `npm run format`. Generated GraphQL artifacts are excluded from Biome.

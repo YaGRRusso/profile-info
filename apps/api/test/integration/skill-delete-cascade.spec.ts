@@ -1,5 +1,5 @@
 import { INestApplication } from "@nestjs/common";
-import { testRequestContext } from "@test/fixtures/request-context";
+import { testAuthContext } from "@test/fixtures/auth-context";
 import { App } from "supertest/types";
 import { UserRole } from "@/core/enums/user-role.enum";
 import { CoursesService } from "@/modules/courses/courses.service";
@@ -63,7 +63,7 @@ describe("Skill delete cascade (integration)", () => {
       category: SkillCategory.LANGUAGE,
     });
 
-    const ownerCtx = testRequestContext({ userId: owner._id.toString() });
+    const ownerCtx = testAuthContext({ userId: owner._id.toString() });
 
     const course = await coursesService.createOne(ownerCtx, {
       slug: "typescript-course",

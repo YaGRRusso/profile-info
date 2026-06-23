@@ -4,8 +4,8 @@ import {
   labelFromI18nTitle,
   RecentActivityRecord,
 } from "@/common/helpers/recent-activity.helper";
-import { toTenantScope } from "@/core/context/request-context.helper";
-import type { RequestContext } from "@/core/context/request-context.interface";
+import { toTenantScope } from "@/core/context/auth-context.helper";
+import type { AuthContext } from "@/core/context/auth-context.interface";
 import { BatchEntity } from "@/core/entities/batch.entity";
 import { PaginatedModel } from "@/core/schemas/paginated.schema";
 import { CourseModel } from "@/modules/courses/schemas/course.schema";
@@ -17,12 +17,12 @@ import { UpdateCourseInput } from "./dto/update-course.input";
 export class CoursesService {
   constructor(private readonly repository: CoursesRepository) {}
 
-  findOneById(ctx: RequestContext, id: string): Promise<CourseModel> {
+  findOneById(ctx: AuthContext, id: string): Promise<CourseModel> {
     return this.repository.tenant.findOneById(toTenantScope(ctx), id);
   }
 
   findOne(
-    ctx: RequestContext,
+    ctx: AuthContext,
     {
       filters,
     }: {
@@ -32,12 +32,12 @@ export class CoursesService {
     return this.repository.tenant.findOne(toTenantScope(ctx), { filters });
   }
 
-  findManyById(ctx: RequestContext, ids: string[]): Promise<CourseModel[]> {
+  findManyById(ctx: AuthContext, ids: string[]): Promise<CourseModel[]> {
     return this.repository.tenant.findManyById(toTenantScope(ctx), ids);
   }
 
   findMany(
-    ctx: RequestContext,
+    ctx: AuthContext,
     {
       filters,
       sort,
@@ -59,7 +59,7 @@ export class CoursesService {
   }
 
   async createOne(
-    ctx: RequestContext,
+    ctx: AuthContext,
     createInput: CreateCourseInput
   ): Promise<CourseModel> {
     const scope = toTenantScope(ctx);
@@ -71,7 +71,7 @@ export class CoursesService {
   }
 
   async createMany(
-    ctx: RequestContext,
+    ctx: AuthContext,
     createInputs: CreateCourseInput[]
   ): Promise<BatchEntity> {
     const scope = toTenantScope(ctx);
@@ -81,7 +81,7 @@ export class CoursesService {
   }
 
   updateOne(
-    ctx: RequestContext,
+    ctx: AuthContext,
     id: string,
     updateInput: UpdateCourseInput
   ): Promise<CourseModel> {
@@ -95,7 +95,7 @@ export class CoursesService {
   }
 
   async updateMany(
-    ctx: RequestContext,
+    ctx: AuthContext,
     ids: string[],
     updateInput: UpdateCourseInput
   ): Promise<BatchEntity> {
@@ -108,13 +108,13 @@ export class CoursesService {
     );
   }
 
-  removeOne(ctx: RequestContext, id: string): Promise<CourseModel> {
+  removeOne(ctx: AuthContext, id: string): Promise<CourseModel> {
     const scope = toTenantScope(ctx);
 
     return this.repository.tenant.deleteOneById(scope, id);
   }
 
-  async removeMany(ctx: RequestContext, ids: string[]): Promise<BatchEntity> {
+  async removeMany(ctx: AuthContext, ids: string[]): Promise<BatchEntity> {
     const scope = toTenantScope(ctx);
 
     return await this.repository.tenant.deleteManyById(scope, ids);

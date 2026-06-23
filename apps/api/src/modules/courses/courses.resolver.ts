@@ -8,10 +8,10 @@ import {
   ResolveField,
   Resolver,
 } from "@nestjs/graphql";
-import type { RequestContext } from "@/core/context/request-context.interface";
+import type { AuthContext } from "@/core/context/auth-context.interface";
 import { BatchEntity } from "@/core/entities/batch.entity";
 import { PaginationInput } from "@/core/inputs/pagination.input";
-import { CurrentRequestContext } from "@/modules/auth/decorators/current-request-context.decorator";
+import { Auth } from "@/modules/auth/decorators/auth-context.decorator";
 import { CourseModel } from "@/modules/courses/schemas/course.schema";
 import type { Ctx } from "@/modules/graphql/context.interface";
 import { OrganizationEntity } from "@/modules/organizations/entities/organization.entity";
@@ -32,7 +32,7 @@ export class CoursesResolver {
 
   @Query(() => CourseEntity)
   findOneCourseById(
-    @CurrentRequestContext() ctx: RequestContext,
+    @Auth() ctx: AuthContext,
     @Args("courseId", { type: () => ID }) courseId: string
   ) {
     return this.coursesService.findOneById(ctx, courseId);
@@ -40,7 +40,7 @@ export class CoursesResolver {
 
   @Query(() => CourseEntity)
   findOneCourse(
-    @CurrentRequestContext() ctx: RequestContext,
+    @Auth() ctx: AuthContext,
     @Args("courseFilters", {
       type: () => FilterCourseInput,
       nullable: true,
@@ -52,7 +52,7 @@ export class CoursesResolver {
 
   @Query(() => [CourseEntity])
   findManyCourseById(
-    @CurrentRequestContext() ctx: RequestContext,
+    @Auth() ctx: AuthContext,
     @Args("courseIds", { type: () => [ID] }) courseIds: string[]
   ) {
     return this.coursesService.findManyById(ctx, courseIds);
@@ -60,7 +60,7 @@ export class CoursesResolver {
 
   @Query(() => PaginatedCourseEntity)
   findManyCourses(
-    @CurrentRequestContext() ctx: RequestContext,
+    @Auth() ctx: AuthContext,
     @Args("courseFilters", {
       type: () => FilterCourseInput,
       nullable: true,
@@ -89,7 +89,7 @@ export class CoursesResolver {
 
   @Mutation(() => CourseEntity)
   createOneCourse(
-    @CurrentRequestContext() ctx: RequestContext,
+    @Auth() ctx: AuthContext,
     @Args("createCourseInput", { type: () => CreateCourseInput })
     createCourseInput: CreateCourseInput
   ) {
@@ -98,7 +98,7 @@ export class CoursesResolver {
 
   @Mutation(() => BatchEntity)
   createManyCourses(
-    @CurrentRequestContext() ctx: RequestContext,
+    @Auth() ctx: AuthContext,
     @Args("createCourseInputs", { type: () => [CreateCourseInput] })
     createCourseInputs: CreateCourseInput[]
   ) {
@@ -107,7 +107,7 @@ export class CoursesResolver {
 
   @Mutation(() => CourseEntity)
   updateOneCourse(
-    @CurrentRequestContext() ctx: RequestContext,
+    @Auth() ctx: AuthContext,
     @Args("courseId", { type: () => ID }) courseId: string,
     @Args("updateCourseInput", { type: () => UpdateCourseInput })
     updateCourseInput: UpdateCourseInput
@@ -117,7 +117,7 @@ export class CoursesResolver {
 
   @Mutation(() => BatchEntity)
   updateManyCourses(
-    @CurrentRequestContext() ctx: RequestContext,
+    @Auth() ctx: AuthContext,
     @Args("courseIds", { type: () => [ID] }) courseIds: string[],
     @Args("updateCourseInput", { type: () => UpdateCourseInput })
     updateCourseInput: UpdateCourseInput
@@ -127,7 +127,7 @@ export class CoursesResolver {
 
   @Mutation(() => CourseEntity)
   removeOneCourse(
-    @CurrentRequestContext() ctx: RequestContext,
+    @Auth() ctx: AuthContext,
     @Args("courseId", { type: () => ID }) courseId: string
   ) {
     return this.coursesService.removeOne(ctx, courseId);
@@ -135,7 +135,7 @@ export class CoursesResolver {
 
   @Mutation(() => BatchEntity)
   removeManyCourses(
-    @CurrentRequestContext() ctx: RequestContext,
+    @Auth() ctx: AuthContext,
     @Args("courseIds", { type: () => [ID] }) courseIds: string[]
   ) {
     return this.coursesService.removeMany(ctx, courseIds);

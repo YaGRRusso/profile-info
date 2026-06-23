@@ -8,13 +8,13 @@ import {
   ResolveField,
   Resolver,
 } from "@nestjs/graphql";
-import type { RequestContext } from "@/core/context/request-context.interface";
+import type { AuthContext } from "@/core/context/auth-context.interface";
 import { Public } from "@/core/decorators/public-route.decorator";
 import { Roles } from "@/core/decorators/roles.decorator";
 import { BatchEntity } from "@/core/entities/batch.entity";
 import { UserRole } from "@/core/enums/user-role.enum";
 import { PaginationInput } from "@/core/inputs/pagination.input";
-import { CurrentRequestContext } from "@/modules/auth/decorators/current-request-context.decorator";
+import { Auth } from "@/modules/auth/decorators/auth-context.decorator";
 import type { Ctx } from "@/modules/graphql/context.interface";
 import type { ProjectModel } from "@/modules/projects/schemas/project.schema";
 import { SkillEntity } from "@/modules/skills/entities/skill.entity";
@@ -93,7 +93,7 @@ export class ProjectsResolver {
   @Roles(UserRole.SUPER_ADMIN)
   @Mutation(() => ProjectEntity)
   createOneProject(
-    @CurrentRequestContext() ctx: RequestContext,
+    @Auth() ctx: AuthContext,
     @Args("createProjectInput", { type: () => CreateProjectInput })
     createProjectInput: CreateProjectInput
   ) {
@@ -103,7 +103,7 @@ export class ProjectsResolver {
   @Roles(UserRole.SUPER_ADMIN)
   @Mutation(() => BatchEntity)
   createManyProjects(
-    @CurrentRequestContext() ctx: RequestContext,
+    @Auth() ctx: AuthContext,
     @Args("createProjectInputs", { type: () => [CreateProjectInput] })
     createProjectInputs: CreateProjectInput[]
   ) {
@@ -113,7 +113,7 @@ export class ProjectsResolver {
   @Roles(UserRole.SUPER_ADMIN)
   @Mutation(() => ProjectEntity)
   updateOneProject(
-    @CurrentRequestContext() ctx: RequestContext,
+    @Auth() ctx: AuthContext,
     @Args("projectId", { type: () => ID }) projectId: string,
     @Args("updateProjectInput", { type: () => UpdateProjectInput })
     updateProjectInput: UpdateProjectInput
@@ -124,7 +124,7 @@ export class ProjectsResolver {
   @Roles(UserRole.SUPER_ADMIN)
   @Mutation(() => BatchEntity)
   updateManyProjects(
-    @CurrentRequestContext() ctx: RequestContext,
+    @Auth() ctx: AuthContext,
     @Args("projectIds", { type: () => [ID] }) projectIds: string[],
     @Args("updateProjectInput", { type: () => UpdateProjectInput })
     updateProjectInput: UpdateProjectInput
@@ -135,7 +135,7 @@ export class ProjectsResolver {
   @Roles(UserRole.SUPER_ADMIN)
   @Mutation(() => ProjectEntity)
   removeOneProject(
-    @CurrentRequestContext() ctx: RequestContext,
+    @Auth() ctx: AuthContext,
     @Args("projectId", { type: () => ID }) projectId: string
   ) {
     return this.projectsService.removeOne(ctx, projectId);
@@ -144,7 +144,7 @@ export class ProjectsResolver {
   @Roles(UserRole.SUPER_ADMIN)
   @Mutation(() => BatchEntity)
   removeManyProjects(
-    @CurrentRequestContext() ctx: RequestContext,
+    @Auth() ctx: AuthContext,
     @Args("projectIds", { type: () => [ID] }) projectIds: string[]
   ) {
     return this.projectsService.removeMany(ctx, projectIds);

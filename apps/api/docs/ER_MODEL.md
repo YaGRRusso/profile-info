@@ -234,7 +234,7 @@ inputs use `organizationId` and `skillIds` (no `ownerId` — injected from conte
 
 Filter `*Input` types use `PartialType(PickType(Create*Input, [...]))` — an explicit
 whitelist of filterable fields. **`ownerId` is never filterable** (tenant scope comes
-from `RequestContext`, not client filters). `FilterUserInput` excludes `password`.
+from `AuthContext`, not client filters). `FilterUserInput` excludes `password`.
 
 ## Maintaining this file
 

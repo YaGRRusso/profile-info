@@ -4,7 +4,7 @@ import {
   labelFromI18nTitle,
   RecentActivityRecord,
 } from "@/common/helpers/recent-activity.helper";
-import type { RequestContext } from "@/core/context/request-context.interface";
+import type { AuthContext } from "@/core/context/auth-context.interface";
 import { BatchEntity } from "@/core/entities/batch.entity";
 import { PaginatedModel } from "@/core/schemas/paginated.schema";
 import { ProjectModel } from "@/modules/projects/schemas/project.schema";
@@ -16,12 +16,12 @@ import { ProjectsRepository } from "./projects.repository";
 export class ProjectsService {
   constructor(private readonly repository: ProjectsRepository) {}
 
-  findOneById(_ctx: RequestContext | null, id: string): Promise<ProjectModel> {
+  findOneById(_ctx: AuthContext | null, id: string): Promise<ProjectModel> {
     return this.repository.findOneById(id);
   }
 
   findOne(
-    _ctx: RequestContext | null,
+    _ctx: AuthContext | null,
     {
       filters,
     }: {
@@ -32,14 +32,14 @@ export class ProjectsService {
   }
 
   findManyById(
-    _ctx: RequestContext | null,
+    _ctx: AuthContext | null,
     ids: string[]
   ): Promise<ProjectModel[]> {
     return this.repository.findManyById(ids);
   }
 
   findMany(
-    _ctx: RequestContext | null,
+    _ctx: AuthContext | null,
     {
       filters,
       sort,
@@ -56,21 +56,21 @@ export class ProjectsService {
   }
 
   createOne(
-    _ctx: RequestContext | null,
+    _ctx: AuthContext | null,
     createInput: CreateProjectInput
   ): Promise<ProjectModel> {
     return this.repository.createOne(createInput as AnyKeys<ProjectModel>);
   }
 
   createMany(
-    _ctx: RequestContext | null,
+    _ctx: AuthContext | null,
     createInputs: CreateProjectInput[]
   ): Promise<BatchEntity> {
     return this.repository.createMany(createInputs as AnyKeys<ProjectModel>[]);
   }
 
   updateOne(
-    _ctx: RequestContext | null,
+    _ctx: AuthContext | null,
     id: string,
     updateInput: UpdateProjectInput
   ): Promise<ProjectModel> {
@@ -81,7 +81,7 @@ export class ProjectsService {
   }
 
   updateMany(
-    _ctx: RequestContext | null,
+    _ctx: AuthContext | null,
     ids: string[],
     updateInput: UpdateProjectInput
   ): Promise<BatchEntity> {
@@ -91,11 +91,11 @@ export class ProjectsService {
     );
   }
 
-  removeOne(_ctx: RequestContext | null, id: string): Promise<ProjectModel> {
+  removeOne(_ctx: AuthContext | null, id: string): Promise<ProjectModel> {
     return this.repository.deleteOneById(id);
   }
 
-  removeMany(_ctx: RequestContext | null, ids: string[]): Promise<BatchEntity> {
+  removeMany(_ctx: AuthContext | null, ids: string[]): Promise<BatchEntity> {
     return this.repository.deleteManyById(ids);
   }
 
