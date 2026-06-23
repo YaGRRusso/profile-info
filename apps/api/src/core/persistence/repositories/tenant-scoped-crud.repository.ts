@@ -14,7 +14,7 @@ import type {
 import type { TenantScope } from "../types/scope.type";
 import type { CrudRepository } from "./crud.repository";
 
-export class TenantScopedRepository<T> {
+export class TenantScopedCrudRepository<T> {
   constructor(private readonly repository: CrudRepository<T>) {}
 
   async findOneById(scope: TenantScope, id: string): Promise<Single<T>> {

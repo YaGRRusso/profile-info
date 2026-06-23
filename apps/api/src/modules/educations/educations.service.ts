@@ -110,12 +110,16 @@ export class EducationsService {
     return await this.repository.tenant.deleteManyById(toTenantScope(ctx), ids);
   }
 
-  count(): Promise<number> {
-    return this.repository.stats.count();
+  count(ctx: AuthContext): Promise<number> {
+    return this.repository.tenantStats.count(toTenantScope(ctx));
   }
 
-  async findRecentActivity(limit: number): Promise<RecentActivityRecord[]> {
-    const rows = await this.repository.stats.findRecentlyUpdated(
+  async findRecentActivity(
+    ctx: AuthContext,
+    limit: number
+  ): Promise<RecentActivityRecord[]> {
+    const rows = await this.repository.tenantStats.findRecentlyUpdated(
+      toTenantScope(ctx),
       limit,
       "slug i18n updatedAt"
     );

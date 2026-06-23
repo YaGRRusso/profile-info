@@ -3,7 +3,7 @@ import mongoose from "mongoose";
 import { PERSISTENCE_NOT_FOUND } from "@/core/persistence/persistence.messages";
 import { CrudRepository } from "@/core/persistence/repositories/crud.repository";
 import { mockQueryChain } from "@/core/persistence/repositories/query-chain.mock";
-import { TenantScopedRepository } from "@/core/persistence/repositories/tenant-scoped.repository";
+import { TenantScopedCrudRepository } from "@/core/persistence/repositories/tenant-scoped-crud.repository";
 import { BaseModel } from "@/core/schemas/base.schema";
 
 interface TestModel extends BaseModel {
@@ -13,9 +13,9 @@ interface TestModel extends BaseModel {
 
 class TestRepository extends CrudRepository<TestModel> {}
 
-describe("TenantScopedRepository", () => {
+describe("TenantScopedCrudRepository", () => {
   let repository: TestRepository;
-  let tenant: TenantScopedRepository<TestModel>;
+  let tenant: TenantScopedCrudRepository<TestModel>;
   let model: {
     findById: jest.Mock;
     findOne: jest.Mock;
@@ -58,7 +58,7 @@ describe("TenantScopedRepository", () => {
     };
 
     repository = new TestRepository(model as never);
-    tenant = new TenantScopedRepository(repository);
+    tenant = new TenantScopedCrudRepository(repository);
   });
 
   describe("findOneById", () => {

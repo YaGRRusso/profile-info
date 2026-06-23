@@ -100,7 +100,7 @@ src/
 ├── schema.gql                # Auto-generated (commit after API type changes)
 ├── common/
 ├── core/
-│   └── persistence/          # CrudRepository, StatsRepository, TenantScopedRepository
+│   └── persistence/          # CrudRepository, StatsRepository, TenantScopedCrudRepository
 ├── integrations/
 │   ├── open-router/          # AI port + OpenRouter adapter
 │   ├── github/

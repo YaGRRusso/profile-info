@@ -18,14 +18,38 @@ import { clearTestDatabase } from "../support/clear-test-database";
 import { createTestApp } from "../support/create-test-app";
 import { graphqlRequest } from "../support/graphql-request";
 
+const DASHBOARD_QUERY = `
+  query Dashboard {
+    dashboard {
+      totals {
+        skills
+        courses
+        educations
+        organizations
+        projects
+        experiences
+      }
+      coursesByStatus {
+        label
+        value
+      }
+      skillsByCategory {
+        label
+        value
+      }
+    }
+  }
+`;
+
 describe("Dashboard (e2e)", () => {
   let app: INestApplication<App>;
   let adminToken: string;
-  let userToken: string;
-  let skillsService: SkillsService;
+  let aliceToken: string;
+  let bobToken: string;
   let coursesService: CoursesService;
   let educationsService: EducationsService;
   let organizationsService: OrganizationsService;
+  let organizationId: string;
 
   beforeAll(async () => {
     const testApp = await createTestApp();
@@ -33,7 +57,7 @@ describe("Dashboard (e2e)", () => {
     await clearTestDatabase(testApp.module);
 
     const usersService = testApp.module.get(UsersService);
-    skillsService = testApp.module.get(SkillsService);
+    const skillsService = testApp.module.get(SkillsService);
     coursesService = testApp.module.get(CoursesService);
     educationsService = testApp.module.get(EducationsService);
     organizationsService = testApp.module.get(OrganizationsService);
@@ -46,39 +70,37 @@ describe("Dashboard (e2e)", () => {
       role: UserRole.SUPER_ADMIN,
     });
 
-    const adminSignIn = await graphqlRequest<{ signIn: string }>(app, {
-      query: `
-        mutation SignIn($signInInput: SignInInput!) {
-          signIn(signInInput: $signInInput)
-        }
-      `,
-      variables: {
-        signInInput: { email: "admin@profile.info", password: "pass.123" },
-      },
-    });
-
-    adminToken = adminSignIn.data?.signIn ?? "";
-
-    const user = await usersService.createOne({
-      name: "User",
-      nickname: "user",
-      email: "user@profile.info",
-      password: "user.123",
+    const alice = await usersService.createOne({
+      name: "Alice",
+      nickname: "alice",
+      email: "alice@profile.info",
+      password: "alice.pass",
       role: UserRole.USER,
     });
 
-    const userSignIn = await graphqlRequest<{ signIn: string }>(app, {
-      query: `
-        mutation SignIn($signInInput: SignInInput!) {
-          signIn(signInInput: $signInInput)
-        }
-      `,
-      variables: {
-        signInInput: { email: "user@profile.info", password: "user.123" },
-      },
+    const bob = await usersService.createOne({
+      name: "Bob",
+      nickname: "bob",
+      email: "bob@profile.info",
+      password: "bob.pass",
+      role: UserRole.USER,
     });
 
-    userToken = userSignIn.data?.signIn ?? "";
+    const signIn = async (email: string, password: string) => {
+      const response = await graphqlRequest<{ signIn: string }>(app, {
+        query: `
+          mutation SignIn($signInInput: SignInInput!) {
+            signIn(signInInput: $signInInput)
+          }
+        `,
+        variables: { signInInput: { email, password } },
+      });
+      return response.data?.signIn ?? "";
+    };
+
+    adminToken = await signIn("admin@profile.info", "pass.123");
+    aliceToken = await signIn("alice@profile.info", "alice.pass");
+    bobToken = await signIn("bob@profile.info", "bob.pass");
 
     const organization = await organizationsService.createOne({
       slug: "dashboard-org",
@@ -88,6 +110,7 @@ describe("Dashboard (e2e)", () => {
       category: OrganizationCategory.COMPANY,
       i18n: [{ locale: "en", messages: { description: "Org" } }],
     });
+    organizationId = organization._id.toString();
 
     await skillsService.createOne({
       slug: "dashboard-skill",
@@ -95,121 +118,143 @@ describe("Dashboard (e2e)", () => {
       category: SkillCategory.BACKEND,
     });
 
-    const userCtx = testAuthContext({ userId: user._id.toString() });
+    const aliceCtx = testAuthContext({ userId: alice._id.toString() });
+    const bobCtx = testAuthContext({ userId: bob._id.toString() });
 
-    await coursesService.createOne(userCtx, {
-      slug: "dashboard-course-complete",
-      organizationId: organization._id.toString(),
+    await coursesService.createOne(aliceCtx, {
+      slug: "alice-course-complete",
+      organizationId,
       status: CourseStatus.COMPLETE,
       i18n: [
         {
           locale: "en",
-          messages: { title: "Complete Course", description: "Done" },
+          messages: { title: "Alice Complete", description: "Done" },
         },
       ],
     } as CreateCourseInput);
 
-    await coursesService.createOne(userCtx, {
-      slug: "dashboard-course-progress",
-      organizationId: organization._id.toString(),
+    await coursesService.createOne(aliceCtx, {
+      slug: "alice-course-progress",
+      organizationId,
       status: CourseStatus.IN_PROGRESS,
       i18n: [
         {
           locale: "en",
-          messages: { title: "Progress Course", description: "Ongoing" },
+          messages: { title: "Alice Progress", description: "Ongoing" },
         },
       ],
     } as CreateCourseInput);
 
-    await educationsService.createOne(userCtx, {
-      slug: "dashboard-education",
-      organizationId: organization._id.toString(),
+    await educationsService.createOne(aliceCtx, {
+      slug: "alice-education",
+      organizationId,
       level: EducationLevel.BACHELOR,
       status: EducationStatus.COMPLETE,
       i18n: [
         {
           locale: "en",
-          messages: { title: "Bachelor Degree", description: "CS" },
+          messages: { title: "Alice Degree", description: "CS" },
         },
       ],
     } as CreateEducationInput);
+
+    await coursesService.createOne(bobCtx, {
+      slug: "bob-course",
+      organizationId,
+      status: CourseStatus.COMPLETE,
+      i18n: [
+        {
+          locale: "en",
+          messages: { title: "Bob Course", description: "Done" },
+        },
+      ],
+    } as CreateCourseInput);
   });
 
   afterAll(async () => {
     if (app) await app.close();
   });
 
-  it("should return dashboard with totals, charts and recentActivity", async () => {
+  it("should return UNAUTHENTICATED without a token", async () => {
+    const response = await graphqlRequest(app, { query: DASHBOARD_QUERY });
+
+    expect(response.errors?.[0]?.extensions?.code).toBe("UNAUTHENTICATED");
+  });
+
+  it("should scope private entity totals to the caller tenant for USER", async () => {
     const response = await graphqlRequest<{
       dashboard: {
         totals: {
           skills: number;
           courses: number;
           educations: number;
+          organizations: number;
+          projects: number;
+          experiences: number;
         };
-        recentActivity: Array<{
-          type: string;
-          label: string;
-          updatedAt: string;
-        }>;
-        skillsByCategory: Array<{ label: string; value: number }>;
         coursesByStatus: Array<{ label: string; value: number }>;
+        skillsByCategory: Array<{ label: string; value: number }>;
       };
     }>(app, {
-      query: `
-        query Dashboard {
-          dashboard {
-            totals {
-              skills
-              courses
-              educations
-            }
-            recentActivity {
-              type
-              label
-              updatedAt
-            }
-            skillsByCategory {
-              label
-              value
-            }
-            coursesByStatus {
-              label
-              value
-            }
-          }
-        }
-      `,
+      query: DASHBOARD_QUERY,
+      token: aliceToken,
+    });
+
+    expect(response.errors).toBeUndefined();
+
+    const dashboard = response.data?.dashboard;
+    expect(dashboard?.totals.courses).toBe(2);
+    expect(dashboard?.totals.educations).toBe(1);
+    expect(dashboard?.totals.projects).toBe(0);
+    expect(dashboard?.totals.experiences).toBe(0);
+    expect(dashboard?.totals.skills).toBe(1);
+    expect(dashboard?.totals.organizations).toBe(1);
+    expect(dashboard?.totals.organizations).toBe(1);
+    expect(dashboard?.coursesByStatus).toEqual(
+      expect.arrayContaining([
+        { label: CourseStatus.COMPLETE, value: 1 },
+        { label: CourseStatus.IN_PROGRESS, value: 1 },
+      ])
+    );
+    expect(dashboard?.skillsByCategory).toEqual([
+      { label: SkillCategory.BACKEND, value: 1 },
+    ]);
+  });
+
+  it("should show another tenant only their private totals", async () => {
+    const response = await graphqlRequest<{
+      dashboard: { totals: { courses: number; educations: number } };
+    }>(app, {
+      query: DASHBOARD_QUERY,
+      token: bobToken,
+    });
+
+    expect(response.errors).toBeUndefined();
+    expect(response.data?.dashboard.totals.courses).toBe(1);
+    expect(response.data?.dashboard.totals.educations).toBe(0);
+  });
+
+  it("should show cross-tenant private totals for SUPER_ADMIN", async () => {
+    const response = await graphqlRequest<{
+      dashboard: {
+        totals: {
+          skills: number;
+          courses: number;
+          educations: number;
+          organizations: number;
+        };
+      };
+    }>(app, {
+      query: DASHBOARD_QUERY,
       token: adminToken,
     });
 
     expect(response.errors).toBeUndefined();
 
     const dashboard = response.data?.dashboard;
-    expect(dashboard?.totals.skills).toBeGreaterThanOrEqual(1);
-    expect(dashboard?.totals.courses).toBe(2);
-    expect(dashboard?.totals.educations).toBeGreaterThanOrEqual(1);
-    expect(dashboard?.recentActivity.length).toBeGreaterThanOrEqual(1);
-    expect(dashboard?.recentActivity[0]?.label).toBeTruthy();
-    expect(dashboard?.recentActivity[0]?.type).toBeTruthy();
-    expect(dashboard?.skillsByCategory.length).toBeGreaterThanOrEqual(1);
-    expect(dashboard?.coursesByStatus.length).toBeGreaterThanOrEqual(1);
-  });
-
-  it("should forbid non-admin users from dashboard query", async () => {
-    const response = await graphqlRequest(app, {
-      query: `
-        query Dashboard {
-          dashboard {
-            totals {
-              skills
-            }
-          }
-        }
-      `,
-      token: userToken,
-    });
-
-    expect(response.errors?.[0]?.message).toContain("Insufficient permissions");
+    expect(dashboard?.totals.courses).toBe(3);
+    expect(dashboard?.totals.educations).toBe(1);
+    expect(dashboard?.totals.skills).toBe(1);
+    expect(dashboard?.totals.organizations).toBe(1);
   });
 });

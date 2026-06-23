@@ -24,7 +24,7 @@
 
 **Course is the only fully migrated private entity.** Experience, Education, and Project still
 expose **public reads** (`@Public()` queries, `ctx: null` in services, no
-`TenantScopedRepository`). Their mutations still carry legacy `@Roles(SUPER_ADMIN)` and do not
+`TenantScopedCrudRepository`). Their mutations still carry legacy `@Roles(SUPER_ADMIN)` and do not
 inject `ownerId` — they must be brought in line with Course, not patched incrementally.
 
 Incremental work landed **ahead of strict phase order** (does not replace entity migration):
@@ -127,10 +127,19 @@ Base Mongo access: `*OneById`, `findOne` / `findMany`, `create*`, `update*`,
 
 #### `StatsRepository<T>`
 
-`count`, `countByField`, `findRecentlyUpdated` — composed as `readonly stats` where
-dashboard needs metrics.
+`count`, `countByField`, `findRecentlyUpdated` — global metrics for **catalog**
+entities (`skills`, `organizations`). Composed as `readonly stats`.
 
-#### `TenantScopedRepository<T>`
+#### `TenantScopedStatsRepository<T>`
+
+Same API as `StatsRepository`, but every method takes `TenantScope` and applies
+`withTenantScope`. Composed as `readonly tenantStats` on private-entity repos.
+Service methods take `ctx: AuthContext` and delegate via `toTenantScope(ctx)`.
+
+**Dashboard rule:** private entities → `tenantStats` (USER sees own data;
+`SUPER_ADMIN` sees all via `crossTenant`). Catalog entities → global `stats`.
+
+#### `TenantScopedCrudRepository<T>`
 
 Composition wrapper over `CrudRepository` (does **not** extend it).
 
@@ -143,12 +152,12 @@ Composition wrapper over `CrudRepository` (does **not** extend it).
 ```typescript
 @Injectable()
 export class CoursesRepository extends CrudRepository<CourseModel> {
-  readonly stats = new StatsRepository(courseModel);
-  readonly tenant = new TenantScopedRepository(this);
+  readonly tenantStats = new TenantScopedStatsRepository(courseModel);
+  readonly tenant = new TenantScopedCrudRepository(this);
 }
 ```
 
-Global catalog repos extend `CrudRepository` only (+ `stats` if needed).
+Global catalog repos extend `CrudRepository` only (+ `stats` for dashboard metrics).
 
 #### `toTenantScope(ctx)`
 
@@ -249,7 +258,7 @@ Do **not** start phase N+1 until phase N passes its [entity gate](#entity-gate).
 | `ownerId` on private schemas + `{ ownerId, slug }` unique index | Done |
 | Catalog FKs `organizationId` / `skillIds` on private schemas | Done |
 | `AuthContext` + helpers (incl. API token types) | Done |
-| `core/persistence/` (`CrudRepository`, `StatsRepository`, `TenantScopedRepository`) | Done |
+| `core/persistence/` (`CrudRepository`, `StatsRepository`, `TenantScopedCrudRepository`) | Done |
 | All repos extend `CrudRepository`; services use `*OneById` / `BatchCount` | Done |
 | `BatchEntity { succeeded, failed }` | Done |
 | DataLoaders: `batchOrganizations`, `batchSkills`, `batchUsers` | Done |
@@ -263,11 +272,8 @@ Do **not** start phase N+1 until phase N passes its [entity gate](#entity-gate).
 | `CoursesService` — required `ctx`, `repository.tenant.*` | Done |
 | `CoursesResolver` — no `@Public()`, `@Auth()` on all ops, `@ResolveField` for `owner` / `organization` / `skills` | Done |
 | `CourseEntity` — output scalars + resolved objects | Done |
-| Unit tests (`courses.service.spec.ts`, `tenant-scoped.repository.spec.ts`) | Done |
+| Unit tests (`courses.service.spec.ts`, `tenant-scoped-crud.repository.spec.ts`) | Done |
 | E2e isolation (`test/e2e/courses.spec.ts`) | Done |
-
-**Known deferrals to phase 5:** `CoursesService.count()` / dashboard stats remain
-global until dashboard is tenant-scoped.
 
 ### Phase 2 — Experience ✅
 
@@ -324,16 +330,24 @@ without touching tenant logic.
 
 #### Phase 5b — Peripheral modules
 
-| Module | Work |
-|--------|------|
-| `resume` | `buildResume(userId)`; keep `GET /resume.pdf?userId=` public |
-| `dashboard` | `ctx`-scoped counts for `USER`; platform-wide for `SUPER_ADMIN` |
-| `ai-tools` | Any authenticated user (drop `@Roles(SUPER_ADMIN)`) |
+| Module | Work | State |
+|--------|------|-------|
+| `dashboard` | `@Auth() ctx`; private stats via `tenantStats`; catalog stats global; USER + SUPER_ADMIN | Done |
+| `resume` | `buildResume(userId)`; keep `GET /resume.pdf?userId=` public | Pending |
+| `ai-tools` | Any authenticated user (drop `@Roles(SUPER_ADMIN)`) | Pending |
 
 **Why separate:** each module has different scoping rules; dashboard touches all
 entities' `count()` / stats.
 
 **Gate:** e2e or integration per module; manual dashboard smoke for USER vs admin.
+
+---
+
+### Stats scoping (implemented)
+
+Private-entity services expose `count(ctx)`, `countByField(ctx, field)` (where
+applicable), and `findRecentActivity(ctx, limit)`. Catalog services keep
+unscoped `count()` / `countByField()` / `findRecentActivity()`.
 
 #### Phase 5c — API tokens
 
@@ -364,16 +378,13 @@ require auth; permission matrix is the largest test surface here.
 
 ---
 
-**Optional later (backlog, not ADR gate):** tenant-scoped `CoursesService.count()` refactor
-if dashboard metrics need per-entity tenant filters beyond phase 5b.
-
 ## Per-entity checklist (copy from Course)
 
 Use this gate for Experience, Education, and Project.
 
 | Layer | Done when |
 |-------|-----------|
-| **Repository** | `readonly tenant = new TenantScopedRepository(this)` |
+| **Repository** | `readonly tenant = new TenantScopedCrudRepository(this)` |
 | **Service** | All CRUD via `repository.tenant.*`; `ctx: AuthContext` required |
 | **Resolver** | No `@Public()` on queries or mutations; no `@Roles(SUPER_ADMIN)` on private CRUD; `@Auth() ctx: AuthContext` everywhere |
 | **GraphQL entity** | `ownerId` + `owner`; `organizationId` + `organization` where applicable; `skillIds` + `skills` where applicable |
@@ -471,7 +482,7 @@ plus resolved `owner`, `organization`, `skills`.
 
 | Risk | Mitigation |
 |------|------------|
-| IDOR on batch ops | `TenantScopedRepository` scopes every ID |
+| IDOR on batch ops | `TenantScopedCrudRepository` scopes every ID |
 | Admin breaks when auth lands on reads | Admin already sends JWT; regenerate codegen after schema changes |
 | Large PR | Entity gates merge incrementally on feature branch; single PR at the end |
 | Half-migrated entities (today) | Strict phase order; Experience must fully match Course before Education |

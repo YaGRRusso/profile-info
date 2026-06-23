@@ -34,7 +34,7 @@ src/
 │   ├── enums/          Enums compartilhados (UserRole, SortEnum)
 │   ├── events/         Domain events (payloads + constantes de nomes)
 │   ├── inputs/         Inputs GraphQL genéricos (pagination, sort factory)
-│   ├── persistence/    CrudRepository, StatsRepository, TenantScopedRepository
+│   ├── persistence/    CrudRepository, StatsRepository, TenantScopedCrudRepository
 │   └── schemas/        Mongoose sub-schemas reutilizáveis
 │                       Regra: NÃO importa de modules/ nem integrations/.
 │
@@ -154,7 +154,7 @@ export class OnSkillDeletedListener {
 ```typescript
 // CrudRepository<T> — find/create/update/delete; batch → BatchCount
 // StatsRepository<T> — count, countByField, findRecentlyUpdated
-// TenantScopedRepository<T> — wrapper com ownerId scope (composição)
+// TenantScopedCrudRepository<T> — wrapper com ownerId scope (composição)
 
 @Injectable()
 export class SkillsRepository extends CrudRepository<SkillModel> {
