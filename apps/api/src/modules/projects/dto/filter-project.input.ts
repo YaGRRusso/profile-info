@@ -7,7 +7,7 @@ export class FilterProjectInput extends PartialType(
     "relevance",
     "slug",
     "images",
-    "skills",
+    "skillIds",
     "i18n",
     "urls",
   ] as const)

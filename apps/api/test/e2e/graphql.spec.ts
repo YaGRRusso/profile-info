@@ -206,7 +206,7 @@ describe("GraphQL (e2e)", () => {
     const experience = await experiencesService.createOne(null, {
       slug: "nested-experience",
       ownerId: portfolioUserId,
-      organization: organization._id.toString(),
+      organizationId: organization._id.toString(),
       category: ExperienceCategory.FULL_TIME,
       roles: [
         {

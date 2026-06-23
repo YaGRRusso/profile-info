@@ -49,7 +49,7 @@ const REMOVE_ONE_COURSE = `
 function buildCourseInput(slug: string, organizationId: string) {
   return {
     slug,
-    organization: organizationId,
+    organizationId,
     status: "COMPLETE",
     relevance: 1,
     i18n: [

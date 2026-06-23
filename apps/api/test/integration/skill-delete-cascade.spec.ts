@@ -67,7 +67,7 @@ describe("Skill delete cascade (integration)", () => {
 
     const course = await coursesService.createOne(ownerCtx, {
       slug: "typescript-course",
-      organization: organization._id.toString(),
+      organizationId: organization._id.toString(),
       status: CourseStatus.COMPLETE,
       i18n: [
         {
@@ -78,10 +78,10 @@ describe("Skill delete cascade (integration)", () => {
           },
         },
       ],
-      skills: [skill._id.toString()],
+      skillIds: [skill._id.toString()],
     } as CreateCourseInput);
 
-    expect(course.skills?.map((id) => id.toString())).toContain(
+    expect(course.skillIds?.map((id) => id.toString())).toContain(
       skill._id.toString()
     );
 
@@ -92,7 +92,7 @@ describe("Skill delete cascade (integration)", () => {
       course._id.toString()
     );
 
-    const skillIds = (updatedCourse.skills ?? []).map((id) => id.toString());
+    const skillIds = (updatedCourse.skillIds ?? []).map((id) => id.toString());
     expect(skillIds).not.toContain(skill._id.toString());
   });
 });

@@ -47,7 +47,7 @@ export class CreateCourseInput {
 
   @RequiredField(() => String)
   @IsMongoId()
-  organization: string;
+  organizationId: string;
 
   @RequiredField(() => CourseStatus)
   @IsEnum(CourseStatus)
@@ -74,5 +74,5 @@ export class CreateCourseInput {
   period?: DateRangeInput;
 
   @OptionalField(() => [String])
-  skills?: string[];
+  skillIds?: string[];
 }

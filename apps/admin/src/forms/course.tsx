@@ -35,13 +35,13 @@ const courseSchema = z.object({
     .string()
     .min(1, "required field")
     .regex(SLUG_REGEX, "invalid field format"),
-  organization: z.string().min(1, "required field"),
+  organizationId: z.string().min(1, "required field"),
   status: z.enum(CourseStatus, "required field"),
   relevance: z.number().min(1, "must be a positive number"),
   url: z.url().or(z.literal("")),
   image: z.url().or(z.literal("")),
   hours: z.number(),
-  skills: z.array(z.string()),
+  skillIds: z.array(z.string()),
   i18n: z
     .array(
       z.object({
@@ -69,13 +69,13 @@ export interface CourseFormProps extends CommonFormProps<CourseSchema> {
 export function courseToInput(data: CourseSchema): CreateCourseInput {
   return {
     slug: data.slug,
-    organization: data.organization,
+    organizationId: data.organizationId,
     status: data.status,
     relevance: data.relevance,
     url: data.url || undefined,
     image: data.image || undefined,
     hours: data.hours || undefined,
-    skills: data.skills.length ? data.skills : undefined,
+    skillIds: data.skillIds.length ? data.skillIds : undefined,
     i18n: data.i18n.map((translation) => ({
       locale: translation.locale,
       messages: {
@@ -89,13 +89,13 @@ export function courseToInput(data: CourseSchema): CreateCourseInput {
 export function courseToForm(course: CourseRow): Partial<CourseSchema> {
   return {
     slug: course.slug,
-    organization: course.organization?.id ?? "",
+    organizationId: course.organization?.id ?? "",
     status: course.status,
     relevance: course.relevance,
     url: course.url ?? "",
     image: course.image ?? "",
     hours: course.hours ?? 0,
-    skills: (course.skills ?? []).map((skill) => skill.id),
+    skillIds: (course.skills ?? []).map((skill) => skill.id),
     i18n: course.i18n.map((translation) => ({
       locale: translation.locale,
       title: translation.messages.title,
@@ -139,13 +139,13 @@ export function CourseForm({
   const form = useForm({
     defaultValues: {
       slug: "",
-      organization: "",
+      organizationId: "",
       status: CourseStatus.Complete,
       relevance: 1,
       url: "",
       image: "",
       hours: 0,
-      skills: [] as string[],
+      skillIds: [] as string[],
       i18n: createEmptyI18n({ title: "", description: "" }),
       ...defaultValues,
     },
@@ -171,7 +171,7 @@ export function CourseForm({
         items: findManySkills.data?.nodes,
         lookupKey: "id",
         labelKey: "name",
-        targetValues: form.getFieldValue("skills"),
+        targetValues: form.getFieldValue("skillIds"),
       });
       if (!skills.length) return toast.error("At least one skill is required");
 
@@ -188,7 +188,7 @@ export function CourseForm({
       details.push({ key: "Status", value: [status] });
 
       const organization = findManyOrganizations.data?.nodes.find(
-        (org) => org.id === form.getFieldValue("organization")
+        (org) => org.id === form.getFieldValue("organizationId")
       );
       if (!organization) return toast.error("Organization is required");
 
@@ -294,7 +294,7 @@ export function CourseForm({
           />
         )}
       </Field>
-      <Field name="organization">
+      <Field name="organizationId">
         {(field) => (
           <SelectInput
             disabled={!organizationOptions.length}
@@ -374,7 +374,7 @@ export function CourseForm({
           />
         )}
       </Field>
-      <Field name="skills">
+      <Field name="skillIds">
         {(field) => (
           <MultiSelectInput
             error={fieldError(field.state.meta)}

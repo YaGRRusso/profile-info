@@ -40,7 +40,7 @@ export class ProjectModel extends BaseModel {
   @Prop({
     type: [{ type: mongoose.Schema.Types.ObjectId, ref: SkillModel.name }],
   })
-  skills?: (mongoose.Types.ObjectId | string)[];
+  skillIds?: (mongoose.Types.ObjectId | string)[];
 
   @Prop({
     type: [{ type: createTranslationModel(ProjectMessagesModel) }],

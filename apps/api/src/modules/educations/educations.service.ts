@@ -124,12 +124,12 @@ export class EducationsService {
 
   async detachSkill(skillId: string): Promise<void> {
     await this.repository.updateMany(
-      { skills: skillId },
-      { $pull: { skills: skillId } }
+      { skillIds: skillId },
+      { $pull: { skillIds: skillId } }
     );
   }
 
   async purgeByOrganization(organizationId: string): Promise<void> {
-    await this.repository.deleteMany({ organization: organizationId });
+    await this.repository.deleteMany({ organizationId });
   }
 }

@@ -120,10 +120,10 @@ When a referenced resource is deleted, emitter services fire domain events **bef
 
 Listeners are thin (`@OnEvent` + delegate to a service method). All MongoDB writes stay in the consumer's service.
 
-- `skill.deleted` (`skills` → `projects`): `$pull` from `skills` array via `detachSkill`
-- `skill.deleted` (`skills` → `courses`): `$pull` from `skills` array via `detachSkill`
-- `skill.deleted` (`skills` → `educations`): `$pull` from `skills` array via `detachSkill`
-- `skill.deleted` (`skills` → `experiences`): `$pull` from nested `roles.skills` via `detachSkill`
+- `skill.deleted` (`skills` → `projects`): `$pull` from `skillIds` array via `detachSkill`
+- `skill.deleted` (`skills` → `courses`): `$pull` from `skillIds` array via `detachSkill`
+- `skill.deleted` (`skills` → `educations`): `$pull` from `skillIds` array via `detachSkill`
+- `skill.deleted` (`skills` → `experiences`): `$pull` from nested `roles.skillIds` via `detachSkill`
 - `organization.deleted` (`organizations` → `courses`): hard `deleteMany` via `purgeByOrganization`
 - `organization.deleted` (`organizations` → `educations`): hard `deleteMany` via `purgeByOrganization`
 - `organization.deleted` (`organizations` → `experiences`): hard `deleteMany` via `purgeByOrganization`

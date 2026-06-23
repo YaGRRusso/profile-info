@@ -119,8 +119,8 @@ export class ProjectsService {
 
   async detachSkill(skillId: string): Promise<void> {
     await this.repository.updateMany(
-      { skills: skillId },
-      { $pull: { skills: skillId } }
+      { skillIds: skillId },
+      { $pull: { skillIds: skillId } }
     );
   }
 }

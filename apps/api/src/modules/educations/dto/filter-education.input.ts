@@ -6,13 +6,13 @@ export class FilterEducationInput extends PartialType(
   PickType(CreateEducationInput, [
     "relevance",
     "slug",
-    "organization",
+    "organizationId",
     "level",
     "status",
     "url",
     "image",
     "i18n",
     "period",
-    "skills",
+    "skillIds",
   ] as const)
 ) {}

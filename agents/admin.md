@@ -30,7 +30,7 @@ Routing:
 - `_authenticated/_sidebar/`: CRUD pages per entity with `-components/table.tsx`.
 - `settings/index.tsx`: inline profile form via `useGetMe()` + `useUpdateMe()` (`updateMe` mutation); syncs auth store after save.
 
-Rich forms map flat Zod schemas to nested GraphQL shapes (`i18n`, `organization`, `skills`, `period`, experience `roles`). Profile settings uses `forms/profile.tsx` (`profileToForm` / `profileToInput`).
+Rich forms map flat Zod schemas to nested GraphQL shapes (`i18n`, `organizationId`, `skillIds`, `period`, experience `roles`). GraphQL output still exposes resolved `organization` and `skills` objects. Profile settings uses `forms/profile.tsx` (`profileToForm` / `profileToInput`).
 
 ## Core technologies
 

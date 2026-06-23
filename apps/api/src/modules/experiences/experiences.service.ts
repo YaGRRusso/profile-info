@@ -128,13 +128,13 @@ export class ExperiencesService {
 
   async detachSkill(skillId: string): Promise<void> {
     await this.repository.updateMany(
-      { "roles.skills": skillId },
-      { $pull: { "roles.$[roleElem].skills": skillId } },
-      { arrayFilters: [{ "roleElem.skills": skillId }] }
+      { "roles.skillIds": skillId },
+      { $pull: { "roles.$[roleElem].skillIds": skillId } },
+      { arrayFilters: [{ "roleElem.skillIds": skillId }] }
     );
   }
 
   async purgeByOrganization(organizationId: string): Promise<void> {
-    await this.repository.deleteMany({ organization: organizationId });
+    await this.repository.deleteMany({ organizationId });
   }
 }

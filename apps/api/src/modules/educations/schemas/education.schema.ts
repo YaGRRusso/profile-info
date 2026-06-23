@@ -36,7 +36,7 @@ export class EducationModel extends BaseModel {
   ownerId: mongoose.Types.ObjectId | string;
 
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: OrganizationModel.name })
-  organization?: (mongoose.Types.ObjectId | string) | string;
+  organizationId?: (mongoose.Types.ObjectId | string) | string;
 
   @Prop({
     type: String,
@@ -76,7 +76,7 @@ export class EducationModel extends BaseModel {
   @Prop({
     type: [{ type: mongoose.Schema.Types.ObjectId, ref: SkillModel.name }],
   })
-  skills?: ((mongoose.Types.ObjectId | string) | string)[];
+  skillIds?: ((mongoose.Types.ObjectId | string) | string)[];
 
   @Prop({
     type: SchemaFactory.createForClass(DateRangeModel),

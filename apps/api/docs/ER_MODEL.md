@@ -10,6 +10,7 @@
 - **Top-level entities:** User, Skill, Organization, Experience, Education, Course, Project, ApiToken (planned — ADR 001 lot 6)
 - **Schema sources:** `apps/api/src/modules/*/schemas/`, `apps/api/src/core/schemas/`
 - **Tenancy:** A tenant is a `User`. Private entities (`Experience`, `Education`, `Course`, `Project`) require `ownerId` → `User`. Global catalog (`Skill`, `Organization`) has no `ownerId`.
+- **FK naming (Mongo):** every stored reference uses an explicit `*Id` / `*Ids` suffix (`ownerId`, `organizationId`, `skillIds`). GraphQL output resolves related entities (`organization`, `skills`) via `@ResolveField` + DataLoaders — not Mongoose `.populate()`.
 
 ## Diagram
 
@@ -45,20 +46,20 @@ erDiagram
     ObjectId _id PK
     ObjectId ownerId FK
     string slug "UK per owner"
-    ObjectId organization FK
+    ObjectId organizationId FK
     object roles "embed"
   }
   ExperienceRole {
     object i18n "embed"
     object period "embed"
-    ObjectId skills FK "array"
+    ObjectId skillIds FK "array"
   }
   Education {
     ObjectId _id PK
     ObjectId ownerId FK
     string slug "UK per owner"
-    ObjectId organization FK
-    ObjectId skills FK "array"
+    ObjectId organizationId FK
+    ObjectId skillIds FK "array"
     string level
     string status
   }
@@ -66,8 +67,8 @@ erDiagram
     ObjectId _id PK
     ObjectId ownerId FK
     string slug "UK per owner"
-    ObjectId organization FK
-    ObjectId skills FK "array"
+    ObjectId organizationId FK
+    ObjectId skillIds FK "array"
     string status
     number hours
   }
@@ -75,7 +76,7 @@ erDiagram
     ObjectId _id PK
     ObjectId ownerId FK
     string slug "UK per owner"
-    ObjectId skills FK "array"
+    ObjectId skillIds FK "array"
     string images "array"
   }
   Skill {
@@ -97,36 +98,33 @@ erDiagram
   User ||--o{ Project : ownerId
   User ||--o{ ApiToken : userId
   Project ||--o{ UrlEmbed : urls
-  Organization ||--o{ Experience : organization
-  Organization ||--o{ Education : organization
-  Organization ||--o{ Course : organization
+  Organization ||--o{ Experience : organizationId
+  Organization ||--o{ Education : organizationId
+  Organization ||--o{ Course : organizationId
   Experience ||--|{ ExperienceRole : roles
-  Skill ||--o{ ExperienceRole : skills
-  Skill ||--o{ Education : skills
-  Skill ||--o{ Course : skills
-  Skill ||--o{ Project : skills
+  Skill ||--o{ ExperienceRole : skillIds
+  Skill ||--o{ Education : skillIds
+  Skill ||--o{ Course : skillIds
+  Skill ||--o{ Project : skillIds
 ```
 
-### Why Organization and Skill look different
+### Catalog references (`organizationId`, `skillIds`)
 
 Both are MongoDB `ObjectId` references. The FK always lives on the document that
 **owns** the pointer (Experience, Education, etc.), never on Organization or Skill.
 
-- **Organization (`organization`, scalar `ObjectId`):** many-to-one. Each
-  Experience/Education/Course points to at most one org. Diagram:
-  `Organization ||--o{ Child`. Field: `ObjectId organization FK` on the child block.
-- **Skill (`skills`, `ObjectId[]`):** many-to-many in practice. Each
+- **Organization (`organizationId`, scalar `ObjectId`):** many-to-one. Each
+  Experience/Education/Course points to at most one org.
+- **Skill (`skillIds`, `ObjectId[]`):** many-to-many in practice. Each
   Education/Course/Project/role stores many skill ids; the same skill id appears on many
-  owners. Diagram: `Skill ||--o{ Owner : skills` (referenced collection on the left,
-  same convention as Organization). Field: `ObjectId skills FK "array of refs"` on the
-  owner block.
-- **Experience:** `organization FK` is on the root document; `skills` only on embedded
+  owners.
+- **Experience:** `organizationId` is on the root document; `skillIds` only on embedded
   `ExperienceRole`, so the Skill edge attaches to `ExperienceRole`, not `Experience`.
 - **Private entities:** `ownerId` → `User` (required). Slug uniqueness is compound
   `{ ownerId, slug }`, not global.
 
-The `ObjectId … FK` lines inside entity blocks are the stored refs; Mermaid edges show
-which collection is pointed at.
+GraphQL exposes resolved `organization` and `skills` objects on output; create/update
+inputs use `organizationId` and `skillIds`.
 
 ## Entities
 
@@ -162,8 +160,8 @@ which collection is pointed at.
 - **Source:** `src/modules/experiences/schemas/experience.schema.ts`
 - **Key fields:** `ownerId` (required, ref → User), `slug` (unique per owner via
   `{ ownerId, slug }` index), `category` (enum, indexed), `relevance`
-- **Embedded:** `roles[]` (`ExperienceRole`: `i18n[]`, `period`, `skills[]`)
-- **References:** `ownerId` → User; `organization` → Organization (optional ObjectId)
+- **Embedded:** `roles[]` (`ExperienceRole`: `i18n[]`, `period`, `skillIds[]`)
+- **References:** `ownerId` → User; `organizationId` → Organization (optional ObjectId)
 
 ### Education (`educations`)
 
@@ -171,7 +169,7 @@ which collection is pointed at.
 - **Key fields:** `ownerId` (required), `slug` (unique per owner), `level` (enum,
   indexed), `status` (enum, indexed), `url`, `image`, `relevance`, `period`, `i18n[]`
 - **Embedded:** `i18n[]` translations, `period` (`DateRange`: `from`, `to`)
-- **References:** `ownerId` → User; `organization` → Organization; `skills[]` → Skill
+- **References:** `ownerId` → User; `organizationId` → Organization; `skillIds[]` → Skill
 
 ### Course (`courses`)
 
@@ -179,7 +177,7 @@ which collection is pointed at.
 - **Key fields:** `ownerId` (required), `slug` (unique per owner), `status` (enum,
   indexed), `url`, `image`, `hours`, `relevance`, `period`, `i18n[]`
 - **Embedded:** `i18n[]` translations, `period`
-- **References:** `ownerId` → User; `organization` → Organization; `skills[]` → Skill
+- **References:** `ownerId` → User; `organizationId` → Organization; `skillIds[]` → Skill
 
 ### Project (`projects`)
 
@@ -187,7 +185,7 @@ which collection is pointed at.
 - **Key fields:** `ownerId` (required), `slug` (unique per owner), `relevance`,
   `images[]`, `i18n[]`
 - **Embedded:** `i18n[]` translations, `urls[]` (`UrlEmbed`)
-- **References:** `ownerId` → User; `skills[]` → Skill
+- **References:** `ownerId` → User; `skillIds[]` → Skill
 
 ### ApiToken (`api_tokens`) — planned (ADR 001 lot 6)
 
@@ -209,13 +207,13 @@ which collection is pointed at.
 
 1. **User** owns many **Experience**, **Education**, **Course**, **Project** via required
    `ownerId`. Same slug may exist on different users (compound unique index).
-2. Experience, Education, Course optionally reference **one** Organization (`organization`:
+2. Experience, Education, Course optionally reference **one** Organization (`organizationId`:
    scalar `ObjectId`).
 3. Education, Course, Project, and embedded Experience roles reference **many** Skills
-   (`skills`: `ObjectId[]`). Same skill `_id` can appear on multiple owners (many-to-many).
+   (`skillIds`: `ObjectId[]`). Same skill `_id` can appear on multiple owners (many-to-many).
 4. User and Project embed URL pairs; no separate `urls` collection.
 5. Experience embeds an ordered list of roles; each role embeds its own i18n, period, and
-   `skills[]`.
+   `skillIds[]`.
 6. **ApiToken** belongs to one **User** (session JWT manages token CRUD).
 
 ## Delete and lifecycle notes

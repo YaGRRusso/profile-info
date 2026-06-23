@@ -276,13 +276,13 @@ async function seed() {
     buildMany(8, (index) => ({
       ownerId: ownerForIndex(index),
       slug: slugFor(faker.company.catchPhrase(), index),
-      organization: randomOrganization(),
+      organizationId: randomOrganization(),
       status: faker.helpers.arrayElement(STATUSES),
       relevance: relevance(),
       hours: faker.number.int({ min: 8, max: 400 }),
       url: faker.internet.url(),
       image: faker.image.urlPicsumPhotos(),
-      skills: randomSkills(),
+      skillIds: randomSkills(),
       i18n: i18n({
         title: faker.lorem.words({ min: 8, max: 16 }),
         description: faker.lorem.sentences({ min: 8, max: 64 }),
@@ -294,11 +294,11 @@ async function seed() {
     buildMany(4, (index) => ({
       ownerId: ownerForIndex(index),
       slug: slugFor(faker.company.catchPhrase(), index),
-      organization: randomOrganization(),
+      organizationId: randomOrganization(),
       level: faker.helpers.arrayElement(EDUCATION_LEVELS),
       status: faker.helpers.arrayElement(STATUSES),
       relevance: relevance(),
-      skills: randomSkills(),
+      skillIds: randomSkills(),
       period: period(),
       i18n: i18n({
         title: faker.lorem.words({ min: 8, max: 16 }),
@@ -315,7 +315,7 @@ async function seed() {
       images: faker.helpers.multiple(() => faker.image.url(), {
         count: { min: 1, max: 3 },
       }),
-      skills: randomSkills(),
+      skillIds: randomSkills(),
       urls: faker.helpers.arrayElements(URL_TYPES).map((type) => ({
         title: type,
         value: faker.internet.url(),
@@ -331,12 +331,12 @@ async function seed() {
     buildMany(6, (index) => ({
       ownerId: ownerForIndex(index),
       slug: slugFor(faker.person.jobTitle(), index),
-      organization: randomOrganization(),
+      organizationId: randomOrganization(),
       category: faker.helpers.arrayElement(EXPERIENCE_CATEGORIES),
       relevance: relevance(),
       roles: buildMany(faker.number.int({ min: 1, max: 3 }), () => ({
         period: period(),
-        skills: randomSkills(),
+        skillIds: randomSkills(),
         i18n: i18n({
           title: faker.lorem.words({ min: 8, max: 16 }),
           description: faker.lorem.sentences({ min: 8, max: 64 }),

@@ -99,7 +99,7 @@ describe("Dashboard (e2e)", () => {
 
     await coursesService.createOne(userCtx, {
       slug: "dashboard-course-complete",
-      organization: organization._id.toString(),
+      organizationId: organization._id.toString(),
       status: CourseStatus.COMPLETE,
       i18n: [
         {
@@ -111,7 +111,7 @@ describe("Dashboard (e2e)", () => {
 
     await coursesService.createOne(userCtx, {
       slug: "dashboard-course-progress",
-      organization: organization._id.toString(),
+      organizationId: organization._id.toString(),
       status: CourseStatus.IN_PROGRESS,
       i18n: [
         {
@@ -124,7 +124,7 @@ describe("Dashboard (e2e)", () => {
     await educationsService.createOne(null, {
       slug: "dashboard-education",
       ownerId: user._id.toString(),
-      organization: organization._id.toString(),
+      organizationId: organization._id.toString(),
       level: EducationLevel.BACHELOR,
       status: EducationStatus.COMPLETE,
       i18n: [

@@ -33,7 +33,7 @@ const projectSchema = z.object({
     .min(1, "required field")
     .regex(SLUG_REGEX, "invalid field format"),
   relevance: z.number().min(1, "must be a positive number"),
-  skills: z.array(z.string()),
+  skillIds: z.array(z.string()),
   images: z.array(z.url()),
   urls: z.array(
     z.object({
@@ -69,7 +69,7 @@ export function projectToInput(data: ProjectSchema): CreateProjectInput {
   return {
     slug: data.slug,
     relevance: data.relevance,
-    skills: data.skills.length ? data.skills : undefined,
+    skillIds: data.skillIds.length ? data.skillIds : undefined,
     images: data.images.length ? data.images : undefined,
     urls: data.urls.length ? data.urls : undefined,
     i18n: data.i18n.map((translation) => ({
@@ -86,7 +86,7 @@ export function projectToForm(project: ProjectRow): Partial<ProjectSchema> {
   return {
     slug: project.slug,
     relevance: project.relevance,
-    skills: (project.skills ?? []).map((skill) => skill.id),
+    skillIds: (project.skills ?? []).map((skill) => skill.id),
     images: project.images ?? [],
     urls: (project.urls ?? []).map((url) => ({
       title: url.title,
@@ -124,7 +124,7 @@ export function ProjectForm({
     defaultValues: {
       slug: "",
       relevance: 1,
-      skills: [] as string[],
+      skillIds: [] as string[],
       images: [] as string[],
       urls: [] as { title: string; value: string }[],
       i18n: createEmptyI18n({ title: "", description: "" }),
@@ -152,7 +152,7 @@ export function ProjectForm({
         items: findManySkills.data?.nodes,
         lookupKey: "id",
         labelKey: "name",
-        targetValues: form.getFieldValue("skills"),
+        targetValues: form.getFieldValue("skillIds"),
       });
       if (!skills.length) return toast.error("At least one skill is required");
 
@@ -264,7 +264,7 @@ export function ProjectForm({
           />
         )}
       </Field>
-      <Field name="skills">
+      <Field name="skillIds">
         {(field) => (
           <MultiSelectInput
             error={fieldError(field.state.meta)}

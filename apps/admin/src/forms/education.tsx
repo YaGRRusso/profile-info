@@ -37,13 +37,13 @@ const educationSchema = z.object({
     .string()
     .min(1, "required field")
     .regex(SLUG_REGEX, "invalid field format"),
-  organization: z.string().min(1, "required field"),
+  organizationId: z.string().min(1, "required field"),
   level: z.enum(EducationLevel, "required field"),
   status: z.enum(EducationStatus, "required field"),
   relevance: z.number().min(1, "must be a positive number"),
   url: z.url().or(z.literal("")),
   image: z.url().or(z.literal("")),
-  skills: z.array(z.string()),
+  skillIds: z.array(z.string()),
   i18n: z
     .array(
       z.object({
@@ -81,13 +81,13 @@ export function educationToInput(data: EducationSchema): CreateEducationInput {
 
   return {
     slug: data.slug,
-    organization: data.organization,
+    organizationId: data.organizationId,
     level: data.level,
     status: data.status,
     relevance: data.relevance,
     url: data.url || undefined,
     image: data.image || undefined,
-    skills: data.skills.length ? data.skills : undefined,
+    skillIds: data.skillIds.length ? data.skillIds : undefined,
     period,
     i18n: data.i18n.map((translation) => ({
       locale: translation.locale,
@@ -104,13 +104,13 @@ export function educationToForm(
 ): Partial<EducationSchema> {
   return {
     slug: education.slug,
-    organization: education.organization?.id ?? "",
+    organizationId: education.organization?.id ?? "",
     level: education.level,
     status: education.status,
     relevance: education.relevance,
     url: education.url ?? "",
     image: education.image ?? "",
-    skills: (education.skills ?? []).map((skill) => skill.id),
+    skillIds: (education.skills ?? []).map((skill) => skill.id),
     period: {
       from: toDateInput(education.period?.from),
       to: toDateInput(education.period?.to),
@@ -163,13 +163,13 @@ export function EducationForm({
   const form = useForm({
     defaultValues: {
       slug: "",
-      organization: "",
+      organizationId: "",
       level: EducationLevel.Bachelor,
       status: EducationStatus.Complete,
       relevance: 1,
       url: "",
       image: "",
-      skills: [] as string[],
+      skillIds: [] as string[],
       period: { from: "", to: "" },
       i18n: createEmptyI18n({ title: "", description: "" }),
       ...defaultValues,
@@ -196,7 +196,7 @@ export function EducationForm({
         items: findManySkills.data?.nodes,
         lookupKey: "id",
         labelKey: "name",
-        targetValues: form.getFieldValue("skills"),
+        targetValues: form.getFieldValue("skillIds"),
       });
       if (!skills.length) return toast.error("At least one skill is required");
 
@@ -220,7 +220,7 @@ export function EducationForm({
       details.push({ key: "Status", value: [status] });
 
       const organization = findManyOrganizations.data?.nodes.find(
-        (org) => org.id === form.getFieldValue("organization")
+        (org) => org.id === form.getFieldValue("organizationId")
       );
       if (!organization) return toast.error("Organization is required");
 
@@ -326,7 +326,7 @@ export function EducationForm({
           />
         )}
       </Field>
-      <Field name="organization">
+      <Field name="organizationId">
         {(field) => (
           <SelectInput
             disabled={!organizationOptions.length}
@@ -416,7 +416,7 @@ export function EducationForm({
           />
         )}
       </Field>
-      <Field name="skills">
+      <Field name="skillIds">
         {(field) => (
           <MultiSelectInput
             error={fieldError(field.state.meta)}

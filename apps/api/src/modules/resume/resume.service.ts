@@ -92,17 +92,17 @@ export class ResumeService {
     const organizationIds = new Set<string>();
 
     for (const experience of experiencesResult.nodes) {
-      const organizationId = toIdString(experience.organization);
+      const organizationId = toIdString(experience.organizationId);
       if (organizationId) organizationIds.add(organizationId);
     }
 
     for (const education of educationsResult.nodes) {
-      const organizationId = toIdString(education.organization);
+      const organizationId = toIdString(education.organizationId);
       if (organizationId) organizationIds.add(organizationId);
     }
 
     for (const course of coursesResult.nodes) {
-      const organizationId = toIdString(course.organization);
+      const organizationId = toIdString(course.organizationId);
       if (organizationId) organizationIds.add(organizationId);
     }
 
@@ -169,7 +169,7 @@ export class ResumeService {
   ): ResumeExperience[] {
     return experiences.map((experience) => {
       const organization = organizationMap.get(
-        String(experience.organization ?? "")
+        String(experience.organizationId ?? "")
       );
 
       const roles = sortDateRange(experience.roles ?? [])
@@ -207,7 +207,7 @@ export class ResumeService {
       if (!translation) return [];
 
       const organization = organizationMap.get(
-        String(education.organization ?? "")
+        String(education.organizationId ?? "")
       );
 
       const description = truncateText(
@@ -236,7 +236,7 @@ export class ResumeService {
       if (!translation) return [];
 
       const organization = organizationMap.get(
-        String(course.organization ?? "")
+        String(course.organizationId ?? "")
       );
 
       return [

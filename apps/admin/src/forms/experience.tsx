@@ -36,7 +36,7 @@ const experienceSchema = z.object({
     .string()
     .min(1, "required field")
     .regex(SLUG_REGEX, "invalid field format"),
-  organization: z.string().min(1, "required field"),
+  organizationId: z.string().min(1, "required field"),
   category: z.enum(ExperienceCategory, "required field"),
   relevance: z.number().min(1, "must be a positive number"),
   roles: z
@@ -64,7 +64,7 @@ const experienceSchema = z.object({
             (range) => !(range.from && range.to) || range.from <= range.to,
             { message: "end date must be after start date" }
           ),
-        skills: z.array(z.string()),
+        skillIds: z.array(z.string()),
       })
     )
     .min(1, "required group"),
@@ -81,7 +81,7 @@ export function experienceToInput(
 ): CreateExperienceInput {
   return {
     slug: data.slug,
-    organization: data.organization,
+    organizationId: data.organizationId,
     category: data.category,
     relevance: data.relevance,
     roles: data.roles.map((role) => ({
@@ -96,7 +96,7 @@ export function experienceToInput(
         role.period.from || role.period.to
           ? { from: toIsoDate(role.period.from), to: toIsoDate(role.period.to) }
           : undefined,
-      skills: role.skills.length ? role.skills : undefined,
+      skillIds: role.skillIds.length ? role.skillIds : undefined,
     })),
   };
 }
@@ -106,7 +106,7 @@ export function experienceToForm(
 ): Partial<ExperienceSchema> {
   return {
     slug: experience.slug,
-    organization: experience.organization?.id ?? "",
+    organizationId: experience.organization?.id ?? "",
     category: experience.category,
     relevance: experience.relevance,
     roles: (experience.roles ?? []).map((role) => ({
@@ -119,7 +119,7 @@ export function experienceToForm(
         from: toDateInput(role.period?.from),
         to: toDateInput(role.period?.to),
       },
-      skills: (role.skills ?? []).map((skill) => skill.id),
+      skillIds: (role.skills ?? []).map((skill) => skill.id),
     })),
   };
 }
@@ -133,7 +133,7 @@ function emptyRole() {
   return {
     i18n: createEmptyI18n({ title: "", description: "" }),
     period: { from: "", to: "" },
-    skills: [] as string[],
+    skillIds: [] as string[],
   };
 }
 
@@ -167,7 +167,7 @@ export function ExperienceForm({
   const form = useForm({
     defaultValues: {
       slug: "",
-      organization: "",
+      organizationId: "",
       category: ExperienceCategory.FullTime,
       relevance: 1,
       roles: [emptyRole()],
@@ -196,7 +196,7 @@ export function ExperienceForm({
         items: findManySkills.data?.nodes,
         lookupKey: "id",
         labelKey: "name",
-        targetValues: fieldParent.skills,
+        targetValues: fieldParent.skillIds,
       });
       if (!skills.length) return toast.error("At least one skill is required");
 
@@ -219,7 +219,7 @@ export function ExperienceForm({
       details.push({ key: "Category", value: [category] });
 
       const organization = findManyOrganizations.data?.nodes.find(
-        (org) => org.id === form.getFieldValue("organization")
+        (org) => org.id === form.getFieldValue("organizationId")
       );
       if (!organization) return toast.error("Organization is required");
 
@@ -322,7 +322,7 @@ export function ExperienceForm({
           />
         )}
       </Field>
-      <Field name="organization">
+      <Field name="organizationId">
         {(field) => (
           <SelectInput
             disabled={!organizationOptions.length}
@@ -394,7 +394,7 @@ export function ExperienceForm({
                   )}
                 </Field>
 
-                <Field name={`roles[${roleIndex}].skills`}>
+                <Field name={`roles[${roleIndex}].skillIds`}>
                   {(field) => (
                     <MultiSelectInput
                       error={fieldError(field.state.meta)}

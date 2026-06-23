@@ -162,15 +162,15 @@ export class EducationsResolver {
 
   @ResolveField(() => OrganizationEntity)
   organization(@Parent() education: EducationModel, @Context() ctx: Ctx) {
-    if (!education?.organization) return null;
+    if (!education?.organizationId) return null;
     return ctx.loaders.batchOrganizations.load(
-      education.organization.toString()
+      education.organizationId.toString()
     );
   }
 
   @ResolveField(() => [SkillEntity])
   skills(@Parent() education: EducationModel, @Context() ctx: Ctx) {
-    const ids = education.skills?.map((id) => id.toString());
+    const ids = education.skillIds?.map((id) => id.toString());
     if (!ids) return [];
     return ctx.loaders.batchSkills.loadMany(ids);
   }

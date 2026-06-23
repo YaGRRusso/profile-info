@@ -176,9 +176,9 @@ export class ExperiencesResolver {
 
   @ResolveField(() => OrganizationEntity)
   organization(@Parent() experience: ExperienceModel, @Context() ctx: Ctx) {
-    if (!experience?.organization) return null;
+    if (!experience?.organizationId) return null;
     return ctx.loaders.batchOrganizations.load(
-      experience.organization.toString()
+      experience.organizationId.toString()
     );
   }
 
@@ -187,8 +187,8 @@ export class ExperiencesResolver {
     const ids = new Set<string>();
 
     for (const role of experience.roles) {
-      if (role.skills) {
-        for (const skill of role.skills) {
+      if (role.skillIds) {
+        for (const skill of role.skillIds) {
           ids.add(skill.toString());
         }
       }
@@ -202,7 +202,7 @@ export class ExperiencesResolver {
 export class ExperienceRoleResolver {
   @ResolveField(() => [SkillEntity])
   skills(@Parent() role: ExperienceRoleModel, @Context() ctx: Ctx) {
-    const ids = role.skills?.map((id) => id.toString());
+    const ids = role.skillIds?.map((id) => id.toString());
     if (!ids) return [];
     return ctx.loaders.batchSkills.loadMany(ids);
   }

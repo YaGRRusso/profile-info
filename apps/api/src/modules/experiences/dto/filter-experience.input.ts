@@ -6,7 +6,7 @@ export class FilterExperienceInput extends PartialType(
   PickType(CreateExperienceInput, [
     "relevance",
     "slug",
-    "organization",
+    "organizationId",
     "category",
     "roles",
   ] as const)

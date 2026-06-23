@@ -151,7 +151,7 @@ export class ProjectsResolver {
 
   @ResolveField(() => [SkillEntity])
   skills(@Parent() project: ProjectModel, @Context() ctx: Ctx) {
-    const ids = project.skills?.map((id) => id.toString());
+    const ids = project.skillIds?.map((id) => id.toString());
     if (!ids) return [];
     return ctx.loaders.batchSkills.loadMany(ids);
   }

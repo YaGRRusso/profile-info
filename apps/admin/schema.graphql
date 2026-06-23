@@ -77,10 +77,10 @@ input CreateCourseInput {
   hours: Int
   i18n: [CreateCourseMessagesInputTranslationInput!]!
   image: String
-  organization: String!
+  organizationId: String!
   period: DateRangeInput
   relevance: Float
-  skills: [String!]
+  skillIds: [String!]
   slug: String!
   status: CourseStatus!
   url: String
@@ -100,10 +100,10 @@ input CreateEducationInput {
   i18n: [CreateEducationMessagesInputTranslationInput!]!
   image: String
   level: EducationLevel!
-  organization: String!
+  organizationId: String!
   period: DateRangeInput
   relevance: Float
-  skills: [String!]
+  skillIds: [String!]
   slug: String!
   status: EducationStatus!
   url: String
@@ -121,7 +121,7 @@ input CreateEducationMessagesInputTranslationInput {
 
 input CreateExperienceInput {
   category: ExperienceCategory!
-  organization: String!
+  organizationId: String!
   relevance: Float
   roles: [CreateExperienceRoleInput!]!
   slug: String!
@@ -140,7 +140,7 @@ input CreateExperienceMessagesInputTranslationInput {
 input CreateExperienceRoleInput {
   i18n: [CreateExperienceMessagesInputTranslationInput!]!
   period: DateRangeInput
-  skills: [String!]
+  skillIds: [String!]
 }
 
 input CreateOrganizationInput {
@@ -166,7 +166,7 @@ input CreateProjectInput {
   i18n: [CreateProjectMessagesInputTranslationInput!]!
   images: [String!]
   relevance: Float
-  skills: [String!]
+  skillIds: [String!]
   slug: String!
   urls: [UrlInput!]
 }
@@ -351,10 +351,10 @@ input FilterCourseInput {
   hours: Int
   i18n: [CreateCourseMessagesInputTranslationInput!]
   image: String
-  organization: String
+  organizationId: String
   period: DateRangeInput
   relevance: Float
-  skills: [String!]
+  skillIds: [String!]
   slug: String
   status: CourseStatus
   url: String
@@ -364,10 +364,10 @@ input FilterEducationInput {
   i18n: [CreateEducationMessagesInputTranslationInput!]
   image: String
   level: EducationLevel
-  organization: String
+  organizationId: String
   period: DateRangeInput
   relevance: Float
-  skills: [String!]
+  skillIds: [String!]
   slug: String
   status: EducationStatus
   url: String
@@ -375,7 +375,7 @@ input FilterEducationInput {
 
 input FilterExperienceInput {
   category: ExperienceCategory
-  organization: String
+  organizationId: String
   relevance: Float
   roles: [CreateExperienceRoleInput!]
   slug: String
@@ -395,7 +395,7 @@ input FilterProjectInput {
   i18n: [CreateProjectMessagesInputTranslationInput!]
   images: [String!]
   relevance: Float
-  skills: [String!]
+  skillIds: [String!]
   slug: String
   urls: [UrlInput!]
 }
@@ -698,10 +698,10 @@ input UpdateCourseInput {
   hours: Int
   i18n: [CreateCourseMessagesInputTranslationInput!]
   image: String
-  organization: String
+  organizationId: String
   period: DateRangeInput
   relevance: Float
-  skills: [String!]
+  skillIds: [String!]
   slug: String
   status: CourseStatus
   url: String
@@ -711,10 +711,10 @@ input UpdateEducationInput {
   i18n: [CreateEducationMessagesInputTranslationInput!]
   image: String
   level: EducationLevel
-  organization: String
+  organizationId: String
   period: DateRangeInput
   relevance: Float
-  skills: [String!]
+  skillIds: [String!]
   slug: String
   status: EducationStatus
   url: String
@@ -722,7 +722,7 @@ input UpdateEducationInput {
 
 input UpdateExperienceInput {
   category: ExperienceCategory
-  organization: String
+  organizationId: String
   relevance: Float
   roles: [CreateExperienceRoleInput!]
   slug: String
@@ -755,7 +755,7 @@ input UpdateProjectInput {
   i18n: [CreateProjectMessagesInputTranslationInput!]
   images: [String!]
   relevance: Float
-  skills: [String!]
+  skillIds: [String!]
   slug: String
   urls: [UrlInput!]
 }

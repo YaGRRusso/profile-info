@@ -47,7 +47,7 @@ export class CreateProjectInput {
   images?: string[];
 
   @OptionalField(() => [String])
-  skills?: string[];
+  skillIds?: string[];
 
   @RequiredField(() => [ProjectTranslationInput])
   @IsArray()

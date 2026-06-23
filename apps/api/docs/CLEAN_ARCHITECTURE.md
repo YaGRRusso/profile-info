@@ -246,7 +246,7 @@ removeOneSkill(id)
       ▼            ▼            ▼              ▼
   Projects     Courses     Educations    Experiences
   $pull skill  $pull skill $pull skill   $pull from
-  from array   from array  from array   roles.skills
+  from array   from array  from array   roles.skillIds
 ```
 
 **Por que eventos e não chamada direta?**

@@ -98,10 +98,10 @@ export type CreateCourseInput = {
   hours?: InputMaybe<Scalars['Int']['input']>;
   i18n: Array<CreateCourseMessagesInputTranslationInput>;
   image?: InputMaybe<Scalars['String']['input']>;
-  organization: Scalars['String']['input'];
+  organizationId: Scalars['String']['input'];
   period?: InputMaybe<DateRangeInput>;
   relevance?: InputMaybe<Scalars['Float']['input']>;
-  skills?: InputMaybe<Array<Scalars['String']['input']>>;
+  skillIds?: InputMaybe<Array<Scalars['String']['input']>>;
   slug: Scalars['String']['input'];
   status: CourseStatus;
   url?: InputMaybe<Scalars['String']['input']>;
@@ -121,10 +121,10 @@ export type CreateEducationInput = {
   i18n: Array<CreateEducationMessagesInputTranslationInput>;
   image?: InputMaybe<Scalars['String']['input']>;
   level: EducationLevel;
-  organization: Scalars['String']['input'];
+  organizationId: Scalars['String']['input'];
   period?: InputMaybe<DateRangeInput>;
   relevance?: InputMaybe<Scalars['Float']['input']>;
-  skills?: InputMaybe<Array<Scalars['String']['input']>>;
+  skillIds?: InputMaybe<Array<Scalars['String']['input']>>;
   slug: Scalars['String']['input'];
   status: EducationStatus;
   url?: InputMaybe<Scalars['String']['input']>;
@@ -142,7 +142,7 @@ export type CreateEducationMessagesInputTranslationInput = {
 
 export type CreateExperienceInput = {
   category: ExperienceCategory;
-  organization: Scalars['String']['input'];
+  organizationId: Scalars['String']['input'];
   relevance?: InputMaybe<Scalars['Float']['input']>;
   roles: Array<CreateExperienceRoleInput>;
   slug: Scalars['String']['input'];
@@ -161,7 +161,7 @@ export type CreateExperienceMessagesInputTranslationInput = {
 export type CreateExperienceRoleInput = {
   i18n: Array<CreateExperienceMessagesInputTranslationInput>;
   period?: InputMaybe<DateRangeInput>;
-  skills?: InputMaybe<Array<Scalars['String']['input']>>;
+  skillIds?: InputMaybe<Array<Scalars['String']['input']>>;
 };
 
 export type CreateOrganizationInput = {
@@ -187,7 +187,7 @@ export type CreateProjectInput = {
   i18n: Array<CreateProjectMessagesInputTranslationInput>;
   images?: InputMaybe<Array<Scalars['String']['input']>>;
   relevance?: InputMaybe<Scalars['Float']['input']>;
-  skills?: InputMaybe<Array<Scalars['String']['input']>>;
+  skillIds?: InputMaybe<Array<Scalars['String']['input']>>;
   slug: Scalars['String']['input'];
   urls?: InputMaybe<Array<UrlInput>>;
 };
@@ -379,10 +379,10 @@ export type FilterCourseInput = {
   hours?: InputMaybe<Scalars['Int']['input']>;
   i18n?: InputMaybe<Array<CreateCourseMessagesInputTranslationInput>>;
   image?: InputMaybe<Scalars['String']['input']>;
-  organization?: InputMaybe<Scalars['String']['input']>;
+  organizationId?: InputMaybe<Scalars['String']['input']>;
   period?: InputMaybe<DateRangeInput>;
   relevance?: InputMaybe<Scalars['Float']['input']>;
-  skills?: InputMaybe<Array<Scalars['String']['input']>>;
+  skillIds?: InputMaybe<Array<Scalars['String']['input']>>;
   slug?: InputMaybe<Scalars['String']['input']>;
   status?: InputMaybe<CourseStatus>;
   url?: InputMaybe<Scalars['String']['input']>;
@@ -392,10 +392,10 @@ export type FilterEducationInput = {
   i18n?: InputMaybe<Array<CreateEducationMessagesInputTranslationInput>>;
   image?: InputMaybe<Scalars['String']['input']>;
   level?: InputMaybe<EducationLevel>;
-  organization?: InputMaybe<Scalars['String']['input']>;
+  organizationId?: InputMaybe<Scalars['String']['input']>;
   period?: InputMaybe<DateRangeInput>;
   relevance?: InputMaybe<Scalars['Float']['input']>;
-  skills?: InputMaybe<Array<Scalars['String']['input']>>;
+  skillIds?: InputMaybe<Array<Scalars['String']['input']>>;
   slug?: InputMaybe<Scalars['String']['input']>;
   status?: InputMaybe<EducationStatus>;
   url?: InputMaybe<Scalars['String']['input']>;
@@ -403,7 +403,7 @@ export type FilterEducationInput = {
 
 export type FilterExperienceInput = {
   category?: InputMaybe<ExperienceCategory>;
-  organization?: InputMaybe<Scalars['String']['input']>;
+  organizationId?: InputMaybe<Scalars['String']['input']>;
   relevance?: InputMaybe<Scalars['Float']['input']>;
   roles?: InputMaybe<Array<CreateExperienceRoleInput>>;
   slug?: InputMaybe<Scalars['String']['input']>;
@@ -423,7 +423,7 @@ export type FilterProjectInput = {
   i18n?: InputMaybe<Array<CreateProjectMessagesInputTranslationInput>>;
   images?: InputMaybe<Array<Scalars['String']['input']>>;
   relevance?: InputMaybe<Scalars['Float']['input']>;
-  skills?: InputMaybe<Array<Scalars['String']['input']>>;
+  skillIds?: InputMaybe<Array<Scalars['String']['input']>>;
   slug?: InputMaybe<Scalars['String']['input']>;
   urls?: InputMaybe<Array<UrlInput>>;
 };
@@ -1146,10 +1146,10 @@ export type UpdateCourseInput = {
   hours?: InputMaybe<Scalars['Int']['input']>;
   i18n?: InputMaybe<Array<CreateCourseMessagesInputTranslationInput>>;
   image?: InputMaybe<Scalars['String']['input']>;
-  organization?: InputMaybe<Scalars['String']['input']>;
+  organizationId?: InputMaybe<Scalars['String']['input']>;
   period?: InputMaybe<DateRangeInput>;
   relevance?: InputMaybe<Scalars['Float']['input']>;
-  skills?: InputMaybe<Array<Scalars['String']['input']>>;
+  skillIds?: InputMaybe<Array<Scalars['String']['input']>>;
   slug?: InputMaybe<Scalars['String']['input']>;
   status?: InputMaybe<CourseStatus>;
   url?: InputMaybe<Scalars['String']['input']>;
@@ -1159,10 +1159,10 @@ export type UpdateEducationInput = {
   i18n?: InputMaybe<Array<CreateEducationMessagesInputTranslationInput>>;
   image?: InputMaybe<Scalars['String']['input']>;
   level?: InputMaybe<EducationLevel>;
-  organization?: InputMaybe<Scalars['String']['input']>;
+  organizationId?: InputMaybe<Scalars['String']['input']>;
   period?: InputMaybe<DateRangeInput>;
   relevance?: InputMaybe<Scalars['Float']['input']>;
-  skills?: InputMaybe<Array<Scalars['String']['input']>>;
+  skillIds?: InputMaybe<Array<Scalars['String']['input']>>;
   slug?: InputMaybe<Scalars['String']['input']>;
   status?: InputMaybe<EducationStatus>;
   url?: InputMaybe<Scalars['String']['input']>;
@@ -1170,7 +1170,7 @@ export type UpdateEducationInput = {
 
 export type UpdateExperienceInput = {
   category?: InputMaybe<ExperienceCategory>;
-  organization?: InputMaybe<Scalars['String']['input']>;
+  organizationId?: InputMaybe<Scalars['String']['input']>;
   relevance?: InputMaybe<Scalars['Float']['input']>;
   roles?: InputMaybe<Array<CreateExperienceRoleInput>>;
   slug?: InputMaybe<Scalars['String']['input']>;
@@ -1203,7 +1203,7 @@ export type UpdateProjectInput = {
   i18n?: InputMaybe<Array<CreateProjectMessagesInputTranslationInput>>;
   images?: InputMaybe<Array<Scalars['String']['input']>>;
   relevance?: InputMaybe<Scalars['Float']['input']>;
-  skills?: InputMaybe<Array<Scalars['String']['input']>>;
+  skillIds?: InputMaybe<Array<Scalars['String']['input']>>;
   slug?: InputMaybe<Scalars['String']['input']>;
   urls?: InputMaybe<Array<UrlInput>>;
 };
