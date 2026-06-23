@@ -4,6 +4,7 @@ import {
   labelFromI18nTitle,
   RecentActivityRecord,
 } from "@/common/helpers/recent-activity.helper";
+import { toTenantScope } from "@/core/context/auth-context.helper";
 import type { AuthContext } from "@/core/context/auth-context.interface";
 import { BatchEntity } from "@/core/entities/batch.entity";
 import { PaginatedModel } from "@/core/schemas/paginated.schema";
@@ -16,30 +17,27 @@ import { EducationsRepository } from "./educations.repository";
 export class EducationsService {
   constructor(private readonly repository: EducationsRepository) {}
 
-  findOneById(_ctx: AuthContext | null, id: string): Promise<EducationModel> {
-    return this.repository.findOneById(id);
+  findOneById(ctx: AuthContext, id: string): Promise<EducationModel> {
+    return this.repository.tenant.findOneById(toTenantScope(ctx), id);
   }
 
   findOne(
-    _ctx: AuthContext | null,
+    ctx: AuthContext,
     {
       filters,
     }: {
       filters?: QueryFilter<EducationModel>;
     }
   ): Promise<EducationModel> {
-    return this.repository.findOne({ filters });
+    return this.repository.tenant.findOne(toTenantScope(ctx), { filters });
   }
 
-  findManyById(
-    _ctx: AuthContext | null,
-    ids: string[]
-  ): Promise<EducationModel[]> {
-    return this.repository.findManyById(ids);
+  findManyById(ctx: AuthContext, ids: string[]): Promise<EducationModel[]> {
+    return this.repository.tenant.findManyById(toTenantScope(ctx), ids);
   }
 
   findMany(
-    _ctx: AuthContext | null,
+    ctx: AuthContext,
     {
       filters,
       sort,
@@ -52,53 +50,64 @@ export class EducationsService {
       skip?: number;
     }
   ): Promise<PaginatedModel<EducationModel>> {
-    return this.repository.findMany({ filters, sort, skip, limit });
+    return this.repository.tenant.findMany(toTenantScope(ctx), {
+      filters,
+      sort,
+      skip,
+      limit,
+    });
   }
 
-  createOne(
-    _ctx: AuthContext | null,
+  async createOne(
+    ctx: AuthContext,
     createInput: CreateEducationInput
   ): Promise<EducationModel> {
-    return this.repository.createOne(createInput as AnyKeys<EducationModel>);
+    return await this.repository.tenant.createOne(
+      toTenantScope(ctx),
+      createInput as AnyKeys<EducationModel>
+    );
   }
 
-  createMany(
-    _ctx: AuthContext | null,
+  async createMany(
+    ctx: AuthContext,
     createInputs: CreateEducationInput[]
   ): Promise<BatchEntity> {
-    return this.repository.createMany(
+    return await this.repository.tenant.createMany(
+      toTenantScope(ctx),
       createInputs as AnyKeys<EducationModel>[]
     );
   }
 
   updateOne(
-    _ctx: AuthContext | null,
+    ctx: AuthContext,
     id: string,
     updateInput: UpdateEducationInput
   ): Promise<EducationModel> {
-    return this.repository.updateOneById(
+    return this.repository.tenant.updateOneById(
+      toTenantScope(ctx),
       id,
-      updateInput as object as UpdateQuery<EducationModel>
+      updateInput as UpdateQuery<EducationModel>
     );
   }
 
-  updateMany(
-    _ctx: AuthContext | null,
+  async updateMany(
+    ctx: AuthContext,
     ids: string[],
     updateInput: UpdateEducationInput
   ): Promise<BatchEntity> {
-    return this.repository.updateManyById(
+    return await this.repository.tenant.updateManyById(
+      toTenantScope(ctx),
       ids,
-      updateInput as object as UpdateQuery<EducationModel>
+      updateInput as UpdateQuery<EducationModel>
     );
   }
 
-  removeOne(_ctx: AuthContext | null, id: string): Promise<EducationModel> {
-    return this.repository.deleteOneById(id);
+  removeOne(ctx: AuthContext, id: string): Promise<EducationModel> {
+    return this.repository.tenant.deleteOneById(toTenantScope(ctx), id);
   }
 
-  removeMany(_ctx: AuthContext | null, ids: string[]): Promise<BatchEntity> {
-    return this.repository.deleteManyById(ids);
+  async removeMany(ctx: AuthContext, ids: string[]): Promise<BatchEntity> {
+    return await this.repository.tenant.deleteManyById(toTenantScope(ctx), ids);
   }
 
   count(): Promise<number> {

@@ -116,23 +116,6 @@ describe("CoursesService", () => {
         expect.objectContaining({ ownerId })
       );
     });
-
-    it("should ignore ownerId in input and use context userId", async () => {
-      const otherOwnerId = new mongoose.Types.ObjectId().toHexString();
-      (model.create as jest.Mock).mockResolvedValue(fakeDoc);
-
-      await service.createOne(ctx, {
-        slug: "bootcamp",
-        ownerId: otherOwnerId,
-      } as any);
-
-      expect(model.create).toHaveBeenCalledWith(
-        expect.objectContaining({ ownerId, slug: "bootcamp" })
-      );
-      expect(model.create).not.toHaveBeenCalledWith(
-        expect.objectContaining({ ownerId: otherOwnerId })
-      );
-    });
   });
 
   describe("updateOne", () => {

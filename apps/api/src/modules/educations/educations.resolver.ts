@@ -9,10 +9,7 @@ import {
   Resolver,
 } from "@nestjs/graphql";
 import type { AuthContext } from "@/core/context/auth-context.interface";
-import { Public } from "@/core/decorators/public-route.decorator";
-import { Roles } from "@/core/decorators/roles.decorator";
 import { BatchEntity } from "@/core/entities/batch.entity";
-import { UserRole } from "@/core/enums/user-role.enum";
 import { PaginationInput } from "@/core/inputs/pagination.input";
 import { Auth } from "@/modules/auth/decorators/auth-context.decorator";
 import { EducationModel } from "@/modules/educations/schemas/education.schema";
@@ -36,37 +33,37 @@ export class EducationsResolver {
 
   // QUERIES
 
-  @Public()
   @Query(() => EducationEntity)
   findOneEducationById(
+    @Auth() ctx: AuthContext,
     @Args("educationId", { type: () => ID }) educationId: string
   ) {
-    return this.educationsService.findOneById(null, educationId);
+    return this.educationsService.findOneById(ctx, educationId);
   }
 
-  @Public()
   @Query(() => EducationEntity)
   findOneEducation(
+    @Auth() ctx: AuthContext,
     @Args("educationFilters", {
       type: () => FilterEducationInput,
       nullable: true,
     })
     educationFilters?: FilterEducationInput
   ) {
-    return this.educationsService.findOne(null, { filters: educationFilters });
+    return this.educationsService.findOne(ctx, { filters: educationFilters });
   }
 
-  @Public()
   @Query(() => [EducationEntity])
   findManyEducationById(
+    @Auth() ctx: AuthContext,
     @Args("educationIds", { type: () => [ID] }) educationIds: string[]
   ) {
-    return this.educationsService.findManyById(null, educationIds);
+    return this.educationsService.findManyById(ctx, educationIds);
   }
 
-  @Public()
   @Query(() => PaginatedEducationEntity)
   findManyEducations(
+    @Auth() ctx: AuthContext,
     @Args("educationFilters", {
       type: () => FilterEducationInput,
       nullable: true,
@@ -83,7 +80,7 @@ export class EducationsResolver {
     })
     educationSort?: SortEducationInput
   ) {
-    return this.educationsService.findMany(null, {
+    return this.educationsService.findMany(ctx, {
       filters: educationFilters,
       sort: educationSort,
       limit: educationPagination?.limit,
@@ -93,7 +90,6 @@ export class EducationsResolver {
 
   // MUTATIONS
 
-  @Roles(UserRole.SUPER_ADMIN)
   @Mutation(() => EducationEntity)
   createOneEducation(
     @Auth() ctx: AuthContext,
@@ -103,7 +99,6 @@ export class EducationsResolver {
     return this.educationsService.createOne(ctx, createEducationInput);
   }
 
-  @Roles(UserRole.SUPER_ADMIN)
   @Mutation(() => BatchEntity)
   createManyEducations(
     @Auth() ctx: AuthContext,
@@ -113,7 +108,6 @@ export class EducationsResolver {
     return this.educationsService.createMany(ctx, createEducationInputs);
   }
 
-  @Roles(UserRole.SUPER_ADMIN)
   @Mutation(() => EducationEntity)
   updateOneEducation(
     @Auth() ctx: AuthContext,
@@ -128,7 +122,6 @@ export class EducationsResolver {
     );
   }
 
-  @Roles(UserRole.SUPER_ADMIN)
   @Mutation(() => BatchEntity)
   updateManyEducations(
     @Auth() ctx: AuthContext,
@@ -143,7 +136,6 @@ export class EducationsResolver {
     );
   }
 
-  @Roles(UserRole.SUPER_ADMIN)
   @Mutation(() => EducationEntity)
   removeOneEducation(
     @Auth() ctx: AuthContext,
@@ -152,7 +144,6 @@ export class EducationsResolver {
     return this.educationsService.removeOne(ctx, educationId);
   }
 
-  @Roles(UserRole.SUPER_ADMIN)
   @Mutation(() => BatchEntity)
   removeManyEducations(
     @Auth() ctx: AuthContext,

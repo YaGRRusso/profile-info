@@ -8,15 +8,15 @@
 
 ## Where we are
 
-**Current phase: 3 — Education** (entity migration **2 of 4** complete).
+**Current phase: 4 — Project** (entity migration **3 of 4** complete).
 
 | Phase | Scope | State |
 |-------|--------|-------|
 | **0** | Shared foundation (`AuthContext`, `core/persistence/`, schemas) | Done |
 | **1** | **Course** — reference private entity | Done |
 | **2** | **Experience** — replicate Course checklist | Done |
-| **3** | **Education** | **Next** |
-| **4** | Project | Pending |
+| **3** | **Education** | Done |
+| **4** | Project | **Next** |
 | **5a** | Catalog & user reads (auth on `skills`, `organizations`, `users` queries) | Pending |
 | **5b** | Peripheral modules (`resume`, `dashboard`, `ai-tools`) | Pending |
 | **5c** | API tokens (collection, guard, CRUD, permission e2e) | Pending |
@@ -136,7 +136,7 @@ Composition wrapper over `CrudRepository` (does **not** extend it).
 
 - `withTenantScope(scope, filter)` adds `ownerId: scope.userId` when
   `crossTenant: false`.
-- `createOne` / `createMany` always inject `scope.userId`; strip `ownerId` from input.
+- `createOne` / `createMany` always inject `scope.userId`; strip `ownerId` from payload (defense for internal callers — GraphQL inputs never expose `ownerId`).
 - **No unscoped read helpers** — if you need unscoped access, you are in the wrong
   layer (use `CrudRepository` directly inside a cascade listener, not from a service).
 
@@ -260,7 +260,7 @@ Do **not** start phase N+1 until phase N passes its [entity gate](#entity-gate).
 | Layer | State |
 |-------|-------|
 | `CoursesRepository.tenant` | Done |
-| `CoursesService` — required `ctx`, `repository.tenant.*`, strip `ownerId` on write | Done |
+| `CoursesService` — required `ctx`, `repository.tenant.*` | Done |
 | `CoursesResolver` — no `@Public()`, `@Auth()` on all ops, `@ResolveField` for `owner` / `organization` / `skills` | Done |
 | `CourseEntity` — output scalars + resolved objects | Done |
 | Unit tests (`courses.service.spec.ts`, `tenant-scoped.repository.spec.ts`) | Done |
@@ -274,26 +274,25 @@ global until dashboard is tenant-scoped.
 | Layer | State |
 |-------|-------|
 | `ExperiencesRepository.tenant` | Done |
-| `ExperiencesService` — required `ctx`, `repository.tenant.*`, strip `ownerId` on write | Done |
+| `ExperiencesService` — required `ctx`, `repository.tenant.*` | Done |
 | `ExperiencesResolver` — no `@Public()`, no `@Roles` on private CRUD | Done |
 | `@ResolveField` owner / organization / skills | Done |
 | Unit tests (`experiences.service.spec.ts`) | Done |
 | E2e isolation (`test/e2e/experiences.spec.ts`) | Done |
 
-### Phase 3 — Education ⏳ **(current)**
+### Phase 3 — Education ✅
 
 | Layer | State |
 |-------|-------|
 | Schema `ownerId` + indexes | Done (data only) |
-| `EducationsRepository.tenant` | **Not started** |
-| `EducationsService` tenant CRUD | **Legacy** (`ctx \| null`, raw repo) |
-| `EducationsResolver` | **Legacy** — queries `@Public()`; mutations `@Roles(SUPER_ADMIN)` |
-| `@ResolveField` owner / organization / skills | Done (GraphQL shape only) |
-| E2e tenant isolation | **Not started** |
+| `EducationsRepository.tenant` | Done |
+| `EducationsService` tenant CRUD | Done |
+| `EducationsResolver` | Done — `@Auth()` on all ops; no `@Public()` / `@Roles` on private CRUD |
+| `@ResolveField` owner / organization / skills | Done |
+| Unit tests (`educations.service.spec.ts`) | Done |
+| E2e isolation (`test/e2e/educations.spec.ts`) | Done |
 
-**Work:** copy Course / Experience pattern; add `test/e2e/educations.spec.ts`.
-
-### Phase 4 — Project
+### Phase 4 — Project ⏳ **(current)**
 
 Same checklist. No `organizationId` on schema. Today: same legacy gap as Education was before phase 3.
 
@@ -367,7 +366,7 @@ Use this gate for Experience, Education, and Project.
 | Layer | Done when |
 |-------|-----------|
 | **Repository** | `readonly tenant = new TenantScopedRepository(this)` |
-| **Service** | All CRUD via `repository.tenant.*`; `ctx: AuthContext` required; payload helpers strip `ownerId` |
+| **Service** | All CRUD via `repository.tenant.*`; `ctx: AuthContext` required |
 | **Resolver** | No `@Public()` on queries or mutations; no `@Roles(SUPER_ADMIN)` on private CRUD; `@Auth() ctx: AuthContext` everywhere |
 | **GraphQL entity** | `ownerId` + `owner`; `organizationId` + `organization` where applicable; `skillIds` + `skills` where applicable |
 | **Tests** | Unit specs for scoped CRUD; e2e: 401 unauthenticated, A≠B isolation, super-admin cross-tenant read by ID |
@@ -386,7 +385,7 @@ Use this gate for Experience, Education, and Project.
 - [ ] Overlapping slugs across users on same entity type work
 
 **Course:** all manual checks done. **Experience:** all manual checks done.
-**Education / Project:** pending.
+**Education:** all manual checks done. **Project:** pending.
 
 ---
 

@@ -102,6 +102,19 @@ describe("TenantScopedRepository", () => {
       );
     });
 
+    it("should ignore ownerId in create input and use scope userId", async () => {
+      model.create.mockResolvedValue(fakeDoc);
+
+      await tenant.createOne({ userId: ownerId, crossTenant: false }, {
+        name: "Test",
+        ownerId: otherOwnerId,
+      } as never);
+
+      expect(model.create).toHaveBeenCalledWith(
+        expect.objectContaining({ name: "Test", ownerId })
+      );
+    });
+
     it("should inject ownerId from context on cross-tenant create", async () => {
       model.create.mockResolvedValue(fakeDoc);
 

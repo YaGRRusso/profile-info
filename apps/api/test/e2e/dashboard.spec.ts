@@ -121,9 +121,8 @@ describe("Dashboard (e2e)", () => {
       ],
     } as CreateCourseInput);
 
-    await educationsService.createOne(null, {
+    await educationsService.createOne(userCtx, {
       slug: "dashboard-education",
-      ownerId: user._id.toString(),
       organizationId: organization._id.toString(),
       level: EducationLevel.BACHELOR,
       status: EducationStatus.COMPLETE,
@@ -133,7 +132,7 @@ describe("Dashboard (e2e)", () => {
           messages: { title: "Bachelor Degree", description: "CS" },
         },
       ],
-    } as CreateEducationInput & { ownerId: string });
+    } as CreateEducationInput);
   });
 
   afterAll(async () => {

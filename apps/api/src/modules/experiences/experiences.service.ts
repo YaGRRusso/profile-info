@@ -59,11 +59,9 @@ export class ExperiencesService {
     ctx: AuthContext,
     createInput: CreateExperienceInput
   ): Promise<ExperienceModel> {
-    const scope = toTenantScope(ctx);
-
     return await this.repository.tenant.createOne(
-      scope,
-      this.toCreatePayload(createInput)
+      toTenantScope(ctx),
+      createInput as AnyKeys<ExperienceModel>
     );
   }
 
@@ -71,10 +69,10 @@ export class ExperiencesService {
     ctx: AuthContext,
     createInputs: CreateExperienceInput[]
   ): Promise<BatchEntity> {
-    const scope = toTenantScope(ctx);
-    const payloads = createInputs.map((input) => this.toCreatePayload(input));
-
-    return await this.repository.tenant.createMany(scope, payloads);
+    return await this.repository.tenant.createMany(
+      toTenantScope(ctx),
+      createInputs as AnyKeys<ExperienceModel>[]
+    );
   }
 
   updateOne(
@@ -82,12 +80,10 @@ export class ExperiencesService {
     id: string,
     updateInput: UpdateExperienceInput
   ): Promise<ExperienceModel> {
-    const scope = toTenantScope(ctx);
-
     return this.repository.tenant.updateOneById(
-      scope,
+      toTenantScope(ctx),
       id,
-      this.toUpdatePayload(updateInput)
+      updateInput as UpdateQuery<ExperienceModel>
     );
   }
 
@@ -96,25 +92,19 @@ export class ExperiencesService {
     ids: string[],
     updateInput: UpdateExperienceInput
   ): Promise<BatchEntity> {
-    const scope = toTenantScope(ctx);
-
     return await this.repository.tenant.updateManyById(
-      scope,
+      toTenantScope(ctx),
       ids,
-      this.toUpdatePayload(updateInput)
+      updateInput as UpdateQuery<ExperienceModel>
     );
   }
 
   removeOne(ctx: AuthContext, id: string): Promise<ExperienceModel> {
-    const scope = toTenantScope(ctx);
-
-    return this.repository.tenant.deleteOneById(scope, id);
+    return this.repository.tenant.deleteOneById(toTenantScope(ctx), id);
   }
 
   async removeMany(ctx: AuthContext, ids: string[]): Promise<BatchEntity> {
-    const scope = toTenantScope(ctx);
-
-    return await this.repository.tenant.deleteManyById(scope, ids);
+    return await this.repository.tenant.deleteManyById(toTenantScope(ctx), ids);
   }
 
   count(): Promise<number> {
@@ -152,25 +142,5 @@ export class ExperiencesService {
 
   async purgeByOrganization(organizationId: string): Promise<void> {
     await this.repository.deleteMany({ organizationId });
-  }
-
-  private toCreatePayload(
-    input: CreateExperienceInput
-  ): AnyKeys<ExperienceModel> {
-    const { ownerId: _, ...rest } = input as CreateExperienceInput & {
-      ownerId?: string;
-    };
-
-    return rest as AnyKeys<ExperienceModel>;
-  }
-
-  private toUpdatePayload(
-    updateInput: UpdateExperienceInput
-  ): UpdateQuery<ExperienceModel> {
-    const { ownerId: _, ...rest } = updateInput as UpdateExperienceInput & {
-      ownerId?: string;
-    };
-
-    return rest as UpdateQuery<ExperienceModel>;
   }
 }
