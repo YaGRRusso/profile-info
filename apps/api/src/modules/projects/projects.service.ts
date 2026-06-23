@@ -4,6 +4,7 @@ import {
   labelFromI18nTitle,
   RecentActivityRecord,
 } from "@/common/helpers/recent-activity.helper";
+import { toTenantScope } from "@/core/context/auth-context.helper";
 import type { AuthContext } from "@/core/context/auth-context.interface";
 import { BatchEntity } from "@/core/entities/batch.entity";
 import { PaginatedModel } from "@/core/schemas/paginated.schema";
@@ -16,30 +17,27 @@ import { ProjectsRepository } from "./projects.repository";
 export class ProjectsService {
   constructor(private readonly repository: ProjectsRepository) {}
 
-  findOneById(_ctx: AuthContext | null, id: string): Promise<ProjectModel> {
-    return this.repository.findOneById(id);
+  findOneById(ctx: AuthContext, id: string): Promise<ProjectModel> {
+    return this.repository.tenant.findOneById(toTenantScope(ctx), id);
   }
 
   findOne(
-    _ctx: AuthContext | null,
+    ctx: AuthContext,
     {
       filters,
     }: {
       filters?: QueryFilter<ProjectModel>;
     }
   ): Promise<ProjectModel> {
-    return this.repository.findOne({ filters });
+    return this.repository.tenant.findOne(toTenantScope(ctx), { filters });
   }
 
-  findManyById(
-    _ctx: AuthContext | null,
-    ids: string[]
-  ): Promise<ProjectModel[]> {
-    return this.repository.findManyById(ids);
+  findManyById(ctx: AuthContext, ids: string[]): Promise<ProjectModel[]> {
+    return this.repository.tenant.findManyById(toTenantScope(ctx), ids);
   }
 
   findMany(
-    _ctx: AuthContext | null,
+    ctx: AuthContext,
     {
       filters,
       sort,
@@ -52,51 +50,64 @@ export class ProjectsService {
       skip?: number;
     }
   ): Promise<PaginatedModel<ProjectModel>> {
-    return this.repository.findMany({ filters, sort, skip, limit });
+    return this.repository.tenant.findMany(toTenantScope(ctx), {
+      filters,
+      sort,
+      skip,
+      limit,
+    });
   }
 
-  createOne(
-    _ctx: AuthContext | null,
+  async createOne(
+    ctx: AuthContext,
     createInput: CreateProjectInput
   ): Promise<ProjectModel> {
-    return this.repository.createOne(createInput as AnyKeys<ProjectModel>);
+    return await this.repository.tenant.createOne(
+      toTenantScope(ctx),
+      createInput as AnyKeys<ProjectModel>
+    );
   }
 
-  createMany(
-    _ctx: AuthContext | null,
+  async createMany(
+    ctx: AuthContext,
     createInputs: CreateProjectInput[]
   ): Promise<BatchEntity> {
-    return this.repository.createMany(createInputs as AnyKeys<ProjectModel>[]);
+    return await this.repository.tenant.createMany(
+      toTenantScope(ctx),
+      createInputs as AnyKeys<ProjectModel>[]
+    );
   }
 
   updateOne(
-    _ctx: AuthContext | null,
+    ctx: AuthContext,
     id: string,
     updateInput: UpdateProjectInput
   ): Promise<ProjectModel> {
-    return this.repository.updateOneById(
+    return this.repository.tenant.updateOneById(
+      toTenantScope(ctx),
       id,
-      updateInput as object as UpdateQuery<ProjectModel>
+      updateInput as UpdateQuery<ProjectModel>
     );
   }
 
-  updateMany(
-    _ctx: AuthContext | null,
+  async updateMany(
+    ctx: AuthContext,
     ids: string[],
     updateInput: UpdateProjectInput
   ): Promise<BatchEntity> {
-    return this.repository.updateManyById(
+    return await this.repository.tenant.updateManyById(
+      toTenantScope(ctx),
       ids,
-      updateInput as object as UpdateQuery<ProjectModel>
+      updateInput as UpdateQuery<ProjectModel>
     );
   }
 
-  removeOne(_ctx: AuthContext | null, id: string): Promise<ProjectModel> {
-    return this.repository.deleteOneById(id);
+  removeOne(ctx: AuthContext, id: string): Promise<ProjectModel> {
+    return this.repository.tenant.deleteOneById(toTenantScope(ctx), id);
   }
 
-  removeMany(_ctx: AuthContext | null, ids: string[]): Promise<BatchEntity> {
-    return this.repository.deleteManyById(ids);
+  async removeMany(ctx: AuthContext, ids: string[]): Promise<BatchEntity> {
+    return await this.repository.tenant.deleteManyById(toTenantScope(ctx), ids);
   }
 
   count(): Promise<number> {

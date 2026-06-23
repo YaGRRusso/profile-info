@@ -9,10 +9,7 @@ import {
   Resolver,
 } from "@nestjs/graphql";
 import type { AuthContext } from "@/core/context/auth-context.interface";
-import { Public } from "@/core/decorators/public-route.decorator";
-import { Roles } from "@/core/decorators/roles.decorator";
 import { BatchEntity } from "@/core/entities/batch.entity";
-import { UserRole } from "@/core/enums/user-role.enum";
 import { PaginationInput } from "@/core/inputs/pagination.input";
 import { Auth } from "@/modules/auth/decorators/auth-context.decorator";
 import type { Ctx } from "@/modules/graphql/context.interface";
@@ -35,35 +32,37 @@ export class ProjectsResolver {
 
   // QUERIES
 
-  @Public()
   @Query(() => ProjectEntity)
-  findOneProjectById(@Args("projectId", { type: () => ID }) projectId: string) {
-    return this.projectsService.findOneById(null, projectId);
+  findOneProjectById(
+    @Auth() ctx: AuthContext,
+    @Args("projectId", { type: () => ID }) projectId: string
+  ) {
+    return this.projectsService.findOneById(ctx, projectId);
   }
 
-  @Public()
   @Query(() => ProjectEntity)
   findOneProject(
+    @Auth() ctx: AuthContext,
     @Args("projectFilters", {
       type: () => FilterProjectInput,
       nullable: true,
     })
     projectFilters?: FilterProjectInput
   ) {
-    return this.projectsService.findOne(null, { filters: projectFilters });
+    return this.projectsService.findOne(ctx, { filters: projectFilters });
   }
 
-  @Public()
   @Query(() => [ProjectEntity])
   findManyProjectById(
+    @Auth() ctx: AuthContext,
     @Args("projectIds", { type: () => [ID] }) projectIds: string[]
   ) {
-    return this.projectsService.findManyById(null, projectIds);
+    return this.projectsService.findManyById(ctx, projectIds);
   }
 
-  @Public()
   @Query(() => PaginatedProjectEntity)
   findManyProjects(
+    @Auth() ctx: AuthContext,
     @Args("projectFilters", {
       type: () => FilterProjectInput,
       nullable: true,
@@ -80,7 +79,7 @@ export class ProjectsResolver {
     })
     projectSort?: SortProjectInput
   ) {
-    return this.projectsService.findMany(null, {
+    return this.projectsService.findMany(ctx, {
       filters: projectFilters,
       sort: projectSort,
       limit: projectPagination?.limit,
@@ -90,7 +89,6 @@ export class ProjectsResolver {
 
   // MUTATIONS
 
-  @Roles(UserRole.SUPER_ADMIN)
   @Mutation(() => ProjectEntity)
   createOneProject(
     @Auth() ctx: AuthContext,
@@ -100,7 +98,6 @@ export class ProjectsResolver {
     return this.projectsService.createOne(ctx, createProjectInput);
   }
 
-  @Roles(UserRole.SUPER_ADMIN)
   @Mutation(() => BatchEntity)
   createManyProjects(
     @Auth() ctx: AuthContext,
@@ -110,7 +107,6 @@ export class ProjectsResolver {
     return this.projectsService.createMany(ctx, createProjectInputs);
   }
 
-  @Roles(UserRole.SUPER_ADMIN)
   @Mutation(() => ProjectEntity)
   updateOneProject(
     @Auth() ctx: AuthContext,
@@ -121,7 +117,6 @@ export class ProjectsResolver {
     return this.projectsService.updateOne(ctx, projectId, updateProjectInput);
   }
 
-  @Roles(UserRole.SUPER_ADMIN)
   @Mutation(() => BatchEntity)
   updateManyProjects(
     @Auth() ctx: AuthContext,
@@ -132,7 +127,6 @@ export class ProjectsResolver {
     return this.projectsService.updateMany(ctx, projectIds, updateProjectInput);
   }
 
-  @Roles(UserRole.SUPER_ADMIN)
   @Mutation(() => ProjectEntity)
   removeOneProject(
     @Auth() ctx: AuthContext,
@@ -141,7 +135,6 @@ export class ProjectsResolver {
     return this.projectsService.removeOne(ctx, projectId);
   }
 
-  @Roles(UserRole.SUPER_ADMIN)
   @Mutation(() => BatchEntity)
   removeManyProjects(
     @Auth() ctx: AuthContext,

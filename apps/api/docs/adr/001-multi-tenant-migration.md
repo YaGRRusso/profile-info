@@ -8,7 +8,7 @@
 
 ## Where we are
 
-**Current phase: 4 — Project** (entity migration **3 of 4** complete).
+**Current phase: 5a — Catalog & user reads** (entity migration **4 of 4** complete).
 
 | Phase | Scope | State |
 |-------|--------|-------|
@@ -16,8 +16,8 @@
 | **1** | **Course** — reference private entity | Done |
 | **2** | **Experience** — replicate Course checklist | Done |
 | **3** | **Education** | Done |
-| **4** | Project | **Next** |
-| **5a** | Catalog & user reads (auth on `skills`, `organizations`, `users` queries) | Pending |
+| **4** | **Project** | Done |
+| **5a** | Catalog & user reads (auth on `skills`, `organizations`, `users` queries) | **Next** |
 | **5b** | Peripheral modules (`resume`, `dashboard`, `ai-tools`) | Pending |
 | **5c** | API tokens (collection, guard, CRUD, permission e2e) | Pending |
 | **5d** | `user.deleted` cascade + seed tokens | Pending |
@@ -292,9 +292,17 @@ global until dashboard is tenant-scoped.
 | Unit tests (`educations.service.spec.ts`) | Done |
 | E2e isolation (`test/e2e/educations.spec.ts`) | Done |
 
-### Phase 4 — Project ⏳ **(current)**
+### Phase 4 — Project ✅
 
-Same checklist. No `organizationId` on schema. Today: same legacy gap as Education was before phase 3.
+| Layer | State |
+|-------|-------|
+| Schema `ownerId` + indexes | Done (data only) |
+| `ProjectsRepository.tenant` | Done |
+| `ProjectsService` tenant CRUD | Done |
+| `ProjectsResolver` | Done — `@Auth()` on all ops; no `@Public()` / `@Roles` on private CRUD |
+| `@ResolveField` owner / skills | Done |
+| Unit tests (`projects.service.spec.ts`) | Done |
+| E2e isolation (`test/e2e/projects.spec.ts`) | Done |
 
 ### Phase 5 — Cross-cutting (split)
 
@@ -385,7 +393,7 @@ Use this gate for Experience, Education, and Project.
 - [ ] Overlapping slugs across users on same entity type work
 
 **Course:** all manual checks done. **Experience:** all manual checks done.
-**Education:** all manual checks done. **Project:** pending.
+**Education:** all manual checks done. **Project:** all manual checks done.
 
 ---
 
