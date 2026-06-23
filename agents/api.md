@@ -65,6 +65,7 @@ Full diagram and field detail: `apps/api/docs/ER_MODEL.md`.
 
 `core/` (cross-cutting NestJS infra, domain-agnostic):
 
+- `persistence/`: generic MongoDB layer — `CrudRepository`, `StatsRepository`, `TenantScopedRepository`, `BatchCount`, `withTenantScope`, `assertBatchSucceeded`. Unit specs in `persistence/repositories/*.spec.ts`.
 - `filters/persistence-exception.filter.ts`: global `APP_FILTER` — maps persistence errors to HTTP exceptions: Mongo `E11000`/`E11001` → 409, Mongo `121` + Mongoose `ValidationError`/`CastError` → 400, `MongooseServerSelectionError` → 503. Services do not catch these; use `assertDuplicate` / `assertReferencesExist` in `common/helpers/assert.helper.ts` only for domain-specific pre-checks.
 - `events/`: `domain-events.ts` (event name constants), `skill-deleted.event.ts`, `organization-deleted.event.ts` (neutral payload classes).
 - `enums/credential-kind.enum.ts`: shared `CredentialKind` enum (`SESSION`, `API_TOKEN`).
@@ -72,7 +73,7 @@ Full diagram and field detail: `apps/api/docs/ER_MODEL.md`.
 - `enums/api-token-permission.enum.ts`: shared `ApiTokenPermission` enum (`QUERY`, `MUTATE`).
 - `schemas/paginated.schema.ts`: `createPaginatedModel(Entity)` for `{ found, nodes }`.
 - `schemas/base.schema.ts`, `translation.schema.ts`, `daterange.schema.ts`, `url.schema.ts`: shared Mongoose sub-schemas.
-- `entities/`: `BaseEntity`, batch, date-range, translation, url GraphQL types.
+- `entities/`: `BaseEntity`, `BatchEntity` (`succeeded`, `failed`), date-range, translation, url GraphQL types.
 - `inputs/`: pagination, sort factory, date-range, translation, url inputs.
 - `decorators/`: `@Public()`, `@RequiredField()`, `@OptionalField()`.
 - `configs/`: `app.config.ts`, `validation.config.ts`.
@@ -136,8 +137,8 @@ Copy `src/modules/skills/` and adapt:
 1. Mongoose model: `src/modules/<name>/schemas/<name>.schema.ts` extending `BaseModel`.
 2. GraphQL entity: `modules/<name>/entities/<name>.entity.ts` extending `BaseEntity`; export `Paginated<Name>Entity = createPaginatedModel(...)`.
 3. Inputs: `Create`, `Update` (PartialType), `Filter` (`PartialType(PickType(Create, [...]))` — explicit whitelist; never `PartialType(Create)` wholesale), `Sort` (SortType factory).
-4. Repository: `<entity>.repository.ts` extends `MongooseCrudRepository<T>`, registered as an `@Injectable()` provider in the module. Entity-specific queries (e.g. `UsersRepository.findOneByEmailWithPassword`) live on the repository.
-5. Service: explicit CRUD methods delegating to the repository; keep domain logic (events, password hashing, `detachSkill`, `purgeByOrganization`) in the service. Filter-based writes use `updateManyByFilter` / `deleteManyByFilter` on the base repository. `skills.service.ts` is the reference for delete events; `users.service.ts` for password hashing.
+4. Repository: `<entity>.repository.ts` extends `CrudRepository<T>` from `core/persistence/repositories/crud.repository.ts`. Compose `readonly stats: StatsRepository<T>` when the entity feeds dashboard metrics. Owner-scoped entities also compose `readonly tenant: TenantScopedRepository<T>` (see ADR 001 lot 1c). Entity-specific queries (e.g. `UsersRepository.findOneByEmailWithPassword`) stay on the repository subclass.
+5. Service: explicit CRUD methods delegating to the repository (or `repository.tenant.*` once tenancy is wired). Batch mutations return `BatchEntity`-shaped `BatchCount` (`{ succeeded, failed }`). Domain logic (events, password hashing, `detachSkill`, `purgeByOrganization`) stays in the service; cascades use raw `repository.updateMany` / `repository.deleteMany`.
 6. Resolver: explicit `@Query` / `@Mutation` methods with `@Public()` on reads; wire pagination/sort/filter args like `skills.resolver.ts`.
 7. Module: `MongooseModule.forFeature`, providers (include repository), export service if needed for loaders. Import in `app.module.ts`.
 
@@ -164,7 +165,7 @@ Run from `apps/api/` or via root `api:*` aliases: `dev`, `prod`, `build`, `start
 
 - `GET /health`: Terminus health check with MongoDB ping.
 - Test layout: `test/fixtures/` (shared builders — import `@test/fixtures/…` from unit specs), `test/config/` (Jest e2e config, setup/teardown), `test/support/` (Nest bootstrap + `TestAppModule`), `test/e2e/`, `test/integration/`. Path aliases: `@/*` → `src/`, `@test/*` → `test/` (Jest + `tsconfig.json`).
-- ADRs in `apps/api/docs/adr/`. Multi-tenant: `001-multi-tenant-migration.md` (backend core + API tokens, branch `feat/multi-tenant`; implement in 8 lots, one at a time). Deferred work: `backlog.md`.
+- ADRs in `apps/api/docs/adr/`. Multi-tenant: `001-multi-tenant-migration.md` (in progress; persistence layer done, tenant wiring next). Deferred work: `backlog.md`.
 
 ## Gotchas & notes
 

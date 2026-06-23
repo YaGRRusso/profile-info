@@ -34,7 +34,7 @@ src/
 │   ├── enums/          Enums compartilhados (UserRole, SortEnum)
 │   ├── events/         Domain events (payloads + constantes de nomes)
 │   ├── inputs/         Inputs GraphQL genéricos (pagination, sort factory)
-│   ├── persistence/    MongooseCrudRepository<T> — abstração genérica
+│   ├── persistence/    CrudRepository, StatsRepository, TenantScopedRepository
 │   └── schemas/        Mongoose sub-schemas reutilizáveis
 │                       Regra: NÃO importa de modules/ nem integrations/.
 │
@@ -72,11 +72,12 @@ modules/skills/
 ├── skills.module.ts        ← Composição: imports, providers, exports
 ├── skills.resolver.ts      ← Camada de APRESENTAÇÃO (GraphQL I/O)
 ├── skills.service.ts       ← Camada de APLICAÇÃO (regras de negócio)
+├── skills.repository.ts    ← Persistência tipada (extends CrudRepository)
 ├── skills-loader.service.ts ← DataLoader para nested fields
 ├── skills.service.spec.ts  ← Testes unitários do service
 │
 ├── schemas/
-│   └── skill.schema.ts     ← Camada de PERSISTÊNCIA (Mongoose model)
+│   └── skill.schema.ts     ← Mongoose model
 │
 ├── entities/
 │   └── skill.entity.ts     ← GraphQL ObjectType (apresentação de saída)
@@ -97,7 +98,7 @@ modules/skills/
 |--------|---------|-----------|---------------|
 | Apresentação | `resolver.ts` | Recebe input, valida tipos, chama service, retorna | Lógica de negócio |
 | Aplicação | `service.ts` | Orquestra regras, emite eventos, chama repository | Saber se é GraphQL ou REST |
-| Persistência | `schema.ts` + `MongooseCrudRepository` | CRUD MongoDB, validação de schema | Regras de negócio |
+| Persistência | `schema.ts` + `*Repository` (`CrudRepository` / `tenant`) | CRUD MongoDB, validação de schema | Regras de negócio |
 | Validação de entrada | `dto/*.input.ts` | Valida shape + constraints (class-validator) | Regras de domínio complexas |
 
 ---
@@ -149,11 +150,18 @@ export class OnSkillDeletedListener {
 }
 ```
 
-### Acesso a dados genérico → MongooseCrudRepository (core/)
+### Acesso a dados genérico → `core/persistence/`
 ```typescript
-export class MongooseCrudRepository<T> {
-  // findOneById, findMany, createOne, updateOne, deleteOne...
-  // Validação de ObjectId, paginação, not-found handling
+// CrudRepository<T> — find/create/update/delete; batch → BatchCount
+// StatsRepository<T> — count, countByField, findRecentlyUpdated
+// TenantScopedRepository<T> — wrapper com ownerId scope (composição)
+
+@Injectable()
+export class SkillsRepository extends CrudRepository<SkillModel> {
+  readonly stats = new StatsRepository(this.model);
+  constructor(@InjectModel(SkillModel.name) model: Model<SkillModel>) {
+    super(model);
+  }
 }
 ```
 
@@ -163,7 +171,7 @@ export class MongooseCrudRepository<T> {
 
 | Pattern | Onde | Por que vale a pena |
 |---------|------|---------------------|
-| **Repository (DI)** | `SkillsRepository extends MongooseCrudRepository<T>` | Tipado, injetável, mockável em testes; se trocar banco, troca só a impl |
+| **Repository (DI)** | `SkillsRepository extends CrudRepository<T>` | Tipado, injetável, mockável; stats/tenant compostos explicitamente |
 | **Domain Events** | `EventEmitter2` + listeners | Desacopla cascatas (skill deletada → projetos atualizam) sem import circular |
 | **Error Handling** | `PersistenceExceptionFilter` (`APP_FILTER`) | Converte erros de Mongo/Mongoose em 4xx/503 globalmente; `assertDuplicate` / `assertReferencesExist` em services só para mensagens específicas |
 | **Port/Adapter** | `integrations/` (abstract class + impl) | Troca OpenRouter por outro LLM sem tocar nos modules |

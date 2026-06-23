@@ -116,7 +116,7 @@ describe("ProjectsService", () => {
   });
 
   describe("removeMany", () => {
-    it("should return a BatchEntity count", async () => {
+    it("should return batch succeeded and failed counts", async () => {
       (model.deleteMany as jest.Mock).mockReturnValue(
         makeExec({ deletedCount: 1 })
       );

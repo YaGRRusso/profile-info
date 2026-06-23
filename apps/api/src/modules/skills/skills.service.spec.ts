@@ -143,7 +143,7 @@ describe("SkillsService", () => {
   });
 
   describe("removeMany", () => {
-    it("should return a BatchEntity count", async () => {
+    it("should return batch succeeded and failed counts", async () => {
       (model.find as jest.Mock).mockReturnValue(makeExec([fakeDoc]));
       (model.deleteMany as jest.Mock).mockReturnValue(
         makeExec({ deletedCount: 1 })

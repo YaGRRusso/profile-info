@@ -4,7 +4,7 @@
 > detail — revisit once the backend structure is stable. Ordered by likely priority.
 
 - **User can use your own integration token:** Users can use your own token of Open Router, Github etc.,
-- **Test suite overhaul:** E2e/integration specs assume single-tenant public reads; need systematic rewrite once API is stable.
+- **Test suite overhaul:** E2e/integration specs still assume single-tenant public reads and pass `ownerId` via cast until tenant lots land; systematic rewrite once API enforces isolation.
 - **REST auth for controllers:** `resume.pdf` (and future REST routes) should accept API tokens in headers, not public `userId` param.
 - **User registration flow:** Today accounts are created manually in MongoDB; need a decision (public sign-up, invite-only, paid).
 - **Collaborative catalog:** Users submit skill/org create-update requests; `SUPER_ADMIN` moderates; local overrides per tenant.

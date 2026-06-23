@@ -2,7 +2,7 @@
 
 | Field | Value |
 |-------|-------|
-| **Status** | Proposed |
+| **Status** | In progress |
 | **Date** | 2026-06-19 |
 | **Branch** | `feat/multi-tenant` |
 | **Deliverable** | 1 PR — backend only; merge when Definition of Done is met |
@@ -28,7 +28,24 @@ permissions (`QUERY` / `MUTATE`) so read-only integrations never need a token th
 can write.
 
 **Scope of this ADR: backend only.** Admin panel, portfolio client, and test-suite
-overhaul are out of scope — see [backlog](./backlog.md).
+overhaul are out of scope — see [backlog](./backlog.md). The admin app is updated
+independently for GraphQL contract changes (e.g. `BatchEntity`).
+
+### Progress (2026-06-23)
+
+| Area | State |
+|------|--------|
+| `SUPER_ADMIN` rename | Done |
+| `ownerId` + compound slug index on private schemas | Done |
+| `RequestContext` + helpers (`toRequestContext`, `isSuperAdmin`, …) | Done — resolvers pass `ctx`; services do not enforce tenancy yet |
+| `core/persistence/` (`CrudRepository`, `StatsRepository`, `TenantScopedRepository`) | Done — unit-tested |
+| Entity repositories extend `CrudRepository`; stats composed where needed | Done |
+| Services migrated to `*OneById` / `*ManyById` / batch `BatchCount` | Done — all CRUD modules |
+| GraphQL `BatchEntity { succeeded, failed }` | Done — API + admin codegen |
+| `TenantScopedRepository` composed in entity repos | **Next** — courses pilot |
+| `toTenantScope(ctx)` + services call `repository.tenant.*` | **Next** |
+| Remove `@Public()` / tenant isolation e2e | Pending (lots 2–3) |
+| API tokens | Pending (lot 6) |
 
 ### Constraints
 
@@ -113,9 +130,77 @@ management (catalog, supporting other tenants).
 - `SUPER_ADMIN` retains full user CRUD.
 - Other user listing/detail queries require session JWT (not API tokens).
 
-### 4. Authorization pattern
+### 4. Persistence layer
 
-Replace the blanket `@Roles(ADMIN)` on private-entity mutations with
+MongoDB access for feature modules lives in `core/persistence/` — generic,
+domain-agnostic, and tested in isolation.
+
+#### `CrudRepository<T>`
+
+Base class for all entity repositories. Naming convention:
+
+| By id | By filter |
+|-------|-----------|
+| `findOneById`, `findManyById` | `findOne`, `findMany` (paginated) |
+| `createOne`, `createMany` | — |
+| `updateOneById`, `updateManyById` | `updateOne`, `updateMany` |
+| `deleteOneById`, `deleteManyById` | `deleteOne`, `deleteMany` |
+
+Return types: `*One` → document; `findMany` → `{ nodes, found }`; batch mutations
+→ `BatchCount { succeeded, failed }`. Partial batch success is allowed; errors
+fire only when `succeeded === 0` (`assertBatchSucceeded`). Filter-based
+`updateMany` / `deleteMany` are for **global cascades** (listeners), not
+tenant-scoped user operations.
+
+#### `StatsRepository<T>`
+
+`count()`, `countByField()`, `findRecentlyUpdated()`. Composed explicitly on
+entity repositories that feed dashboard metrics:
+
+```typescript
+readonly stats = new StatsRepository(model);
+```
+
+Not every repository needs stats (e.g. `UsersRepository`).
+
+#### `TenantScopedRepository<T>`
+
+Composition wrapper over `CrudRepository` — **does not extend** `CrudRepository`
+(so unscoped methods are not exposed on the same object).
+
+- `withTenantScope(scope, filter)` adds `ownerId: scope.userId` when
+  `crossTenant: false`; `crossTenant: true` bypasses scope (`SUPER_ADMIN`).
+- `createOne` / `createMany` inject `ownerId` for tenants.
+- `findManyUnscoped` for public portfolio reads (no `ownerId` filter).
+- No filter-based `updateMany` / `deleteMany` — cascades use raw `CrudRepository`.
+
+Entity module pattern (owner-scoped entities):
+
+```typescript
+@Injectable()
+export class CoursesRepository extends CrudRepository<CourseModel> {
+  readonly stats: StatsRepository<CourseModel>;
+  readonly tenant: TenantScopedRepository<CourseModel>;
+
+  constructor(@InjectModel(CourseModel.name) model: Model<CourseModel>) {
+    super(model);
+    this.stats = new StatsRepository(model);
+    this.tenant = new TenantScopedRepository(this);
+  }
+}
+```
+
+Global catalog repos (`Skill`, `Organization`) extend `CrudRepository` only
+(+ `stats` if needed).
+
+#### GraphQL batch type
+
+`BatchEntity { succeeded, failed }` mirrors `BatchCount`. Services return batch
+results from the repository directly — no extra mapping layer.
+
+### 5. Authorization pattern
+
+Replace the blanket `@Roles(SUPER_ADMIN)` on private-entity mutations with
 **ownership + role** checks.
 
 #### Resolver responsibility
@@ -126,7 +211,7 @@ The resolver is the **entry point** for auth context:
    decorator).
 2. Pass `RequestContext` as the **first argument** to every service method that
    touches tenant-scoped or role-gated data.
-3. Remove `@Roles(ADMIN)` from private-entity mutations and from `dashboard` /
+3. Remove `@Roles(SUPER_ADMIN)` from private-entity mutations and from `dashboard` /
    `ai-tools` (any authenticated user calls them).
 4. Keep `@Roles(SUPER_ADMIN)` on global catalog mutations and user CRUD (or
    equivalent check in service).
@@ -137,33 +222,34 @@ context.
 #### Service responsibility
 
 Services stay unified (no separate “admin service” vs “user service”). Each method
-receives `RequestContext` and derives filters:
+receives `RequestContext` and delegates tenant-scoped I/O to
+`repository.tenant.*`:
 
 ```typescript
-function tenantFilter(ctx: RequestContext): { ownerId?: ObjectId } {
-  if (isSuperAdmin(ctx)) return {};
-  return { ownerId: ctx.userId };
+function toTenantScope(ctx: RequestContext): TenantScope {
+  return { userId: ctx.userId, crossTenant: isSuperAdmin(ctx) };
 }
 
-/** Caller filters first; tenant scope last so USER cannot override ownerId. */
-function mergeScopingFilters<T extends Record<string, unknown>>(
-  userFilters: T | undefined,
-  ctx: RequestContext
-): T & { ownerId?: ObjectId } {
-  return { ...userFilters, ...tenantFilter(ctx) };
+// Example — CoursesService
+findMany(ctx, query) {
+  return this.repository.tenant.findMany(toTenantScope(ctx), query);
+}
+
+createOne(ctx, input) {
+  return this.repository.tenant.createOne(toTenantScope(ctx), input);
 }
 ```
 
-For `USER` and API tokens, **always** spread `tenantFilter(ctx)` **after** any
-client-supplied filters so `ownerId` from the request can never widen or override
-tenant scope.
+Global cascades (`detachSkill`, `purgeByOrganization`) call
+`repository.updateMany` / `repository.deleteMany` on the raw CRUD repo — no
+tenant filter.
 
 | Operation | `USER` / API token | `SUPER_ADMIN` (session JWT) |
 |-----------|-------------------|----------------------------|
-| List / find | Merge `tenantFilter` into query | No `ownerId` filter (sees all tenants) |
-| Create | `ownerId = ctx.userId` (injected) | `ownerId` from input (required; targets another user) |
-| Update / delete by ID | Load with `tenantFilter` first → 404 if not owner | By explicit ID, no tenant filter |
-| Batch update / delete | Each ID must pass `tenantFilter` | Unfiltered |
+| List / find (scoped) | `repository.tenant.*` with `crossTenant: false` | `crossTenant: true` or by explicit ID |
+| Create | `ownerId` injected by `TenantScopedRepository` | `ownerId` from input (required) |
+| Update / delete by ID | `repository.tenant.*` → 404 if not owner | `crossTenant: true` |
+| Batch update / delete | Each ID scoped via `tenant` wrapper | `crossTenant: true` |
 
 **IDOR rule (USER only):** guessing another tenant's ID returns **404** (not 403),
 because the query includes `ownerId` and finds nothing.
@@ -190,7 +276,7 @@ integration also needs profile metadata.
 API tokens cannot manage other API tokens — only a logged-in user via session JWT
 creates/revokes tokens (admin panel; front out of scope).
 
-### 5. `ownerId` rules
+### 6. `ownerId` rules
 
 | Caller | Create | Update | Read / delete |
 |--------|--------|--------|---------------|
@@ -210,10 +296,10 @@ creates/revokes tokens (admin panel; front out of scope).
 Filter DTOs use **`PartialType(PickType(Create*Input, [...]))`** — an explicit whitelist
 of filterable fields. Never `PartialType(Create*Input)` wholesale (that would inherit
 future create-only fields like `ownerId`). **`ownerId` is never a filter field**; tenant
-scope comes only from `RequestContext` via `mergeScopingFilters`. `FilterUserInput`
-excludes `password`.
+scope comes only from `RequestContext` via `TenantScopedRepository` (not from
+filter inputs). `FilterUserInput` excludes `password`.
 
-### 6. Authentication model
+### 7. Authentication model
 
 #### GraphQL
 
@@ -272,7 +358,7 @@ type RequestContext =
 // isApiToken(ctx), hasPermission(ctx, ApiTokenPermission.QUERY)).
 ```
 
-### 7. Domain events
+### 8. Domain events
 
 Global catalog deletes affect all tenants that reference the entity — intentional.
 
@@ -284,7 +370,7 @@ Global catalog deletes affect all tenants that reference the entity — intentio
 
 Emit **before** delete (unchanged). Listeners stay thin.
 
-### 8. Peripheral modules
+### 9. Peripheral modules
 
 | Module | Change |
 |--------|--------|
@@ -293,7 +379,7 @@ Emit **before** delete (unchanged). Listeners stay thin.
 | `ai-tools` | Session JWT only. Any `USER` or `SUPER_ADMIN` (no paid plan gate yet). |
 | `users` | Remove `@Public()` from reads; `SUPER_ADMIN` for user CRUD mutations. |
 
-### 9. Seeds and testing
+### 10. Seeds and testing
 
 Minimum CI gate from phase 1a:
 
@@ -371,22 +457,53 @@ flowchart TD
 
 ---
 
-### Lot 1 — Foundation
+### Lot 1 — Foundation (persistence + plumbing)
+
+Split into three checkpoints on the feature branch. **Do not start lot 2 until
+1c is complete.**
+
+#### Lot 1a — Persistence layer ✅
 
 | | |
 |---|---|
-| **Scope** | `RequestContext` type + decorator; pass context from resolvers (plumbing only — private services may accept but not enforce yet); required `ownerId` on 4 private schemas + compound `{ ownerId, slug }` index; seed: 2 `USER` + 1 `SUPER_ADMIN` with distinct credentials; **filter DTOs → `PartialType(PickType(...))` whitelist** (no `password` on user filter) |
-| **~Files** | 12–18 |
-| **Out of scope** | Tenant filters, removing `@Public()`, API tokens |
+| **Scope** | `core/persistence/`: `CrudRepository`, `StatsRepository`, `TenantScopedRepository`, `BatchCount`, helpers, unit specs |
+| **~Files** | ~15 |
+| **Gate** | `npm run api:test` — persistence specs green |
 
-**Automated gate:** `npm run lint` · `npm run api:seed` · `npm run api:test`
+#### Lot 1b — Repository & service migration ✅
+
+| | |
+|---|---|
+| **Scope** | All entity repos extend `CrudRepository`; stats composed where needed; services use `*OneById` / batch API; `BatchEntity { succeeded, failed }`; service unit specs updated |
+| **~Files** | ~25 |
+| **Gate** | `npm run api:build` · `npm run api:test` (135+ unit tests) |
+
+Admin: regenerate codegen after `schema.gql` batch-type change (`succeeded` /
+`failed` on batch mutations).
+
+#### Lot 1c — Tenant wiring (in progress)
+
+| | |
+|---|---|
+| **Scope** | `toTenantScope(ctx)` in `core/context/`; compose `readonly tenant` on owner-scoped repos; **courses pilot** — service calls `repository.tenant.*`; seeds set `ownerId` |
+| **~Files** | ~12–18 |
+| **Out of scope** | Removing `@Public()`, other private entities, API tokens |
+
+**Automated gate:** `npm run lint` · `npm run api:test` · `npm run api:seed`
 
 **Manual gate:**
-- [ ] `getMe` returns correct role per seed user
-- [ ] App boots; GraphQL playground loads
-- [ ] Private collections have `ownerId` field (inspect Mongo or seed output)
+- [ ] User A creates course → only A lists/sees it
+- [ ] User B `findOneCourseById` with A's ID → not found
+- [ ] Super admin `crossTenant` sees all courses
 
 ---
+
+### Lot 1 (legacy note)
+
+Earlier drafts combined schema + `RequestContext` + filter DTOs in a single lot.
+`ownerId` on private schemas and `RequestContext` plumbing are done; filter DTO
+whitelists and tenancy enforcement follow lots 1c–3 below.
+
 
 ### Lot 2 — Private tenancy (Experience + Education)
 
@@ -566,7 +683,7 @@ owner (union of the QUERY and MUTATE columns, including `getMe` + writes).
 
 ### Positive
 
-- Single service layer with `tenantFilter` — no duplicated admin/user code paths.
+- Single service layer with `repository.tenant` — no duplicated admin/user code paths.
 - Prefixed API tokens avoid JWT ambiguity without extra headers.
 - Backend-first delivery; frontends can catch up after API stabilizes.
 
@@ -574,7 +691,7 @@ owner (union of the QUERY and MUTATE columns, including `getMe` + writes).
 
 | Risk | Mitigation |
 |------|------------|
-| IDOR on batch ops | `tenantFilter` on every ID in `*ManyById` / `updateMany` / `removeMany` |
+| IDOR on batch ops | `TenantScopedRepository` scopes every batch ID; partial batches return `{ succeeded, failed }` |
 | Large PR | Eight implementation lots; gate per lot; ≤ ~35 files each |
 | `resume.pdf` public with `userId` | Anyone can download any user's PDF if they know the ID — acceptable for now; see [backlog](./backlog.md) |
 | CORS fixed to one origin | `*` or [backlog](./backlog.md) when second tenant has own domain |

@@ -12,7 +12,7 @@ by the `@profile-info/admin` dashboard.
 - **MongoDB + Mongoose**: ODM schemas in `src/modules/<name>/schemas/`.
 - **Passport JWT**: global `GqlAuthGuard` with `@Public()` opt-out and `RolesGuard` for admin-only writes.
 - **DataLoader**: batches skill and organization lookups on nested fields.
-- **Jest**: unit (`src/**/*.spec.ts`), e2e (`test/e2e/`), and integration (`test/integration/`) tests. Coverage: `npm run test:coverage`.
+- **Jest**: unit (`src/**/*.spec.ts`, including `core/persistence/repositories/*.spec.ts`), e2e (`test/e2e/`), and integration (`test/integration/`). E2e/integration require MongoDB on `localhost:27017`. Coverage: `npm run test:coverage`.
 
 ## Dependency map
 
@@ -100,6 +100,7 @@ src/
 ├── schema.gql                # Auto-generated (commit after API type changes)
 ├── common/
 ├── core/
+│   └── persistence/          # CrudRepository, StatsRepository, TenantScopedRepository
 ├── integrations/
 │   ├── open-router/          # AI port + OpenRouter adapter
 │   ├── github/
