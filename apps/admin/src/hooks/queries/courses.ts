@@ -27,6 +27,7 @@ const findManyCourses = graphql(`
       nodes {
         id
         slug
+        ownerId
         status
         relevance
         url

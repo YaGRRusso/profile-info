@@ -15,9 +15,9 @@ npm run test:e2e   # e2e + integration (this folder)
 ```
 test/
 ├── config/           # Jest wiring (lifecycle hooks, env)
-├── e2e/              # HTTP / GraphQL smoke tests (*.e2e-spec.ts)
+├── e2e/              # HTTP / GraphQL tests (*.spec.ts)
 ├── fixtures/         # test data builders (import via @test/fixtures/…)
-├── integration/      # service-level tests (*.integration-spec.ts)
+├── integration/      # service-level tests (*.spec.ts)
 └── support/          # Nest bootstrap, DB, HTTP helpers (e2e/integration only)
 ```
 
@@ -55,7 +55,7 @@ Jest is configured **twice** on purpose:
 |---|------------|-------------------|
 | Config | `package.json` → `"jest"` | `test/config/jest-e2e.json` |
 | Command | `npm run test` | `npm run test:e2e` |
-| Files | `src/**/*.spec.ts` | `test/e2e/**`, `test/integration/**` |
+| Files | `src/**/*.spec.ts` | `test/e2e/**`, `test/integration/**` (all `*.spec.ts`) |
 | App | mocks / isolated modules | full `TestAppModule` + real Mongo |
 
 They do not share setup files. Changes here affect **only** `test:e2e`.
@@ -174,7 +174,7 @@ Tests import `TestAppModule`, not `AppModule`:
 
 ## Adding a new test
 
-1. Add `test/e2e/my-feature.e2e-spec.ts` or `test/integration/my-feature.integration-spec.ts` (suffix must match `jest-e2e.json` → `testMatch`).
+1. Add `test/e2e/my-feature.spec.ts` or `test/integration/my-feature.spec.ts` (suffix must match `jest-e2e.json` → `testMatch`).
 2. Use `createTestApp()` + `afterAll` → `app.close()`.
 3. Run `npm run test:e2e` (or `USE_MEMORY_MONGO=true …` if you have no local Mongo).
 

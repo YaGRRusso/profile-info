@@ -1,4 +1,5 @@
 import { INestApplication } from "@nestjs/common";
+import { testRequestContext } from "@test/fixtures/request-context";
 import { App } from "supertest/types";
 import { UserRole } from "@/core/enums/user-role.enum";
 import { CoursesService } from "@/modules/courses/courses.service";
@@ -94,9 +95,10 @@ describe("Dashboard (e2e)", () => {
       category: SkillCategory.BACKEND,
     });
 
-    await coursesService.createOne(null, {
+    const userCtx = testRequestContext({ userId: user._id.toString() });
+
+    await coursesService.createOne(userCtx, {
       slug: "dashboard-course-complete",
-      ownerId: user._id.toString(),
       organization: organization._id.toString(),
       status: CourseStatus.COMPLETE,
       i18n: [
@@ -105,11 +107,10 @@ describe("Dashboard (e2e)", () => {
           messages: { title: "Complete Course", description: "Done" },
         },
       ],
-    } as CreateCourseInput & { ownerId: string });
+    } as CreateCourseInput);
 
-    await coursesService.createOne(null, {
+    await coursesService.createOne(userCtx, {
       slug: "dashboard-course-progress",
-      ownerId: user._id.toString(),
       organization: organization._id.toString(),
       status: CourseStatus.IN_PROGRESS,
       i18n: [
@@ -118,7 +119,7 @@ describe("Dashboard (e2e)", () => {
           messages: { title: "Progress Course", description: "Ongoing" },
         },
       ],
-    } as CreateCourseInput & { ownerId: string });
+    } as CreateCourseInput);
 
     await educationsService.createOne(null, {
       slug: "dashboard-education",

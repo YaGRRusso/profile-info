@@ -102,7 +102,7 @@ describe("TenantScopedRepository", () => {
       );
     });
 
-    it("should not inject ownerId for cross-tenant create", async () => {
+    it("should inject ownerId from context on cross-tenant create", async () => {
       model.create.mockResolvedValue(fakeDoc);
 
       await tenant.createOne({ userId: ownerId, crossTenant: true }, {
@@ -111,7 +111,7 @@ describe("TenantScopedRepository", () => {
       } as never);
 
       expect(model.create).toHaveBeenCalledWith(
-        expect.objectContaining({ name: "Test", ownerId: otherOwnerId })
+        expect.objectContaining({ name: "Test", ownerId })
       );
     });
   });

@@ -1,6 +1,7 @@
 import { ApiTokenPermission } from "@/core/enums/api-token-permission.enum";
 import { CredentialKind } from "@/core/enums/credential-kind.enum";
 import { UserRole } from "@/core/enums/user-role.enum";
+import type { TenantScope } from "@/core/persistence/types/scope.type";
 import type {
   ApiTokenRequestContext,
   RequestContext,
@@ -60,4 +61,8 @@ export function toApiTokenRequestContext(
     credentialKind: CredentialKind.API_TOKEN,
     permissions,
   };
+}
+
+export function toTenantScope(ctx: RequestContext): TenantScope {
+  return { userId: ctx.userId, crossTenant: isSuperAdmin(ctx) };
 }

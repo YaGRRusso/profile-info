@@ -1,4 +1,5 @@
 import { INestApplication } from "@nestjs/common";
+import { testRequestContext } from "@test/fixtures/request-context";
 import { App } from "supertest/types";
 import { UserRole } from "@/core/enums/user-role.enum";
 import { CoursesService } from "@/modules/courses/courses.service";
@@ -62,9 +63,10 @@ describe("Skill delete cascade (integration)", () => {
       category: SkillCategory.LANGUAGE,
     });
 
-    const course = await coursesService.createOne(null, {
+    const ownerCtx = testRequestContext({ userId: owner._id.toString() });
+
+    const course = await coursesService.createOne(ownerCtx, {
       slug: "typescript-course",
-      ownerId: owner._id.toString(),
       organization: organization._id.toString(),
       status: CourseStatus.COMPLETE,
       i18n: [
@@ -77,7 +79,7 @@ describe("Skill delete cascade (integration)", () => {
         },
       ],
       skills: [skill._id.toString()],
-    } as CreateCourseInput & { ownerId: string });
+    } as CreateCourseInput);
 
     expect(course.skills?.map((id) => id.toString())).toContain(
       skill._id.toString()
@@ -86,7 +88,7 @@ describe("Skill delete cascade (integration)", () => {
     await skillsService.removeOne(skill._id.toString());
 
     const updatedCourse = await coursesService.findOneById(
-      null,
+      ownerCtx,
       course._id.toString()
     );
 

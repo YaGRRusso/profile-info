@@ -3,15 +3,18 @@ import { getModelToken } from "@nestjs/mongoose";
 import { Test, TestingModule } from "@nestjs/testing";
 import { testRequestContext } from "@test/fixtures/request-context";
 import mongoose, { Model } from "mongoose";
+import { UserRole } from "@/core/enums/user-role.enum";
 import { CourseModel } from "@/modules/courses/schemas/course.schema";
 import { CoursesRepository } from "./courses.repository";
 import { CoursesService } from "./courses.service";
 
 const validId = new mongoose.Types.ObjectId().toHexString();
 const invalidId = "not-an-object-id";
-const ctx = testRequestContext();
+const ownerId = "507f1f77bcf86cd799439011";
+const ctx = testRequestContext({ userId: ownerId });
 const fakeDoc = {
   _id: validId,
+  ownerId,
   title: "Full-Stack Bootcamp",
 } as unknown as CourseModel;
 
@@ -43,8 +46,10 @@ describe("CoursesService", () => {
             find: jest.fn(),
             create: jest.fn(),
             findByIdAndUpdate: jest.fn(),
+            findOneAndUpdate: jest.fn(),
             updateMany: jest.fn(),
             findByIdAndDelete: jest.fn(),
+            findOneAndDelete: jest.fn(),
             deleteMany: jest.fn(),
           },
         },
@@ -60,9 +65,14 @@ describe("CoursesService", () => {
   });
 
   describe("findOneById", () => {
-    it("should return the course document", async () => {
-      (model.findById as jest.Mock).mockReturnValue(makeExec(fakeDoc));
+    it("should scope by ownerId", async () => {
+      (model.findOne as jest.Mock).mockReturnValue(makeExec(fakeDoc));
+
       expect(await service.findOneById(ctx, validId)).toBe(fakeDoc);
+      expect(model.findOne).toHaveBeenCalledWith({
+        _id: validId,
+        ownerId,
+      });
     });
 
     it("should throw BadRequestException for invalid ID", async () => {
@@ -72,7 +82,7 @@ describe("CoursesService", () => {
     });
 
     it("should throw NotFoundException when not found", async () => {
-      (model.findById as jest.Mock).mockReturnValue(makeExec(null));
+      (model.findOne as jest.Mock).mockReturnValue(makeExec(null));
       await expect(service.findOneById(ctx, validId)).rejects.toThrow(
         NotFoundException
       );
@@ -80,19 +90,61 @@ describe("CoursesService", () => {
   });
 
   describe("createOne", () => {
-    it("should return the created document", async () => {
+    it("should inject ownerId for regular users", async () => {
       (model.create as jest.Mock).mockResolvedValue(fakeDoc);
+
       const result = await service.createOne(ctx, {
-        title: "Full-Stack Bootcamp",
+        slug: "bootcamp",
       } as any);
+
       expect(result).toBe(fakeDoc);
+      expect(model.create).toHaveBeenCalledWith(
+        expect.objectContaining({ ownerId })
+      );
+    });
+
+    it("should inject ownerId from context for super admins", async () => {
+      const superAdminCtx = testRequestContext({
+        role: UserRole.SUPER_ADMIN,
+        userId: ownerId,
+      });
+      (model.create as jest.Mock).mockResolvedValue(fakeDoc);
+
+      await service.createOne(superAdminCtx, { slug: "bootcamp" } as any);
+
+      expect(model.create).toHaveBeenCalledWith(
+        expect.objectContaining({ ownerId })
+      );
+    });
+
+    it("should ignore ownerId in input and use context userId", async () => {
+      const otherOwnerId = new mongoose.Types.ObjectId().toHexString();
+      (model.create as jest.Mock).mockResolvedValue(fakeDoc);
+
+      await service.createOne(ctx, {
+        slug: "bootcamp",
+        ownerId: otherOwnerId,
+      } as any);
+
+      expect(model.create).toHaveBeenCalledWith(
+        expect.objectContaining({ ownerId, slug: "bootcamp" })
+      );
+      expect(model.create).not.toHaveBeenCalledWith(
+        expect.objectContaining({ ownerId: otherOwnerId })
+      );
     });
   });
 
   describe("updateOne", () => {
     it("should return the updated document", async () => {
-      (model.findByIdAndUpdate as jest.Mock).mockReturnValue(makeExec(fakeDoc));
+      (model.findOneAndUpdate as jest.Mock).mockReturnValue(makeExec(fakeDoc));
+
       expect(await service.updateOne(ctx, validId, {})).toBe(fakeDoc);
+      expect(model.findOneAndUpdate).toHaveBeenCalledWith(
+        { _id: validId, ownerId },
+        {},
+        { new: true, runValidators: true }
+      );
     });
 
     it("should throw BadRequestException for invalid ID", async () => {
@@ -104,8 +156,13 @@ describe("CoursesService", () => {
 
   describe("removeOne", () => {
     it("should return the removed document", async () => {
-      (model.findByIdAndDelete as jest.Mock).mockReturnValue(makeExec(fakeDoc));
+      (model.findOneAndDelete as jest.Mock).mockReturnValue(makeExec(fakeDoc));
+
       expect(await service.removeOne(ctx, validId)).toBe(fakeDoc);
+      expect(model.findOneAndDelete).toHaveBeenCalledWith({
+        _id: validId,
+        ownerId,
+      });
     });
 
     it("should throw BadRequestException for invalid ID", async () => {
@@ -120,9 +177,14 @@ describe("CoursesService", () => {
       (model.deleteMany as jest.Mock).mockReturnValue(
         makeExec({ deletedCount: 1 })
       );
+
       expect(await service.removeMany(ctx, [validId])).toEqual({
         succeeded: 1,
         failed: 0,
+      });
+      expect(model.deleteMany).toHaveBeenCalledWith({
+        _id: { $in: [validId] },
+        ownerId,
       });
     });
   });

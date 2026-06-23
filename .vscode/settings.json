@@ -19,6 +19,7 @@
   "editor.tabSize": 2,
   "editor.rulers": [120],
   "emmet.showExpandedAbbreviation": "never",
+  "typescript.tsdk": "node_modules/typescript/lib",
   "editor.codeActionsOnSave": {
     "source.fixAll.biome": "explicit",
     "source.organizeImports.biome": "explicit"

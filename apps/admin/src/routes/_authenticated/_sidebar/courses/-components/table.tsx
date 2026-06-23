@@ -31,7 +31,7 @@ import { useMemo, useState } from "react";
 import { z } from "zod";
 import { BadgeList } from "@/components/display/badge-list";
 import { Link } from "@/components/display/link";
-import { CourseStatus } from "@/generated/graphql/graphql";
+import { CourseStatus, UserRole } from "@/generated/graphql/graphql";
 import { useActiveFilters } from "@/hooks/custom/use-active-filters";
 import { usePersistedState } from "@/hooks/custom/use-persisted-state";
 import { useStableValue } from "@/hooks/custom/use-stable-value";
@@ -39,7 +39,13 @@ import type { CourseRow } from "@/hooks/queries/courses";
 import { cn } from "@/lib/cn";
 import { getMinMaxFacets, getUniqueFacets } from "@/lib/facets";
 import { parseAsShape } from "@/lib/parsers";
+import {
+  canSeeColumn,
+  getRestrictedVisibility,
+  RestrictedColumns,
+} from "@/lib/table-columns";
 import { dateRangeFilter, numberRangeFilter } from "@/lib/table-filters";
+import { useAuthStore } from "@/stores/auth";
 
 const debouncedUrlUpdates = { method: "debounce" as const, timeMs: 500 };
 const persistentOptions = { clearOnDefault: true, history: "push" as const };
@@ -68,17 +74,21 @@ const relevanceParser = parseAsShape(
   limitUrlUpdates: debouncedUrlUpdates,
 });
 
-const STATUS_LABELS: Array<{ value: CourseStatus; label: string }> = [
+const STATUS_LABELS: { value: CourseStatus; label: string }[] = [
   { value: CourseStatus.Complete, label: "Complete" },
   { value: CourseStatus.Incomplete, label: "Incomplete" },
   { value: CourseStatus.InProgress, label: "In Progress" },
 ];
 
-const DATE_OPTIONS = [
+const DATE_OPTIONS: { value: string; label: string }[] = [
   { value: "", label: "Any date" },
   { value: "week", label: "Last 7 days" },
   { value: "month", label: "This month" },
 ];
+
+const RESTRICTED_COLUMNS: RestrictedColumns = {
+  [UserRole.SuperAdmin]: ["ownerId"],
+};
 
 const columnHelper = createColumnHelper<CourseRow>();
 
@@ -124,6 +134,14 @@ const getColumns = (
   }),
   columnHelper.accessor("slug", {
     header: "Slug",
+  }),
+  columnHelper.accessor("ownerId", {
+    header: "Owner ID",
+    enableGlobalFilter: false,
+    enableSorting: false,
+    cell: (data) => (
+      <span className="font-mono text-xs">{data.getValue()}</span>
+    ),
   }),
   columnHelper.accessor((row) => row.organization?.name ?? "", {
     id: "organization",
@@ -252,6 +270,7 @@ export function CoursesTable({
   onMultiView,
   onMultiDelete,
 }: CoursesTableProps) {
+  const userRole = useAuthStore((state) => state.user?.role);
   const [searchQuery, setSearchQuery] = useQueryState("query", queryParser);
   const [sort, setSort] = useQueryState("sort", sortParser);
   const [status, setStatus] = useQueryState("status", statusParser);
@@ -325,7 +344,11 @@ export function CoursesTable({
       sorting: sort,
       columnFilters,
       rowSelection,
-      columnVisibility,
+      columnVisibility: getRestrictedVisibility(
+        columnVisibility,
+        RESTRICTED_COLUMNS,
+        userRole
+      ),
     },
     onSortingChange: handleSortingChange,
     onRowSelectionChange: setRowSelection,
@@ -500,6 +523,9 @@ export function CoursesTable({
                 {table
                   .getAllColumns()
                   .filter((col) => col.getCanHide())
+                  .filter((col) =>
+                    canSeeColumn(RESTRICTED_COLUMNS, col.id, userRole)
+                  )
                   .map((col) => (
                     <label
                       className="flex items-center gap-2 text-sm"

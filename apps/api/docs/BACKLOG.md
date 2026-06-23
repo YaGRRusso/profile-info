@@ -1,10 +1,7 @@
-# Multi-tenant backlog
-
-> Work deferred from [ADR 001](./001-multi-tenant-migration.md). Not planned in
-> detail — revisit once the backend structure is stable. Ordered by likely priority.
+# API Backlog
 
 - **User can use your own integration token:** Users can use your own token of Open Router, Github etc.,
-- **Test suite overhaul:** E2e/integration specs still assume single-tenant public reads and pass `ownerId` via cast until tenant lots land; systematic rewrite once API enforces isolation.
+- **Test suite overhaul:** E2e/integration specs for unmigrated entities may still use legacy patterns; add per-entity isolation e2e as each private entity completes the ADR 001 checklist (starting with Course).
 - **REST auth for controllers:** `resume.pdf` (and future REST routes) should accept API tokens in headers, not public `userId` param.
 - **User registration flow:** Today accounts are created manually in MongoDB; need a decision (public sign-up, invite-only, paid).
 - **Collaborative catalog:** Users submit skill/org create-update requests; `SUPER_ADMIN` moderates; local overrides per tenant.

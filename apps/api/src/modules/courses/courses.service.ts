@@ -4,6 +4,7 @@ import {
   labelFromI18nTitle,
   RecentActivityRecord,
 } from "@/common/helpers/recent-activity.helper";
+import { toTenantScope } from "@/core/context/request-context.helper";
 import type { RequestContext } from "@/core/context/request-context.interface";
 import { BatchEntity } from "@/core/entities/batch.entity";
 import { PaginatedModel } from "@/core/schemas/paginated.schema";
@@ -16,30 +17,27 @@ import { UpdateCourseInput } from "./dto/update-course.input";
 export class CoursesService {
   constructor(private readonly repository: CoursesRepository) {}
 
-  findOneById(_ctx: RequestContext | null, id: string): Promise<CourseModel> {
-    return this.repository.findOneById(id);
+  findOneById(ctx: RequestContext, id: string): Promise<CourseModel> {
+    return this.repository.tenant.findOneById(toTenantScope(ctx), id);
   }
 
   findOne(
-    _ctx: RequestContext | null,
+    ctx: RequestContext,
     {
       filters,
     }: {
       filters?: QueryFilter<CourseModel>;
     }
   ): Promise<CourseModel> {
-    return this.repository.findOne({ filters });
+    return this.repository.tenant.findOne(toTenantScope(ctx), { filters });
   }
 
-  findManyById(
-    _ctx: RequestContext | null,
-    ids: string[]
-  ): Promise<CourseModel[]> {
-    return this.repository.findManyById(ids);
+  findManyById(ctx: RequestContext, ids: string[]): Promise<CourseModel[]> {
+    return this.repository.tenant.findManyById(toTenantScope(ctx), ids);
   }
 
   findMany(
-    _ctx: RequestContext | null,
+    ctx: RequestContext,
     {
       filters,
       sort,
@@ -52,56 +50,74 @@ export class CoursesService {
       skip?: number;
     }
   ): Promise<PaginatedModel<CourseModel>> {
-    return this.repository.findMany({ filters, sort, skip, limit });
+    return this.repository.tenant.findMany(toTenantScope(ctx), {
+      filters,
+      sort,
+      skip,
+      limit,
+    });
   }
 
-  createOne(
-    _ctx: RequestContext | null,
+  async createOne(
+    ctx: RequestContext,
     createInput: CreateCourseInput
   ): Promise<CourseModel> {
-    return this.repository.createOne(createInput as AnyKeys<CourseModel>);
-  }
+    const scope = toTenantScope(ctx);
 
-  async createMany(
-    _ctx: RequestContext | null,
-    createInputs: CreateCourseInput[]
-  ): Promise<BatchEntity> {
-    return await this.repository.createMany(
-      createInputs as AnyKeys<CourseModel>[]
+    return await this.repository.tenant.createOne(
+      scope,
+      this.toCreatePayload(createInput)
     );
   }
 
+  async createMany(
+    ctx: RequestContext,
+    createInputs: CreateCourseInput[]
+  ): Promise<BatchEntity> {
+    const scope = toTenantScope(ctx);
+    const payloads = createInputs.map((input) => this.toCreatePayload(input));
+
+    return await this.repository.tenant.createMany(scope, payloads);
+  }
+
   updateOne(
-    _ctx: RequestContext | null,
+    ctx: RequestContext,
     id: string,
     updateInput: UpdateCourseInput
   ): Promise<CourseModel> {
-    return this.repository.updateOneById(
+    const scope = toTenantScope(ctx);
+
+    return this.repository.tenant.updateOneById(
+      scope,
       id,
-      updateInput as object as UpdateQuery<CourseModel>
+      this.toUpdatePayload(updateInput)
     );
   }
 
   async updateMany(
-    _ctx: RequestContext | null,
+    ctx: RequestContext,
     ids: string[],
     updateInput: UpdateCourseInput
   ): Promise<BatchEntity> {
-    return await this.repository.updateManyById(
+    const scope = toTenantScope(ctx);
+
+    return await this.repository.tenant.updateManyById(
+      scope,
       ids,
-      updateInput as object as UpdateQuery<CourseModel>
+      this.toUpdatePayload(updateInput)
     );
   }
 
-  removeOne(_ctx: RequestContext | null, id: string): Promise<CourseModel> {
-    return this.repository.deleteOneById(id);
+  removeOne(ctx: RequestContext, id: string): Promise<CourseModel> {
+    const scope = toTenantScope(ctx);
+
+    return this.repository.tenant.deleteOneById(scope, id);
   }
 
-  async removeMany(
-    _ctx: RequestContext | null,
-    ids: string[]
-  ): Promise<BatchEntity> {
-    return await this.repository.deleteManyById(ids);
+  async removeMany(ctx: RequestContext, ids: string[]): Promise<BatchEntity> {
+    const scope = toTenantScope(ctx);
+
+    return await this.repository.tenant.deleteManyById(scope, ids);
   }
 
   count(): Promise<number> {
@@ -135,5 +151,23 @@ export class CoursesService {
 
   async purgeByOrganization(organizationId: string): Promise<void> {
     await this.repository.deleteMany({ organization: organizationId });
+  }
+
+  private toCreatePayload(input: CreateCourseInput): AnyKeys<CourseModel> {
+    const { ownerId: _, ...rest } = input as CreateCourseInput & {
+      ownerId?: string;
+    };
+
+    return rest as AnyKeys<CourseModel>;
+  }
+
+  private toUpdatePayload(
+    updateInput: UpdateCourseInput
+  ): UpdateQuery<CourseModel> {
+    const { ownerId: _, ...rest } = updateInput as UpdateCourseInput & {
+      ownerId?: string;
+    };
+
+    return rest as UpdateQuery<CourseModel>;
   }
 }

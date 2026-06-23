@@ -1551,7 +1551,7 @@ export type FindManyCoursesQueryVariables = Exact<{
 }>;
 
 
-export type FindManyCoursesQuery = { __typename?: 'Query', findManyCourses: { __typename?: 'PaginatedCourseEntity', found: number, nodes: Array<{ __typename?: 'CourseEntity', id: string, slug: string, status: CourseStatus, relevance: number, url?: string | null, image?: string | null, hours?: number | null, createdAt: any, updatedAt: any, organization: { __typename?: 'OrganizationEntity', id: string, name: string, slug: string }, i18n: Array<{ __typename?: 'CourseTranslationLocale', locale: string, messages: { __typename?: 'CourseMessages', title: string, description: string } }>, skills?: Array<{ __typename?: 'SkillEntity', id: string, name: string }> | null }> } };
+export type FindManyCoursesQuery = { __typename?: 'Query', findManyCourses: { __typename?: 'PaginatedCourseEntity', found: number, nodes: Array<{ __typename?: 'CourseEntity', id: string, slug: string, ownerId: string, status: CourseStatus, relevance: number, url?: string | null, image?: string | null, hours?: number | null, createdAt: any, updatedAt: any, organization: { __typename?: 'OrganizationEntity', id: string, name: string, slug: string }, i18n: Array<{ __typename?: 'CourseTranslationLocale', locale: string, messages: { __typename?: 'CourseMessages', title: string, description: string } }>, skills?: Array<{ __typename?: 'SkillEntity', id: string, name: string }> | null }> } };
 
 export type DashboardQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -2029,6 +2029,7 @@ export const FindManyCoursesDocument = new TypedDocumentString(`
     nodes {
       id
       slug
+      ownerId
       status
       relevance
       url

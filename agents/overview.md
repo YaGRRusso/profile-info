@@ -81,7 +81,7 @@ The auth handshake: admin calls the `signIn(signInInput: SignInInput!): String!`
 - Types: `tsconfig.base.json` sets `strictNullChecks: true` (not full `strict`). The API package loosens `noImplicitAny` and `strictBindCallApply` to `false`.
 - Naming: files and folders are kebab-case; suffixes signal role (`*.resolver.ts`, `*.service.ts`, `*.schema.ts`, `*.entity.ts`, `*.input.ts`).
 - Code artifacts (names, comments, files) are written in English even though project discussion may be in Portuguese.
-- Testing: API uses Jest (`*.spec.ts` unit, `*.e2e-spec.ts` e2e). The admin has no test setup yet.
+- Testing: API uses Jest — unit tests in `src/**/*.spec.ts`; e2e/integration in `test/**/*.spec.ts` (`npm run test` vs `npm run test:e2e`). The admin has no test setup yet.
 
 ## Environment variables
 

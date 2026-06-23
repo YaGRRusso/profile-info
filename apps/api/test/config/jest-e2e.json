@@ -8,8 +8,8 @@
   "testTimeout": 120000,
   "maxWorkers": 1,
   "testMatch": [
-    "<rootDir>/test/e2e/**/*.e2e-spec.ts",
-    "<rootDir>/test/integration/**/*.integration-spec.ts"
+    "<rootDir>/test/e2e/**/*.spec.ts",
+    "<rootDir>/test/integration/**/*.spec.ts"
   ],
   "moduleNameMapper": {
     "^@/(.*)$": "<rootDir>/src/$1",

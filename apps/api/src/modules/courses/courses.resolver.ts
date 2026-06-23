@@ -9,10 +9,7 @@ import {
   Resolver,
 } from "@nestjs/graphql";
 import type { RequestContext } from "@/core/context/request-context.interface";
-import { Public } from "@/core/decorators/public-route.decorator";
-import { Roles } from "@/core/decorators/roles.decorator";
 import { BatchEntity } from "@/core/entities/batch.entity";
-import { UserRole } from "@/core/enums/user-role.enum";
 import { PaginationInput } from "@/core/inputs/pagination.input";
 import { CurrentRequestContext } from "@/modules/auth/decorators/current-request-context.decorator";
 import { CourseModel } from "@/modules/courses/schemas/course.schema";
@@ -32,35 +29,37 @@ export class CoursesResolver {
 
   // QUERIES
 
-  @Public()
   @Query(() => CourseEntity)
-  findOneCourseById(@Args("courseId", { type: () => ID }) courseId: string) {
-    return this.coursesService.findOneById(null, courseId);
+  findOneCourseById(
+    @CurrentRequestContext() ctx: RequestContext,
+    @Args("courseId", { type: () => ID }) courseId: string
+  ) {
+    return this.coursesService.findOneById(ctx, courseId);
   }
 
-  @Public()
   @Query(() => CourseEntity)
   findOneCourse(
+    @CurrentRequestContext() ctx: RequestContext,
     @Args("courseFilters", {
       type: () => FilterCourseInput,
       nullable: true,
     })
     courseFilters?: FilterCourseInput
   ) {
-    return this.coursesService.findOne(null, { filters: courseFilters });
+    return this.coursesService.findOne(ctx, { filters: courseFilters });
   }
 
-  @Public()
   @Query(() => [CourseEntity])
   findManyCourseById(
+    @CurrentRequestContext() ctx: RequestContext,
     @Args("courseIds", { type: () => [ID] }) courseIds: string[]
   ) {
-    return this.coursesService.findManyById(null, courseIds);
+    return this.coursesService.findManyById(ctx, courseIds);
   }
 
-  @Public()
   @Query(() => PaginatedCourseEntity)
   findManyCourses(
+    @CurrentRequestContext() ctx: RequestContext,
     @Args("courseFilters", {
       type: () => FilterCourseInput,
       nullable: true,
@@ -77,7 +76,7 @@ export class CoursesResolver {
     })
     courseSort?: SortCourseInput
   ) {
-    return this.coursesService.findMany(null, {
+    return this.coursesService.findMany(ctx, {
       filters: courseFilters,
       sort: courseSort,
       limit: coursePagination?.limit,
@@ -87,7 +86,6 @@ export class CoursesResolver {
 
   // MUTATIONS
 
-  @Roles(UserRole.SUPER_ADMIN)
   @Mutation(() => CourseEntity)
   createOneCourse(
     @CurrentRequestContext() ctx: RequestContext,
@@ -97,7 +95,6 @@ export class CoursesResolver {
     return this.coursesService.createOne(ctx, createCourseInput);
   }
 
-  @Roles(UserRole.SUPER_ADMIN)
   @Mutation(() => BatchEntity)
   createManyCourses(
     @CurrentRequestContext() ctx: RequestContext,
@@ -107,7 +104,6 @@ export class CoursesResolver {
     return this.coursesService.createMany(ctx, createCourseInputs);
   }
 
-  @Roles(UserRole.SUPER_ADMIN)
   @Mutation(() => CourseEntity)
   updateOneCourse(
     @CurrentRequestContext() ctx: RequestContext,
@@ -118,7 +114,6 @@ export class CoursesResolver {
     return this.coursesService.updateOne(ctx, courseId, updateCourseInput);
   }
 
-  @Roles(UserRole.SUPER_ADMIN)
   @Mutation(() => BatchEntity)
   updateManyCourses(
     @CurrentRequestContext() ctx: RequestContext,
@@ -129,7 +124,6 @@ export class CoursesResolver {
     return this.coursesService.updateMany(ctx, courseIds, updateCourseInput);
   }
 
-  @Roles(UserRole.SUPER_ADMIN)
   @Mutation(() => CourseEntity)
   removeOneCourse(
     @CurrentRequestContext() ctx: RequestContext,
@@ -138,7 +132,6 @@ export class CoursesResolver {
     return this.coursesService.removeOne(ctx, courseId);
   }
 
-  @Roles(UserRole.SUPER_ADMIN)
   @Mutation(() => BatchEntity)
   removeManyCourses(
     @CurrentRequestContext() ctx: RequestContext,

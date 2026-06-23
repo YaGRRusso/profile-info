@@ -264,7 +264,7 @@ async function seed() {
       name: "Admin",
       nickname: "admin",
       email: "admin@profile.info",
-      password: "pass.123",
+      password: "admin.pass",
       role: UserRole.SUPER_ADMIN,
     }),
   ]);

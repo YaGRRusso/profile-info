@@ -4,6 +4,7 @@ import { formatPeriod } from "@/common/helpers/format-period.helper";
 import { pickTranslation } from "@/common/helpers/pick-translation.helper";
 import { truncateText } from "@/common/helpers/truncate-text.helper";
 import { DEFAULT_LOCALE, type LocaleCode } from "@/common/i18n/locales";
+import { toRequestContext } from "@/core/context/request-context.helper";
 import { UserRole } from "@/core/enums/user-role.enum";
 import { CoursesService } from "@/modules/courses/courses.service";
 import { EducationsService } from "@/modules/educations/educations.service";
@@ -53,6 +54,11 @@ export class ResumeService {
     const user = users[0];
     if (!user) throw new NotFoundException("Profile user not found");
 
+    const portfolioCtx = toRequestContext({
+      id: user._id.toString(),
+      role: user.role ?? UserRole.USER,
+    });
+
     const [
       skillsResult,
       experiencesResult,
@@ -72,7 +78,7 @@ export class ResumeService {
         sort: { relevance: -1 },
         limit: RESUME_LIMITS.educations,
       }),
-      this.coursesService.findMany(null, {
+      this.coursesService.findMany(portfolioCtx, {
         filters: { status: "COMPLETE" },
         sort: { relevance: -1 },
         limit: RESUME_LIMITS.certifications,

@@ -63,17 +63,13 @@ export class TenantScopedRepository<T> {
     });
   }
 
-  findManyUnscoped(query: FindManyQuery<T>): Promise<MultiPaged<T>> {
-    return this.repository.findMany(query);
-  }
-
   createOne(scope: TenantScope, createInput: AnyKeys<T>): Promise<Single<T>> {
-    if (scope.crossTenant) {
-      return this.repository.createOne(createInput);
-    }
+    const { ownerId: _, ...rest } = createInput as AnyKeys<T> & {
+      ownerId?: string;
+    };
 
     return this.repository.createOne({
-      ...createInput,
+      ...rest,
       ownerId: scope.userId,
     } as AnyKeys<T>);
   }
@@ -82,14 +78,16 @@ export class TenantScopedRepository<T> {
     scope: TenantScope,
     createInputs: AnyKeys<T>[]
   ): Promise<BatchCount> {
-    if (scope.crossTenant) {
-      return this.repository.createMany(createInputs);
-    }
+    const payloads = createInputs.map((input) => {
+      const { ownerId: _, ...rest } = input as AnyKeys<T> & {
+        ownerId?: string;
+      };
 
-    const payloads = createInputs.map((input) => ({
-      ...input,
-      ownerId: scope.userId,
-    }));
+      return {
+        ...rest,
+        ownerId: scope.userId,
+      };
+    });
 
     return this.repository.createMany(payloads as AnyKeys<T>[]);
   }
