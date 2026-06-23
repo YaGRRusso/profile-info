@@ -58,7 +58,7 @@ describe("TenantScopedStatsRepository", () => {
       ]);
 
       expect(model.aggregate).toHaveBeenCalledWith([
-        { $match: { ownerId } },
+        { $match: { ownerId: new mongoose.Types.ObjectId(ownerId) } },
         { $group: { _id: "$status", value: { $sum: 1 } } },
         { $sort: { value: -1 } },
       ]);

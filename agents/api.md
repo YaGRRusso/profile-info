@@ -65,7 +65,7 @@ Full diagram and field detail: `apps/api/docs/ER_MODEL.md`.
 
 `core/` (cross-cutting NestJS infra, domain-agnostic):
 
-- `persistence/`: generic MongoDB layer — `CrudRepository`, `StatsRepository` (catalog), `TenantScopedStatsRepository` (private entities), `TenantScopedCrudRepository`, `BatchCount`, `withTenantScope`, `assertBatchSucceeded`. Unit specs in `persistence/repositories/*.spec.ts`.
+- `persistence/`: generic MongoDB layer — `CrudRepository`, `StatsRepository` (catalog), `TenantScopedStatsRepository` (private entities), `TenantScopedCrudRepository`, `BatchCount`, `withTenantScope`, `withTenantScopeForAggregate` (aggregate `$match` only), `assertBatchSucceeded`. Unit specs in `persistence/repositories/*.spec.ts`.
 - `filters/persistence-exception.filter.ts`: global `APP_FILTER` — maps persistence errors to HTTP exceptions: Mongo `E11000`/`E11001` → 409, Mongo `121` + Mongoose `ValidationError`/`CastError` → 400, `MongooseServerSelectionError` → 503. Services do not catch these; use `assertDuplicate` / `assertReferencesExist` in `common/helpers/assert.helper.ts` only for domain-specific pre-checks.
 - `events/`: `domain-events.ts` (event name constants), `skill-deleted.event.ts`, `organization-deleted.event.ts` (neutral payload classes).
 - `enums/credential-kind.enum.ts`: shared `CredentialKind` enum (`SESSION`, `API_TOKEN`).
@@ -170,6 +170,7 @@ Run from `apps/api/` or via root `api:*` aliases: `dev`, `prod`, `build`, `start
 ## Gotchas & notes
 
 - **NestJS GraphQL resolver hot-reload:** changing a resolver method signature (`@Auth`, `@Args`, `@Context` order or count) under `nest start --watch` can leave **stale parameter-binding metadata** for that method only. Symptom: one query (e.g. `findManyEducations`) throws `Cannot read properties of null (reading 'userId')` in `toTenantScope`, while sibling entities with identical resolver shape work. **Do not refactor auth or param decorators until this is ruled out.** First step: **restart the API process** (stop `nr dev`, start again) or revert + clean restart. Compare `ROUTE_ARGS_METADATA` with a working resolver if unsure. Only change code if the error survives a full restart.
+- **Tenant `countByField` / aggregate:** `withTenantScope` uses string `userId` for `find`/`countDocuments` (Mongoose casts). `TenantScopedStatsRepository.countByField` must use `withTenantScopeForAggregate` so `$match.ownerId` is `ObjectId` — otherwise USER dashboards show empty `experiencesByCategory` / `coursesByStatus` while totals and SUPER_ADMIN charts work.
 - `ValidationPipe` has `whitelist: true`: on `@InputType`, use `@RequiredField()` / `@OptionalField()` — never bare `@Field` (silently dropped). Both exist mainly to register the property with `class-validator` for whitelist; `@RequiredField` uses `@IsDefined()`, `@OptionalField` uses `@IsOptional()`. Stack `@Is*` when you need format validation.
 - Regenerate `src/schema.gql` after type changes so admin codegen stays in sync. E2E/integration tests use in-memory schema (`autoSchemaFile: true` when `NODE_ENV=test`) so they never overwrite the committed file — `TestAppModule` omits `AiToolsModule` and would strip AI types if it wrote to disk.
 - New public GraphQL fields need `@Public()` or they 401.

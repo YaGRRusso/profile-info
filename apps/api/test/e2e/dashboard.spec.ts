@@ -5,10 +5,12 @@ import { UserRole } from "@/core/enums/user-role.enum";
 import { CoursesService } from "@/modules/courses/courses.service";
 import { CreateCourseInput } from "@/modules/courses/dto/create-course.input";
 import { CourseStatus } from "@/modules/courses/enums/status.enum";
-import { CreateEducationInput } from "@/modules/educations/dto/create-education.input";
 import { EducationsService } from "@/modules/educations/educations.service";
 import { EducationLevel } from "@/modules/educations/enums/level.enum";
 import { EducationStatus } from "@/modules/educations/enums/status.enum";
+import { CreateExperienceInput } from "@/modules/experiences/dto/create-experience.input";
+import { ExperienceCategory } from "@/modules/experiences/enums/category.enum";
+import { ExperiencesService } from "@/modules/experiences/experiences.service";
 import { OrganizationCategory } from "@/modules/organizations/enums/category.enum";
 import { OrganizationsService } from "@/modules/organizations/organizations.service";
 import { SkillCategory } from "@/modules/skills/enums/category.enum";
@@ -33,6 +35,10 @@ const DASHBOARD_QUERY = `
         label
         value
       }
+      experiencesByCategory {
+        label
+        value
+      }
       skillsByCategory {
         label
         value
@@ -48,6 +54,7 @@ describe("Dashboard (e2e)", () => {
   let bobToken: string;
   let coursesService: CoursesService;
   let educationsService: EducationsService;
+  let experiencesService: ExperiencesService;
   let organizationsService: OrganizationsService;
   let organizationId: string;
 
@@ -60,6 +67,7 @@ describe("Dashboard (e2e)", () => {
     const skillsService = testApp.module.get(SkillsService);
     coursesService = testApp.module.get(CoursesService);
     educationsService = testApp.module.get(EducationsService);
+    experiencesService = testApp.module.get(ExperiencesService);
     organizationsService = testApp.module.get(OrganizationsService);
 
     await usersService.createOne({
@@ -158,6 +166,38 @@ describe("Dashboard (e2e)", () => {
       ],
     } as CreateEducationInput);
 
+    await experiencesService.createOne(aliceCtx, {
+      slug: "alice-experience-full-time",
+      organizationId,
+      category: ExperienceCategory.FULL_TIME,
+      roles: [
+        {
+          i18n: [
+            {
+              locale: "en",
+              messages: { title: "Engineer", description: "Backend work" },
+            },
+          ],
+        },
+      ],
+    } as CreateExperienceInput);
+
+    await experiencesService.createOne(aliceCtx, {
+      slug: "alice-experience-freelance",
+      organizationId,
+      category: ExperienceCategory.FREELANCE,
+      roles: [
+        {
+          i18n: [
+            {
+              locale: "en",
+              messages: { title: "Consultant", description: "Side projects" },
+            },
+          ],
+        },
+      ],
+    } as CreateExperienceInput);
+
     await coursesService.createOne(bobCtx, {
       slug: "bob-course",
       organizationId,
@@ -193,6 +233,7 @@ describe("Dashboard (e2e)", () => {
           experiences: number;
         };
         coursesByStatus: Array<{ label: string; value: number }>;
+        experiencesByCategory: Array<{ label: string; value: number }>;
         skillsByCategory: Array<{ label: string; value: number }>;
       };
     }>(app, {
@@ -206,14 +247,19 @@ describe("Dashboard (e2e)", () => {
     expect(dashboard?.totals.courses).toBe(2);
     expect(dashboard?.totals.educations).toBe(1);
     expect(dashboard?.totals.projects).toBe(0);
-    expect(dashboard?.totals.experiences).toBe(0);
+    expect(dashboard?.totals.experiences).toBe(2);
     expect(dashboard?.totals.skills).toBe(1);
-    expect(dashboard?.totals.organizations).toBe(1);
     expect(dashboard?.totals.organizations).toBe(1);
     expect(dashboard?.coursesByStatus).toEqual(
       expect.arrayContaining([
         { label: CourseStatus.COMPLETE, value: 1 },
         { label: CourseStatus.IN_PROGRESS, value: 1 },
+      ])
+    );
+    expect(dashboard?.experiencesByCategory).toEqual(
+      expect.arrayContaining([
+        { label: ExperienceCategory.FULL_TIME, value: 1 },
+        { label: ExperienceCategory.FREELANCE, value: 1 },
       ])
     );
     expect(dashboard?.skillsByCategory).toEqual([
