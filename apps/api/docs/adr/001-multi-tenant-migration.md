@@ -8,7 +8,7 @@
 
 ## Where we are
 
-**Current phase: 5a — Catalog & user reads** (entity migration **4 of 4** complete).
+**Current phase: 5b — Peripheral modules** (phase **5a** complete).
 
 | Phase | Scope | State |
 |-------|--------|-------|
@@ -17,24 +17,16 @@
 | **2** | **Experience** — replicate Course checklist | Done |
 | **3** | **Education** | Done |
 | **4** | **Project** | Done |
-| **5a** | Catalog & user reads (auth on `skills`, `organizations`, `users` queries) | **Next** |
-| **5b** | Peripheral modules (`resume`, `dashboard`, `ai-tools`) | Pending |
+| **5a** | Catalog & user reads (auth on `skills`, `organizations`, `users` queries) | Done |
+| **5b** | Peripheral modules (`resume`, `dashboard`, `ai-tools`) | **Next** |
 | **5c** | API tokens (collection, guard, CRUD, permission e2e) | Pending |
 | **5d** | `user.deleted` cascade + seed tokens | Pending |
 
-**Course is the only fully migrated private entity.** Experience, Education, and Project still
-expose **public reads** (`@Public()` queries, `ctx: null` in services, no
-`TenantScopedCrudRepository`). Their mutations still carry legacy `@Roles(SUPER_ADMIN)` and do not
-inject `ownerId` — they must be brought in line with Course, not patched incrementally.
-
-Incremental work landed **ahead of strict phase order** (does not replace entity migration):
-
-- Mongo FK naming: `organizationId`, `skillIds` (plus `ownerId`) on all private schemas.
-- GraphQL **output** exposes both scalars (`ownerId`, `organizationId`, `skillIds`) and
-  resolved objects (`owner`, `organization`, `skills`) via `@ResolveField` + DataLoaders
-  (`batchUsers`, `batchOrganizations`, `batchSkills`).
 - Seed: Alice, Bob (`USER`) + Admin (`SUPER_ADMIN`); private data alternates `ownerId`.
 - Admin (out of ADR scope): courses CRUD against tenant API; owner column for super admin.
+
+**All four private entities** (Course, Experience, Education, Project) are fully migrated:
+`@Auth()` on every operation, `TenantScopedCrudRepository` + `tenantStats`, no `@Public()` reads.
 
 ---
 
@@ -133,7 +125,9 @@ entities (`skills`, `organizations`). Composed as `readonly stats`.
 #### `TenantScopedStatsRepository<T>`
 
 Same API as `StatsRepository`, but every method takes `TenantScope` and applies
-`withTenantScope`. Composed as `readonly tenantStats` on private-entity repos.
+`withTenantScope` (or `withTenantScopeForAggregate` in `countByField` — aggregate
+`$match` requires `ObjectId` `ownerId`; Mongoose casts string `ownerId` in
+`find` / `countDocuments` only). Composed as `readonly tenantStats` on private-entity repos.
 Service methods take `ctx: AuthContext` and delegate via `toTenantScope(ctx)`.
 
 **Dashboard rule:** private entities → `tenantStats` (USER sees own data;
@@ -143,8 +137,10 @@ Service methods take `ctx: AuthContext` and delegate via `toTenantScope(ctx)`.
 
 Composition wrapper over `CrudRepository` (does **not** extend it).
 
-- `withTenantScope(scope, filter)` adds `ownerId: scope.userId` when
-  `crossTenant: false`.
+- `withTenantScope(scope, filter)` adds `ownerId: scope.userId` (string) when
+  `crossTenant: false` — used by `find` / `countDocuments`.
+- `withTenantScopeForAggregate(scope, filter)` adds `ownerId` as `ObjectId` — used
+  only by `TenantScopedStatsRepository.countByField`.
 - `createOne` / `createMany` always inject `scope.userId`; strip `ownerId` from payload (defense for internal callers — GraphQL inputs never expose `ownerId`).
 - **No unscoped read helpers** — if you need unscoped access, you are in the wrong
   layer (use `CrudRepository` directly inside a cascade listener, not from a service).
@@ -226,8 +222,8 @@ Token CRUD requires session JWT. See [Permission matrix](#permission-matrix).
 | `resume` | `buildResume(userId)`; `GET /resume.pdf?userId=` stays public | Legacy: picks first `SUPER_ADMIN` user |
 | `dashboard` | Session JWT; counts scoped to `ownerId` (`SUPER_ADMIN`: platform-wide) | `@Roles(SUPER_ADMIN)` only; global counts |
 | `ai-tools` | Session JWT; any authenticated user | `@Roles(SUPER_ADMIN)` only |
-| `users` | Auth on reads; `SUPER_ADMIN` for user CRUD | Reads `@Public()`; mutations `SUPER_ADMIN` |
-| `skills` / `organizations` | Auth on reads; `SUPER_ADMIN` for mutations | Reads `@Public()`; mutations `SUPER_ADMIN` |
+| `users` | Auth on reads; `SUPER_ADMIN` for user CRUD | Reads require JWT; mutations `SUPER_ADMIN` |
+| `skills` / `organizations` | Auth on reads; `SUPER_ADMIN` for mutations | Reads require JWT; mutations `SUPER_ADMIN` |
 
 ---
 
@@ -315,16 +311,13 @@ Do **not** start phase N+1 until phase N passes its [entity gate](#entity-gate).
 Phase 5 is **not** one PR. It is four small phases after all private entities
 migrate. Each has its own gate; do not batch unrelated concerns.
 
-#### Phase 5a — Catalog & user reads
+#### Phase 5a — Catalog & user reads ✅
 
 | Item | ~scope |
 |------|--------|
 | Remove `@Public()` from `skills` / `organizations` / `users` **queries** | 3 resolvers |
 | Keep `SUPER_ADMIN` on catalog **mutations** | unchanged |
-| E2e: unauthenticated catalog read → 401 | 1 spec file |
-
-**Why first:** smallest auth surface; unblocks admin relying on JWT for reads
-without touching tenant logic.
+| E2e: unauthenticated catalog read → 401 | `test/e2e/catalog.spec.ts` |
 
 **Gate:** `npm run api:test` · smoke e2e on catalog queries.
 

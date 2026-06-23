@@ -1,5 +1,4 @@
 import { Args, ID, Mutation, Query, Resolver } from "@nestjs/graphql";
-import { Public } from "@/core/decorators/public-route.decorator";
 import { Roles } from "@/core/decorators/roles.decorator";
 import { BatchEntity } from "@/core/entities/batch.entity";
 import { UserRole } from "@/core/enums/user-role.enum";
@@ -20,7 +19,6 @@ export class OrganizationsResolver {
 
   // QUERIES
 
-  @Public()
   @Query(() => OrganizationEntity)
   findOneOrganizationById(
     @Args("organizationId", { type: () => ID }) organizationId: string
@@ -28,7 +26,6 @@ export class OrganizationsResolver {
     return this.organizationsService.findOneById(organizationId);
   }
 
-  @Public()
   @Query(() => OrganizationEntity)
   findOneOrganization(
     @Args("organizationFilters", {
@@ -40,7 +37,6 @@ export class OrganizationsResolver {
     return this.organizationsService.findOne({ filters: organizationFilters });
   }
 
-  @Public()
   @Query(() => [OrganizationEntity])
   findManyOrganizationById(
     @Args("organizationIds", { type: () => [ID] }) organizationIds: string[]
@@ -48,7 +44,6 @@ export class OrganizationsResolver {
     return this.organizationsService.findManyById(organizationIds);
   }
 
-  @Public()
   @Query(() => PaginatedOrganizationEntity)
   findManyOrganizations(
     @Args("organizationFilters", {

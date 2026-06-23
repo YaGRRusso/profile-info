@@ -1,5 +1,4 @@
 import { Args, ID, Mutation, Query, Resolver } from "@nestjs/graphql";
-import { Public } from "@/core/decorators/public-route.decorator";
 import { Roles } from "@/core/decorators/roles.decorator";
 import { BatchEntity } from "@/core/entities/batch.entity";
 import { UserRole } from "@/core/enums/user-role.enum";
@@ -17,13 +16,11 @@ export class UsersResolver {
 
   // QUERIES
 
-  @Public()
   @Query(() => UserEntity)
   findOneUserById(@Args("userId", { type: () => ID }) userId: string) {
     return this.usersService.findOneById(userId);
   }
 
-  @Public()
   @Query(() => UserEntity)
   findOneUser(
     @Args("userFilters", {
@@ -35,13 +32,11 @@ export class UsersResolver {
     return this.usersService.findOne({ filters: userFilters });
   }
 
-  @Public()
   @Query(() => [UserEntity])
   findManyUserById(@Args("userIds", { type: () => [ID] }) userIds: string[]) {
     return this.usersService.findManyById(userIds);
   }
 
-  @Public()
   @Query(() => PaginatedUserEntity)
   findManyUsers(
     @Args("userFilters", {

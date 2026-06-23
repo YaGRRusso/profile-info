@@ -63,6 +63,23 @@ describe("TenantScopedStatsRepository", () => {
         { $sort: { value: -1 } },
       ]);
     });
+
+    it("should not scope aggregation by ownerId for cross-tenant access", async () => {
+      model.aggregate.mockResolvedValue([{ _id: "FULL_TIME", value: 2 }]);
+
+      await expect(
+        repository.countByField(
+          { userId: ownerId, crossTenant: true },
+          "category"
+        )
+      ).resolves.toEqual([{ label: "FULL_TIME", value: 2 }]);
+
+      expect(model.aggregate).toHaveBeenCalledWith([
+        { $match: {} },
+        { $group: { _id: "$category", value: { $sum: 1 } } },
+        { $sort: { value: -1 } },
+      ]);
+    });
   });
 
   describe("findRecentlyUpdated", () => {

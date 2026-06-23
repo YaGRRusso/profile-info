@@ -56,7 +56,8 @@ The threat model is intentional, not accidental:
 
 | Operation class | Auth | Who |
 |-----------------|------|-----|
-| Profile reads (`findManySkills`, `findManyExperiences`, …) | None (`@Public()`) | Anyone |
+| Catalog reads (`findManySkills`, `findManyOrganizations`, `findManyUsers`) | JWT | Authenticated users |
+| Private entity reads (`findManyCourses`, …) | JWT + `@Auth()` | Tenant-scoped |
 | `GET /resume.pdf` | None (REST; guard skips non-GraphQL) | Anyone |
 | `signIn` | None (`@Public()`) | Anyone |
 | `getMe` | JWT | Any authenticated user |
