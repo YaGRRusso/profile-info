@@ -220,7 +220,7 @@ describe("CrudRepository", () => {
       expect(model.findByIdAndUpdate).toHaveBeenCalledWith(
         docId,
         { name: "Updated" },
-        { new: true, runValidators: true }
+        { returnDocument: "after", runValidators: true }
       );
     });
   });

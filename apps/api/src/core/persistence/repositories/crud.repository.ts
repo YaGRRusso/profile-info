@@ -123,7 +123,10 @@ export class CrudRepository<T> {
     assertValidObjectId(id);
 
     const res = await this.model
-      .findByIdAndUpdate(id, updateInput, { new: true, runValidators: true })
+      .findByIdAndUpdate(id, updateInput, {
+        returnDocument: "after",
+        runValidators: true,
+      })
       .exec();
 
     if (isNil(res)) throw new NotFoundException(PERSISTENCE_NOT_UPDATED);
@@ -162,7 +165,7 @@ export class CrudRepository<T> {
 
     const res = await this.model
       .findOneAndUpdate(clearedFilters, updateInput, {
-        new: true,
+        returnDocument: "after",
         runValidators: true,
       })
       .exec();
@@ -181,7 +184,7 @@ export class CrudRepository<T> {
     const res = await this.model
       .updateMany(clearedFilters, update, {
         ...options,
-        ...{ new: true, runValidators: true },
+        runValidators: true,
       })
       .exec();
 

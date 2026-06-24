@@ -234,7 +234,7 @@ describe("UsersService", () => {
       expect(model.findByIdAndUpdate).toHaveBeenCalledWith(
         "507f1f77bcf86cd799439011",
         expect.objectContaining({ password: "hashed-password" }),
-        { new: true, runValidators: true }
+        { returnDocument: "after", runValidators: true }
       );
     });
   });

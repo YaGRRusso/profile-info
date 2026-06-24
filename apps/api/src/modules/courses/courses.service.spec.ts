@@ -126,7 +126,7 @@ describe("CoursesService", () => {
       expect(model.findOneAndUpdate).toHaveBeenCalledWith(
         { _id: validId, ownerId },
         {},
-        { new: true, runValidators: true }
+        { returnDocument: "after", runValidators: true }
       );
     });
 
