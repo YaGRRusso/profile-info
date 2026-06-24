@@ -13,7 +13,9 @@
   ],
   "moduleNameMapper": {
     "^@/(.*)$": "<rootDir>/src/$1",
-    "^@test/(.*)$": "<rootDir>/test/$1"
+    "^@test/(.*)$": "<rootDir>/test/$1",
+    "^@octokit/rest$": "<rootDir>/test/mocks/octokit-rest.mock.ts",
+    "^@openrouter/sdk(.*)$": "<rootDir>/test/mocks/openrouter-sdk.mock.ts"
   },
   "transform": {
     "^.+\\.(t|j)s$": [
