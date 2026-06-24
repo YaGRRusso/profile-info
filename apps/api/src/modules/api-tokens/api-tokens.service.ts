@@ -121,8 +121,13 @@ export class ApiTokensService {
 
   private toEntity(apiToken: ApiTokenModel): ApiTokenEntity {
     return {
-      ...apiToken,
-      ownerId: apiToken.ownerId.toString(),
+      id: String(apiToken.id),
+      ownerId: String(apiToken.ownerId),
+      name: apiToken.name,
+      permissions: apiToken.permissions,
+      expiresAt: apiToken.expiresAt,
+      createdAt: apiToken.createdAt,
+      updatedAt: apiToken.updatedAt,
     };
   }
 

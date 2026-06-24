@@ -5,6 +5,7 @@ import {
   GearIcon,
   GraduationCapIcon,
   HouseIcon,
+  KeyIcon,
   ListIcon,
   PackageIcon,
   RocketLaunchIcon,
@@ -76,6 +77,12 @@ const MENU_SECTIONS: MenuSection[] = [
   {
     label: "Actions",
     items: [
+      {
+        icon: <KeyIcon size={24} weight="duotone" />,
+        label: "Tokens",
+        to: "/api-tokens",
+        type: "link",
+      },
       {
         icon: <GearIcon size={24} />,
         label: "Settings",

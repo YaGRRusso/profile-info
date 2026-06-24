@@ -24,6 +24,22 @@ export type AiEntity = {
   usage?: Maybe<UsageEntity>;
 };
 
+export type ApiTokenEntity = {
+  __typename?: 'ApiTokenEntity';
+  createdAt: Scalars['DateTime']['output'];
+  expiresAt?: Maybe<Scalars['DateTime']['output']>;
+  id: Scalars['ID']['output'];
+  name: Scalars['String']['output'];
+  ownerId: Scalars['String']['output'];
+  permissions: Array<ApiTokenPermission>;
+  updatedAt: Scalars['DateTime']['output'];
+};
+
+export enum ApiTokenPermission {
+  Mutate = 'MUTATE',
+  Query = 'QUERY'
+}
+
 export type AtsSummarizeInput = {
   details?: InputMaybe<Array<DetailInput>>;
   raw: Scalars['String']['input'];
@@ -95,6 +111,12 @@ export type CourseTranslationLocale = {
   __typename?: 'CourseTranslationLocale';
   locale: Scalars['String']['output'];
   messages: CourseMessages;
+};
+
+export type CreateApiTokenInput = {
+  expiresAt?: InputMaybe<Scalars['DateTime']['input']>;
+  name: Scalars['String']['input'];
+  permissions: Array<ApiTokenPermission>;
 };
 
 export type CreateCourseInput = {
@@ -384,6 +406,12 @@ export type ExperienceTranslationLocale = {
   messages: ExperienceMessages;
 };
 
+export type FilterApiTokenInput = {
+  expiresAt?: InputMaybe<Scalars['DateTime']['input']>;
+  name?: InputMaybe<Scalars['String']['input']>;
+  permissions?: InputMaybe<Array<ApiTokenPermission>>;
+};
+
 export type FilterCourseInput = {
   hours?: InputMaybe<Scalars['Int']['input']>;
   i18n?: InputMaybe<Array<CreateCourseMessagesInputTranslationInput>>;
@@ -475,6 +503,7 @@ export type Mutation = {
   createManyProjects: BatchEntity;
   createManySkills: BatchEntity;
   createManyUsers: BatchEntity;
+  createOneApiToken: NewApiTokenEntity;
   createOneCourse: CourseEntity;
   createOneEducation: EducationEntity;
   createOneExperience: ExperienceEntity;
@@ -482,6 +511,7 @@ export type Mutation = {
   createOneProject: ProjectEntity;
   createOneSkill: SkillEntity;
   createOneUser: UserEntity;
+  removeManyApiTokens: BatchEntity;
   removeManyCourses: BatchEntity;
   removeManyEducations: BatchEntity;
   removeManyExperiences: BatchEntity;
@@ -489,6 +519,7 @@ export type Mutation = {
   removeManyProjects: BatchEntity;
   removeManySkills: BatchEntity;
   removeManyUsers: BatchEntity;
+  removeOneApiToken: ApiTokenEntity;
   removeOneCourse: CourseEntity;
   removeOneEducation: EducationEntity;
   removeOneExperience: ExperienceEntity;
@@ -499,6 +530,7 @@ export type Mutation = {
   signIn: Scalars['String']['output'];
   summarize: AiEntity;
   translate: AiEntity;
+  updateManyApiTokens: BatchEntity;
   updateManyCourses: BatchEntity;
   updateManyEducations: BatchEntity;
   updateManyExperiences: BatchEntity;
@@ -507,6 +539,7 @@ export type Mutation = {
   updateManySkills: BatchEntity;
   updateManyUsers: BatchEntity;
   updateMe: UserEntity;
+  updateOneApiToken: ApiTokenEntity;
   updateOneCourse: CourseEntity;
   updateOneEducation: EducationEntity;
   updateOneExperience: ExperienceEntity;
@@ -557,6 +590,11 @@ export type MutationCreateManyUsersArgs = {
 };
 
 
+export type MutationCreateOneApiTokenArgs = {
+  createApiTokenInput: CreateApiTokenInput;
+};
+
+
 export type MutationCreateOneCourseArgs = {
   createCourseInput: CreateCourseInput;
 };
@@ -592,6 +630,11 @@ export type MutationCreateOneUserArgs = {
 };
 
 
+export type MutationRemoveManyApiTokensArgs = {
+  apiTokenIds: Array<Scalars['ID']['input']>;
+};
+
+
 export type MutationRemoveManyCoursesArgs = {
   courseIds: Array<Scalars['ID']['input']>;
 };
@@ -624,6 +667,11 @@ export type MutationRemoveManySkillsArgs = {
 
 export type MutationRemoveManyUsersArgs = {
   userIds: Array<Scalars['ID']['input']>;
+};
+
+
+export type MutationRemoveOneApiTokenArgs = {
+  apiTokenId: Scalars['ID']['input'];
 };
 
 
@@ -677,6 +725,12 @@ export type MutationTranslateArgs = {
 };
 
 
+export type MutationUpdateManyApiTokensArgs = {
+  apiTokenIds: Array<Scalars['ID']['input']>;
+  updateApiTokenInput: UpdateApiTokenInput;
+};
+
+
 export type MutationUpdateManyCoursesArgs = {
   courseIds: Array<Scalars['ID']['input']>;
   updateCourseInput: UpdateCourseInput;
@@ -724,6 +778,12 @@ export type MutationUpdateMeArgs = {
 };
 
 
+export type MutationUpdateOneApiTokenArgs = {
+  apiTokenId: Scalars['ID']['input'];
+  updateApiTokenInput: UpdateApiTokenInput;
+};
+
+
 export type MutationUpdateOneCourseArgs = {
   courseId: Scalars['ID']['input'];
   updateCourseInput: UpdateCourseInput;
@@ -765,6 +825,12 @@ export type MutationUpdateOneUserArgs = {
   userId: Scalars['ID']['input'];
 };
 
+export type NewApiTokenEntity = {
+  __typename?: 'NewApiTokenEntity';
+  apiToken: ApiTokenEntity;
+  token: Scalars['String']['output'];
+};
+
 export enum OrganizationCategory {
   Company = 'COMPANY',
   Other = 'OTHER',
@@ -794,6 +860,12 @@ export type OrganizationTranslationLocale = {
   __typename?: 'OrganizationTranslationLocale';
   locale: Scalars['String']['output'];
   messages: OrganizationMessages;
+};
+
+export type PaginatedApiTokenEntity = {
+  __typename?: 'PaginatedApiTokenEntity';
+  found: Scalars['Float']['output'];
+  nodes: Array<ApiTokenEntity>;
 };
 
 export type PaginatedCourseEntity = {
@@ -874,6 +946,8 @@ export type ProjectMessagesTranslationEntity = {
 export type Query = {
   __typename?: 'Query';
   dashboard: DashboardEntity;
+  findManyApiTokenById: Array<ApiTokenEntity>;
+  findManyApiTokens: PaginatedApiTokenEntity;
   findManyCourseById: Array<CourseEntity>;
   findManyCourses: PaginatedCourseEntity;
   findManyEducationById: Array<EducationEntity>;
@@ -888,6 +962,8 @@ export type Query = {
   findManySkills: PaginatedSkillEntity;
   findManyUserById: Array<UserEntity>;
   findManyUsers: PaginatedUserEntity;
+  findOneApiToken: ApiTokenEntity;
+  findOneApiTokenById: ApiTokenEntity;
   findOneCourse: CourseEntity;
   findOneCourseById: CourseEntity;
   findOneEducation: EducationEntity;
@@ -903,6 +979,18 @@ export type Query = {
   findOneUser: UserEntity;
   findOneUserById: UserEntity;
   getMe: UserEntity;
+};
+
+
+export type QueryFindManyApiTokenByIdArgs = {
+  apiTokenIds: Array<Scalars['ID']['input']>;
+};
+
+
+export type QueryFindManyApiTokensArgs = {
+  apiTokenFilters?: InputMaybe<FilterApiTokenInput>;
+  apiTokenPagination?: InputMaybe<PaginationInput>;
+  apiTokenSort?: InputMaybe<SortApiTokenInput>;
 };
 
 
@@ -987,6 +1075,16 @@ export type QueryFindManyUsersArgs = {
   userFilters?: InputMaybe<FilterUserInput>;
   userPagination?: InputMaybe<PaginationInput>;
   userSort?: InputMaybe<SortUserInput>;
+};
+
+
+export type QueryFindOneApiTokenArgs = {
+  apiTokenFilters?: InputMaybe<FilterApiTokenInput>;
+};
+
+
+export type QueryFindOneApiTokenByIdArgs = {
+  apiTokenId: Scalars['ID']['input'];
 };
 
 
@@ -1092,6 +1190,13 @@ export type SkillEntity = {
   updatedAt: Scalars['DateTime']['output'];
 };
 
+export type SortApiTokenInput = {
+  createdAt?: InputMaybe<SortEnum>;
+  expiresAt?: InputMaybe<SortEnum>;
+  name?: InputMaybe<SortEnum>;
+  updatedAt?: InputMaybe<SortEnum>;
+};
+
 export type SortCourseInput = {
   createdAt?: InputMaybe<SortEnum>;
   relevance?: InputMaybe<SortEnum>;
@@ -1151,6 +1256,12 @@ export type TranslateInput = {
   raw: Scalars['String']['input'];
   sourceLanguage?: InputMaybe<Scalars['String']['input']>;
   targetLanguage: Scalars['String']['input'];
+};
+
+export type UpdateApiTokenInput = {
+  expiresAt?: InputMaybe<Scalars['DateTime']['input']>;
+  name?: InputMaybe<Scalars['String']['input']>;
+  permissions?: InputMaybe<Array<ApiTokenPermission>>;
 };
 
 export type UpdateCourseInput = {
@@ -1313,6 +1424,43 @@ export type TranslateMutationVariables = Exact<{
 
 
 export type TranslateMutation = { __typename?: 'Mutation', translate: { __typename?: 'AiEntity', messages: Array<{ __typename?: 'ChoiceEntity', finishReason?: ChatFinishReason | null, message: { __typename?: 'MessageEntity', content: string, reasoning?: string | null, refusal?: string | null, role: ChatRole } }>, usage?: { __typename?: 'UsageEntity', completionTokens?: number | null, cost?: number | null, promptTokens?: number | null, totalTokens?: number | null } | null } };
+
+export type CreateOneApiTokenMutationVariables = Exact<{
+  createApiTokenInput: CreateApiTokenInput;
+}>;
+
+
+export type CreateOneApiTokenMutation = { __typename?: 'Mutation', createOneApiToken: { __typename?: 'NewApiTokenEntity', token: string, apiToken: { __typename?: 'ApiTokenEntity', id: string, ownerId: string, name: string, permissions: Array<ApiTokenPermission>, expiresAt?: any | null, createdAt: any, updatedAt: any } } };
+
+export type UpdateOneApiTokenMutationVariables = Exact<{
+  apiTokenId: Scalars['ID']['input'];
+  updateApiTokenInput: UpdateApiTokenInput;
+}>;
+
+
+export type UpdateOneApiTokenMutation = { __typename?: 'Mutation', updateOneApiToken: { __typename?: 'ApiTokenEntity', id: string, ownerId: string, name: string, permissions: Array<ApiTokenPermission>, expiresAt?: any | null, createdAt: any, updatedAt: any } };
+
+export type UpdateManyApiTokensMutationVariables = Exact<{
+  apiTokenIds: Array<Scalars['ID']['input']> | Scalars['ID']['input'];
+  updateApiTokenInput: UpdateApiTokenInput;
+}>;
+
+
+export type UpdateManyApiTokensMutation = { __typename?: 'Mutation', updateManyApiTokens: { __typename?: 'BatchEntity', succeeded: number, failed: number } };
+
+export type RemoveOneApiTokenMutationVariables = Exact<{
+  apiTokenId: Scalars['ID']['input'];
+}>;
+
+
+export type RemoveOneApiTokenMutation = { __typename?: 'Mutation', removeOneApiToken: { __typename?: 'ApiTokenEntity', id: string, name: string, permissions: Array<ApiTokenPermission>, expiresAt?: any | null, createdAt: any, updatedAt: any } };
+
+export type RemoveManyApiTokensMutationVariables = Exact<{
+  apiTokenIds: Array<Scalars['ID']['input']> | Scalars['ID']['input'];
+}>;
+
+
+export type RemoveManyApiTokensMutation = { __typename?: 'Mutation', removeManyApiTokens: { __typename?: 'BatchEntity', succeeded: number, failed: number } };
 
 export type SignInMutationVariables = Exact<{
   signInInput: SignInInput;
@@ -1550,6 +1698,15 @@ export type UpdateMeMutationVariables = Exact<{
 
 export type UpdateMeMutation = { __typename?: 'Mutation', updateMe: { __typename?: 'UserEntity', id: string, email: string, name: string, nickname: string, role: UserRole, avatar?: string | null, phone?: string | null, birth?: string | null, address?: string | null, i18n?: Array<{ __typename?: 'UserTranslationLocale', locale: string, messages: { __typename?: 'UserMessages', title?: string | null, description?: string | null } }> | null, urls?: Array<{ __typename?: 'UrlEntity', title: string, value: string }> | null } };
 
+export type FindManyApiTokensQueryVariables = Exact<{
+  apiTokenFilters?: InputMaybe<FilterApiTokenInput>;
+  apiTokenPagination?: InputMaybe<PaginationInput>;
+  apiTokenSort?: InputMaybe<SortApiTokenInput>;
+}>;
+
+
+export type FindManyApiTokensQuery = { __typename?: 'Query', findManyApiTokens: { __typename?: 'PaginatedApiTokenEntity', found: number, nodes: Array<{ __typename?: 'ApiTokenEntity', id: string, ownerId: string, name: string, permissions: Array<ApiTokenPermission>, expiresAt?: any | null, createdAt: any, updatedAt: any }> } };
+
 export type GetMeQueryVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -1696,6 +1853,69 @@ export const TranslateDocument = new TypedDocumentString(`
   }
 }
     `) as unknown as TypedDocumentString<TranslateMutation, TranslateMutationVariables>;
+export const CreateOneApiTokenDocument = new TypedDocumentString(`
+    mutation CreateOneApiToken($createApiTokenInput: CreateApiTokenInput!) {
+  createOneApiToken(createApiTokenInput: $createApiTokenInput) {
+    token
+    apiToken {
+      id
+      ownerId
+      name
+      permissions
+      expiresAt
+      createdAt
+      updatedAt
+    }
+  }
+}
+    `) as unknown as TypedDocumentString<CreateOneApiTokenMutation, CreateOneApiTokenMutationVariables>;
+export const UpdateOneApiTokenDocument = new TypedDocumentString(`
+    mutation UpdateOneApiToken($apiTokenId: ID!, $updateApiTokenInput: UpdateApiTokenInput!) {
+  updateOneApiToken(
+    apiTokenId: $apiTokenId
+    updateApiTokenInput: $updateApiTokenInput
+  ) {
+    id
+    ownerId
+    name
+    permissions
+    expiresAt
+    createdAt
+    updatedAt
+  }
+}
+    `) as unknown as TypedDocumentString<UpdateOneApiTokenMutation, UpdateOneApiTokenMutationVariables>;
+export const UpdateManyApiTokensDocument = new TypedDocumentString(`
+    mutation UpdateManyApiTokens($apiTokenIds: [ID!]!, $updateApiTokenInput: UpdateApiTokenInput!) {
+  updateManyApiTokens(
+    apiTokenIds: $apiTokenIds
+    updateApiTokenInput: $updateApiTokenInput
+  ) {
+    succeeded
+    failed
+  }
+}
+    `) as unknown as TypedDocumentString<UpdateManyApiTokensMutation, UpdateManyApiTokensMutationVariables>;
+export const RemoveOneApiTokenDocument = new TypedDocumentString(`
+    mutation RemoveOneApiToken($apiTokenId: ID!) {
+  removeOneApiToken(apiTokenId: $apiTokenId) {
+    id
+    name
+    permissions
+    expiresAt
+    createdAt
+    updatedAt
+  }
+}
+    `) as unknown as TypedDocumentString<RemoveOneApiTokenMutation, RemoveOneApiTokenMutationVariables>;
+export const RemoveManyApiTokensDocument = new TypedDocumentString(`
+    mutation RemoveManyApiTokens($apiTokenIds: [ID!]!) {
+  removeManyApiTokens(apiTokenIds: $apiTokenIds) {
+    succeeded
+    failed
+  }
+}
+    `) as unknown as TypedDocumentString<RemoveManyApiTokensMutation, RemoveManyApiTokensMutationVariables>;
 export const SignInDocument = new TypedDocumentString(`
     mutation SignIn($signInInput: SignInInput!) {
   signIn(signInInput: $signInInput)
@@ -2003,6 +2223,26 @@ export const UpdateMeDocument = new TypedDocumentString(`
   }
 }
     `) as unknown as TypedDocumentString<UpdateMeMutation, UpdateMeMutationVariables>;
+export const FindManyApiTokensDocument = new TypedDocumentString(`
+    query FindManyApiTokens($apiTokenFilters: FilterApiTokenInput, $apiTokenPagination: PaginationInput, $apiTokenSort: SortApiTokenInput) {
+  findManyApiTokens(
+    apiTokenFilters: $apiTokenFilters
+    apiTokenPagination: $apiTokenPagination
+    apiTokenSort: $apiTokenSort
+  ) {
+    found
+    nodes {
+      id
+      ownerId
+      name
+      permissions
+      expiresAt
+      createdAt
+      updatedAt
+    }
+  }
+}
+    `) as unknown as TypedDocumentString<FindManyApiTokensQuery, FindManyApiTokensQueryVariables>;
 export const GetMeDocument = new TypedDocumentString(`
     query GetMe {
   getMe {
