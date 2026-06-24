@@ -99,7 +99,7 @@ export function ApiTokenForm({
               field.handleChange(value as ApiTokenPermission[])
             }
             options={PERMISSION_OPTIONS}
-            placeholder={PLACEHOLDERS.choosePermissions}
+            placeholder={PLACEHOLDERS.chooseMulti}
             value={field.state.value}
           />
         )}

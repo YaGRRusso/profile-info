@@ -1,42 +1,34 @@
 export const PLACEHOLDERS = {
-  slug: "e.g. senior-software-engineer",
-  name: "e.g. John Smith",
-  skillName: "e.g. React, TypeScript",
-  organizationName: "e.g. Acme Corp",
+  // basics
+  slug: "e.g. my-slug",
   nickname: "e.g. johndoe",
-  title: "e.g. Senior Software Engineer",
-  profileDescription:
-    "Brief professional summary — highlights your experience and goals",
-  email: "you@example.com",
-  phone: "+55 11 99999-9999",
-  address: "Street, City, State, Country",
-  password: "Enter your password",
-  newPassword: "Leave blank to keep current",
-  avatarUrl: "https://example.com/avatar.png",
-  logoUrl: "https://cdn.example.com/logo.png",
-  websiteUrl: "https://company.com",
-  imageUrl: "https://example.com/image.png",
-  certificateUrl: "https://example.com/certificate",
-  linkTitle: "e.g. GitHub, LinkedIn, Demo",
-  linkUrl: "https://github.com/username",
-  hours: "e.g. 40",
-  chooseCategory: "Choose a category",
-  chooseLevel: "Choose education level",
-  chooseStatus: "Choose a status",
-  chooseOrganization: "Pick an organization",
-  chooseLanguage: "Choose a language",
-  choosePermissions: "Choose permissions",
-  apiTokenName: "e.g. CI pipeline",
-  searchSkills: "Type to search skills...",
-  organizationDescription:
-    "What the organization does and its role in your profile",
-  experienceRoleTitle: "e.g. Senior Software Engineer",
-  experienceDescription:
-    "Key responsibilities, technologies used, and measurable results",
-  educationTitle: "e.g. B.S. Computer Science",
-  educationDescription: "Notable coursework, achievements, or areas of focus",
+  email: "e.g. you@example.com",
+  phone: "e.g. 11 99999-9999",
+  address: "e.g. Street, City, State, Country",
+  url: "e.g. https://example.com",
+  hours: "e.g. 24",
+  password: "e.g. abc#123",
+
+  // names
+  profileName: "e.g. John Doe",
+  skillName: "e.g. Javascript, TypeScript",
+  organizationName: "e.g. Acme Corp",
+  apiTokenName: "e.g. Pipeline Token",
+
+  // titles
+  profileTitle: "e.g. Senior Software Engineer",
+  experienceTitle: "e.g. Senior Software Engineer",
+  educationTitle: "e.g. Computer Science",
   courseTitle: "e.g. Advanced React Patterns",
-  courseDescription: "Topics covered and skills you developed",
   projectTitle: "e.g. E-commerce Platform",
-  projectDescription: "What you built, your role, and the impact it had",
+  linkTitle: "e.g. GitHub, LinkedIn, Demo",
+
+  // choose
+  choose: "Choose...",
+  chooseOne: "Choose one...",
+  chooseMulti: "Choose one or more...",
+
+  // completions
+  search: "Type to search...",
+  description: "Write a brief description...",
 } as const;

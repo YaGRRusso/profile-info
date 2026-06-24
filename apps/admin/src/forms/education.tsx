@@ -335,7 +335,7 @@ export function EducationForm({
             name={field.name}
             onChange={field.handleChange}
             options={organizationOptions}
-            placeholder={PLACEHOLDERS.chooseOrganization}
+            placeholder={PLACEHOLDERS.chooseOne}
             value={field.state.value}
           />
         )}
@@ -348,7 +348,7 @@ export function EducationForm({
             name={field.name}
             onChange={(value) => field.handleChange(value as EducationLevel)}
             options={LEVEL_OPTIONS}
-            placeholder={PLACEHOLDERS.chooseLevel}
+            placeholder={PLACEHOLDERS.chooseOne}
             value={field.state.value}
           />
         )}
@@ -361,7 +361,7 @@ export function EducationForm({
             name={field.name}
             onChange={(value) => field.handleChange(value as EducationStatus)}
             options={STATUS_OPTIONS}
-            placeholder={PLACEHOLDERS.chooseStatus}
+            placeholder={PLACEHOLDERS.chooseOne}
             value={field.state.value}
           />
         )}
@@ -373,7 +373,7 @@ export function EducationForm({
             label="URL"
             name={field.name}
             onChange={field.handleChange}
-            placeholder={PLACEHOLDERS.certificateUrl}
+            placeholder={PLACEHOLDERS.url}
             value={field.state.value}
           />
         )}
@@ -385,7 +385,7 @@ export function EducationForm({
             label="Image"
             name={field.name}
             onChange={field.handleChange}
-            placeholder={PLACEHOLDERS.imageUrl}
+            placeholder={PLACEHOLDERS.url}
             value={field.state.value}
           />
         )}
@@ -423,7 +423,7 @@ export function EducationForm({
             label="Skills"
             onChange={field.handleChange}
             options={skillOptions}
-            placeholder={PLACEHOLDERS.searchSkills}
+            placeholder={PLACEHOLDERS.search}
             value={field.state.value}
           />
         )}
@@ -452,7 +452,7 @@ export function EducationForm({
                       name={field.name}
                       onChange={field.handleChange}
                       options={LOCALES}
-                      placeholder={PLACEHOLDERS.chooseLanguage}
+                      placeholder={PLACEHOLDERS.chooseOne}
                       value={field.state.value}
                     />
                   )}
@@ -491,7 +491,7 @@ export function EducationForm({
                           field.state.value
                         )
                       }
-                      placeholder={PLACEHOLDERS.educationDescription}
+                      placeholder={PLACEHOLDERS.description}
                       value={field.state.value}
                     />
                   )}

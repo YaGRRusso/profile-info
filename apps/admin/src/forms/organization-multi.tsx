@@ -80,7 +80,7 @@ export function OrganizationMultiForm({
               field.handleChange(value as OrganizationCategory)
             }
             options={CATEGORY_OPTIONS}
-            placeholder={PLACEHOLDERS.chooseCategory}
+            placeholder={PLACEHOLDERS.chooseOne}
             value={field.state.value}
           />
         )}

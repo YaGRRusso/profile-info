@@ -86,7 +86,7 @@ export function EducationMultiForm({
             name={field.name}
             onChange={(value) => field.handleChange(value as EducationLevel)}
             options={LEVEL_OPTIONS}
-            placeholder={PLACEHOLDERS.chooseLevel}
+            placeholder={PLACEHOLDERS.chooseOne}
             value={field.state.value}
           />
         )}
@@ -109,7 +109,7 @@ export function EducationMultiForm({
             name={field.name}
             onChange={(value) => field.handleChange(value as EducationStatus)}
             options={STATUS_OPTIONS}
-            placeholder={PLACEHOLDERS.chooseStatus}
+            placeholder={PLACEHOLDERS.chooseOne}
             value={field.state.value}
           />
         )}

@@ -271,7 +271,7 @@ export function ProjectForm({
             label="Skills"
             onChange={field.handleChange}
             options={skillOptions}
-            placeholder={PLACEHOLDERS.searchSkills}
+            placeholder={PLACEHOLDERS.search}
             value={field.state.value}
           />
         )}
@@ -295,7 +295,7 @@ export function ProjectForm({
                     error={fieldError(field.state.meta)}
                     name={field.name}
                     onChange={field.handleChange}
-                    placeholder={PLACEHOLDERS.imageUrl}
+                    placeholder={PLACEHOLDERS.url}
                     value={field.state.value}
                   />
                 )}
@@ -335,7 +335,7 @@ export function ProjectForm({
                       error={fieldError(field.state.meta)}
                       name={field.name}
                       onChange={field.handleChange}
-                      placeholder={PLACEHOLDERS.linkUrl}
+                      placeholder={PLACEHOLDERS.url}
                       value={field.state.value}
                     />
                   )}
@@ -369,7 +369,7 @@ export function ProjectForm({
                       name={field.name}
                       onChange={field.handleChange}
                       options={LOCALES}
-                      placeholder={PLACEHOLDERS.chooseLanguage}
+                      placeholder={PLACEHOLDERS.chooseOne}
                       value={field.state.value}
                     />
                   )}
@@ -408,7 +408,7 @@ export function ProjectForm({
                           field.state.value
                         )
                       }
-                      placeholder={PLACEHOLDERS.projectDescription}
+                      placeholder={PLACEHOLDERS.description}
                       value={field.state.value}
                     />
                   )}

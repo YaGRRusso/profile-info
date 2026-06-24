@@ -265,7 +265,7 @@ export function OrganizationForm({
               field.handleChange(value as OrganizationCategory)
             }
             options={CATEGORY_OPTIONS}
-            placeholder={PLACEHOLDERS.chooseCategory}
+            placeholder={PLACEHOLDERS.chooseOne}
             value={field.state.value}
           />
         )}
@@ -277,7 +277,7 @@ export function OrganizationForm({
             label="Logo"
             name={field.name}
             onChange={field.handleChange}
-            placeholder={PLACEHOLDERS.logoUrl}
+            placeholder={PLACEHOLDERS.url}
             value={field.state.value}
           />
         )}
@@ -289,7 +289,7 @@ export function OrganizationForm({
             label="Website"
             name={field.name}
             onChange={field.handleChange}
-            placeholder={PLACEHOLDERS.websiteUrl}
+            placeholder={PLACEHOLDERS.url}
             value={field.state.value}
           />
         )}
@@ -330,7 +330,7 @@ export function OrganizationForm({
                       name={field.name}
                       onChange={field.handleChange}
                       options={LOCALES}
-                      placeholder={PLACEHOLDERS.chooseLanguage}
+                      placeholder={PLACEHOLDERS.chooseOne}
                       value={field.state.value}
                     />
                   )}
@@ -357,7 +357,7 @@ export function OrganizationForm({
                           field.state.value
                         )
                       }
-                      placeholder={PLACEHOLDERS.organizationDescription}
+                      placeholder={PLACEHOLDERS.description}
                       value={field.state.value}
                     />
                   )}

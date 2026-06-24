@@ -250,7 +250,7 @@ export function ProfileForm({
                 label="Name"
                 name={field.name}
                 onChange={field.handleChange}
-                placeholder={PLACEHOLDERS.name}
+                placeholder={PLACEHOLDERS.profileName}
                 value={field.state.value}
               />
             )}
@@ -290,7 +290,7 @@ export function ProfileForm({
                 label="Avatar URL"
                 name={field.name}
                 onChange={field.handleChange}
-                placeholder={PLACEHOLDERS.avatarUrl}
+                placeholder={PLACEHOLDERS.url}
                 value={field.state.value}
               />
             )}
@@ -324,7 +324,7 @@ export function ProfileForm({
                           name={field.name}
                           onChange={field.handleChange}
                           options={LOCALES}
-                          placeholder={PLACEHOLDERS.chooseLanguage}
+                          placeholder={PLACEHOLDERS.chooseOne}
                           value={field.state.value}
                         />
                       )}
@@ -336,7 +336,7 @@ export function ProfileForm({
                           label="Title"
                           name={field.name}
                           onChange={field.handleChange}
-                          placeholder={PLACEHOLDERS.title}
+                          placeholder={PLACEHOLDERS.profileTitle}
                           value={field.state.value}
                         />
                       )}
@@ -365,7 +365,7 @@ export function ProfileForm({
                               field.state.value
                             )
                           }
-                          placeholder={PLACEHOLDERS.profileDescription}
+                          placeholder={PLACEHOLDERS.description}
                           value={field.state.value}
                         />
                       )}
@@ -433,7 +433,7 @@ export function ProfileForm({
               label="New password"
               name={field.name}
               onChange={field.handleChange}
-              placeholder={PLACEHOLDERS.newPassword}
+              placeholder={PLACEHOLDERS.password}
               value={field.state.value}
             />
           )}
@@ -471,7 +471,7 @@ export function ProfileForm({
                         error={fieldError(field.state.meta)}
                         name={field.name}
                         onChange={field.handleChange}
-                        placeholder={PLACEHOLDERS.linkUrl}
+                        placeholder={PLACEHOLDERS.url}
                         value={field.state.value}
                       />
                     )}

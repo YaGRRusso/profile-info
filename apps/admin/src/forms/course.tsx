@@ -303,7 +303,7 @@ export function CourseForm({
             name={field.name}
             onChange={field.handleChange}
             options={organizationOptions}
-            placeholder={PLACEHOLDERS.chooseOrganization}
+            placeholder={PLACEHOLDERS.chooseOne}
             value={field.state.value}
           />
         )}
@@ -316,7 +316,7 @@ export function CourseForm({
             name={field.name}
             onChange={(value) => field.handleChange(value as CourseStatus)}
             options={STATUS_OPTIONS}
-            placeholder={PLACEHOLDERS.chooseStatus}
+            placeholder={PLACEHOLDERS.chooseOne}
             value={field.state.value}
           />
         )}
@@ -328,7 +328,7 @@ export function CourseForm({
             label="URL"
             name={field.name}
             onChange={field.handleChange}
-            placeholder={PLACEHOLDERS.certificateUrl}
+            placeholder={PLACEHOLDERS.url}
             value={field.state.value}
           />
         )}
@@ -340,7 +340,7 @@ export function CourseForm({
             label="Image"
             name={field.name}
             onChange={field.handleChange}
-            placeholder={PLACEHOLDERS.imageUrl}
+            placeholder={PLACEHOLDERS.url}
             value={field.state.value}
           />
         )}
@@ -381,7 +381,7 @@ export function CourseForm({
             label="Skills"
             onChange={field.handleChange}
             options={skillOptions}
-            placeholder={PLACEHOLDERS.searchSkills}
+            placeholder={PLACEHOLDERS.search}
             value={field.state.value}
           />
         )}
@@ -410,7 +410,7 @@ export function CourseForm({
                       name={field.name}
                       onChange={field.handleChange}
                       options={LOCALES}
-                      placeholder={PLACEHOLDERS.chooseLanguage}
+                      placeholder={PLACEHOLDERS.chooseOne}
                       value={field.state.value}
                     />
                   )}
@@ -449,7 +449,7 @@ export function CourseForm({
                           field.state.value
                         )
                       }
-                      placeholder={PLACEHOLDERS.courseDescription}
+                      placeholder={PLACEHOLDERS.description}
                       value={field.state.value}
                     />
                   )}

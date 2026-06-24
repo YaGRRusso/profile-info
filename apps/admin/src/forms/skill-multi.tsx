@@ -76,7 +76,7 @@ export function SkillMultiForm({
             name={field.name}
             onChange={(value) => field.handleChange(value as SkillCategory)}
             options={CATEGORY_OPTIONS}
-            placeholder={PLACEHOLDERS.chooseCategory}
+            placeholder={PLACEHOLDERS.chooseOne}
             value={field.state.value}
           />
         )}

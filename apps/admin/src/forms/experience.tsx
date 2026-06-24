@@ -331,7 +331,7 @@ export function ExperienceForm({
             name={field.name}
             onChange={field.handleChange}
             options={organizationOptions}
-            placeholder={PLACEHOLDERS.chooseOrganization}
+            placeholder={PLACEHOLDERS.chooseOne}
             value={field.state.value}
           />
         )}
@@ -346,7 +346,7 @@ export function ExperienceForm({
               field.handleChange(value as ExperienceCategory)
             }
             options={CATEGORY_OPTIONS}
-            placeholder={PLACEHOLDERS.chooseCategory}
+            placeholder={PLACEHOLDERS.chooseOne}
             value={field.state.value}
           />
         )}
@@ -401,7 +401,7 @@ export function ExperienceForm({
                       label="Skills"
                       onChange={field.handleChange}
                       options={skillOptions}
-                      placeholder={PLACEHOLDERS.searchSkills}
+                      placeholder={PLACEHOLDERS.search}
                       value={field.state.value}
                     />
                   )}
@@ -437,7 +437,7 @@ export function ExperienceForm({
                                 name={field.name}
                                 onChange={field.handleChange}
                                 options={LOCALES}
-                                placeholder={PLACEHOLDERS.chooseLanguage}
+                                placeholder={PLACEHOLDERS.chooseOne}
                                 value={field.state.value}
                               />
                             )}
@@ -451,7 +451,7 @@ export function ExperienceForm({
                                 label="Title"
                                 name={field.name}
                                 onChange={field.handleChange}
-                                placeholder={PLACEHOLDERS.experienceRoleTitle}
+                                placeholder={PLACEHOLDERS.experienceTitle}
                                 value={field.state.value}
                               />
                             )}
@@ -485,7 +485,7 @@ export function ExperienceForm({
                                     field.state.value
                                   )
                                 }
-                                placeholder={PLACEHOLDERS.experienceDescription}
+                                placeholder={PLACEHOLDERS.description}
                                 value={field.state.value}
                               />
                             )}
