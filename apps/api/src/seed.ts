@@ -5,7 +5,10 @@ import { hash } from "bcryptjs";
 import type { Model } from "mongoose";
 import { AppModule } from "./app.module";
 import { Locale } from "./common/i18n/locales";
+import { ApiTokenPermission } from "./core/enums/api-token-permission.enum";
 import { UserRole } from "./core/enums/user-role.enum";
+import { API_TOKEN_PREFIX } from "./modules/api-tokens/helpers/api-token-secret.helper";
+import { ApiTokenModel } from "./modules/api-tokens/schemas/api-token.schema";
 import { CourseModel } from "./modules/courses/schemas/course.schema";
 import { EducationModel } from "./modules/educations/schemas/education.schema";
 import { ExperienceModel } from "./modules/experiences/schemas/experience.schema";
@@ -118,6 +121,30 @@ const EXPERIENCE_CATEGORIES = [
 ];
 const SEED_LOCALES = [Locale.EN, Locale.PT];
 
+const SEED_API_TOKENS = [
+  {
+    id: "674a00000000000000000001",
+    owner: "alice" as const,
+    name: "Alice dev (query)",
+    permissions: [ApiTokenPermission.QUERY],
+    secret: "alice-query-dev-secret-32-chars!!",
+  },
+  {
+    id: "674a00000000000000000002",
+    owner: "alice" as const,
+    name: "Alice dev (mutate)",
+    permissions: [ApiTokenPermission.MUTATE],
+    secret: "alice-mutate-dev-secret-32-chars!!",
+  },
+  {
+    id: "674a00000000000000000003",
+    owner: "bob" as const,
+    name: "Bob dev (query + mutate)",
+    permissions: [ApiTokenPermission.QUERY, ApiTokenPermission.MUTATE],
+    secret: "bob-combined-dev-secret-32-chars!!",
+  },
+] as const;
+
 const relevance = () => faker.number.int({ min: 1, max: 5 });
 
 const capitalize = (value: string) =>
@@ -199,6 +226,7 @@ async function seed() {
   const projects = model<ProjectModel>(ProjectModel);
   const experiences = model<ExperienceModel>(ExperienceModel);
   const users = model<UserModel>(UserModel);
+  const apiTokens = model<ApiTokenModel>(ApiTokenModel);
 
   await Promise.all([
     skills.deleteMany({}),
@@ -207,6 +235,7 @@ async function seed() {
     educations.deleteMany({}),
     projects.deleteMany({}),
     experiences.deleteMany({}),
+    apiTokens.deleteMany({}),
     users.deleteMany({}),
   ]);
 
@@ -345,6 +374,23 @@ async function seed() {
     }))
   );
 
+  const ownersByKey = {
+    alice: userAlice._id,
+    bob: userBob._id,
+  } as const;
+
+  await apiTokens.create(
+    await Promise.all(
+      SEED_API_TOKENS.map(async (token) => ({
+        _id: token.id,
+        ownerId: ownersByKey[token.owner],
+        name: token.name,
+        hashedSecret: await hash(token.secret, 8),
+        permissions: [...token.permissions],
+      }))
+    )
+  );
+
   const counts = {
     skills: await skills.countDocuments(),
     organizations: await organizations.countDocuments(),
@@ -353,11 +399,17 @@ async function seed() {
     projects: await projects.countDocuments(),
     experiences: await experiences.countDocuments(),
     users: await users.countDocuments(),
+    apiTokens: await apiTokens.countDocuments(),
   };
 
   console.info("alice@profile.info / alice.pass (USER)");
   console.info("bob@profile.info / bob.pass (USER)");
   console.info("admin@profile.info / pass.123 (SUPER_ADMIN)");
+  for (const token of SEED_API_TOKENS) {
+    console.info(
+      `${token.owner} API token (${token.permissions.join("+")}): ${API_TOKEN_PREFIX}${token.id}_${token.secret}`
+    );
+  }
   console.info("seeded:", counts);
 
   await app.close();

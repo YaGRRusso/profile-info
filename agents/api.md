@@ -38,7 +38,7 @@ Request flow: Apollo → `GqlAuthGuard` (unless `@Public()`) → resolver → se
 
 Full diagram and field detail: `apps/api/docs/ER_MODEL.md`.
 
-- MongoDB via Mongoose; seven top-level collections (User, Skill, Organization, Experience, Education, Course, Project).
+- MongoDB via Mongoose; eight top-level collections (User, Skill, Organization, Experience, Education, Course, Project, ApiToken).
 - Organization is referenced by Experience, Education, and Course; Skill is referenced by arrays on Education, Course, Project, and nested Experience roles.
 - Deletes use domain events (`skill.deleted`, `organization.deleted`) for detach and purge; see ER doc for behavior.
 
@@ -161,11 +161,10 @@ Loaded via `--env-file .env.development` / `.env.production` and `ConfigModule`.
 
 Run from `apps/api/` or via root `api:*` aliases: `dev`, `prod`, `build`, `start`, `seed`, `test`, `test:coverage`, `test:e2e`, `typecheck`, `lint`, `format`.
 
-`npm run seed`: wipes profile collections and inserts faker dev data plus `alice@profile.info` / `alice.pass`, `bob@profile.info` / `bob.pass` (USER), and `admin@profile.info` / `pass.123` (SUPER_ADMIN).
+`npm run seed`: wipes profile collections and inserts faker dev data plus `alice@profile.info` / `alice.pass`, `bob@profile.info` / `bob.pass` (USER), and `admin@profile.info` / `pass.123` (SUPER_ADMIN). Logs fixed dev API tokens (`pi_…`) for Alice (QUERY, MUTATE) and Bob (QUERY+MUTATE).
 
 - `GET /health`: Terminus health check with MongoDB ping.
 - Test layout: `test/fixtures/` (shared builders — import `@test/fixtures/…` from unit specs), `test/config/` (Jest e2e config, setup/teardown), `test/support/` (Nest bootstrap + `TestAppModule`), `test/e2e/`, `test/integration/`. Path aliases: `@/*` → `src/`, `@test/*` → `test/` (Jest + `tsconfig.json`).
-- ADRs in `apps/api/docs/adr/`. Multi-tenant: `001-multi-tenant-migration.md` (**Course** reference complete; next: Experience). Deferred work: `backlog.md`.
 
 ## Gotchas & notes
 
