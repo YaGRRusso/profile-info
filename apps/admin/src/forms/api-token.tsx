@@ -2,6 +2,7 @@ import { useForm } from "@tanstack/react-form";
 import z from "zod";
 import { MultiSelectInput } from "@/components/inputs/multi-select";
 import { TextInput } from "@/components/inputs/text";
+import { PLACEHOLDERS } from "@/consts/placeholders";
 import {
   ApiTokenPermission,
   type CreateApiTokenInput,
@@ -83,7 +84,7 @@ export function ApiTokenForm({
             label="Name"
             name={field.name}
             onChange={field.handleChange}
-            placeholder="e.g. CI pipeline"
+            placeholder={PLACEHOLDERS.apiTokenName}
             value={field.state.value}
           />
         )}
@@ -98,7 +99,7 @@ export function ApiTokenForm({
               field.handleChange(value as ApiTokenPermission[])
             }
             options={PERMISSION_OPTIONS}
-            placeholder="Choose permissions"
+            placeholder={PLACEHOLDERS.choosePermissions}
             value={field.state.value}
           />
         )}

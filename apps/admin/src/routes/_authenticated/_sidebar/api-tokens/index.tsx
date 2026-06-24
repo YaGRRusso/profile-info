@@ -164,28 +164,25 @@ function RouteComponent() {
           },
           {
             icon: <PlusIcon />,
-            label: "New Token",
+            label: "New API Token",
             className: "btn-soft",
             onClick: () => setFormValues({ state: "CREATING" }),
           },
         ]}
-        description="Create and manage API tokens for programmatic access to your data."
-        title="API Tokens"
+        description="Create, update or delete API tokens for programmatic access to your data."
+        title="Manage API Tokens"
       />
 
       <Modal
-        description="Fill the details below. The token value is shown only once after creation."
+        description="Fill the details below and submit."
         isOpen={
           formValues?.state === "CREATING" || formValues?.state === "UPDATING"
         }
         onClose={() => setFormValues(undefined)}
-        title={
-          formValues?.state === "CREATING"
-            ? "Create API Token"
-            : "Edit API Token"
-        }
+        title="Manage API Token"
       >
         <ApiTokenForm
+          customValues={formValues?.customValues}
           defaultValues={formValues?.defaultValues}
           isLoading={createOneApiToken.isPending || updateOneApiToken.isPending}
           onCancel={() => setFormValues(undefined)}
@@ -221,10 +218,10 @@ function RouteComponent() {
       </Modal>
 
       <Modal
-        description={`Apply the same permissions to all ${formValues?.customValues?.length ?? 0} selected tokens. Names and expiry are edited one token at a time.`}
+        description={`Update the fields below to apply them to all ${formValues?.customValues?.length ?? 0} selected API tokens.`}
         isOpen={formValues?.state === "MULTI_UPDATING"}
         onClose={() => setFormValues(undefined)}
-        title="Update token permissions"
+        title="Update API Tokens"
       >
         <ApiTokenMultiForm
           isLoading={updateManyApiTokens.isPending}
@@ -254,7 +251,7 @@ function RouteComponent() {
             onClick: () => setFormValues(undefined),
           },
         ]}
-        description="Read only view of the API token metadata."
+        description="Read only view of the API token."
         isOpen={
           formValues?.state === "READING" ||
           formValues?.state === "MULTI_READING"
@@ -310,9 +307,9 @@ function RouteComponent() {
 
         <DataState.Empty>
           <Alert
-            description="Create a token to authenticate scripts and integrations."
+            description="Try refreshing the page or create a new API token."
             icon={<WarningIcon weight="bold" />}
-            title="No API tokens yet"
+            title="Nothing found!"
           />
         </DataState.Empty>
 

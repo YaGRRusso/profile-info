@@ -25,6 +25,8 @@ export const PLACEHOLDERS = {
   chooseStatus: "Choose a status",
   chooseOrganization: "Pick an organization",
   chooseLanguage: "Choose a language",
+  choosePermissions: "Choose permissions",
+  apiTokenName: "e.g. CI pipeline",
   searchSkills: "Type to search skills...",
   organizationDescription:
     "What the organization does and its role in your profile",

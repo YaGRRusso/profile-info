@@ -3,6 +3,7 @@ import { useState } from "react";
 import z from "zod";
 import { CheckboxInput } from "@/components/inputs/checkbox";
 import { MultiSelectInput } from "@/components/inputs/multi-select";
+import { PLACEHOLDERS } from "@/consts/placeholders";
 import {
   ApiTokenPermission,
   type UpdateApiTokenInput,
@@ -54,15 +55,15 @@ export function ApiTokenMultiForm({
   return (
     <form
       className="form"
-      onSubmit={(event) => {
-        event.preventDefault();
-        event.stopPropagation();
+      onSubmit={(e) => {
+        e.preventDefault();
+        e.stopPropagation();
         form.handleSubmit();
       }}
     >
       <CheckboxInput
         checked={changePermissions}
-        label="Change permissions"
+        label="Change Permissions"
         onChange={setChangePermissions}
       />
 
@@ -76,7 +77,7 @@ export function ApiTokenMultiForm({
               field.handleChange(value as ApiTokenPermission[])
             }
             options={PERMISSION_OPTIONS}
-            placeholder="Choose permissions"
+            placeholder={PLACEHOLDERS.choosePermissions}
             value={field.state.value}
           />
         )}
@@ -108,7 +109,7 @@ export function ApiTokenMultiForm({
               {(isSubmitting || isLoading) && (
                 <span className="loading loading-spinner loading-xs" />
               )}
-              Update Tokens
+              Update API Tokens
             </button>
           )}
         </Subscribe>
