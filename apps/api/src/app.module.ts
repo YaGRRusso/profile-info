@@ -10,6 +10,7 @@ import { type Env, validateEnv } from "./core/configs/env.validation";
 import { PersistenceExceptionFilter } from "./core/filters/persistence-exception.filter";
 import { HealthModule } from "./core/health/health.module";
 import { AiToolsModule } from "./modules/ai-tools/ai-tools.module";
+import { ApiTokensModule } from "./modules/api-tokens/api-tokens.module";
 import { AuthModule } from "./modules/auth/auth.module";
 import { CoursesModule } from "./modules/courses/courses.module";
 import { DashboardModule } from "./modules/dashboard/dashboard.module";
@@ -42,6 +43,7 @@ import { UsersModule } from "./modules/users/users.module";
     GraphqlModule,
     HealthModule,
     AuthModule,
+    ApiTokensModule,
     SkillsModule,
     OrganizationsModule,
     UsersModule,
