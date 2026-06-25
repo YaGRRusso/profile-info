@@ -64,7 +64,7 @@ describe("StatsRepository", () => {
         repository.findRecentlyUpdated(5, "name updatedAt")
       ).resolves.toEqual(rows);
 
-      expect(model.find).toHaveBeenCalledWith();
+      expect(model.find).toHaveBeenCalledWith({});
       expect(chain.sort).toHaveBeenCalledWith({ updatedAt: -1 });
       expect(chain.limit).toHaveBeenCalledWith(5);
       expect(chain.select).toHaveBeenCalledWith("name updatedAt");

@@ -15,14 +15,8 @@ interface TestModel extends BaseModel {
   name: string;
 }
 
-class TestRepository extends CrudRepository<TestModel, TestModel> {
-  protected toEntity(model: TestModel): TestModel {
-    return model;
-  }
-}
-
 describe("CrudRepository", () => {
-  let repository: TestRepository;
+  let repository: CrudRepository<TestModel, TestModel>;
   let model: {
     findById: jest.Mock;
     findOne: jest.Mock;
@@ -57,7 +51,7 @@ describe("CrudRepository", () => {
       deleteMany: jest.fn(),
     };
 
-    repository = new TestRepository(model as never);
+    repository = new CrudRepository(model as never, (doc) => doc);
   });
 
   describe("findOneById", () => {

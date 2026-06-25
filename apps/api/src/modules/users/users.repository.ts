@@ -10,19 +10,17 @@ import { toUserEntity } from "./mappers/user.mapper";
 import { UserModel } from "./schemas/user.schema";
 
 @Injectable()
-export class UsersRepository extends CrudRepository<UserModel, UserEntity> {
-  constructor(@InjectModel(UserModel.name) model: Model<UserModel>) {
-    super(model);
-  }
+export class UsersRepository {
+  readonly crud: CrudRepository<UserModel, UserEntity>;
 
-  protected toEntity(model: UserModel): UserEntity {
-    return toUserEntity(model);
+  constructor(@InjectModel(UserModel.name) model: Model<UserModel>) {
+    this.crud = new CrudRepository(model, toUserEntity);
   }
 
   async findOneByEmailWithPassword(
     email: string
   ): Promise<UserWithPasswordEntity> {
-    const document = await this.model
+    const document = await this.crud.model
       .findOne({ email })
       .select("+password")
       .exec();
@@ -30,7 +28,7 @@ export class UsersRepository extends CrudRepository<UserModel, UserEntity> {
     if (isNil(document)) throw new NotFoundException(PERSISTENCE_NOT_FOUND);
 
     return {
-      ...this.toEntity(document),
+      ...toUserEntity(document),
       password: document.password,
     };
   }

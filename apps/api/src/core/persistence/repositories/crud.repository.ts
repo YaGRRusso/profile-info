@@ -24,10 +24,11 @@ import {
 import { FindManyQuery, FindOneQuery } from "../types/input.type";
 import type { BatchCount, MultiPaged } from "../types/output.type";
 
-export abstract class CrudRepository<TModel, TEntity> {
-  constructor(protected readonly model: Model<TModel>) {}
-
-  protected abstract toEntity(model: TModel): TEntity;
+export class CrudRepository<TModel, TEntity> {
+  constructor(
+    readonly model: Model<TModel>,
+    private readonly toEntity: (model: TModel) => TEntity
+  ) {}
 
   private toFilter(filters?: QueryFilter<TModel>): QueryFilter<TModel> {
     return clearObject(filters) as QueryFilter<TModel>;

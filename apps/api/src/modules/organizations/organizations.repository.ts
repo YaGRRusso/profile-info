@@ -8,20 +8,14 @@ import { toOrganizationEntity } from "./mappers/organization.mapper";
 import { OrganizationModel } from "./schemas/organization.schema";
 
 @Injectable()
-export class OrganizationsRepository extends CrudRepository<
-  OrganizationModel,
-  OrganizationEntity
-> {
+export class OrganizationsRepository {
+  readonly crud: CrudRepository<OrganizationModel, OrganizationEntity>;
   readonly stats: StatsRepository<OrganizationModel>;
 
   constructor(
     @InjectModel(OrganizationModel.name) model: Model<OrganizationModel>
   ) {
-    super(model);
+    this.crud = new CrudRepository(model, toOrganizationEntity);
     this.stats = new StatsRepository(model);
-  }
-
-  protected toEntity(model: OrganizationModel): OrganizationEntity {
-    return toOrganizationEntity(model);
   }
 }

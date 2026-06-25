@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 import { mockQueryChain } from "@/core/persistence/repositories/query-chain.mock";
+import { StatsRepository } from "@/core/persistence/repositories/stats.repository";
 import { TenantScopedStatsRepository } from "@/core/persistence/repositories/tenant-scoped-stats.repository";
 import { BaseModel } from "@/core/schemas/base.schema";
 
@@ -10,6 +11,7 @@ interface TestModel extends BaseModel {
 
 describe("TenantScopedStatsRepository", () => {
   let repository: TenantScopedStatsRepository<TestModel>;
+  let stats: StatsRepository<TestModel>;
   let model: {
     countDocuments: jest.Mock;
     aggregate: jest.Mock;
@@ -28,7 +30,8 @@ describe("TenantScopedStatsRepository", () => {
       find: jest.fn(),
     };
 
-    repository = new TenantScopedStatsRepository(model as never);
+    stats = new StatsRepository(model as never);
+    repository = new TenantScopedStatsRepository(stats);
   });
 
   describe("count", () => {
@@ -75,7 +78,6 @@ describe("TenantScopedStatsRepository", () => {
       ).resolves.toEqual([{ label: "FULL_TIME", value: 2 }]);
 
       expect(model.aggregate).toHaveBeenCalledWith([
-        { $match: {} },
         { $group: { _id: "$category", value: { $sum: 1 } } },
         { $sort: { value: -1 } },
       ]);

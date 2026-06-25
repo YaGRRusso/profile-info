@@ -8,15 +8,12 @@ import { toSkillEntity } from "./mappers/skill.mapper";
 import { SkillModel } from "./schemas/skill.schema";
 
 @Injectable()
-export class SkillsRepository extends CrudRepository<SkillModel, SkillEntity> {
+export class SkillsRepository {
+  readonly crud: CrudRepository<SkillModel, SkillEntity>;
   readonly stats: StatsRepository<SkillModel>;
 
   constructor(@InjectModel(SkillModel.name) model: Model<SkillModel>) {
-    super(model);
+    this.crud = new CrudRepository(model, toSkillEntity);
     this.stats = new StatsRepository(model);
-  }
-
-  protected toEntity(model: SkillModel): SkillEntity {
-    return toSkillEntity(model);
   }
 }
