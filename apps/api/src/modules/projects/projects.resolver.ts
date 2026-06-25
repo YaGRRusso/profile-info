@@ -13,7 +13,6 @@ import { BatchEntity } from "@/core/entities/batch.entity";
 import { PaginationInput } from "@/core/inputs/pagination.input";
 import { Auth } from "@/modules/auth/decorators/auth-context.decorator";
 import type { Ctx } from "@/modules/graphql/context.interface";
-import type { ProjectModel } from "@/modules/projects/schemas/project.schema";
 import { SkillEntity } from "@/modules/skills/entities/skill.entity";
 import { UserEntity } from "@/modules/users/entities/user.entity";
 import { CreateProjectInput } from "./dto/create-project.input";
@@ -144,14 +143,14 @@ export class ProjectsResolver {
   }
 
   @ResolveField(() => UserEntity)
-  owner(@Parent() project: ProjectModel, @Context() ctx: Ctx) {
+  owner(@Parent() project: ProjectEntity, @Context() ctx: Ctx) {
     if (!project?.ownerId) return null;
-    return ctx.loaders.batchUsers.load(project.ownerId.toString());
+    return ctx.loaders.batchUsers.load(project.ownerId);
   }
 
   @ResolveField(() => [SkillEntity])
-  skills(@Parent() project: ProjectModel, @Context() ctx: Ctx) {
-    const ids = project.skillIds?.map((id) => id.toString());
+  skills(@Parent() project: ProjectEntity, @Context() ctx: Ctx) {
+    const ids = project.skillIds;
     if (!ids) return [];
     return ctx.loaders.batchSkills.loadMany(ids);
   }

@@ -13,10 +13,6 @@ import type { AuthContext } from "@/core/context/auth-context.interface";
 import { BatchEntity } from "@/core/entities/batch.entity";
 import { PaginationInput } from "@/core/inputs/pagination.input";
 import { Auth } from "@/modules/auth/decorators/auth-context.decorator";
-import {
-  ExperienceModel,
-  ExperienceRoleModel,
-} from "@/modules/experiences/schemas/experience.schema";
 import type { Ctx } from "@/modules/graphql/context.interface";
 import { OrganizationEntity } from "@/modules/organizations/entities/organization.entity";
 import { SkillEntity } from "@/modules/skills/entities/skill.entity";
@@ -160,34 +156,32 @@ export class ExperiencesResolver {
   }
 
   @ResolveField(() => UserEntity)
-  owner(@Parent() experience: ExperienceModel, @Context() ctx: Ctx) {
+  owner(@Parent() experience: ExperienceEntity, @Context() ctx: Ctx) {
     if (!experience?.ownerId) return null;
-    return ctx.loaders.batchUsers.load(experience.ownerId.toString());
+    return ctx.loaders.batchUsers.load(experience.ownerId);
   }
 
   @ResolveField(() => [ExperienceRole])
-  roles(@Parent() experience: ExperienceModel) {
+  roles(@Parent() experience: ExperienceEntity) {
     if (experience.roles) {
       return sortDateRange([...experience.roles]);
     }
   }
 
   @ResolveField(() => OrganizationEntity)
-  organization(@Parent() experience: ExperienceModel, @Context() ctx: Ctx) {
+  organization(@Parent() experience: ExperienceEntity, @Context() ctx: Ctx) {
     if (!experience?.organizationId) return null;
-    return ctx.loaders.batchOrganizations.load(
-      experience.organizationId.toString()
-    );
+    return ctx.loaders.batchOrganizations.load(experience.organizationId);
   }
 
   @ResolveField(() => [SkillEntity])
-  skills(@Parent() experience: ExperienceModel, @Context() ctx: Ctx) {
+  skills(@Parent() experience: ExperienceEntity, @Context() ctx: Ctx) {
     const ids = new Set<string>();
 
     for (const role of experience.roles) {
       if (role.skillIds) {
-        for (const skill of role.skillIds) {
-          ids.add(skill.toString());
+        for (const skillId of role.skillIds) {
+          ids.add(skillId);
         }
       }
     }
@@ -199,8 +193,8 @@ export class ExperiencesResolver {
 @Resolver(() => ExperienceRole)
 export class ExperienceRoleResolver {
   @ResolveField(() => [SkillEntity])
-  skills(@Parent() role: ExperienceRoleModel, @Context() ctx: Ctx) {
-    const ids = role.skillIds?.map((id) => id.toString());
+  skills(@Parent() role: ExperienceRole, @Context() ctx: Ctx) {
+    const ids = role.skillIds;
     if (!ids) return [];
     return ctx.loaders.batchSkills.loadMany(ids);
   }

@@ -12,7 +12,6 @@ import type { AuthContext } from "@/core/context/auth-context.interface";
 import { BatchEntity } from "@/core/entities/batch.entity";
 import { PaginationInput } from "@/core/inputs/pagination.input";
 import { Auth } from "@/modules/auth/decorators/auth-context.decorator";
-import { CourseModel } from "@/modules/courses/schemas/course.schema";
 import type { Ctx } from "@/modules/graphql/context.interface";
 import { OrganizationEntity } from "@/modules/organizations/entities/organization.entity";
 import { SkillEntity } from "@/modules/skills/entities/skill.entity";
@@ -142,22 +141,20 @@ export class CoursesResolver {
   }
 
   @ResolveField(() => UserEntity)
-  owner(@Parent() course: CourseModel, @Context() ctx: Ctx) {
+  owner(@Parent() course: CourseEntity, @Context() ctx: Ctx) {
     if (!course?.ownerId) return null;
-    return ctx.loaders.batchUsers.load(course.ownerId.toString());
+    return ctx.loaders.batchUsers.load(course.ownerId);
   }
 
   @ResolveField(() => OrganizationEntity)
-  organization(@Parent() course: CourseModel, @Context() ctx: Ctx) {
+  organization(@Parent() course: CourseEntity, @Context() ctx: Ctx) {
     if (!course?.organizationId) return null;
-    return ctx.loaders.batchOrganizations.load(
-      course.organizationId.toString()
-    );
+    return ctx.loaders.batchOrganizations.load(course.organizationId);
   }
 
   @ResolveField(() => [SkillEntity])
-  skills(@Parent() course: CourseModel, @Context() ctx: Ctx) {
-    const ids = course.skillIds?.map((id) => id.toString());
+  skills(@Parent() course: CourseEntity, @Context() ctx: Ctx) {
+    const ids = course.skillIds;
     if (!ids) return [];
     return ctx.loaders.batchSkills.loadMany(ids);
   }
