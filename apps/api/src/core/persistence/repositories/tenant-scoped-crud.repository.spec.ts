@@ -11,11 +11,19 @@ interface TestModel extends BaseModel {
   ownerId: string;
 }
 
-class TestRepository extends CrudRepository<TestModel> {}
+class TestRepository extends CrudRepository<TestModel, TestModel> {
+  protected toEntity(model: TestModel): TestModel {
+    return model;
+  }
+
+  createTenantScopeForTest() {
+    return new TenantScopedCrudRepository(this);
+  }
+}
 
 describe("TenantScopedCrudRepository", () => {
   let repository: TestRepository;
-  let tenant: TenantScopedCrudRepository<TestModel>;
+  let tenant: TenantScopedCrudRepository<TestModel, TestModel>;
   let model: {
     findById: jest.Mock;
     findOne: jest.Mock;
@@ -58,7 +66,7 @@ describe("TenantScopedCrudRepository", () => {
     };
 
     repository = new TestRepository(model as never);
-    tenant = new TenantScopedCrudRepository(repository);
+    tenant = repository.createTenantScopeForTest();
   });
 
   describe("findOneById", () => {

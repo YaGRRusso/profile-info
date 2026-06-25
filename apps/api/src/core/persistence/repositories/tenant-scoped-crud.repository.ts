@@ -5,19 +5,14 @@ import {
 } from "@/common/helpers/object-id.helper";
 import { withTenantScope } from "../helpers/tenant-scope.helper";
 import type { FindManyQuery, FindOneQuery } from "../types/input.type";
-import type {
-  BatchCount,
-  Multi,
-  MultiPaged,
-  Single,
-} from "../types/output.type";
+import type { BatchCount, MultiPaged } from "../types/output.type";
 import type { TenantScope } from "../types/scope.type";
 import type { CrudRepository } from "./crud.repository";
 
-export class TenantScopedCrudRepository<T> {
-  constructor(private readonly repository: CrudRepository<T>) {}
+export class TenantScopedCrudRepository<TModel, TEntity> {
+  constructor(private readonly repository: CrudRepository<TModel, TEntity>) {}
 
-  async findOneById(scope: TenantScope, id: string): Promise<Single<T>> {
+  async findOneById(scope: TenantScope, id: string): Promise<TEntity> {
     assertValidObjectId(id);
 
     if (scope.crossTenant) {
@@ -25,17 +20,22 @@ export class TenantScopedCrudRepository<T> {
     }
 
     return await this.repository.findOne({
-      filters: withTenantScope<T>(scope, { _id: id } as QueryFilter<T>),
+      filters: withTenantScope<TModel>(scope, {
+        _id: id,
+      } as QueryFilter<TModel>),
     });
   }
 
-  findOne(scope: TenantScope, query: FindOneQuery<T>): Promise<Single<T>> {
-    return this.repository.findOne({
-      filters: withTenantScope<T>(scope, query.filters),
+  async findOne(
+    scope: TenantScope,
+    query: FindOneQuery<TModel>
+  ): Promise<TEntity> {
+    return await this.repository.findOne({
+      filters: withTenantScope<TModel>(scope, query.filters),
     });
   }
 
-  async findManyById(scope: TenantScope, ids: string[]): Promise<Multi<T>> {
+  async findManyById(scope: TenantScope, ids: string[]): Promise<TEntity[]> {
     assertValidObjectIds(ids);
     if (ids.length === 0) return [];
 
@@ -44,42 +44,45 @@ export class TenantScopedCrudRepository<T> {
     }
 
     const { nodes } = await this.repository.findMany({
-      filters: withTenantScope<T>(scope, {
+      filters: withTenantScope<TModel>(scope, {
         _id: { $in: ids },
-      } as QueryFilter<T>),
+      } as QueryFilter<TModel>),
       limit: ids.length,
     });
 
     return nodes;
   }
 
-  findMany(
+  async findMany(
     scope: TenantScope,
-    query: FindManyQuery<T>
-  ): Promise<MultiPaged<T>> {
-    return this.repository.findMany({
+    query: FindManyQuery<TModel>
+  ): Promise<MultiPaged<TEntity>> {
+    return await this.repository.findMany({
       ...query,
-      filters: withTenantScope<T>(scope, query.filters),
+      filters: withTenantScope<TModel>(scope, query.filters),
     });
   }
 
-  createOne(scope: TenantScope, createInput: AnyKeys<T>): Promise<Single<T>> {
-    const { ownerId: _, ...rest } = createInput as AnyKeys<T> & {
+  async createOne(
+    scope: TenantScope,
+    createInput: AnyKeys<TModel>
+  ): Promise<TEntity> {
+    const { ownerId: _, ...rest } = createInput as AnyKeys<TModel> & {
       ownerId?: string;
     };
 
-    return this.repository.createOne({
+    return await this.repository.createOne({
       ...rest,
       ownerId: scope.userId,
-    } as AnyKeys<T>);
+    } as AnyKeys<TModel>);
   }
 
-  createMany(
+  async createMany(
     scope: TenantScope,
-    createInputs: AnyKeys<T>[]
+    createInputs: AnyKeys<TModel>[]
   ): Promise<BatchCount> {
     const payloads = createInputs.map((input) => {
-      const { ownerId: _, ...rest } = input as AnyKeys<T> & {
+      const { ownerId: _, ...rest } = input as AnyKeys<TModel> & {
         ownerId?: string;
       };
 
@@ -89,18 +92,22 @@ export class TenantScopedCrudRepository<T> {
       };
     });
 
-    return this.repository.createMany(payloads as AnyKeys<T>[]);
+    return await this.repository.createMany(payloads as AnyKeys<TModel>[]);
   }
 
   async updateOneById(
     scope: TenantScope,
     id: string,
-    updateInput: UpdateQuery<T>
-  ): Promise<Single<T>> {
+    updateInput: UpdateQuery<TModel>
+  ): Promise<TEntity> {
     assertValidObjectId(id);
 
     return await this.repository.updateOne(
-      { filters: withTenantScope<T>(scope, { _id: id } as QueryFilter<T>) },
+      {
+        filters: withTenantScope<TModel>(scope, {
+          _id: id,
+        } as QueryFilter<TModel>),
+      },
       updateInput
     );
   }
@@ -108,7 +115,7 @@ export class TenantScopedCrudRepository<T> {
   async updateManyById(
     scope: TenantScope,
     ids: string[],
-    updateInput: UpdateQuery<T>
+    updateInput: UpdateQuery<TModel>
   ): Promise<BatchCount> {
     assertValidObjectIds(ids);
     if (ids.length === 0) return { succeeded: 0, failed: 0 };
@@ -118,7 +125,9 @@ export class TenantScopedCrudRepository<T> {
     }
 
     const result = await this.repository.updateMany(
-      withTenantScope<T>(scope, { _id: { $in: ids } } as QueryFilter<T>),
+      withTenantScope<TModel>(scope, {
+        _id: { $in: ids },
+      } as QueryFilter<TModel>),
       updateInput
     );
 
@@ -128,11 +137,13 @@ export class TenantScopedCrudRepository<T> {
     };
   }
 
-  async deleteOneById(scope: TenantScope, id: string): Promise<Single<T>> {
+  async deleteOneById(scope: TenantScope, id: string): Promise<TEntity> {
     assertValidObjectId(id);
 
     return await this.repository.deleteOne({
-      filters: withTenantScope<T>(scope, { _id: id } as QueryFilter<T>),
+      filters: withTenantScope<TModel>(scope, {
+        _id: id,
+      } as QueryFilter<TModel>),
     });
   }
 
@@ -145,7 +156,9 @@ export class TenantScopedCrudRepository<T> {
     }
 
     const result = await this.repository.deleteMany(
-      withTenantScope<T>(scope, { _id: { $in: ids } } as QueryFilter<T>)
+      withTenantScope<TModel>(scope, {
+        _id: { $in: ids },
+      } as QueryFilter<TModel>)
     );
 
     return {

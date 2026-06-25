@@ -15,7 +15,11 @@ interface TestModel extends BaseModel {
   name: string;
 }
 
-class TestRepository extends CrudRepository<TestModel> {}
+class TestRepository extends CrudRepository<TestModel, TestModel> {
+  protected toEntity(model: TestModel): TestModel {
+    return model;
+  }
+}
 
 describe("CrudRepository", () => {
   let repository: TestRepository;
