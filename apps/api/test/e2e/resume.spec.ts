@@ -38,7 +38,7 @@ describe("ResumeController (e2e)", () => {
         },
       ],
     });
-    profileUserId = profileUser._id.toString();
+    profileUserId = profileUser.id;
 
     await skillsService.createOne({
       name: "TypeScript",

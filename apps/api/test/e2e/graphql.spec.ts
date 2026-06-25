@@ -47,7 +47,7 @@ describe("GraphQL (e2e)", () => {
       password: "user.123",
       role: UserRole.USER,
     });
-    portfolioUserId = user._id.toString();
+    portfolioUserId = user.id;
 
     const adminSignIn = await graphqlRequest<{ signIn: string }>(app, {
       query: `
@@ -207,7 +207,7 @@ describe("GraphQL (e2e)", () => {
 
     const experience = await experiencesService.createOne(portfolioCtx, {
       slug: "nested-experience",
-      organizationId: organization._id.toString(),
+      organizationId: organization.id,
       category: ExperienceCategory.FULL_TIME,
       roles: [
         {
@@ -247,7 +247,7 @@ describe("GraphQL (e2e)", () => {
           }
         }
       `,
-      variables: { experienceId: experience._id.toString() },
+      variables: { experienceId: experience.id },
       token: userToken,
     });
 
@@ -256,7 +256,7 @@ describe("GraphQL (e2e)", () => {
       "Nested Org"
     );
     expect(response.data?.findOneExperienceById.organization.id).toBe(
-      organization._id.toString()
+      organization.id
     );
   });
 });

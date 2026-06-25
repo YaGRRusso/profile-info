@@ -113,7 +113,7 @@ describe("Courses tenant isolation (e2e)", () => {
       category: OrganizationCategory.COMPANY,
       i18n: [{ locale: "en", messages: { description: "Org" } }],
     });
-    organizationId = organization._id.toString();
+    organizationId = organization.id;
 
     const signIn = async (email: string, password: string) => {
       const response = await graphqlRequest<{ signIn: string }>(app, {

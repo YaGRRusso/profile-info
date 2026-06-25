@@ -5,6 +5,7 @@ import { UserRole } from "@/core/enums/user-role.enum";
 import { CoursesService } from "@/modules/courses/courses.service";
 import { CreateCourseInput } from "@/modules/courses/dto/create-course.input";
 import { CourseStatus } from "@/modules/courses/enums/status.enum";
+import { CreateEducationInput } from "@/modules/educations/dto/create-education.input";
 import { EducationsService } from "@/modules/educations/educations.service";
 import { EducationLevel } from "@/modules/educations/enums/level.enum";
 import { EducationStatus } from "@/modules/educations/enums/status.enum";
@@ -118,7 +119,7 @@ describe("Dashboard (e2e)", () => {
       category: OrganizationCategory.COMPANY,
       i18n: [{ locale: "en", messages: { description: "Org" } }],
     });
-    organizationId = organization._id.toString();
+    organizationId = organization.id;
 
     await skillsService.createOne({
       slug: "dashboard-skill",
@@ -126,8 +127,8 @@ describe("Dashboard (e2e)", () => {
       category: SkillCategory.BACKEND,
     });
 
-    const aliceCtx = testAuthContext({ userId: alice._id.toString() });
-    const bobCtx = testAuthContext({ userId: bob._id.toString() });
+    const aliceCtx = testAuthContext({ userId: alice.id });
+    const bobCtx = testAuthContext({ userId: bob.id });
 
     await coursesService.createOne(aliceCtx, {
       slug: "alice-course-complete",
