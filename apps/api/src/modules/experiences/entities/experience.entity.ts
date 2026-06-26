@@ -72,3 +72,12 @@ export class ExperienceEntity extends BaseEntity {
 }
 
 export const PaginatedExperienceEntity = createPaginatedModel(ExperienceEntity);
+
+export type ExperienceRoleRecord = Omit<ExperienceRole, "skills">;
+
+export type ExperienceEntityRecord = Omit<
+  ExperienceEntity,
+  "owner" | "organization" | "skills" | "roles"
+> & {
+  roles: ExperienceRoleRecord[];
+};

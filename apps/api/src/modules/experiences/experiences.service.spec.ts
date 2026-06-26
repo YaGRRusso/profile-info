@@ -4,6 +4,7 @@ import { Test, TestingModule } from "@nestjs/testing";
 import { testAuthContext } from "@test/fixtures/auth-context";
 import mongoose, { Model } from "mongoose";
 import { UserRole } from "@/core/enums/user-role.enum";
+import { ExperienceCategory } from "@/modules/experiences/enums/category.enum";
 import { ExperienceModel } from "@/modules/experiences/schemas/experience.schema";
 import { ExperiencesRepository } from "./experiences.repository";
 import { ExperiencesService } from "./experiences.service";
@@ -11,6 +12,7 @@ import { ExperiencesService } from "./experiences.service";
 const validId = new mongoose.Types.ObjectId().toHexString();
 const invalidId = "not-an-object-id";
 const ownerId = "507f1f77bcf86cd799439011";
+const organizationId = "507f1f77bcf86cd799439012";
 const ctx = testAuthContext({ userId: ownerId });
 const fakeDoc = {
   _id: validId,
@@ -94,12 +96,29 @@ describe("ExperiencesService", () => {
   });
 
   describe("createOne", () => {
+    const createInput = {
+      slug: "software-engineer",
+      organizationId,
+      category: ExperienceCategory.FULL_TIME,
+      roles: [
+        {
+          i18n: [
+            {
+              locale: "en",
+              messages: {
+                title: "Software Engineer",
+                description: "Backend development",
+              },
+            },
+          ],
+        },
+      ],
+    };
+
     it("should inject ownerId for regular users", async () => {
       (model.create as jest.Mock).mockResolvedValue(fakeDoc);
 
-      const result = await service.createOne(ctx, {
-        slug: "software-engineer",
-      } as any);
+      const result = await service.createOne(ctx, createInput);
 
       expect(result).toEqual(expect.objectContaining({ id: validId, ownerId }));
       expect(model.create).toHaveBeenCalledWith(
@@ -114,9 +133,7 @@ describe("ExperiencesService", () => {
       });
       (model.create as jest.Mock).mockResolvedValue(fakeDoc);
 
-      await service.createOne(superAdminCtx, {
-        slug: "software-engineer",
-      } as any);
+      await service.createOne(superAdminCtx, createInput);
 
       expect(model.create).toHaveBeenCalledWith(
         expect.objectContaining({ ownerId })

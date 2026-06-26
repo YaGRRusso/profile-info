@@ -1,21 +1,24 @@
 import { Injectable } from "@nestjs/common";
-import { AnyKeys, QueryFilter, SortOrder, UpdateQuery } from "mongoose";
 import { RecentActivityRecord } from "@/common/helpers/recent-activity.helper";
 import { toTenantScope } from "@/core/context/auth-context.helper";
 import type { AuthContext } from "@/core/context/auth-context.interface";
 import { BatchEntity } from "@/core/entities/batch.entity";
-import { PaginatedModel } from "@/core/schemas/paginated.schema";
+import type {
+  FieldCount,
+  MultiPaged,
+} from "@/core/persistence/types/output.type";
 import { CreateExperienceInput } from "./dto/create-experience.input";
+import { FilterExperienceInput } from "./dto/filter-experience.input";
+import { SortExperienceInput } from "./dto/sort-experience.input";
 import { UpdateExperienceInput } from "./dto/update-experience.input";
-import { ExperienceEntity } from "./entities/experience.entity";
+import type { ExperienceEntityRecord } from "./entities/experience.entity";
 import { ExperiencesRepository } from "./experiences.repository";
-import { ExperienceModel } from "./schemas/experience.schema";
 
 @Injectable()
 export class ExperiencesService {
   constructor(private readonly repository: ExperiencesRepository) {}
 
-  findOneById(ctx: AuthContext, id: string): Promise<ExperienceEntity> {
+  findOneById(ctx: AuthContext, id: string): Promise<ExperienceEntityRecord> {
     return this.repository.crud.scoped(toTenantScope(ctx)).findOneById(id);
   }
 
@@ -24,13 +27,16 @@ export class ExperiencesService {
     {
       filters,
     }: {
-      filters?: QueryFilter<ExperienceModel>;
+      filters?: FilterExperienceInput;
     }
-  ): Promise<ExperienceEntity> {
+  ): Promise<ExperienceEntityRecord> {
     return this.repository.crud.scoped(toTenantScope(ctx)).findOne({ filters });
   }
 
-  findManyById(ctx: AuthContext, ids: string[]): Promise<ExperienceEntity[]> {
+  findManyById(
+    ctx: AuthContext,
+    ids: string[]
+  ): Promise<ExperienceEntityRecord[]> {
     return this.repository.crud.scoped(toTenantScope(ctx)).findManyById(ids);
   }
 
@@ -42,12 +48,12 @@ export class ExperiencesService {
       skip = 0,
       limit = 50,
     }: {
-      filters?: QueryFilter<ExperienceModel>;
-      sort?: Partial<Record<keyof ExperienceModel, SortOrder>>;
+      filters?: FilterExperienceInput;
+      sort?: SortExperienceInput;
       limit?: number;
       skip?: number;
     }
-  ): Promise<PaginatedModel<ExperienceEntity>> {
+  ): Promise<MultiPaged<ExperienceEntityRecord>> {
     return this.repository.crud.scoped(toTenantScope(ctx)).findMany({
       filters,
       sort,
@@ -56,62 +62,57 @@ export class ExperiencesService {
     });
   }
 
-  async createOne(
+  createOne(
     ctx: AuthContext,
     createInput: CreateExperienceInput
-  ): Promise<ExperienceEntity> {
-    return await this.repository.crud
+  ): Promise<ExperienceEntityRecord> {
+    return this.repository.crud
       .scoped(toTenantScope(ctx))
-      .createOne(createInput as AnyKeys<ExperienceModel>);
+      .createOne(createInput);
   }
 
-  async createMany(
+  createMany(
     ctx: AuthContext,
     createInputs: CreateExperienceInput[]
   ): Promise<BatchEntity> {
-    return await this.repository.crud
+    return this.repository.crud
       .scoped(toTenantScope(ctx))
-      .createMany(createInputs as AnyKeys<ExperienceModel>[]);
+      .createMany(createInputs);
   }
 
   updateOne(
     ctx: AuthContext,
     id: string,
     updateInput: UpdateExperienceInput
-  ): Promise<ExperienceEntity> {
+  ): Promise<ExperienceEntityRecord> {
     return this.repository.crud
       .scoped(toTenantScope(ctx))
-      .updateOneById(id, updateInput as UpdateQuery<ExperienceModel>);
+      .updateOneById(id, updateInput);
   }
 
-  async updateMany(
+  updateMany(
     ctx: AuthContext,
     ids: string[],
     updateInput: UpdateExperienceInput
   ): Promise<BatchEntity> {
-    return await this.repository.crud
+    return this.repository.crud
       .scoped(toTenantScope(ctx))
-      .updateManyById(ids, updateInput as UpdateQuery<ExperienceModel>);
+      .updateManyById(ids, updateInput);
   }
 
-  removeOne(ctx: AuthContext, id: string): Promise<ExperienceEntity> {
+  removeOne(ctx: AuthContext, id: string): Promise<ExperienceEntityRecord> {
     return this.repository.crud.scoped(toTenantScope(ctx)).deleteOneById(id);
   }
 
-  async removeMany(ctx: AuthContext, ids: string[]): Promise<BatchEntity> {
-    return await this.repository.crud
-      .scoped(toTenantScope(ctx))
-      .deleteManyById(ids);
+  removeMany(ctx: AuthContext, ids: string[]): Promise<BatchEntity> {
+    return this.repository.crud.scoped(toTenantScope(ctx)).deleteManyById(ids);
   }
 
   count(ctx: AuthContext): Promise<number> {
     return this.repository.stats.scoped(toTenantScope(ctx)).count();
   }
 
-  countByField(
-    ctx: AuthContext,
-    field: string
-  ): Promise<{ label: string; value: number }[]> {
+  countByField(ctx: AuthContext, field: string): Promise<FieldCount[]> {
     return this.repository.stats.scoped(toTenantScope(ctx)).countByField(field);
   }
 
@@ -135,14 +136,10 @@ export class ExperiencesService {
   }
 
   async detachSkill(skillId: string): Promise<void> {
-    await this.repository.crud.updateMany(
-      { "roles.skillIds": skillId },
-      { $pull: { "roles.$[roleElem].skillIds": skillId } },
-      { arrayFilters: [{ "roleElem.skillIds": skillId }] }
-    );
+    await this.repository.detachSkill(skillId);
   }
 
   async purgeByOrganization(organizationId: string): Promise<void> {
-    await this.repository.crud.deleteMany({ organizationId });
+    await this.repository.purgeByOrganization(organizationId);
   }
 }
