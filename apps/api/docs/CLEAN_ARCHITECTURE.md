@@ -170,7 +170,8 @@ export class CoursesRepository {
 
 | Pattern | Onde | Por que vale a pena |
 |---------|------|---------------------|
-| **Repository (DI)** | `SkillsRepository extends CrudRepository<T>` | Tipado, injetável, mockável; stats/tenant compostos explicitamente |
+| **Mapper (CrudMapperInterface)** | `mappers/<entity>.mapper.ts` | Model ↔ domain record; DTOs → persistence; `withObjectIdRefs` em filters |
+| **Repository (DI)** | `CoursesRepository` — `crud` + `stats` + mapper | Tipado, injetável, mockável; tenant via `scoped()` |
 | **Domain Events** | `EventEmitter2` + listeners | Desacopla cascatas (skill deletada → projetos atualizam) sem import circular |
 | **Error Handling** | `PersistenceExceptionFilter` (`APP_FILTER`) | Converte erros de Mongo/Mongoose em 4xx/503 globalmente; `assertDuplicate` / `assertReferencesExist` em services só para mensagens específicas |
 | **Port/Adapter** | `integrations/` (abstract class + impl) | Troca OpenRouter por outro LLM sem tocar nos modules |
@@ -186,7 +187,6 @@ export class CoursesRepository {
 |------------------|----------------------|
 | Use Cases separados do Service | O Service do NestJS JÁ É o use case. Separar só se houver múltiplos consumers |
 | Value Objects manuais | class-validator + GraphQL types já validam na fronteira |
-| Mappers Domain↔Persistence | O Mongoose model já é o retorno — as camadas usam o mesmo shape |
 | CQRS | Um banco só, uma interface só — a separação query/command no service basta |
 | Entidade Rica separada | Para CRUD simples, o schema + service cobrem. Se o domínio cresce, aí sim |
 
@@ -216,7 +216,7 @@ export class CoursesRepository {
               │              │              │
     ┌─────────▼──────┐ ┌────▼────┐ ┌──────▼───────┐
     │  Repository    │ │ Events  │ │  DataLoader  │
-    │  (Mongoose)    │ │ (EE2)   │ │  (batching)  │
+    │  crud + mapper │ │ (EE2)   │ │  (batching)  │
     └─────────┬──────┘ └────┬────┘ └──────────────┘
               │              │
     ┌─────────▼──────┐ ┌────▼────────────────┐
@@ -264,7 +264,7 @@ A pergunta na entrevista: "E se precisar ficar mais complexo?"
 | Mesma lógica consumida por GraphQL + REST + Worker | Extrair Use Cases do Service |
 | Invariantes que precisam valer fora da fronteira de entrada | Criar Value Objects |
 | Modelo de leitura ≠ modelo de escrita | Considerar CQRS leve |
-| Schema do DB diverge do GraphQL response | Introduzir Mapper |
+| Schema do DB diverge do GraphQL response | `CrudMapperInterface` + `*EntityRecord` (implemented) |
 | Trocar MongoDB por PostgreSQL | O Repository em `core/` já isola — criar nova implementação |
 | Módulo cresce demais | Criar sub-módulos ou extrair para microservice |
 

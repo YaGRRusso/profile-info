@@ -112,7 +112,7 @@ src/
     ├── auth/
     ├── dashboard/
     ├── resume/               # PDF export (REST GET /resume.pdf)
-    ├── skills/               # Canonical CRUD module; exports SkillsLoaderService
+    ├── skills/               # Catalog CRUD; exports SkillsLoaderService
     ├── ai-tools/
     │   ├── resource-detail/  # Orchestrator + *ExtractorService per source
     │   ├── prompts/

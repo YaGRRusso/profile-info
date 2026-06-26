@@ -14,7 +14,7 @@ The NestJS GraphQL API for profile-info. It is code-first: GraphQL types are Typ
 
 The source is a modular monolith with a strict dependency rule (`modules → integrations → common` and `modules → core → common`; `common` imports nothing; `integrations` never import from `modules`). The top-level layers under `src/` are `common/` (pure TS), `core/` (cross-cutting NestJS infra), `integrations/` (external system adapters), and `modules/` (business domains).
 
-Feature modules follow the same explicit CRUD pattern: resolver methods call service methods that use the injected Mongoose model. Copy `src/modules/skills/` as the reference implementation.
+Feature modules follow the same explicit CRUD pattern: resolver → service → repository (`CrudRepository` + mapper). Copy `src/modules/courses/` as the reference implementation.
 
 ## Architecture & flow
 
@@ -32,7 +32,7 @@ Entry point `src/main.ts`:
 - `GraphqlModule` (`modules/graphql/graphql.module.ts`): wraps `GraphQLModule.forRootAsync` with `ApolloDriver`, schema at `src/schema.gql`, and per-request DataLoaders via `createLoaders(...)` from `modules/graphql/loaders.helper.ts`.
 - Feature modules: `AuthModule`, CRUD entities, `DashboardModule` (read-only aggregation), `ResumeModule` (PDF export), `AiToolsModule`.
 
-Request flow: Apollo → `GqlAuthGuard` (unless `@Public()`) → resolver → service → Mongoose model. Nested fields use `@ResolveField` + per-request DataLoaders. REST routes (e.g. `GET /resume.pdf`) skip `GqlAuthGuard` when `context.getType() !== "graphql"`.
+Request flow: Apollo → `GqlAuthGuard` (unless `@Public()`) → resolver → service → repository (`CrudRepository` + mapper) → Mongoose. Nested fields use `@ResolveField` + per-request DataLoaders. REST routes (e.g. `GET /resume.pdf`) skip `GqlAuthGuard` when `context.getType() !== "graphql"`.
 
 ## Data model (ER)
 
@@ -90,17 +90,20 @@ DI pattern is the NestJS-idiomatic **abstract class as token**: ports are abstra
 `modules/` (business domains):
 
 - `graphql/`: `graphql.module.ts` (single module — Apollo wiring), `loaders.service.ts` (composes per-entity loaders), `context.interface.ts` (`Ctx`). `forRootAsync` injects exported `*LoaderService` from entity modules; batching logic stays in those services.
-- `auth/`: global `GqlAuthGuard` (JWT + `UNAUTHENTICATED` GraphQL extension) and `RolesGuard` (`@Roles(SUPER_ADMIN)` on catalog mutations and user CRUD). `signIn` (`@Public`) returns JWT; catalog/user **queries** require JWT (phase 5a); `getMe` returns current user; `updateMe` lets any authenticated user update their own profile (no `role` in input). `@CurrentUser()` → raw `UserModel` (profile ops). `@Auth()` → `AuthContext` (`core/context/auth-context.interface.ts`): authenticated caller (`userId`, `role`, `credentialKind`; API tokens add `permissions`). Session: `toSessionAuthContext()`; API tokens (future): `toApiTokenAuthContext()`. Helpers in `auth-context.helper.ts`: `isSession`, `isApiToken`, `isSuperAdmin`, `hasPermission`, `toTenantScope`. Distinct from GraphQL `@Context()` (`Ctx` / loaders). Private entities: `@Auth()` on all ops, `repository.tenant.*`, required `ctx` (Course is the reference).
+- `auth/`: global `GqlAuthGuard` (JWT + `UNAUTHENTICATED` GraphQL extension) and `RolesGuard` (`@Roles(SUPER_ADMIN)` on catalog mutations and user CRUD). `signIn` (`@Public`) returns JWT; catalog/user **queries** require JWT (phase 5a); `getMe` returns current user; `updateMe` lets any authenticated user update their own profile (no `role` in input). `@CurrentUser()` → `UserEntity` from JWT strategy (`AuthContextUser` on `req.user`). `@Auth()` → `AuthContext` (`core/context/auth-context.interface.ts`): authenticated caller (`userId`, `role`, `credentialKind`; API tokens add `permissions`). Session: `toSessionAuthContext()` from `AuthContextUser`; API tokens (future guard): `toApiTokenAuthContext()`. Helpers in `auth-context.helper.ts`: `isSession`, `isApiToken`, `isSuperAdmin`, `hasPermission`, `toTenantScope`. Distinct from GraphQL `@Context()` (`Ctx` / loaders). Private entities: `@Auth()` on all ops, `repository.crud.scoped(toTenantScope(ctx)).*`, required `ctx` (Course is the reference).
 - `ai-tools/`: AI use-cases (`atsSummarize`, `summarize`, `translate`). Any authenticated user (JWT); `@Roles(SUPER_ADMIN)` removed in phase 5b. `GqlThrottlerGuard` + `@Throttle` on resolver. Owns `AiEntity` GraphQL types, enums (`ChatRole`, `ChatFinishReason`), and mappers (`IntegrationChatResult` → `AiEntity`). `resource-detail/` orchestrates `*ExtractorService` classes. Injects `AiChatProvider`, `RepositoryMetadataProvider`, `WebContentProvider`. `AiToolsModule` imports `OpenRouterModule`, `GithubModule`, `TavilyModule`.
 - `dashboard/`: read-only aggregation via feature **services**. `@Auth() ctx` on `dashboard` query. Private entities: `count(ctx)` / `countByField(ctx)` / `findRecentActivity(ctx)` (tenant-scoped). Catalog (`skills`, `organizations`): global `count()` / stats. USER sees own private totals + full catalog; `SUPER_ADMIN` sees all private data (`crossTenant`).
 - `resume/`: `ResumeService.buildResume(userId, locale)` aggregates one user's profile (top by `relevance`, completed educations/courses); skills use top `skillsPerCategory` per category (empty categories omitted). PDF export via public `GET /resume.pdf?userId=&locale=` (`normalizeLocale`, `pickTranslation`, `formatPeriod`, `resolveResumeLabels` in `resume.labels.ts`). Filename is always `resume.pdf`. Private entities use owner-scoped `ctx` for the requested `userId` (forced `USER` role so `SUPER_ADMIN` profiles do not pull cross-tenant data). Org refs resolved via `OrganizationsService.findManyById`. CV-specific rendering in `resume/pdf/` (`renderResumeDocument`, section renderers); uses `PdfRenderService` from `core/pdf/PdfModule`.
-- CRUD feature modules (`skills/`, `users/`, `experiences/`, `educations/`, `courses/`, `organizations/`, `projects/`): canonical skeleton:
+- CRUD feature modules (`skills/`, `users/`, `api-tokens/`, `experiences/`, `educations/`, `courses/`, `organizations/`, `projects/`): canonical skeleton:
 
 ```
 modules/<entity>/
 ├── <entity>.module.ts
 ├── <entity>.resolver.ts
 ├── <entity>.service.ts
+├── <entity>.repository.ts
+├── mappers/
+│   └── <entity>.mapper.ts
 ├── schemas/
 ├── entities/
 ├── dto/          # always *.input.ts (create, update, filter, sort)

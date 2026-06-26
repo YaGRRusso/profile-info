@@ -26,7 +26,7 @@
 - Admin (out of ADR scope): courses CRUD against tenant API; owner column for super admin.
 
 **All four private entities** (Course, Experience, Education, Project) are fully migrated:
-`@Auth()` on every operation, `TenantScopedCrudRepository` + `tenantStats`, no `@Public()` reads.
+`@Auth()` on every operation, `repository.crud.scoped(toTenantScope(ctx)).*` + `stats.scoped(...)`, no `@Public()` reads.
 
 ---
 
@@ -103,7 +103,7 @@ Applies to `Experience`, `Education`, `Course`, `Project`:
 | GraphQL reads & mutations | **No `@Public()`**; **no `@Roles(SUPER_ADMIN)`** on private CRUD (tenancy replaces role gate) |
 | GraphQL output | Scalars `ownerId`, `organizationId`, `skillIds` from document; objects `owner`, `organization`, `skills` via `@ResolveField` |
 | Service API | Every CRUD method: `(ctx: AuthContext, …)` — `ctx` is **required** |
-| Cascades | `detachSkill`, `purgeByOrganization` use raw `CrudRepository` `updateMany` / `deleteMany` (global, no tenant filter) |
+| Cascades | `detachSkill`, `purgeByOrganization` on repository (raw `model`); listeners delegate to service methods |
 
 **IDOR:** wrong tenant's ID → **404**, not 403.
 
@@ -111,55 +111,53 @@ Applies to `Experience`, `Education`, `Course`, `Project`:
 
 Domain-agnostic; unit-tested.
 
-#### `CrudRepository<T>`
+#### `CrudRepository` + `CrudMapperInterface`
 
-Base Mongo access: `*OneById`, `findOne` / `findMany`, `create*`, `update*`,
-`delete*`. Batch returns `BatchCount { succeeded, failed }`. Filter-based
-`updateMany` / `deleteMany` are for **global cascades only**.
+Mongo access through a per-entity mapper: `*OneById`, `findOne` / `findMany`, `create*`,
+`update*`, `delete*`. Batch returns `BatchCount { succeeded, failed }`. Create/update/filter/sort
+inputs are typed DTOs (`TCreate`, `TUpdate`, `TFilter`, `TSort`). Filter ObjectId refs use
+`withObjectIdRefs` in mappers.
 
-#### `StatsRepository<T>`
+`scoped(TenantScope)` / `global()` compose tenant filters on the same repository instance —
+no separate `TenantScopedCrudRepository` wrapper.
 
-`count`, `countByField`, `findRecentlyUpdated` — global metrics for **catalog**
-entities (`skills`, `organizations`). Composed as `readonly stats`.
+#### `StatsRepository`
 
-#### `TenantScopedStatsRepository<T>`
-
-Same API as `StatsRepository`, but every method takes `TenantScope` and applies
-`withTenantScope` (or `withTenantScopeForAggregate` in `countByField` — aggregate
-`$match` requires `ObjectId` `ownerId`; Mongoose casts string `ownerId` in
-`find` / `countDocuments` only). Composed as `readonly tenantStats` on private-entity repos.
-Service methods take `ctx: AuthContext` and delegate via `toTenantScope(ctx)`.
-
-**Dashboard rule:** private entities → `tenantStats` (USER sees own data;
-`SUPER_ADMIN` sees all via `crossTenant`). Catalog entities → global `stats`.
-
-#### `TenantScopedCrudRepository<T>`
-
-Composition wrapper over `CrudRepository` (does **not** extend it).
-
-- `withTenantScope(scope, filter)` adds `ownerId: scope.userId` (string) when
-  `crossTenant: false` — used by `find` / `countDocuments`.
-- `withTenantScopeForAggregate(scope, filter)` adds `ownerId` as `ObjectId` — used
-  only by `TenantScopedStatsRepository.countByField`.
-- `createOne` / `createMany` always inject `scope.userId`; strip `ownerId` from payload (defense for internal callers — GraphQL inputs never expose `ownerId`).
-- **No unscoped read helpers** — if you need unscoped access, you are in the wrong
-  layer (use `CrudRepository` directly inside a cascade listener, not from a service).
+`count`, `countByField`, `findRecentlyUpdated`. Composed as `readonly stats` on entity repos.
+Private entities: `stats.scoped(toTenantScope(ctx))` from the service. Catalog entities:
+unscoped `stats`. `countByField` on scoped stats uses `withTenantScopeForAggregate` so
+`$match.ownerId` is `ObjectId`.
 
 ```typescript
 @Injectable()
-export class CoursesRepository extends CrudRepository<CourseModel> {
-  readonly tenantStats = new TenantScopedStatsRepository(courseModel);
-  readonly tenant = new TenantScopedCrudRepository(this);
+export class CoursesRepository {
+  readonly crud: CrudRepository<
+    CourseModel,
+    CourseEntityRecord,
+    CreateCourseInput,
+    UpdateCourseInput,
+    FilterCourseInput,
+    SortCourseInput
+  >;
+  readonly stats: StatsRepository<CourseModel>;
+
+  constructor(@InjectModel(CourseModel.name) model: Model<CourseModel>) {
+    this.crud = new CrudRepository(model, new CourseMapper());
+    this.stats = new StatsRepository(model);
+  }
 }
 ```
 
-Global catalog repos extend `CrudRepository` only (+ `stats` for dashboard metrics).
+Global catalog repos use unscoped `crud` + `stats`.
 
 #### `toTenantScope(ctx)`
 
 ```typescript
 { userId: ctx.userId, crossTenant: isSuperAdmin(ctx) }
 ```
+
+`createOne` / `createMany` on scoped `crud` inject `scope.userId` as `ownerId` and strip
+`ownerId` from the payload.
 
 ### 5. Auth context
 
@@ -182,8 +180,8 @@ Types and helpers exist; **API token guard and CRUD are phase 5**.
 **Resolver → service:** `@Auth() ctx: AuthContext` on every
 private-entity operation. The resolver does not implement ownership logic.
 
-**Service → repository:** `repository.tenant.*(toTenantScope(ctx), …)` for all
-tenant-scoped CRUD.
+**Service → repository:** `repository.crud.scoped(toTenantScope(ctx)).*(…)` for all
+tenant-scoped CRUD; `repository.stats.scoped(toTenantScope(ctx))` for private stats.
 
 ### 6. Filter inputs
 
@@ -268,15 +266,15 @@ Do **not** start phase N+1 until phase N passes its [entity gate](#entity-gate).
 | `CoursesService` — required `ctx`, `repository.crud.scoped(ctx).*` | Done |
 | `CoursesResolver` — no `@Public()`, `@Auth()` on all ops, `@ResolveField` for `owner` / `organization` / `skills` | Done |
 | `CourseEntity` — output scalars + resolved objects | Done |
-| Unit tests (`courses.service.spec.ts`, `tenant-scoped-crud.repository.spec.ts`) | Done |
+| Unit tests (`courses.service.spec.ts`, `crud.repository.spec.ts`) | Done |
 | E2e isolation (`test/e2e/courses.spec.ts`) | Done |
 
 ### Phase 2 — Experience ✅
 
 | Layer | State |
 |-------|-------|
-| `ExperiencesRepository.tenant` | Done |
-| `ExperiencesService` — required `ctx`, `repository.tenant.*` | Done |
+| `ExperiencesRepository` — `crud` + `stats` | Done |
+| `ExperiencesService` — required `ctx`, `repository.crud.scoped(ctx).*` | Done |
 | `ExperiencesResolver` — no `@Public()`, no `@Roles` on private CRUD | Done |
 | `@ResolveField` owner / organization / skills | Done |
 | Unit tests (`experiences.service.spec.ts`) | Done |
@@ -287,7 +285,7 @@ Do **not** start phase N+1 until phase N passes its [entity gate](#entity-gate).
 | Layer | State |
 |-------|-------|
 | Schema `ownerId` + indexes | Done (data only) |
-| `EducationsRepository.tenant` | Done |
+| `EducationsRepository` — `crud` + `stats` | Done |
 | `EducationsService` tenant CRUD | Done |
 | `EducationsResolver` | Done — `@Auth()` on all ops; no `@Public()` / `@Roles` on private CRUD |
 | `@ResolveField` owner / organization / skills | Done |
@@ -299,7 +297,7 @@ Do **not** start phase N+1 until phase N passes its [entity gate](#entity-gate).
 | Layer | State |
 |-------|-------|
 | Schema `ownerId` + indexes | Done (data only) |
-| `ProjectsRepository.tenant` | Done |
+| `ProjectsRepository` — `crud` + `stats` | Done |
 | `ProjectsService` tenant CRUD | Done |
 | `ProjectsResolver` | Done — `@Auth()` on all ops; no `@Public()` / `@Roles` on private CRUD |
 | `@ResolveField` owner / skills | Done |
@@ -325,7 +323,7 @@ migrate. Each has its own gate; do not batch unrelated concerns.
 
 | Module | Work | State |
 |--------|------|-------|
-| `dashboard` | `@Auth() ctx`; private stats via `tenantStats`; catalog stats global; USER + SUPER_ADMIN | Done |
+| `dashboard` | `@Auth() ctx`; private stats via `stats.scoped(ctx)`; catalog stats global; USER + SUPER_ADMIN | Done |
 | `resume` | `buildResume(userId)`; `GET /resume.pdf?userId=` stays public | Done |
 | `ai-tools` | Any authenticated user (drop `@Roles(SUPER_ADMIN)`) | Done |
 
@@ -377,8 +375,8 @@ Use this gate for Experience, Education, and Project.
 
 | Layer | Done when |
 |-------|-----------|
-| **Repository** | `readonly tenant = new TenantScopedCrudRepository(this)` |
-| **Service** | All CRUD via `repository.tenant.*`; `ctx: AuthContext` required |
+| **Repository** | `readonly crud` + `readonly stats`; full `CrudRepository<…>` generics; mapper in `mappers/` |
+| **Service** | All CRUD via `repository.crud.scoped(toTenantScope(ctx)).*`; `ctx: AuthContext` required |
 | **Resolver** | No `@Public()` on queries or mutations; no `@Roles(SUPER_ADMIN)` on private CRUD; `@Auth() ctx: AuthContext` everywhere |
 | **GraphQL entity** | `ownerId` + `owner`; `organizationId` + `organization` where applicable; `skillIds` + `skills` where applicable |
 | **Tests** | Unit specs for scoped CRUD; e2e: 401 unauthenticated, A≠B isolation, super-admin cross-tenant read by ID |
@@ -475,7 +473,7 @@ plus resolved `owner`, `organization`, `skills`.
 
 | Risk | Mitigation |
 |------|------------|
-| IDOR on batch ops | `TenantScopedCrudRepository` scopes every ID |
+| IDOR on batch ops | `crud.scoped(toTenantScope(ctx))` scopes every ID |
 | Admin breaks when auth lands on reads | Admin already sends JWT; regenerate codegen after schema changes |
 | Large PR | Entity gates merge incrementally on feature branch; single PR at the end |
 | Half-migrated entities (today) | Strict phase order; Experience must fully match Course before Education |
