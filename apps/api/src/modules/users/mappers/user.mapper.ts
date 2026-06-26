@@ -15,11 +15,11 @@ import { UpdateUserInput } from "../dto/update-user.input";
 import type { UserEntity } from "../entities/user.entity";
 import type { UserModel } from "../schemas/user.schema";
 
-type UserCreateRecord = Omit<CreateUserInput, "password"> & {
+export type UserCreateRecord = Omit<CreateUserInput, "password"> & {
   password: string;
 };
 
-type UserUpdateRecord = Omit<UpdateUserInput, "password"> & {
+export type UserUpdateRecord = Omit<UpdateUserInput, "password"> & {
   password?: string;
 };
 

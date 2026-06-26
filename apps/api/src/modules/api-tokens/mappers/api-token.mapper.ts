@@ -17,7 +17,7 @@ import { UpdateApiTokenInput } from "../dto/update-api-token.input";
 import type { ApiTokenEntity } from "../entities/api-token.entity";
 import type { ApiTokenModel } from "../schemas/api-token.schema";
 
-type ApiTokenCreateRecord = CreateApiTokenInput & {
+export type ApiTokenCreateRecord = CreateApiTokenInput & {
   id: string;
   hashedSecret: string;
 };

@@ -3,6 +3,10 @@ import { InjectModel } from "@nestjs/mongoose";
 import { Model } from "mongoose";
 import { CrudRepository } from "@/core/persistence/repositories/crud/crud.repository";
 import { StatsRepository } from "@/core/persistence/repositories/stats/stats.repository";
+import { CreateCourseInput } from "./dto/create-course.input";
+import { FilterCourseInput } from "./dto/filter-course.input";
+import { SortCourseInput } from "./dto/sort-course.input";
+import { UpdateCourseInput } from "./dto/update-course.input";
 import type { CourseEntityRecord } from "./entities/course.entity";
 import { CourseMapper } from "./mappers/course.mapper";
 import { CourseModel } from "./schemas/course.schema";
@@ -10,7 +14,14 @@ import { CourseModel } from "./schemas/course.schema";
 @Injectable()
 export class CoursesRepository {
   private readonly model: Model<CourseModel>;
-  readonly crud: CrudRepository<CourseModel, CourseEntityRecord>;
+  readonly crud: CrudRepository<
+    CourseModel,
+    CourseEntityRecord,
+    CreateCourseInput,
+    UpdateCourseInput,
+    FilterCourseInput,
+    SortCourseInput
+  >;
   readonly stats: StatsRepository<CourseModel>;
 
   constructor(@InjectModel(CourseModel.name) model: Model<CourseModel>) {

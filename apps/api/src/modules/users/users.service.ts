@@ -8,6 +8,7 @@ import { SortUserInput } from "./dto/sort-user.input";
 import { UpdateUserInput } from "./dto/update-user.input";
 import { UserEntity } from "./entities/user.entity";
 import type { UserWithPasswordEntity } from "./entities/user-with-password.entity";
+import type { UserCreateRecord, UserUpdateRecord } from "./mappers/user.mapper";
 import { UsersRepository } from "./users.repository";
 
 @Injectable()
@@ -51,18 +52,18 @@ export class UsersService {
     return this.repository.crud.createOne({
       ...createUserInput,
       password: await hash(password, 8),
-    } as Partial<UserEntity>);
+    });
   }
 
   async createMany(createUserInputs: CreateUserInput[]): Promise<BatchEntity> {
-    const inputs = await Promise.all(
+    const inputs: UserCreateRecord[] = await Promise.all(
       createUserInputs.map(async ({ password, ...createUserInput }) => ({
         ...createUserInput,
         password: await hash(password, 8),
       }))
     );
 
-    return this.repository.crud.createMany(inputs as Partial<UserEntity>[]);
+    return this.repository.crud.createMany(inputs);
   }
 
   async updateOne(
@@ -78,7 +79,7 @@ export class UsersService {
     return this.repository.crud.updateOneById(id, {
       ...rest,
       password: await hash(password, 8),
-    } as Partial<UserEntity>);
+    });
   }
 
   async updateMany(
@@ -91,10 +92,12 @@ export class UsersService {
       return this.repository.crud.updateManyById(ids, rest);
     }
 
-    return this.repository.crud.updateManyById(ids, {
+    const update: UserUpdateRecord = {
       ...rest,
       password: await hash(password, 8),
-    } as Partial<UserEntity>);
+    };
+
+    return this.repository.crud.updateManyById(ids, update);
   }
 
   removeOne(id: string): Promise<UserEntity> {

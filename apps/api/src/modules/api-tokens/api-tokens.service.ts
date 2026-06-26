@@ -11,6 +11,7 @@ import { SortApiTokenInput } from "./dto/sort-api-token.input";
 import { UpdateApiTokenInput } from "./dto/update-api-token.input";
 import { ApiTokenEntity, NewApiTokenEntity } from "./entities/api-token.entity";
 import { emitApiToken } from "./helpers/api-token-secret.helper";
+import type { ApiTokenCreateRecord } from "./mappers/api-token.mapper";
 
 @Injectable()
 export class ApiTokensService {
@@ -64,13 +65,15 @@ export class ApiTokensService {
     this.assertSession(ctx);
     const { plaintext, tokenId, secret } = emitApiToken();
 
+    const createInput: ApiTokenCreateRecord = {
+      ...input,
+      id: tokenId,
+      hashedSecret: await hash(secret, 8),
+    };
+
     const apiToken = await this.repository.crud
       .scoped(toTenantScope(ctx))
-      .createOne({
-        ...input,
-        id: tokenId,
-        hashedSecret: await hash(secret, 8),
-      } as Partial<ApiTokenEntity>);
+      .createOne(createInput);
 
     return { token: plaintext, apiToken };
   }
