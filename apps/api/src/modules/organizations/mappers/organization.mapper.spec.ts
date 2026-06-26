@@ -1,9 +1,11 @@
 import { OrganizationCategory } from "../enums/category.enum";
 import type { OrganizationModel } from "../schemas/organization.schema";
-import { toOrganizationEntity } from "./organization.mapper";
+import { OrganizationMapper } from "./organization.mapper";
 
-describe("toOrganizationEntity", () => {
-  it("maps persistence fields to the GraphQL entity", () => {
+describe("OrganizationMapper", () => {
+  const mapper = new OrganizationMapper();
+
+  it("maps persistence fields to the domain entity", () => {
     const model = {
       id: "507f1f77bcf86cd799439011",
       createdAt: new Date("2024-01-01"),
@@ -30,7 +32,7 @@ describe("toOrganizationEntity", () => {
       ],
     } as OrganizationModel;
 
-    expect(toOrganizationEntity(model)).toEqual({
+    expect(mapper.toDomain(model)).toEqual({
       id: "507f1f77bcf86cd799439011",
       createdAt: model.createdAt,
       updatedAt: model.updatedAt,
@@ -55,5 +57,15 @@ describe("toOrganizationEntity", () => {
         },
       ],
     });
+  });
+
+  it("maps filter input to a persistence query", () => {
+    expect(mapper.toPersistenceForFilter({ name: "Google" })).toEqual({
+      name: "Google",
+    });
+  });
+
+  it("maps sort input to a persistence sort", () => {
+    expect(mapper.toPersistenceForSort({ name: 1 })).toEqual({ name: 1 });
   });
 });

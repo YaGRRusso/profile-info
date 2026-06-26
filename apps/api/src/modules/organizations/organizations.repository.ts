@@ -4,7 +4,7 @@ import { Model } from "mongoose";
 import { CrudRepository } from "@/core/persistence/repositories/crud/crud.repository";
 import { StatsRepository } from "@/core/persistence/repositories/stats/stats.repository";
 import type { OrganizationEntity } from "./entities/organization.entity";
-import { toOrganizationEntity } from "./mappers/organization.mapper";
+import { OrganizationMapper } from "./mappers/organization.mapper";
 import { OrganizationModel } from "./schemas/organization.schema";
 
 @Injectable()
@@ -15,7 +15,7 @@ export class OrganizationsRepository {
   constructor(
     @InjectModel(OrganizationModel.name) model: Model<OrganizationModel>
   ) {
-    this.crud = new CrudRepository(model, toOrganizationEntity);
+    this.crud = new CrudRepository(model, new OrganizationMapper());
     this.stats = new StatsRepository(model);
   }
 }

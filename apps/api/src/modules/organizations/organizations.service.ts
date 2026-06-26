@@ -1,16 +1,16 @@
 import { Injectable } from "@nestjs/common";
 import { EventEmitter2 } from "@nestjs/event-emitter";
-import { AnyKeys, QueryFilter, SortOrder, UpdateQuery } from "mongoose";
 import { RecentActivityRecord } from "@/common/helpers/recent-activity.helper";
 import { BatchEntity } from "@/core/entities/batch.entity";
 import { DomainEvents } from "@/core/events/domain-events";
 import { OrganizationDeletedEvent } from "@/core/events/organization-deleted.event";
-import { PaginatedModel } from "@/core/schemas/paginated.schema";
+import type { MultiPaged } from "@/core/persistence/types/output.type";
 import { CreateOrganizationInput } from "./dto/create-organization.input";
+import { FilterOrganizationInput } from "./dto/filter-organization.input";
+import { SortOrganizationInput } from "./dto/sort-organization.input";
 import { UpdateOrganizationInput } from "./dto/update-organization.input";
 import { OrganizationEntity } from "./entities/organization.entity";
 import { OrganizationsRepository } from "./organizations.repository";
-import { OrganizationModel } from "./schemas/organization.schema";
 
 @Injectable()
 export class OrganizationsService {
@@ -26,7 +26,7 @@ export class OrganizationsService {
   findOne({
     filters,
   }: {
-    filters?: QueryFilter<OrganizationModel>;
+    filters?: FilterOrganizationInput;
   }): Promise<OrganizationEntity> {
     return this.repository.crud.findOne({ filters });
   }
@@ -41,44 +41,34 @@ export class OrganizationsService {
     skip = 0,
     limit = 50,
   }: {
-    filters?: QueryFilter<OrganizationModel>;
-    sort?: Partial<Record<keyof OrganizationModel, SortOrder>>;
+    filters?: FilterOrganizationInput;
+    sort?: SortOrganizationInput;
     limit?: number;
     skip?: number;
-  }): Promise<PaginatedModel<OrganizationEntity>> {
+  }): Promise<MultiPaged<OrganizationEntity>> {
     return this.repository.crud.findMany({ filters, sort, skip, limit });
   }
 
   createOne(createInput: CreateOrganizationInput): Promise<OrganizationEntity> {
-    return this.repository.crud.createOne(
-      createInput as AnyKeys<OrganizationModel>
-    );
+    return this.repository.crud.createOne(createInput);
   }
 
   createMany(createInputs: CreateOrganizationInput[]): Promise<BatchEntity> {
-    return this.repository.crud.createMany(
-      createInputs as AnyKeys<OrganizationModel>[]
-    );
+    return this.repository.crud.createMany(createInputs);
   }
 
   updateOne(
     id: string,
     updateInput: UpdateOrganizationInput
   ): Promise<OrganizationEntity> {
-    return this.repository.crud.updateOneById(
-      id,
-      updateInput as object as UpdateQuery<OrganizationModel>
-    );
+    return this.repository.crud.updateOneById(id, updateInput);
   }
 
   updateMany(
     ids: string[],
     updateInput: UpdateOrganizationInput
   ): Promise<BatchEntity> {
-    return this.repository.crud.updateManyById(
-      ids,
-      updateInput as object as UpdateQuery<OrganizationModel>
-    );
+    return this.repository.crud.updateManyById(ids, updateInput);
   }
 
   async removeOne(id: string): Promise<OrganizationEntity> {
