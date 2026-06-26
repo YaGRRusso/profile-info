@@ -35,7 +35,7 @@ describe("StatsRepository", () => {
   };
 
   const ownerId = new mongoose.Types.ObjectId().toHexString();
-  const scope = { userId: ownerId, crossTenant: false };
+  const tenantScope = { userId: ownerId, crossTenant: false };
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -54,6 +54,14 @@ describe("StatsRepository", () => {
       model.countDocuments.mockReturnValue(mockQueryChain(42));
 
       await expect(repository.count()).resolves.toBe(42);
+      expect(model.countDocuments).toHaveBeenCalledWith({});
+    });
+
+    it("should resolve filters before counting", async () => {
+      model.countDocuments.mockReturnValue(mockQueryChain(3));
+
+      await expect(repository.count({ name: "TypeScript" })).resolves.toBe(3);
+      expect(model.countDocuments).toHaveBeenCalledWith({ name: "TypeScript" });
     });
   });
 
@@ -71,6 +79,18 @@ describe("StatsRepository", () => {
 
       expect(model.aggregate).toHaveBeenCalledWith([
         { $group: { _id: "$name", value: { $sum: 1 } } },
+        { $sort: { value: -1 } },
+      ]);
+    });
+
+    it("should resolve match filters before aggregating", async () => {
+      model.aggregate.mockResolvedValue([{ _id: "COMPLETE", value: 2 }]);
+
+      await repository.countByField("status", { name: "TypeScript" });
+
+      expect(model.aggregate).toHaveBeenCalledWith([
+        { $match: { name: "TypeScript" } },
+        { $group: { _id: "$status", value: { $sum: 1 } } },
         { $sort: { value: -1 } },
       ]);
     });
@@ -93,13 +113,29 @@ describe("StatsRepository", () => {
       expect(chain.select).toHaveBeenCalledWith("name updatedAt");
       expect(chain.lean).toHaveBeenCalled();
     });
+
+    it("should resolve filters before querying", async () => {
+      const chain = mockQueryChain([]);
+      model.find.mockReturnValue(chain);
+
+      await repository.findRecentlyUpdated(5, "name updatedAt", {
+        name: "TypeScript",
+      });
+
+      expect(model.find).toHaveBeenCalledWith({ name: "TypeScript" });
+    });
   });
 
   describe("scoped", () => {
     let scoped: StatsRepository<TestModel>;
 
     beforeEach(() => {
-      scoped = repository.scoped(scope);
+      scoped = repository.scoped(tenantScope);
+    });
+
+    it("should return a new repository instance", () => {
+      expect(scoped).not.toBe(repository);
+      expect(scoped).toBeInstanceOf(StatsRepository);
     });
 
     describe("count", () => {
@@ -110,13 +146,29 @@ describe("StatsRepository", () => {
         expect(model.countDocuments).toHaveBeenCalledWith({ ownerId });
       });
 
+      it("should scope resolved filters by ownerId", async () => {
+        model.countDocuments.mockReturnValue(mockQueryChain(1));
+
+        await scoped.count({ name: "TypeScript" });
+
+        expect(model.countDocuments).toHaveBeenCalledWith({
+          name: "TypeScript",
+          ownerId,
+        });
+      });
+
       it("should count all documents for cross-tenant access", async () => {
         model.countDocuments.mockReturnValue(mockQueryChain(5));
 
         await expect(
-          repository.scoped({ userId: ownerId, crossTenant: true }).count()
+          repository.scoped({ userId: ownerId, crossTenant: true }).count({
+            name: "TypeScript",
+          })
         ).resolves.toBe(5);
-        expect(model.countDocuments).toHaveBeenCalledWith({});
+
+        expect(model.countDocuments).toHaveBeenCalledWith({
+          name: "TypeScript",
+        });
       });
     });
 
@@ -130,6 +182,23 @@ describe("StatsRepository", () => {
 
         expect(model.aggregate).toHaveBeenCalledWith([
           { $match: { ownerId: new mongoose.Types.ObjectId(ownerId) } },
+          { $group: { _id: "$status", value: { $sum: 1 } } },
+          { $sort: { value: -1 } },
+        ]);
+      });
+
+      it("should scope resolved match filters for aggregation", async () => {
+        model.aggregate.mockResolvedValue([{ _id: "COMPLETE", value: 1 }]);
+
+        await scoped.countByField("status", { name: "TypeScript" });
+
+        expect(model.aggregate).toHaveBeenCalledWith([
+          {
+            $match: {
+              name: "TypeScript",
+              ownerId: new mongoose.Types.ObjectId(ownerId),
+            },
+          },
           { $group: { _id: "$status", value: { $sum: 1 } } },
           { $sort: { value: -1 } },
         ]);
@@ -165,6 +234,30 @@ describe("StatsRepository", () => {
         expect(model.find).toHaveBeenCalledWith({ ownerId });
         expect(chain.limit).toHaveBeenCalledWith(3);
       });
+
+      it("should scope resolved filters for recent activity", async () => {
+        const chain = mockQueryChain([]);
+        model.find.mockReturnValue(chain);
+
+        await scoped.findRecentlyUpdated(3, "name updatedAt", {
+          name: "TypeScript",
+        });
+
+        expect(model.find).toHaveBeenCalledWith({
+          name: "TypeScript",
+          ownerId,
+        });
+      });
+    });
+  });
+
+  describe("global", () => {
+    it("should return an unscoped repository instance", async () => {
+      model.countDocuments.mockReturnValue(mockQueryChain(7));
+
+      await repository.global().count({ name: "TypeScript" });
+
+      expect(model.countDocuments).toHaveBeenCalledWith({ name: "TypeScript" });
     });
   });
 });

@@ -26,34 +26,40 @@ export class StatsRepository<TModel>
 
   // --- scope ---
 
-  private applyScope(filters: QueryFilter<TModel> = {}): QueryFilter<TModel> {
-    const cleanFilters = clearObject(filters) as QueryFilter<TModel>;
+  private resolveFilter(filters?: QueryFilter<TModel>): QueryFilter<TModel> {
+    return clearObject(filters) as QueryFilter<TModel>;
+  }
+
+  private applyScope(filters?: QueryFilter<TModel>): QueryFilter<TModel> {
     if (!this.currentScope || this.currentScope.crossTenant)
-      return cleanFilters;
-    return withTenantScope<TModel>(this.currentScope, cleanFilters);
+      return filters ?? {};
+    return withTenantScope<TModel>(this.currentScope, filters);
   }
 
   private applyScopeForAggregate(
-    filters: QueryFilter<TModel> = {}
+    filters?: QueryFilter<TModel>
   ): QueryFilter<TModel> {
-    const cleanFilters = clearObject(filters) as QueryFilter<TModel>;
     if (!this.currentScope || this.currentScope.crossTenant)
-      return cleanFilters;
-    return withTenantScopeForAggregate<TModel>(this.currentScope, cleanFilters);
+      return filters ?? {};
+    return withTenantScopeForAggregate<TModel>(this.currentScope, filters);
   }
 
   // --- read ---
 
   async count(filters: QueryFilter<TModel> = {}) {
-    return await this.model.countDocuments(this.applyScope(filters)).exec();
+    const resolvedFilter = this.resolveFilter(filters);
+    const scopedFilter = this.applyScope(resolvedFilter);
+
+    return await this.model.countDocuments(scopedFilter).exec();
   }
 
   async countByField(field: string, match: QueryFilter<TModel> = {}) {
-    const scopedMatch = this.applyScopeForAggregate(match);
+    const resolvedFilter = this.resolveFilter(match);
+    const scopedAggregateFilter = this.applyScopeForAggregate(resolvedFilter);
     const pipeline: PipelineStage[] = [];
 
-    if (Object.keys(scopedMatch).length > 0) {
-      pipeline.push({ $match: scopedMatch });
+    if (Object.keys(scopedAggregateFilter).length > 0) {
+      pipeline.push({ $match: scopedAggregateFilter });
     }
 
     pipeline.push(
@@ -73,8 +79,11 @@ export class StatsRepository<TModel>
     projection: string,
     filters: QueryFilter<TModel> = {}
   ) {
+    const resolvedFilter = this.resolveFilter(filters);
+    const scopedFilter = this.applyScope(resolvedFilter);
+
     const rows = await this.model
-      .find(this.applyScope(filters))
+      .find(scopedFilter)
       .sort({ updatedAt: -1 as SortOrder })
       .limit(limit)
       .select(projection)

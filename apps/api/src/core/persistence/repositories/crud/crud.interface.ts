@@ -18,21 +18,23 @@ export interface CrudRepositoryInterface<TModel, TEntity> {
   createMany(createInputs: Partial<TEntity>[]): Promise<BatchCount>;
   createOne(createInput: Partial<TEntity>): Promise<TEntity>;
 
-  deleteMany(filter: QueryFilter<TModel>): Promise<BatchCount>;
+  deleteMany(filter: Partial<TEntity>): Promise<BatchCount>;
   deleteManyById(ids: string[]): Promise<BatchCount>;
-  deleteOne(query: FindOneQuery<TModel>): Promise<TEntity>;
+  deleteOne(query: FindOneQuery<Partial<TEntity>>): Promise<TEntity>;
   deleteOneById(id: string): Promise<TEntity>;
 
-  findMany(query: FindManyQuery<TModel>): Promise<MultiPaged<TEntity>>;
+  findMany(
+    query: FindManyQuery<Partial<TEntity>, Partial<TEntity>>
+  ): Promise<MultiPaged<TEntity>>;
   findManyById(ids: string[]): Promise<TEntity[]>;
-  findOne(query: FindOneQuery<TModel>): Promise<TEntity>;
+  findOne(query: FindOneQuery<Partial<TEntity>>): Promise<TEntity>;
   findOneById(id: string): Promise<TEntity>;
 
   global(): CrudRepositoryInterface<TModel, TEntity>;
   scoped(scope: TenantScope): CrudRepositoryInterface<TModel, TEntity>;
 
   updateMany(
-    filter: QueryFilter<TModel>,
+    filter: Partial<TEntity>,
     updateInput: Partial<TEntity>,
     options?: { arrayFilters?: Record<string, unknown>[] }
   ): Promise<BatchCount>;
@@ -41,7 +43,7 @@ export interface CrudRepositoryInterface<TModel, TEntity> {
     updateInput: Partial<TEntity>
   ): Promise<BatchCount>;
   updateOne(
-    query: FindOneQuery<TModel>,
+    query: FindOneQuery<Partial<TEntity>>,
     updateInput: Partial<TEntity>
   ): Promise<TEntity>;
   updateOneById(id: string, updateInput: Partial<TEntity>): Promise<TEntity>;

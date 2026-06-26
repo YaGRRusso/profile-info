@@ -4,7 +4,6 @@ import mongoose, {
   SortOrder,
   UpdateQuery,
 } from "mongoose";
-import { clearObject } from "@/common/helpers/object.helper";
 import {
   toBaseEntityFields,
   toIdString,
@@ -63,14 +62,12 @@ export class CourseMapper
   }
 
   toPersistenceForFilter(entity: FilterCourseInput): QueryFilter<CourseModel> {
-    const obj = clearObject(entity);
-    return { ...obj } as QueryFilter<CourseModel>;
+    return { ...entity } as QueryFilter<CourseModel>;
   }
 
   toPersistenceForSort(
     entity: SortCourseInput
   ): Record<keyof CourseModel, SortOrder> {
-    const obj = clearObject(entity);
-    return { ...obj } as Record<keyof CourseModel, SortOrder>;
+    return { ...entity } as Record<keyof CourseModel, SortOrder>;
   }
 }
