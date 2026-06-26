@@ -1,9 +1,11 @@
 import { UserRole } from "@/core/enums/user-role.enum";
 import type { UserModel } from "../schemas/user.schema";
-import { toUserEntity } from "./user.mapper";
+import { UserMapper } from "./user.mapper";
 
-describe("toUserEntity", () => {
-  it("maps model to entity without password", () => {
+describe("UserMapper", () => {
+  const mapper = new UserMapper();
+
+  it("maps persistence fields to the domain entity", () => {
     const model = {
       id: "507f1f77bcf86cd799439011",
       createdAt: new Date("2024-01-01"),
@@ -16,7 +18,7 @@ describe("toUserEntity", () => {
       urls: [{ title: "GitHub", value: "https://github.com/alice" }],
     } as UserModel;
 
-    expect(toUserEntity(model)).toEqual({
+    expect(mapper.toDomain(model)).toEqual({
       id: "507f1f77bcf86cd799439011",
       createdAt: model.createdAt,
       updatedAt: model.updatedAt,
@@ -31,5 +33,33 @@ describe("toUserEntity", () => {
       i18n: undefined,
       urls: [{ title: "GitHub", value: "https://github.com/alice" }],
     });
+  });
+
+  it("maps create input to a persistence payload", () => {
+    expect(
+      mapper.toPersistenceForCreate({
+        name: "Alice",
+        nickname: "alice",
+        email: "alice@profile.info",
+        password: "hashed",
+        role: UserRole.USER,
+      })
+    ).toEqual({
+      name: "Alice",
+      nickname: "alice",
+      email: "alice@profile.info",
+      password: "hashed",
+      role: UserRole.USER,
+    });
+  });
+
+  it("maps filter input to a persistence query", () => {
+    expect(
+      mapper.toPersistenceForFilter({ email: "alice@profile.info" })
+    ).toEqual({ email: "alice@profile.info" });
+  });
+
+  it("maps sort input to a persistence sort", () => {
+    expect(mapper.toPersistenceForSort({ name: 1 })).toEqual({ name: 1 });
   });
 });

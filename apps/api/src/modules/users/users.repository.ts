@@ -6,17 +6,18 @@ import { PERSISTENCE_NOT_FOUND } from "@/core/persistence/persistence.messages";
 import { CrudRepository } from "@/core/persistence/repositories/crud/crud.repository";
 import type { UserEntity } from "./entities/user.entity";
 import type { UserWithPasswordEntity } from "./entities/user-with-password.entity";
-import { toUserEntity } from "./mappers/user.mapper";
+import { UserMapper } from "./mappers/user.mapper";
 import { UserModel } from "./schemas/user.schema";
 
 @Injectable()
 export class UsersRepository {
+  private readonly mapper = new UserMapper();
   readonly crud: CrudRepository<UserModel, UserEntity>;
 
   constructor(
     @InjectModel(UserModel.name) private readonly model: Model<UserModel>
   ) {
-    this.crud = new CrudRepository(model, toUserEntity);
+    this.crud = new CrudRepository(this.model, this.mapper);
   }
 
   async findOneByEmailWithPassword(
@@ -30,7 +31,7 @@ export class UsersRepository {
     if (isNil(document)) throw new NotFoundException(PERSISTENCE_NOT_FOUND);
 
     return {
-      ...toUserEntity(document),
+      ...this.mapper.toDomain(document),
       password: document.password,
     };
   }
