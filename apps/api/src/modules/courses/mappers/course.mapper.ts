@@ -12,6 +12,7 @@ import {
   toObjectIds,
 } from "@/core/mappers/base.mapper";
 import { toTranslationEntityList } from "@/core/mappers/translation.mapper";
+import { withObjectIdRefs } from "@/core/persistence/helpers/filter-ref.helper";
 import type { CrudMapperInterface } from "@/core/persistence/repositories/crud/crud.interface";
 import { CreateCourseInput } from "../dto/create-course.input";
 import { FilterCourseInput } from "../dto/filter-course.input";
@@ -22,7 +23,15 @@ import type { CourseStatus } from "../enums/status.enum";
 import type { CourseModel } from "../schemas/course.schema";
 
 export class CourseMapper
-  implements CrudMapperInterface<CourseEntityRecord, CourseModel>
+  implements
+    CrudMapperInterface<
+      CourseEntityRecord,
+      CourseModel,
+      CreateCourseInput,
+      UpdateCourseInput,
+      FilterCourseInput,
+      SortCourseInput
+    >
 {
   toDomain(model: CourseModel): CourseEntityRecord {
     return {
@@ -66,7 +75,10 @@ export class CourseMapper
   }
 
   toPersistenceForFilter(entity: FilterCourseInput): QueryFilter<CourseModel> {
-    return { ...entity } as QueryFilter<CourseModel>;
+    return withObjectIdRefs(entity, {
+      array: ["skillIds"],
+      single: ["organizationId"],
+    });
   }
 
   toPersistenceForSort(

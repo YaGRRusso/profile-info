@@ -16,7 +16,15 @@ import type { OrganizationCategory } from "../enums/category.enum";
 import type { OrganizationModel } from "../schemas/organization.schema";
 
 export class OrganizationMapper
-  implements CrudMapperInterface<OrganizationEntity, OrganizationModel>
+  implements
+    CrudMapperInterface<
+      OrganizationEntity,
+      OrganizationModel,
+      CreateOrganizationInput,
+      UpdateOrganizationInput,
+      FilterOrganizationInput,
+      SortOrganizationInput
+    >
 {
   toDomain(model: OrganizationModel): OrganizationEntity {
     return {

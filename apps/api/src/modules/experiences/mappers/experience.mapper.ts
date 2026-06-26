@@ -13,6 +13,7 @@ import {
 } from "@/core/mappers/base.mapper";
 import { toDateRangeEntity } from "@/core/mappers/date-range.mapper";
 import { toTranslationEntityList } from "@/core/mappers/translation.mapper";
+import { withObjectIdRefs } from "@/core/persistence/helpers/filter-ref.helper";
 import type { CrudMapperInterface } from "@/core/persistence/repositories/crud/crud.interface";
 import { CreateExperienceInput } from "../dto/create-experience.input";
 import { FilterExperienceInput } from "../dto/filter-experience.input";
@@ -55,7 +56,15 @@ function mapRolesForPersistence<TRole extends { skillIds?: string[] }>(
 }
 
 export class ExperienceMapper
-  implements CrudMapperInterface<ExperienceEntityRecord, ExperienceModel>
+  implements
+    CrudMapperInterface<
+      ExperienceEntityRecord,
+      ExperienceModel,
+      CreateExperienceInput,
+      UpdateExperienceInput,
+      FilterExperienceInput,
+      SortExperienceInput
+    >
 {
   toDomain(model: ExperienceModel): ExperienceEntityRecord {
     return {
@@ -94,7 +103,14 @@ export class ExperienceMapper
   toPersistenceForFilter(
     entity: FilterExperienceInput
   ): QueryFilter<ExperienceModel> {
-    return { ...entity } as QueryFilter<ExperienceModel>;
+    const { roles, ...rest } = entity;
+    const filter = withObjectIdRefs(rest, { single: ["organizationId"] });
+    if (!roles) return filter;
+
+    return {
+      ...filter,
+      roles: mapRolesForPersistence(roles),
+    } as QueryFilter<ExperienceModel>;
   }
 
   toPersistenceForSort(

@@ -23,7 +23,15 @@ type ApiTokenCreateRecord = CreateApiTokenInput & {
 };
 
 export class ApiTokenMapper
-  implements CrudMapperInterface<ApiTokenEntity, ApiTokenModel>
+  implements
+    CrudMapperInterface<
+      ApiTokenEntity,
+      ApiTokenModel,
+      ApiTokenCreateRecord,
+      UpdateApiTokenInput,
+      FilterApiTokenInput,
+      SortApiTokenInput
+    >
 {
   toDomain(model: ApiTokenModel): ApiTokenEntity {
     return {
@@ -35,15 +43,13 @@ export class ApiTokenMapper
     };
   }
 
-  toPersistenceForCreate(entity: CreateApiTokenInput): AnyKeys<ApiTokenModel> {
-    const input = entity as ApiTokenCreateRecord;
-
+  toPersistenceForCreate(entity: ApiTokenCreateRecord): AnyKeys<ApiTokenModel> {
     return {
-      _id: toObjectId(input.id),
-      name: input.name,
-      hashedSecret: input.hashedSecret,
-      permissions: input.permissions,
-      expiresAt: input.expiresAt,
+      _id: toObjectId(entity.id),
+      name: entity.name,
+      hashedSecret: entity.hashedSecret,
+      permissions: entity.permissions,
+      expiresAt: entity.expiresAt,
     };
   }
 

@@ -13,6 +13,7 @@ import {
 } from "@/core/mappers/base.mapper";
 import { toDateRangeEntity } from "@/core/mappers/date-range.mapper";
 import { toTranslationEntityList } from "@/core/mappers/translation.mapper";
+import { withObjectIdRefs } from "@/core/persistence/helpers/filter-ref.helper";
 import type { CrudMapperInterface } from "@/core/persistence/repositories/crud/crud.interface";
 import { CreateEducationInput } from "../dto/create-education.input";
 import { FilterEducationInput } from "../dto/filter-education.input";
@@ -24,7 +25,15 @@ import type { EducationStatus } from "../enums/status.enum";
 import type { EducationModel } from "../schemas/education.schema";
 
 export class EducationMapper
-  implements CrudMapperInterface<EducationEntityRecord, EducationModel>
+  implements
+    CrudMapperInterface<
+      EducationEntityRecord,
+      EducationModel,
+      CreateEducationInput,
+      UpdateEducationInput,
+      FilterEducationInput,
+      SortEducationInput
+    >
 {
   toDomain(model: EducationModel): EducationEntityRecord {
     return {
@@ -75,7 +84,10 @@ export class EducationMapper
   toPersistenceForFilter(
     entity: FilterEducationInput
   ): QueryFilter<EducationModel> {
-    return { ...entity } as QueryFilter<EducationModel>;
+    return withObjectIdRefs(entity, {
+      array: ["skillIds"],
+      single: ["organizationId"],
+    });
   }
 
   toPersistenceForSort(

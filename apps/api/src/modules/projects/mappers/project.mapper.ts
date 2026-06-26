@@ -12,6 +12,7 @@ import {
 } from "@/core/mappers/base.mapper";
 import { toTranslationEntityList } from "@/core/mappers/translation.mapper";
 import { toUrlEntityList } from "@/core/mappers/url.mapper";
+import { withObjectIdRefs } from "@/core/persistence/helpers/filter-ref.helper";
 import type { CrudMapperInterface } from "@/core/persistence/repositories/crud/crud.interface";
 import { CreateProjectInput } from "../dto/create-project.input";
 import { FilterProjectInput } from "../dto/filter-project.input";
@@ -21,7 +22,15 @@ import type { ProjectEntityRecord } from "../entities/project.entity";
 import type { ProjectModel } from "../schemas/project.schema";
 
 export class ProjectMapper
-  implements CrudMapperInterface<ProjectEntityRecord, ProjectModel>
+  implements
+    CrudMapperInterface<
+      ProjectEntityRecord,
+      ProjectModel,
+      CreateProjectInput,
+      UpdateProjectInput,
+      FilterProjectInput,
+      SortProjectInput
+    >
 {
   toDomain(model: ProjectModel): ProjectEntityRecord {
     return {
@@ -62,7 +71,7 @@ export class ProjectMapper
   toPersistenceForFilter(
     entity: FilterProjectInput
   ): QueryFilter<ProjectModel> {
-    return { ...entity } as QueryFilter<ProjectModel>;
+    return withObjectIdRefs(entity, { array: ["skillIds"] });
   }
 
   toPersistenceForSort(

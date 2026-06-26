@@ -15,7 +15,15 @@ import type { SkillCategory } from "../enums/category.enum";
 import type { SkillModel } from "../schemas/skill.schema";
 
 export class SkillMapper
-  implements CrudMapperInterface<SkillEntity, SkillModel>
+  implements
+    CrudMapperInterface<
+      SkillEntity,
+      SkillModel,
+      CreateSkillInput,
+      UpdateSkillInput,
+      FilterSkillInput,
+      SortSkillInput
+    >
 {
   toDomain(model: SkillModel): SkillEntity {
     return {

@@ -6,7 +6,7 @@ import {
 import { toTenantScope } from "@/core/context/auth-context.helper";
 import type { AuthContext } from "@/core/context/auth-context.interface";
 import { BatchEntity } from "@/core/entities/batch.entity";
-import { MultiPaged } from "@/core/persistence/types/output.type";
+import { FieldCount, MultiPaged } from "@/core/persistence/types/output.type";
 import { CoursesRepository } from "./courses.repository";
 import { CreateCourseInput } from "./dto/create-course.input";
 import { FilterCourseInput } from "./dto/filter-course.input";
@@ -111,10 +111,7 @@ export class CoursesService {
     return this.repository.stats.scoped(toTenantScope(ctx)).count();
   }
 
-  countByField(
-    ctx: AuthContext,
-    field: string
-  ): Promise<{ label: string; value: number }[]> {
+  countByField(ctx: AuthContext, field: string): Promise<FieldCount[]> {
     return this.repository.stats.scoped(toTenantScope(ctx)).countByField(field);
   }
 

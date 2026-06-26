@@ -23,7 +23,17 @@ type UserUpdateRecord = Omit<UpdateUserInput, "password"> & {
   password?: string;
 };
 
-export class UserMapper implements CrudMapperInterface<UserEntity, UserModel> {
+export class UserMapper
+  implements
+    CrudMapperInterface<
+      UserEntity,
+      UserModel,
+      UserCreateRecord,
+      UserUpdateRecord,
+      FilterUserInput,
+      SortUserInput
+    >
+{
   toDomain(model: UserModel): UserEntity {
     return {
       ...toBaseEntityFields(model),
@@ -40,12 +50,12 @@ export class UserMapper implements CrudMapperInterface<UserEntity, UserModel> {
     };
   }
 
-  toPersistenceForCreate(entity: CreateUserInput): AnyKeys<UserModel> {
-    return { ...(entity as UserCreateRecord) };
+  toPersistenceForCreate(entity: UserCreateRecord): AnyKeys<UserModel> {
+    return { ...entity };
   }
 
-  toPersistenceForUpdate(entity: UpdateUserInput): UpdateQuery<UserModel> {
-    return { ...(entity as UserUpdateRecord) };
+  toPersistenceForUpdate(entity: UserUpdateRecord): UpdateQuery<UserModel> {
+    return { ...entity };
   }
 
   toPersistenceForFilter(entity: FilterUserInput): QueryFilter<UserModel> {
