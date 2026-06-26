@@ -1730,7 +1730,7 @@ export type FindManyEducationsQueryVariables = Exact<{
 }>;
 
 
-export type FindManyEducationsQuery = { __typename?: 'Query', findManyEducations: { __typename?: 'PaginatedEducationEntity', found: number, nodes: Array<{ __typename?: 'EducationEntity', id: string, slug: string, level: EducationLevel, status: EducationStatus, relevance: number, url?: string | null, image?: string | null, createdAt: any, updatedAt: any, organization: { __typename?: 'OrganizationEntity', id: string, name: string, slug: string }, i18n: Array<{ __typename?: 'EducationTranslationLocale', locale: string, messages: { __typename?: 'EducationMessages', title: string, description: string } }>, skills?: Array<{ __typename?: 'SkillEntity', id: string, name: string }> | null, period?: { __typename?: 'DateRangeEntity', from?: any | null, to?: any | null } | null }> } };
+export type FindManyEducationsQuery = { __typename?: 'Query', findManyEducations: { __typename?: 'PaginatedEducationEntity', found: number, nodes: Array<{ __typename?: 'EducationEntity', id: string, slug: string, level: EducationLevel, status: EducationStatus, relevance: number, url?: string | null, image?: string | null, createdAt: any, updatedAt: any, owner: { __typename?: 'UserEntity', id: string, nickname: string, name: string, role: UserRole, email: string, phone?: string | null, avatar?: string | null }, organization: { __typename?: 'OrganizationEntity', id: string, name: string, slug: string }, i18n: Array<{ __typename?: 'EducationTranslationLocale', locale: string, messages: { __typename?: 'EducationMessages', title: string, description: string } }>, skills?: Array<{ __typename?: 'SkillEntity', id: string, name: string }> | null, period?: { __typename?: 'DateRangeEntity', from?: any | null, to?: any | null } | null }> } };
 
 export type FindManyExperiencesQueryVariables = Exact<{
   experienceFilters?: InputMaybe<FilterExperienceInput>;
@@ -1739,7 +1739,7 @@ export type FindManyExperiencesQueryVariables = Exact<{
 }>;
 
 
-export type FindManyExperiencesQuery = { __typename?: 'Query', findManyExperiences: { __typename?: 'PaginatedExperienceEntity', found: number, nodes: Array<{ __typename?: 'ExperienceEntity', id: string, slug: string, category: ExperienceCategory, relevance: number, createdAt: any, updatedAt: any, organization: { __typename?: 'OrganizationEntity', id: string, name: string, slug: string }, roles: Array<{ __typename?: 'ExperienceRole', i18n: Array<{ __typename?: 'ExperienceTranslationLocale', locale: string, messages: { __typename?: 'ExperienceMessages', title: string, description: string } }>, period?: { __typename?: 'DateRangeEntity', from?: any | null, to?: any | null } | null, skills?: Array<{ __typename?: 'SkillEntity', id: string, name: string }> | null }> }> } };
+export type FindManyExperiencesQuery = { __typename?: 'Query', findManyExperiences: { __typename?: 'PaginatedExperienceEntity', found: number, nodes: Array<{ __typename?: 'ExperienceEntity', id: string, slug: string, category: ExperienceCategory, relevance: number, createdAt: any, updatedAt: any, owner: { __typename?: 'UserEntity', id: string, nickname: string, name: string, role: UserRole, email: string, phone?: string | null, avatar?: string | null }, organization: { __typename?: 'OrganizationEntity', id: string, name: string, slug: string }, roles: Array<{ __typename?: 'ExperienceRole', i18n: Array<{ __typename?: 'ExperienceTranslationLocale', locale: string, messages: { __typename?: 'ExperienceMessages', title: string, description: string } }>, period?: { __typename?: 'DateRangeEntity', from?: any | null, to?: any | null } | null, skills?: Array<{ __typename?: 'SkillEntity', id: string, name: string }> | null }> }> } };
 
 export type FindManyOrganizationsQueryVariables = Exact<{
   organizationFilters?: InputMaybe<FilterOrganizationInput>;
@@ -1757,7 +1757,7 @@ export type FindManyProjectsQueryVariables = Exact<{
 }>;
 
 
-export type FindManyProjectsQuery = { __typename?: 'Query', findManyProjects: { __typename?: 'PaginatedProjectEntity', found: number, nodes: Array<{ __typename?: 'ProjectEntity', id: string, slug: string, relevance: number, images?: Array<string> | null, createdAt: any, updatedAt: any, urls?: Array<{ __typename?: 'UrlEntity', title: string, value: string }> | null, i18n: Array<{ __typename?: 'ProjectMessagesTranslationEntity', locale: string, messages: { __typename?: 'ProjectMessages', title: string, description: string } }>, skills?: Array<{ __typename?: 'SkillEntity', id: string, name: string }> | null }> } };
+export type FindManyProjectsQuery = { __typename?: 'Query', findManyProjects: { __typename?: 'PaginatedProjectEntity', found: number, nodes: Array<{ __typename?: 'ProjectEntity', id: string, slug: string, relevance: number, images?: Array<string> | null, createdAt: any, updatedAt: any, owner: { __typename?: 'UserEntity', id: string, nickname: string, name: string, role: UserRole, email: string, phone?: string | null, avatar?: string | null }, urls?: Array<{ __typename?: 'UrlEntity', title: string, value: string }> | null, i18n: Array<{ __typename?: 'ProjectMessagesTranslationEntity', locale: string, messages: { __typename?: 'ProjectMessages', title: string, description: string } }>, skills?: Array<{ __typename?: 'SkillEntity', id: string, name: string }> | null }> } };
 
 export type FindManySkillsQueryVariables = Exact<{
   skillFilters?: InputMaybe<FilterSkillInput>;
@@ -2360,6 +2360,15 @@ export const FindManyEducationsDocument = new TypedDocumentString(`
       relevance
       url
       image
+      owner {
+        id
+        nickname
+        name
+        role
+        email
+        phone
+        avatar
+      }
       organization {
         id
         name
@@ -2399,6 +2408,15 @@ export const FindManyExperiencesDocument = new TypedDocumentString(`
       slug
       category
       relevance
+      owner {
+        id
+        nickname
+        name
+        role
+        email
+        phone
+        avatar
+      }
       organization {
         id
         name
@@ -2467,6 +2485,15 @@ export const FindManyProjectsDocument = new TypedDocumentString(`
       id
       slug
       relevance
+      owner {
+        id
+        nickname
+        name
+        role
+        email
+        phone
+        avatar
+      }
       images
       urls {
         title

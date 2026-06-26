@@ -30,6 +30,7 @@ import { useQueryState } from "nuqs";
 import { useMemo, useState } from "react";
 import { z } from "zod";
 import { BadgeList } from "@/components/display/badge-list";
+import { UserRole } from "@/generated/graphql/graphql";
 import { useActiveFilters } from "@/hooks/custom/use-active-filters";
 import { usePersistedState } from "@/hooks/custom/use-persisted-state";
 import { useStableValue } from "@/hooks/custom/use-stable-value";
@@ -37,7 +38,13 @@ import type { ProjectRow } from "@/hooks/queries/projects";
 import { cn } from "@/lib/cn";
 import { getMinMaxFacets } from "@/lib/facets";
 import { parseAsShape } from "@/lib/parsers";
+import {
+  canSeeColumn,
+  getRestrictedVisibility,
+  RestrictedColumns,
+} from "@/lib/table-columns";
 import { dateRangeFilter, numberRangeFilter } from "@/lib/table-filters";
+import { useAuthStore } from "@/stores/auth";
 
 const debouncedUrlUpdates = { method: "debounce" as const, timeMs: 500 };
 const persistentOptions = { clearOnDefault: true, history: "push" as const };
@@ -70,6 +77,10 @@ const DATE_OPTIONS = [
   { value: "week", label: "Last 7 days" },
   { value: "month", label: "This month" },
 ];
+
+const RESTRICTED_COLUMNS: RestrictedColumns = {
+  [UserRole.SuperAdmin]: ["owner"],
+};
 
 const columnHelper = createColumnHelper<ProjectRow>();
 
@@ -115,6 +126,15 @@ const getColumns = (
   }),
   columnHelper.accessor("slug", {
     header: "Slug",
+  }),
+  columnHelper.accessor((row) => row.owner?.nickname ?? "", {
+    id: "owner",
+    header: "Owner",
+    enableGlobalFilter: false,
+    enableSorting: false,
+    cell: (data) => (
+      <span className="badge badge-soft badge-sm">{data.getValue()}</span>
+    ),
   }),
   columnHelper.accessor("relevance", {
     header: "Relevance",
@@ -220,6 +240,7 @@ export function ProjectsTable({
   onMultiView,
   onMultiDelete,
 }: ProjectsTableProps) {
+  const userRole = useAuthStore((state) => state.user?.role);
   const [searchQuery, setSearchQuery] = useQueryState("query", queryParser);
   const [sort, setSort] = useQueryState("sort", sortParser);
   const [createdAt, setCreatedAt] = useQueryState("createdAt", createdAtParser);
@@ -290,7 +311,11 @@ export function ProjectsTable({
       sorting: sort,
       columnFilters,
       rowSelection,
-      columnVisibility,
+      columnVisibility: getRestrictedVisibility(
+        columnVisibility,
+        RESTRICTED_COLUMNS,
+        userRole
+      ),
     },
     onSortingChange: handleSortingChange,
     onRowSelectionChange: setRowSelection,
@@ -445,6 +470,9 @@ export function ProjectsTable({
                 {table
                   .getAllColumns()
                   .filter((col) => col.getCanHide())
+                  .filter((col) =>
+                    canSeeColumn(RESTRICTED_COLUMNS, col.id, userRole)
+                  )
                   .map((col) => (
                     <label
                       className="flex items-center gap-2 text-sm"

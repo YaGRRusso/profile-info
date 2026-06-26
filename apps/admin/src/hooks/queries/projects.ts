@@ -28,6 +28,15 @@ const findManyProjects = graphql(`
         id
         slug
         relevance
+        owner {
+          id
+          nickname
+          name
+          role
+          email
+          phone
+          avatar
+        }
         images
         urls {
           title

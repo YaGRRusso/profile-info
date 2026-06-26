@@ -32,6 +32,15 @@ const findManyEducations = graphql(`
         relevance
         url
         image
+        owner {
+          id
+          nickname
+          name
+          role
+          email
+          phone
+          avatar
+        }
         organization {
           id
           name

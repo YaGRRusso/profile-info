@@ -29,6 +29,15 @@ const findManyExperiences = graphql(`
         slug
         category
         relevance
+        owner {
+          id
+          nickname
+          name
+          role
+          email
+          phone
+          avatar
+        }
         organization {
           id
           name
