@@ -13,40 +13,37 @@ import { BaseModel } from "@/core/schemas/base.schema";
 
 interface TestModel extends BaseModel {
   name: string;
+  ownerId?: string;
 }
 
 describe("CrudRepository", () => {
   let repository: CrudRepository<TestModel, TestModel>;
   let model: {
-    findById: jest.Mock;
     findOne: jest.Mock;
     find: jest.Mock;
     create: jest.Mock;
     countDocuments: jest.Mock;
-    findByIdAndUpdate: jest.Mock;
     findOneAndUpdate: jest.Mock;
     updateMany: jest.Mock;
-    findByIdAndDelete: jest.Mock;
     findOneAndDelete: jest.Mock;
     deleteMany: jest.Mock;
   };
 
+  const ownerId = new mongoose.Types.ObjectId().toHexString();
+  const otherOwnerId = new mongoose.Types.ObjectId().toHexString();
   const docId = new mongoose.Types.ObjectId().toHexString();
-  const fakeDoc = { _id: docId, name: "Test" } as unknown as TestModel;
+  const fakeDoc = { _id: docId, ownerId, name: "Test" } as unknown as TestModel;
 
   beforeEach(() => {
     jest.clearAllMocks();
 
     model = {
-      findById: jest.fn(),
       findOne: jest.fn(),
       find: jest.fn(),
       create: jest.fn(),
       countDocuments: jest.fn(),
-      findByIdAndUpdate: jest.fn(),
       findOneAndUpdate: jest.fn(),
       updateMany: jest.fn(),
-      findByIdAndDelete: jest.fn(),
       findOneAndDelete: jest.fn(),
       deleteMany: jest.fn(),
     };
@@ -56,13 +53,14 @@ describe("CrudRepository", () => {
 
   describe("findOneById", () => {
     it("should return the document when found", async () => {
-      model.findById.mockReturnValue(mockQueryChain(fakeDoc));
+      model.findOne.mockReturnValue(mockQueryChain(fakeDoc));
 
       await expect(repository.findOneById(docId)).resolves.toBe(fakeDoc);
+      expect(model.findOne).toHaveBeenCalledWith({ _id: docId });
     });
 
     it("should throw NotFoundException when missing", async () => {
-      model.findById.mockReturnValue(mockQueryChain(null));
+      model.findOne.mockReturnValue(mockQueryChain(null));
 
       await expect(repository.findOneById(docId)).rejects.toThrow(
         new NotFoundException(PERSISTENCE_NOT_FOUND)
@@ -84,8 +82,13 @@ describe("CrudRepository", () => {
 
     it("should query by id list", async () => {
       model.find.mockReturnValue({
-        limit: jest.fn().mockReturnValue(mockQueryChain([fakeDoc])),
+        sort: jest.fn().mockReturnValue({
+          skip: jest.fn().mockReturnValue({
+            limit: jest.fn().mockReturnValue(mockQueryChain([fakeDoc])),
+          }),
+        }),
       });
+      model.countDocuments.mockReturnValue(mockQueryChain(1));
 
       await repository.findManyById([docId]);
 
@@ -211,12 +214,12 @@ describe("CrudRepository", () => {
 
   describe("updateOneById", () => {
     it("should use runValidators and return the updated document", async () => {
-      model.findByIdAndUpdate.mockReturnValue(mockQueryChain(fakeDoc));
+      model.findOneAndUpdate.mockReturnValue(mockQueryChain(fakeDoc));
 
       await repository.updateOneById(docId, { name: "Updated" });
 
-      expect(model.findByIdAndUpdate).toHaveBeenCalledWith(
-        docId,
+      expect(model.findOneAndUpdate).toHaveBeenCalledWith(
+        { _id: docId },
         { name: "Updated" },
         { returnDocument: "after", runValidators: true }
       );
@@ -230,6 +233,115 @@ describe("CrudRepository", () => {
       await expect(
         repository.deleteOne({ filters: { name: "Missing" } })
       ).rejects.toThrow(new NotFoundException(PERSISTENCE_NOT_REMOVED));
+    });
+  });
+
+  describe("scoped", () => {
+    const tenantScope = { userId: ownerId, crossTenant: false };
+
+    describe("findOneById", () => {
+      it("should scope by ownerId for tenant users", async () => {
+        model.findOne.mockReturnValue(mockQueryChain(fakeDoc));
+
+        await repository.scoped(tenantScope).findOneById(docId);
+
+        expect(model.findOne).toHaveBeenCalledWith(
+          expect.objectContaining({ _id: docId, ownerId })
+        );
+      });
+
+      it("should bypass owner scope for cross-tenant access", async () => {
+        model.findOne.mockReturnValue(mockQueryChain(fakeDoc));
+
+        await repository
+          .scoped({ userId: ownerId, crossTenant: true })
+          .findOneById(docId);
+
+        expect(model.findOne).toHaveBeenCalledWith({ _id: docId });
+      });
+
+      it("should throw NotFoundException when scoped document is missing", async () => {
+        model.findOne.mockReturnValue(mockQueryChain(null));
+
+        await expect(
+          repository
+            .scoped({ userId: otherOwnerId, crossTenant: false })
+            .findOneById(docId)
+        ).rejects.toThrow(new NotFoundException(PERSISTENCE_NOT_FOUND));
+      });
+    });
+
+    describe("createOne", () => {
+      it("should inject ownerId for tenant users", async () => {
+        model.create.mockResolvedValue(fakeDoc);
+
+        await repository
+          .scoped(tenantScope)
+          .createOne({ name: "Test" } as never);
+
+        expect(model.create).toHaveBeenCalledWith(
+          expect.objectContaining({ ownerId, name: "Test" })
+        );
+      });
+
+      it("should ignore ownerId in create input and use scope userId", async () => {
+        model.create.mockResolvedValue(fakeDoc);
+
+        await repository.scoped(tenantScope).createOne({
+          name: "Test",
+          ownerId: otherOwnerId,
+        } as never);
+
+        expect(model.create).toHaveBeenCalledWith(
+          expect.objectContaining({ name: "Test", ownerId })
+        );
+      });
+
+      it("should inject ownerId from context on cross-tenant create", async () => {
+        model.create.mockResolvedValue(fakeDoc);
+
+        await repository
+          .scoped({ userId: ownerId, crossTenant: true })
+          .createOne({ name: "Test", ownerId: otherOwnerId } as never);
+
+        expect(model.create).toHaveBeenCalledWith(
+          expect.objectContaining({ name: "Test", ownerId })
+        );
+      });
+    });
+
+    describe("updateManyById", () => {
+      it("should return partial batch counts for tenant scope", async () => {
+        model.updateMany.mockReturnValue(mockQueryChain({ matchedCount: 1 }));
+
+        const otherId = new mongoose.Types.ObjectId().toHexString();
+        const result = await repository
+          .scoped(tenantScope)
+          .updateManyById([docId, otherId], { name: "Updated" });
+
+        expect(model.updateMany).toHaveBeenCalledWith(
+          expect.objectContaining({ ownerId, _id: { $in: [docId, otherId] } }),
+          { name: "Updated" },
+          expect.objectContaining({ runValidators: true })
+        );
+        expect(result).toEqual({ succeeded: 1, failed: 1 });
+      });
+    });
+
+    describe("deleteManyById", () => {
+      it("should return partial batch counts for tenant scope", async () => {
+        model.deleteMany.mockReturnValue(mockQueryChain({ deletedCount: 1 }));
+
+        const otherId = new mongoose.Types.ObjectId().toHexString();
+        const result = await repository
+          .scoped(tenantScope)
+          .deleteManyById([docId, otherId]);
+
+        expect(model.deleteMany).toHaveBeenCalledWith(
+          expect.objectContaining({ ownerId, _id: { $in: [docId, otherId] } })
+        );
+        expect(result).toEqual({ succeeded: 1, failed: 1 });
+      });
     });
   });
 });

@@ -1,9 +1,11 @@
+import mongoose from "mongoose";
 import { mockQueryChain } from "@/core/persistence/repositories/query-chain.mock";
 import { StatsRepository } from "@/core/persistence/repositories/stats.repository";
 import { BaseModel } from "@/core/schemas/base.schema";
 
 interface TestModel extends BaseModel {
   name: string;
+  ownerId: string;
 }
 
 describe("StatsRepository", () => {
@@ -13,6 +15,9 @@ describe("StatsRepository", () => {
     aggregate: jest.Mock;
     find: jest.Mock;
   };
+
+  const ownerId = new mongoose.Types.ObjectId().toHexString();
+  const scope = { userId: ownerId, crossTenant: false };
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -69,6 +74,79 @@ describe("StatsRepository", () => {
       expect(chain.limit).toHaveBeenCalledWith(5);
       expect(chain.select).toHaveBeenCalledWith("name updatedAt");
       expect(chain.lean).toHaveBeenCalled();
+    });
+  });
+
+  describe("scoped", () => {
+    let scoped: StatsRepository<TestModel>;
+
+    beforeEach(() => {
+      scoped = repository.scoped(scope);
+    });
+
+    describe("count", () => {
+      it("should scope by ownerId for tenant users", async () => {
+        model.countDocuments.mockReturnValue(mockQueryChain(2));
+
+        await expect(scoped.count()).resolves.toBe(2);
+        expect(model.countDocuments).toHaveBeenCalledWith({ ownerId });
+      });
+
+      it("should count all documents for cross-tenant access", async () => {
+        model.countDocuments.mockReturnValue(mockQueryChain(5));
+
+        await expect(
+          repository.scoped({ userId: ownerId, crossTenant: true }).count()
+        ).resolves.toBe(5);
+        expect(model.countDocuments).toHaveBeenCalledWith({});
+      });
+    });
+
+    describe("countByField", () => {
+      it("should scope aggregation by ownerId", async () => {
+        model.aggregate.mockResolvedValue([{ _id: "COMPLETE", value: 1 }]);
+
+        await expect(scoped.countByField("status")).resolves.toEqual([
+          { label: "COMPLETE", value: 1 },
+        ]);
+
+        expect(model.aggregate).toHaveBeenCalledWith([
+          { $match: { ownerId: new mongoose.Types.ObjectId(ownerId) } },
+          { $group: { _id: "$status", value: { $sum: 1 } } },
+          { $sort: { value: -1 } },
+        ]);
+      });
+
+      it("should not scope aggregation by ownerId for cross-tenant access", async () => {
+        model.aggregate.mockResolvedValue([{ _id: "FULL_TIME", value: 2 }]);
+
+        await expect(
+          repository
+            .scoped({ userId: ownerId, crossTenant: true })
+            .countByField("category")
+        ).resolves.toEqual([{ label: "FULL_TIME", value: 2 }]);
+
+        expect(model.aggregate).toHaveBeenCalledWith([
+          { $group: { _id: "$category", value: { $sum: 1 } } },
+          { $sort: { value: -1 } },
+        ]);
+      });
+    });
+
+    describe("findRecentlyUpdated", () => {
+      it("should scope recent activity by ownerId", async () => {
+        const updatedAt = new Date("2026-01-01T00:00:00.000Z");
+        const rows = [{ name: "Test", updatedAt }];
+        const chain = mockQueryChain(rows);
+        model.find.mockReturnValue(chain);
+
+        await expect(
+          scoped.findRecentlyUpdated(3, "name updatedAt")
+        ).resolves.toEqual(rows);
+
+        expect(model.find).toHaveBeenCalledWith({ ownerId });
+        expect(chain.limit).toHaveBeenCalledWith(3);
+      });
     });
   });
 });

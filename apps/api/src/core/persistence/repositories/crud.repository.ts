@@ -15,6 +15,7 @@ import {
 } from "@/common/helpers/object-id.helper";
 import { DEFAULT_PAGE_SIZE, MAX_PAGE_SIZE } from "../consts/limits.const";
 import { assertBatchSucceeded } from "../helpers/batch.helper";
+import { withTenantScope } from "../helpers/tenant-scope.helper";
 import {
   PERSISTENCE_NOT_CREATED,
   PERSISTENCE_NOT_FOUND,
@@ -23,46 +24,50 @@ import {
 } from "../persistence.messages";
 import { FindManyQuery, FindOneQuery } from "../types/input.type";
 import type { BatchCount, MultiPaged } from "../types/output.type";
+import type { TenantScope } from "../types/scope.type";
 
 export class CrudRepository<TModel, TEntity> {
   constructor(
-    readonly model: Model<TModel>,
-    private readonly toEntity: (model: TModel) => TEntity
+    protected readonly model: Model<TModel>,
+    protected readonly toEntity: (model: TModel) => TEntity,
+    protected readonly currentScope?: TenantScope
   ) {}
 
-  private toFilter(filters?: QueryFilter<TModel>): QueryFilter<TModel> {
-    return clearObject(filters) as QueryFilter<TModel>;
+  scoped(scope: TenantScope): CrudRepository<TModel, TEntity> {
+    return new CrudRepository(this.model, this.toEntity, scope);
+  }
+
+  global(): CrudRepository<TModel, TEntity> {
+    return new CrudRepository(this.model, this.toEntity, undefined);
+  }
+
+  // --- scope ---
+
+  private applyScope(filters?: QueryFilter<TModel>): QueryFilter<TModel> {
+    const cleanFilters = clearObject(filters) as QueryFilter<TModel>;
+    if (!this.currentScope || this.currentScope.crossTenant)
+      return cleanFilters;
+    return withTenantScope<TModel>(this.currentScope, cleanFilters);
+  }
+
+  private injectOwner(payload: AnyKeys<TModel>): AnyKeys<TModel> {
+    if (!this.currentScope) return payload;
+    const { ownerId: _, ...rest } = payload as AnyKeys<TModel> & {
+      ownerId?: string;
+    };
+    return { ...rest, ownerId: this.currentScope.userId } as AnyKeys<TModel>;
   }
 
   private toLimit(limit?: number): number {
     return Math.min(limit ?? DEFAULT_PAGE_SIZE, MAX_PAGE_SIZE);
   }
 
-  async findOneById(id: string): Promise<TEntity> {
-    assertValidObjectId(id);
-
-    const document = await this.model.findById(id).exec();
-    if (isNil(document)) throw new NotFoundException(PERSISTENCE_NOT_FOUND);
-    return this.toEntity(document);
-  }
-
-  async findManyById(ids: string[]): Promise<TEntity[]> {
-    assertValidObjectIds(ids);
-    if (ids.length === 0) return [];
-
-    const documents = await this.model
-      .find({ _id: { $in: ids } } as QueryFilter<TModel>)
-      .limit(ids.length)
-      .exec();
-
-    return documents.map((document) => this.toEntity(document));
-  }
+  // --- read ---
 
   async findOne({ filters }: FindOneQuery<TModel>): Promise<TEntity> {
-    const document = await this.model.findOne(this.toFilter(filters)).exec();
-
+    const document = await this.model.findOne(this.applyScope(filters)).exec();
     if (isNil(document)) throw new NotFoundException(PERSISTENCE_NOT_FOUND);
-    return this.toEntity(document);
+    return await this.toEntity(document);
   }
 
   async findMany({
@@ -71,17 +76,17 @@ export class CrudRepository<TModel, TEntity> {
     skip = 0,
     limit = DEFAULT_PAGE_SIZE,
   }: FindManyQuery<TModel>): Promise<MultiPaged<TEntity>> {
-    const clearedFilters = this.toFilter(filters);
+    const scopedFilters = this.applyScope(filters);
     const safeLimit = this.toLimit(limit);
 
     const [documents, found] = await Promise.all([
       this.model
-        .find(clearedFilters)
+        .find(scopedFilters)
         .sort(clearObject(sort) as Record<keyof TModel, SortOrder>)
         .skip(skip)
         .limit(safeLimit)
         .exec(),
-      this.model.countDocuments(clearedFilters).exec(),
+      this.model.countDocuments(scopedFilters).exec(),
     ]);
 
     return mapPage({ nodes: documents, found }, (document) =>
@@ -89,16 +94,35 @@ export class CrudRepository<TModel, TEntity> {
     );
   }
 
+  async findOneById(id: string): Promise<TEntity> {
+    assertValidObjectId(id);
+    return await this.findOne({ filters: { _id: id } as QueryFilter<TModel> });
+  }
+
+  async findManyById(ids: string[]): Promise<TEntity[]> {
+    assertValidObjectIds(ids);
+    if (ids.length === 0) return [];
+
+    const { nodes } = await this.findMany({
+      filters: { _id: { $in: ids } } as QueryFilter<TModel>,
+      limit: ids.length,
+    });
+    return nodes;
+  }
+
+  // --- create ---
+
   async createOne(createInput: AnyKeys<TModel>): Promise<TEntity> {
-    const document = await this.model.create(createInput);
+    const document = await this.model.create(this.injectOwner(createInput));
     if (isNil(document)) throw new BadRequestException(PERSISTENCE_NOT_CREATED);
-    return this.toEntity(document);
+    return await this.toEntity(document);
   }
 
   async createMany(createInputs: AnyKeys<TModel>[]): Promise<BatchCount> {
     if (createInputs.length === 0) return { succeeded: 0, failed: 0 };
 
-    const documents = await this.model.create(createInputs);
+    const payloads = createInputs.map((input) => this.injectOwner(input));
+    const documents = await this.model.create(payloads);
     if (isNil(documents))
       throw new BadRequestException(PERSISTENCE_NOT_CREATED);
 
@@ -111,58 +135,21 @@ export class CrudRepository<TModel, TEntity> {
     );
   }
 
-  async updateOneById(
-    id: string,
-    updateInput: UpdateQuery<TModel>
-  ): Promise<TEntity> {
-    assertValidObjectId(id);
-
-    const document = await this.model
-      .findByIdAndUpdate(id, updateInput, {
-        returnDocument: "after",
-        runValidators: true,
-      })
-      .exec();
-
-    if (isNil(document)) throw new NotFoundException(PERSISTENCE_NOT_UPDATED);
-    return this.toEntity(document);
-  }
-
-  async updateManyById(
-    ids: string[],
-    updateInput: UpdateQuery<TModel>
-  ): Promise<BatchCount> {
-    assertValidObjectIds(ids);
-    if (ids.length === 0) return { succeeded: 0, failed: 0 };
-
-    const result = await this.model
-      .updateMany({ _id: { $in: ids } } as QueryFilter<TModel>, updateInput, {
-        runValidators: true,
-      })
-      .exec();
-
-    return assertBatchSucceeded(
-      {
-        succeeded: result.matchedCount,
-        failed: ids.length - result.matchedCount,
-      },
-      new NotFoundException(PERSISTENCE_NOT_UPDATED)
-    );
-  }
+  // --- update ---
 
   async updateOne(
     { filters }: FindOneQuery<TModel>,
     updateInput: UpdateQuery<TModel>
   ): Promise<TEntity> {
     const document = await this.model
-      .findOneAndUpdate(this.toFilter(filters), updateInput, {
+      .findOneAndUpdate(this.applyScope(filters), updateInput, {
         returnDocument: "after",
         runValidators: true,
       })
       .exec();
 
     if (isNil(document)) throw new NotFoundException(PERSISTENCE_NOT_UPDATED);
-    return this.toEntity(document);
+    return await this.toEntity(document);
   }
 
   async updateMany(
@@ -171,7 +158,7 @@ export class CrudRepository<TModel, TEntity> {
     options?: { arrayFilters?: Record<string, unknown>[] }
   ): Promise<BatchCount> {
     const result = await this.model
-      .updateMany(this.toFilter(filter), update, {
+      .updateMany(this.applyScope(filter), update, {
         ...options,
         runValidators: true,
       })
@@ -183,46 +170,69 @@ export class CrudRepository<TModel, TEntity> {
     );
   }
 
+  async updateOneById(
+    id: string,
+    updateInput: UpdateQuery<TModel>
+  ): Promise<TEntity> {
+    assertValidObjectId(id);
+    return await this.updateOne(
+      { filters: { _id: id } as QueryFilter<TModel> },
+      updateInput
+    );
+  }
+
+  async updateManyById(
+    ids: string[],
+    updateInput: UpdateQuery<TModel>
+  ): Promise<BatchCount> {
+    assertValidObjectIds(ids);
+    if (ids.length === 0) return { succeeded: 0, failed: 0 };
+
+    const result = await this.updateMany(
+      { _id: { $in: ids } } as QueryFilter<TModel>,
+      updateInput
+    );
+    return {
+      succeeded: result.succeeded,
+      failed: ids.length - result.succeeded,
+    };
+  }
+
+  // --- delete ---
+
+  async deleteOne({ filters }: FindOneQuery<TModel>): Promise<TEntity> {
+    const document = await this.model
+      .findOneAndDelete(this.applyScope(filters))
+      .exec();
+    if (isNil(document)) throw new NotFoundException(PERSISTENCE_NOT_REMOVED);
+    return await this.toEntity(document);
+  }
+
+  async deleteMany(filter: QueryFilter<TModel>): Promise<BatchCount> {
+    const result = await this.model.deleteMany(this.applyScope(filter)).exec();
+    return assertBatchSucceeded(
+      { succeeded: result.deletedCount, failed: 0 },
+      new NotFoundException(PERSISTENCE_NOT_REMOVED)
+    );
+  }
+
   async deleteOneById(id: string): Promise<TEntity> {
     assertValidObjectId(id);
-
-    const document = await this.model.findByIdAndDelete(id).exec();
-    if (isNil(document)) throw new NotFoundException(PERSISTENCE_NOT_REMOVED);
-    return this.toEntity(document);
+    return await this.deleteOne({
+      filters: { _id: id } as QueryFilter<TModel>,
+    });
   }
 
   async deleteManyById(ids: string[]): Promise<BatchCount> {
     assertValidObjectIds(ids);
     if (ids.length === 0) return { succeeded: 0, failed: 0 };
 
-    const result = await this.model
-      .deleteMany({ _id: { $in: ids } } as QueryFilter<TModel>)
-      .exec();
-
-    return assertBatchSucceeded(
-      {
-        succeeded: result.deletedCount,
-        failed: ids.length - result.deletedCount,
-      },
-      new NotFoundException(PERSISTENCE_NOT_REMOVED)
-    );
-  }
-
-  async deleteOne({ filters }: FindOneQuery<TModel>): Promise<TEntity> {
-    const document = await this.model
-      .findOneAndDelete(this.toFilter(filters))
-      .exec();
-
-    if (isNil(document)) throw new NotFoundException(PERSISTENCE_NOT_REMOVED);
-    return this.toEntity(document);
-  }
-
-  async deleteMany(filter: QueryFilter<TModel>): Promise<BatchCount> {
-    const result = await this.model.deleteMany(this.toFilter(filter)).exec();
-
-    return assertBatchSucceeded(
-      { succeeded: result.deletedCount, failed: 0 },
-      new NotFoundException(PERSISTENCE_NOT_REMOVED)
-    );
+    const result = await this.deleteMany({
+      _id: { $in: ids },
+    } as QueryFilter<TModel>);
+    return {
+      succeeded: result.succeeded,
+      failed: ids.length - result.succeeded,
+    };
   }
 }
