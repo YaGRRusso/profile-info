@@ -1,16 +1,16 @@
 import type DataLoader from "dataloader";
+import type { OrganizationEntity } from "@/modules/organizations/entities/organization.entity";
 import { OrganizationsLoaderService } from "@/modules/organizations/organizations-loader.service";
-import type { OrganizationModel } from "@/modules/organizations/schemas/organization.schema";
-import type { SkillModel } from "@/modules/skills/schemas/skill.schema";
+import type { SkillEntity } from "@/modules/skills/entities/skill.entity";
 import { SkillsLoaderService } from "@/modules/skills/skills-loader.service";
 
-import type { UserModel } from "@/modules/users/schemas/user.schema";
+import type { UserEntity } from "@/modules/users/entities/user.entity";
 import { UsersLoaderService } from "@/modules/users/users-loader.service";
 
 export interface Loaders {
-  batchOrganizations: DataLoader<string, OrganizationModel | null>;
-  batchSkills: DataLoader<string, SkillModel | null>;
-  batchUsers: DataLoader<string, UserModel | null>;
+  batchOrganizations: DataLoader<string, OrganizationEntity | null>;
+  batchSkills: DataLoader<string, SkillEntity | null>;
+  batchUsers: DataLoader<string, UserEntity | null>;
 }
 
 export class LoadersService {

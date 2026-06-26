@@ -49,7 +49,7 @@ describe("ResumeService", () => {
 
   it("should scope private entities to the requested userId", async () => {
     usersService.findOneById.mockResolvedValue({
-      _id: userId,
+      id: userId,
       name: "Alice",
       email: "alice@profile.info",
       role: UserRole.SUPER_ADMIN,
@@ -92,7 +92,7 @@ describe("ResumeService", () => {
 
   it("should build header data from the requested user", async () => {
     usersService.findOneById.mockResolvedValue({
-      _id: userId,
+      id: userId,
       name: "Alice",
       email: "alice@profile.info",
       phone: "+5511999999999",

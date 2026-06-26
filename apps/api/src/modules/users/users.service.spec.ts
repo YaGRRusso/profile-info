@@ -3,6 +3,7 @@ import { getModelToken } from "@nestjs/mongoose";
 import { Test, TestingModule } from "@nestjs/testing";
 import { hash } from "bcryptjs";
 import mongoose, { Model } from "mongoose";
+import { UserRole } from "@/core/enums/user-role.enum";
 import { UserModel } from "@/modules/users/schemas/user.schema";
 import { UsersRepository } from "./users.repository";
 import { UsersService } from "./users.service";
@@ -15,10 +16,14 @@ const validId = new mongoose.Types.ObjectId().toHexString();
 
 const fakeUser = {
   _id: validId,
+  id: validId,
   name: "John",
+  nickname: "john",
   email: "john@example.com",
   password: "hashed-password",
-  role: "USER",
+  role: UserRole.USER,
+  i18n: [],
+  urls: [],
 } as unknown as UserModel;
 
 function makeExec(returnValue: unknown) {
@@ -42,14 +47,13 @@ describe("UsersService", () => {
         {
           provide: getModelToken(UserModel.name),
           useValue: {
-            findById: jest.fn(),
             findOne: jest.fn(),
-            create: jest.fn(),
-            // inherited methods (not overridden)
             find: jest.fn(),
-            findByIdAndUpdate: jest.fn(),
+            create: jest.fn(),
+            countDocuments: jest.fn(),
+            findOneAndUpdate: jest.fn(),
+            findOneAndDelete: jest.fn(),
             updateMany: jest.fn(),
-            findByIdAndDelete: jest.fn(),
             deleteMany: jest.fn(),
           },
         },
@@ -64,17 +68,16 @@ describe("UsersService", () => {
     expect(service).toBeDefined();
   });
 
-  // ------------------------------------------------------------------ //
-  // findOneById
-  // ------------------------------------------------------------------ //
-
   describe("findOneById", () => {
     it("should return the user without password", async () => {
-      (model.findById as jest.Mock).mockReturnValue(makeExec(fakeUser));
+      (model.findOne as jest.Mock).mockReturnValue(makeExec(fakeUser));
 
       const result = await service.findOneById(validId);
-      expect(result).toBe(fakeUser);
-      expect(model.findById).toHaveBeenCalledWith(validId);
+      expect(result).toEqual(
+        expect.objectContaining({ id: validId, email: "john@example.com" })
+      );
+      expect(result).not.toHaveProperty("password");
+      expect(model.findOne).toHaveBeenCalledWith({ _id: validId });
     });
 
     it("should throw BadRequestException for invalid id", async () => {
@@ -84,7 +87,7 @@ describe("UsersService", () => {
     });
 
     it("should throw NotFoundException when user is not found", async () => {
-      (model.findById as jest.Mock).mockReturnValue(makeExec(null));
+      (model.findOne as jest.Mock).mockReturnValue(makeExec(null));
 
       await expect(service.findOneById(validId)).rejects.toThrow(
         NotFoundException
@@ -92,18 +95,16 @@ describe("UsersService", () => {
     });
   });
 
-  // ------------------------------------------------------------------ //
-  // findOne
-  // ------------------------------------------------------------------ //
-
   describe("findOne", () => {
     it("should return the user matching filters", async () => {
       (model.findOne as jest.Mock).mockReturnValue(makeExec(fakeUser));
 
       const result = await service.findOne({
-        filters: { email: "john@example.com" } as any,
+        filters: { email: "john@example.com" },
       });
-      expect(result).toBe(fakeUser);
+      expect(result).toEqual(
+        expect.objectContaining({ id: validId, email: "john@example.com" })
+      );
     });
 
     it("should throw NotFoundException when no user matches", async () => {
@@ -113,10 +114,6 @@ describe("UsersService", () => {
     });
   });
 
-  // ------------------------------------------------------------------ //
-  // findOneByEmailWithPassword
-  // ------------------------------------------------------------------ //
-
   describe("findOneByEmailWithPassword", () => {
     it("should return the user with password selected", async () => {
       (model.findOne as jest.Mock).mockReturnValue(makeExec(fakeUser));
@@ -124,7 +121,13 @@ describe("UsersService", () => {
       const result =
         await service.findOneByEmailWithPassword("john@example.com");
 
-      expect(result).toBe(fakeUser);
+      expect(result).toEqual(
+        expect.objectContaining({
+          id: validId,
+          email: "john@example.com",
+          password: "hashed-password",
+        })
+      );
       expect(model.findOne).toHaveBeenCalledWith({ email: "john@example.com" });
     });
 
@@ -137,17 +140,13 @@ describe("UsersService", () => {
     });
   });
 
-  // ------------------------------------------------------------------ //
-  // createOne (overridden — hashes password)
-  // ------------------------------------------------------------------ //
-
   describe("createOne", () => {
     const createInput = {
       name: "John",
       nickname: "john",
       email: "john@example.com",
       password: "plain-pass",
-      role: "USER" as any,
+      role: UserRole.USER,
     };
 
     it("should hash the password before creating the user", async () => {
@@ -159,7 +158,9 @@ describe("UsersService", () => {
       expect(model.create).toHaveBeenCalledWith(
         expect.objectContaining({ password: "hashed-password" })
       );
-      expect(result).toBe(fakeUser);
+      expect(result).toEqual(
+        expect.objectContaining({ id: validId, email: "john@example.com" })
+      );
     });
 
     it("should throw BadRequestException when create returns null", async () => {
@@ -171,10 +172,6 @@ describe("UsersService", () => {
     });
   });
 
-  // ------------------------------------------------------------------ //
-  // createMany (overridden — hashes passwords)
-  // ------------------------------------------------------------------ //
-
   describe("createMany", () => {
     const createInputs = [
       {
@@ -182,14 +179,14 @@ describe("UsersService", () => {
         nickname: "alice",
         email: "alice@example.com",
         password: "pass1",
-        role: "USER" as any,
+        role: UserRole.USER,
       },
       {
         name: "Bob",
         nickname: "bob",
         email: "bob@example.com",
         password: "pass2",
-        role: "USER" as any,
+        role: UserRole.USER,
       },
     ];
 
@@ -216,23 +213,17 @@ describe("UsersService", () => {
     });
   });
 
-  // ------------------------------------------------------------------ //
-  // updateOne (overridden — hashes password when provided)
-  // ------------------------------------------------------------------ //
-
   describe("updateOne", () => {
     it("should hash the password when updating a user", async () => {
-      (model.findByIdAndUpdate as jest.Mock).mockReturnValue(
-        makeExec(fakeUser)
-      );
+      (model.findOneAndUpdate as jest.Mock).mockReturnValue(makeExec(fakeUser));
 
       await service.updateOne("507f1f77bcf86cd799439011", {
         password: "new-pass",
       });
 
       expect(hash).toHaveBeenCalledWith("new-pass", 8);
-      expect(model.findByIdAndUpdate).toHaveBeenCalledWith(
-        "507f1f77bcf86cd799439011",
+      expect(model.findOneAndUpdate).toHaveBeenCalledWith(
+        { _id: "507f1f77bcf86cd799439011" },
         expect.objectContaining({ password: "hashed-password" }),
         { returnDocument: "after", runValidators: true }
       );

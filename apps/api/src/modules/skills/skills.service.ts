@@ -6,9 +6,10 @@ import { BatchEntity } from "@/core/entities/batch.entity";
 import { DomainEvents } from "@/core/events/domain-events";
 import { SkillDeletedEvent } from "@/core/events/skill-deleted.event";
 import { PaginatedModel } from "@/core/schemas/paginated.schema";
-import { SkillModel } from "@/modules/skills/schemas/skill.schema";
 import { CreateSkillInput } from "./dto/create-skill.input";
 import { UpdateSkillInput } from "./dto/update-skill.input";
+import { SkillEntity } from "./entities/skill.entity";
+import { SkillModel } from "./schemas/skill.schema";
 import { SkillsRepository } from "./skills.repository";
 
 @Injectable()
@@ -18,20 +19,20 @@ export class SkillsService {
     private readonly eventEmitter: EventEmitter2
   ) {}
 
-  findOneById(id: string): Promise<SkillModel> {
-    return this.repository.findOneById(id);
+  findOneById(id: string): Promise<SkillEntity> {
+    return this.repository.crud.findOneById(id);
   }
 
   findOne({
     filters,
   }: {
     filters?: QueryFilter<SkillModel>;
-  }): Promise<SkillModel> {
-    return this.repository.findOne({ filters });
+  }): Promise<SkillEntity> {
+    return this.repository.crud.findOne({ filters });
   }
 
-  findManyById(ids: string[]): Promise<SkillModel[]> {
-    return this.repository.findManyById(ids);
+  findManyById(ids: string[]): Promise<SkillEntity[]> {
+    return this.repository.crud.findManyById(ids);
   }
 
   findMany({
@@ -44,20 +45,22 @@ export class SkillsService {
     sort?: Partial<Record<keyof SkillModel, SortOrder>>;
     limit?: number;
     skip?: number;
-  }): Promise<PaginatedModel<SkillModel>> {
-    return this.repository.findMany({ filters, sort, skip, limit });
+  }): Promise<PaginatedModel<SkillEntity>> {
+    return this.repository.crud.findMany({ filters, sort, skip, limit });
   }
 
-  createOne(createInput: CreateSkillInput): Promise<SkillModel> {
-    return this.repository.createOne(createInput as AnyKeys<SkillModel>);
+  createOne(createInput: CreateSkillInput): Promise<SkillEntity> {
+    return this.repository.crud.createOne(createInput as AnyKeys<SkillModel>);
   }
 
   createMany(createInputs: CreateSkillInput[]): Promise<BatchEntity> {
-    return this.repository.createMany(createInputs as AnyKeys<SkillModel>[]);
+    return this.repository.crud.createMany(
+      createInputs as AnyKeys<SkillModel>[]
+    );
   }
 
-  updateOne(id: string, updateInput: UpdateSkillInput): Promise<SkillModel> {
-    return this.repository.updateOneById(
+  updateOne(id: string, updateInput: UpdateSkillInput): Promise<SkillEntity> {
+    return this.repository.crud.updateOneById(
       id,
       updateInput as object as UpdateQuery<SkillModel>
     );
@@ -67,35 +70,35 @@ export class SkillsService {
     ids: string[],
     updateInput: UpdateSkillInput
   ): Promise<BatchEntity> {
-    return this.repository.updateManyById(
+    return this.repository.crud.updateManyById(
       ids,
       updateInput as object as UpdateQuery<SkillModel>
     );
   }
 
-  async removeOne(id: string): Promise<SkillModel> {
-    const skill = await this.repository.findOneById(id);
+  async removeOne(id: string): Promise<SkillEntity> {
+    const skill = await this.repository.crud.findOneById(id);
 
     await this.eventEmitter.emitAsync(
       DomainEvents.skill.deleted,
-      new SkillDeletedEvent(skill._id.toString())
+      new SkillDeletedEvent(skill.id)
     );
 
-    await this.repository.deleteOneById(id);
+    await this.repository.crud.deleteOneById(id);
     return skill;
   }
 
   async removeMany(ids: string[]): Promise<BatchEntity> {
-    const skills = await this.repository.findManyById(ids);
+    const skills = await this.repository.crud.findManyById(ids);
 
     for (const skill of skills) {
       await this.eventEmitter.emitAsync(
         DomainEvents.skill.deleted,
-        new SkillDeletedEvent(skill._id.toString())
+        new SkillDeletedEvent(skill.id)
       );
     }
 
-    return this.repository.deleteManyById(ids);
+    return this.repository.crud.deleteManyById(ids);
   }
 
   count(): Promise<number> {

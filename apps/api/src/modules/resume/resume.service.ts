@@ -9,8 +9,8 @@ import { UserRole } from "@/core/enums/user-role.enum";
 import { CoursesService } from "@/modules/courses/courses.service";
 import { EducationsService } from "@/modules/educations/educations.service";
 import { ExperiencesService } from "@/modules/experiences/experiences.service";
+import { OrganizationEntity } from "@/modules/organizations/entities/organization.entity";
 import { OrganizationsService } from "@/modules/organizations/organizations.service";
-import { OrganizationModel } from "@/modules/organizations/schemas/organization.schema";
 import { ProjectsService } from "@/modules/projects/projects.service";
 import { SkillsService } from "@/modules/skills/skills.service";
 import { UsersService } from "@/modules/users/users.service";
@@ -50,7 +50,7 @@ export class ResumeService {
     const user = await this.usersService.findOneById(userId);
 
     const ctx = toSessionAuthContext({
-      id: user._id.toString(),
+      id: user.id,
       role: UserRole.USER,
     });
 
@@ -106,10 +106,7 @@ export class ResumeService {
     ]);
 
     const organizationMap = new Map(
-      organizations.map((organization) => [
-        String(organization._id),
-        organization,
-      ])
+      organizations.map((organization) => [organization.id, organization])
     );
 
     const userTranslation = pickTranslation(user.i18n, locale);
@@ -159,7 +156,7 @@ export class ResumeService {
 
   private buildExperiences(
     experiences: Awaited<ReturnType<ExperiencesService["findMany"]>>["nodes"],
-    organizationMap: Map<string, OrganizationModel>,
+    organizationMap: Map<string, OrganizationEntity>,
     locale: LocaleCode
   ): ResumeExperience[] {
     return experiences.map((experience) => {
@@ -194,7 +191,7 @@ export class ResumeService {
 
   private buildEducations(
     educations: Awaited<ReturnType<EducationsService["findMany"]>>["nodes"],
-    organizationMap: Map<string, OrganizationModel>,
+    organizationMap: Map<string, OrganizationEntity>,
     locale: LocaleCode
   ): ResumeEducation[] {
     return educations.flatMap((education): ResumeEducation[] => {
@@ -223,7 +220,7 @@ export class ResumeService {
 
   private buildCertifications(
     courses: Awaited<ReturnType<CoursesService["findMany"]>>["nodes"],
-    organizationMap: Map<string, OrganizationModel>,
+    organizationMap: Map<string, OrganizationEntity>,
     locale: LocaleCode
   ): ResumeCertification[] {
     return courses.flatMap((course): ResumeCertification[] => {

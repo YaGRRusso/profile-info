@@ -13,14 +13,16 @@ import { UserModel } from "./schemas/user.schema";
 export class UsersRepository {
   readonly crud: CrudRepository<UserModel, UserEntity>;
 
-  constructor(@InjectModel(UserModel.name) model: Model<UserModel>) {
+  constructor(
+    @InjectModel(UserModel.name) private readonly model: Model<UserModel>
+  ) {
     this.crud = new CrudRepository(model, toUserEntity);
   }
 
   async findOneByEmailWithPassword(
     email: string
   ): Promise<UserWithPasswordEntity> {
-    const document = await this.crud.model
+    const document = await this.model
       .findOne({ email })
       .select("+password")
       .exec();

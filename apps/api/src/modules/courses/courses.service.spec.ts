@@ -14,8 +14,9 @@ const ownerId = "507f1f77bcf86cd799439011";
 const ctx = testAuthContext({ userId: ownerId });
 const fakeDoc = {
   _id: validId,
+  id: validId,
   ownerId,
-  title: "Full-Stack Bootcamp",
+  slug: "bootcamp",
 } as unknown as CourseModel;
 
 function makeExec(returnValue: unknown) {
@@ -68,7 +69,9 @@ describe("CoursesService", () => {
     it("should scope by ownerId", async () => {
       (model.findOne as jest.Mock).mockReturnValue(makeExec(fakeDoc));
 
-      expect(await service.findOneById(ctx, validId)).toBe(fakeDoc);
+      expect(await service.findOneById(ctx, validId)).toEqual(
+        expect.objectContaining({ id: validId, ownerId })
+      );
       expect(model.findOne).toHaveBeenCalledWith({
         _id: validId,
         ownerId,
@@ -97,7 +100,7 @@ describe("CoursesService", () => {
         slug: "bootcamp",
       } as any);
 
-      expect(result).toBe(fakeDoc);
+      expect(result).toEqual(expect.objectContaining({ id: validId, ownerId }));
       expect(model.create).toHaveBeenCalledWith(
         expect.objectContaining({ ownerId })
       );
@@ -122,7 +125,9 @@ describe("CoursesService", () => {
     it("should return the updated document", async () => {
       (model.findOneAndUpdate as jest.Mock).mockReturnValue(makeExec(fakeDoc));
 
-      expect(await service.updateOne(ctx, validId, {})).toBe(fakeDoc);
+      expect(await service.updateOne(ctx, validId, {})).toEqual(
+        expect.objectContaining({ id: validId, ownerId })
+      );
       expect(model.findOneAndUpdate).toHaveBeenCalledWith(
         { _id: validId, ownerId },
         {},
@@ -141,7 +146,9 @@ describe("CoursesService", () => {
     it("should return the removed document", async () => {
       (model.findOneAndDelete as jest.Mock).mockReturnValue(makeExec(fakeDoc));
 
-      expect(await service.removeOne(ctx, validId)).toBe(fakeDoc);
+      expect(await service.removeOne(ctx, validId)).toEqual(
+        expect.objectContaining({ id: validId, ownerId })
+      );
       expect(model.findOneAndDelete).toHaveBeenCalledWith({
         _id: validId,
         ownerId,

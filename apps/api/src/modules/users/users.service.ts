@@ -1,35 +1,37 @@
 import { Injectable } from "@nestjs/common";
 import { hash } from "bcryptjs";
-import { QueryFilter, SortOrder, UpdateQuery } from "mongoose";
+import { AnyKeys, QueryFilter, SortOrder, UpdateQuery } from "mongoose";
 import { BatchEntity } from "@/core/entities/batch.entity";
 import { PaginatedModel } from "@/core/schemas/paginated.schema";
-import { UserModel } from "@/modules/users/schemas/user.schema";
 import { CreateUserInput } from "./dto/create-user.input";
 import { UpdateUserInput } from "./dto/update-user.input";
+import { UserEntity } from "./entities/user.entity";
+import type { UserWithPasswordEntity } from "./entities/user-with-password.entity";
+import { UserModel } from "./schemas/user.schema";
 import { UsersRepository } from "./users.repository";
 
 @Injectable()
 export class UsersService {
   constructor(private readonly repository: UsersRepository) {}
 
-  findOneById(id: string): Promise<UserModel> {
-    return this.repository.findOneById(id);
+  findOneById(id: string): Promise<UserEntity> {
+    return this.repository.crud.findOneById(id);
   }
 
   findOne({
     filters,
   }: {
     filters?: QueryFilter<UserModel>;
-  }): Promise<UserModel> {
-    return this.repository.findOne({ filters });
+  }): Promise<UserEntity> {
+    return this.repository.crud.findOne({ filters });
   }
 
-  findOneByEmailWithPassword(email: string): Promise<UserModel> {
+  findOneByEmailWithPassword(email: string): Promise<UserWithPasswordEntity> {
     return this.repository.findOneByEmailWithPassword(email);
   }
 
-  findManyById(ids: string[]): Promise<UserModel[]> {
-    return this.repository.findManyById(ids);
+  findManyById(ids: string[]): Promise<UserEntity[]> {
+    return this.repository.crud.findManyById(ids);
   }
 
   findMany({
@@ -42,18 +44,18 @@ export class UsersService {
     sort?: Partial<Record<keyof UserModel, SortOrder>>;
     limit?: number;
     skip?: number;
-  }): Promise<PaginatedModel<UserModel>> {
-    return this.repository.findMany({ filters, sort, skip, limit });
+  }): Promise<PaginatedModel<UserEntity>> {
+    return this.repository.crud.findMany({ filters, sort, skip, limit });
   }
 
   async createOne({
     password,
     ...createUserInput
-  }: CreateUserInput): Promise<UserModel> {
-    return this.repository.createOne({
+  }: CreateUserInput): Promise<UserEntity> {
+    return this.repository.crud.createOne({
       ...createUserInput,
       password: await hash(password, 8),
-    });
+    } as AnyKeys<UserModel>);
   }
 
   async createMany(createUserInputs: CreateUserInput[]): Promise<BatchEntity> {
@@ -64,15 +66,15 @@ export class UsersService {
       }))
     );
 
-    return this.repository.createMany(inputs);
+    return this.repository.crud.createMany(inputs as AnyKeys<UserModel>[]);
   }
 
   async updateOne(
     id: string,
     updateInput: UpdateUserInput
-  ): Promise<UserModel> {
+  ): Promise<UserEntity> {
     const update = await this.buildUpdateQuery(updateInput);
-    return this.repository.updateOneById(id, update);
+    return this.repository.crud.updateOneById(id, update);
   }
 
   async updateMany(
@@ -80,15 +82,15 @@ export class UsersService {
     updateInput: UpdateUserInput
   ): Promise<BatchEntity> {
     const update = await this.buildUpdateQuery(updateInput);
-    return this.repository.updateManyById(ids, update);
+    return this.repository.crud.updateManyById(ids, update);
   }
 
-  removeOne(id: string): Promise<UserModel> {
-    return this.repository.deleteOneById(id);
+  removeOne(id: string): Promise<UserEntity> {
+    return this.repository.crud.deleteOneById(id);
   }
 
   removeMany(ids: string[]): Promise<BatchEntity> {
-    return this.repository.deleteManyById(ids);
+    return this.repository.crud.deleteManyById(ids);
   }
 
   private async buildUpdateQuery(

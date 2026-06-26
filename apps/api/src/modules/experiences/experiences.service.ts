@@ -5,17 +5,18 @@ import { toTenantScope } from "@/core/context/auth-context.helper";
 import type { AuthContext } from "@/core/context/auth-context.interface";
 import { BatchEntity } from "@/core/entities/batch.entity";
 import { PaginatedModel } from "@/core/schemas/paginated.schema";
-import { ExperienceModel } from "@/modules/experiences/schemas/experience.schema";
 import { CreateExperienceInput } from "./dto/create-experience.input";
 import { UpdateExperienceInput } from "./dto/update-experience.input";
+import { ExperienceEntity } from "./entities/experience.entity";
 import { ExperiencesRepository } from "./experiences.repository";
+import { ExperienceModel } from "./schemas/experience.schema";
 
 @Injectable()
 export class ExperiencesService {
   constructor(private readonly repository: ExperiencesRepository) {}
 
-  findOneById(ctx: AuthContext, id: string): Promise<ExperienceModel> {
-    return this.repository.tenant.findOneById(toTenantScope(ctx), id);
+  findOneById(ctx: AuthContext, id: string): Promise<ExperienceEntity> {
+    return this.repository.crud.scoped(toTenantScope(ctx)).findOneById(id);
   }
 
   findOne(
@@ -25,12 +26,12 @@ export class ExperiencesService {
     }: {
       filters?: QueryFilter<ExperienceModel>;
     }
-  ): Promise<ExperienceModel> {
-    return this.repository.tenant.findOne(toTenantScope(ctx), { filters });
+  ): Promise<ExperienceEntity> {
+    return this.repository.crud.scoped(toTenantScope(ctx)).findOne({ filters });
   }
 
-  findManyById(ctx: AuthContext, ids: string[]): Promise<ExperienceModel[]> {
-    return this.repository.tenant.findManyById(toTenantScope(ctx), ids);
+  findManyById(ctx: AuthContext, ids: string[]): Promise<ExperienceEntity[]> {
+    return this.repository.crud.scoped(toTenantScope(ctx)).findManyById(ids);
   }
 
   findMany(
@@ -46,8 +47,8 @@ export class ExperiencesService {
       limit?: number;
       skip?: number;
     }
-  ): Promise<PaginatedModel<ExperienceModel>> {
-    return this.repository.tenant.findMany(toTenantScope(ctx), {
+  ): Promise<PaginatedModel<ExperienceEntity>> {
+    return this.repository.crud.scoped(toTenantScope(ctx)).findMany({
       filters,
       sort,
       skip,
@@ -58,33 +59,29 @@ export class ExperiencesService {
   async createOne(
     ctx: AuthContext,
     createInput: CreateExperienceInput
-  ): Promise<ExperienceModel> {
-    return await this.repository.tenant.createOne(
-      toTenantScope(ctx),
-      createInput as AnyKeys<ExperienceModel>
-    );
+  ): Promise<ExperienceEntity> {
+    return await this.repository.crud
+      .scoped(toTenantScope(ctx))
+      .createOne(createInput as AnyKeys<ExperienceModel>);
   }
 
   async createMany(
     ctx: AuthContext,
     createInputs: CreateExperienceInput[]
   ): Promise<BatchEntity> {
-    return await this.repository.tenant.createMany(
-      toTenantScope(ctx),
-      createInputs as AnyKeys<ExperienceModel>[]
-    );
+    return await this.repository.crud
+      .scoped(toTenantScope(ctx))
+      .createMany(createInputs as AnyKeys<ExperienceModel>[]);
   }
 
   updateOne(
     ctx: AuthContext,
     id: string,
     updateInput: UpdateExperienceInput
-  ): Promise<ExperienceModel> {
-    return this.repository.tenant.updateOneById(
-      toTenantScope(ctx),
-      id,
-      updateInput as UpdateQuery<ExperienceModel>
-    );
+  ): Promise<ExperienceEntity> {
+    return this.repository.crud
+      .scoped(toTenantScope(ctx))
+      .updateOneById(id, updateInput as UpdateQuery<ExperienceModel>);
   }
 
   async updateMany(
@@ -92,41 +89,39 @@ export class ExperiencesService {
     ids: string[],
     updateInput: UpdateExperienceInput
   ): Promise<BatchEntity> {
-    return await this.repository.tenant.updateManyById(
-      toTenantScope(ctx),
-      ids,
-      updateInput as UpdateQuery<ExperienceModel>
-    );
+    return await this.repository.crud
+      .scoped(toTenantScope(ctx))
+      .updateManyById(ids, updateInput as UpdateQuery<ExperienceModel>);
   }
 
-  removeOne(ctx: AuthContext, id: string): Promise<ExperienceModel> {
-    return this.repository.tenant.deleteOneById(toTenantScope(ctx), id);
+  removeOne(ctx: AuthContext, id: string): Promise<ExperienceEntity> {
+    return this.repository.crud.scoped(toTenantScope(ctx)).deleteOneById(id);
   }
 
   async removeMany(ctx: AuthContext, ids: string[]): Promise<BatchEntity> {
-    return await this.repository.tenant.deleteManyById(toTenantScope(ctx), ids);
+    return await this.repository.crud
+      .scoped(toTenantScope(ctx))
+      .deleteManyById(ids);
   }
 
   count(ctx: AuthContext): Promise<number> {
-    return this.repository.tenantStats.count(toTenantScope(ctx));
+    return this.repository.stats.scoped(toTenantScope(ctx)).count();
   }
 
   countByField(
     ctx: AuthContext,
     field: string
   ): Promise<{ label: string; value: number }[]> {
-    return this.repository.tenantStats.countByField(toTenantScope(ctx), field);
+    return this.repository.stats.scoped(toTenantScope(ctx)).countByField(field);
   }
 
   async findRecentActivity(
     ctx: AuthContext,
     limit: number
   ): Promise<RecentActivityRecord[]> {
-    const rows = await this.repository.tenantStats.findRecentlyUpdated(
-      toTenantScope(ctx),
-      limit,
-      "slug roles updatedAt"
-    );
+    const rows = await this.repository.stats
+      .scoped(toTenantScope(ctx))
+      .findRecentlyUpdated(limit, "slug roles updatedAt");
     return rows.map((row) => {
       const roles = row.roles as
         | Array<{ i18n?: Array<{ messages?: { title?: string } }> }>
@@ -140,7 +135,7 @@ export class ExperiencesService {
   }
 
   async detachSkill(skillId: string): Promise<void> {
-    await this.repository.updateMany(
+    await this.repository.crud.updateMany(
       { "roles.skillIds": skillId },
       { $pull: { "roles.$[roleElem].skillIds": skillId } },
       { arrayFilters: [{ "roleElem.skillIds": skillId }] }
@@ -148,6 +143,6 @@ export class ExperiencesService {
   }
 
   async purgeByOrganization(organizationId: string): Promise<void> {
-    await this.repository.deleteMany({ organizationId });
+    await this.repository.crud.deleteMany({ organizationId });
   }
 }

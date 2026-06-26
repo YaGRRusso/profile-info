@@ -63,11 +63,11 @@ describe("Skill delete cascade (integration)", () => {
       category: SkillCategory.LANGUAGE,
     });
 
-    const ownerCtx = testAuthContext({ userId: owner._id.toString() });
+    const ownerCtx = testAuthContext({ userId: owner.id });
 
     const course = await coursesService.createOne(ownerCtx, {
       slug: "typescript-course",
-      organizationId: organization._id.toString(),
+      organizationId: organization.id,
       status: CourseStatus.COMPLETE,
       i18n: [
         {
@@ -78,21 +78,16 @@ describe("Skill delete cascade (integration)", () => {
           },
         },
       ],
-      skillIds: [skill._id.toString()],
+      skillIds: [skill.id],
     } as CreateCourseInput);
 
-    expect(course.skillIds?.map((id) => id.toString())).toContain(
-      skill._id.toString()
-    );
+    expect(course.skillIds?.map((id) => id.toString())).toContain(skill.id);
 
-    await skillsService.removeOne(skill._id.toString());
+    await skillsService.removeOne(skill.id);
 
-    const updatedCourse = await coursesService.findOneById(
-      ownerCtx,
-      course._id.toString()
-    );
+    const updatedCourse = await coursesService.findOneById(ownerCtx, course.id);
 
     const skillIds = (updatedCourse.skillIds ?? []).map((id) => id.toString());
-    expect(skillIds).not.toContain(skill._id.toString());
+    expect(skillIds).not.toContain(skill.id);
   });
 });

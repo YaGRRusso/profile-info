@@ -1,10 +1,10 @@
 import { groupBy, orderBy } from "lodash";
-import type { SkillModel } from "@/modules/skills/schemas/skill.schema";
+import type { SkillEntity } from "@/modules/skills/entities/skill.entity";
 import { RESUME_LIMITS } from "../const/resume-limits.const";
 import type { ResumeSkillGroup } from "../types/resume-document.type";
 
 export function selectResumeSkillGroups(
-  skills: SkillModel[]
+  skills: SkillEntity[]
 ): ResumeSkillGroup[] {
   const grouped = groupBy(skills, (skill) => skill.category);
 

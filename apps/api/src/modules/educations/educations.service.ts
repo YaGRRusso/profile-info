@@ -8,17 +8,18 @@ import { toTenantScope } from "@/core/context/auth-context.helper";
 import type { AuthContext } from "@/core/context/auth-context.interface";
 import { BatchEntity } from "@/core/entities/batch.entity";
 import { PaginatedModel } from "@/core/schemas/paginated.schema";
-import { EducationModel } from "@/modules/educations/schemas/education.schema";
 import { CreateEducationInput } from "./dto/create-education.input";
 import { UpdateEducationInput } from "./dto/update-education.input";
 import { EducationsRepository } from "./educations.repository";
+import { EducationEntity } from "./entities/education.entity";
+import { EducationModel } from "./schemas/education.schema";
 
 @Injectable()
 export class EducationsService {
   constructor(private readonly repository: EducationsRepository) {}
 
-  findOneById(ctx: AuthContext, id: string): Promise<EducationModel> {
-    return this.repository.tenant.findOneById(toTenantScope(ctx), id);
+  findOneById(ctx: AuthContext, id: string): Promise<EducationEntity> {
+    return this.repository.crud.scoped(toTenantScope(ctx)).findOneById(id);
   }
 
   findOne(
@@ -28,12 +29,12 @@ export class EducationsService {
     }: {
       filters?: QueryFilter<EducationModel>;
     }
-  ): Promise<EducationModel> {
-    return this.repository.tenant.findOne(toTenantScope(ctx), { filters });
+  ): Promise<EducationEntity> {
+    return this.repository.crud.scoped(toTenantScope(ctx)).findOne({ filters });
   }
 
-  findManyById(ctx: AuthContext, ids: string[]): Promise<EducationModel[]> {
-    return this.repository.tenant.findManyById(toTenantScope(ctx), ids);
+  findManyById(ctx: AuthContext, ids: string[]): Promise<EducationEntity[]> {
+    return this.repository.crud.scoped(toTenantScope(ctx)).findManyById(ids);
   }
 
   findMany(
@@ -49,8 +50,8 @@ export class EducationsService {
       limit?: number;
       skip?: number;
     }
-  ): Promise<PaginatedModel<EducationModel>> {
-    return this.repository.tenant.findMany(toTenantScope(ctx), {
+  ): Promise<PaginatedModel<EducationEntity>> {
+    return this.repository.crud.scoped(toTenantScope(ctx)).findMany({
       filters,
       sort,
       skip,
@@ -61,33 +62,29 @@ export class EducationsService {
   async createOne(
     ctx: AuthContext,
     createInput: CreateEducationInput
-  ): Promise<EducationModel> {
-    return await this.repository.tenant.createOne(
-      toTenantScope(ctx),
-      createInput as AnyKeys<EducationModel>
-    );
+  ): Promise<EducationEntity> {
+    return await this.repository.crud
+      .scoped(toTenantScope(ctx))
+      .createOne(createInput as AnyKeys<EducationModel>);
   }
 
   async createMany(
     ctx: AuthContext,
     createInputs: CreateEducationInput[]
   ): Promise<BatchEntity> {
-    return await this.repository.tenant.createMany(
-      toTenantScope(ctx),
-      createInputs as AnyKeys<EducationModel>[]
-    );
+    return await this.repository.crud
+      .scoped(toTenantScope(ctx))
+      .createMany(createInputs as AnyKeys<EducationModel>[]);
   }
 
   updateOne(
     ctx: AuthContext,
     id: string,
     updateInput: UpdateEducationInput
-  ): Promise<EducationModel> {
-    return this.repository.tenant.updateOneById(
-      toTenantScope(ctx),
-      id,
-      updateInput as UpdateQuery<EducationModel>
-    );
+  ): Promise<EducationEntity> {
+    return this.repository.crud
+      .scoped(toTenantScope(ctx))
+      .updateOneById(id, updateInput as UpdateQuery<EducationModel>);
   }
 
   async updateMany(
@@ -95,34 +92,32 @@ export class EducationsService {
     ids: string[],
     updateInput: UpdateEducationInput
   ): Promise<BatchEntity> {
-    return await this.repository.tenant.updateManyById(
-      toTenantScope(ctx),
-      ids,
-      updateInput as UpdateQuery<EducationModel>
-    );
+    return await this.repository.crud
+      .scoped(toTenantScope(ctx))
+      .updateManyById(ids, updateInput as UpdateQuery<EducationModel>);
   }
 
-  removeOne(ctx: AuthContext, id: string): Promise<EducationModel> {
-    return this.repository.tenant.deleteOneById(toTenantScope(ctx), id);
+  removeOne(ctx: AuthContext, id: string): Promise<EducationEntity> {
+    return this.repository.crud.scoped(toTenantScope(ctx)).deleteOneById(id);
   }
 
   async removeMany(ctx: AuthContext, ids: string[]): Promise<BatchEntity> {
-    return await this.repository.tenant.deleteManyById(toTenantScope(ctx), ids);
+    return await this.repository.crud
+      .scoped(toTenantScope(ctx))
+      .deleteManyById(ids);
   }
 
   count(ctx: AuthContext): Promise<number> {
-    return this.repository.tenantStats.count(toTenantScope(ctx));
+    return this.repository.stats.scoped(toTenantScope(ctx)).count();
   }
 
   async findRecentActivity(
     ctx: AuthContext,
     limit: number
   ): Promise<RecentActivityRecord[]> {
-    const rows = await this.repository.tenantStats.findRecentlyUpdated(
-      toTenantScope(ctx),
-      limit,
-      "slug i18n updatedAt"
-    );
+    const rows = await this.repository.stats
+      .scoped(toTenantScope(ctx))
+      .findRecentlyUpdated(limit, "slug i18n updatedAt");
     return rows.map((row) => ({
       label: labelFromI18nTitle(
         row.slug as string,
@@ -133,13 +128,13 @@ export class EducationsService {
   }
 
   async detachSkill(skillId: string): Promise<void> {
-    await this.repository.updateMany(
+    await this.repository.crud.updateMany(
       { skillIds: skillId },
       { $pull: { skillIds: skillId } }
     );
   }
 
   async purgeByOrganization(organizationId: string): Promise<void> {
-    await this.repository.deleteMany({ organizationId });
+    await this.repository.crud.deleteMany({ organizationId });
   }
 }

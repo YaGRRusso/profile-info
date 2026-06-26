@@ -13,8 +13,10 @@ const validId = new mongoose.Types.ObjectId().toHexString();
 const invalidId = "not-an-object-id";
 const fakeDoc = {
   _id: validId,
+  id: validId,
   name: "TypeScript",
   slug: "typescript",
+  category: "LANGUAGE",
 } as unknown as SkillModel;
 
 function makeExec(returnValue: unknown) {
@@ -22,6 +24,22 @@ function makeExec(returnValue: unknown) {
     sort: jest.fn().mockReturnThis(),
     skip: jest.fn().mockReturnThis(),
     limit: jest.fn().mockReturnThis(),
+    exec: jest.fn().mockResolvedValue(returnValue),
+  };
+}
+
+function makeFindManyChain(nodes: unknown[]) {
+  return {
+    sort: jest.fn().mockReturnValue({
+      skip: jest.fn().mockReturnValue({
+        limit: jest.fn().mockReturnValue(mockQueryChain(nodes)),
+      }),
+    }),
+  };
+}
+
+function mockQueryChain(returnValue: unknown) {
+  return {
     exec: jest.fn().mockResolvedValue(returnValue),
   };
 }
@@ -41,14 +59,13 @@ describe("SkillsService", () => {
         {
           provide: getModelToken(SkillModel.name),
           useValue: {
-            findById: jest.fn(),
             findOne: jest.fn(),
             find: jest.fn(),
             create: jest.fn(),
             countDocuments: jest.fn(),
-            findByIdAndUpdate: jest.fn(),
+            findOneAndUpdate: jest.fn(),
+            findOneAndDelete: jest.fn(),
             updateMany: jest.fn(),
-            findByIdAndDelete: jest.fn(),
             deleteMany: jest.fn(),
           },
         },
@@ -72,8 +89,11 @@ describe("SkillsService", () => {
 
   describe("findOneById", () => {
     it("should return the skill document", async () => {
-      (model.findById as jest.Mock).mockReturnValue(makeExec(fakeDoc));
-      expect(await service.findOneById(validId)).toBe(fakeDoc);
+      (model.findOne as jest.Mock).mockReturnValue(makeExec(fakeDoc));
+      expect(await service.findOneById(validId)).toEqual(
+        expect.objectContaining({ id: validId, name: "TypeScript" })
+      );
+      expect(model.findOne).toHaveBeenCalledWith({ _id: validId });
     });
 
     it("should throw BadRequestException for invalid ID", async () => {
@@ -83,7 +103,7 @@ describe("SkillsService", () => {
     });
 
     it("should throw NotFoundException when not found", async () => {
-      (model.findById as jest.Mock).mockReturnValue(makeExec(null));
+      (model.findOne as jest.Mock).mockReturnValue(makeExec(null));
       await expect(service.findOneById(validId)).rejects.toThrow(
         NotFoundException
       );
@@ -96,16 +116,25 @@ describe("SkillsService", () => {
       const result = await service.createOne({
         name: "TypeScript",
         slug: "typescript",
-        category: "LANGUAGE" as any,
+        category: "LANGUAGE" as never,
       });
-      expect(result).toBe(fakeDoc);
+      expect(result).toEqual(
+        expect.objectContaining({ id: validId, name: "TypeScript" })
+      );
     });
   });
 
   describe("updateOne", () => {
     it("should return the updated document", async () => {
-      (model.findByIdAndUpdate as jest.Mock).mockReturnValue(makeExec(fakeDoc));
-      expect(await service.updateOne(validId, { name: "TS" })).toBe(fakeDoc);
+      (model.findOneAndUpdate as jest.Mock).mockReturnValue(makeExec(fakeDoc));
+      expect(await service.updateOne(validId, { name: "TS" })).toEqual(
+        expect.objectContaining({ id: validId, name: "TypeScript" })
+      );
+      expect(model.findOneAndUpdate).toHaveBeenCalledWith(
+        { _id: validId },
+        { name: "TS" },
+        { returnDocument: "after", runValidators: true }
+      );
     });
 
     it("should throw BadRequestException for invalid ID", async () => {
@@ -117,14 +146,16 @@ describe("SkillsService", () => {
 
   describe("removeOne", () => {
     it("should return the removed document", async () => {
-      (model.findById as jest.Mock).mockReturnValue(makeExec(fakeDoc));
-      (model.findByIdAndDelete as jest.Mock).mockReturnValue(makeExec(fakeDoc));
-      expect(await service.removeOne(validId)).toBe(fakeDoc);
+      (model.findOne as jest.Mock).mockReturnValue(makeExec(fakeDoc));
+      (model.findOneAndDelete as jest.Mock).mockReturnValue(makeExec(fakeDoc));
+      expect(await service.removeOne(validId)).toEqual(
+        expect.objectContaining({ id: validId, name: "TypeScript" })
+      );
     });
 
     it("should emit skill.deleted before deleting the document", async () => {
-      (model.findById as jest.Mock).mockReturnValue(makeExec(fakeDoc));
-      (model.findByIdAndDelete as jest.Mock).mockReturnValue(makeExec(fakeDoc));
+      (model.findOne as jest.Mock).mockReturnValue(makeExec(fakeDoc));
+      (model.findOneAndDelete as jest.Mock).mockReturnValue(makeExec(fakeDoc));
 
       await service.removeOne(validId);
 
@@ -132,7 +163,7 @@ describe("SkillsService", () => {
         DomainEvents.skill.deleted,
         new SkillDeletedEvent(validId)
       );
-      expect(model.findByIdAndDelete).toHaveBeenCalled();
+      expect(model.findOneAndDelete).toHaveBeenCalled();
     });
 
     it("should throw BadRequestException for invalid ID", async () => {
@@ -144,7 +175,12 @@ describe("SkillsService", () => {
 
   describe("removeMany", () => {
     it("should return batch succeeded and failed counts", async () => {
-      (model.find as jest.Mock).mockReturnValue(makeExec([fakeDoc]));
+      (model.find as jest.Mock).mockReturnValue(
+        makeFindManyChain([fakeDoc]) as never
+      );
+      (model.countDocuments as jest.Mock).mockReturnValue(
+        mockQueryChain(1) as never
+      );
       (model.deleteMany as jest.Mock).mockReturnValue(
         makeExec({ deletedCount: 1 })
       );
@@ -155,7 +191,12 @@ describe("SkillsService", () => {
     });
 
     it("should emit skill.deleted for each skill before deleteMany", async () => {
-      (model.find as jest.Mock).mockReturnValue(makeExec([fakeDoc]));
+      (model.find as jest.Mock).mockReturnValue(
+        makeFindManyChain([fakeDoc]) as never
+      );
+      (model.countDocuments as jest.Mock).mockReturnValue(
+        mockQueryChain(1) as never
+      );
       (model.deleteMany as jest.Mock).mockReturnValue(
         makeExec({ deletedCount: 1 })
       );

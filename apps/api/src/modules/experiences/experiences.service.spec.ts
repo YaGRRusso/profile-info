@@ -14,8 +14,10 @@ const ownerId = "507f1f77bcf86cd799439011";
 const ctx = testAuthContext({ userId: ownerId });
 const fakeDoc = {
   _id: validId,
+  id: validId,
   ownerId,
   slug: "software-engineer",
+  roles: [],
 } as unknown as ExperienceModel;
 
 function makeExec(returnValue: unknown) {
@@ -68,7 +70,9 @@ describe("ExperiencesService", () => {
     it("should scope by ownerId", async () => {
       (model.findOne as jest.Mock).mockReturnValue(makeExec(fakeDoc));
 
-      expect(await service.findOneById(ctx, validId)).toBe(fakeDoc);
+      expect(await service.findOneById(ctx, validId)).toEqual(
+        expect.objectContaining({ id: validId, ownerId })
+      );
       expect(model.findOne).toHaveBeenCalledWith({
         _id: validId,
         ownerId,
@@ -97,7 +101,7 @@ describe("ExperiencesService", () => {
         slug: "software-engineer",
       } as any);
 
-      expect(result).toBe(fakeDoc);
+      expect(result).toEqual(expect.objectContaining({ id: validId, ownerId }));
       expect(model.create).toHaveBeenCalledWith(
         expect.objectContaining({ ownerId })
       );
@@ -124,7 +128,9 @@ describe("ExperiencesService", () => {
     it("should return the updated document", async () => {
       (model.findOneAndUpdate as jest.Mock).mockReturnValue(makeExec(fakeDoc));
 
-      expect(await service.updateOne(ctx, validId, {})).toBe(fakeDoc);
+      expect(await service.updateOne(ctx, validId, {})).toEqual(
+        expect.objectContaining({ id: validId, ownerId })
+      );
       expect(model.findOneAndUpdate).toHaveBeenCalledWith(
         { _id: validId, ownerId },
         {},
@@ -143,7 +149,9 @@ describe("ExperiencesService", () => {
     it("should return the removed document", async () => {
       (model.findOneAndDelete as jest.Mock).mockReturnValue(makeExec(fakeDoc));
 
-      expect(await service.removeOne(ctx, validId)).toBe(fakeDoc);
+      expect(await service.removeOne(ctx, validId)).toEqual(
+        expect.objectContaining({ id: validId, ownerId })
+      );
       expect(model.findOneAndDelete).toHaveBeenCalledWith({
         _id: validId,
         ownerId,
