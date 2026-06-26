@@ -1,7 +1,6 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import mongoose, { type HydratedDocument } from "mongoose";
 import { BaseModel } from "@/core/schemas/base.schema";
-import { DateRangeModel } from "@/core/schemas/daterange.schema";
 import {
   createTranslationModel,
   TranslationModel,
@@ -65,11 +64,6 @@ export class CourseModel extends BaseModel {
     type: [{ type: mongoose.Schema.Types.ObjectId, ref: SkillModel.name }],
   })
   skillIds?: ((mongoose.Types.ObjectId | string) | string)[];
-
-  @Prop({
-    type: SchemaFactory.createForClass(DateRangeModel),
-  })
-  period?: DateRangeModel;
 }
 
 export type CourseDocument = HydratedDocument<CourseModel>;

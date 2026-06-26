@@ -12,7 +12,6 @@ export class FilterCourseInput extends PartialType(
     "image",
     "hours",
     "i18n",
-    "period",
     "skillIds",
   ] as const)
 ) {}

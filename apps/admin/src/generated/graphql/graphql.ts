@@ -124,7 +124,6 @@ export type CreateCourseInput = {
   i18n: Array<CreateCourseMessagesInputTranslationInput>;
   image?: InputMaybe<Scalars['String']['input']>;
   organizationId: Scalars['String']['input'];
-  period?: InputMaybe<DateRangeInput>;
   relevance?: InputMaybe<Scalars['Float']['input']>;
   skillIds?: InputMaybe<Array<Scalars['String']['input']>>;
   slug: Scalars['String']['input'];
@@ -417,7 +416,6 @@ export type FilterCourseInput = {
   i18n?: InputMaybe<Array<CreateCourseMessagesInputTranslationInput>>;
   image?: InputMaybe<Scalars['String']['input']>;
   organizationId?: InputMaybe<Scalars['String']['input']>;
-  period?: InputMaybe<DateRangeInput>;
   relevance?: InputMaybe<Scalars['Float']['input']>;
   skillIds?: InputMaybe<Array<Scalars['String']['input']>>;
   slug?: InputMaybe<Scalars['String']['input']>;
@@ -1269,7 +1267,6 @@ export type UpdateCourseInput = {
   i18n?: InputMaybe<Array<CreateCourseMessagesInputTranslationInput>>;
   image?: InputMaybe<Scalars['String']['input']>;
   organizationId?: InputMaybe<Scalars['String']['input']>;
-  period?: InputMaybe<DateRangeInput>;
   relevance?: InputMaybe<Scalars['Float']['input']>;
   skillIds?: InputMaybe<Array<Scalars['String']['input']>>;
   slug?: InputMaybe<Scalars['String']['input']>;

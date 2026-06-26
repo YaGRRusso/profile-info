@@ -101,7 +101,6 @@ input CreateCourseInput {
   i18n: [CreateCourseMessagesInputTranslationInput!]!
   image: String
   organizationId: String!
-  period: DateRangeInput
   relevance: Float
   skillIds: [String!]
   slug: String!
@@ -387,7 +386,6 @@ input FilterCourseInput {
   i18n: [CreateCourseMessagesInputTranslationInput!]
   image: String
   organizationId: String
-  period: DateRangeInput
   relevance: Float
   skillIds: [String!]
   slug: String
@@ -768,7 +766,6 @@ input UpdateCourseInput {
   i18n: [CreateCourseMessagesInputTranslationInput!]
   image: String
   organizationId: String
-  period: DateRangeInput
   relevance: Float
   skillIds: [String!]
   slug: String
