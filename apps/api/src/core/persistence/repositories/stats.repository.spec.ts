@@ -1,11 +1,29 @@
 import mongoose from "mongoose";
-import { mockQueryChain } from "@/core/persistence/repositories/query-chain.mock";
 import { StatsRepository } from "@/core/persistence/repositories/stats.repository";
 import { BaseModel } from "@/core/schemas/base.schema";
 
 interface TestModel extends BaseModel {
   name: string;
   ownerId: string;
+}
+
+function mockQueryChain(returnValue: unknown) {
+  const chain = {
+    sort: jest.fn(),
+    skip: jest.fn(),
+    limit: jest.fn(),
+    select: jest.fn(),
+    lean: jest.fn(),
+    exec: jest.fn().mockResolvedValue(returnValue),
+  };
+
+  chain.sort.mockReturnValue(chain);
+  chain.skip.mockReturnValue(chain);
+  chain.limit.mockReturnValue(chain);
+  chain.select.mockReturnValue(chain);
+  chain.lean.mockReturnValue(chain);
+
+  return chain;
 }
 
 describe("StatsRepository", () => {

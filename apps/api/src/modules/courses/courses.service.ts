@@ -1,5 +1,4 @@
 import { Injectable } from "@nestjs/common";
-import { AnyKeys, QueryFilter, SortOrder, UpdateQuery } from "mongoose";
 import {
   labelFromI18nTitle,
   RecentActivityRecord,
@@ -7,18 +6,19 @@ import {
 import { toTenantScope } from "@/core/context/auth-context.helper";
 import type { AuthContext } from "@/core/context/auth-context.interface";
 import { BatchEntity } from "@/core/entities/batch.entity";
-import { PaginatedModel } from "@/core/schemas/paginated.schema";
+import { MultiPaged } from "@/core/persistence/types/output.type";
 import { CoursesRepository } from "./courses.repository";
 import { CreateCourseInput } from "./dto/create-course.input";
+import { FilterCourseInput } from "./dto/filter-course.input";
+import { SortCourseInput } from "./dto/sort-course.input";
 import { UpdateCourseInput } from "./dto/update-course.input";
-import { CourseEntity } from "./entities/course.entity";
-import { CourseModel } from "./schemas/course.schema";
+import { CourseEntityRecord } from "./entities/course.entity";
 
 @Injectable()
 export class CoursesService {
   constructor(private readonly repository: CoursesRepository) {}
 
-  findOneById(ctx: AuthContext, id: string): Promise<CourseEntity> {
+  findOneById(ctx: AuthContext, id: string): Promise<CourseEntityRecord> {
     return this.repository.crud.scoped(toTenantScope(ctx)).findOneById(id);
   }
 
@@ -27,13 +27,13 @@ export class CoursesService {
     {
       filters,
     }: {
-      filters?: QueryFilter<CourseModel>;
+      filters?: FilterCourseInput;
     }
-  ): Promise<CourseEntity> {
+  ): Promise<CourseEntityRecord> {
     return this.repository.crud.scoped(toTenantScope(ctx)).findOne({ filters });
   }
 
-  findManyById(ctx: AuthContext, ids: string[]): Promise<CourseEntity[]> {
+  findManyById(ctx: AuthContext, ids: string[]): Promise<CourseEntityRecord[]> {
     return this.repository.crud.scoped(toTenantScope(ctx)).findManyById(ids);
   }
 
@@ -45,12 +45,12 @@ export class CoursesService {
       skip = 0,
       limit = 50,
     }: {
-      filters?: QueryFilter<CourseModel>;
-      sort?: Partial<Record<keyof CourseModel, SortOrder>>;
+      filters?: FilterCourseInput;
+      sort?: SortCourseInput;
       limit?: number;
       skip?: number;
     }
-  ): Promise<PaginatedModel<CourseEntity>> {
+  ): Promise<MultiPaged<CourseEntityRecord>> {
     return this.repository.crud.scoped(toTenantScope(ctx)).findMany({
       filters,
       sort,
@@ -62,10 +62,10 @@ export class CoursesService {
   async createOne(
     ctx: AuthContext,
     createInput: CreateCourseInput
-  ): Promise<CourseEntity> {
+  ): Promise<CourseEntityRecord> {
     return await this.repository.crud
       .scoped(toTenantScope(ctx))
-      .createOne(createInput as AnyKeys<CourseModel>);
+      .createOne(createInput);
   }
 
   async createMany(
@@ -74,17 +74,17 @@ export class CoursesService {
   ): Promise<BatchEntity> {
     return await this.repository.crud
       .scoped(toTenantScope(ctx))
-      .createMany(createInputs as AnyKeys<CourseModel>[]);
+      .createMany(createInputs);
   }
 
   updateOne(
     ctx: AuthContext,
     id: string,
     updateInput: UpdateCourseInput
-  ): Promise<CourseEntity> {
+  ): Promise<CourseEntityRecord> {
     return this.repository.crud
       .scoped(toTenantScope(ctx))
-      .updateOneById(id, updateInput as UpdateQuery<CourseModel>);
+      .updateOneById(id, updateInput);
   }
 
   async updateMany(
@@ -94,10 +94,10 @@ export class CoursesService {
   ): Promise<BatchEntity> {
     return await this.repository.crud
       .scoped(toTenantScope(ctx))
-      .updateManyById(ids, updateInput as UpdateQuery<CourseModel>);
+      .updateManyById(ids, updateInput);
   }
 
-  removeOne(ctx: AuthContext, id: string): Promise<CourseEntity> {
+  removeOne(ctx: AuthContext, id: string): Promise<CourseEntityRecord> {
     return this.repository.crud.scoped(toTenantScope(ctx)).deleteOneById(id);
   }
 
@@ -135,13 +135,10 @@ export class CoursesService {
   }
 
   async detachSkill(skillId: string): Promise<void> {
-    await this.repository.crud.updateMany(
-      { skillIds: skillId },
-      { $pull: { skillIds: skillId } }
-    );
+    await this.repository.detachSkill(skillId);
   }
 
   async purgeByOrganization(organizationId: string): Promise<void> {
-    await this.repository.crud.deleteMany({ organizationId });
+    await this.repository.purgeByOrganization(organizationId);
   }
 }

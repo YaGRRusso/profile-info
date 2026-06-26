@@ -68,3 +68,8 @@ export class CourseEntity extends BaseEntity {
 }
 
 export const PaginatedCourseEntity = createPaginatedModel(CourseEntity);
+
+export type CourseEntityRecord = Omit<
+  CourseEntity,
+  "owner" | "organization" | "skills"
+>;

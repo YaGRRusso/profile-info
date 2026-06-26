@@ -7,13 +7,32 @@ import {
   PERSISTENCE_NOT_REMOVED,
   PERSISTENCE_NOT_UPDATED,
 } from "@/core/persistence/persistence.messages";
+import type { CrudMapperInterface } from "@/core/persistence/repositories/crud.interface";
 import { CrudRepository } from "@/core/persistence/repositories/crud.repository";
-import { mockQueryChain } from "@/core/persistence/repositories/query-chain.mock";
 import { BaseModel } from "@/core/schemas/base.schema";
 
 interface TestModel extends BaseModel {
   name: string;
   ownerId?: string;
+}
+
+function mockQueryChain(returnValue: unknown) {
+  const chain = {
+    sort: jest.fn(),
+    skip: jest.fn(),
+    limit: jest.fn(),
+    select: jest.fn(),
+    lean: jest.fn(),
+    exec: jest.fn().mockResolvedValue(returnValue),
+  };
+
+  chain.sort.mockReturnValue(chain);
+  chain.skip.mockReturnValue(chain);
+  chain.limit.mockReturnValue(chain);
+  chain.select.mockReturnValue(chain);
+  chain.lean.mockReturnValue(chain);
+
+  return chain;
 }
 
 describe("CrudRepository", () => {
@@ -48,7 +67,12 @@ describe("CrudRepository", () => {
       deleteMany: jest.fn(),
     };
 
-    repository = new CrudRepository(model as never, (doc) => doc);
+    const mapper: CrudMapperInterface<TestModel, TestModel> = {
+      toDomain: (doc) => doc,
+      toPersistenceForCreate: (entity) => entity,
+      toPersistenceForUpdate: (entity) => entity,
+    };
+    repository = new CrudRepository(model as never, mapper);
   });
 
   describe("findOneById", () => {
@@ -178,13 +202,13 @@ describe("CrudRepository", () => {
 
       await repository.updateMany(
         { name: "Test" },
-        { $set: { name: "Updated" } },
+        { name: "Updated" },
         { arrayFilters: [{ "elem.name": "Test" }] }
       );
 
       expect(model.updateMany).toHaveBeenCalledWith(
         { name: "Test" },
-        { $set: { name: "Updated" } },
+        { name: "Updated" },
         expect.objectContaining({
           arrayFilters: [{ "elem.name": "Test" }],
           runValidators: true,
