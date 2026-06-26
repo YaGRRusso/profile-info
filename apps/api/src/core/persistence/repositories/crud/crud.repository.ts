@@ -28,12 +28,26 @@ import type {
   CrudRepositoryInterface,
 } from "./crud.interface";
 
-export class CrudRepository<TModel, TEntity>
-  implements CrudRepositoryInterface<TModel, TEntity>
+export class CrudRepository<
+  TModel,
+  TEntity,
+  TCreate = Partial<TEntity>,
+  TUpdate = Partial<TEntity>,
+  TFilter extends object = Partial<TEntity>,
+  TSort extends object = Partial<TEntity>,
+> implements
+    CrudRepositoryInterface<TModel, TEntity, TCreate, TUpdate, TFilter, TSort>
 {
   constructor(
     protected readonly model: Model<TModel>,
-    protected readonly mapper: CrudMapperInterface<TEntity, TModel>,
+    protected readonly mapper: CrudMapperInterface<
+      TEntity,
+      TModel,
+      TCreate,
+      TUpdate,
+      TFilter,
+      TSort
+    >,
     protected readonly currentScope?: TenantScope
   ) {}
 
@@ -66,9 +80,7 @@ export class CrudRepository<TModel, TEntity>
     return Math.min(limit ?? DEFAULT_PAGE_SIZE, MAX_PAGE_SIZE);
   }
 
-  private resolveFilter(
-    filters?: Partial<TEntity>
-  ): QueryFilter<TModel> | undefined {
+  private resolveFilter(filters?: TFilter): QueryFilter<TModel> | undefined {
     const value = clearObject(filters);
     if (!value) return;
 
@@ -76,7 +88,7 @@ export class CrudRepository<TModel, TEntity>
   }
 
   private resolveSort(
-    sort?: Partial<TEntity>
+    sort?: TSort
   ): Record<keyof TModel, SortOrder> | undefined {
     const value = clearObject(sort);
     if (!value) return;
@@ -86,7 +98,7 @@ export class CrudRepository<TModel, TEntity>
 
   // --- read ---
 
-  async findOne(query: FindOneQuery<Partial<TEntity>>) {
+  async findOne(query: FindOneQuery<TFilter>) {
     const { filters } = query;
     const resolvedFilter = this.resolveFilter(filters);
     const scopedFilter = this.applyScope(resolvedFilter);
@@ -96,7 +108,7 @@ export class CrudRepository<TModel, TEntity>
     return await this.mapper.toDomain(document);
   }
 
-  async findMany(query: FindManyQuery<Partial<TEntity>, Partial<TEntity>>) {
+  async findMany(query: FindManyQuery<TFilter, TSort>) {
     const { filters, sort, skip = 0, limit = DEFAULT_PAGE_SIZE } = query;
     const resolvedFilter = this.resolveFilter(filters);
     const scopedFilter = this.applyScope(resolvedFilter);
@@ -147,7 +159,7 @@ export class CrudRepository<TModel, TEntity>
 
   // --- create ---
 
-  async createOne(createInput: Partial<TEntity>) {
+  async createOne(createInput: TCreate) {
     const payload = this.injectOwner(
       this.mapper.toPersistenceForCreate(createInput)
     );
@@ -156,7 +168,7 @@ export class CrudRepository<TModel, TEntity>
     return await this.mapper.toDomain(document);
   }
 
-  async createMany(createInputs: Partial<TEntity>[]) {
+  async createMany(createInputs: TCreate[]) {
     if (createInputs.length === 0) return { succeeded: 0, failed: 0 };
 
     const payloads = createInputs.map((input) =>
@@ -177,10 +189,7 @@ export class CrudRepository<TModel, TEntity>
 
   // --- update ---
 
-  async updateOne(
-    query: FindOneQuery<Partial<TEntity>>,
-    updateInput: Partial<TEntity>
-  ) {
+  async updateOne(query: FindOneQuery<TFilter>, updateInput: TUpdate) {
     const { filters } = query;
     const resolvedFilter = this.resolveFilter(filters);
     const scopedFilter = this.applyScope(resolvedFilter);
@@ -201,8 +210,8 @@ export class CrudRepository<TModel, TEntity>
   }
 
   async updateMany(
-    filter: Partial<TEntity>,
-    updateInput: Partial<TEntity>,
+    filter: TFilter,
+    updateInput: TUpdate,
     options?: { arrayFilters?: Record<string, unknown>[] }
   ) {
     const resolvedFilter = this.resolveFilter(filter);
@@ -225,7 +234,7 @@ export class CrudRepository<TModel, TEntity>
     );
   }
 
-  async updateOneById(id: string, updateInput: Partial<TEntity>) {
+  async updateOneById(id: string, updateInput: TUpdate) {
     assertValidObjectId(id);
     const resolvedFilter = { _id: id } as QueryFilter<TModel>;
     const scopedFilter = this.applyScope(resolvedFilter);
@@ -245,7 +254,7 @@ export class CrudRepository<TModel, TEntity>
     return await this.mapper.toDomain(document);
   }
 
-  async updateManyById(ids: string[], updateInput: Partial<TEntity>) {
+  async updateManyById(ids: string[], updateInput: TUpdate) {
     assertValidObjectIds(ids);
     if (ids.length === 0) return { succeeded: 0, failed: 0 };
 
@@ -274,7 +283,7 @@ export class CrudRepository<TModel, TEntity>
 
   // --- delete ---
 
-  async deleteOne(query: FindOneQuery<Partial<TEntity>>) {
+  async deleteOne(query: FindOneQuery<TFilter>) {
     const { filters } = query;
     const resolvedFilter = this.resolveFilter(filters);
     const scopedFilter = this.applyScope(resolvedFilter);
@@ -284,7 +293,7 @@ export class CrudRepository<TModel, TEntity>
     return await this.mapper.toDomain(document);
   }
 
-  async deleteMany(filter: Partial<TEntity>) {
+  async deleteMany(filter: TFilter) {
     const resolvedFilter = this.resolveFilter(filter);
     const scopedFilter = this.applyScope(resolvedFilter);
 

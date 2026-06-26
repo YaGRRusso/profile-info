@@ -4,47 +4,63 @@ import type { FindManyQuery, FindOneQuery } from "../../types/input.type";
 import type { BatchCount, MultiPaged } from "../../types/output.type";
 import type { TenantScope } from "../../types/scope.type";
 
-export interface CrudMapperInterface<TEntity, TModel> {
+export interface CrudMapperInterface<
+  TEntity,
+  TModel,
+  TCreate = Partial<TEntity>,
+  TUpdate = Partial<TEntity>,
+  TFilter extends object = Partial<TEntity>,
+  TSort extends object = Partial<TEntity>,
+> {
   toDomain(raw: TModel): TEntity;
-  toPersistenceForCreate(entity: Partial<TEntity>): AnyKeys<TModel>;
-  toPersistenceForFilter(entity: Partial<TEntity>): QueryFilter<TModel>;
-  toPersistenceForSort(
-    entity: Partial<TEntity>
-  ): Record<keyof TModel, SortOrder>;
-  toPersistenceForUpdate(entity: Partial<TEntity>): UpdateQuery<TModel>;
+  toPersistenceForCreate(entity: TCreate): AnyKeys<TModel>;
+  toPersistenceForFilter(entity: Partial<TFilter>): QueryFilter<TModel>;
+  toPersistenceForSort(entity: Partial<TSort>): Record<keyof TModel, SortOrder>;
+  toPersistenceForUpdate(entity: TUpdate): UpdateQuery<TModel>;
 }
 
-export interface CrudRepositoryInterface<TModel, TEntity> {
-  createMany(createInputs: Partial<TEntity>[]): Promise<BatchCount>;
-  createOne(createInput: Partial<TEntity>): Promise<TEntity>;
+export interface CrudRepositoryInterface<
+  TModel,
+  TEntity,
+  TCreate = Partial<TEntity>,
+  TUpdate = Partial<TEntity>,
+  TFilter extends object = Partial<TEntity>,
+  TSort extends object = Partial<TEntity>,
+> {
+  createMany(createInputs: TCreate[]): Promise<BatchCount>;
+  createOne(createInput: TCreate): Promise<TEntity>;
 
-  deleteMany(filter: Partial<TEntity>): Promise<BatchCount>;
+  deleteMany(filter: TFilter): Promise<BatchCount>;
   deleteManyById(ids: string[]): Promise<BatchCount>;
-  deleteOne(query: FindOneQuery<Partial<TEntity>>): Promise<TEntity>;
+  deleteOne(query: FindOneQuery<TFilter>): Promise<TEntity>;
   deleteOneById(id: string): Promise<TEntity>;
 
-  findMany(
-    query: FindManyQuery<Partial<TEntity>, Partial<TEntity>>
-  ): Promise<MultiPaged<TEntity>>;
+  findMany(query: FindManyQuery<TFilter, TSort>): Promise<MultiPaged<TEntity>>;
   findManyById(ids: string[]): Promise<TEntity[]>;
-  findOne(query: FindOneQuery<Partial<TEntity>>): Promise<TEntity>;
+  findOne(query: FindOneQuery<TFilter>): Promise<TEntity>;
   findOneById(id: string): Promise<TEntity>;
 
-  global(): CrudRepositoryInterface<TModel, TEntity>;
-  scoped(scope: TenantScope): CrudRepositoryInterface<TModel, TEntity>;
+  global(): CrudRepositoryInterface<
+    TModel,
+    TEntity,
+    TCreate,
+    TUpdate,
+    TFilter,
+    TSort
+  >;
+  scoped(
+    scope: TenantScope
+  ): CrudRepositoryInterface<TModel, TEntity, TCreate, TUpdate, TFilter, TSort>;
 
   updateMany(
-    filter: Partial<TEntity>,
-    updateInput: Partial<TEntity>,
+    filter: TFilter,
+    updateInput: TUpdate,
     options?: { arrayFilters?: Record<string, unknown>[] }
   ): Promise<BatchCount>;
-  updateManyById(
-    ids: string[],
-    updateInput: Partial<TEntity>
-  ): Promise<BatchCount>;
+  updateManyById(ids: string[], updateInput: TUpdate): Promise<BatchCount>;
   updateOne(
-    query: FindOneQuery<Partial<TEntity>>,
-    updateInput: Partial<TEntity>
+    query: FindOneQuery<TFilter>,
+    updateInput: TUpdate
   ): Promise<TEntity>;
-  updateOneById(id: string, updateInput: Partial<TEntity>): Promise<TEntity>;
+  updateOneById(id: string, updateInput: TUpdate): Promise<TEntity>;
 }
