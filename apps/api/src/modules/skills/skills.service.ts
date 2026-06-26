@@ -1,15 +1,18 @@
 import { Injectable } from "@nestjs/common";
 import { EventEmitter2 } from "@nestjs/event-emitter";
-import { AnyKeys, QueryFilter, SortOrder, UpdateQuery } from "mongoose";
 import { RecentActivityRecord } from "@/common/helpers/recent-activity.helper";
 import { BatchEntity } from "@/core/entities/batch.entity";
 import { DomainEvents } from "@/core/events/domain-events";
 import { SkillDeletedEvent } from "@/core/events/skill-deleted.event";
-import { PaginatedModel } from "@/core/schemas/paginated.schema";
+import type {
+  FieldCount,
+  MultiPaged,
+} from "@/core/persistence/types/output.type";
 import { CreateSkillInput } from "./dto/create-skill.input";
+import { FilterSkillInput } from "./dto/filter-skill.input";
+import { SortSkillInput } from "./dto/sort-skill.input";
 import { UpdateSkillInput } from "./dto/update-skill.input";
 import { SkillEntity } from "./entities/skill.entity";
-import { SkillModel } from "./schemas/skill.schema";
 import { SkillsRepository } from "./skills.repository";
 
 @Injectable()
@@ -23,11 +26,7 @@ export class SkillsService {
     return this.repository.crud.findOneById(id);
   }
 
-  findOne({
-    filters,
-  }: {
-    filters?: QueryFilter<SkillModel>;
-  }): Promise<SkillEntity> {
+  findOne({ filters }: { filters?: FilterSkillInput }): Promise<SkillEntity> {
     return this.repository.crud.findOne({ filters });
   }
 
@@ -41,39 +40,31 @@ export class SkillsService {
     skip = 0,
     limit = 50,
   }: {
-    filters?: QueryFilter<SkillModel>;
-    sort?: Partial<Record<keyof SkillModel, SortOrder>>;
+    filters?: FilterSkillInput;
+    sort?: SortSkillInput;
     limit?: number;
     skip?: number;
-  }): Promise<PaginatedModel<SkillEntity>> {
+  }): Promise<MultiPaged<SkillEntity>> {
     return this.repository.crud.findMany({ filters, sort, skip, limit });
   }
 
   createOne(createInput: CreateSkillInput): Promise<SkillEntity> {
-    return this.repository.crud.createOne(createInput as AnyKeys<SkillModel>);
+    return this.repository.crud.createOne(createInput);
   }
 
   createMany(createInputs: CreateSkillInput[]): Promise<BatchEntity> {
-    return this.repository.crud.createMany(
-      createInputs as AnyKeys<SkillModel>[]
-    );
+    return this.repository.crud.createMany(createInputs);
   }
 
   updateOne(id: string, updateInput: UpdateSkillInput): Promise<SkillEntity> {
-    return this.repository.crud.updateOneById(
-      id,
-      updateInput as object as UpdateQuery<SkillModel>
-    );
+    return this.repository.crud.updateOneById(id, updateInput);
   }
 
   updateMany(
     ids: string[],
     updateInput: UpdateSkillInput
   ): Promise<BatchEntity> {
-    return this.repository.crud.updateManyById(
-      ids,
-      updateInput as object as UpdateQuery<SkillModel>
-    );
+    return this.repository.crud.updateManyById(ids, updateInput);
   }
 
   async removeOne(id: string): Promise<SkillEntity> {
@@ -105,7 +96,7 @@ export class SkillsService {
     return this.repository.stats.count();
   }
 
-  countByField(field: string): Promise<{ label: string; value: number }[]> {
+  countByField(field: string): Promise<FieldCount[]> {
     return this.repository.stats.countByField(field);
   }
 

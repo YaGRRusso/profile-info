@@ -1,9 +1,11 @@
 import { SkillCategory } from "../enums/category.enum";
 import type { SkillModel } from "../schemas/skill.schema";
-import { toSkillEntity } from "./skill.mapper";
+import { SkillMapper } from "./skill.mapper";
 
-describe("toSkillEntity", () => {
-  it("maps persistence fields to the GraphQL entity", () => {
+describe("SkillMapper", () => {
+  const mapper = new SkillMapper();
+
+  it("maps persistence fields to the domain entity", () => {
     const model = {
       id: "507f1f77bcf86cd799439011",
       createdAt: new Date("2024-01-01"),
@@ -14,7 +16,7 @@ describe("toSkillEntity", () => {
       category: "LANGUAGE",
     } as SkillModel;
 
-    expect(toSkillEntity(model)).toEqual({
+    expect(mapper.toDomain(model)).toEqual({
       id: "507f1f77bcf86cd799439011",
       createdAt: model.createdAt,
       updatedAt: model.updatedAt,
@@ -23,5 +25,15 @@ describe("toSkillEntity", () => {
       name: "TypeScript",
       category: SkillCategory.LANGUAGE,
     });
+  });
+
+  it("maps filter input to a persistence query", () => {
+    expect(mapper.toPersistenceForFilter({ name: "TypeScript" })).toEqual({
+      name: "TypeScript",
+    });
+  });
+
+  it("maps sort input to a persistence sort", () => {
+    expect(mapper.toPersistenceForSort({ name: 1 })).toEqual({ name: 1 });
   });
 });

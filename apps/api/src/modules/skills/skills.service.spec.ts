@@ -28,22 +28,6 @@ function makeExec(returnValue: unknown) {
   };
 }
 
-function makeFindManyChain(nodes: unknown[]) {
-  return {
-    sort: jest.fn().mockReturnValue({
-      skip: jest.fn().mockReturnValue({
-        limit: jest.fn().mockReturnValue(mockQueryChain(nodes)),
-      }),
-    }),
-  };
-}
-
-function mockQueryChain(returnValue: unknown) {
-  return {
-    exec: jest.fn().mockResolvedValue(returnValue),
-  };
-}
-
 describe("SkillsService", () => {
   let service: SkillsService;
   let model: jest.Mocked<Model<SkillModel>>;
@@ -175,12 +159,9 @@ describe("SkillsService", () => {
 
   describe("removeMany", () => {
     it("should return batch succeeded and failed counts", async () => {
-      (model.find as jest.Mock).mockReturnValue(
-        makeFindManyChain([fakeDoc]) as never
-      );
-      (model.countDocuments as jest.Mock).mockReturnValue(
-        mockQueryChain(1) as never
-      );
+      (model.find as jest.Mock).mockReturnValue({
+        limit: jest.fn().mockReturnValue(makeExec([fakeDoc])),
+      });
       (model.deleteMany as jest.Mock).mockReturnValue(
         makeExec({ deletedCount: 1 })
       );
@@ -191,12 +172,9 @@ describe("SkillsService", () => {
     });
 
     it("should emit skill.deleted for each skill before deleteMany", async () => {
-      (model.find as jest.Mock).mockReturnValue(
-        makeFindManyChain([fakeDoc]) as never
-      );
-      (model.countDocuments as jest.Mock).mockReturnValue(
-        mockQueryChain(1) as never
-      );
+      (model.find as jest.Mock).mockReturnValue({
+        limit: jest.fn().mockReturnValue(makeExec([fakeDoc])),
+      });
       (model.deleteMany as jest.Mock).mockReturnValue(
         makeExec({ deletedCount: 1 })
       );

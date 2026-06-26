@@ -1,14 +1,47 @@
+import {
+  type AnyKeys,
+  type QueryFilter,
+  type SortOrder,
+  type UpdateQuery,
+} from "mongoose";
 import { toBaseEntityFields } from "@/core/mappers/base.mapper";
+import type { CrudMapperInterface } from "@/core/persistence/repositories/crud/crud.interface";
+import { CreateSkillInput } from "../dto/create-skill.input";
+import { FilterSkillInput } from "../dto/filter-skill.input";
+import { SortSkillInput } from "../dto/sort-skill.input";
+import { UpdateSkillInput } from "../dto/update-skill.input";
 import type { SkillEntity } from "../entities/skill.entity";
 import type { SkillCategory } from "../enums/category.enum";
 import type { SkillModel } from "../schemas/skill.schema";
 
-export function toSkillEntity(model: SkillModel): SkillEntity {
-  return {
-    ...toBaseEntityFields(model),
-    relevance: model.relevance,
-    slug: model.slug,
-    name: model.name,
-    category: model.category as SkillCategory,
-  };
+export class SkillMapper
+  implements CrudMapperInterface<SkillEntity, SkillModel>
+{
+  toDomain(model: SkillModel): SkillEntity {
+    return {
+      ...toBaseEntityFields(model),
+      relevance: model.relevance,
+      slug: model.slug,
+      name: model.name,
+      category: model.category as SkillCategory,
+    };
+  }
+
+  toPersistenceForCreate(entity: CreateSkillInput): AnyKeys<SkillModel> {
+    return { ...entity };
+  }
+
+  toPersistenceForUpdate(entity: UpdateSkillInput): UpdateQuery<SkillModel> {
+    return { ...entity };
+  }
+
+  toPersistenceForFilter(entity: FilterSkillInput): QueryFilter<SkillModel> {
+    return { ...entity } as QueryFilter<SkillModel>;
+  }
+
+  toPersistenceForSort(
+    entity: SortSkillInput
+  ): Record<keyof SkillModel, SortOrder> {
+    return { ...entity } as Record<keyof SkillModel, SortOrder>;
+  }
 }
