@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import { ApiTokenPermission } from "@/core/enums/api-token-permission.enum";
 import type { CreateApiTokenInput } from "../dto/create-api-token.input";
 import type { ApiTokenModel } from "../schemas/api-token.schema";
@@ -42,7 +43,7 @@ describe("ApiTokenMapper", () => {
         expiresAt,
       } as CreateApiTokenInput & { id: string; hashedSecret: string })
     ).toEqual({
-      _id: "507f1f77bcf86cd799439011",
+      _id: new mongoose.Types.ObjectId("507f1f77bcf86cd799439011"),
       name: "CI token",
       hashedSecret: "hashed",
       permissions: [ApiTokenPermission.QUERY],

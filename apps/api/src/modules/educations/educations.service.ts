@@ -1,5 +1,4 @@
 import { Injectable } from "@nestjs/common";
-import { AnyKeys, QueryFilter, SortOrder, UpdateQuery } from "mongoose";
 import {
   labelFromI18nTitle,
   RecentActivityRecord,
@@ -7,18 +6,19 @@ import {
 import { toTenantScope } from "@/core/context/auth-context.helper";
 import type { AuthContext } from "@/core/context/auth-context.interface";
 import { BatchEntity } from "@/core/entities/batch.entity";
-import { PaginatedModel } from "@/core/schemas/paginated.schema";
+import type { MultiPaged } from "@/core/persistence/types/output.type";
 import { CreateEducationInput } from "./dto/create-education.input";
+import { FilterEducationInput } from "./dto/filter-education.input";
+import { SortEducationInput } from "./dto/sort-education.input";
 import { UpdateEducationInput } from "./dto/update-education.input";
 import { EducationsRepository } from "./educations.repository";
-import { EducationEntity } from "./entities/education.entity";
-import { EducationModel } from "./schemas/education.schema";
+import type { EducationEntityRecord } from "./entities/education.entity";
 
 @Injectable()
 export class EducationsService {
   constructor(private readonly repository: EducationsRepository) {}
 
-  findOneById(ctx: AuthContext, id: string): Promise<EducationEntity> {
+  findOneById(ctx: AuthContext, id: string): Promise<EducationEntityRecord> {
     return this.repository.crud.scoped(toTenantScope(ctx)).findOneById(id);
   }
 
@@ -27,13 +27,16 @@ export class EducationsService {
     {
       filters,
     }: {
-      filters?: QueryFilter<EducationModel>;
+      filters?: FilterEducationInput;
     }
-  ): Promise<EducationEntity> {
+  ): Promise<EducationEntityRecord> {
     return this.repository.crud.scoped(toTenantScope(ctx)).findOne({ filters });
   }
 
-  findManyById(ctx: AuthContext, ids: string[]): Promise<EducationEntity[]> {
+  findManyById(
+    ctx: AuthContext,
+    ids: string[]
+  ): Promise<EducationEntityRecord[]> {
     return this.repository.crud.scoped(toTenantScope(ctx)).findManyById(ids);
   }
 
@@ -45,12 +48,12 @@ export class EducationsService {
       skip = 0,
       limit = 50,
     }: {
-      filters?: QueryFilter<EducationModel>;
-      sort?: Partial<Record<keyof EducationModel, SortOrder>>;
+      filters?: FilterEducationInput;
+      sort?: SortEducationInput;
       limit?: number;
       skip?: number;
     }
-  ): Promise<PaginatedModel<EducationEntity>> {
+  ): Promise<MultiPaged<EducationEntityRecord>> {
     return this.repository.crud.scoped(toTenantScope(ctx)).findMany({
       filters,
       sort,
@@ -59,52 +62,50 @@ export class EducationsService {
     });
   }
 
-  async createOne(
+  createOne(
     ctx: AuthContext,
     createInput: CreateEducationInput
-  ): Promise<EducationEntity> {
-    return await this.repository.crud
+  ): Promise<EducationEntityRecord> {
+    return this.repository.crud
       .scoped(toTenantScope(ctx))
-      .createOne(createInput as AnyKeys<EducationModel>);
+      .createOne(createInput);
   }
 
-  async createMany(
+  createMany(
     ctx: AuthContext,
     createInputs: CreateEducationInput[]
   ): Promise<BatchEntity> {
-    return await this.repository.crud
+    return this.repository.crud
       .scoped(toTenantScope(ctx))
-      .createMany(createInputs as AnyKeys<EducationModel>[]);
+      .createMany(createInputs);
   }
 
   updateOne(
     ctx: AuthContext,
     id: string,
     updateInput: UpdateEducationInput
-  ): Promise<EducationEntity> {
+  ): Promise<EducationEntityRecord> {
     return this.repository.crud
       .scoped(toTenantScope(ctx))
-      .updateOneById(id, updateInput as UpdateQuery<EducationModel>);
+      .updateOneById(id, updateInput);
   }
 
-  async updateMany(
+  updateMany(
     ctx: AuthContext,
     ids: string[],
     updateInput: UpdateEducationInput
   ): Promise<BatchEntity> {
-    return await this.repository.crud
+    return this.repository.crud
       .scoped(toTenantScope(ctx))
-      .updateManyById(ids, updateInput as UpdateQuery<EducationModel>);
+      .updateManyById(ids, updateInput);
   }
 
-  removeOne(ctx: AuthContext, id: string): Promise<EducationEntity> {
+  removeOne(ctx: AuthContext, id: string): Promise<EducationEntityRecord> {
     return this.repository.crud.scoped(toTenantScope(ctx)).deleteOneById(id);
   }
 
-  async removeMany(ctx: AuthContext, ids: string[]): Promise<BatchEntity> {
-    return await this.repository.crud
-      .scoped(toTenantScope(ctx))
-      .deleteManyById(ids);
+  removeMany(ctx: AuthContext, ids: string[]): Promise<BatchEntity> {
+    return this.repository.crud.scoped(toTenantScope(ctx)).deleteManyById(ids);
   }
 
   count(ctx: AuthContext): Promise<number> {
@@ -128,13 +129,10 @@ export class EducationsService {
   }
 
   async detachSkill(skillId: string): Promise<void> {
-    await this.repository.crud.updateMany(
-      { skillIds: skillId },
-      { $pull: { skillIds: skillId } }
-    );
+    await this.repository.detachSkill(skillId);
   }
 
   async purgeByOrganization(organizationId: string): Promise<void> {
-    await this.repository.crud.deleteMany({ organizationId });
+    await this.repository.purgeByOrganization(organizationId);
   }
 }

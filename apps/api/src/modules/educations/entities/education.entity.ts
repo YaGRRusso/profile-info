@@ -73,3 +73,8 @@ export class EducationEntity extends BaseEntity {
 }
 
 export const PaginatedEducationEntity = createPaginatedModel(EducationEntity);
+
+export type EducationEntityRecord = Omit<
+  EducationEntity,
+  "owner" | "organization" | "skills"
+>;

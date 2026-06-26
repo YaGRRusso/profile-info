@@ -1,4 +1,4 @@
-import mongoose, {
+import {
   type AnyKeys,
   type QueryFilter,
   type SortOrder,
@@ -8,6 +8,7 @@ import {
   toBaseEntityFields,
   toIdString,
   toIdStrings,
+  toObjectIds,
 } from "@/core/mappers/base.mapper";
 import { toTranslationEntityList } from "@/core/mappers/translation.mapper";
 import { toUrlEntityList } from "@/core/mappers/url.mapper";
@@ -45,9 +46,7 @@ export class ProjectMapper
   toPersistenceForCreate(entity: CreateProjectInput): AnyKeys<ProjectModel> {
     return {
       ...entity,
-      skillIds: entity.skillIds?.map(
-        (skillId) => new mongoose.Types.ObjectId(skillId)
-      ),
+      skillIds: toObjectIds(entity.skillIds),
     };
   }
 
@@ -56,9 +55,7 @@ export class ProjectMapper
   ): UpdateQuery<ProjectModel> {
     return {
       ...entity,
-      skillIds: entity.skillIds?.map(
-        (skillId) => new mongoose.Types.ObjectId(skillId)
-      ),
+      skillIds: toObjectIds(entity.skillIds),
     };
   }
 

@@ -5,6 +5,7 @@ import {
   type UpdateQuery,
 } from "mongoose";
 import { toBaseEntityFields } from "@/core/mappers/base.mapper";
+import { toTranslationEntityList } from "@/core/mappers/translation.mapper";
 import type { CrudMapperInterface } from "@/core/persistence/repositories/crud/crud.interface";
 import { CreateOrganizationInput } from "../dto/create-organization.input";
 import { FilterOrganizationInput } from "../dto/filter-organization.input";
@@ -25,10 +26,11 @@ export class OrganizationMapper
       name: model.name,
       website: model.website,
       logo: model.logo,
-      i18n: model.i18n.map((entry) => ({
-        locale: entry.locale,
-        messages: { description: entry.messages.description },
-      })),
+      i18n:
+        toTranslationEntityList(model.i18n)?.map((entry) => ({
+          locale: entry.locale,
+          messages: { description: entry.messages.description },
+        })) ?? [],
       category: model.category as OrganizationCategory,
     };
   }

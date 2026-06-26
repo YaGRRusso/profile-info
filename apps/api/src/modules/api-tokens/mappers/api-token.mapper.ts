@@ -4,7 +4,11 @@ import {
   type SortOrder,
   type UpdateQuery,
 } from "mongoose";
-import { toBaseEntityFields, toIdString } from "@/core/mappers/base.mapper";
+import {
+  toBaseEntityFields,
+  toIdString,
+  toObjectId,
+} from "@/core/mappers/base.mapper";
 import type { CrudMapperInterface } from "@/core/persistence/repositories/crud/crud.interface";
 import { CreateApiTokenInput } from "../dto/create-api-token.input";
 import { FilterApiTokenInput } from "../dto/filter-api-token.input";
@@ -35,7 +39,7 @@ export class ApiTokenMapper
     const input = entity as ApiTokenCreateRecord;
 
     return {
-      _id: input.id,
+      _id: toObjectId(input.id),
       name: input.name,
       hashedSecret: input.hashedSecret,
       permissions: input.permissions,

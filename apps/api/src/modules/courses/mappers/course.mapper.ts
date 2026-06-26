@@ -1,23 +1,25 @@
-import mongoose, {
-  AnyKeys,
-  QueryFilter,
-  SortOrder,
-  UpdateQuery,
+import {
+  type AnyKeys,
+  type QueryFilter,
+  type SortOrder,
+  type UpdateQuery,
 } from "mongoose";
 import {
   toBaseEntityFields,
   toIdString,
   toIdStrings,
+  toObjectId,
+  toObjectIds,
 } from "@/core/mappers/base.mapper";
 import { toTranslationEntityList } from "@/core/mappers/translation.mapper";
 import type { CrudMapperInterface } from "@/core/persistence/repositories/crud/crud.interface";
-import { CreateCourseInput } from "./dto/create-course.input";
-import { FilterCourseInput } from "./dto/filter-course.input";
-import { SortCourseInput } from "./dto/sort-course.input";
-import { UpdateCourseInput } from "./dto/update-course.input";
-import { CourseEntityRecord } from "./entities/course.entity";
-import { CourseStatus } from "./enums/status.enum";
-import { CourseModel } from "./schemas/course.schema";
+import { CreateCourseInput } from "../dto/create-course.input";
+import { FilterCourseInput } from "../dto/filter-course.input";
+import { SortCourseInput } from "../dto/sort-course.input";
+import { UpdateCourseInput } from "../dto/update-course.input";
+import type { CourseEntityRecord } from "../entities/course.entity";
+import type { CourseStatus } from "../enums/status.enum";
+import type { CourseModel } from "../schemas/course.schema";
 
 export class CourseMapper
   implements CrudMapperInterface<CourseEntityRecord, CourseModel>
@@ -48,7 +50,8 @@ export class CourseMapper
   toPersistenceForCreate(entity: CreateCourseInput): AnyKeys<CourseModel> {
     return {
       ...entity,
-      organizationId: new mongoose.Types.ObjectId(entity.organizationId),
+      organizationId: toObjectId(entity.organizationId),
+      skillIds: toObjectIds(entity.skillIds),
     };
   }
 
@@ -56,8 +59,9 @@ export class CourseMapper
     return {
       ...entity,
       organizationId: entity.organizationId
-        ? new mongoose.Types.ObjectId(entity.organizationId)
+        ? toObjectId(entity.organizationId)
         : undefined,
+      skillIds: toObjectIds(entity.skillIds),
     };
   }
 

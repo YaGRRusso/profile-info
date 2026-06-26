@@ -7,7 +7,9 @@ import { DEFAULT_LOCALE, type LocaleCode } from "@/common/i18n/locales";
 import { toSessionAuthContext } from "@/core/context/auth-context.helper";
 import { UserRole } from "@/core/enums/user-role.enum";
 import { CoursesService } from "@/modules/courses/courses.service";
+import { CourseStatus } from "@/modules/courses/enums/status.enum";
 import { EducationsService } from "@/modules/educations/educations.service";
+import { EducationStatus } from "@/modules/educations/enums/status.enum";
 import { ExperiencesService } from "@/modules/experiences/experiences.service";
 import { OrganizationEntity } from "@/modules/organizations/entities/organization.entity";
 import { OrganizationsService } from "@/modules/organizations/organizations.service";
@@ -69,12 +71,12 @@ export class ResumeService {
         limit: RESUME_LIMITS.experiences,
       }),
       this.educationsService.findMany(ctx, {
-        filters: { status: "COMPLETE" },
+        filters: { status: EducationStatus.COMPLETE },
         sort: { relevance: -1 },
         limit: RESUME_LIMITS.educations,
       }),
       this.coursesService.findMany(ctx, {
-        filters: { status: "COMPLETE" },
+        filters: { status: CourseStatus.COMPLETE },
         sort: { relevance: -1 },
         limit: RESUME_LIMITS.certifications,
       }),
