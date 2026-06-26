@@ -3,7 +3,7 @@ import { InjectModel } from "@nestjs/mongoose";
 import { isNil } from "lodash";
 import { Model } from "mongoose";
 import { PERSISTENCE_NOT_FOUND } from "@/core/persistence/persistence.messages";
-import { CrudRepository } from "@/core/persistence/repositories/crud.repository";
+import { CrudRepository } from "@/core/persistence/repositories/crud/crud.repository";
 import type { UserEntity } from "./entities/user.entity";
 import type { UserWithPasswordEntity } from "./entities/user-with-password.entity";
 import { toUserEntity } from "./mappers/user.mapper";

@@ -3,8 +3,8 @@ import { clearObject } from "@/common/helpers/object.helper";
 import {
   withTenantScope,
   withTenantScopeForAggregate,
-} from "../helpers/tenant-scope.helper";
-import type { TenantScope } from "../types/scope.type";
+} from "../../helpers/tenant-scope.helper";
+import type { TenantScope } from "../../types/scope.type";
 
 export class StatsRepository<T> {
   constructor(

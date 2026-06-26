@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import { StatsRepository } from "@/core/persistence/repositories/stats.repository";
+import { StatsRepository } from "@/core/persistence/repositories/stats/stats.repository";
 import { BaseModel } from "@/core/schemas/base.schema";
 
 interface TestModel extends BaseModel {

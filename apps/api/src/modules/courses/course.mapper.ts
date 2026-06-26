@@ -11,7 +11,7 @@ import {
   toIdStrings,
 } from "@/core/mappers/base.mapper";
 import { toTranslationEntityList } from "@/core/mappers/translation.mapper";
-import type { CrudMapperInterface } from "@/core/persistence/repositories/crud.interface";
+import type { CrudMapperInterface } from "@/core/persistence/repositories/crud/crud.interface";
 import { CreateCourseInput } from "./dto/create-course.input";
 import { FilterCourseInput } from "./dto/filter-course.input";
 import { SortCourseInput } from "./dto/sort-course.input";

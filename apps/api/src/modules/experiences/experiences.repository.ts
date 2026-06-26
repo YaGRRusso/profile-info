@@ -1,8 +1,8 @@
 import { Injectable } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import { Model } from "mongoose";
-import { CrudRepository } from "@/core/persistence/repositories/crud.repository";
-import { StatsRepository } from "@/core/persistence/repositories/stats.repository";
+import { CrudRepository } from "@/core/persistence/repositories/crud/crud.repository";
+import { StatsRepository } from "@/core/persistence/repositories/stats/stats.repository";
 import type { ExperienceEntity } from "./entities/experience.entity";
 import { toExperienceEntity } from "./mappers/experience.mapper";
 import { ExperienceModel } from "./schemas/experience.schema";

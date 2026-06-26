@@ -1,8 +1,8 @@
 import type { AnyKeys, QueryFilter, UpdateQuery } from "mongoose";
 import { SortOrder } from "mongoose";
-import type { FindManyQuery, FindOneQuery } from "../types/input.type";
-import type { BatchCount, MultiPaged } from "../types/output.type";
-import type { TenantScope } from "../types/scope.type";
+import type { FindManyQuery, FindOneQuery } from "../../types/input.type";
+import type { BatchCount, MultiPaged } from "../../types/output.type";
+import type { TenantScope } from "../../types/scope.type";
 
 export interface CrudMapperInterface<TEntity, TModel> {
   toDomain(raw: TModel): TEntity;

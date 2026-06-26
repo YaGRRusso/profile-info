@@ -7,8 +7,8 @@ import {
   PERSISTENCE_NOT_REMOVED,
   PERSISTENCE_NOT_UPDATED,
 } from "@/core/persistence/persistence.messages";
-import type { CrudMapperInterface } from "@/core/persistence/repositories/crud.interface";
-import { CrudRepository } from "@/core/persistence/repositories/crud.repository";
+import type { CrudMapperInterface } from "@/core/persistence/repositories/crud/crud.interface";
+import { CrudRepository } from "@/core/persistence/repositories/crud/crud.repository";
 import { BaseModel } from "@/core/schemas/base.schema";
 
 interface TestModel extends BaseModel {
