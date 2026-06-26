@@ -65,7 +65,7 @@ Full diagram and field detail: `apps/api/docs/ER_MODEL.md`.
 
 `core/` (cross-cutting NestJS infra, domain-agnostic):
 
-- `persistence/`: generic MongoDB layer — `CrudRepository`, `StatsRepository` (catalog), `TenantScopedStatsRepository` (private entities), `TenantScopedCrudRepository`, `BatchCount`, `withTenantScope`, `withTenantScopeForAggregate` (aggregate `$match` only). Unit specs in `persistence/helpers/*.spec.ts` and `persistence/repositories/*.spec.ts`.
+- `persistence/`: generic MongoDB layer — `CrudRepository` + `CrudMapperInterface` (DTO-aware create/update/filter/sort), `StatsRepository`, `scoped()` / `global()` tenant composition on both, `withObjectIdRefs` for filter ObjectId refs, `BatchCount`, `withTenantScope`, `withTenantScopeForAggregate` (aggregate `$match` only). Unit specs in `persistence/helpers/*.spec.ts` and `persistence/repositories/*.spec.ts`.
 - `filters/persistence-exception.filter.ts`: global `APP_FILTER` — maps persistence errors to HTTP exceptions: Mongo `E11000`/`E11001` → 409, Mongo `121` + Mongoose `ValidationError`/`CastError` → 400, `MongooseServerSelectionError` → 503. Services do not catch these; use `assertDuplicate` / `assertReferencesExist` in `common/helpers/assert.helper.ts` only for domain-specific pre-checks.
 - `events/`: `domain-events.ts` (event name constants), `skill-deleted.event.ts`, `organization-deleted.event.ts` (neutral payload classes).
 - `enums/credential-kind.enum.ts`: shared `CredentialKind` enum (`SESSION`, `API_TOKEN`).
@@ -132,15 +132,16 @@ Do not use Mongoose `pre('deleteOne')` hooks — they miss `findByIdAndDelete` /
 
 ## The patterns to follow when extending
 
-Copy `src/modules/skills/` and adapt:
+Copy `src/modules/courses/` (or `educations/`) and adapt:
 
 1. Mongoose model: `src/modules/<name>/schemas/<name>.schema.ts` extending `BaseModel`.
-2. GraphQL entity: `modules/<name>/entities/<name>.entity.ts` extending `BaseEntity`; export `Paginated<Name>Entity = createPaginatedModel(...)`.
-3. Inputs: `Create`, `Update` (PartialType), `Filter` (`PartialType(PickType(Create, [...]))` — explicit whitelist; never `PartialType(Create)` wholesale), `Sort` (SortType factory).
-4. Repository: `<entity>.repository.ts` extends `CrudRepository<T>` from `core/persistence/repositories/crud.repository.ts`. Catalog entities: `readonly stats: StatsRepository<T>` for dashboard. Owner-scoped entities: `readonly tenant: TenantScopedCrudRepository<T>` and `readonly tenantStats: TenantScopedStatsRepository<T>` (see ADR 001). Entity-specific queries (e.g. `UsersRepository.findOneByEmailWithPassword`) stay on the repository subclass.
-5. Service: explicit CRUD methods delegating to `repository.tenant.*` for owner-scoped entities. `AuthContext` is **required** on every method — no `null`, no `*Unscoped` escape hatches. Batch mutations return `BatchEntity`-shaped `BatchCount` (`{ succeeded, failed }`). Domain logic (events, password hashing, `detachSkill`, `purgeByOrganization`) stays in the service; cascades use raw `repository.updateMany` / `repository.deleteMany`.
-6. Resolver: explicit `@Query` / `@Mutation` methods; private entities — no `@Public()`, `@Auth() ctx: AuthContext` on every operation. Copy `courses.resolver.ts` once Course reference is complete.
-7. Module: `MongooseModule.forFeature`, providers (include repository), export service if needed for loaders. Import in `app.module.ts`.
+2. GraphQL entity: `modules/<name>/entities/<name>.entity.ts` extending `BaseEntity`; export `Paginated<Name>Entity = createPaginatedModel(...)`. When the entity has `@ResolveField` relations, define `<Name>EntityRecord` (`Omit<Entity, resolved fields>`) for mapper/repository typing.
+3. Mapper: `modules/<name>/mappers/<name>.mapper.ts` implementing `CrudMapperInterface` — `toDomain`, `toPersistenceForCreate/Update/Filter/Sort`; use `toObjectId` / `toObjectIds` from `core/mappers/base.mapper` for refs in create, update, and filter (`withObjectIdRefs` from `core/persistence/helpers/filter-ref.helper`).
+4. Inputs: `Create`, `Update` (PartialType), `Filter` (`PartialType(PickType(Create, [...]))` — explicit whitelist; never `PartialType(Create)` wholesale), `Sort` (SortType factory).
+5. Repository: `<entity>.repository.ts` — `readonly crud: CrudRepository<Model, EntityRecord, …>` and `readonly stats: StatsRepository<Model>`; cascade helpers (`detachSkill`, `purgeByOrganization`) use raw `model` when needed. Entity-specific queries (e.g. `UsersRepository.findOneByEmailWithPassword`) stay on the repository class.
+6. Service: explicit CRUD methods delegating to `repository.crud.scoped(toTenantScope(ctx))` for owner-scoped entities (catalog: unscoped `repository.crud`). `AuthContext` is **required** on every tenant method — no `null`, no `*Unscoped` escape hatches. Return `MultiPaged<T>` from `findMany`; batch mutations return `BatchEntity`-shaped `BatchCount`. Domain logic (events, password hashing, token secret) stays in the service; cascades call repository helpers, not `repository.crud.updateMany` from the service.
+7. Resolver: explicit `@Query` / `@Mutation` methods; private entities — no `@Public()`, `@Auth() ctx: AuthContext` on every operation. Copy `courses.resolver.ts`.
+8. Module: `MongooseModule.forFeature`, providers (include repository), export service if needed for loaders. Import in `app.module.ts`.
 
 If other modules reference the new entity in arrays: add payload to `core/events/`, emit from `removeOne` / `removeMany`, add a service method in each consumer (e.g. `detachSkill`), and a thin listener that delegates to it.
 
@@ -169,7 +170,7 @@ Run from `apps/api/` or via root `api:*` aliases: `dev`, `prod`, `build`, `start
 ## Gotchas & notes
 
 - **NestJS GraphQL resolver hot-reload:** changing a resolver method signature (`@Auth`, `@Args`, `@Context` order or count) under `nest start --watch` can leave **stale parameter-binding metadata** for that method only. Symptom: one query (e.g. `findManyEducations`) throws `Cannot read properties of null (reading 'userId')` in `toTenantScope`, while sibling entities with identical resolver shape work. **Do not refactor auth or param decorators until this is ruled out.** First step: **restart the API process** (stop `nr dev`, start again) or revert + clean restart. Compare `ROUTE_ARGS_METADATA` with a working resolver if unsure. Only change code if the error survives a full restart.
-- **Tenant `countByField` / aggregate:** `withTenantScope` uses string `userId` for `find`/`countDocuments` (Mongoose casts). `TenantScopedStatsRepository.countByField` must use `withTenantScopeForAggregate` so `$match.ownerId` is `ObjectId` — otherwise USER dashboards show empty `experiencesByCategory` / `coursesByStatus` while totals and SUPER_ADMIN charts work.
+- **Tenant `countByField` / aggregate:** `withTenantScope` uses string `userId` for `find`/`countDocuments` (Mongoose casts). `StatsRepository.scoped(ctx).countByField` uses `withTenantScopeForAggregate` so `$match.ownerId` is `ObjectId` — otherwise USER dashboards show empty `experiencesByCategory` / `coursesByStatus` while totals and SUPER_ADMIN charts work.
 - `ValidationPipe` has `whitelist: true`: on `@InputType`, use `@RequiredField()` / `@OptionalField()` — never bare `@Field` (silently dropped). Both exist mainly to register the property with `class-validator` for whitelist; `@RequiredField` uses `@IsDefined()`, `@OptionalField` uses `@IsOptional()`. Stack `@Is*` when you need format validation.
 - Regenerate `src/schema.gql` after type changes so admin codegen stays in sync. E2E/integration tests use in-memory schema (`autoSchemaFile: true` when `NODE_ENV=test`) so they never overwrite the committed file — `TestAppModule` omits `AiToolsModule` and would strip AI types if it wrote to disk.
 - New public GraphQL fields need `@Public()` or they 401.

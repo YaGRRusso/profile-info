@@ -254,8 +254,8 @@ Do **not** start phase N+1 until phase N passes its [entity gate](#entity-gate).
 | `ownerId` on private schemas + `{ ownerId, slug }` unique index | Done |
 | Catalog FKs `organizationId` / `skillIds` on private schemas | Done |
 | `AuthContext` + helpers (incl. API token types) | Done |
-| `core/persistence/` (`CrudRepository`, `StatsRepository`, `TenantScopedCrudRepository`) | Done |
-| All repos extend `CrudRepository`; services use `*OneById` / `BatchCount` | Done |
+| `core/persistence/` (`CrudRepository`, `StatsRepository`, `scoped()` composition) | Done |
+| All repos use `CrudRepository` + mapper; services use `crud.scoped(ctx).*` / `*OneById` / `BatchCount` | Done |
 | `BatchEntity { succeeded, failed }` | Done |
 | DataLoaders: `batchOrganizations`, `batchSkills`, `batchUsers` | Done |
 | Seed: multi-user `ownerId` on private data | Done |
@@ -264,8 +264,8 @@ Do **not** start phase N+1 until phase N passes its [entity gate](#entity-gate).
 
 | Layer | State |
 |-------|-------|
-| `CoursesRepository.tenant` | Done |
-| `CoursesService` — required `ctx`, `repository.tenant.*` | Done |
+| `CoursesRepository` — `crud` + `stats` | Done |
+| `CoursesService` — required `ctx`, `repository.crud.scoped(ctx).*` | Done |
 | `CoursesResolver` — no `@Public()`, `@Auth()` on all ops, `@ResolveField` for `owner` / `organization` / `skills` | Done |
 | `CourseEntity` — output scalars + resolved objects | Done |
 | Unit tests (`courses.service.spec.ts`, `tenant-scoped-crud.repository.spec.ts`) | Done |

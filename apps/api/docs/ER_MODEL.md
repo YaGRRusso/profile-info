@@ -177,8 +177,8 @@ inputs use `organizationId` and `skillIds` (no `ownerId` — injected from conte
 
 - **Source:** `src/modules/courses/schemas/course.schema.ts`
 - **Key fields:** `ownerId` (required), `slug` (unique per owner), `status` (enum,
-  indexed), `url`, `image`, `hours`, `relevance`, `period`, `i18n[]`
-- **Embedded:** `i18n[]` translations, `period`
+  indexed), `url`, `image`, `hours`, `relevance`, `i18n[]`
+- **Embedded:** `i18n[]` translations
 - **References:** `ownerId` → User; `organizationId` → Organization; `skillIds[]` → Skill
 
 ### Project (`projects`)

@@ -34,7 +34,7 @@ src/
 │   ├── enums/          Enums compartilhados (UserRole, SortEnum)
 │   ├── events/         Domain events (payloads + constantes de nomes)
 │   ├── inputs/         Inputs GraphQL genéricos (pagination, sort factory)
-│   ├── persistence/    CrudRepository, StatsRepository, TenantScopedCrudRepository
+│   ├── persistence/    CrudRepository, StatsRepository, CrudMapperInterface, scoped()
 │   └── schemas/        Mongoose sub-schemas reutilizáveis
 │                       Regra: NÃO importa de modules/ nem integrations/.
 │
@@ -65,31 +65,27 @@ integrations → modules (PROIBIDO) (adapters não conhecem domínio)
 
 ## Estrutura de um Módulo (Micro)
 
-Usando `skills/` como exemplo:
+Usando `courses/` como exemplo:
 
 ```
-modules/skills/
-├── skills.module.ts        ← Composição: imports, providers, exports
-├── skills.resolver.ts      ← Camada de APRESENTAÇÃO (GraphQL I/O)
-├── skills.service.ts       ← Camada de APLICAÇÃO (regras de negócio)
-├── skills.repository.ts    ← Persistência tipada (extends CrudRepository)
-├── skills-loader.service.ts ← DataLoader para nested fields
-├── skills.service.spec.ts  ← Testes unitários do service
-│
+modules/courses/
+├── courses.module.ts
+├── courses.resolver.ts
+├── courses.service.ts
+├── courses.repository.ts
+├── mappers/
+│   └── course.mapper.ts    ← Model ↔ domain record; DTO → persistence
 ├── schemas/
-│   └── skill.schema.ts     ← Mongoose model
-│
+│   └── course.schema.ts
 ├── entities/
-│   └── skill.entity.ts     ← GraphQL ObjectType (apresentação de saída)
-│
+│   └── course.entity.ts
 ├── dto/
-│   ├── create-skill.input.ts  ← GraphQL InputType + class-validator
-│   ├── update-skill.input.ts
-│   ├── filter-skill.input.ts
-│   └── sort-skill.input.ts
-│
+│   ├── create-course.input.ts
+│   ├── update-course.input.ts
+│   ├── filter-course.input.ts
+│   └── sort-course.input.ts
 └── enums/
-    └── category.enum.ts    ← Enum registrado no GraphQL
+    └── status.enum.ts
 ```
 
 ### Responsabilidades
@@ -98,7 +94,7 @@ modules/skills/
 |--------|---------|-----------|---------------|
 | Apresentação | `resolver.ts` | Recebe input, valida tipos, chama service, retorna | Lógica de negócio |
 | Aplicação | `service.ts` | Orquestra regras, emite eventos, chama repository | Saber se é GraphQL ou REST |
-| Persistência | `schema.ts` + `*Repository` (`CrudRepository` / `tenant`) | CRUD MongoDB, validação de schema | Regras de negócio |
+| Persistência | `schema.ts` + `repository.ts` + `mappers/` | CRUD via `CrudRepository` + mapper; cascade ops on raw `model` | Regras de negócio |
 | Validação de entrada | `dto/*.input.ts` | Valida shape + constraints (class-validator) | Regras de domínio complexas |
 
 ---
@@ -152,15 +148,18 @@ export class OnSkillDeletedListener {
 
 ### Acesso a dados genérico → `core/persistence/`
 ```typescript
-// CrudRepository<T> — find/create/update/delete; batch → BatchCount
-// StatsRepository<T> — count, countByField, findRecentlyUpdated
-// TenantScopedCrudRepository<T> — wrapper com ownerId scope (composição)
+// CrudRepository + CrudMapperInterface — find/create/update/delete; batch → BatchCount
+// StatsRepository — count, countByField, findRecentlyUpdated
+// scoped(TenantScope) — ownerId filter composition (no separate wrapper class)
 
 @Injectable()
-export class SkillsRepository extends CrudRepository<SkillModel> {
-  readonly stats = new StatsRepository(this.model);
-  constructor(@InjectModel(SkillModel.name) model: Model<SkillModel>) {
-    super(model);
+export class CoursesRepository {
+  readonly crud: CrudRepository<CourseModel, CourseEntityRecord, ...>;
+  readonly stats: StatsRepository<CourseModel>;
+
+  constructor(@InjectModel(CourseModel.name) model: Model<CourseModel>) {
+    this.crud = new CrudRepository(model, new CourseMapper());
+    this.stats = new StatsRepository(model);
   }
 }
 ```

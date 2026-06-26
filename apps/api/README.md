@@ -45,7 +45,7 @@ modules         ← business domains (resolvers, services, schemas)
 ### Request flow (typical)
 
 ```
-HTTP → Apollo → GqlAuthGuard → RolesGuard → Resolver → Service → Mongoose
+HTTP → Apollo → GqlAuthGuard → RolesGuard → Resolver → Service → Repository (CrudRepository + mapper) → Mongoose
                               ↘ @ResolveField → DataLoader → Service
 ```
 
@@ -102,7 +102,7 @@ src/
 ├── schema.gql                # Auto-generated (commit after API type changes)
 ├── common/
 ├── core/
-│   └── persistence/          # CrudRepository, StatsRepository, TenantScopedCrudRepository
+│   └── persistence/          # CrudRepository, StatsRepository, CrudMapperInterface, scoped()
 ├── integrations/
 │   ├── open-router/          # AI port + OpenRouter adapter
 │   ├── github/
