@@ -8,7 +8,7 @@ import type {
   SessionAuthContext,
 } from "./auth-context.interface";
 
-interface AuthContextUser {
+export interface AuthContextUser {
   id: string;
   role?: UserRole;
 }

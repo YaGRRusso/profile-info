@@ -10,7 +10,6 @@ import type { GraphqlContext } from "@/core/context/graphql-context.interface";
 import { PUBLIC_KEY } from "@/core/decorators/public-route.decorator";
 import { ROLES_KEY } from "@/core/decorators/roles.decorator";
 import { UserRole } from "@/core/enums/user-role.enum";
-import { UserModel } from "@/modules/users/schemas/user.schema";
 
 @Injectable()
 export class RolesGuard implements CanActivate {
@@ -34,9 +33,7 @@ export class RolesGuard implements CanActivate {
     if (!requiredRoles?.length) return true;
 
     const ctx = GqlExecutionContext.create(context);
-    const user = (ctx.getContext() as GraphqlContext).req.user as
-      | UserModel
-      | undefined;
+    const user = (ctx.getContext() as GraphqlContext).req.user;
 
     if (!user?.role || !requiredRoles.includes(user.role)) {
       throw new ForbiddenException("Insufficient permissions");
