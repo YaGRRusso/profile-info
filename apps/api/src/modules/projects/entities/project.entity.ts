@@ -52,3 +52,5 @@ export class ProjectEntity extends BaseEntity {
 }
 
 export const PaginatedProjectEntity = createPaginatedModel(ProjectEntity);
+
+export type ProjectEntityRecord = Omit<ProjectEntity, "owner" | "skills">;
