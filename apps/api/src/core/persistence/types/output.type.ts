@@ -10,3 +10,10 @@ export interface BatchCount {
   failed: number;
   succeeded: number;
 }
+
+export interface FieldCount {
+  label: string;
+  value: number;
+}
+
+export type RecentUpdateRow = Record<string, unknown> & { updatedAt: Date };
