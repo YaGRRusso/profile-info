@@ -95,8 +95,16 @@ describe("CourseMapper", () => {
 
   it("maps filter input to a persistence query", () => {
     expect(
-      mapper.toPersistenceForFilter({ slug: "typescript-fundamentals" })
-    ).toEqual({ slug: "typescript-fundamentals" });
+      mapper.toPersistenceForFilter({
+        slug: "typescript-fundamentals",
+        organizationId,
+        skillIds: [skillId],
+      })
+    ).toEqual({
+      slug: "typescript-fundamentals",
+      organizationId: new mongoose.Types.ObjectId(organizationId),
+      skillIds: [new mongoose.Types.ObjectId(skillId)],
+    });
   });
 
   it("maps sort input to a persistence sort", () => {

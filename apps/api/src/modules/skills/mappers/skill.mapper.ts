@@ -5,6 +5,7 @@ import {
   type UpdateQuery,
 } from "mongoose";
 import { toBaseEntityFields } from "@/core/mappers/base.mapper";
+import { withObjectIdRefs } from "@/core/persistence/helpers/filter-ref.helper";
 import type { CrudMapperInterface } from "@/core/persistence/repositories/crud/crud.interface";
 import { CreateSkillInput } from "../dto/create-skill.input";
 import { FilterSkillInput } from "../dto/filter-skill.input";
@@ -44,7 +45,7 @@ export class SkillMapper
   }
 
   toPersistenceForFilter(entity: FilterSkillInput): QueryFilter<SkillModel> {
-    return { ...entity } as QueryFilter<SkillModel>;
+    return withObjectIdRefs(entity, {});
   }
 
   toPersistenceForSort(

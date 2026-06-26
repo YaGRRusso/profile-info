@@ -6,6 +6,7 @@ import {
 } from "mongoose";
 import { toBaseEntityFields } from "@/core/mappers/base.mapper";
 import { toTranslationEntityList } from "@/core/mappers/translation.mapper";
+import { withObjectIdRefs } from "@/core/persistence/helpers/filter-ref.helper";
 import type { CrudMapperInterface } from "@/core/persistence/repositories/crud/crud.interface";
 import { CreateOrganizationInput } from "../dto/create-organization.input";
 import { FilterOrganizationInput } from "../dto/filter-organization.input";
@@ -58,7 +59,7 @@ export class OrganizationMapper
   toPersistenceForFilter(
     entity: FilterOrganizationInput
   ): QueryFilter<OrganizationModel> {
-    return { ...entity } as QueryFilter<OrganizationModel>;
+    return withObjectIdRefs(entity, {});
   }
 
   toPersistenceForSort(

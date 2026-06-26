@@ -82,8 +82,14 @@ describe("ProjectMapper", () => {
   });
 
   it("maps filter input to a persistence query", () => {
-    expect(mapper.toPersistenceForFilter({ slug: "portfolio-app" })).toEqual({
+    expect(
+      mapper.toPersistenceForFilter({
+        slug: "portfolio-app",
+        skillIds: [skillId],
+      })
+    ).toEqual({
       slug: "portfolio-app",
+      skillIds: [new mongoose.Types.ObjectId(skillId)],
     });
   });
 

@@ -105,8 +105,16 @@ describe("EducationMapper", () => {
   });
 
   it("maps filter input to a persistence query", () => {
-    expect(mapper.toPersistenceForFilter({ slug: "bachelor-cs" })).toEqual({
+    expect(
+      mapper.toPersistenceForFilter({
+        slug: "bachelor-cs",
+        organizationId,
+        skillIds: [skillId],
+      })
+    ).toEqual({
       slug: "bachelor-cs",
+      organizationId: new mongoose.Types.ObjectId(organizationId),
+      skillIds: [new mongoose.Types.ObjectId(skillId)],
     });
   });
 

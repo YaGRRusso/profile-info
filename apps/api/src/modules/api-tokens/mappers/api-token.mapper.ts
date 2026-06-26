@@ -9,6 +9,7 @@ import {
   toIdString,
   toObjectId,
 } from "@/core/mappers/base.mapper";
+import { withObjectIdRefs } from "@/core/persistence/helpers/filter-ref.helper";
 import type { CrudMapperInterface } from "@/core/persistence/repositories/crud/crud.interface";
 import { CreateApiTokenInput } from "../dto/create-api-token.input";
 import { FilterApiTokenInput } from "../dto/filter-api-token.input";
@@ -62,7 +63,7 @@ export class ApiTokenMapper
   toPersistenceForFilter(
     entity: FilterApiTokenInput
   ): QueryFilter<ApiTokenModel> {
-    return { ...entity } as QueryFilter<ApiTokenModel>;
+    return withObjectIdRefs(entity, {});
   }
 
   toPersistenceForSort(

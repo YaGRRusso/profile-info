@@ -115,8 +115,16 @@ describe("ExperienceMapper", () => {
   });
 
   it("maps filter input to a persistence query", () => {
-    expect(mapper.toPersistenceForFilter({ slug: "acme-corp" })).toEqual({
+    expect(
+      mapper.toPersistenceForFilter({
+        slug: "acme-corp",
+        organizationId,
+        roles: [{ skillIds: [skillId] }],
+      })
+    ).toEqual({
       slug: "acme-corp",
+      organizationId: new mongoose.Types.ObjectId(organizationId),
+      roles: [{ skillIds: [new mongoose.Types.ObjectId(skillId)] }],
     });
   });
 
