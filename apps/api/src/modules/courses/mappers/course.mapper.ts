@@ -13,6 +13,7 @@ import {
 } from "@/core/mappers/base.mapper";
 import { toTranslationEntityList } from "@/core/mappers/translation.mapper";
 import { withObjectIdRefs } from "@/core/persistence/helpers/filter-ref.helper";
+import { toPersistenceSort } from "@/core/persistence/helpers/sort-ref.helper";
 import type { CrudMapperInterface } from "@/core/persistence/repositories/crud/crud.interface";
 import { CreateCourseInput } from "../dto/create-course.input";
 import { FilterCourseInput } from "../dto/filter-course.input";
@@ -84,6 +85,6 @@ export class CourseMapper
   toPersistenceForSort(
     entity: SortCourseInput
   ): Record<keyof CourseModel, SortOrder> {
-    return { ...entity } as Record<keyof CourseModel, SortOrder>;
+    return toPersistenceSort<SortCourseInput, CourseModel>(entity);
   }
 }

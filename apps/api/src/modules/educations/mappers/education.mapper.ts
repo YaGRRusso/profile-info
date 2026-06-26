@@ -14,6 +14,7 @@ import {
 import { toDateRangeEntity } from "@/core/mappers/date-range.mapper";
 import { toTranslationEntityList } from "@/core/mappers/translation.mapper";
 import { withObjectIdRefs } from "@/core/persistence/helpers/filter-ref.helper";
+import { toPersistenceSort } from "@/core/persistence/helpers/sort-ref.helper";
 import type { CrudMapperInterface } from "@/core/persistence/repositories/crud/crud.interface";
 import { CreateEducationInput } from "../dto/create-education.input";
 import { FilterEducationInput } from "../dto/filter-education.input";
@@ -93,6 +94,6 @@ export class EducationMapper
   toPersistenceForSort(
     entity: SortEducationInput
   ): Record<keyof EducationModel, SortOrder> {
-    return { ...entity } as Record<keyof EducationModel, SortOrder>;
+    return toPersistenceSort<SortEducationInput, EducationModel>(entity);
   }
 }

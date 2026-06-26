@@ -1,66 +1,53 @@
-import { BadRequestException, NotFoundException } from "@nestjs/common";
-import { getModelToken } from "@nestjs/mongoose";
 import { Test, TestingModule } from "@nestjs/testing";
 import { testAuthContext } from "@test/fixtures/auth-context";
-import mongoose, { Model } from "mongoose";
-import { UserRole } from "@/core/enums/user-role.enum";
+import { toTenantScope } from "@/core/context/auth-context.helper";
+import {
+  createMockCrud,
+  createMockStats,
+} from "@/core/persistence/repositories/testing/service-spec.mock";
 import { CourseStatus } from "@/modules/courses/enums/status.enum";
-import { CourseModel } from "@/modules/courses/schemas/course.schema";
 import { CoursesRepository } from "./courses.repository";
 import { CoursesService } from "./courses.service";
 
-const validId = new mongoose.Types.ObjectId().toHexString();
-const invalidId = "not-an-object-id";
 const ownerId = "507f1f77bcf86cd799439011";
 const organizationId = "507f1f77bcf86cd799439012";
+const validId = "507f1f77bcf86cd799439013";
 const ctx = testAuthContext({ userId: ownerId });
-const fakeDoc = {
-  _id: validId,
+
+const fakeEntity = {
   id: validId,
   ownerId,
   slug: "bootcamp",
-} as unknown as CourseModel;
-
-function makeExec(returnValue: unknown) {
-  return {
-    sort: jest.fn().mockReturnThis(),
-    skip: jest.fn().mockReturnThis(),
-    limit: jest.fn().mockReturnThis(),
-    exec: jest.fn().mockResolvedValue(returnValue),
-  };
-}
+};
 
 describe("CoursesService", () => {
   let service: CoursesService;
-  let model: jest.Mocked<Model<CourseModel>>;
+  let crud: ReturnType<typeof createMockCrud>;
+  let repository: {
+    crud: ReturnType<typeof createMockCrud>;
+    stats: ReturnType<typeof createMockStats>;
+    detachSkill: jest.Mock;
+    purgeByOrganization: jest.Mock;
+  };
 
   beforeEach(async () => {
     jest.clearAllMocks();
+    crud = createMockCrud();
+    repository = {
+      crud,
+      stats: createMockStats(),
+      detachSkill: jest.fn(),
+      purgeByOrganization: jest.fn(),
+    };
 
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         CoursesService,
-        CoursesRepository,
-        {
-          provide: getModelToken(CourseModel.name),
-          useValue: {
-            findById: jest.fn(),
-            findOne: jest.fn(),
-            find: jest.fn(),
-            create: jest.fn(),
-            findByIdAndUpdate: jest.fn(),
-            findOneAndUpdate: jest.fn(),
-            updateMany: jest.fn(),
-            findByIdAndDelete: jest.fn(),
-            findOneAndDelete: jest.fn(),
-            deleteMany: jest.fn(),
-          },
-        },
+        { provide: CoursesRepository, useValue: repository },
       ],
     }).compile();
 
-    service = module.get<CoursesService>(CoursesService);
-    model = module.get(getModelToken(CourseModel.name));
+    service = module.get(CoursesService);
   });
 
   it("should be defined", () => {
@@ -68,29 +55,14 @@ describe("CoursesService", () => {
   });
 
   describe("findOneById", () => {
-    it("should scope by ownerId", async () => {
-      (model.findOne as jest.Mock).mockReturnValue(makeExec(fakeDoc));
+    it("delegates to scoped crud", async () => {
+      crud.findOneById.mockResolvedValue(fakeEntity);
 
-      expect(await service.findOneById(ctx, validId)).toEqual(
-        expect.objectContaining({ id: validId, ownerId })
+      await expect(service.findOneById(ctx, validId)).resolves.toEqual(
+        fakeEntity
       );
-      expect(model.findOne).toHaveBeenCalledWith({
-        _id: validId,
-        ownerId,
-      });
-    });
-
-    it("should throw BadRequestException for invalid ID", async () => {
-      await expect(service.findOneById(ctx, invalidId)).rejects.toThrow(
-        BadRequestException
-      );
-    });
-
-    it("should throw NotFoundException when not found", async () => {
-      (model.findOne as jest.Mock).mockReturnValue(makeExec(null));
-      await expect(service.findOneById(ctx, validId)).rejects.toThrow(
-        NotFoundException
-      );
+      expect(crud.scoped).toHaveBeenCalledWith(toTenantScope(ctx));
+      expect(crud.findOneById).toHaveBeenCalledWith(validId);
     });
   });
 
@@ -110,87 +82,67 @@ describe("CoursesService", () => {
       ],
     };
 
-    it("should inject ownerId for regular users", async () => {
-      (model.create as jest.Mock).mockResolvedValue(fakeDoc);
+    it("delegates to scoped crud", async () => {
+      crud.createOne.mockResolvedValue(fakeEntity);
 
-      const result = await service.createOne(ctx, createInput);
-
-      expect(result).toEqual(expect.objectContaining({ id: validId, ownerId }));
-      expect(model.create).toHaveBeenCalledWith(
-        expect.objectContaining({ ownerId })
+      await expect(service.createOne(ctx, createInput)).resolves.toEqual(
+        fakeEntity
       );
-    });
-
-    it("should inject ownerId from context for super admins", async () => {
-      const superAdminCtx = testAuthContext({
-        role: UserRole.SUPER_ADMIN,
-        userId: ownerId,
-      });
-      (model.create as jest.Mock).mockResolvedValue(fakeDoc);
-
-      await service.createOne(superAdminCtx, createInput);
-
-      expect(model.create).toHaveBeenCalledWith(
-        expect.objectContaining({ ownerId })
-      );
+      expect(crud.scoped).toHaveBeenCalledWith(toTenantScope(ctx));
+      expect(crud.createOne).toHaveBeenCalledWith(createInput);
     });
   });
 
   describe("updateOne", () => {
-    it("should return the updated document", async () => {
-      (model.findOneAndUpdate as jest.Mock).mockReturnValue(makeExec(fakeDoc));
+    it("delegates to scoped crud", async () => {
+      crud.updateOneById.mockResolvedValue(fakeEntity);
 
-      expect(await service.updateOne(ctx, validId, {})).toEqual(
-        expect.objectContaining({ id: validId, ownerId })
+      await expect(service.updateOne(ctx, validId, {})).resolves.toEqual(
+        fakeEntity
       );
-      expect(model.findOneAndUpdate).toHaveBeenCalledWith(
-        { _id: validId, ownerId },
-        {},
-        { returnDocument: "after", runValidators: true }
-      );
-    });
-
-    it("should throw BadRequestException for invalid ID", async () => {
-      await expect(service.updateOne(ctx, invalidId, {})).rejects.toThrow(
-        BadRequestException
-      );
+      expect(crud.scoped).toHaveBeenCalledWith(toTenantScope(ctx));
+      expect(crud.updateOneById).toHaveBeenCalledWith(validId, {});
     });
   });
 
   describe("removeOne", () => {
-    it("should return the removed document", async () => {
-      (model.findOneAndDelete as jest.Mock).mockReturnValue(makeExec(fakeDoc));
+    it("delegates to scoped crud", async () => {
+      crud.deleteOneById.mockResolvedValue(fakeEntity);
 
-      expect(await service.removeOne(ctx, validId)).toEqual(
-        expect.objectContaining({ id: validId, ownerId })
+      await expect(service.removeOne(ctx, validId)).resolves.toEqual(
+        fakeEntity
       );
-      expect(model.findOneAndDelete).toHaveBeenCalledWith({
-        _id: validId,
-        ownerId,
-      });
-    });
-
-    it("should throw BadRequestException for invalid ID", async () => {
-      await expect(service.removeOne(ctx, invalidId)).rejects.toThrow(
-        BadRequestException
-      );
+      expect(crud.scoped).toHaveBeenCalledWith(toTenantScope(ctx));
+      expect(crud.deleteOneById).toHaveBeenCalledWith(validId);
     });
   });
 
   describe("removeMany", () => {
-    it("should return batch succeeded and failed counts", async () => {
-      (model.deleteMany as jest.Mock).mockReturnValue(
-        makeExec({ deletedCount: 1 })
-      );
+    it("delegates to scoped crud", async () => {
+      crud.deleteManyById.mockResolvedValue({ succeeded: 1, failed: 0 });
 
-      expect(await service.removeMany(ctx, [validId])).toEqual({
+      await expect(service.removeMany(ctx, [validId])).resolves.toEqual({
         succeeded: 1,
         failed: 0,
       });
-      expect(model.deleteMany).toHaveBeenCalledWith({
-        _id: { $in: [validId] },
-        ownerId,
-      });
+      expect(crud.scoped).toHaveBeenCalledWith(toTenantScope(ctx));
+      expect(crud.deleteManyById).toHaveBeenCalledWith([validId]);
+    });
+  });
+
+  describe("detachSkill", () => {
+    it("delegates to repository helper", async () => {
+      await service.detachSkill(validId);
+      expect(repository.detachSkill).toHaveBeenCalledWith(validId);
+    });
+  });
+
+  describe("purgeByOrganization", () => {
+    it("delegates to repository helper", async () => {
+      await service.purgeByOrganization(organizationId);
+      expect(repository.purgeByOrganization).toHaveBeenCalledWith(
+        organizationId
+      );
     });
   });
 });

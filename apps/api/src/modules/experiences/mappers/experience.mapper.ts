@@ -14,6 +14,7 @@ import {
 import { toDateRangeEntity } from "@/core/mappers/date-range.mapper";
 import { toTranslationEntityList } from "@/core/mappers/translation.mapper";
 import { withObjectIdRefs } from "@/core/persistence/helpers/filter-ref.helper";
+import { toPersistenceSort } from "@/core/persistence/helpers/sort-ref.helper";
 import type { CrudMapperInterface } from "@/core/persistence/repositories/crud/crud.interface";
 import { CreateExperienceInput } from "../dto/create-experience.input";
 import { FilterExperienceInput } from "../dto/filter-experience.input";
@@ -116,6 +117,6 @@ export class ExperienceMapper
   toPersistenceForSort(
     entity: SortExperienceInput
   ): Record<keyof ExperienceModel, SortOrder> {
-    return { ...entity } as Record<keyof ExperienceModel, SortOrder>;
+    return toPersistenceSort<SortExperienceInput, ExperienceModel>(entity);
   }
 }

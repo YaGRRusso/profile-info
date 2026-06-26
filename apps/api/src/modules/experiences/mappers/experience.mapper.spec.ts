@@ -119,12 +119,32 @@ describe("ExperienceMapper", () => {
       mapper.toPersistenceForFilter({
         slug: "acme-corp",
         organizationId,
-        roles: [{ skillIds: [skillId] }],
+        roles: [
+          {
+            skillIds: [skillId],
+            i18n: [
+              {
+                locale: "en",
+                messages: { title: "Engineer", description: "Work" },
+              },
+            ],
+          },
+        ],
       })
     ).toEqual({
       slug: "acme-corp",
       organizationId: new mongoose.Types.ObjectId(organizationId),
-      roles: [{ skillIds: [new mongoose.Types.ObjectId(skillId)] }],
+      roles: [
+        {
+          skillIds: [new mongoose.Types.ObjectId(skillId)],
+          i18n: [
+            {
+              locale: "en",
+              messages: { title: "Engineer", description: "Work" },
+            },
+          ],
+        },
+      ],
     });
   });
 

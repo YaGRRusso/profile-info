@@ -10,6 +10,7 @@ import {
   toObjectId,
 } from "@/core/mappers/base.mapper";
 import { withObjectIdRefs } from "@/core/persistence/helpers/filter-ref.helper";
+import { toPersistenceSort } from "@/core/persistence/helpers/sort-ref.helper";
 import type { CrudMapperInterface } from "@/core/persistence/repositories/crud/crud.interface";
 import { CreateApiTokenInput } from "../dto/create-api-token.input";
 import { FilterApiTokenInput } from "../dto/filter-api-token.input";
@@ -69,6 +70,6 @@ export class ApiTokenMapper
   toPersistenceForSort(
     entity: SortApiTokenInput
   ): Record<keyof ApiTokenModel, SortOrder> {
-    return { ...entity } as Record<keyof ApiTokenModel, SortOrder>;
+    return toPersistenceSort<SortApiTokenInput, ApiTokenModel>(entity);
   }
 }

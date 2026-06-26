@@ -6,6 +6,7 @@ import {
 } from "mongoose";
 import { toBaseEntityFields } from "@/core/mappers/base.mapper";
 import { withObjectIdRefs } from "@/core/persistence/helpers/filter-ref.helper";
+import { toPersistenceSort } from "@/core/persistence/helpers/sort-ref.helper";
 import type { CrudMapperInterface } from "@/core/persistence/repositories/crud/crud.interface";
 import { CreateSkillInput } from "../dto/create-skill.input";
 import { FilterSkillInput } from "../dto/filter-skill.input";
@@ -51,6 +52,6 @@ export class SkillMapper
   toPersistenceForSort(
     entity: SortSkillInput
   ): Record<keyof SkillModel, SortOrder> {
-    return { ...entity } as Record<keyof SkillModel, SortOrder>;
+    return toPersistenceSort<SortSkillInput, SkillModel>(entity);
   }
 }

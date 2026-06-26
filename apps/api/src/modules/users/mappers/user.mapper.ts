@@ -8,6 +8,7 @@ import { toBaseEntityFields } from "@/core/mappers/base.mapper";
 import { toTranslationEntityList } from "@/core/mappers/translation.mapper";
 import { toUrlEntityList } from "@/core/mappers/url.mapper";
 import { withObjectIdRefs } from "@/core/persistence/helpers/filter-ref.helper";
+import { toPersistenceSort } from "@/core/persistence/helpers/sort-ref.helper";
 import type { CrudMapperInterface } from "@/core/persistence/repositories/crud/crud.interface";
 import { CreateUserInput } from "../dto/create-user.input";
 import { FilterUserInput } from "../dto/filter-user.input";
@@ -66,6 +67,6 @@ export class UserMapper
   toPersistenceForSort(
     entity: SortUserInput
   ): Record<keyof UserModel, SortOrder> {
-    return { ...entity } as Record<keyof UserModel, SortOrder>;
+    return toPersistenceSort<SortUserInput, UserModel>(entity);
   }
 }

@@ -13,6 +13,7 @@ import {
 import { toTranslationEntityList } from "@/core/mappers/translation.mapper";
 import { toUrlEntityList } from "@/core/mappers/url.mapper";
 import { withObjectIdRefs } from "@/core/persistence/helpers/filter-ref.helper";
+import { toPersistenceSort } from "@/core/persistence/helpers/sort-ref.helper";
 import type { CrudMapperInterface } from "@/core/persistence/repositories/crud/crud.interface";
 import { CreateProjectInput } from "../dto/create-project.input";
 import { FilterProjectInput } from "../dto/filter-project.input";
@@ -77,6 +78,6 @@ export class ProjectMapper
   toPersistenceForSort(
     entity: SortProjectInput
   ): Record<keyof ProjectModel, SortOrder> {
-    return { ...entity } as Record<keyof ProjectModel, SortOrder>;
+    return toPersistenceSort<SortProjectInput, ProjectModel>(entity);
   }
 }
