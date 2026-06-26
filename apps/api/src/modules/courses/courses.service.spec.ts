@@ -4,6 +4,7 @@ import { Test, TestingModule } from "@nestjs/testing";
 import { testAuthContext } from "@test/fixtures/auth-context";
 import mongoose, { Model } from "mongoose";
 import { UserRole } from "@/core/enums/user-role.enum";
+import { CourseStatus } from "@/modules/courses/enums/status.enum";
 import { CourseModel } from "@/modules/courses/schemas/course.schema";
 import { CoursesRepository } from "./courses.repository";
 import { CoursesService } from "./courses.service";
@@ -11,6 +12,7 @@ import { CoursesService } from "./courses.service";
 const validId = new mongoose.Types.ObjectId().toHexString();
 const invalidId = "not-an-object-id";
 const ownerId = "507f1f77bcf86cd799439011";
+const organizationId = "507f1f77bcf86cd799439012";
 const ctx = testAuthContext({ userId: ownerId });
 const fakeDoc = {
   _id: validId,
@@ -93,12 +95,25 @@ describe("CoursesService", () => {
   });
 
   describe("createOne", () => {
+    const createInput = {
+      slug: "bootcamp",
+      organizationId,
+      status: CourseStatus.COMPLETE,
+      i18n: [
+        {
+          locale: "en",
+          messages: {
+            title: "Bootcamp",
+            description: "Intensive course",
+          },
+        },
+      ],
+    };
+
     it("should inject ownerId for regular users", async () => {
       (model.create as jest.Mock).mockResolvedValue(fakeDoc);
 
-      const result = await service.createOne(ctx, {
-        slug: "bootcamp",
-      } as any);
+      const result = await service.createOne(ctx, createInput);
 
       expect(result).toEqual(expect.objectContaining({ id: validId, ownerId }));
       expect(model.create).toHaveBeenCalledWith(
@@ -113,7 +128,7 @@ describe("CoursesService", () => {
       });
       (model.create as jest.Mock).mockResolvedValue(fakeDoc);
 
-      await service.createOne(superAdminCtx, { slug: "bootcamp" } as any);
+      await service.createOne(superAdminCtx, createInput);
 
       expect(model.create).toHaveBeenCalledWith(
         expect.objectContaining({ ownerId })

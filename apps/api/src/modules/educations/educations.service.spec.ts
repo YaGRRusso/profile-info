@@ -4,6 +4,8 @@ import { Test, TestingModule } from "@nestjs/testing";
 import { testAuthContext } from "@test/fixtures/auth-context";
 import mongoose, { Model } from "mongoose";
 import { UserRole } from "@/core/enums/user-role.enum";
+import { EducationLevel } from "@/modules/educations/enums/level.enum";
+import { EducationStatus } from "@/modules/educations/enums/status.enum";
 import { EducationModel } from "@/modules/educations/schemas/education.schema";
 import { EducationsRepository } from "./educations.repository";
 import { EducationsService } from "./educations.service";
@@ -11,6 +13,7 @@ import { EducationsService } from "./educations.service";
 const validId = new mongoose.Types.ObjectId().toHexString();
 const invalidId = "not-an-object-id";
 const ownerId = "507f1f77bcf86cd799439011";
+const organizationId = "507f1f77bcf86cd799439012";
 const ctx = testAuthContext({ userId: ownerId });
 const fakeDoc = {
   _id: validId,
@@ -93,12 +96,26 @@ describe("EducationsService", () => {
   });
 
   describe("createOne", () => {
+    const createInput = {
+      slug: "bachelor-cs",
+      organizationId,
+      level: EducationLevel.BACHELOR,
+      status: EducationStatus.COMPLETE,
+      i18n: [
+        {
+          locale: "en",
+          messages: {
+            title: "Computer Science",
+            description: "Bachelor degree",
+          },
+        },
+      ],
+    };
+
     it("should inject ownerId for regular users", async () => {
       (model.create as jest.Mock).mockResolvedValue(fakeDoc);
 
-      const result = await service.createOne(ctx, {
-        slug: "bachelor-cs",
-      } as any);
+      const result = await service.createOne(ctx, createInput);
 
       expect(result).toEqual(expect.objectContaining({ id: validId, ownerId }));
       expect(model.create).toHaveBeenCalledWith(
@@ -113,9 +130,7 @@ describe("EducationsService", () => {
       });
       (model.create as jest.Mock).mockResolvedValue(fakeDoc);
 
-      await service.createOne(superAdminCtx, {
-        slug: "bachelor-cs",
-      } as any);
+      await service.createOne(superAdminCtx, createInput);
 
       expect(model.create).toHaveBeenCalledWith(
         expect.objectContaining({ ownerId })

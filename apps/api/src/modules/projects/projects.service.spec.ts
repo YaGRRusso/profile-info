@@ -93,12 +93,23 @@ describe("ProjectsService", () => {
   });
 
   describe("createOne", () => {
+    const createInput = {
+      slug: "portfolio-app",
+      i18n: [
+        {
+          locale: "en",
+          messages: {
+            title: "Portfolio",
+            description: "My portfolio app",
+          },
+        },
+      ],
+    };
+
     it("should inject ownerId for regular users", async () => {
       (model.create as jest.Mock).mockResolvedValue(fakeDoc);
 
-      const result = await service.createOne(ctx, {
-        slug: "portfolio-app",
-      } as any);
+      const result = await service.createOne(ctx, createInput);
 
       expect(result).toEqual(expect.objectContaining({ id: validId, ownerId }));
       expect(model.create).toHaveBeenCalledWith(
@@ -113,9 +124,7 @@ describe("ProjectsService", () => {
       });
       (model.create as jest.Mock).mockResolvedValue(fakeDoc);
 
-      await service.createOne(superAdminCtx, {
-        slug: "portfolio-app",
-      } as any);
+      await service.createOne(superAdminCtx, createInput);
 
       expect(model.create).toHaveBeenCalledWith(
         expect.objectContaining({ ownerId })
