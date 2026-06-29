@@ -9,12 +9,12 @@ import { CoursesModule } from "@/modules/courses/courses.module";
 import { DashboardModule } from "@/modules/dashboard/dashboard.module";
 import { EducationsModule } from "@/modules/educations/educations.module";
 import { ExperiencesModule } from "@/modules/experiences/experiences.module";
-import { GraphqlModule } from "@/modules/graphql/graphql.module";
 import { OrganizationsModule } from "@/modules/organizations/organizations.module";
 import { ProjectsModule } from "@/modules/projects/projects.module";
 import { ResumeModule } from "@/modules/resume/resume.module";
 import { SkillsModule } from "@/modules/skills/skills.module";
 import { UsersModule } from "@/modules/users/users.module";
+import { GraphqlModule } from "@/platform/graphql/graphql.module";
 
 @Module({
   imports: [

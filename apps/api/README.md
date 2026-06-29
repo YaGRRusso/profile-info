@@ -26,6 +26,8 @@ core            ← shared Nest/GraphQL/Mongoose primitives, event contracts
 integrations    ← external APIs; each folder = one adapter + port (abstract class)
   ↑
 modules         ← business domains (resolvers, services, schemas)
+  ↑
+platform        ← transport composition (GraphQL wiring, DataLoader aggregation)
 ```
 
 | Folder | What it is | Why it exists |
@@ -36,8 +38,8 @@ modules         ← business domains (resolvers, services, schemas)
 | **`integrations/github/`** | GitHub adapter for repository metadata (`RepositoryMetadataProvider`). | Same port pattern as Tavily/OpenRouter. |
 | **`integrations/tavily/`** | Tavily adapter for web content extraction (`WebContentProvider`). | Used by resource-detail extractors. |
 | **`modules/`** | Business domains. Each CRUD entity = resolver + service + schema + entity + dto. | Where profile rules and GraphQL operations live. |
+| **`platform/graphql/`** | `GraphqlModule` + `LoadersService`. Wires Apollo; composes loaders exported by entity modules. | Transport composition — batching logic stays in each `*LoaderService`. |
 | **`modules/auth/`** | JWT guard, `signIn`, `getMe`. Global auth, not a CRUD entity. | Security cross-cut; uses `UsersService.findOneByEmailWithPassword`. |
-| **`modules/graphql/`** | `GraphqlModule` + `LoadersService`. Wires Apollo; composes loaders exported by entity modules. | Transport infra — batching logic stays in each `*LoaderService`. |
 | **`modules/dashboard/`** | Read-only stats; imports other modules' **services** (not Mongoose models). | Aggregation without bypassing service boundaries. |
 | **`modules/resume/`** | Aggregates a user's profile data and renders a PDF via `GET /resume.pdf?userId=&locale=`. Uses `pdfkit`; imports feature services like dashboard. | CV export for admin and external portfolio clients. |
 | **`modules/ai-tools/`** | AI use-cases (summarize, translate, ATS). Owns `AiEntity`, enums, and mappers. | Converts `IntegrationChatResult` → GraphQL; orchestrates `*ExtractorService` before calling `AiChatProvider`. |

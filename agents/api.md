@@ -12,7 +12,7 @@ when schemas, references, or delete behavior change.
 
 The NestJS GraphQL API for profile-info. It is code-first: GraphQL types are TypeScript classes with `@ObjectType` / `@InputType` / `@Field` decorators, and the schema is generated to `src/schema.gql`. Data lives in MongoDB via Mongoose. Every operation except `signIn` requires a JWT. The admin app is the only known client.
 
-The source is a modular monolith with a strict dependency rule (`modules → integrations → common` and `modules → core → common`; `common` imports nothing; `integrations` never import from `modules`). The top-level layers under `src/` are `common/` (pure TS), `core/` (cross-cutting NestJS infra), `integrations/` (external system adapters), and `modules/` (business domains).
+The source is a modular monolith with a strict dependency rule (`modules → platform → integrations → core → common`; `platform` imports `modules` for composition only; `common` imports nothing; `integrations` never import from `modules`). The top-level layers under `src/` are `common/` (pure TS), `core/` (cross-cutting NestJS infra), `integrations/` (external system adapters), `platform/` (transport composition — GraphQL wiring, DataLoader aggregation), and `modules/` (business domains).
 
 Feature modules follow the same explicit CRUD pattern: resolver → service → repository (`CrudRepository` + mapper). Copy `src/modules/courses/` as the reference implementation.
 
@@ -29,7 +29,7 @@ Entry point `src/main.ts`:
 - `EventEmitterModule.forRoot({ global: true })`.
 - `ConfigModule.forRoot({ isGlobal: true })`.
 - `MongooseModule.forRootAsync` reads `DATABASE_URL`.
-- `GraphqlModule` (`modules/graphql/graphql.module.ts`): wraps `GraphQLModule.forRootAsync` with `ApolloDriver`, schema at `src/schema.gql`, and per-request DataLoaders via `createLoaders(...)` from `modules/graphql/loaders.helper.ts`.
+- `GraphqlModule` (`platform/graphql/graphql.module.ts`): wraps `GraphQLModule.forRootAsync` with `ApolloDriver`, schema at `src/schema.gql`, and per-request DataLoaders via `LoadersService`.
 - Feature modules: `AuthModule`, CRUD entities, `DashboardModule` (read-only aggregation), `ResumeModule` (PDF export), `AiToolsModule`.
 
 Request flow: Apollo → `GqlAuthGuard` (unless `@Public()`) → resolver → service → repository (`CrudRepository` + mapper) → Mongoose. Nested fields use `@ResolveField` + per-request DataLoaders. REST routes (e.g. `GET /resume.pdf`) skip `GqlAuthGuard` when `context.getType() !== "graphql"`.
@@ -49,7 +49,7 @@ Full diagram and field detail: `apps/api/docs/ER_MODEL.md`.
 - **@nestjs/jwt + passport**: global 8h JWT in `src/auth/`.
 - **@nestjs/event-emitter**: domain events on delete (see below).
 - **bcryptjs**: password hashing in `users/users.service.ts`.
-- **dataloader + lodash**: `modules/graphql/loaders.helper.ts`.
+- **dataloader + lodash**: per-entity `*LoaderService` in feature modules; `platform/graphql/loaders.service.ts` composes them per request.
 - **class-validator / class-transformer**: input validation via global `ValidationPipe`.
 
 ## Module / directory breakdown
@@ -87,9 +87,11 @@ Full diagram and field detail: `apps/api/docs/ER_MODEL.md`.
 
 DI pattern is the NestJS-idiomatic **abstract class as token**: ports are abstract classes (no `Symbol`, no `@Inject()`); modules bind `{ provide: Port, useClass: Impl }` and consumers inject the port by type. A service implementing a port `extends` it and must call `super()` in its constructor.
 
-`modules/` (business domains):
+`platform/` (transport composition — may import `modules/`; not a business domain):
 
-- `graphql/`: `graphql.module.ts` (single module — Apollo wiring), `loaders.service.ts` (composes per-entity loaders), `context.interface.ts` (`Ctx`). `forRootAsync` injects exported `*LoaderService` from entity modules; batching logic stays in those services.
+- `graphql/`: `graphql.module.ts` (Apollo `forRootAsync` + per-request context), `loaders.service.ts` (composes exported `*LoaderService` from entity modules), `loaders.types.ts` (`Loaders` interface), `context.interface.ts` (`Ctx`). Batching logic stays in each entity's `*LoaderService`.
+
+`modules/` (business domains):
 - `auth/`: global `GqlAuthGuard` (JWT + `UNAUTHENTICATED` GraphQL extension) and `RolesGuard` (`@Roles(SUPER_ADMIN)` on catalog mutations and user CRUD). `signIn` (`@Public`) returns JWT; catalog/user **queries** require JWT (phase 5a); `getMe` returns current user; `updateMe` lets any authenticated user update their own profile (no `role` in input). `@CurrentUser()` → `UserEntity` from JWT strategy (`AuthContextUser` on `req.user`). `@Auth()` → `AuthContext` (`core/context/auth-context.interface.ts`): authenticated caller (`userId`, `role`, `credentialKind`; API tokens add `permissions`). Session: `toSessionAuthContext()` from `AuthContextUser`; API tokens (future guard): `toApiTokenAuthContext()`. Helpers in `auth-context.helper.ts`: `isSession`, `isApiToken`, `isSuperAdmin`, `hasPermission`, `toTenantScope`. Distinct from GraphQL `@Context()` (`Ctx` / loaders). Private entities: `@Auth()` on all ops, `repository.crud.scoped(toTenantScope(ctx)).*`, required `ctx` (Course is the reference).
 - `ai-tools/`: AI use-cases (`atsSummarize`, `summarize`, `translate`). Any authenticated user (JWT); `@Roles(SUPER_ADMIN)` removed in phase 5b. `GqlThrottlerGuard` + `@Throttle` on resolver. Owns `AiEntity` GraphQL types, enums (`ChatRole`, `ChatFinishReason`), and mappers (`IntegrationChatResult` → `AiEntity`). `resource-detail/` orchestrates `*ExtractorService` classes. Injects `AiChatProvider`, `RepositoryMetadataProvider`, `WebContentProvider`. `AiToolsModule` imports `OpenRouterModule`, `GithubModule`, `TavilyModule`.
 - `dashboard/`: read-only aggregation via feature **services**. `@Auth() ctx` on `dashboard` query. Private entities: `count(ctx)` / `countByField(ctx)` / `findRecentActivity(ctx)` (tenant-scoped). Catalog (`skills`, `organizations`): global `count()` / stats. USER sees own private totals + full catalog; `SUPER_ADMIN` sees all private data (`crossTenant`).
@@ -115,7 +117,7 @@ Notable specifics:
 
 - `modules/users/users.service.ts`: hashes password on create; `findOneByEmailWithPassword` (with `select("+password")`) is auth-only — public CRUD methods never load password.
 - `modules/experiences/experiences.resolver.ts`: `@ResolveField` for `organization`, `skills`, sorted `roles`.
-- `modules/skills/` and `modules/organizations/` export `SkillsLoaderService` / `OrganizationsLoaderService`; `LoadersService` composes them per request.
+- `modules/skills/` and `modules/organizations/` export `SkillsLoaderService` / `OrganizationsLoaderService`; `platform/graphql/loaders.service.ts` composes them per request.
 
 ## Domain events (delete cascade)
 
@@ -148,7 +150,7 @@ Copy `src/modules/courses/` (or `educations/`) and adapt:
 
 If other modules reference the new entity in arrays: add payload to `core/events/`, emit from `removeOne` / `removeMany`, add a service method in each consumer (e.g. `detachSkill`), and a thin listener that delegates to it.
 
-For nested `@ResolveField`, use DataLoaders from `ctx.loaders`; add a `*LoaderService` in the entity module, export it, and wire it in `LoadersService`.
+For nested `@ResolveField`, use DataLoaders from `ctx.loaders`; add a `*LoaderService` in the entity module, export it, and wire it in `platform/graphql/loaders.service.ts`.
 
 CRUD field names follow the skills convention: `findOneSkillById`, `findManySkills`, `createOneSkill`, etc. Check `src/schema.gql` for exact names.
 
