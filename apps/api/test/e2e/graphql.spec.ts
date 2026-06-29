@@ -203,7 +203,7 @@ describe("GraphQL (e2e)", () => {
       ],
     });
 
-    const portfolioCtx = testAuthContext({ userId: portfolioUserId });
+    const portfolioCtx = testAuthContext({ id: portfolioUserId });
 
     const experience = await experiencesService.createOne(portfolioCtx, {
       slug: "nested-experience",

@@ -10,7 +10,7 @@ import { ProjectsService } from "./projects.service";
 
 const ownerId = "507f1f77bcf86cd799439011";
 const validId = "507f1f77bcf86cd799439013";
-const ctx = testAuthContext({ userId: ownerId });
+const ctx = testAuthContext({ id: ownerId });
 
 const fakeEntity = {
   id: validId,

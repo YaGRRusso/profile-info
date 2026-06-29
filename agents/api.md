@@ -77,7 +77,7 @@ Full diagram and field detail: `apps/api/docs/ER_MODEL.md`.
 - `inputs/`: pagination, sort factory, date-range, translation, url inputs.
 - `decorators/`: `@RequiredField()`, `@OptionalField()` (GraphQL input validation only).
 - `configs/`: `app.config.ts`, `validation.config.ts`.
-- `context/`: `auth-context.interface.ts` (`AuthContextUser`, `AuthContext` union), `auth-context.helper.ts` (`toSessionAuthContext`, `toTenantScope`, `hasPermission`, …). Service-layer auth contract — not GraphQL transport.
+- `context/`: `auth-context.interface.ts` (`AuthContextUser` with `id` + `role?`; `SessionAuthContext` / `ApiTokenAuthContext` extend it; `AuthContext` union), `auth-context.helper.ts` (`toSessionAuthContext`, `toTenantScope` maps `ctx.id` → `TenantScope.userId`, `hasPermission`, …). Service-layer auth contract — not GraphQL transport.
 - `pdf/`: cross-cutting PDF infra — `PdfRenderService` (PDFKit document lifecycle → `Buffer`), `PdfModule`. Rendering primitives (context, theme, layout) live in `common/pdf/`. Import `PdfModule` from use-case modules that export PDFs.
 
 `integrations/` (each owns its port — an **abstract class** used as the DI token — plus neutral types; map vendor types → neutral contracts; never import from `modules`):

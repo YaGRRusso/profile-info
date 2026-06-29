@@ -36,11 +36,9 @@ export function hasPermission(
 export function toSessionAuthContext(
   user: AuthContextUser
 ): SessionAuthContext {
-  const role = user.role ?? UserRole.USER;
-
   return {
-    userId: user.id,
-    role,
+    ...user,
+    role: user.role ?? UserRole.USER,
     credentialKind: CredentialKind.SESSION,
   };
 }
@@ -49,16 +47,14 @@ export function toApiTokenAuthContext(
   user: AuthContextUser,
   permissions: ApiTokenPermission[]
 ): ApiTokenAuthContext {
-  const role = user.role ?? UserRole.USER;
-
   return {
-    userId: user.id,
-    role,
+    ...user,
+    role: user.role ?? UserRole.USER,
     credentialKind: CredentialKind.API_TOKEN,
     permissions,
   };
 }
 
 export function toTenantScope(ctx: AuthContext): TenantScope {
-  return { userId: ctx.userId, crossTenant: isSuperAdmin(ctx) };
+  return { userId: ctx.id, crossTenant: isSuperAdmin(ctx) };
 }

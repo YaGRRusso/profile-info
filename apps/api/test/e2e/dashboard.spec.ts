@@ -127,8 +127,8 @@ describe("Dashboard (e2e)", () => {
       category: SkillCategory.BACKEND,
     });
 
-    const aliceCtx = testAuthContext({ userId: alice.id });
-    const bobCtx = testAuthContext({ userId: bob.id });
+    const aliceCtx = testAuthContext({ id: alice.id });
+    const bobCtx = testAuthContext({ id: bob.id });
 
     await coursesService.createOne(aliceCtx, {
       slug: "alice-course-complete",

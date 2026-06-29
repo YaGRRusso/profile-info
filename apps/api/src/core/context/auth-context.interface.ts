@@ -7,16 +7,11 @@ export interface AuthContextUser {
   role?: UserRole;
 }
 
-interface AuthContextBase {
-  role: UserRole;
-  userId: string;
-}
-
-export interface SessionAuthContext extends AuthContextBase {
+export interface SessionAuthContext extends AuthContextUser {
   credentialKind: CredentialKind.SESSION;
 }
 
-export interface ApiTokenAuthContext extends AuthContextBase {
+export interface ApiTokenAuthContext extends AuthContextUser {
   credentialKind: CredentialKind.API_TOKEN;
   permissions: ApiTokenPermission[];
 }

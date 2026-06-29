@@ -4,7 +4,7 @@ import { toTenantScope } from "./auth-context.helper";
 
 describe("toTenantScope", () => {
   it("scopes to the caller userId for regular users", () => {
-    const ctx = testAuthContext({ userId: "user-a" });
+    const ctx = testAuthContext({ id: "user-a" });
 
     expect(toTenantScope(ctx)).toEqual({
       userId: "user-a",
@@ -16,7 +16,7 @@ describe("toTenantScope", () => {
     const ctx = testAuthContext({ role: UserRole.SUPER_ADMIN });
 
     expect(toTenantScope(ctx)).toEqual({
-      userId: ctx.userId,
+      userId: ctx.id,
       crossTenant: true,
     });
   });

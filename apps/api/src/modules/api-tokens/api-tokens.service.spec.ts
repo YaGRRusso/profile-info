@@ -22,9 +22,9 @@ jest.mock("./helpers/api-token-secret.helper", () => ({
 
 const validId = "507f1f77bcf86cd799439013";
 const ownerId = "507f1f77bcf86cd799439011";
-const ctx = testAuthContext({ userId: ownerId });
+const ctx = testAuthContext({ id: ownerId });
 const apiTokenCtx = testApiTokenAuthContext([ApiTokenPermission.QUERY], {
-  userId: ownerId,
+  id: ownerId,
 });
 
 const fakeEntity = {

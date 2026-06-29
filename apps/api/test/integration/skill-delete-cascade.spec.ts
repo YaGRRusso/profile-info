@@ -63,7 +63,7 @@ describe("Skill delete cascade (integration)", () => {
       category: SkillCategory.LANGUAGE,
     });
 
-    const ownerCtx = testAuthContext({ userId: owner.id });
+    const ownerCtx = testAuthContext({ id: owner.id });
 
     const course = await coursesService.createOne(ownerCtx, {
       slug: "typescript-course",
