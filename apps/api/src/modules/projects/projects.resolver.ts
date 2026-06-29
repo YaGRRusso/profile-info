@@ -9,12 +9,12 @@ import {
   Resolver,
 } from "@nestjs/graphql";
 import type { AuthContext } from "@/core/context/auth-context.interface";
+import type { GraphqlContext } from "@/core/context/graphql-context.interface";
 import { BatchEntity } from "@/core/entities/batch.entity";
 import { PaginationInput } from "@/core/inputs/pagination.input";
 import { Auth } from "@/modules/auth/decorators/auth-context.decorator";
 import { SkillEntity } from "@/modules/skills/entities/skill.entity";
 import { UserEntity } from "@/modules/users/entities/user.entity";
-import type { Ctx } from "@/platform/graphql/context.interface";
 import { CreateProjectInput } from "./dto/create-project.input";
 import { FilterProjectInput } from "./dto/filter-project.input";
 import { SortProjectInput } from "./dto/sort-project.input";
@@ -143,13 +143,13 @@ export class ProjectsResolver {
   }
 
   @ResolveField(() => UserEntity)
-  owner(@Parent() project: ProjectEntity, @Context() ctx: Ctx) {
+  owner(@Parent() project: ProjectEntity, @Context() ctx: GraphqlContext) {
     if (!project?.ownerId) return null;
     return ctx.loaders.batchUsers.load(project.ownerId);
   }
 
   @ResolveField(() => [SkillEntity])
-  skills(@Parent() project: ProjectEntity, @Context() ctx: Ctx) {
+  skills(@Parent() project: ProjectEntity, @Context() ctx: GraphqlContext) {
     const ids = project.skillIds;
     if (!ids) return [];
     return ctx.loaders.batchSkills.loadMany(ids);

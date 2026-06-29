@@ -33,12 +33,12 @@ platform        ← transport composition (GraphQL wiring, DataLoader aggregatio
 | Folder | What it is | Why it exists |
 |--------|------------|---------------|
 | **`common/`** | Framework-agnostic utilities (`clearObject`, `assertValidObjectId`, `orchestrate`). | Reusable logic without Nest/Mongoose/GraphQL coupling. |
-| **`core/`** | Cross-cutting infra: configs, decorators, shared inputs/entities, `domain-events`, `UserRole`. | Things many modules need but that are not tied to one entity. |
+| **`core/`** | Cross-cutting infra: configs, validation decorators, shared inputs/entities, `domain-events`, `AuthContext`, `UserRole`. | Domain/service contracts — not GraphQL transport. |
 | **`integrations/open-router/`** | OpenRouter adapter + AI port (`ai-chat.provider.ts`). Binds `AiChatProvider` → `OpenRouterService`; mappers translate SDK ↔ loose DTO. | SDK and port live together; `ai-tools` owns strong GraphQL types. |
 | **`integrations/github/`** | GitHub adapter for repository metadata (`RepositoryMetadataProvider`). | Same port pattern as Tavily/OpenRouter. |
 | **`integrations/tavily/`** | Tavily adapter for web content extraction (`WebContentProvider`). | Used by resource-detail extractors. |
 | **`modules/`** | Business domains. Each CRUD entity = resolver + service + schema + entity + dto. | Where profile rules and GraphQL operations live. |
-| **`platform/graphql/`** | `GraphqlModule` + `LoadersService`. Wires Apollo; composes loaders exported by entity modules. | Transport composition — batching logic stays in each `*LoaderService`. |
+| **`platform/graphql/`** | GraphQL transport: `GraphqlModule`, `LoadersService`, loader registry augmentation. | Apollo wiring and per-request context. |
 | **`modules/auth/`** | JWT guard, `signIn`, `getMe`. Global auth, not a CRUD entity. | Security cross-cut; uses `UsersService.findOneByEmailWithPassword`. |
 | **`modules/dashboard/`** | Read-only stats; imports other modules' **services** (not Mongoose models). | Aggregation without bypassing service boundaries. |
 | **`modules/resume/`** | Aggregates a user's profile data and renders a PDF via `GET /resume.pdf?userId=&locale=`. Uses `pdfkit`; imports feature services like dashboard. | CV export for admin and external portfolio clients. |
@@ -72,7 +72,7 @@ The threat model is intentional, not accidental:
 
 - Private portfolio data requires JWT; `USER` sees only `ownerId === ctx.userId` (404 on wrong ID).
 - Catalog reads require JWT (phase 5a); mutations remain `SUPER_ADMIN`.
-- Missing or invalid JWT on protected operations returns GraphQL error extension `code: UNAUTHENTICATED` (the admin client clears auth on this).
+- Missing or invalid JWT: guards throw `UnauthorizedException`; Apollo `formatError` exposes `extensions.code: UNAUTHENTICATED`. Insufficient role → `ForbiddenException` → `FORBIDDEN`. Admin clears auth on `UNAUTHENTICATED`.
 - `signIn` always returns `401 Unauthorized` for invalid credentials — no email enumeration via `404`.
 - Passwords are bcrypt-hashed on create **and** update; the hash is never exposed via GraphQL (`select: false`).
 

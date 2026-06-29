@@ -5,11 +5,11 @@ import { JwtModule } from "@nestjs/jwt";
 import { PassportModule } from "@nestjs/passport";
 import type { Env } from "@/core/configs/env.validation";
 import { UsersModule } from "@/modules/users/users.module";
-import { GqlAuthGuard } from "./auth.guard";
 import { AuthResolver } from "./auth.resolver";
 import { AuthService } from "./auth.service";
 import { AuthStrategy } from "./auth.strategy";
-import { RolesGuard } from "./roles.guard";
+import { GqlAuthGuard } from "./guards/gql-auth.guard";
+import { RolesGuard } from "./guards/gql-roles.guard";
 
 @Module({
   imports: [

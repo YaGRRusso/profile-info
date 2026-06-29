@@ -1,10 +1,10 @@
 import { ExecutionContext, ForbiddenException } from "@nestjs/common";
 import { Reflector } from "@nestjs/core";
 import { GqlExecutionContext } from "@nestjs/graphql";
-import { PUBLIC_KEY } from "@/core/decorators/public-route.decorator";
+import { PUBLIC_KEY } from "@/core/decorators/public.decorator";
 import { ROLES_KEY } from "@/core/decorators/roles.decorator";
 import { UserRole } from "@/core/enums/user-role.enum";
-import { RolesGuard } from "./roles.guard";
+import { RolesGuard } from "./gql-roles.guard";
 
 describe("RolesGuard", () => {
   const reflector = {

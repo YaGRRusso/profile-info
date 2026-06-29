@@ -5,13 +5,9 @@ import type { TenantScope } from "@/core/persistence/types/scope.type";
 import type {
   ApiTokenAuthContext,
   AuthContext,
+  AuthContextUser,
   SessionAuthContext,
 } from "./auth-context.interface";
-
-export interface AuthContextUser {
-  id: string;
-  role?: UserRole;
-}
 
 export function isSuperAdmin(ctx: AuthContext): boolean {
   return ctx.role === UserRole.SUPER_ADMIN;

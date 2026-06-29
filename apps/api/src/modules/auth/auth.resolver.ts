@@ -1,5 +1,5 @@
 import { Args, Mutation, Query, Resolver } from "@nestjs/graphql";
-import { Public } from "@/core/decorators/public-route.decorator";
+import { Public } from "@/core/decorators/public.decorator";
 import { CurrentUser } from "@/modules/auth/decorators/current-user.decorator";
 import { UserEntity } from "@/modules/users/entities/user.entity";
 import { AuthService } from "./auth.service";

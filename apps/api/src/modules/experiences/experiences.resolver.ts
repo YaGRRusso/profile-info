@@ -10,13 +10,13 @@ import {
 } from "@nestjs/graphql";
 import { sortDateRange } from "@/common/helpers/daterange.helper";
 import type { AuthContext } from "@/core/context/auth-context.interface";
+import type { GraphqlContext } from "@/core/context/graphql-context.interface";
 import { BatchEntity } from "@/core/entities/batch.entity";
 import { PaginationInput } from "@/core/inputs/pagination.input";
 import { Auth } from "@/modules/auth/decorators/auth-context.decorator";
 import { OrganizationEntity } from "@/modules/organizations/entities/organization.entity";
 import { SkillEntity } from "@/modules/skills/entities/skill.entity";
 import { UserEntity } from "@/modules/users/entities/user.entity";
-import type { Ctx } from "@/platform/graphql/context.interface";
 import { CreateExperienceInput } from "./dto/create-experience.input";
 import { FilterExperienceInput } from "./dto/filter-experience.input";
 import { SortExperienceInput } from "./dto/sort-experience.input";
@@ -156,7 +156,10 @@ export class ExperiencesResolver {
   }
 
   @ResolveField(() => UserEntity)
-  owner(@Parent() experience: ExperienceEntity, @Context() ctx: Ctx) {
+  owner(
+    @Parent() experience: ExperienceEntity,
+    @Context() ctx: GraphqlContext
+  ) {
     if (!experience?.ownerId) return null;
     return ctx.loaders.batchUsers.load(experience.ownerId);
   }
@@ -169,13 +172,19 @@ export class ExperiencesResolver {
   }
 
   @ResolveField(() => OrganizationEntity)
-  organization(@Parent() experience: ExperienceEntity, @Context() ctx: Ctx) {
+  organization(
+    @Parent() experience: ExperienceEntity,
+    @Context() ctx: GraphqlContext
+  ) {
     if (!experience?.organizationId) return null;
     return ctx.loaders.batchOrganizations.load(experience.organizationId);
   }
 
   @ResolveField(() => [SkillEntity])
-  skills(@Parent() experience: ExperienceEntity, @Context() ctx: Ctx) {
+  skills(
+    @Parent() experience: ExperienceEntity,
+    @Context() ctx: GraphqlContext
+  ) {
     const ids = new Set<string>();
 
     for (const role of experience.roles) {
@@ -193,7 +202,7 @@ export class ExperiencesResolver {
 @Resolver(() => ExperienceRole)
 export class ExperienceRoleResolver {
   @ResolveField(() => [SkillEntity])
-  skills(@Parent() role: ExperienceRole, @Context() ctx: Ctx) {
+  skills(@Parent() role: ExperienceRole, @Context() ctx: GraphqlContext) {
     const ids = role.skillIds;
     if (!ids) return [];
     return ctx.loaders.batchSkills.loadMany(ids);

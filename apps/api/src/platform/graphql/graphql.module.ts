@@ -13,6 +13,7 @@ import { SkillsLoaderService } from "@/modules/skills/skills-loader.service";
 import { UsersModule } from "@/modules/users/users.module";
 import { UsersLoaderService } from "@/modules/users/users-loader.service";
 import { LoadersService } from "./loaders.service";
+import "./loaders.registry";
 
 @Module({
   imports: [

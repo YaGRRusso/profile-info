@@ -8,7 +8,7 @@ import {
 } from "@nestjs/common";
 import { assertValidObjectId } from "@/common/helpers/object-id.helper";
 import { normalizeLocale } from "@/common/i18n/locales";
-import { Public } from "@/core/decorators/public-route.decorator";
+import { Public } from "@/core/decorators/public.decorator";
 import { PdfRenderService } from "@/core/pdf/pdf-render.service";
 import {
   createResumePdfOptions,

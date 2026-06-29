@@ -2,6 +2,11 @@ import { ApiTokenPermission } from "@/core/enums/api-token-permission.enum";
 import { CredentialKind } from "@/core/enums/credential-kind.enum";
 import { UserRole } from "@/core/enums/user-role.enum";
 
+export interface AuthContextUser {
+  id: string;
+  role?: UserRole;
+}
+
 interface AuthContextBase {
   role: UserRole;
   userId: string;

@@ -1,7 +1,7 @@
+import type { AppLoaders } from "@/core/context/graphql-context.interface";
 import { OrganizationsLoaderService } from "@/modules/organizations/organizations-loader.service";
 import { SkillsLoaderService } from "@/modules/skills/skills-loader.service";
 import { UsersLoaderService } from "@/modules/users/users-loader.service";
-import type { Loaders } from "./loaders.types";
 
 export class LoadersService {
   constructor(
@@ -10,7 +10,7 @@ export class LoadersService {
     private readonly usersLoaderService: UsersLoaderService
   ) {}
 
-  createLoaders(): Loaders {
+  createLoaders(): AppLoaders {
     return {
       batchSkills: this.skillsLoaderService.createLoader(),
       batchOrganizations: this.organizationsLoaderService.createLoader(),

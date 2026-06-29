@@ -9,13 +9,13 @@ import {
   Resolver,
 } from "@nestjs/graphql";
 import type { AuthContext } from "@/core/context/auth-context.interface";
+import type { GraphqlContext } from "@/core/context/graphql-context.interface";
 import { BatchEntity } from "@/core/entities/batch.entity";
 import { PaginationInput } from "@/core/inputs/pagination.input";
 import { Auth } from "@/modules/auth/decorators/auth-context.decorator";
 import { OrganizationEntity } from "@/modules/organizations/entities/organization.entity";
 import { SkillEntity } from "@/modules/skills/entities/skill.entity";
 import { UserEntity } from "@/modules/users/entities/user.entity";
-import type { Ctx } from "@/platform/graphql/context.interface";
 import { CreateEducationInput } from "./dto/create-education.input";
 import { FilterEducationInput } from "./dto/filter-education.input";
 import { SortEducationInput } from "./dto/sort-education.input";
@@ -152,19 +152,22 @@ export class EducationsResolver {
   }
 
   @ResolveField(() => UserEntity)
-  owner(@Parent() education: EducationEntity, @Context() ctx: Ctx) {
+  owner(@Parent() education: EducationEntity, @Context() ctx: GraphqlContext) {
     if (!education?.ownerId) return null;
     return ctx.loaders.batchUsers.load(education.ownerId);
   }
 
   @ResolveField(() => OrganizationEntity)
-  organization(@Parent() education: EducationEntity, @Context() ctx: Ctx) {
+  organization(
+    @Parent() education: EducationEntity,
+    @Context() ctx: GraphqlContext
+  ) {
     if (!education?.organizationId) return null;
     return ctx.loaders.batchOrganizations.load(education.organizationId);
   }
 
   @ResolveField(() => [SkillEntity])
-  skills(@Parent() education: EducationEntity, @Context() ctx: Ctx) {
+  skills(@Parent() education: EducationEntity, @Context() ctx: GraphqlContext) {
     const ids = education.skillIds;
     if (!ids) return [];
     return ctx.loaders.batchSkills.loadMany(ids);
