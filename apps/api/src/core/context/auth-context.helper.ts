@@ -21,16 +21,15 @@ export function isApiToken(ctx: AuthContext): ctx is ApiTokenAuthContext {
   return ctx.credentialKind === CredentialKind.API_TOKEN;
 }
 
-/** Session JWT skips API-token permission checks; role and guards decide the rest. */
 export function hasPermission(
   ctx: AuthContext,
   permission: ApiTokenPermission
 ): boolean {
-  if (isSession(ctx)) {
-    return true;
+  if (isApiToken(ctx)) {
+    return ctx.permissions.includes(permission);
   }
 
-  return ctx.permissions.includes(permission);
+  return true;
 }
 
 export function toSessionAuthContext(

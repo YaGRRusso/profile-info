@@ -19,3 +19,9 @@ export function getGraphqlRequest(
 ): GraphqlContext["req"] {
   return getGraphqlContext(context).req;
 }
+
+export function getGraphqlResponse(
+  context: ExecutionContext
+): GraphqlContext["res"] {
+  return getGraphqlContext(context).res;
+}
