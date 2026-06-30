@@ -1,6 +1,7 @@
 import { UseGuards } from "@nestjs/common";
 import { Args, Mutation, Resolver } from "@nestjs/graphql";
 import { Throttle } from "@nestjs/throttler";
+import { SessionOnly } from "@/core/decorators/session-only.decorator";
 import { AiToolsService } from "./ai-tools.service";
 import { AtsSummarizeInput } from "./dto/ats-summarize.input";
 import { SummarizeInput } from "./dto/summarize.input";
@@ -8,6 +9,7 @@ import { TranslateInput } from "./dto/translate.input";
 import { AiEntity } from "./entities/ai-response.entity";
 import { GqlThrottlerGuard } from "./gql-throttler.guard";
 
+@SessionOnly()
 @UseGuards(GqlThrottlerGuard)
 @Throttle({ default: { limit: 5, ttl: 60_000 } })
 @Resolver(() => AiEntity)

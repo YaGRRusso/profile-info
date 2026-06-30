@@ -1,9 +1,5 @@
-import { UnauthorizedException } from "@nestjs/common";
 import { Test, TestingModule } from "@nestjs/testing";
-import {
-  testApiTokenAuthContext,
-  testAuthContext,
-} from "@test/fixtures/auth-context";
+import { testAuthContext } from "@test/fixtures/auth-context";
 import { hash } from "bcryptjs";
 import { toTenantScope } from "@/core/context/auth-context.helper";
 import { ApiTokenPermission } from "@/core/enums/api-token-permission.enum";
@@ -23,9 +19,6 @@ jest.mock("./helpers/api-token-secret.helper", () => ({
 const validId = "507f1f77bcf86cd799439013";
 const ownerId = "507f1f77bcf86cd799439011";
 const ctx = testAuthContext({ id: ownerId });
-const apiTokenCtx = testApiTokenAuthContext([ApiTokenPermission.QUERY], {
-  id: ownerId,
-});
 
 const fakeEntity = {
   id: validId,
@@ -60,14 +53,6 @@ describe("ApiTokensService", () => {
 
   it("should be defined", () => {
     expect(service).toBeDefined();
-  });
-
-  describe("session guard", () => {
-    it("should reject API token auth context", () => {
-      expect(() => service.findOneById(apiTokenCtx, validId)).toThrow(
-        UnauthorizedException
-      );
-    });
   });
 
   describe("findOneById", () => {

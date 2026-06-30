@@ -1,5 +1,6 @@
 import { Args, ID, Mutation, Query, Resolver } from "@nestjs/graphql";
 import type { AuthContext } from "@/core/context/auth-context.interface";
+import { SessionOnly } from "@/core/decorators/session-only.decorator";
 import { BatchEntity } from "@/core/entities/batch.entity";
 import { PaginationInput } from "@/core/inputs/pagination.input";
 import { Auth } from "@/modules/auth/decorators/auth-context.decorator";
@@ -14,6 +15,7 @@ import {
   PaginatedApiTokenEntity,
 } from "./entities/api-token.entity";
 
+@SessionOnly()
 @Resolver(() => ApiTokenEntity)
 export class ApiTokensResolver {
   constructor(private readonly apiTokensService: ApiTokensService) {}

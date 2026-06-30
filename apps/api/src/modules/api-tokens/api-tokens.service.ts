@@ -1,6 +1,6 @@
-import { Injectable, UnauthorizedException } from "@nestjs/common";
+import { Injectable } from "@nestjs/common";
 import { hash } from "bcryptjs";
-import { isSession, toTenantScope } from "@/core/context/auth-context.helper";
+import { toTenantScope } from "@/core/context/auth-context.helper";
 import type { AuthContext } from "@/core/context/auth-context.interface";
 import { BatchEntity } from "@/core/entities/batch.entity";
 import type { MultiPaged } from "@/core/persistence/types/output.type";
@@ -18,12 +18,10 @@ export class ApiTokensService {
   constructor(private readonly repository: ApiTokensRepository) {}
 
   findOneById(ctx: AuthContext, id: string): Promise<ApiTokenEntity> {
-    this.assertSession(ctx);
     return this.repository.crud.scoped(toTenantScope(ctx)).findOneById(id);
   }
 
   findManyById(ctx: AuthContext, ids: string[]): Promise<ApiTokenEntity[]> {
-    this.assertSession(ctx);
     return this.repository.crud.scoped(toTenantScope(ctx)).findManyById(ids);
   }
 
@@ -31,7 +29,6 @@ export class ApiTokensService {
     ctx: AuthContext,
     { filters }: { filters?: FilterApiTokenInput } = {}
   ): Promise<ApiTokenEntity> {
-    this.assertSession(ctx);
     return this.repository.crud.scoped(toTenantScope(ctx)).findOne({ filters });
   }
 
@@ -49,7 +46,6 @@ export class ApiTokensService {
       limit?: number;
     } = {}
   ): Promise<MultiPaged<ApiTokenEntity>> {
-    this.assertSession(ctx);
     return this.repository.crud.scoped(toTenantScope(ctx)).findMany({
       filters,
       sort,
@@ -62,7 +58,6 @@ export class ApiTokensService {
     ctx: AuthContext,
     input: CreateApiTokenInput
   ): Promise<NewApiTokenEntity> {
-    this.assertSession(ctx);
     const { plaintext, tokenId, secret } = emitApiToken();
 
     const createInput: ApiTokenCreateRecord = {
@@ -83,7 +78,6 @@ export class ApiTokensService {
     id: string,
     updateInput: UpdateApiTokenInput
   ): Promise<ApiTokenEntity> {
-    this.assertSession(ctx);
     return this.repository.crud
       .scoped(toTenantScope(ctx))
       .updateOneById(id, updateInput);
@@ -94,25 +88,16 @@ export class ApiTokensService {
     ids: string[],
     updateInput: UpdateApiTokenInput
   ): Promise<BatchEntity> {
-    this.assertSession(ctx);
     return this.repository.crud
       .scoped(toTenantScope(ctx))
       .updateManyById(ids, updateInput);
   }
 
   removeOne(ctx: AuthContext, id: string): Promise<ApiTokenEntity> {
-    this.assertSession(ctx);
     return this.repository.crud.scoped(toTenantScope(ctx)).deleteOneById(id);
   }
 
   removeMany(ctx: AuthContext, ids: string[]): Promise<BatchEntity> {
-    this.assertSession(ctx);
     return this.repository.crud.scoped(toTenantScope(ctx)).deleteManyById(ids);
-  }
-
-  private assertSession(ctx: AuthContext): void {
-    if (!isSession(ctx)) {
-      throw new UnauthorizedException();
-    }
   }
 }

@@ -23,7 +23,28 @@ export class ApiTokensRepository {
     SortApiTokenInput
   >;
 
-  constructor(@InjectModel(ApiTokenModel.name) model: Model<ApiTokenModel>) {
+  constructor(
+    @InjectModel(ApiTokenModel.name)
+    private readonly model: Model<ApiTokenModel>
+  ) {
     this.crud = new CrudRepository(model, new ApiTokenMapper());
+  }
+
+  async findByIdForAuth(id: string) {
+    const record = await this.model
+      .findById(id)
+      .select("+hashedSecret ownerId permissions expiresAt")
+      .lean();
+
+    if (!record) {
+      return null;
+    }
+
+    return {
+      ownerId: String(record.ownerId),
+      permissions: record.permissions,
+      hashedSecret: record.hashedSecret,
+      expiresAt: record.expiresAt,
+    };
   }
 }

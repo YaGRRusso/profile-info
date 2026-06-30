@@ -1,20 +1,25 @@
 import { Module } from "@nestjs/common";
 import { MongooseModule } from "@nestjs/mongoose";
-import {
-  ApiTokenModel,
-  ApiTokenSchema,
-} from "@/modules/api-tokens/schemas/api-token.schema";
+import { UsersModule } from "@/modules/users/users.module";
+import { ApiTokenValidationService } from "./api-token-validation.service";
 import { ApiTokensRepository } from "./api-tokens.repository";
 import { ApiTokensResolver } from "./api-tokens.resolver";
 import { ApiTokensService } from "./api-tokens.service";
+import { ApiTokenModel, ApiTokenSchema } from "./schemas/api-token.schema";
 
 @Module({
   imports: [
+    UsersModule,
     MongooseModule.forFeature([
       { name: ApiTokenModel.name, schema: ApiTokenSchema },
     ]),
   ],
-  providers: [ApiTokensRepository, ApiTokensResolver, ApiTokensService],
-  exports: [ApiTokensService],
+  providers: [
+    ApiTokensRepository,
+    ApiTokenValidationService,
+    ApiTokensResolver,
+    ApiTokensService,
+  ],
+  exports: [ApiTokensService, ApiTokenValidationService],
 })
 export class ApiTokensModule {}
