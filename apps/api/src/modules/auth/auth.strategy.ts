@@ -6,8 +6,10 @@ import type { Env } from "@/core/configs/env.validation";
 import { UsersService } from "@/modules/users/users.service";
 import { JwtPayload } from "./entities/jwt.entity";
 
+export const JWT_STRATEGY = "jwt" as const;
+
 @Injectable()
-export class AuthStrategy extends PassportStrategy(Strategy) {
+export class AuthStrategy extends PassportStrategy(Strategy, JWT_STRATEGY) {
   constructor(
     config: ConfigService<Env, true>,
     private readonly usersService: UsersService

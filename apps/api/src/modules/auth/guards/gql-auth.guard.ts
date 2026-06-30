@@ -12,9 +12,10 @@ import {
 } from "@/core/context/graphql-context.helper";
 import type { GraphqlContext } from "@/core/context/graphql-context.interface";
 import { PUBLIC_KEY } from "@/core/decorators/public.decorator";
+import { JWT_STRATEGY } from "../auth.strategy";
 
 @Injectable()
-export class GqlAuthGuard extends AuthGuard("jwt") {
+export class GqlAuthGuard extends AuthGuard(JWT_STRATEGY) {
   constructor(private readonly reflector: Reflector) {
     super();
   }
