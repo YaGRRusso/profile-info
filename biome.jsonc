@@ -41,9 +41,6 @@
       "suspicious": {
         "noExplicitAny": "warn",
         "noArrayIndexKey": "off"
-      },
-      "performance": {
-        "useTopLevelRegex": "off"
       }
     }
   },

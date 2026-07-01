@@ -7,20 +7,20 @@ import type { AuthContext } from "@/core/context/auth-context.interface";
 import { BatchEntity } from "@/core/entities/batch.entity";
 import type { MultiPaged } from "@/core/persistence/types/output.type";
 import { ApiTokensRepository } from "./api-tokens.repository";
+import {
+  API_TOKEN_PREFIX,
+  TOKEN_ID_PATTERN,
+} from "./constants/api-token.constants";
 import { CreateApiTokenInput } from "./dto/create-api-token.input";
 import { FilterApiTokenInput } from "./dto/filter-api-token.input";
 import { SortApiTokenInput } from "./dto/sort-api-token.input";
 import { UpdateApiTokenInput } from "./dto/update-api-token.input";
 import { ApiTokenEntity, NewApiTokenEntity } from "./entities/api-token.entity";
 import { ApiTokenWithHashedEntity } from "./entities/api-token-with-hashed.entity";
-
 import type { ApiTokenCreateRecord } from "./mappers/api-token.mapper";
 
 @Injectable()
 export class ApiTokensService {
-  private readonly API_TOKEN_PREFIX = "pi_";
-  private readonly TOKEN_ID_PATTERN = /^[a-f0-9]{24}$/;
-
   constructor(private readonly repository: ApiTokensRepository) {}
 
   findOneByIdWithHashedSecret(id: string): Promise<ApiTokenWithHashedEntity> {
@@ -144,7 +144,7 @@ export class ApiTokensService {
   } {
     const tokenId = new mongoose.Types.ObjectId().toHexString();
     const secret = randomBytes(32).toString("base64url");
-    const plaintext = `${this.API_TOKEN_PREFIX}${tokenId}_${secret}`;
+    const plaintext = `${API_TOKEN_PREFIX}${tokenId}_${secret}`;
     return { plaintext, tokenId, secret };
   }
 
@@ -152,15 +152,15 @@ export class ApiTokensService {
     tokenId: string;
     secret: string;
   } | null {
-    if (!value.startsWith(this.API_TOKEN_PREFIX)) return null;
+    if (!value.startsWith(API_TOKEN_PREFIX)) return null;
 
-    const payload = value.slice(this.API_TOKEN_PREFIX.length);
+    const payload = value.slice(API_TOKEN_PREFIX.length);
     const separatorIndex = payload.indexOf("_");
     if (separatorIndex <= 0) return null;
 
     const tokenId = payload.slice(0, separatorIndex);
     const secret = payload.slice(separatorIndex + 1);
-    if (!this.TOKEN_ID_PATTERN.test(tokenId) || secret.length < 16) return null;
+    if (!TOKEN_ID_PATTERN.test(tokenId) || secret.length < 16) return null;
 
     return { tokenId, secret };
   }

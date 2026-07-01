@@ -5,7 +5,7 @@ import { Model } from "mongoose";
 import { App } from "supertest/types";
 import { ApiTokenPermission } from "@/core/enums/api-token-permission.enum";
 import { UserRole } from "@/core/enums/user-role.enum";
-import { API_TOKEN_PREFIX } from "@/modules/api-tokens/helpers/api-token-secret.helper";
+import { API_TOKEN_PREFIX } from "@/modules/api-tokens/constants/api-token.constants";
 import { ApiTokenModel } from "@/modules/api-tokens/schemas/api-token.schema";
 import { OrganizationCategory } from "@/modules/organizations/enums/category.enum";
 import { OrganizationsService } from "@/modules/organizations/organizations.service";

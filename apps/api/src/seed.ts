@@ -7,7 +7,7 @@ import { AppModule } from "./app.module";
 import { Locale } from "./common/i18n/locales";
 import { ApiTokenPermission } from "./core/enums/api-token-permission.enum";
 import { UserRole } from "./core/enums/user-role.enum";
-import { API_TOKEN_PREFIX } from "./modules/api-tokens/helpers/api-token-secret.helper";
+import { API_TOKEN_PREFIX } from "./modules/api-tokens/constants/api-token.constants";
 import { ApiTokenModel } from "./modules/api-tokens/schemas/api-token.schema";
 import { CourseModel } from "./modules/courses/schemas/course.schema";
 import { EducationModel } from "./modules/educations/schemas/education.schema";

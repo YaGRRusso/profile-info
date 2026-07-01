@@ -6,14 +6,9 @@ import { ApiTokenPermission } from "@/core/enums/api-token-permission.enum";
 import { createMockCrud } from "@/core/persistence/repositories/testing/service-spec.mock";
 import { ApiTokensRepository } from "./api-tokens.repository";
 import { ApiTokensService } from "./api-tokens.service";
-import { emitApiToken } from "./helpers/api-token-secret.helper";
 
 jest.mock("bcryptjs", () => ({
   hash: jest.fn().mockResolvedValue("hashed-secret"),
-}));
-
-jest.mock("./helpers/api-token-secret.helper", () => ({
-  emitApiToken: jest.fn(),
 }));
 
 const validId = "507f1f77bcf86cd799439013";
@@ -35,11 +30,22 @@ describe("ApiTokensService", () => {
   beforeEach(async () => {
     jest.clearAllMocks();
     crud = createMockCrud();
-    jest.mocked(emitApiToken).mockReturnValue({
-      plaintext: `pi_${validId}_secret-value`,
-      tokenId: validId,
-      secret: "secret-value",
-    });
+    jest
+      .spyOn(
+        ApiTokensService.prototype as unknown as {
+          emitApiToken: () => {
+            plaintext: string;
+            tokenId: string;
+            secret: string;
+          };
+        },
+        "emitApiToken"
+      )
+      .mockReturnValue({
+        plaintext: `pi_${validId}_secret-value`,
+        tokenId: validId,
+        secret: "secret-value",
+      });
 
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -81,7 +87,6 @@ describe("ApiTokensService", () => {
         apiToken: fakeEntity,
       });
 
-      expect(emitApiToken).toHaveBeenCalled();
       expect(hash).toHaveBeenCalledWith("secret-value", 8);
       expect(crud.scoped).toHaveBeenCalledWith(toTenantScope(ctx));
       expect(crud.createOne).toHaveBeenCalledWith({

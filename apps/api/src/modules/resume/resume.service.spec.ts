@@ -67,7 +67,7 @@ describe("ResumeService", () => {
     await service.buildResume(userId);
 
     const ownerCtx = expect.objectContaining({
-      userId,
+      id: userId,
       role: UserRole.USER,
       credentialKind: "session",
     });
