@@ -65,6 +65,32 @@ export class SkillsResolver {
     });
   }
 
+  @Query(() => PaginatedSkillEntity)
+  findManyActiveSkills(
+    @Args("skillFilters", {
+      type: () => FilterSkillInput,
+      nullable: true,
+    })
+    skillFilters?: FilterSkillInput,
+    @Args("skillPagination", {
+      type: () => PaginationInput,
+      nullable: true,
+    })
+    skillPagination?: PaginationInput,
+    @Args("skillSort", {
+      type: () => SortSkillInput,
+      nullable: true,
+    })
+    skillSort?: SortSkillInput
+  ) {
+    return this.skillsService.findManyActive({
+      filters: skillFilters,
+      sort: skillSort,
+      limit: skillPagination?.limit,
+      skip: skillPagination?.skip,
+    });
+  }
+
   // MUTATIONS
 
   @Roles(UserRole.SUPER_ADMIN)

@@ -4,19 +4,14 @@ Deferred API and admin work, ordered by criticality, then value, then effort.
 
 ## High Priority
 
-- **Organization disable (admin)** — API pronta; admin ainda usa `remove*`. Trocar UI para disable. Hard delete (`remove*`) permanece com cascata.
-- **Skill disable (admin)** — API alinhada ao padrão Organization; admin ainda usa `remove*`. Trocar UI para disable. Hard delete (`remove*`) permanece com `skill.deleted` + `detachSkill`.
 - **Private CV + REST auth** — `GET /resume.pdf` is public today; REST routes should accept session JWT or `X-Api-Key`
+- **Collaborative catalog** — Users submit skill/org requests; `SUPER_ADMIN` moderates; local overrides per tenant.
 
 ## Medium Priority
 
-### Collaborative Platform
-
-- **User-owned integration keys** — Optional BYOK for OpenRouter, GitHub, Tavily.
-- **Collaborative catalog** — Users submit skill/org requests; `SUPER_ADMIN` moderates; local overrides per tenant.
-
 ### Better Prompts
 
+- **User-owned integration keys** — Optional BYOK for OpenRouter, GitHub, Tavily.
 - **Optimize prompts** — Refine `ats-summarize`, `summarize`, and `translate` for quality, cost, and locale.
 - **CV tailoring** — Per-user or per-job variants (sections, emphasis, templates).
 

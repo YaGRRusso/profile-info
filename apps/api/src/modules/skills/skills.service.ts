@@ -53,6 +53,20 @@ export class SkillsService {
     limit?: number;
     skip?: number;
   }): Promise<MultiPaged<SkillEntity>> {
+    return this.repository.crud.findMany({ filters, sort, skip, limit });
+  }
+
+  findManyActive({
+    filters,
+    sort,
+    skip = 0,
+    limit = 50,
+  }: {
+    filters?: FilterSkillInput;
+    sort?: SortSkillInput;
+    limit?: number;
+    skip?: number;
+  }): Promise<MultiPaged<SkillEntity>> {
     return this.repository.findManyActive({ filters, sort, skip, limit });
   }
 

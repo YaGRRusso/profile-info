@@ -70,6 +70,32 @@ export class OrganizationsResolver {
     });
   }
 
+  @Query(() => PaginatedOrganizationEntity)
+  findManyActiveOrganizations(
+    @Args("organizationFilters", {
+      type: () => FilterOrganizationInput,
+      nullable: true,
+    })
+    organizationFilters?: FilterOrganizationInput,
+    @Args("organizationPagination", {
+      type: () => PaginationInput,
+      nullable: true,
+    })
+    organizationPagination?: PaginationInput,
+    @Args("organizationSort", {
+      type: () => SortOrganizationInput,
+      nullable: true,
+    })
+    organizationSort?: SortOrganizationInput
+  ) {
+    return this.organizationsService.findManyActive({
+      filters: organizationFilters,
+      sort: organizationSort,
+      limit: organizationPagination?.limit,
+      skip: organizationPagination?.skip,
+    });
+  }
+
   // MUTATIONS
 
   @Roles(UserRole.SUPER_ADMIN)

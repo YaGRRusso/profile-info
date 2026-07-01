@@ -54,6 +54,20 @@ export class OrganizationsService {
     limit?: number;
     skip?: number;
   }): Promise<MultiPaged<OrganizationEntity>> {
+    return this.repository.crud.findMany({ filters, sort, skip, limit });
+  }
+
+  findManyActive({
+    filters,
+    sort,
+    skip = 0,
+    limit = 50,
+  }: {
+    filters?: FilterOrganizationInput;
+    sort?: SortOrganizationInput;
+    limit?: number;
+    skip?: number;
+  }): Promise<MultiPaged<OrganizationEntity>> {
     return this.repository.findManyActive({ filters, sort, skip, limit });
   }
 
