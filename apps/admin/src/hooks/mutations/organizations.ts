@@ -47,18 +47,36 @@ const updateManyOrganizations = graphql(`
   }
 `);
 
-const removeOneOrganization = graphql(`
-  mutation RemoveOneOrganization($organizationId: ID!) {
-    removeOneOrganization(organizationId: $organizationId) {
+const disableOneOrganization = graphql(`
+  mutation DisableOneOrganization($organizationId: ID!) {
+    disableOneOrganization(organizationId: $organizationId) {
       id
       slug
     }
   }
 `);
 
-const removeManyOrganizations = graphql(`
-  mutation RemoveManyOrganizations($organizationIds: [ID!]!) {
-    removeManyOrganizations(organizationIds: $organizationIds) {
+const disableManyOrganizations = graphql(`
+  mutation DisableManyOrganizations($organizationIds: [ID!]!) {
+    disableManyOrganizations(organizationIds: $organizationIds) {
+      succeeded
+      failed
+    }
+  }
+`);
+
+const enableOneOrganization = graphql(`
+  mutation EnableOneOrganization($organizationId: ID!) {
+    enableOneOrganization(organizationId: $organizationId) {
+      id
+      slug
+    }
+  }
+`);
+
+const enableManyOrganizations = graphql(`
+  mutation EnableManyOrganizations($organizationIds: [ID!]!) {
+    enableManyOrganizations(organizationIds: $organizationIds) {
       succeeded
       failed
     }
@@ -107,18 +125,34 @@ export function useUpdateManyOrganizations() {
   });
 }
 
-export function useRemoveOneOrganization() {
+export function useDisableOneOrganization() {
   return useMutation({
-    mutationKey: ["removeOneOrganization"],
+    mutationKey: ["disableOneOrganization"],
     mutationFn: (organizationId: string) =>
-      execute(removeOneOrganization, { organizationId }),
+      execute(disableOneOrganization, { organizationId }),
   });
 }
 
-export function useRemoveManyOrganizations() {
+export function useDisableManyOrganizations() {
   return useMutation({
-    mutationKey: ["removeManyOrganizations"],
+    mutationKey: ["disableManyOrganizations"],
     mutationFn: (organizationIds: string[]) =>
-      execute(removeManyOrganizations, { organizationIds }),
+      execute(disableManyOrganizations, { organizationIds }),
+  });
+}
+
+export function useEnableOneOrganization() {
+  return useMutation({
+    mutationKey: ["enableOneOrganization"],
+    mutationFn: (organizationId: string) =>
+      execute(enableOneOrganization, { organizationId }),
+  });
+}
+
+export function useEnableManyOrganizations() {
+  return useMutation({
+    mutationKey: ["enableManyOrganizations"],
+    mutationFn: (organizationIds: string[]) =>
+      execute(enableManyOrganizations, { organizationIds }),
   });
 }

@@ -31,6 +31,41 @@ const findManyOrganizations = graphql(`
         category
         logo
         website
+        disabled
+        i18n {
+          locale
+          messages {
+            description
+          }
+        }
+        relevance
+        createdAt
+        updatedAt
+      }
+    }
+  }
+`);
+
+const findManyActiveOrganizations = graphql(`
+  query FindManyActiveOrganizations(
+    $organizationFilters: FilterOrganizationInput
+    $organizationPagination: PaginationInput
+    $organizationSort: SortOrganizationInput
+  ) {
+    findManyActiveOrganizations(
+      organizationFilters: $organizationFilters
+      organizationPagination: $organizationPagination
+      organizationSort: $organizationSort
+    ) {
+      found
+      nodes {
+        id
+        name
+        slug
+        category
+        logo
+        website
+        disabled
         i18n {
           locale
           messages {
@@ -72,6 +107,38 @@ export function useFindManyOrganizations(
     select: (data) => ({
       found: data.pages[0]?.findManyOrganizations.found ?? 0,
       nodes: data.pages.flatMap((p) => p.findManyOrganizations.nodes),
+    }),
+    ...options,
+  });
+}
+
+export function useFindManyActiveOrganizations(
+  variables?: {
+    organizationFilters?: FilterOrganizationInput;
+    organizationSort?: SortOrganizationInput;
+  },
+  options?: { enabled?: boolean }
+) {
+  return useInfiniteQuery({
+    queryKey: ["findManyActiveOrganizations", variables],
+    queryFn: ({ pageParam }) =>
+      execute(findManyActiveOrganizations, {
+        ...variables,
+        organizationPagination: { skip: pageParam, limit: PAGE_SIZE },
+      }),
+    initialPageParam: 0,
+    getNextPageParam: (lastPage, allPages) => {
+      const totalFetched = allPages.reduce(
+        (sum, p) => sum + p.findManyActiveOrganizations.nodes.length,
+        0
+      );
+      return totalFetched < lastPage.findManyActiveOrganizations.found
+        ? totalFetched
+        : undefined;
+    },
+    select: (data) => ({
+      found: data.pages[0]?.findManyActiveOrganizations.found ?? 0,
+      nodes: data.pages.flatMap((p) => p.findManyActiveOrganizations.nodes),
     }),
     ...options,
   });

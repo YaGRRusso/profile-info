@@ -2,12 +2,13 @@ import {
   ArrowDownIcon,
   ArrowsDownUpIcon,
   ArrowUpIcon,
+  CheckCircleIcon,
   EyeIcon,
   GearIcon,
   MagnifyingGlassIcon,
   PencilIcon,
   SlidersHorizontalIcon,
-  TrashSimpleIcon,
+  XCircleIcon,
   XIcon,
 } from "@phosphor-icons/react";
 import {
@@ -89,7 +90,8 @@ function SortIcon({ sorted }: { sorted: false | "asc" | "desc" }) {
 
 const getColumns = (
   onEdit: (organization: OrganizationRow) => void,
-  onDelete: (organization: OrganizationRow) => void,
+  onDisable: (organization: OrganizationRow) => void,
+  onEnable: (organization: OrganizationRow) => void,
   onView: (organization: OrganizationRow) => void
 ) => [
   columnHelper.display({
@@ -169,6 +171,21 @@ const getColumns = (
       <span className="badge badge-soft badge-sm">{data.getValue()}</span>
     ),
   }),
+  columnHelper.accessor("disabled", {
+    header: "Status",
+    enableGlobalFilter: false,
+    enableSorting: false,
+    cell: (data) => (
+      <span
+        className={cn(
+          "badge badge-sm badge-soft",
+          data.getValue() ? "badge-error" : "badge-success"
+        )}
+      >
+        {data.getValue() ? "Disabled" : "Active"}
+      </span>
+    ),
+  }),
   columnHelper.accessor("createdAt", {
     header: "Created",
     enableColumnFilter: true,
@@ -204,13 +221,23 @@ const getColumns = (
         >
           <EyeIcon />
         </button>
-        <button
-          className="btn btn-sm btn-square btn-ghost btn-error"
-          onClick={() => onDelete(row.original)}
-          type="button"
-        >
-          <TrashSimpleIcon />
-        </button>
+        {row.original.disabled ? (
+          <button
+            className="btn btn-sm btn-square btn-ghost btn-success"
+            onClick={() => onEnable(row.original)}
+            type="button"
+          >
+            <CheckCircleIcon />
+          </button>
+        ) : (
+          <button
+            className="btn btn-sm btn-square btn-ghost btn-error"
+            onClick={() => onDisable(row.original)}
+            type="button"
+          >
+            <XCircleIcon />
+          </button>
+        )}
       </div>
     ),
   }),
@@ -218,10 +245,12 @@ const getColumns = (
 
 interface OrganizationsTableProps {
   data: OrganizationRow[];
-  onDelete: (organization: OrganizationRow) => void;
+  onDisable: (organization: OrganizationRow) => void;
   onEdit: (organization: OrganizationRow) => void;
-  onMultiDelete: (organizations: OrganizationRow[]) => void;
+  onEnable: (organization: OrganizationRow) => void;
+  onMultiDisable: (organizations: OrganizationRow[]) => void;
   onMultiEdit: (organizations: OrganizationRow[]) => void;
+  onMultiEnable: (organizations: OrganizationRow[]) => void;
   onMultiView: (organizations: OrganizationRow[]) => void;
   onView: (organization: OrganizationRow) => void;
 }
@@ -229,11 +258,13 @@ interface OrganizationsTableProps {
 export function OrganizationsTable({
   data,
   onEdit,
-  onDelete,
+  onDisable,
+  onEnable,
   onView,
   onMultiEdit,
   onMultiView,
-  onMultiDelete,
+  onMultiDisable,
+  onMultiEnable,
 }: OrganizationsTableProps) {
   const [searchQuery, setSearchQuery] = useQueryState("query", queryParser);
   const [sort, setSort] = useQueryState("sort", sortParser);
@@ -300,7 +331,7 @@ export function OrganizationsTable({
 
   const table = useReactTable({
     data,
-    columns: getColumns(onEdit, onDelete, onView),
+    columns: getColumns(onEdit, onDisable, onEnable, onView),
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     getSortedRowModel: getSortedRowModel(),
@@ -365,13 +396,22 @@ export function OrganizationsTable({
             <span>View Selected ({selected.length})</span>
           </button>
           <button
-            className="btn btn-ghost btn-sm btn-error"
+            className="btn btn-ghost btn-sm btn-success"
             disabled={!selected?.length}
-            onClick={() => onMultiDelete(selected)}
+            onClick={() => onMultiEnable(selected)}
             type="button"
           >
-            <TrashSimpleIcon />
-            <span>Remove Selected ({selected.length})</span>
+            <CheckCircleIcon />
+            <span>Enable Selected ({selected.length})</span>
+          </button>
+          <button
+            className="btn btn-ghost btn-sm btn-error"
+            disabled={!selected?.length}
+            onClick={() => onMultiDisable(selected)}
+            type="button"
+          >
+            <XCircleIcon />
+            <span>Disable Selected ({selected.length})</span>
           </button>
         </div>
       </div>

@@ -417,6 +417,7 @@ input FilterExperienceInput {
 
 input FilterOrganizationInput {
   category: OrganizationCategory
+  disabled: Boolean
   i18n: [CreateOrganizationMessagesInputTranslationInput!]
   logo: String
   name: String
@@ -436,6 +437,7 @@ input FilterProjectInput {
 
 input FilterSkillInput {
   category: SkillCategory
+  disabled: Boolean
   name: String
   relevance: Float
   slug: String
@@ -478,6 +480,14 @@ type Mutation {
   createOneProject(createProjectInput: CreateProjectInput!): ProjectEntity!
   createOneSkill(createSkillInput: CreateSkillInput!): SkillEntity!
   createOneUser(createUserInput: CreateUserInput!): UserEntity!
+  disableManyOrganizations(organizationIds: [ID!]!): BatchEntity!
+  disableManySkills(skillIds: [ID!]!): BatchEntity!
+  disableOneOrganization(organizationId: ID!): OrganizationEntity!
+  disableOneSkill(skillId: ID!): SkillEntity!
+  enableManyOrganizations(organizationIds: [ID!]!): BatchEntity!
+  enableManySkills(skillIds: [ID!]!): BatchEntity!
+  enableOneOrganization(organizationId: ID!): OrganizationEntity!
+  enableOneSkill(skillId: ID!): SkillEntity!
   removeManyApiTokens(apiTokenIds: [ID!]!): BatchEntity!
   removeManyCourses(courseIds: [ID!]!): BatchEntity!
   removeManyEducations(educationIds: [ID!]!): BatchEntity!
@@ -530,6 +540,7 @@ enum OrganizationCategory {
 type OrganizationEntity {
   category: OrganizationCategory!
   createdAt: DateTime!
+  disabled: Boolean!
   i18n: [OrganizationTranslationLocale!]!
   id: ID!
   logo: String!
@@ -621,6 +632,8 @@ type ProjectMessagesTranslationEntity {
 
 type Query {
   dashboard: DashboardEntity!
+  findManyActiveOrganizations(organizationFilters: FilterOrganizationInput, organizationPagination: PaginationInput, organizationSort: SortOrganizationInput): PaginatedOrganizationEntity!
+  findManyActiveSkills(skillFilters: FilterSkillInput, skillPagination: PaginationInput, skillSort: SortSkillInput): PaginatedSkillEntity!
   findManyApiTokenById(apiTokenIds: [ID!]!): [ApiTokenEntity!]!
   findManyApiTokens(apiTokenFilters: FilterApiTokenInput, apiTokenPagination: PaginationInput, apiTokenSort: SortApiTokenInput): PaginatedApiTokenEntity!
   findManyCourseById(courseIds: [ID!]!): [CourseEntity!]!
@@ -681,6 +694,7 @@ enum SkillCategory {
 type SkillEntity {
   category: SkillCategory!
   createdAt: DateTime!
+  disabled: Boolean!
   id: ID!
   name: String!
   relevance: Float!
@@ -810,6 +824,7 @@ input UpdateMeInput {
 
 input UpdateOrganizationInput {
   category: OrganizationCategory
+  disabled: Boolean
   i18n: [CreateOrganizationMessagesInputTranslationInput!]
   logo: String
   name: String
@@ -829,6 +844,7 @@ input UpdateProjectInput {
 
 input UpdateSkillInput {
   category: SkillCategory
+  disabled: Boolean
   name: String
   relevance: Float
   slug: String

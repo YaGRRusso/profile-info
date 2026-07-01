@@ -446,6 +446,7 @@ export type FilterExperienceInput = {
 
 export type FilterOrganizationInput = {
   category?: InputMaybe<OrganizationCategory>;
+  disabled?: InputMaybe<Scalars['Boolean']['input']>;
   i18n?: InputMaybe<Array<CreateOrganizationMessagesInputTranslationInput>>;
   logo?: InputMaybe<Scalars['String']['input']>;
   name?: InputMaybe<Scalars['String']['input']>;
@@ -465,6 +466,7 @@ export type FilterProjectInput = {
 
 export type FilterSkillInput = {
   category?: InputMaybe<SkillCategory>;
+  disabled?: InputMaybe<Scalars['Boolean']['input']>;
   name?: InputMaybe<Scalars['String']['input']>;
   relevance?: InputMaybe<Scalars['Float']['input']>;
   slug?: InputMaybe<Scalars['String']['input']>;
@@ -509,6 +511,14 @@ export type Mutation = {
   createOneProject: ProjectEntity;
   createOneSkill: SkillEntity;
   createOneUser: UserEntity;
+  disableManyOrganizations: BatchEntity;
+  disableManySkills: BatchEntity;
+  disableOneOrganization: OrganizationEntity;
+  disableOneSkill: SkillEntity;
+  enableManyOrganizations: BatchEntity;
+  enableManySkills: BatchEntity;
+  enableOneOrganization: OrganizationEntity;
+  enableOneSkill: SkillEntity;
   removeManyApiTokens: BatchEntity;
   removeManyCourses: BatchEntity;
   removeManyEducations: BatchEntity;
@@ -625,6 +635,46 @@ export type MutationCreateOneSkillArgs = {
 
 export type MutationCreateOneUserArgs = {
   createUserInput: CreateUserInput;
+};
+
+
+export type MutationDisableManyOrganizationsArgs = {
+  organizationIds: Array<Scalars['ID']['input']>;
+};
+
+
+export type MutationDisableManySkillsArgs = {
+  skillIds: Array<Scalars['ID']['input']>;
+};
+
+
+export type MutationDisableOneOrganizationArgs = {
+  organizationId: Scalars['ID']['input'];
+};
+
+
+export type MutationDisableOneSkillArgs = {
+  skillId: Scalars['ID']['input'];
+};
+
+
+export type MutationEnableManyOrganizationsArgs = {
+  organizationIds: Array<Scalars['ID']['input']>;
+};
+
+
+export type MutationEnableManySkillsArgs = {
+  skillIds: Array<Scalars['ID']['input']>;
+};
+
+
+export type MutationEnableOneOrganizationArgs = {
+  organizationId: Scalars['ID']['input'];
+};
+
+
+export type MutationEnableOneSkillArgs = {
+  skillId: Scalars['ID']['input'];
 };
 
 
@@ -839,6 +889,7 @@ export type OrganizationEntity = {
   __typename?: 'OrganizationEntity';
   category: OrganizationCategory;
   createdAt: Scalars['DateTime']['output'];
+  disabled: Scalars['Boolean']['output'];
   i18n: Array<OrganizationTranslationLocale>;
   id: Scalars['ID']['output'];
   logo: Scalars['String']['output'];
@@ -944,6 +995,8 @@ export type ProjectMessagesTranslationEntity = {
 export type Query = {
   __typename?: 'Query';
   dashboard: DashboardEntity;
+  findManyActiveOrganizations: PaginatedOrganizationEntity;
+  findManyActiveSkills: PaginatedSkillEntity;
   findManyApiTokenById: Array<ApiTokenEntity>;
   findManyApiTokens: PaginatedApiTokenEntity;
   findManyCourseById: Array<CourseEntity>;
@@ -977,6 +1030,20 @@ export type Query = {
   findOneUser: UserEntity;
   findOneUserById: UserEntity;
   getMe: UserEntity;
+};
+
+
+export type QueryFindManyActiveOrganizationsArgs = {
+  organizationFilters?: InputMaybe<FilterOrganizationInput>;
+  organizationPagination?: InputMaybe<PaginationInput>;
+  organizationSort?: InputMaybe<SortOrganizationInput>;
+};
+
+
+export type QueryFindManyActiveSkillsArgs = {
+  skillFilters?: InputMaybe<FilterSkillInput>;
+  skillPagination?: InputMaybe<PaginationInput>;
+  skillSort?: InputMaybe<SortSkillInput>;
 };
 
 
@@ -1181,6 +1248,7 @@ export type SkillEntity = {
   __typename?: 'SkillEntity';
   category: SkillCategory;
   createdAt: Scalars['DateTime']['output'];
+  disabled: Scalars['Boolean']['output'];
   id: Scalars['ID']['output'];
   name: Scalars['String']['output'];
   relevance: Scalars['Float']['output'];
@@ -1310,6 +1378,7 @@ export type UpdateMeInput = {
 
 export type UpdateOrganizationInput = {
   category?: InputMaybe<OrganizationCategory>;
+  disabled?: InputMaybe<Scalars['Boolean']['input']>;
   i18n?: InputMaybe<Array<CreateOrganizationMessagesInputTranslationInput>>;
   logo?: InputMaybe<Scalars['String']['input']>;
   name?: InputMaybe<Scalars['String']['input']>;
@@ -1329,6 +1398,7 @@ export type UpdateProjectInput = {
 
 export type UpdateSkillInput = {
   category?: InputMaybe<SkillCategory>;
+  disabled?: InputMaybe<Scalars['Boolean']['input']>;
   name?: InputMaybe<Scalars['String']['input']>;
   relevance?: InputMaybe<Scalars['Float']['input']>;
   slug?: InputMaybe<Scalars['String']['input']>;
@@ -1600,19 +1670,33 @@ export type UpdateManyOrganizationsMutationVariables = Exact<{
 
 export type UpdateManyOrganizationsMutation = { __typename?: 'Mutation', updateManyOrganizations: { __typename?: 'BatchEntity', succeeded: number, failed: number } };
 
-export type RemoveOneOrganizationMutationVariables = Exact<{
+export type DisableOneOrganizationMutationVariables = Exact<{
   organizationId: Scalars['ID']['input'];
 }>;
 
 
-export type RemoveOneOrganizationMutation = { __typename?: 'Mutation', removeOneOrganization: { __typename?: 'OrganizationEntity', id: string, slug: string } };
+export type DisableOneOrganizationMutation = { __typename?: 'Mutation', disableOneOrganization: { __typename?: 'OrganizationEntity', id: string, slug: string } };
 
-export type RemoveManyOrganizationsMutationVariables = Exact<{
+export type DisableManyOrganizationsMutationVariables = Exact<{
   organizationIds: Array<Scalars['ID']['input']> | Scalars['ID']['input'];
 }>;
 
 
-export type RemoveManyOrganizationsMutation = { __typename?: 'Mutation', removeManyOrganizations: { __typename?: 'BatchEntity', succeeded: number, failed: number } };
+export type DisableManyOrganizationsMutation = { __typename?: 'Mutation', disableManyOrganizations: { __typename?: 'BatchEntity', succeeded: number, failed: number } };
+
+export type EnableOneOrganizationMutationVariables = Exact<{
+  organizationId: Scalars['ID']['input'];
+}>;
+
+
+export type EnableOneOrganizationMutation = { __typename?: 'Mutation', enableOneOrganization: { __typename?: 'OrganizationEntity', id: string, slug: string } };
+
+export type EnableManyOrganizationsMutationVariables = Exact<{
+  organizationIds: Array<Scalars['ID']['input']> | Scalars['ID']['input'];
+}>;
+
+
+export type EnableManyOrganizationsMutation = { __typename?: 'Mutation', enableManyOrganizations: { __typename?: 'BatchEntity', succeeded: number, failed: number } };
 
 export type CreateOneProjectMutationVariables = Exact<{
   createProjectInput: CreateProjectInput;
@@ -1748,7 +1832,16 @@ export type FindManyOrganizationsQueryVariables = Exact<{
 }>;
 
 
-export type FindManyOrganizationsQuery = { __typename?: 'Query', findManyOrganizations: { __typename?: 'PaginatedOrganizationEntity', found: number, nodes: Array<{ __typename?: 'OrganizationEntity', id: string, name: string, slug: string, category: OrganizationCategory, logo: string, website: string, relevance: number, createdAt: any, updatedAt: any, i18n: Array<{ __typename?: 'OrganizationTranslationLocale', locale: string, messages: { __typename?: 'OrganizationMessages', description: string } }> }> } };
+export type FindManyOrganizationsQuery = { __typename?: 'Query', findManyOrganizations: { __typename?: 'PaginatedOrganizationEntity', found: number, nodes: Array<{ __typename?: 'OrganizationEntity', id: string, name: string, slug: string, category: OrganizationCategory, logo: string, website: string, disabled: boolean, relevance: number, createdAt: any, updatedAt: any, i18n: Array<{ __typename?: 'OrganizationTranslationLocale', locale: string, messages: { __typename?: 'OrganizationMessages', description: string } }> }> } };
+
+export type FindManyActiveOrganizationsQueryVariables = Exact<{
+  organizationFilters?: InputMaybe<FilterOrganizationInput>;
+  organizationPagination?: InputMaybe<PaginationInput>;
+  organizationSort?: InputMaybe<SortOrganizationInput>;
+}>;
+
+
+export type FindManyActiveOrganizationsQuery = { __typename?: 'Query', findManyActiveOrganizations: { __typename?: 'PaginatedOrganizationEntity', found: number, nodes: Array<{ __typename?: 'OrganizationEntity', id: string, name: string, slug: string, category: OrganizationCategory, logo: string, website: string, disabled: boolean, relevance: number, createdAt: any, updatedAt: any, i18n: Array<{ __typename?: 'OrganizationTranslationLocale', locale: string, messages: { __typename?: 'OrganizationMessages', description: string } }> }> } };
 
 export type FindManyProjectsQueryVariables = Exact<{
   projectFilters?: InputMaybe<FilterProjectInput>;
@@ -2080,22 +2173,38 @@ export const UpdateManyOrganizationsDocument = new TypedDocumentString(`
   }
 }
     `) as unknown as TypedDocumentString<UpdateManyOrganizationsMutation, UpdateManyOrganizationsMutationVariables>;
-export const RemoveOneOrganizationDocument = new TypedDocumentString(`
-    mutation RemoveOneOrganization($organizationId: ID!) {
-  removeOneOrganization(organizationId: $organizationId) {
+export const DisableOneOrganizationDocument = new TypedDocumentString(`
+    mutation DisableOneOrganization($organizationId: ID!) {
+  disableOneOrganization(organizationId: $organizationId) {
     id
     slug
   }
 }
-    `) as unknown as TypedDocumentString<RemoveOneOrganizationMutation, RemoveOneOrganizationMutationVariables>;
-export const RemoveManyOrganizationsDocument = new TypedDocumentString(`
-    mutation RemoveManyOrganizations($organizationIds: [ID!]!) {
-  removeManyOrganizations(organizationIds: $organizationIds) {
+    `) as unknown as TypedDocumentString<DisableOneOrganizationMutation, DisableOneOrganizationMutationVariables>;
+export const DisableManyOrganizationsDocument = new TypedDocumentString(`
+    mutation DisableManyOrganizations($organizationIds: [ID!]!) {
+  disableManyOrganizations(organizationIds: $organizationIds) {
     succeeded
     failed
   }
 }
-    `) as unknown as TypedDocumentString<RemoveManyOrganizationsMutation, RemoveManyOrganizationsMutationVariables>;
+    `) as unknown as TypedDocumentString<DisableManyOrganizationsMutation, DisableManyOrganizationsMutationVariables>;
+export const EnableOneOrganizationDocument = new TypedDocumentString(`
+    mutation EnableOneOrganization($organizationId: ID!) {
+  enableOneOrganization(organizationId: $organizationId) {
+    id
+    slug
+  }
+}
+    `) as unknown as TypedDocumentString<EnableOneOrganizationMutation, EnableOneOrganizationMutationVariables>;
+export const EnableManyOrganizationsDocument = new TypedDocumentString(`
+    mutation EnableManyOrganizations($organizationIds: [ID!]!) {
+  enableManyOrganizations(organizationIds: $organizationIds) {
+    succeeded
+    failed
+  }
+}
+    `) as unknown as TypedDocumentString<EnableManyOrganizationsMutation, EnableManyOrganizationsMutationVariables>;
 export const CreateOneProjectDocument = new TypedDocumentString(`
     mutation CreateOneProject($createProjectInput: CreateProjectInput!) {
   createOneProject(createProjectInput: $createProjectInput) {
@@ -2460,6 +2569,7 @@ export const FindManyOrganizationsDocument = new TypedDocumentString(`
       category
       logo
       website
+      disabled
       i18n {
         locale
         messages {
@@ -2473,6 +2583,35 @@ export const FindManyOrganizationsDocument = new TypedDocumentString(`
   }
 }
     `) as unknown as TypedDocumentString<FindManyOrganizationsQuery, FindManyOrganizationsQueryVariables>;
+export const FindManyActiveOrganizationsDocument = new TypedDocumentString(`
+    query FindManyActiveOrganizations($organizationFilters: FilterOrganizationInput, $organizationPagination: PaginationInput, $organizationSort: SortOrganizationInput) {
+  findManyActiveOrganizations(
+    organizationFilters: $organizationFilters
+    organizationPagination: $organizationPagination
+    organizationSort: $organizationSort
+  ) {
+    found
+    nodes {
+      id
+      name
+      slug
+      category
+      logo
+      website
+      disabled
+      i18n {
+        locale
+        messages {
+          description
+        }
+      }
+      relevance
+      createdAt
+      updatedAt
+    }
+  }
+}
+    `) as unknown as TypedDocumentString<FindManyActiveOrganizationsQuery, FindManyActiveOrganizationsQueryVariables>;
 export const FindManyProjectsDocument = new TypedDocumentString(`
     query FindManyProjects($projectFilters: FilterProjectInput, $projectPagination: PaginationInput, $projectSort: SortProjectInput) {
   findManyProjects(

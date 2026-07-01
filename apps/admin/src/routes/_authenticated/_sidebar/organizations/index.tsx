@@ -22,8 +22,10 @@ import { OrganizationMultiForm } from "@/forms/organization-multi";
 import { useQueryAllPages } from "@/hooks/custom/use-query-all-pages";
 import {
   useCreateOneOrganization,
-  useRemoveManyOrganizations,
-  useRemoveOneOrganization,
+  useDisableManyOrganizations,
+  useDisableOneOrganization,
+  useEnableManyOrganizations,
+  useEnableOneOrganization,
   useUpdateManyOrganizations,
   useUpdateOneOrganization,
 } from "@/hooks/mutations/organizations";
@@ -50,12 +52,14 @@ function RouteComponent() {
   const createOneOrganization = useCreateOneOrganization();
   const updateOneOrganization = useUpdateOneOrganization();
   const updateManyOrganizations = useUpdateManyOrganizations();
-  const removeOneOrganization = useRemoveOneOrganization();
-  const removeManyOrganizations = useRemoveManyOrganizations();
+  const disableOneOrganization = useDisableOneOrganization();
+  const disableManyOrganizations = useDisableManyOrganizations();
+  const enableOneOrganization = useEnableOneOrganization();
+  const enableManyOrganizations = useEnableManyOrganizations();
 
-  const closeAndRefetch = useCallback(() => {
+  const closeAndRefetch = useCallback(async () => {
     setFormValues(undefined);
-    findManyOrganizations.refetch();
+    await findManyOrganizations.refetch();
   }, [findManyOrganizations.refetch]);
 
   const selectedOrganizationIds = useMemo(
@@ -106,22 +110,22 @@ function RouteComponent() {
     ]
   );
 
-  const handleDelete = useCallback(() => {
+  const handleDisable = useCallback(() => {
     switch (formValues?.state) {
-      case "DELETING":
-        removeOneOrganization.mutate(selectedOrganizationIds[0], {
+      case "DISABLING":
+        disableOneOrganization.mutate(selectedOrganizationIds[0], {
           onSuccess: () => {
             closeAndRefetch();
-            toast.success("Organization deleted successfully");
+            toast.success("Organization disabled successfully");
           },
         });
         break;
-      case "MULTI_DELETING":
-        removeManyOrganizations.mutate(selectedOrganizationIds, {
+      case "MULTI_DISABLING":
+        disableManyOrganizations.mutate(selectedOrganizationIds, {
           onSuccess: (data) => {
             closeAndRefetch();
             toast.success(
-              `${data.removeManyOrganizations.succeeded} organizations deleted successfully`
+              `${data.disableManyOrganizations.succeeded} organizations disabled successfully`
             );
           },
         });
@@ -131,10 +135,41 @@ function RouteComponent() {
     }
   }, [
     formValues?.state,
-    removeOneOrganization,
+    disableOneOrganization,
     selectedOrganizationIds,
     closeAndRefetch,
-    removeManyOrganizations,
+    disableManyOrganizations,
+  ]);
+
+  const handleEnable = useCallback(() => {
+    switch (formValues?.state) {
+      case "ENABLING":
+        enableOneOrganization.mutate(selectedOrganizationIds[0], {
+          onSuccess: () => {
+            closeAndRefetch();
+            toast.success("Organization enabled successfully");
+          },
+        });
+        break;
+      case "MULTI_ENABLING":
+        enableManyOrganizations.mutate(selectedOrganizationIds, {
+          onSuccess: (data) => {
+            closeAndRefetch();
+            toast.success(
+              `${data.enableManyOrganizations.succeeded} organizations enabled successfully`
+            );
+          },
+        });
+        break;
+      default:
+        break;
+    }
+  }, [
+    formValues?.state,
+    enableOneOrganization,
+    selectedOrganizationIds,
+    closeAndRefetch,
+    enableManyOrganizations,
   ]);
 
   return (
@@ -160,7 +195,7 @@ function RouteComponent() {
             onClick: () => setFormValues({ state: "CREATING" }),
           },
         ]}
-        description="Create, update or delete organizations referenced across your profile."
+        description="Create, update, disable or enable organizations referenced across your profile."
         title="Manage Organizations"
       />
 
@@ -248,18 +283,51 @@ function RouteComponent() {
             label: "Confirm",
             className: "btn-soft btn-error",
             disabled:
-              removeOneOrganization.isPending ||
-              removeManyOrganizations.isPending,
-            onClick: () => handleDelete(),
+              disableOneOrganization.isPending ||
+              disableManyOrganizations.isPending,
+            onClick: () => handleDisable(),
           },
         ]}
-        description="Are you sure you want to delete the following organizations?"
+        description="Are you sure you want to disable the following organizations?"
         isOpen={
-          formValues?.state === "MULTI_DELETING" ||
-          formValues?.state === "DELETING"
+          formValues?.state === "MULTI_DISABLING" ||
+          formValues?.state === "DISABLING"
         }
         onClose={() => setFormValues(undefined)}
-        title="Delete organizations?"
+        title="Disable organizations?"
+      >
+        <ul className="flex flex-wrap items-center gap-1">
+          {formValues?.customValues?.map((organization) => (
+            <li className="badge badge-sm badge-soft" key={organization?.id}>
+              {organization?.name}
+            </li>
+          ))}
+        </ul>
+      </Modal>
+
+      <Modal
+        actions={[
+          {
+            label: "Cancel",
+            className: "btn-ghost",
+            onClick: () => setFormValues(undefined),
+          },
+          {
+            label: "Confirm",
+            className: "btn-soft btn-success",
+            disabled:
+              enableOneOrganization.isPending ||
+              enableManyOrganizations.isPending,
+            onClick: () => handleEnable(),
+          },
+        ]}
+        description="Are you sure you want to enable the following organizations?"
+        isOpen={
+          formValues?.state === "MULTI_ENABLING" ||
+          formValues?.state === "ENABLING"
+        }
+        onClose={() => setFormValues(undefined)}
+        title="Enable organizations?"
       >
         <ul className="flex flex-wrap items-center gap-1">
           {formValues?.customValues?.map((organization) => (
@@ -290,9 +358,9 @@ function RouteComponent() {
         <DataState.Content>
           <OrganizationsTable
             data={findManyOrganizations.data?.nodes ?? []}
-            onDelete={(organization) =>
+            onDisable={(organization) =>
               setFormValues({
-                state: "DELETING",
+                state: "DISABLING",
                 customValues: [organization],
               })
             }
@@ -303,15 +371,27 @@ function RouteComponent() {
                 customValues: [organization],
               })
             }
-            onMultiDelete={(organizations) =>
+            onEnable={(organization) =>
               setFormValues({
-                state: "MULTI_DELETING",
+                state: "ENABLING",
+                customValues: [organization],
+              })
+            }
+            onMultiDisable={(organizations) =>
+              setFormValues({
+                state: "MULTI_DISABLING",
                 customValues: organizations,
               })
             }
             onMultiEdit={(organizations) =>
               setFormValues({
                 state: "MULTI_UPDATING",
+                customValues: organizations,
+              })
+            }
+            onMultiEnable={(organizations) =>
+              setFormValues({
+                state: "MULTI_ENABLING",
                 customValues: organizations,
               })
             }

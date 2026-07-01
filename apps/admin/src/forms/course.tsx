@@ -22,7 +22,7 @@ import {
 import { useQueryAllPages } from "@/hooks/custom/use-query-all-pages";
 import { useAtsSummarize, useTranslate } from "@/hooks/mutations/ai";
 import type { CourseRow } from "@/hooks/queries/courses";
-import { useFindManyOrganizations } from "@/hooks/queries/organizations";
+import { useFindManyActiveOrganizations } from "@/hooks/queries/organizations";
 import { useFindManySkills } from "@/hooks/queries/skills";
 import { fieldError } from "@/lib/field-error";
 import { createEmptyI18n, pickTranslation } from "@/lib/i18n";
@@ -118,7 +118,7 @@ export function CourseForm({
   isLoading,
   state,
 }: CourseFormProps) {
-  const findManyOrganizations = useFindManyOrganizations();
+  const findManyOrganizations = useFindManyActiveOrganizations();
   useQueryAllPages(findManyOrganizations);
 
   const findManySkills = useFindManySkills();

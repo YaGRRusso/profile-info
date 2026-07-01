@@ -23,7 +23,7 @@ import {
 import { useQueryAllPages } from "@/hooks/custom/use-query-all-pages";
 import { useAtsSummarize, useTranslate } from "@/hooks/mutations/ai";
 import type { EducationRow } from "@/hooks/queries/educations";
-import { useFindManyOrganizations } from "@/hooks/queries/organizations";
+import { useFindManyActiveOrganizations } from "@/hooks/queries/organizations";
 import { useFindManySkills } from "@/hooks/queries/skills";
 import { toDateInput, toIsoDate } from "@/lib/date";
 import { fieldError } from "@/lib/field-error";
@@ -142,7 +142,7 @@ export function EducationForm({
   isLoading,
   state,
 }: EducationFormProps) {
-  const findManyOrganizations = useFindManyOrganizations();
+  const findManyOrganizations = useFindManyActiveOrganizations();
   useQueryAllPages(findManyOrganizations);
 
   const findManySkills = useFindManySkills();
