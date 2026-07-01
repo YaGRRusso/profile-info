@@ -9,7 +9,7 @@
 - **ORM / layer:** Mongoose (`@nestjs/mongoose`)
 - **Top-level entities:** User, Skill, Organization, Experience, Education, Course, Project, ApiToken
 - **Schema sources:** `apps/api/src/modules/*/schemas/`, `apps/api/src/core/schemas/`
-- **Tenancy:** A tenant is a `User`. Private entities (`Experience`, `Education`, `Course`, `Project`) require `ownerId` → `User`. Global catalog (`Skill`, `Organization`) has no `ownerId`.
+- **Tenancy:** A tenant is a `User`. Private entities (`Experience`, `Education`, `Course`, `Project`) require `ownerId` → `User`. Catalog entities (`Skill`, `Organization`) use `scope` (`GLOBAL` | `LOCAL`): global rows have no `ownerId`; local rows require `ownerId` → `User`.
 - **FK naming (Mongo):** every stored reference uses an explicit `*Id` / `*Ids` suffix (`ownerId`, `organizationId`, `skillIds`). GraphQL output resolves related entities (`owner`, `organization`, `skills`) via `@ResolveField` + DataLoaders — FK scalars are not exposed on output types.
 
 ## Diagram
@@ -37,7 +37,9 @@ erDiagram
   }
   Organization {
     ObjectId _id PK
-    string slug UK
+    string scope "GLOBAL LOCAL"
+    ObjectId ownerId FK "local only"
+    string slug "UK per scope"
     string name
     string category
     object i18n "embed"
@@ -81,7 +83,9 @@ erDiagram
   }
   Skill {
     ObjectId _id PK
-    string slug UK
+    string scope "GLOBAL LOCAL"
+    ObjectId ownerId FK "local only"
+    string slug "UK per scope"
     string name
     string category
   }
@@ -99,6 +103,8 @@ erDiagram
   User ||--o{ Course : ownerId
   User ||--o{ Project : ownerId
   User ||--o{ ApiToken : ownerId
+  User ||--o{ Skill : "ownerId local"
+  User ||--o{ Organization : "ownerId local"
   Project ||--o{ UrlEmbed : urls
   Organization ||--o{ Experience : organizationId
   Organization ||--o{ Education : organizationId
@@ -145,17 +151,23 @@ inputs use `organizationId` and `skillIds` (no `ownerId` — injected from conte
 ### Skill (`skills`)
 
 - **Source:** `src/modules/skills/schemas/skill.schema.ts`
-- **Key fields:** `slug` (unique), `name`, `category` (enum, indexed), `relevance`
+- **Key fields:** `scope` (enum: `GLOBAL`, `LOCAL`; default `GLOBAL`, indexed),
+  `ownerId` (ref → User; required when `scope` is `LOCAL`, absent when `GLOBAL`),
+  `slug` (unique per `{ scope, ownerId }` — disabled rows still occupy the slug; re-enable to reuse),
+  `name`, `category` (enum, indexed), `relevance`, `disabled`
 - **Embedded:** none
-- **References:** none (global catalog; referenced by private entities)
+- **References:** optional `ownerId` → User (local catalog only; referenced by private entities via `skillIds`)
 
 ### Organization (`organizations`)
 
 - **Source:** `src/modules/organizations/schemas/organization.schema.ts`
-- **Key fields:** `slug` (unique), `name`, `website`, `logo`, `category` (enum, indexed),
-  `relevance`, `i18n[]` (embed: `locale`, `messages.description`)
+- **Key fields:** `scope` (enum: `GLOBAL`, `LOCAL`; default `GLOBAL`, indexed),
+  `ownerId` (ref → User; required when `scope` is `LOCAL`, absent when `GLOBAL`),
+  `slug` (unique per `{ scope, ownerId }` — disabled rows still occupy the slug; re-enable to reuse),
+  `name`, `website`, `logo`, `category` (enum, indexed),
+  `relevance`, `disabled`, `i18n[]` (embed: `locale`, `messages.description`)
 - **Embedded:** `i18n[]` translations
-- **References:** none (global catalog; referenced by Experience, Education, Course)
+- **References:** optional `ownerId` → User (local catalog only; referenced by Experience, Education, Course)
 
 ### Experience (`experiences`)
 
