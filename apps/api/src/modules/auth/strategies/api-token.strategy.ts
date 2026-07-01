@@ -22,7 +22,7 @@ export class ApiTokenStrategy extends PassportStrategy(
   }
 
   async validate(apiKey: string): Promise<ApiTokenAuthContext> {
-    const verified = await this.apiTokensService.verify(apiKey);
+    const verified = await this.apiTokensService.validate(apiKey);
     if (!verified) throw new UnauthorizedException();
 
     const user = await this.usersService.findOneById(verified.ownerId);
