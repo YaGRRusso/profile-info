@@ -28,6 +28,7 @@ describe("CoursesService", () => {
     stats: ReturnType<typeof createMockStats>;
     detachSkill: jest.Mock;
     purgeByOrganization: jest.Mock;
+    purgeByOwner: jest.Mock;
   };
 
   beforeEach(async () => {
@@ -38,6 +39,7 @@ describe("CoursesService", () => {
       stats: createMockStats(),
       detachSkill: jest.fn(),
       purgeByOrganization: jest.fn(),
+      purgeByOwner: jest.fn(),
     };
 
     const module: TestingModule = await Test.createTestingModule({
@@ -143,6 +145,13 @@ describe("CoursesService", () => {
       expect(repository.purgeByOrganization).toHaveBeenCalledWith(
         organizationId
       );
+    });
+  });
+
+  describe("purgeByOwner", () => {
+    it("delegates to repository helper", async () => {
+      await service.purgeByOwner(ownerId);
+      expect(repository.purgeByOwner).toHaveBeenCalledWith(ownerId);
     });
   });
 });

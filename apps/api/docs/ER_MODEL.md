@@ -139,8 +139,8 @@ inputs use `organizationId` and `skillIds` (no `ownerId` — injected from conte
   `messages.description`)
 - **Embedded:** `urls[]` (`UrlEmbed`: `title`, `value`), `i18n[]` translations
 - **References:** none (tenant root; referenced by private entities and `ApiToken`)
-- **Delete:** `SUPER_ADMIN` accounts cannot be deleted. Deleting a `USER` will cascade to
-  their private entities and API tokens once `user.deleted` ships (see backlog).
+- **Delete:** `SUPER_ADMIN` accounts cannot be deleted. Deleting a `USER` emits
+  `user.deleted`, which hard-deletes all private entities and API tokens for that `ownerId`.
 
 ### Skill (`skills`)
 
@@ -199,7 +199,7 @@ inputs use `organizationId` and `skillIds` (no `ownerId` — injected from conte
   (session JWT only); send as `X-Api-Key` on GraphQL requests; dev seed logs fixed tokens
   (see `npm run seed`)
 - **References:** `ownerId` → User
-- **Delete:** cascade when parent `User` is deleted (`user.deleted` — see backlog)
+- **Delete:** cascade when parent `User` is deleted (`user.deleted`)
 
 ## Shared value objects
 
@@ -231,9 +231,9 @@ inputs use `organizationId` and `skillIds` (no `ownerId` — injected from conte
 - `organization.deleted` event: hard `deleteMany` on Course, Education, Experience tied
   to that organization **across all tenants** (`purgeByOrganization`) — intentional;
   softer detach is [backlog](./BACKLOG.md).
-- `user.deleted` event (pending): `deleteMany` on all private
-  entities with matching `ownerId`; `deleteMany` on `ApiToken` for that `ownerId`.
-  **`SUPER_ADMIN` users cannot be deleted.**
+- `user.deleted` event: hard `deleteMany` on Experience, Education, Course, Project,
+  and ApiToken with matching `ownerId` (`purgeByOwner`). **`SUPER_ADMIN` users cannot
+  be deleted.**
 - Private entity updates never change `ownerId` — transfer is delete + recreate (see
   [backlog](./BACKLOG.md)).
 - No Mongoose `pre('deleteOne')` hooks; deletes go through services that emit events first.

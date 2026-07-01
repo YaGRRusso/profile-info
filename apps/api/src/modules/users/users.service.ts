@@ -1,6 +1,10 @@
-import { Injectable } from "@nestjs/common";
+import { ForbiddenException, Injectable } from "@nestjs/common";
+import { EventEmitter2 } from "@nestjs/event-emitter";
 import { hash } from "bcryptjs";
 import { BatchEntity } from "@/core/entities/batch.entity";
+import { UserRole } from "@/core/enums/user-role.enum";
+import { DomainEvents } from "@/core/events/domain-events";
+import { UserDeletedEvent } from "@/core/events/user-deleted.event";
 import type { MultiPaged } from "@/core/persistence/types/output.type";
 import { CreateUserInput } from "./dto/create-user.input";
 import { FilterUserInput } from "./dto/filter-user.input";
@@ -13,7 +17,10 @@ import { UsersRepository } from "./users.repository";
 
 @Injectable()
 export class UsersService {
-  constructor(private readonly repository: UsersRepository) {}
+  constructor(
+    private readonly repository: UsersRepository,
+    private readonly eventEmitter: EventEmitter2
+  ) {}
 
   findOneById(id: string): Promise<UserEntity> {
     return this.repository.crud.findOneById(id);
@@ -100,11 +107,40 @@ export class UsersService {
     return this.repository.crud.updateManyById(ids, update);
   }
 
-  removeOne(id: string): Promise<UserEntity> {
-    return this.repository.crud.deleteOneById(id);
+  async removeOne(id: string): Promise<UserEntity> {
+    const user = await this.repository.crud.findOneById(id);
+
+    this.assertDeletable(user);
+
+    await this.eventEmitter.emitAsync(
+      DomainEvents.user.deleted,
+      new UserDeletedEvent(user.id)
+    );
+
+    await this.repository.crud.deleteOneById(id);
+    return user;
   }
 
-  removeMany(ids: string[]): Promise<BatchEntity> {
+  async removeMany(ids: string[]): Promise<BatchEntity> {
+    const users = await this.repository.crud.findManyById(ids);
+
+    for (const user of users) {
+      this.assertDeletable(user);
+    }
+
+    for (const user of users) {
+      await this.eventEmitter.emitAsync(
+        DomainEvents.user.deleted,
+        new UserDeletedEvent(user.id)
+      );
+    }
+
     return this.repository.crud.deleteManyById(ids);
+  }
+
+  private assertDeletable(user: UserEntity): void {
+    if (user.role === UserRole.SUPER_ADMIN) {
+      throw new ForbiddenException("SUPER_ADMIN users cannot be deleted");
+    }
   }
 }

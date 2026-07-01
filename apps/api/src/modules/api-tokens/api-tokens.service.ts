@@ -111,6 +111,10 @@ export class ApiTokensService {
     return this.repository.crud.scoped(toTenantScope(ctx)).deleteManyById(ids);
   }
 
+  async purgeByOwner(ownerId: string): Promise<void> {
+    await this.repository.purgeByOwner(ownerId);
+  }
+
   stringifyApiToken(tokenId: string, secret: string): string {
     return `${API_TOKEN_PREFIX}${tokenId}_${secret}`;
   }

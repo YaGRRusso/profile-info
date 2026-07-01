@@ -138,4 +138,8 @@ export class CoursesService {
   async purgeByOrganization(organizationId: string): Promise<void> {
     await this.repository.purgeByOrganization(organizationId);
   }
+
+  async purgeByOwner(ownerId: string): Promise<void> {
+    await this.repository.purgeByOwner(ownerId);
+  }
 }

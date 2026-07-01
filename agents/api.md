@@ -67,7 +67,7 @@ Full diagram and field detail: `apps/api/docs/ER_MODEL.md`.
 
 - `persistence/`: generic MongoDB layer — `CrudRepository` + `CrudMapperInterface` (DTO-aware create/update/filter/sort), `StatsRepository`, `scoped()` / `global()` tenant composition on both, `withObjectIdRefs` for filter ObjectId refs, `BatchCount`, `withTenantScope`, `withTenantScopeForAggregate` (aggregate `$match` only). Unit specs in `persistence/helpers/*.spec.ts` and `persistence/repositories/*.spec.ts`.
 - `filters/persistence-exception.filter.ts`: global `APP_FILTER` — maps persistence errors to HTTP exceptions: Mongo `E11000`/`E11001` → 409, Mongo `121` + Mongoose `ValidationError`/`CastError` → 400, `MongooseServerSelectionError` → 503. Services do not catch these; use `assertDuplicate` / `assertReferencesExist` in `common/helpers/assert.helper.ts` only for domain-specific pre-checks.
-- `events/`: `domain-events.ts` (event name constants), `skill-deleted.event.ts`, `organization-deleted.event.ts` (neutral payload classes).
+- `events/`: `domain-events.ts` (event name constants), `skill-deleted.event.ts`, `organization-deleted.event.ts`, `user-deleted.event.ts` (neutral payload classes).
 - `enums/credential-kind.enum.ts`: shared `CredentialKind` enum (`SESSION`, `API_TOKEN`).
 - `enums/user-role.enum.ts`: shared `UserRole` enum (`USER`, `SUPER_ADMIN`).
 - `enums/api-token-permission.enum.ts`: shared `ApiTokenPermission` enum (`QUERY`, `MUTATE`).
@@ -134,6 +134,8 @@ Listeners are thin (`@OnEvent` + delegate to a service method). All MongoDB writ
 - `organization.deleted` (`organizations` → `courses`): hard `deleteMany` via `purgeByOrganization`
 - `organization.deleted` (`organizations` → `educations`): hard `deleteMany` via `purgeByOrganization`
 - `organization.deleted` (`organizations` → `experiences`): hard `deleteMany` via `purgeByOrganization`
+- `user.deleted` (`users` → `experiences`, `educations`, `courses`, `projects`): hard `deleteMany` via `purgeByOwner`
+- `user.deleted` (`users` → `api-tokens`): hard `deleteMany` via `purgeByOwner`
 
 Do not use Mongoose `pre('deleteOne')` hooks — they miss `findByIdAndDelete` / `deleteMany`.
 

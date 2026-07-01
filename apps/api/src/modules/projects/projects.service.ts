@@ -131,4 +131,8 @@ export class ProjectsService {
   async detachSkill(skillId: string): Promise<void> {
     await this.repository.detachSkill(skillId);
   }
+
+  async purgeByOwner(ownerId: string): Promise<void> {
+    await this.repository.purgeByOwner(ownerId);
+  }
 }

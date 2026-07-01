@@ -45,4 +45,8 @@ export class ExperiencesRepository {
   async purgeByOrganization(organizationId: string): Promise<void> {
     await this.model.deleteMany({ organizationId }).exec();
   }
+
+  async purgeByOwner(ownerId: string): Promise<void> {
+    await this.model.deleteMany({ ownerId }).exec();
+  }
 }

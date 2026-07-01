@@ -5,6 +5,7 @@ import {
   ProjectSchema,
 } from "@/modules/projects/schemas/project.schema";
 import { OnSkillDeletedListener } from "./listeners/on-skill-deleted.listener";
+import { OnUserDeletedListener } from "./listeners/on-user-deleted.listener";
 import { ProjectsRepository } from "./projects.repository";
 import { ProjectsResolver } from "./projects.resolver";
 import { ProjectsService } from "./projects.service";
@@ -20,6 +21,7 @@ import { ProjectsService } from "./projects.service";
     ProjectsResolver,
     ProjectsService,
     OnSkillDeletedListener,
+    OnUserDeletedListener,
   ],
   exports: [ProjectsService],
 })

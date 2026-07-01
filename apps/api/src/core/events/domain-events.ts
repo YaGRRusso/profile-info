@@ -5,4 +5,7 @@ export const DomainEvents = {
   organization: {
     deleted: "organization.deleted",
   },
+  user: {
+    deleted: "user.deleted",
+  },
 } as const;

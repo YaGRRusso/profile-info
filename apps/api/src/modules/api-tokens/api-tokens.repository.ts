@@ -51,4 +51,8 @@ export class ApiTokensRepository {
       hashedSecret: String(document.hashedSecret),
     };
   }
+
+  async purgeByOwner(ownerId: string): Promise<void> {
+    await this.model.deleteMany({ ownerId }).exec();
+  }
 }

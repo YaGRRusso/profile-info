@@ -1,6 +1,9 @@
+import { EventEmitter2 } from "@nestjs/event-emitter";
 import { Test, TestingModule } from "@nestjs/testing";
 import { hash } from "bcryptjs";
 import { UserRole } from "@/core/enums/user-role.enum";
+import { DomainEvents } from "@/core/events/domain-events";
+import { UserDeletedEvent } from "@/core/events/user-deleted.event";
 import { createMockCrud } from "@/core/persistence/repositories/testing/service-spec.mock";
 import { UsersRepository } from "./users.repository";
 import { UsersService } from "./users.service";
@@ -29,6 +32,7 @@ const fakeUserWithPassword = {
 describe("UsersService", () => {
   let service: UsersService;
   let crud: ReturnType<typeof createMockCrud>;
+  let eventEmitter: jest.Mocked<Pick<EventEmitter2, "emitAsync">>;
   let repository: {
     crud: ReturnType<typeof createMockCrud>;
     findOneByEmailWithPassword: jest.Mock;
@@ -46,10 +50,15 @@ describe("UsersService", () => {
       providers: [
         UsersService,
         { provide: UsersRepository, useValue: repository },
+        {
+          provide: EventEmitter2,
+          useValue: { emitAsync: jest.fn().mockResolvedValue([]) },
+        },
       ],
     }).compile();
 
     service = module.get(UsersService);
+    eventEmitter = module.get(EventEmitter2);
   });
 
   it("should be defined", () => {
@@ -185,6 +194,69 @@ describe("UsersService", () => {
       expect(crud.updateOneById).toHaveBeenCalledWith(validId, {
         name: "Jane",
       });
+    });
+  });
+
+  describe("removeOne", () => {
+    it("emits user.deleted before deleting", async () => {
+      crud.findOneById.mockResolvedValue(fakeUser);
+      crud.deleteOneById.mockResolvedValue(fakeUser);
+
+      await expect(service.removeOne(validId)).resolves.toEqual(fakeUser);
+
+      expect(eventEmitter.emitAsync).toHaveBeenCalledWith(
+        DomainEvents.user.deleted,
+        new UserDeletedEvent(validId)
+      );
+      expect(crud.deleteOneById).toHaveBeenCalledWith(validId);
+    });
+
+    it("rejects SUPER_ADMIN deletion", async () => {
+      crud.findOneById.mockResolvedValue({
+        ...fakeUser,
+        role: UserRole.SUPER_ADMIN,
+      });
+
+      await expect(service.removeOne(validId)).rejects.toThrow(
+        "SUPER_ADMIN users cannot be deleted"
+      );
+      expect(eventEmitter.emitAsync).not.toHaveBeenCalled();
+      expect(crud.deleteOneById).not.toHaveBeenCalled();
+    });
+  });
+
+  describe("removeMany", () => {
+    it("emits user.deleted for each user before deleteManyById", async () => {
+      crud.findManyById.mockResolvedValue([fakeUser]);
+      crud.deleteManyById.mockResolvedValue({ succeeded: 1, failed: 0 });
+
+      await expect(service.removeMany([validId])).resolves.toEqual({
+        succeeded: 1,
+        failed: 0,
+      });
+
+      expect(eventEmitter.emitAsync).toHaveBeenCalledWith(
+        DomainEvents.user.deleted,
+        new UserDeletedEvent(validId)
+      );
+      expect(crud.deleteManyById).toHaveBeenCalledWith([validId]);
+    });
+
+    it("rejects batch when any user is SUPER_ADMIN", async () => {
+      crud.findManyById.mockResolvedValue([
+        fakeUser,
+        {
+          ...fakeUser,
+          id: "507f1f77bcf86cd799439014",
+          role: UserRole.SUPER_ADMIN,
+        },
+      ]);
+
+      await expect(
+        service.removeMany([validId, "507f1f77bcf86cd799439014"])
+      ).rejects.toThrow("SUPER_ADMIN users cannot be deleted");
+      expect(eventEmitter.emitAsync).not.toHaveBeenCalled();
+      expect(crud.deleteManyById).not.toHaveBeenCalled();
     });
   });
 });

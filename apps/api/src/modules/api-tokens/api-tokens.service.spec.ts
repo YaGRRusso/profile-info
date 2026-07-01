@@ -26,6 +26,7 @@ const fakeEntity = {
 describe("ApiTokensService", () => {
   let service: ApiTokensService;
   let crud: ReturnType<typeof createMockCrud>;
+  let purgeByOwner: jest.Mock;
 
   beforeEach(async () => {
     jest.clearAllMocks();
@@ -47,10 +48,12 @@ describe("ApiTokensService", () => {
         secret: "secret-value",
       });
 
+    purgeByOwner = jest.fn();
+
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         ApiTokensService,
-        { provide: ApiTokensRepository, useValue: { crud } },
+        { provide: ApiTokensRepository, useValue: { crud, purgeByOwner } },
       ],
     }).compile();
 
@@ -107,6 +110,13 @@ describe("ApiTokensService", () => {
       );
       expect(crud.scoped).toHaveBeenCalledWith(toTenantScope(ctx));
       expect(crud.deleteOneById).toHaveBeenCalledWith(validId);
+    });
+  });
+
+  describe("purgeByOwner", () => {
+    it("delegates to repository helper", async () => {
+      await service.purgeByOwner(ownerId);
+      expect(purgeByOwner).toHaveBeenCalledWith(ownerId);
     });
   });
 });

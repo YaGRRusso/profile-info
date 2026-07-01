@@ -9,6 +9,7 @@ import { CoursesResolver } from "./courses.resolver";
 import { CoursesService } from "./courses.service";
 import { OnOrganizationDeletedListener } from "./listeners/on-organization-deleted.listener";
 import { OnSkillDeletedListener } from "./listeners/on-skill-deleted.listener";
+import { OnUserDeletedListener } from "./listeners/on-user-deleted.listener";
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { OnSkillDeletedListener } from "./listeners/on-skill-deleted.listener";
     CoursesService,
     OnSkillDeletedListener,
     OnOrganizationDeletedListener,
+    OnUserDeletedListener,
   ],
   exports: [CoursesService],
 })

@@ -25,6 +25,7 @@ describe("ProjectsService", () => {
     crud: ReturnType<typeof createMockCrud>;
     stats: ReturnType<typeof createMockStats>;
     detachSkill: jest.Mock;
+    purgeByOwner: jest.Mock;
   };
 
   beforeEach(async () => {
@@ -34,6 +35,7 @@ describe("ProjectsService", () => {
       crud,
       stats: createMockStats(),
       detachSkill: jest.fn(),
+      purgeByOwner: jest.fn(),
     };
 
     const module: TestingModule = await Test.createTestingModule({
@@ -128,6 +130,13 @@ describe("ProjectsService", () => {
     it("delegates to repository helper", async () => {
       await service.detachSkill(validId);
       expect(repository.detachSkill).toHaveBeenCalledWith(validId);
+    });
+  });
+
+  describe("purgeByOwner", () => {
+    it("delegates to repository helper", async () => {
+      await service.purgeByOwner(ownerId);
+      expect(repository.purgeByOwner).toHaveBeenCalledWith(ownerId);
     });
   });
 });

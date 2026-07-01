@@ -35,4 +35,8 @@ export class ProjectsRepository {
       .updateMany({ skillIds: skillId }, { $pull: { skillIds: skillId } })
       .exec();
   }
+
+  async purgeByOwner(ownerId: string): Promise<void> {
+    await this.model.deleteMany({ ownerId }).exec();
+  }
 }
