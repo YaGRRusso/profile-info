@@ -70,5 +70,6 @@ export class CreateCourseInput {
   i18n: TranslationInput<CreateCourseMessagesInput>[];
 
   @OptionalField(() => [String])
+  @IsMongoId({ each: true })
   skillIds?: string[];
 }

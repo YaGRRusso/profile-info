@@ -8,6 +8,7 @@ import { OrganizationsRepository } from "./organizations.repository";
 import { OrganizationsResolver } from "./organizations.resolver";
 import { OrganizationsService } from "./organizations.service";
 import { OrganizationsLoaderService } from "./organizations-loader.service";
+import { OrganizationsValidatorService } from "./organizations-validator.service";
 
 @Module({
   imports: [
@@ -20,7 +21,12 @@ import { OrganizationsLoaderService } from "./organizations-loader.service";
     OrganizationsResolver,
     OrganizationsService,
     OrganizationsLoaderService,
+    OrganizationsValidatorService,
   ],
-  exports: [OrganizationsService, OrganizationsLoaderService],
+  exports: [
+    OrganizationsService,
+    OrganizationsLoaderService,
+    OrganizationsValidatorService,
+  ],
 })
 export class OrganizationsModule {}

@@ -76,5 +76,6 @@ export class CreateEducationInput {
   period?: DateRangeInput;
 
   @OptionalField(() => [String])
+  @IsMongoId({ each: true })
   skillIds?: string[];
 }

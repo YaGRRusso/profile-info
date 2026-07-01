@@ -2,6 +2,7 @@ import { InputType } from "@nestjs/graphql";
 import { Type } from "class-transformer";
 import {
   IsArray,
+  IsMongoId,
   IsNotEmpty,
   IsString,
   IsUrl,
@@ -47,6 +48,7 @@ export class CreateProjectInput {
   images?: string[];
 
   @OptionalField(() => [String])
+  @IsMongoId({ each: true })
   skillIds?: string[];
 
   @RequiredField(() => [ProjectTranslationInput])

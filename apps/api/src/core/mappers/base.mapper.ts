@@ -1,4 +1,8 @@
 import mongoose from "mongoose";
+import {
+  assertValidObjectId,
+  assertValidObjectIds,
+} from "@/common/helpers/object-id.helper";
 import type { BaseEntity } from "@/core/entities/base.entity";
 import type { BaseModel } from "@/core/schemas/base.schema";
 
@@ -27,11 +31,15 @@ export function toIdStrings(
 export function toObjectId(
   value: string | { toString(): string }
 ): mongoose.Types.ObjectId {
-  return new mongoose.Types.ObjectId(String(value));
+  const id = String(value);
+  assertValidObjectId(id);
+  return new mongoose.Types.ObjectId(id);
 }
 
 export function toObjectIds(
   values: string[] | undefined
 ): mongoose.Types.ObjectId[] | undefined {
-  return values?.map(toObjectId);
+  if (values === undefined) return;
+  assertValidObjectIds(values);
+  return values.map((value) => new mongoose.Types.ObjectId(value));
 }

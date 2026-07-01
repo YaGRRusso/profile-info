@@ -56,7 +56,7 @@ Full diagram and field detail: `apps/api/docs/ER_MODEL.md`.
 
 `common/` (pure TS, no NestJS/Mongoose/GraphQL imports):
 
-- `helpers/`: `object.helper.ts` (`clearObject`), `object-id.helper.ts` (`assertValidObjectId`, `assertValidObjectIds`), `daterange.helper.ts` (`sortDateRange`), `pick-translation.helper.ts` (`pickTranslation`), `format-period.helper.ts` (`formatPeriod`), `breakpoint.helper.ts`.
+- `helpers/`: `object.helper.ts` (`clearObject`), `object-id.helper.ts` (`assertValidObjectId`, `assertValidObjectIds`), `assert.helper.ts` (`assertReferencesExist`, `assertReferencesResolved`, `REFERENCES_NOT_FOUND`), `daterange.helper.ts` (`sortDateRange`), `pick-translation.helper.ts` (`pickTranslation`), `format-period.helper.ts` (`formatPeriod`), `breakpoint.helper.ts`.
 - `i18n/locales.ts`: `Locale`, `SUPPORTED_CONTENT_LOCALES`, `normalizeLocale` — app-owned copy (resume PDF, future errors). Entity `i18n[].locale` is a free string (`@IsString` + `@IsNotEmpty` only).
 - `pdf/`: domain-agnostic PDFKit layer — `PdfContext`, `DEFAULT_PDF_THEME`, `PDF_SPACING` scale (`xs`–`block`), layout primitives in `layout/` (`renderSection`, `renderEntryBlock`, `renderLabeledLinks`). `renderEntryBlock` and `renderSection` measure content height and call `ensureBlockFits` so section titles and entry headers are not orphaned at page breaks; long descriptions and multi-entry sections still flow across pages.
 - `execution/orchestrator.helper.ts`: `orchestrate(...)`, a concurrency-limited + timeout task runner (plain function, used by `ai-tools`).
@@ -119,7 +119,7 @@ Notable specifics:
 - `modules/users/users.service.ts`: hashes password on create; `findOneByEmailWithPassword` (with `select("+password")`) is auth-only — public CRUD methods never load password. Password validation lives in `AuthService.validate`.
 - `modules/api-tokens/api-tokens.service.ts`: hashes secret on create; `findOneByIdWithHashedSecret` (with `select("+hashedSecret")`) is auth-only — public CRUD methods never load `hashedSecret`. Credential validation (parse, expiry, bcrypt compare) lives in `ApiTokenStrategy.validate`; `parseApiToken` is shared with create formatting.
 - `modules/experiences/experiences.resolver.ts`: `@ResolveField` for `organization`, `skills`, sorted `roles`.
-- `modules/skills/` and `modules/organizations/` export `SkillsLoaderService` / `OrganizationsLoaderService`; `platform/graphql/loaders.service.ts` composes them per request.
+- `modules/skills/` and `modules/organizations/` export `SkillsLoaderService` / `OrganizationsLoaderService` and `SkillsValidatorService` / `OrganizationsValidatorService` (`assertSkillExists`, `assertSkillsExist`, `assertOrganizationExists`, `assertOrganizationsExist`); private-entity services call validators on create/update. `platform/graphql/loaders.service.ts` composes loaders per request.
 
 ## Domain events (delete cascade)
 
@@ -145,7 +145,7 @@ Copy `src/modules/courses/` (or `educations/`) and adapt:
 
 1. Mongoose model: `src/modules/<name>/schemas/<name>.schema.ts` extending `BaseModel`.
 2. GraphQL entity: `modules/<name>/entities/<name>.entity.ts` extending `BaseEntity`; export `Paginated<Name>Entity = createPaginatedModel(...)`. When the entity has `@ResolveField` relations, define `<Name>EntityRecord` (`Omit<Entity, resolved fields>`) for mapper/repository typing.
-3. Mapper: `modules/<name>/mappers/<name>.mapper.ts` implementing `CrudMapperInterface` — `toDomain`, `toPersistenceForCreate/Update/Filter/Sort`; use `toObjectId` / `toObjectIds` from `core/mappers/base.mapper` for refs in create, update, and filter (`withObjectIdRefs` from `core/persistence/helpers/filter-ref.helper`).
+3. Mapper: `modules/<name>/mappers/<name>.mapper.ts` implementing `CrudMapperInterface` — `toDomain`, `toPersistenceForCreate/Update/Filter/Sort`; use `toObjectId` / `toObjectIds` from `core/mappers/base.mapper` for refs in create, update, and filter (`withObjectIdRefs` from `core/persistence/helpers/filter-ref.helper`). Both helpers call `assertValidObjectId(s)` before constructing `ObjectId`.
 4. Inputs: `Create`, `Update` (PartialType), `Filter` (`PartialType(PickType(Create, [...]))` — explicit whitelist; never `PartialType(Create)` wholesale), `Sort` (SortType factory).
 5. Repository: `<entity>.repository.ts` — `readonly crud: CrudRepository<Model, EntityRecord, …>` and `readonly stats: StatsRepository<Model>`; cascade helpers (`detachSkill`, `purgeByOrganization`) use raw `model` when needed. Entity-specific queries (e.g. `UsersRepository.findOneByEmailWithPassword`) stay on the repository class.
 6. Service: explicit CRUD methods delegating to `repository.crud.scoped(toTenantScope(ctx))` for owner-scoped entities (catalog: unscoped `repository.crud`). `AuthContext` is **required** on every tenant method — no `null`, no `*Unscoped` escape hatches. Return `MultiPaged<T>` from `findMany`; batch mutations return `BatchEntity`-shaped `BatchCount`. Domain logic (events, password hashing, token secret) stays in the service; cascades call repository helpers, not `repository.crud.updateMany` from the service.

@@ -51,4 +51,13 @@ describe("withObjectIdRefs", () => {
 
     expect(entity.organizationId).toBe(organizationId);
   });
+
+  it("should reject invalid ObjectId refs", () => {
+    expect(() =>
+      withObjectIdRefs<TestFilter, TestModel>(
+        { organizationId: "not-an-object-id" },
+        { single: ["organizationId"] }
+      )
+    ).toThrow("Invalid ID");
+  });
 });
