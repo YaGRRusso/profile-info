@@ -20,7 +20,7 @@ import {
 import { useQueryAllPages } from "@/hooks/custom/use-query-all-pages";
 import { useAtsSummarize, useTranslate } from "@/hooks/mutations/ai";
 import type { ProjectRow } from "@/hooks/queries/projects";
-import { useFindManySkills } from "@/hooks/queries/skills";
+import { useFindManyActiveSkills } from "@/hooks/queries/skills";
 import { fieldError } from "@/lib/field-error";
 import { createEmptyI18n } from "@/lib/i18n";
 import { findLabelsByIds } from "@/lib/mappers";
@@ -109,7 +109,7 @@ export function ProjectForm({
   isLoading,
   state,
 }: ProjectFormProps) {
-  const findManySkills = useFindManySkills();
+  const findManySkills = useFindManyActiveSkills();
   useQueryAllPages(findManySkills);
 
   const atsSummarize = useAtsSummarize();

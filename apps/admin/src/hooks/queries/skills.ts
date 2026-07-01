@@ -29,6 +29,33 @@ const findManySkills = graphql(`
         slug
         category
         relevance
+        disabled
+        createdAt
+        updatedAt
+      }
+    }
+  }
+`);
+
+const findManyActiveSkills = graphql(`
+  query FindManyActiveSkills(
+    $skillFilters: FilterSkillInput
+    $skillPagination: PaginationInput
+    $skillSort: SortSkillInput
+  ) {
+    findManyActiveSkills(
+      skillFilters: $skillFilters
+      skillPagination: $skillPagination
+      skillSort: $skillSort
+    ) {
+      found
+      nodes {
+        id
+        name
+        slug
+        category
+        relevance
+        disabled
         createdAt
         updatedAt
       }
@@ -60,6 +87,35 @@ export function useFindManySkills(
     select: (data) => ({
       found: data.pages[0]?.findManySkills.found ?? 0,
       nodes: data.pages.flatMap((p) => p.findManySkills.nodes),
+    }),
+    ...options,
+  });
+}
+
+export function useFindManyActiveSkills(
+  variables?: { skillFilters?: FilterSkillInput; skillSort?: SortSkillInput },
+  options?: { enabled?: boolean }
+) {
+  return useInfiniteQuery({
+    queryKey: ["findManyActiveSkills", variables],
+    queryFn: ({ pageParam }) =>
+      execute(findManyActiveSkills, {
+        ...variables,
+        skillPagination: { skip: pageParam, limit: PAGE_SIZE },
+      }),
+    initialPageParam: 0,
+    getNextPageParam: (lastPage, allPages) => {
+      const totalFetched = allPages.reduce(
+        (sum, p) => sum + p.findManyActiveSkills.nodes.length,
+        0
+      );
+      return totalFetched < lastPage.findManyActiveSkills.found
+        ? totalFetched
+        : undefined;
+    },
+    select: (data) => ({
+      found: data.pages[0]?.findManyActiveSkills.found ?? 0,
+      nodes: data.pages.flatMap((p) => p.findManyActiveSkills.nodes),
     }),
     ...options,
   });

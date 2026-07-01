@@ -23,7 +23,7 @@ import { useQueryAllPages } from "@/hooks/custom/use-query-all-pages";
 import { useAtsSummarize, useTranslate } from "@/hooks/mutations/ai";
 import type { ExperienceRow } from "@/hooks/queries/experiences";
 import { useFindManyActiveOrganizations } from "@/hooks/queries/organizations";
-import { useFindManySkills } from "@/hooks/queries/skills";
+import { useFindManyActiveSkills } from "@/hooks/queries/skills";
 import { toDateInput, toIsoDate } from "@/lib/date";
 import { fieldError } from "@/lib/field-error";
 import { createEmptyI18n, pickTranslation } from "@/lib/i18n";
@@ -149,7 +149,7 @@ export function ExperienceForm({
   const findManyOrganizations = useFindManyActiveOrganizations();
   useQueryAllPages(findManyOrganizations);
 
-  const findManySkills = useFindManySkills();
+  const findManySkills = useFindManyActiveSkills();
   useQueryAllPages(findManySkills);
 
   const atsSummarize = useAtsSummarize();

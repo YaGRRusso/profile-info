@@ -18,7 +18,7 @@ import {
 } from "@/generated/graphql/graphql";
 import { useQueryAllPages } from "@/hooks/custom/use-query-all-pages";
 import { useAtsSummarize, useTranslate } from "@/hooks/mutations/ai";
-import { useFindManySkills } from "@/hooks/queries/skills";
+import { useFindManyActiveSkills } from "@/hooks/queries/skills";
 import { toDateInput, toIsoDate } from "@/lib/date";
 import { fieldError } from "@/lib/field-error";
 import { createEmptyI18n } from "@/lib/i18n";
@@ -125,7 +125,7 @@ export function ProfileForm({
   isDisabled,
   isLoading,
 }: ProfileFormProps) {
-  const findManySkills = useFindManySkills();
+  const findManySkills = useFindManyActiveSkills();
   useQueryAllPages(findManySkills);
 
   const atsSummarize = useAtsSummarize();

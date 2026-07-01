@@ -17,8 +17,10 @@ import { SkillMultiForm } from "@/forms/skill-multi";
 import { useQueryAllPages } from "@/hooks/custom/use-query-all-pages";
 import {
   useCreateOneSkill,
-  useRemoveManySkills,
-  useRemoveOneSkill,
+  useDisableManySkills,
+  useDisableOneSkill,
+  useEnableManySkills,
+  useEnableOneSkill,
   useUpdateManySkills,
   useUpdateOneSkill,
 } from "@/hooks/mutations/skills";
@@ -40,12 +42,14 @@ function RouteComponent() {
   const createOneSkill = useCreateOneSkill();
   const updateOneSkill = useUpdateOneSkill();
   const updateManySkills = useUpdateManySkills();
-  const removeOneSkill = useRemoveOneSkill();
-  const removeManySkills = useRemoveManySkills();
+  const disableOneSkill = useDisableOneSkill();
+  const disableManySkills = useDisableManySkills();
+  const enableOneSkill = useEnableOneSkill();
+  const enableManySkills = useEnableManySkills();
 
-  const closeAndRefetch = useCallback(() => {
+  const closeAndRefetch = useCallback(async () => {
     setFormValues(undefined);
-    findManySkills.refetch();
+    await findManySkills.refetch();
   }, [findManySkills.refetch]);
 
   const selectedSkillIds = useMemo(
@@ -99,22 +103,22 @@ function RouteComponent() {
     ]
   );
 
-  const handleDelete = useCallback(() => {
+  const handleDisable = useCallback(() => {
     switch (formValues?.state) {
-      case "DELETING":
-        removeOneSkill.mutate(selectedSkillIds[0], {
+      case "DISABLING":
+        disableOneSkill.mutate(selectedSkillIds[0], {
           onSuccess: () => {
             closeAndRefetch();
-            toast.success("Skill deleted successfully");
+            toast.success("Skill disabled successfully");
           },
         });
         break;
-      case "MULTI_DELETING":
-        removeManySkills.mutate(selectedSkillIds, {
+      case "MULTI_DISABLING":
+        disableManySkills.mutate(selectedSkillIds, {
           onSuccess: (data) => {
             closeAndRefetch();
             toast.success(
-              `${data.removeManySkills.succeeded} skills deleted successfully`
+              `${data.disableManySkills.succeeded} skills disabled successfully`
             );
           },
         });
@@ -124,10 +128,41 @@ function RouteComponent() {
     }
   }, [
     formValues?.state,
-    removeOneSkill,
+    disableOneSkill,
     selectedSkillIds,
     closeAndRefetch,
-    removeManySkills,
+    disableManySkills,
+  ]);
+
+  const handleEnable = useCallback(() => {
+    switch (formValues?.state) {
+      case "ENABLING":
+        enableOneSkill.mutate(selectedSkillIds[0], {
+          onSuccess: () => {
+            closeAndRefetch();
+            toast.success("Skill enabled successfully");
+          },
+        });
+        break;
+      case "MULTI_ENABLING":
+        enableManySkills.mutate(selectedSkillIds, {
+          onSuccess: (data) => {
+            closeAndRefetch();
+            toast.success(
+              `${data.enableManySkills.succeeded} skills enabled successfully`
+            );
+          },
+        });
+        break;
+      default:
+        break;
+    }
+  }, [
+    formValues?.state,
+    enableOneSkill,
+    selectedSkillIds,
+    closeAndRefetch,
+    enableManySkills,
   ]);
 
   return (
@@ -151,7 +186,7 @@ function RouteComponent() {
             onClick: () => setFormValues({ state: "CREATING" }),
           },
         ]}
-        description="Create, update or delete skills that can be associated with your profile."
+        description="Create, update, disable or enable skills that can be associated with your profile."
         title="Manage Skills"
       />
 
@@ -231,17 +266,48 @@ function RouteComponent() {
           {
             label: "Confirm",
             className: "btn-soft btn-error",
-            disabled: removeOneSkill.isPending || removeManySkills.isPending,
-            onClick: () => handleDelete(),
+            disabled: disableOneSkill.isPending || disableManySkills.isPending,
+            onClick: () => handleDisable(),
           },
         ]}
-        description="Are you sure you want to delete the following skills?"
+        description="Are you sure you want to disable the following skills?"
         isOpen={
-          formValues?.state === "MULTI_DELETING" ||
-          formValues?.state === "DELETING"
+          formValues?.state === "MULTI_DISABLING" ||
+          formValues?.state === "DISABLING"
         }
         onClose={() => setFormValues(undefined)}
-        title="Delete skills?"
+        title="Disable skills?"
+      >
+        <ul className="flex flex-wrap items-center gap-1">
+          {formValues?.customValues?.map((skill) => (
+            <li className="badge badge-sm badge-soft" key={skill?.id}>
+              {skill?.name}
+            </li>
+          ))}
+        </ul>
+      </Modal>
+
+      <Modal
+        actions={[
+          {
+            label: "Cancel",
+            className: "btn-ghost",
+            onClick: () => setFormValues(undefined),
+          },
+          {
+            label: "Confirm",
+            className: "btn-soft btn-success",
+            disabled: enableOneSkill.isPending || enableManySkills.isPending,
+            onClick: () => handleEnable(),
+          },
+        ]}
+        description="Are you sure you want to enable the following skills?"
+        isOpen={
+          formValues?.state === "MULTI_ENABLING" ||
+          formValues?.state === "ENABLING"
+        }
+        onClose={() => setFormValues(undefined)}
+        title="Enable skills?"
       >
         <ul className="flex flex-wrap items-center gap-1">
           {formValues?.customValues?.map((skill) => (
@@ -272,9 +338,9 @@ function RouteComponent() {
         <DataState.Content>
           <SkillsTable
             data={findManySkills.data?.nodes ?? []}
-            onDelete={(skill) =>
+            onDisable={(skill) =>
               setFormValues({
-                state: "DELETING",
+                state: "DISABLING",
                 customValues: [skill],
               })
             }
@@ -285,15 +351,27 @@ function RouteComponent() {
                 customValues: [skill],
               })
             }
-            onMultiDelete={(skills) =>
+            onEnable={(skill) =>
               setFormValues({
-                state: "MULTI_DELETING",
+                state: "ENABLING",
+                customValues: [skill],
+              })
+            }
+            onMultiDisable={(skills) =>
+              setFormValues({
+                state: "MULTI_DISABLING",
                 customValues: skills,
               })
             }
             onMultiEdit={(skills) =>
               setFormValues({
                 state: "MULTI_UPDATING",
+                customValues: skills,
+              })
+            }
+            onMultiEnable={(skills) =>
+              setFormValues({
+                state: "MULTI_ENABLING",
                 customValues: skills,
               })
             }

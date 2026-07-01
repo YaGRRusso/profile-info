@@ -4,16 +4,18 @@ Deferred API and admin work, ordered by criticality, then value, then effort.
 
 ## High Priority
 
-- **Private CV + REST auth** — `GET /resume.pdf` is public today; REST routes should accept session JWT or `X-Api-Key`
-- **Collaborative catalog** — Users submit skill/org requests; `SUPER_ADMIN` moderates; local overrides per tenant.
+### Better Prompts
+
+- **Optimize prompts** — Refine `ats-summarize`, `summarize`, and `translate` for quality, cost, and locale.
+- **CV tailoring** — Per-user or per-job variants (sections, emphasis, templates).
 
 ## Medium Priority
 
-### Better Prompts
+### Multi User
 
+- **Collaborative catalog** — Users submit skill/org requests; `SUPER_ADMIN` moderates; local overrides per tenant.
+- **Private CV + REST auth** — `GET /resume.pdf` is public today; REST routes should accept session JWT or `X-Api-Key`
 - **User-owned integration keys** — Optional BYOK for OpenRouter, GitHub, Tavily.
-- **Optimize prompts** — Refine `ats-summarize`, `summarize`, and `translate` for quality, cost, and locale.
-- **CV tailoring** — Per-user or per-job variants (sections, emphasis, templates).
 
 ### UI
 

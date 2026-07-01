@@ -84,7 +84,7 @@ Keep `components/`, `hooks/custom/`, and `lib/` domain-agnostic.
 
 - Codegen reads `../api/src/schema.gql` from disk; keep it up to date after API changes.
 - Batch mutations (`createMany*`, `updateMany*`, `removeMany*`, `disableMany*`, `enableMany*`) return `BatchEntity { succeeded, failed }` — not `count` or entity arrays.
-- Catalog admin tables: `useFindManyOrganizations`. Reference pickers: `useFindManyActiveOrganizations` (calls `findManyActiveOrganizations` on the API).
+- Catalog admin tables: `useFindManyOrganizations` / `useFindManySkills`. Reference pickers: `useFindManyActiveOrganizations` / `useFindManyActiveSkills` (calls `findManyActive*` on the API).
 - `src/generated/graphql/` and `routeTree.gen.ts` are generated.
 - Do not add ad-hoc 401 handling in hooks.
 - `dev` backgrounds codegen; first start may race — run `build` once if types missing.

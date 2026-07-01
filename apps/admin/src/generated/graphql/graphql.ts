@@ -1758,19 +1758,33 @@ export type UpdateManySkillsMutationVariables = Exact<{
 
 export type UpdateManySkillsMutation = { __typename?: 'Mutation', updateManySkills: { __typename?: 'BatchEntity', succeeded: number, failed: number } };
 
-export type RemoveOneSkillMutationVariables = Exact<{
+export type DisableOneSkillMutationVariables = Exact<{
   skillId: Scalars['ID']['input'];
 }>;
 
 
-export type RemoveOneSkillMutation = { __typename?: 'Mutation', removeOneSkill: { __typename?: 'SkillEntity', id: string, name: string, slug: string, category: SkillCategory, relevance: number, createdAt: any, updatedAt: any } };
+export type DisableOneSkillMutation = { __typename?: 'Mutation', disableOneSkill: { __typename?: 'SkillEntity', id: string, slug: string } };
 
-export type RemoveManySkillsMutationVariables = Exact<{
+export type DisableManySkillsMutationVariables = Exact<{
   skillIds: Array<Scalars['ID']['input']> | Scalars['ID']['input'];
 }>;
 
 
-export type RemoveManySkillsMutation = { __typename?: 'Mutation', removeManySkills: { __typename?: 'BatchEntity', succeeded: number, failed: number } };
+export type DisableManySkillsMutation = { __typename?: 'Mutation', disableManySkills: { __typename?: 'BatchEntity', succeeded: number, failed: number } };
+
+export type EnableOneSkillMutationVariables = Exact<{
+  skillId: Scalars['ID']['input'];
+}>;
+
+
+export type EnableOneSkillMutation = { __typename?: 'Mutation', enableOneSkill: { __typename?: 'SkillEntity', id: string, slug: string } };
+
+export type EnableManySkillsMutationVariables = Exact<{
+  skillIds: Array<Scalars['ID']['input']> | Scalars['ID']['input'];
+}>;
+
+
+export type EnableManySkillsMutation = { __typename?: 'Mutation', enableManySkills: { __typename?: 'BatchEntity', succeeded: number, failed: number } };
 
 export type UpdateMeMutationVariables = Exact<{
   updateMeInput: UpdateMeInput;
@@ -1859,7 +1873,16 @@ export type FindManySkillsQueryVariables = Exact<{
 }>;
 
 
-export type FindManySkillsQuery = { __typename?: 'Query', findManySkills: { __typename?: 'PaginatedSkillEntity', found: number, nodes: Array<{ __typename?: 'SkillEntity', id: string, name: string, slug: string, category: SkillCategory, relevance: number, createdAt: any, updatedAt: any }> } };
+export type FindManySkillsQuery = { __typename?: 'Query', findManySkills: { __typename?: 'PaginatedSkillEntity', found: number, nodes: Array<{ __typename?: 'SkillEntity', id: string, name: string, slug: string, category: SkillCategory, relevance: number, disabled: boolean, createdAt: any, updatedAt: any }> } };
+
+export type FindManyActiveSkillsQueryVariables = Exact<{
+  skillFilters?: InputMaybe<FilterSkillInput>;
+  skillPagination?: InputMaybe<PaginationInput>;
+  skillSort?: InputMaybe<SortSkillInput>;
+}>;
+
+
+export type FindManyActiveSkillsQuery = { __typename?: 'Query', findManyActiveSkills: { __typename?: 'PaginatedSkillEntity', found: number, nodes: Array<{ __typename?: 'SkillEntity', id: string, name: string, slug: string, category: SkillCategory, relevance: number, disabled: boolean, createdAt: any, updatedAt: any }> } };
 
 export class TypedDocumentString<TResult, TVariables>
   extends String
@@ -2282,27 +2305,38 @@ export const UpdateManySkillsDocument = new TypedDocumentString(`
   }
 }
     `) as unknown as TypedDocumentString<UpdateManySkillsMutation, UpdateManySkillsMutationVariables>;
-export const RemoveOneSkillDocument = new TypedDocumentString(`
-    mutation RemoveOneSkill($skillId: ID!) {
-  removeOneSkill(skillId: $skillId) {
+export const DisableOneSkillDocument = new TypedDocumentString(`
+    mutation DisableOneSkill($skillId: ID!) {
+  disableOneSkill(skillId: $skillId) {
     id
-    name
     slug
-    category
-    relevance
-    createdAt
-    updatedAt
   }
 }
-    `) as unknown as TypedDocumentString<RemoveOneSkillMutation, RemoveOneSkillMutationVariables>;
-export const RemoveManySkillsDocument = new TypedDocumentString(`
-    mutation RemoveManySkills($skillIds: [ID!]!) {
-  removeManySkills(skillIds: $skillIds) {
+    `) as unknown as TypedDocumentString<DisableOneSkillMutation, DisableOneSkillMutationVariables>;
+export const DisableManySkillsDocument = new TypedDocumentString(`
+    mutation DisableManySkills($skillIds: [ID!]!) {
+  disableManySkills(skillIds: $skillIds) {
     succeeded
     failed
   }
 }
-    `) as unknown as TypedDocumentString<RemoveManySkillsMutation, RemoveManySkillsMutationVariables>;
+    `) as unknown as TypedDocumentString<DisableManySkillsMutation, DisableManySkillsMutationVariables>;
+export const EnableOneSkillDocument = new TypedDocumentString(`
+    mutation EnableOneSkill($skillId: ID!) {
+  enableOneSkill(skillId: $skillId) {
+    id
+    slug
+  }
+}
+    `) as unknown as TypedDocumentString<EnableOneSkillMutation, EnableOneSkillMutationVariables>;
+export const EnableManySkillsDocument = new TypedDocumentString(`
+    mutation EnableManySkills($skillIds: [ID!]!) {
+  enableManySkills(skillIds: $skillIds) {
+    succeeded
+    failed
+  }
+}
+    `) as unknown as TypedDocumentString<EnableManySkillsMutation, EnableManySkillsMutationVariables>;
 export const UpdateMeDocument = new TypedDocumentString(`
     mutation UpdateMe($updateMeInput: UpdateMeInput!) {
   updateMe(updateMeInput: $updateMeInput) {
@@ -2669,9 +2703,31 @@ export const FindManySkillsDocument = new TypedDocumentString(`
       slug
       category
       relevance
+      disabled
       createdAt
       updatedAt
     }
   }
 }
     `) as unknown as TypedDocumentString<FindManySkillsQuery, FindManySkillsQueryVariables>;
+export const FindManyActiveSkillsDocument = new TypedDocumentString(`
+    query FindManyActiveSkills($skillFilters: FilterSkillInput, $skillPagination: PaginationInput, $skillSort: SortSkillInput) {
+  findManyActiveSkills(
+    skillFilters: $skillFilters
+    skillPagination: $skillPagination
+    skillSort: $skillSort
+  ) {
+    found
+    nodes {
+      id
+      name
+      slug
+      category
+      relevance
+      disabled
+      createdAt
+      updatedAt
+    }
+  }
+}
+    `) as unknown as TypedDocumentString<FindManyActiveSkillsQuery, FindManyActiveSkillsQueryVariables>;

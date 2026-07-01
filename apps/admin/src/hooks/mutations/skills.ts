@@ -46,23 +46,36 @@ const updateManySkills = graphql(`
   }
 `);
 
-const removeOneSkill = graphql(`
-  mutation RemoveOneSkill($skillId: ID!) {
-    removeOneSkill(skillId: $skillId) {
+const disableOneSkill = graphql(`
+  mutation DisableOneSkill($skillId: ID!) {
+    disableOneSkill(skillId: $skillId) {
       id
-      name
       slug
-      category
-      relevance
-      createdAt
-      updatedAt
     }
   }
 `);
 
-const removeManySkills = graphql(`
-  mutation RemoveManySkills($skillIds: [ID!]!) {
-    removeManySkills(skillIds: $skillIds) {
+const disableManySkills = graphql(`
+  mutation DisableManySkills($skillIds: [ID!]!) {
+    disableManySkills(skillIds: $skillIds) {
+      succeeded
+      failed
+    }
+  }
+`);
+
+const enableOneSkill = graphql(`
+  mutation EnableOneSkill($skillId: ID!) {
+    enableOneSkill(skillId: $skillId) {
+      id
+      slug
+    }
+  }
+`);
+
+const enableManySkills = graphql(`
+  mutation EnableManySkills($skillIds: [ID!]!) {
+    enableManySkills(skillIds: $skillIds) {
       succeeded
       failed
     }
@@ -103,16 +116,31 @@ export function useUpdateManySkills() {
   });
 }
 
-export function useRemoveOneSkill() {
+export function useDisableOneSkill() {
   return useMutation({
-    mutationKey: ["removeOneSkill"],
-    mutationFn: (skillId: string) => execute(removeOneSkill, { skillId }),
+    mutationKey: ["disableOneSkill"],
+    mutationFn: (skillId: string) => execute(disableOneSkill, { skillId }),
   });
 }
 
-export function useRemoveManySkills() {
+export function useDisableManySkills() {
   return useMutation({
-    mutationKey: ["removeManySkills"],
-    mutationFn: (skillIds: string[]) => execute(removeManySkills, { skillIds }),
+    mutationKey: ["disableManySkills"],
+    mutationFn: (skillIds: string[]) =>
+      execute(disableManySkills, { skillIds }),
+  });
+}
+
+export function useEnableOneSkill() {
+  return useMutation({
+    mutationKey: ["enableOneSkill"],
+    mutationFn: (skillId: string) => execute(enableOneSkill, { skillId }),
+  });
+}
+
+export function useEnableManySkills() {
+  return useMutation({
+    mutationKey: ["enableManySkills"],
+    mutationFn: (skillIds: string[]) => execute(enableManySkills, { skillIds }),
   });
 }
