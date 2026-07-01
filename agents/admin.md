@@ -49,7 +49,7 @@ Rich forms map flat Zod schemas to nested GraphQL shapes (`i18n`, `organizationI
 ## Module / directory breakdown
 
 - `src/lib/execute.ts`: GraphQL transport. `src/lib/api.ts`: REST transport (`getApiOrigin`, `apiRequest`). Other helpers: `gql.ts`, `tc.ts`, `cn.ts`, `parsers.ts`, `field-error.ts`, `chart-theme.ts`, `dayjs.ts`, `greeting.ts`, etc.
-- `src/hooks/queries/` and `mutations/`: one file per entity; `graphql` tag must use static string literals (no interpolated fragments).
+- `src/hooks/queries/` and `mutations/`: one file per entity; `graphql` tag must use static string literals (no interpolated fragments). Paginated list hooks use `hooks/custom/paginated-query.ts` helpers inside `useInfiniteQuery` — each helper receives an explicit key (`withPagination`: variables pagination key; `paginatedNextPageParam` / `paginatedSelect`: response field name).
 - `src/generated/graphql/`: codegen output — regenerate, do not edit.
 - `src/forms/`: entity forms + `*ToInput`/`*ToForm` mappers co-located.
 - `src/components/`: generic `display/` and `inputs/` (domain-agnostic).

@@ -3,11 +3,15 @@ import { graphql } from "@/generated/graphql";
 import type {
   FilterExperienceInput,
   FindManyExperiencesQuery,
+  FindManyExperiencesQueryVariables,
   SortExperienceInput,
 } from "@/generated/graphql/graphql";
+import {
+  paginatedNextPageParam,
+  paginatedSelect,
+  withPagination,
+} from "@/hooks/custom/paginated-query";
 import { execute } from "@/lib/execute";
-
-const PAGE_SIZE = 50;
 
 export type ExperienceRow =
   FindManyExperiencesQuery["findManyExperiences"]["nodes"][number];
@@ -77,24 +81,19 @@ export function useFindManyExperiences(
   return useInfiniteQuery({
     queryKey: ["findManyExperiences", variables],
     queryFn: ({ pageParam }) =>
-      execute(findManyExperiences, {
-        ...variables,
-        experiencePagination: { skip: pageParam, limit: PAGE_SIZE },
-      }),
+      execute(
+        findManyExperiences,
+        withPagination<FindManyExperiencesQueryVariables>(
+          "experiencePagination",
+          pageParam,
+          variables
+        )
+      ),
     initialPageParam: 0,
-    getNextPageParam: (lastPage, allPages) => {
-      const totalFetched = allPages.reduce(
-        (sum, p) => sum + p.findManyExperiences.nodes.length,
-        0
-      );
-      return totalFetched < lastPage.findManyExperiences.found
-        ? totalFetched
-        : undefined;
-    },
-    select: (data) => ({
-      found: data.pages[0]?.findManyExperiences.found ?? 0,
-      nodes: data.pages.flatMap((p) => p.findManyExperiences.nodes),
-    }),
+    getNextPageParam: paginatedNextPageParam<FindManyExperiencesQuery>(
+      "findManyExperiences"
+    ),
+    select: paginatedSelect<FindManyExperiencesQuery>("findManyExperiences"),
     ...options,
   });
 }

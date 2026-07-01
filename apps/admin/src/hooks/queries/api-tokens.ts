@@ -3,11 +3,15 @@ import { graphql } from "@/generated/graphql";
 import type {
   FilterApiTokenInput,
   FindManyApiTokensQuery,
+  FindManyApiTokensQueryVariables,
   SortApiTokenInput,
 } from "@/generated/graphql/graphql";
+import {
+  paginatedNextPageParam,
+  paginatedSelect,
+  withPagination,
+} from "@/hooks/custom/paginated-query";
 import { execute } from "@/lib/execute";
-
-const PAGE_SIZE = 50;
 
 export type ApiTokenRow =
   FindManyApiTokensQuery["findManyApiTokens"]["nodes"][number];
@@ -47,24 +51,18 @@ export function useFindManyApiTokens(
   return useInfiniteQuery({
     queryKey: ["findManyApiTokens", variables],
     queryFn: ({ pageParam }) =>
-      execute(findManyApiTokens, {
-        ...variables,
-        apiTokenPagination: { skip: pageParam, limit: PAGE_SIZE },
-      }),
+      execute(
+        findManyApiTokens,
+        withPagination<FindManyApiTokensQueryVariables>(
+          "apiTokenPagination",
+          pageParam,
+          variables
+        )
+      ),
     initialPageParam: 0,
-    getNextPageParam: (lastPage, allPages) => {
-      const totalFetched = allPages.reduce(
-        (sum, page) => sum + page.findManyApiTokens.nodes.length,
-        0
-      );
-      return totalFetched < lastPage.findManyApiTokens.found
-        ? totalFetched
-        : undefined;
-    },
-    select: (data) => ({
-      found: data.pages[0]?.findManyApiTokens.found ?? 0,
-      nodes: data.pages.flatMap((page) => page.findManyApiTokens.nodes),
-    }),
+    getNextPageParam:
+      paginatedNextPageParam<FindManyApiTokensQuery>("findManyApiTokens"),
+    select: paginatedSelect<FindManyApiTokensQuery>("findManyApiTokens"),
     ...options,
   });
 }

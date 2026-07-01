@@ -2,12 +2,18 @@ import { useInfiniteQuery } from "@tanstack/react-query";
 import { graphql } from "@/generated/graphql";
 import type {
   FilterOrganizationInput,
+  FindManyActiveOrganizationsQuery,
+  FindManyActiveOrganizationsQueryVariables,
   FindManyOrganizationsQuery,
+  FindManyOrganizationsQueryVariables,
   SortOrganizationInput,
 } from "@/generated/graphql/graphql";
+import {
+  paginatedNextPageParam,
+  paginatedSelect,
+  withPagination,
+} from "@/hooks/custom/paginated-query";
 import { execute } from "@/lib/execute";
-
-const PAGE_SIZE = 50;
 
 export type OrganizationRow =
   FindManyOrganizationsQuery["findManyOrganizations"]["nodes"][number];
@@ -90,24 +96,21 @@ export function useFindManyOrganizations(
   return useInfiniteQuery({
     queryKey: ["findManyOrganizations", variables],
     queryFn: ({ pageParam }) =>
-      execute(findManyOrganizations, {
-        ...variables,
-        organizationPagination: { skip: pageParam, limit: PAGE_SIZE },
-      }),
+      execute(
+        findManyOrganizations,
+        withPagination<FindManyOrganizationsQueryVariables>(
+          "organizationPagination",
+          pageParam,
+          variables
+        )
+      ),
     initialPageParam: 0,
-    getNextPageParam: (lastPage, allPages) => {
-      const totalFetched = allPages.reduce(
-        (sum, p) => sum + p.findManyOrganizations.nodes.length,
-        0
-      );
-      return totalFetched < lastPage.findManyOrganizations.found
-        ? totalFetched
-        : undefined;
-    },
-    select: (data) => ({
-      found: data.pages[0]?.findManyOrganizations.found ?? 0,
-      nodes: data.pages.flatMap((p) => p.findManyOrganizations.nodes),
-    }),
+    getNextPageParam: paginatedNextPageParam<FindManyOrganizationsQuery>(
+      "findManyOrganizations"
+    ),
+    select: paginatedSelect<FindManyOrganizationsQuery>(
+      "findManyOrganizations"
+    ),
     ...options,
   });
 }
@@ -122,24 +125,21 @@ export function useFindManyActiveOrganizations(
   return useInfiniteQuery({
     queryKey: ["findManyActiveOrganizations", variables],
     queryFn: ({ pageParam }) =>
-      execute(findManyActiveOrganizations, {
-        ...variables,
-        organizationPagination: { skip: pageParam, limit: PAGE_SIZE },
-      }),
+      execute(
+        findManyActiveOrganizations,
+        withPagination<FindManyActiveOrganizationsQueryVariables>(
+          "organizationPagination",
+          pageParam,
+          variables
+        )
+      ),
     initialPageParam: 0,
-    getNextPageParam: (lastPage, allPages) => {
-      const totalFetched = allPages.reduce(
-        (sum, p) => sum + p.findManyActiveOrganizations.nodes.length,
-        0
-      );
-      return totalFetched < lastPage.findManyActiveOrganizations.found
-        ? totalFetched
-        : undefined;
-    },
-    select: (data) => ({
-      found: data.pages[0]?.findManyActiveOrganizations.found ?? 0,
-      nodes: data.pages.flatMap((p) => p.findManyActiveOrganizations.nodes),
-    }),
+    getNextPageParam: paginatedNextPageParam<FindManyActiveOrganizationsQuery>(
+      "findManyActiveOrganizations"
+    ),
+    select: paginatedSelect<FindManyActiveOrganizationsQuery>(
+      "findManyActiveOrganizations"
+    ),
     ...options,
   });
 }
