@@ -1,4 +1,4 @@
-# ADR 001 — Local catalog (skills & organizations)
+# ADR 002 — Local catalog (skills & organizations)
 
 **Status:** Accepted (schemas done)  
 **Date:** 2026-07-01
