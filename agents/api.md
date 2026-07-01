@@ -116,7 +116,8 @@ modules/<entity>/
 
 Notable specifics:
 
-- `modules/users/users.service.ts`: hashes password on create; `findOneByEmailWithPassword` (with `select("+password")`) is auth-only — public CRUD methods never load password.
+- `modules/users/users.service.ts`: hashes password on create; `findOneByEmailWithPassword` (with `select("+password")`) is auth-only — public CRUD methods never load password. Password validation lives in `AuthService.validate`.
+- `modules/api-tokens/api-tokens.service.ts`: hashes secret on create; `findOneByIdWithHashedSecret` (with `select("+hashedSecret")`) is auth-only — public CRUD methods never load `hashedSecret`. Credential validation (parse, expiry, bcrypt compare) lives in `ApiTokenStrategy.validate`; `parseApiToken` is shared with create formatting.
 - `modules/experiences/experiences.resolver.ts`: `@ResolveField` for `organization`, `skills`, sorted `roles`.
 - `modules/skills/` and `modules/organizations/` export `SkillsLoaderService` / `OrganizationsLoaderService`; `platform/graphql/loaders.service.ts` composes them per request.
 

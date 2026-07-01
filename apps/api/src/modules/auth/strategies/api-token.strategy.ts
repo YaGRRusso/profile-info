@@ -1,5 +1,6 @@
 import { Injectable, UnauthorizedException } from "@nestjs/common";
 import { PassportStrategy } from "@nestjs/passport";
+import { compare } from "bcryptjs";
 import { HeaderAPIKeyStrategy } from "passport-headerapikey";
 import { toApiTokenAuthContext } from "@/core/context/auth-context.helper";
 import type { ApiTokenAuthContext } from "@/core/context/auth-context.interface";
@@ -22,12 +23,32 @@ export class ApiTokenStrategy extends PassportStrategy(
   }
 
   async validate(apiKey: string): Promise<ApiTokenAuthContext> {
-    const verified = await this.apiTokensService.validate(apiKey);
-    if (!verified) throw new UnauthorizedException();
+    const parsed = this.apiTokensService.parseApiToken(apiKey);
+    if (!parsed) {
+      throw new UnauthorizedException();
+    }
 
-    const user = await this.usersService.findOneById(verified.ownerId);
+    const token = await this.apiTokensService.findOneByIdWithHashedSecret(
+      parsed.tokenId
+    );
+    if (!token) {
+      throw new UnauthorizedException();
+    }
+
+    const isExpired =
+      token.expiresAt && token.expiresAt.getTime() <= Date.now();
+    if (isExpired) {
+      throw new UnauthorizedException();
+    }
+
+    const secretMatches = await compare(parsed.secret, token.hashedSecret);
+    if (!secretMatches) {
+      throw new UnauthorizedException();
+    }
+
+    const user = await this.usersService.findOneById(token.ownerId);
     if (!user) throw new UnauthorizedException();
 
-    return toApiTokenAuthContext(user, verified.permissions);
+    return toApiTokenAuthContext(user, token.permissions);
   }
 }

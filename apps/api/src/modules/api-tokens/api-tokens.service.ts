@@ -1,6 +1,6 @@
 import { randomBytes } from "node:crypto";
-import { Injectable, UnauthorizedException } from "@nestjs/common";
-import { compare, hash } from "bcryptjs";
+import { Injectable } from "@nestjs/common";
+import { hash } from "bcryptjs";
 import mongoose from "mongoose";
 import { toTenantScope } from "@/core/context/auth-context.helper";
 import type { AuthContext } from "@/core/context/auth-context.interface";
@@ -111,44 +111,11 @@ export class ApiTokensService {
     return this.repository.crud.scoped(toTenantScope(ctx)).deleteManyById(ids);
   }
 
-  async validate(plaintext: string) {
-    const parsed = this.parseApiToken(plaintext);
-    if (!parsed) {
-      throw new UnauthorizedException();
-    }
-
-    const record = await this.findOneByIdWithHashedSecret(parsed.tokenId);
-    if (!record) {
-      throw new UnauthorizedException();
-    }
-
-    if (record.expiresAt && record.expiresAt.getTime() <= Date.now()) {
-      throw new UnauthorizedException();
-    }
-
-    const secretMatches = await compare(parsed.secret, record.hashedSecret);
-    if (!secretMatches) {
-      throw new UnauthorizedException();
-    }
-
-    return {
-      ownerId: record.ownerId,
-      permissions: record.permissions,
-    };
+  stringifyApiToken(tokenId: string, secret: string): string {
+    return `${API_TOKEN_PREFIX}${tokenId}_${secret}`;
   }
 
-  private emitApiToken(): {
-    plaintext: string;
-    tokenId: string;
-    secret: string;
-  } {
-    const tokenId = new mongoose.Types.ObjectId().toHexString();
-    const secret = randomBytes(32).toString("base64url");
-    const plaintext = `${API_TOKEN_PREFIX}${tokenId}_${secret}`;
-    return { plaintext, tokenId, secret };
-  }
-
-  private parseApiToken(value: string): {
+  parseApiToken(value: string): {
     tokenId: string;
     secret: string;
   } | null {
@@ -163,5 +130,16 @@ export class ApiTokensService {
     if (!TOKEN_ID_PATTERN.test(tokenId) || secret.length < 16) return null;
 
     return { tokenId, secret };
+  }
+
+  private emitApiToken(): {
+    plaintext: string;
+    tokenId: string;
+    secret: string;
+  } {
+    const tokenId = new mongoose.Types.ObjectId().toHexString();
+    const secret = randomBytes(32).toString("base64url");
+    const plaintext = this.stringifyApiToken(tokenId, secret);
+    return { plaintext, tokenId, secret };
   }
 }
