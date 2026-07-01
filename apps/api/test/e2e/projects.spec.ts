@@ -2,6 +2,11 @@ import { INestApplication } from "@nestjs/common";
 import { App } from "supertest/types";
 import { UserRole } from "@/core/enums/user-role.enum";
 import { UsersService } from "@/modules/users/users.service";
+import {
+  INVALID_OBJECT_ID,
+  REFERENCES_NOT_FOUND,
+  UNKNOWN_CATALOG_ID,
+} from "../support/catalog-reference-validation";
 import { clearTestDatabase } from "../support/clear-test-database";
 import { createTestApp } from "../support/create-test-app";
 import { graphqlRequest } from "../support/graphql-request";
@@ -141,6 +146,39 @@ describe("Projects tenant isolation (e2e)", () => {
 
     expect(response.errors).toBeUndefined();
     expect(response.data?.createOneProject.slug).toBe("alice-portfolio");
+  });
+
+  it("should reject create with invalid skillIds", async () => {
+    const response = await graphqlRequest(app, {
+      query: CREATE_ONE_PROJECT,
+      variables: {
+        createProjectInput: {
+          ...buildProjectInput("invalid-skills-project"),
+          skillIds: [INVALID_OBJECT_ID],
+        },
+      },
+      token: userAToken,
+    });
+
+    expect(response.errors?.length).toBeGreaterThan(0);
+    expect(response.data).toBeNull();
+  });
+
+  it("should reject create with unknown skillIds", async () => {
+    const response = await graphqlRequest(app, {
+      query: CREATE_ONE_PROJECT,
+      variables: {
+        createProjectInput: {
+          ...buildProjectInput("unknown-skills-project"),
+          skillIds: [UNKNOWN_CATALOG_ID],
+        },
+      },
+      token: userAToken,
+    });
+
+    expect(response.errors?.length).toBeGreaterThan(0);
+    expect(response.errors?.[0]?.message).toContain(REFERENCES_NOT_FOUND);
+    expect(response.data).toBeNull();
   });
 
   it("should list only the caller tenant projects for USER A", async () => {

@@ -6,6 +6,11 @@ import { EducationStatus } from "@/modules/educations/enums/status.enum";
 import { OrganizationCategory } from "@/modules/organizations/enums/category.enum";
 import { OrganizationsService } from "@/modules/organizations/organizations.service";
 import { UsersService } from "@/modules/users/users.service";
+import {
+  INVALID_OBJECT_ID,
+  REFERENCES_NOT_FOUND,
+  UNKNOWN_CATALOG_ID,
+} from "../support/catalog-reference-validation";
 import { clearTestDatabase } from "../support/clear-test-database";
 import { createTestApp } from "../support/create-test-app";
 import { graphqlRequest } from "../support/graphql-request";
@@ -164,6 +169,72 @@ describe("Educations tenant isolation (e2e)", () => {
 
     expect(response.errors).toBeUndefined();
     expect(response.data?.createOneEducation.slug).toBe("alice-bachelor");
+  });
+
+  it("should reject create with an invalid organizationId", async () => {
+    const response = await graphqlRequest(app, {
+      query: CREATE_ONE_EDUCATION,
+      variables: {
+        createEducationInput: buildEducationInput(
+          "invalid-org-education",
+          INVALID_OBJECT_ID
+        ),
+      },
+      token: userAToken,
+    });
+
+    expect(response.errors?.length).toBeGreaterThan(0);
+    expect(response.data).toBeNull();
+  });
+
+  it("should reject create with invalid skillIds", async () => {
+    const response = await graphqlRequest(app, {
+      query: CREATE_ONE_EDUCATION,
+      variables: {
+        createEducationInput: {
+          ...buildEducationInput("invalid-skills-education", organizationId),
+          skillIds: [INVALID_OBJECT_ID],
+        },
+      },
+      token: userAToken,
+    });
+
+    expect(response.errors?.length).toBeGreaterThan(0);
+    expect(response.data).toBeNull();
+  });
+
+  it("should reject create with unknown organizationId", async () => {
+    const response = await graphqlRequest(app, {
+      query: CREATE_ONE_EDUCATION,
+      variables: {
+        createEducationInput: buildEducationInput(
+          "unknown-org-education",
+          UNKNOWN_CATALOG_ID
+        ),
+      },
+      token: userAToken,
+    });
+
+    expect(response.errors?.length).toBeGreaterThan(0);
+    expect(response.errors?.[0]?.message).toContain(REFERENCES_NOT_FOUND);
+    expect(response.data).toBeNull();
+  });
+
+  it("should reject create with unknown skillIds", async () => {
+    const response = await graphqlRequest(app, {
+      query: CREATE_ONE_EDUCATION,
+      variables: {
+        createEducationInput: {
+          ...buildEducationInput("unknown-skills-education", organizationId),
+          skillIds: [UNKNOWN_CATALOG_ID],
+        },
+      },
+      token: userAToken,
+    });
+
+    expect(response.errors?.length).toBeGreaterThan(0);
+    expect(response.errors?.[0]?.message).toContain(REFERENCES_NOT_FOUND);
+    expect(response.data).toBeNull();
   });
 
   it("should list only the caller tenant educations for USER A", async () => {

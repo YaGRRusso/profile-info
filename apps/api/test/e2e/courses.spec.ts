@@ -4,6 +4,11 @@ import { UserRole } from "@/core/enums/user-role.enum";
 import { OrganizationCategory } from "@/modules/organizations/enums/category.enum";
 import { OrganizationsService } from "@/modules/organizations/organizations.service";
 import { UsersService } from "@/modules/users/users.service";
+import {
+  INVALID_OBJECT_ID,
+  REFERENCES_NOT_FOUND,
+  UNKNOWN_CATALOG_ID,
+} from "../support/catalog-reference-validation";
 import { clearTestDatabase } from "../support/clear-test-database";
 import { createTestApp } from "../support/create-test-app";
 import { graphqlRequest } from "../support/graphql-request";
@@ -158,6 +163,72 @@ describe("Courses tenant isolation (e2e)", () => {
 
     expect(response.errors).toBeUndefined();
     expect(response.data?.createOneCourse.slug).toBe("alice-bootcamp");
+  });
+
+  it("should reject create with an invalid organizationId", async () => {
+    const response = await graphqlRequest(app, {
+      query: CREATE_ONE_COURSE,
+      variables: {
+        createCourseInput: buildCourseInput(
+          "invalid-org-course",
+          INVALID_OBJECT_ID
+        ),
+      },
+      token: userAToken,
+    });
+
+    expect(response.errors?.length).toBeGreaterThan(0);
+    expect(response.data).toBeNull();
+  });
+
+  it("should reject create with invalid skillIds", async () => {
+    const response = await graphqlRequest(app, {
+      query: CREATE_ONE_COURSE,
+      variables: {
+        createCourseInput: {
+          ...buildCourseInput("invalid-skills-course", organizationId),
+          skillIds: [INVALID_OBJECT_ID],
+        },
+      },
+      token: userAToken,
+    });
+
+    expect(response.errors?.length).toBeGreaterThan(0);
+    expect(response.data).toBeNull();
+  });
+
+  it("should reject create with unknown organizationId", async () => {
+    const response = await graphqlRequest(app, {
+      query: CREATE_ONE_COURSE,
+      variables: {
+        createCourseInput: buildCourseInput(
+          "unknown-org-course",
+          UNKNOWN_CATALOG_ID
+        ),
+      },
+      token: userAToken,
+    });
+
+    expect(response.errors?.length).toBeGreaterThan(0);
+    expect(response.errors?.[0]?.message).toContain(REFERENCES_NOT_FOUND);
+    expect(response.data).toBeNull();
+  });
+
+  it("should reject create with unknown skillIds", async () => {
+    const response = await graphqlRequest(app, {
+      query: CREATE_ONE_COURSE,
+      variables: {
+        createCourseInput: {
+          ...buildCourseInput("unknown-skills-course", organizationId),
+          skillIds: [UNKNOWN_CATALOG_ID],
+        },
+      },
+      token: userAToken,
+    });
+
+    expect(response.errors?.length).toBeGreaterThan(0);
+    expect(response.errors?.[0]?.message).toContain(REFERENCES_NOT_FOUND);
+    expect(response.data).toBeNull();
   });
 
   it("should list only the caller tenant courses for USER A", async () => {

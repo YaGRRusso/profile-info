@@ -5,6 +5,11 @@ import { ExperienceCategory } from "@/modules/experiences/enums/category.enum";
 import { OrganizationCategory } from "@/modules/organizations/enums/category.enum";
 import { OrganizationsService } from "@/modules/organizations/organizations.service";
 import { UsersService } from "@/modules/users/users.service";
+import {
+  INVALID_OBJECT_ID,
+  REFERENCES_NOT_FOUND,
+  UNKNOWN_CATALOG_ID,
+} from "../support/catalog-reference-validation";
 import { clearTestDatabase } from "../support/clear-test-database";
 import { createTestApp } from "../support/create-test-app";
 import { graphqlRequest } from "../support/graphql-request";
@@ -166,6 +171,98 @@ describe("Experiences tenant isolation (e2e)", () => {
 
     expect(response.errors).toBeUndefined();
     expect(response.data?.createOneExperience.slug).toBe("alice-engineer");
+  });
+
+  it("should reject create with an invalid organizationId", async () => {
+    const response = await graphqlRequest(app, {
+      query: CREATE_ONE_EXPERIENCE,
+      variables: {
+        createExperienceInput: buildExperienceInput(
+          "invalid-org-experience",
+          INVALID_OBJECT_ID
+        ),
+      },
+      token: userAToken,
+    });
+
+    expect(response.errors?.length).toBeGreaterThan(0);
+    expect(response.data).toBeNull();
+  });
+
+  it("should reject create with invalid skillIds in roles", async () => {
+    const response = await graphqlRequest(app, {
+      query: CREATE_ONE_EXPERIENCE,
+      variables: {
+        createExperienceInput: {
+          ...buildExperienceInput("invalid-skills-experience", organizationId),
+          roles: [
+            {
+              i18n: [
+                {
+                  locale: "en",
+                  messages: {
+                    title: "Engineer",
+                    description: "Built APIs",
+                  },
+                },
+              ],
+              skillIds: [INVALID_OBJECT_ID],
+            },
+          ],
+        },
+      },
+      token: userAToken,
+    });
+
+    expect(response.errors?.length).toBeGreaterThan(0);
+    expect(response.data).toBeNull();
+  });
+
+  it("should reject create with unknown organizationId", async () => {
+    const response = await graphqlRequest(app, {
+      query: CREATE_ONE_EXPERIENCE,
+      variables: {
+        createExperienceInput: buildExperienceInput(
+          "unknown-org-experience",
+          UNKNOWN_CATALOG_ID
+        ),
+      },
+      token: userAToken,
+    });
+
+    expect(response.errors?.length).toBeGreaterThan(0);
+    expect(response.errors?.[0]?.message).toContain(REFERENCES_NOT_FOUND);
+    expect(response.data).toBeNull();
+  });
+
+  it("should reject create with unknown skillIds in roles", async () => {
+    const response = await graphqlRequest(app, {
+      query: CREATE_ONE_EXPERIENCE,
+      variables: {
+        createExperienceInput: {
+          ...buildExperienceInput("unknown-skills-experience", organizationId),
+          roles: [
+            {
+              i18n: [
+                {
+                  locale: "en",
+                  messages: {
+                    title: "Engineer",
+                    description: "Built APIs",
+                  },
+                },
+              ],
+              skillIds: [UNKNOWN_CATALOG_ID],
+            },
+          ],
+        },
+      },
+      token: userAToken,
+    });
+
+    expect(response.errors?.length).toBeGreaterThan(0);
+    expect(response.errors?.[0]?.message).toContain(REFERENCES_NOT_FOUND);
+    expect(response.data).toBeNull();
   });
 
   it("should list only the caller tenant experiences for USER A", async () => {
