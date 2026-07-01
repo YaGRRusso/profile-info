@@ -406,8 +406,9 @@ async function seed() {
   console.info("bob@profile.info / bob.pass (USER)");
   console.info("admin@profile.info / pass.123 (SUPER_ADMIN)");
   for (const token of SEED_API_TOKENS) {
+    const value = `${API_TOKEN_PREFIX}${token.id}_${token.secret}`;
     console.info(
-      `${token.owner} API token (${token.permissions.join("+")}): ${API_TOKEN_PREFIX}${token.id}_${token.secret}`
+      `${token.owner} API token (${token.permissions.join("+")}): X-Api-Key: ${value}`
     );
   }
   console.info("seeded:", counts);

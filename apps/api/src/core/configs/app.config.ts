@@ -10,7 +10,7 @@ export async function appConfig(app: INestApplication) {
   app.enableCors({
     origin: [localhost, "https://yagrrusso.github.io"],
     methods: ["GET", "POST", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization"],
+    allowedHeaders: ["Content-Type", "Authorization", "X-Api-Key"],
     credentials: true,
   });
 

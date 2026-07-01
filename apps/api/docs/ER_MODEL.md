@@ -140,7 +140,7 @@ inputs use `organizationId` and `skillIds` (no `ownerId` — injected from conte
 - **Embedded:** `urls[]` (`UrlEmbed`: `title`, `value`), `i18n[]` translations
 - **References:** none (tenant root; referenced by private entities and `ApiToken`)
 - **Delete:** `SUPER_ADMIN` accounts cannot be deleted. Deleting a `USER` will cascade to
-  their private entities and API tokens once `user.deleted` ships (ADR 001 phase 5d).
+  their private entities and API tokens once `user.deleted` ships (see backlog).
 
 ### Skill (`skills`)
 
@@ -196,10 +196,10 @@ inputs use `organizationId` and `skillIds` (no `ownerId` — injected from conte
   (required, `select: false`), `permissions[]` (`QUERY`, `MUTATE` — one or both),
   optional `expiresAt`; `createdAt` / `updatedAt` from `BaseModel`
 - **Plaintext format:** `pi_<tokenId>_<secret>` — returned once on `createOneApiToken`
-  (session JWT only); dev seed logs fixed tokens (see `npm run seed`)
+  (session JWT only); send as `X-Api-Key` on GraphQL requests; dev seed logs fixed tokens
+  (see `npm run seed`)
 - **References:** `ownerId` → User
-- **Delete:** cascade when parent `User` is deleted (`user.deleted` — ADR 001 phase 5d,
-  pending)
+- **Delete:** cascade when parent `User` is deleted (`user.deleted` — see backlog)
 
 ## Shared value objects
 
@@ -222,7 +222,7 @@ inputs use `organizationId` and `skillIds` (no `ownerId` — injected from conte
 5. Experience embeds an ordered list of roles; each role embeds its own i18n, period, and
    `skillIds[]`.
 6. **ApiToken** belongs to one **User** via `ownerId`. CRUD requires session JWT;
-   bearer `pi_…` tokens authenticate GraphQL per the [permission matrix](./adr/001-multi-tenant-migration.md#permission-matrix).
+   `X-Api-Key` header authenticates GraphQL (see `BACKLOG.md` permission matrix).
 
 ## Delete and lifecycle notes
 
@@ -230,12 +230,12 @@ inputs use `organizationId` and `skillIds` (no `ownerId` — injected from conte
   and nested Experience role arrays (`detachSkill`).
 - `organization.deleted` event: hard `deleteMany` on Course, Education, Experience tied
   to that organization **across all tenants** (`purgeByOrganization`) — intentional;
-  softer detach is [backlog](./adr/backlog.md).
-- `user.deleted` event (ADR 001 phase 5d, pending): `deleteMany` on all private
+  softer detach is [backlog](./BACKLOG.md).
+- `user.deleted` event (pending): `deleteMany` on all private
   entities with matching `ownerId`; `deleteMany` on `ApiToken` for that `ownerId`.
   **`SUPER_ADMIN` users cannot be deleted.**
 - Private entity updates never change `ownerId` — transfer is delete + recreate (see
-  [backlog](./adr/backlog.md)).
+  [backlog](./BACKLOG.md)).
 - No Mongoose `pre('deleteOne')` hooks; deletes go through services that emit events first.
 
 ## GraphQL filter inputs

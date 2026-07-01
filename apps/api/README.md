@@ -177,7 +177,7 @@ E2E tests use `mongodb://127.0.0.1:27017/profile-test-e2e` by default (Docker Co
 
 See **`test/README.md`** for Jest lifecycle, folder layout, database modes, and troubleshooting.
 
-Seed credentials: `alice@profile.info` / `alice.pass`, `bob@profile.info` / `bob.pass` (USER), `admin@profile.info` / `pass.123` (SUPER_ADMIN). After `npm run seed`, the console also prints fixed dev API tokens (`pi_…`) for Alice (QUERY, MUTATE) and Bob (QUERY+MUTATE).
+Seed credentials: `alice@profile.info` / `alice.pass`, `bob@profile.info` / `bob.pass` (USER), `admin@profile.info` / `pass.123` (SUPER_ADMIN). After `npm run seed`, the console prints fixed dev API tokens (`pi_…`) — send as `X-Api-Key` on GraphQL requests.
 
 ## Further reading
 
