@@ -1,11 +1,15 @@
+import { BadRequestException } from "@nestjs/common";
 import { Test, TestingModule } from "@nestjs/testing";
 import { testAuthContext } from "@test/fixtures/auth-context";
+import { REFERENCES_NOT_FOUND } from "@/common/helpers/assert.helper";
 import { toTenantScope } from "@/core/context/auth-context.helper";
 import {
   createMockCrud,
   createMockStats,
 } from "@/core/persistence/repositories/testing/service-spec.mock";
 import { CourseStatus } from "@/modules/courses/enums/status.enum";
+import { OrganizationsValidatorService } from "@/modules/organizations/organizations-validator.service";
+import { SkillsValidatorService } from "@/modules/skills/skills-validator.service";
 import { CoursesRepository } from "./courses.repository";
 import { CoursesService } from "./courses.service";
 
@@ -23,6 +27,11 @@ const fakeEntity = {
 describe("CoursesService", () => {
   let service: CoursesService;
   let crud: ReturnType<typeof createMockCrud>;
+  let organizationsValidator: {
+    assertOrganizationExists: jest.Mock;
+    assertOrganizationsExist: jest.Mock;
+  };
+  let skillsValidator: { assertSkillsExist: jest.Mock };
   let repository: {
     crud: ReturnType<typeof createMockCrud>;
     stats: ReturnType<typeof createMockStats>;
@@ -41,11 +50,23 @@ describe("CoursesService", () => {
       purgeByOrganization: jest.fn(),
       purgeByOwner: jest.fn(),
     };
+    organizationsValidator = {
+      assertOrganizationExists: jest.fn().mockResolvedValue(undefined),
+      assertOrganizationsExist: jest.fn().mockResolvedValue(undefined),
+    };
+    skillsValidator = {
+      assertSkillsExist: jest.fn().mockResolvedValue(undefined),
+    };
 
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         CoursesService,
         { provide: CoursesRepository, useValue: repository },
+        {
+          provide: OrganizationsValidatorService,
+          useValue: organizationsValidator,
+        },
+        { provide: SkillsValidatorService, useValue: skillsValidator },
       ],
     }).compile();
 
@@ -90,8 +111,22 @@ describe("CoursesService", () => {
       await expect(service.createOne(ctx, createInput)).resolves.toEqual(
         fakeEntity
       );
+      expect(
+        organizationsValidator.assertOrganizationExists
+      ).toHaveBeenCalledWith(organizationId);
       expect(crud.scoped).toHaveBeenCalledWith(toTenantScope(ctx));
       expect(crud.createOne).toHaveBeenCalledWith(createInput);
+    });
+
+    it("rejects missing organization reference", async () => {
+      organizationsValidator.assertOrganizationExists.mockRejectedValue(
+        new BadRequestException(REFERENCES_NOT_FOUND)
+      );
+
+      await expect(service.createOne(ctx, createInput)).rejects.toThrow(
+        new BadRequestException(REFERENCES_NOT_FOUND)
+      );
+      expect(crud.createOne).not.toHaveBeenCalled();
     });
   });
 

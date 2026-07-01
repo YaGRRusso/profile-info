@@ -4,6 +4,8 @@ import {
   ExperienceModel,
   ExperienceSchema,
 } from "@/modules/experiences/schemas/experience.schema";
+import { OrganizationsModule } from "@/modules/organizations/organizations.module";
+import { SkillsModule } from "@/modules/skills/skills.module";
 import { ExperiencesRepository } from "./experiences.repository";
 import {
   ExperienceRoleResolver,
@@ -16,6 +18,8 @@ import { OnUserDeletedListener } from "./listeners/on-user-deleted.listener";
 
 @Module({
   imports: [
+    OrganizationsModule,
+    SkillsModule,
     MongooseModule.forFeature([
       { name: ExperienceModel.name, schema: ExperienceSchema },
     ]),

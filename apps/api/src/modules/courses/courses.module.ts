@@ -4,6 +4,8 @@ import {
   CourseModel,
   CourseSchema,
 } from "@/modules/courses/schemas/course.schema";
+import { OrganizationsModule } from "@/modules/organizations/organizations.module";
+import { SkillsModule } from "@/modules/skills/skills.module";
 import { CoursesRepository } from "./courses.repository";
 import { CoursesResolver } from "./courses.resolver";
 import { CoursesService } from "./courses.service";
@@ -13,6 +15,8 @@ import { OnUserDeletedListener } from "./listeners/on-user-deleted.listener";
 
 @Module({
   imports: [
+    OrganizationsModule,
+    SkillsModule,
     MongooseModule.forFeature([
       { name: CourseModel.name, schema: CourseSchema },
     ]),

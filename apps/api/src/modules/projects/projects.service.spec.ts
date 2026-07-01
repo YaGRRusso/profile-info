@@ -5,6 +5,7 @@ import {
   createMockCrud,
   createMockStats,
 } from "@/core/persistence/repositories/testing/service-spec.mock";
+import { SkillsValidatorService } from "@/modules/skills/skills-validator.service";
 import { ProjectsRepository } from "./projects.repository";
 import { ProjectsService } from "./projects.service";
 
@@ -42,6 +43,12 @@ describe("ProjectsService", () => {
       providers: [
         ProjectsService,
         { provide: ProjectsRepository, useValue: repository },
+        {
+          provide: SkillsValidatorService,
+          useValue: {
+            assertSkillsExist: jest.fn().mockResolvedValue(undefined),
+          },
+        },
       ],
     }).compile();
 

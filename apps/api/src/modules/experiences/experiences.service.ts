@@ -7,6 +7,8 @@ import type {
   FieldCount,
   MultiPaged,
 } from "@/core/persistence/types/output.type";
+import { OrganizationsValidatorService } from "@/modules/organizations/organizations-validator.service";
+import { SkillsValidatorService } from "@/modules/skills/skills-validator.service";
 import { CreateExperienceInput } from "./dto/create-experience.input";
 import { FilterExperienceInput } from "./dto/filter-experience.input";
 import { SortExperienceInput } from "./dto/sort-experience.input";
@@ -14,9 +16,18 @@ import { UpdateExperienceInput } from "./dto/update-experience.input";
 import type { ExperienceEntityRecord } from "./entities/experience.entity";
 import { ExperiencesRepository } from "./experiences.repository";
 
+interface ExperienceCatalogRefs {
+  organizationId?: string;
+  roles?: Array<{ skillIds?: string[] }>;
+}
+
 @Injectable()
 export class ExperiencesService {
-  constructor(private readonly repository: ExperiencesRepository) {}
+  constructor(
+    private readonly repository: ExperiencesRepository,
+    private readonly organizationsValidator: OrganizationsValidatorService,
+    private readonly skillsValidator: SkillsValidatorService
+  ) {}
 
   findOneById(ctx: AuthContext, id: string): Promise<ExperienceEntityRecord> {
     return this.repository.crud.scoped(toTenantScope(ctx)).findOneById(id);
@@ -62,39 +73,47 @@ export class ExperiencesService {
     });
   }
 
-  createOne(
+  async createOne(
     ctx: AuthContext,
     createInput: CreateExperienceInput
   ): Promise<ExperienceEntityRecord> {
+    await this.assertCatalogReferences(createInput);
+
     return this.repository.crud
       .scoped(toTenantScope(ctx))
       .createOne(createInput);
   }
 
-  createMany(
+  async createMany(
     ctx: AuthContext,
     createInputs: CreateExperienceInput[]
   ): Promise<BatchEntity> {
+    await this.assertCatalogReferencesMany(createInputs);
+
     return this.repository.crud
       .scoped(toTenantScope(ctx))
       .createMany(createInputs);
   }
 
-  updateOne(
+  async updateOne(
     ctx: AuthContext,
     id: string,
     updateInput: UpdateExperienceInput
   ): Promise<ExperienceEntityRecord> {
+    await this.assertCatalogReferences(updateInput);
+
     return this.repository.crud
       .scoped(toTenantScope(ctx))
       .updateOneById(id, updateInput);
   }
 
-  updateMany(
+  async updateMany(
     ctx: AuthContext,
     ids: string[],
     updateInput: UpdateExperienceInput
   ): Promise<BatchEntity> {
+    await this.assertCatalogReferences(updateInput);
+
     return this.repository.crud
       .scoped(toTenantScope(ctx))
       .updateManyById(ids, updateInput);
@@ -145,5 +164,49 @@ export class ExperiencesService {
 
   async purgeByOwner(ownerId: string): Promise<void> {
     await this.repository.purgeByOwner(ownerId);
+  }
+
+  private collectSkillIds(roles?: Array<{ skillIds?: string[] }>): string[] {
+    return roles?.flatMap((role) => role.skillIds ?? []) ?? [];
+  }
+
+  private async assertCatalogReferences(
+    input: ExperienceCatalogRefs
+  ): Promise<void> {
+    if (input.organizationId) {
+      await this.organizationsValidator.assertOrganizationExists(
+        input.organizationId
+      );
+    }
+
+    const skillIds = this.collectSkillIds(input.roles);
+    if (skillIds.length > 0) {
+      await this.skillsValidator.assertSkillsExist(skillIds);
+    }
+  }
+
+  private async assertCatalogReferencesMany(
+    inputs: ExperienceCatalogRefs[]
+  ): Promise<void> {
+    const organizationIds = [
+      ...new Set(
+        inputs
+          .map((item) => item.organizationId)
+          .filter((id): id is string => id !== undefined)
+      ),
+    ];
+    const skillIds = [
+      ...new Set(inputs.flatMap((item) => this.collectSkillIds(item.roles))),
+    ];
+
+    if (organizationIds.length > 0) {
+      await this.organizationsValidator.assertOrganizationsExist(
+        organizationIds
+      );
+    }
+
+    if (skillIds.length > 0) {
+      await this.skillsValidator.assertSkillsExist(skillIds);
+    }
   }
 }

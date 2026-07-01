@@ -7,6 +7,8 @@ import {
 } from "@/core/persistence/repositories/testing/service-spec.mock";
 import { EducationLevel } from "@/modules/educations/enums/level.enum";
 import { EducationStatus } from "@/modules/educations/enums/status.enum";
+import { OrganizationsValidatorService } from "@/modules/organizations/organizations-validator.service";
+import { SkillsValidatorService } from "@/modules/skills/skills-validator.service";
 import { EducationsRepository } from "./educations.repository";
 import { EducationsService } from "./educations.service";
 
@@ -47,6 +49,19 @@ describe("EducationsService", () => {
       providers: [
         EducationsService,
         { provide: EducationsRepository, useValue: repository },
+        {
+          provide: OrganizationsValidatorService,
+          useValue: {
+            assertOrganizationExists: jest.fn().mockResolvedValue(undefined),
+            assertOrganizationsExist: jest.fn().mockResolvedValue(undefined),
+          },
+        },
+        {
+          provide: SkillsValidatorService,
+          useValue: {
+            assertSkillsExist: jest.fn().mockResolvedValue(undefined),
+          },
+        },
       ],
     }).compile();
 

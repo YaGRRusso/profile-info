@@ -6,6 +6,8 @@ import {
   createMockStats,
 } from "@/core/persistence/repositories/testing/service-spec.mock";
 import { ExperienceCategory } from "@/modules/experiences/enums/category.enum";
+import { OrganizationsValidatorService } from "@/modules/organizations/organizations-validator.service";
+import { SkillsValidatorService } from "@/modules/skills/skills-validator.service";
 import { ExperiencesRepository } from "./experiences.repository";
 import { ExperiencesService } from "./experiences.service";
 
@@ -47,6 +49,19 @@ describe("ExperiencesService", () => {
       providers: [
         ExperiencesService,
         { provide: ExperiencesRepository, useValue: repository },
+        {
+          provide: OrganizationsValidatorService,
+          useValue: {
+            assertOrganizationExists: jest.fn().mockResolvedValue(undefined),
+            assertOrganizationsExist: jest.fn().mockResolvedValue(undefined),
+          },
+        },
+        {
+          provide: SkillsValidatorService,
+          useValue: {
+            assertSkillsExist: jest.fn().mockResolvedValue(undefined),
+          },
+        },
       ],
     }).compile();
 

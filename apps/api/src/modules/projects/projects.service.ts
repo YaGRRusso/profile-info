@@ -7,6 +7,7 @@ import { toTenantScope } from "@/core/context/auth-context.helper";
 import type { AuthContext } from "@/core/context/auth-context.interface";
 import { BatchEntity } from "@/core/entities/batch.entity";
 import type { MultiPaged } from "@/core/persistence/types/output.type";
+import { SkillsValidatorService } from "@/modules/skills/skills-validator.service";
 import { CreateProjectInput } from "./dto/create-project.input";
 import { FilterProjectInput } from "./dto/filter-project.input";
 import { SortProjectInput } from "./dto/sort-project.input";
@@ -14,9 +15,16 @@ import { UpdateProjectInput } from "./dto/update-project.input";
 import type { ProjectEntityRecord } from "./entities/project.entity";
 import { ProjectsRepository } from "./projects.repository";
 
+interface ProjectCatalogRefs {
+  skillIds?: string[];
+}
+
 @Injectable()
 export class ProjectsService {
-  constructor(private readonly repository: ProjectsRepository) {}
+  constructor(
+    private readonly repository: ProjectsRepository,
+    private readonly skillsValidator: SkillsValidatorService
+  ) {}
 
   findOneById(ctx: AuthContext, id: string): Promise<ProjectEntityRecord> {
     return this.repository.crud.scoped(toTenantScope(ctx)).findOneById(id);
@@ -62,39 +70,47 @@ export class ProjectsService {
     });
   }
 
-  createOne(
+  async createOne(
     ctx: AuthContext,
     createInput: CreateProjectInput
   ): Promise<ProjectEntityRecord> {
+    await this.assertCatalogReferences(createInput);
+
     return this.repository.crud
       .scoped(toTenantScope(ctx))
       .createOne(createInput);
   }
 
-  createMany(
+  async createMany(
     ctx: AuthContext,
     createInputs: CreateProjectInput[]
   ): Promise<BatchEntity> {
+    await this.assertCatalogReferencesMany(createInputs);
+
     return this.repository.crud
       .scoped(toTenantScope(ctx))
       .createMany(createInputs);
   }
 
-  updateOne(
+  async updateOne(
     ctx: AuthContext,
     id: string,
     updateInput: UpdateProjectInput
   ): Promise<ProjectEntityRecord> {
+    await this.assertCatalogReferences(updateInput);
+
     return this.repository.crud
       .scoped(toTenantScope(ctx))
       .updateOneById(id, updateInput);
   }
 
-  updateMany(
+  async updateMany(
     ctx: AuthContext,
     ids: string[],
     updateInput: UpdateProjectInput
   ): Promise<BatchEntity> {
+    await this.assertCatalogReferences(updateInput);
+
     return this.repository.crud
       .scoped(toTenantScope(ctx))
       .updateManyById(ids, updateInput);
@@ -134,5 +150,25 @@ export class ProjectsService {
 
   async purgeByOwner(ownerId: string): Promise<void> {
     await this.repository.purgeByOwner(ownerId);
+  }
+
+  private async assertCatalogReferences(
+    input: ProjectCatalogRefs
+  ): Promise<void> {
+    if (input.skillIds?.length) {
+      await this.skillsValidator.assertSkillsExist(input.skillIds);
+    }
+  }
+
+  private async assertCatalogReferencesMany(
+    inputs: ProjectCatalogRefs[]
+  ): Promise<void> {
+    const skillIds = [
+      ...new Set(inputs.flatMap((item) => item.skillIds ?? [])),
+    ];
+
+    if (skillIds.length > 0) {
+      await this.skillsValidator.assertSkillsExist(skillIds);
+    }
   }
 }

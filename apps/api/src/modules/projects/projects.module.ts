@@ -4,6 +4,7 @@ import {
   ProjectModel,
   ProjectSchema,
 } from "@/modules/projects/schemas/project.schema";
+import { SkillsModule } from "@/modules/skills/skills.module";
 import { OnSkillDeletedListener } from "./listeners/on-skill-deleted.listener";
 import { OnUserDeletedListener } from "./listeners/on-user-deleted.listener";
 import { ProjectsRepository } from "./projects.repository";
@@ -12,6 +13,7 @@ import { ProjectsService } from "./projects.service";
 
 @Module({
   imports: [
+    SkillsModule,
     MongooseModule.forFeature([
       { name: ProjectModel.name, schema: ProjectSchema },
     ]),
