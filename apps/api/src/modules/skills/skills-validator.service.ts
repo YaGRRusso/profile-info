@@ -12,7 +12,7 @@ export class SkillsValidatorService {
 
   assertSkillsExist(skillIds: string[]): Promise<void> {
     return assertReferencesResolved(skillIds, (ids) =>
-      this.skillsService.findManyById(ids)
+      this.skillsService.findManyActiveById(ids)
     );
   }
 }

@@ -2,10 +2,7 @@ import { EventEmitter2 } from "@nestjs/event-emitter";
 import { Test, TestingModule } from "@nestjs/testing";
 import { DomainEvents } from "@/core/events/domain-events";
 import { OrganizationDeletedEvent } from "@/core/events/organization-deleted.event";
-import {
-  createMockCrud,
-  createMockStats,
-} from "@/core/persistence/repositories/testing/service-spec.mock";
+import { createMockCrud } from "@/core/persistence/repositories/testing/service-spec.mock";
 import { OrganizationsRepository } from "./organizations.repository";
 import { OrganizationsService } from "./organizations.service";
 
@@ -17,23 +14,34 @@ const fakeEntity = {
   slug: "acme-corp",
   category: "COMPANY",
   i18n: [],
+  disabled: false,
 };
 
 describe("OrganizationsService", () => {
   let service: OrganizationsService;
   let crud: ReturnType<typeof createMockCrud>;
+  let repository: {
+    crud: ReturnType<typeof createMockCrud>;
+    countActive: jest.Mock;
+    findRecentlyUpdatedActive: jest.Mock;
+  };
   let eventEmitter: jest.Mocked<Pick<EventEmitter2, "emitAsync">>;
 
   beforeEach(async () => {
     jest.clearAllMocks();
     crud = createMockCrud();
+    repository = {
+      crud,
+      countActive: jest.fn().mockResolvedValue(2),
+      findRecentlyUpdatedActive: jest.fn(),
+    };
 
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         OrganizationsService,
         {
           provide: OrganizationsRepository,
-          useValue: { crud, stats: createMockStats() },
+          useValue: repository,
         },
         {
           provide: EventEmitter2,
@@ -50,31 +58,18 @@ describe("OrganizationsService", () => {
     expect(service).toBeDefined();
   });
 
-  describe("findOneById", () => {
-    it("delegates to crud", async () => {
-      crud.findOneById.mockResolvedValue(fakeEntity);
+  describe("disableOne", () => {
+    it("sets disabled to true without emitting delete", async () => {
+      crud.updateOneById.mockResolvedValue({ ...fakeEntity, disabled: true });
 
-      await expect(service.findOneById(validId)).resolves.toEqual(fakeEntity);
-      expect(crud.findOneById).toHaveBeenCalledWith(validId);
-    });
-  });
-
-  describe("createOne", () => {
-    it("delegates to crud", async () => {
-      const createInput = { name: "Acme Corp" } as never;
-      crud.createOne.mockResolvedValue(fakeEntity);
-
-      await expect(service.createOne(createInput)).resolves.toEqual(fakeEntity);
-      expect(crud.createOne).toHaveBeenCalledWith(createInput);
-    });
-  });
-
-  describe("updateOne", () => {
-    it("delegates to crud", async () => {
-      crud.updateOneById.mockResolvedValue(fakeEntity);
-
-      await expect(service.updateOne(validId, {})).resolves.toEqual(fakeEntity);
-      expect(crud.updateOneById).toHaveBeenCalledWith(validId, {});
+      await expect(service.disableOne(validId)).resolves.toEqual({
+        ...fakeEntity,
+        disabled: true,
+      });
+      expect(crud.updateOneById).toHaveBeenCalledWith(validId, {
+        disabled: true,
+      });
+      expect(eventEmitter.emitAsync).not.toHaveBeenCalled();
     });
   });
 
@@ -108,6 +103,24 @@ describe("OrganizationsService", () => {
         new OrganizationDeletedEvent(validId)
       );
       expect(crud.deleteManyById).toHaveBeenCalledWith([validId]);
+    });
+  });
+
+  describe("enableOne", () => {
+    it("re-enables by setting disabled to false", async () => {
+      crud.updateOneById.mockResolvedValue(fakeEntity);
+
+      await expect(service.enableOne(validId)).resolves.toEqual(fakeEntity);
+      expect(crud.updateOneById).toHaveBeenCalledWith(validId, {
+        disabled: false,
+      });
+    });
+  });
+
+  describe("count", () => {
+    it("delegates to repository.countActive", async () => {
+      await expect(service.count()).resolves.toBe(2);
+      expect(repository.countActive).toHaveBeenCalled();
     });
   });
 });

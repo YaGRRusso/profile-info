@@ -1,4 +1,5 @@
 import { InputType, PartialType, PickType } from "@nestjs/graphql";
+import { OptionalField } from "@/core/decorators/optional-field.decorator";
 import { CreateOrganizationInput } from "./create-organization.input";
 
 @InputType()
@@ -12,4 +13,7 @@ export class FilterOrganizationInput extends PartialType(
     "i18n",
     "category",
   ] as const)
-) {}
+) {
+  @OptionalField(() => Boolean)
+  disabled?: boolean;
+}

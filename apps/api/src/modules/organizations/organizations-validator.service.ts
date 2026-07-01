@@ -12,7 +12,7 @@ export class OrganizationsValidatorService {
 
   assertOrganizationsExist(organizationIds: string[]): Promise<void> {
     return assertReferencesResolved(organizationIds, (ids) =>
-      this.organizationsService.findManyById(ids)
+      this.organizationsService.findManyActiveById(ids)
     );
   }
 }

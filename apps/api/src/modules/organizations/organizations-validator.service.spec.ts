@@ -1,6 +1,7 @@
-import { BadRequestException } from "@nestjs/common";
+import { BadRequestException, NotFoundException } from "@nestjs/common";
 import { Test, TestingModule } from "@nestjs/testing";
 import { REFERENCES_NOT_FOUND } from "@/common/helpers/assert.helper";
+import { PERSISTENCE_NOT_FOUND } from "@/core/persistence/persistence.messages";
 import { OrganizationsService } from "./organizations.service";
 import { OrganizationsValidatorService } from "./organizations-validator.service";
 
@@ -9,11 +10,13 @@ const missingId = "507f1f77bcf86cd799439099";
 
 describe("OrganizationsValidatorService", () => {
   let validator: OrganizationsValidatorService;
-  let organizationsService: { findManyById: jest.Mock };
+  let organizationsService: { findManyActiveById: jest.Mock };
 
   beforeEach(async () => {
     organizationsService = {
-      findManyById: jest.fn().mockResolvedValue([{ id: organizationId }]),
+      findManyActiveById: jest
+        .fn()
+        .mockResolvedValue([{ id: organizationId, disabled: false }]),
     };
 
     const module: TestingModule = await Test.createTestingModule({
@@ -30,7 +33,7 @@ describe("OrganizationsValidatorService", () => {
     it("delegates to assertOrganizationsExist", async () => {
       await validator.assertOrganizationExists(organizationId);
 
-      expect(organizationsService.findManyById).toHaveBeenCalledWith([
+      expect(organizationsService.findManyActiveById).toHaveBeenCalledWith([
         organizationId,
       ]);
     });
@@ -44,11 +47,21 @@ describe("OrganizationsValidatorService", () => {
     });
 
     it("rejects when any organization is missing", async () => {
-      organizationsService.findManyById.mockResolvedValue([]);
+      organizationsService.findManyActiveById.mockResolvedValue([]);
 
       await expect(
         validator.assertOrganizationsExist([missingId])
       ).rejects.toThrow(new BadRequestException(REFERENCES_NOT_FOUND));
+    });
+
+    it("rejects when any organization is disabled", async () => {
+      organizationsService.findManyActiveById.mockRejectedValue(
+        new NotFoundException(PERSISTENCE_NOT_FOUND)
+      );
+
+      await expect(
+        validator.assertOrganizationsExist([organizationId])
+      ).rejects.toThrow(new NotFoundException(PERSISTENCE_NOT_FOUND));
     });
   });
 });

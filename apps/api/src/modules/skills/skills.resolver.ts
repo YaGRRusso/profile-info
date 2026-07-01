@@ -116,4 +116,30 @@ export class SkillsResolver {
   removeManySkills(@Args("skillIds", { type: () => [ID] }) skillIds: string[]) {
     return this.skillsService.removeMany(skillIds);
   }
+
+  @Roles(UserRole.SUPER_ADMIN)
+  @Mutation(() => SkillEntity)
+  disableOneSkill(@Args("skillId", { type: () => ID }) skillId: string) {
+    return this.skillsService.disableOne(skillId);
+  }
+
+  @Roles(UserRole.SUPER_ADMIN)
+  @Mutation(() => BatchEntity)
+  disableManySkills(
+    @Args("skillIds", { type: () => [ID] }) skillIds: string[]
+  ) {
+    return this.skillsService.disableMany(skillIds);
+  }
+
+  @Roles(UserRole.SUPER_ADMIN)
+  @Mutation(() => SkillEntity)
+  enableOneSkill(@Args("skillId", { type: () => ID }) skillId: string) {
+    return this.skillsService.enableOne(skillId);
+  }
+
+  @Roles(UserRole.SUPER_ADMIN)
+  @Mutation(() => BatchEntity)
+  enableManySkills(@Args("skillIds", { type: () => [ID] }) skillIds: string[]) {
+    return this.skillsService.enableMany(skillIds);
+  }
 }

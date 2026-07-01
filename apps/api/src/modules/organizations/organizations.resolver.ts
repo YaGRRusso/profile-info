@@ -131,4 +131,36 @@ export class OrganizationsResolver {
   ) {
     return this.organizationsService.removeMany(organizationIds);
   }
+
+  @Roles(UserRole.SUPER_ADMIN)
+  @Mutation(() => OrganizationEntity)
+  disableOneOrganization(
+    @Args("organizationId", { type: () => ID }) organizationId: string
+  ) {
+    return this.organizationsService.disableOne(organizationId);
+  }
+
+  @Roles(UserRole.SUPER_ADMIN)
+  @Mutation(() => BatchEntity)
+  disableManyOrganizations(
+    @Args("organizationIds", { type: () => [ID] }) organizationIds: string[]
+  ) {
+    return this.organizationsService.disableMany(organizationIds);
+  }
+
+  @Roles(UserRole.SUPER_ADMIN)
+  @Mutation(() => OrganizationEntity)
+  enableOneOrganization(
+    @Args("organizationId", { type: () => ID }) organizationId: string
+  ) {
+    return this.organizationsService.enableOne(organizationId);
+  }
+
+  @Roles(UserRole.SUPER_ADMIN)
+  @Mutation(() => BatchEntity)
+  enableManyOrganizations(
+    @Args("organizationIds", { type: () => [ID] }) organizationIds: string[]
+  ) {
+    return this.organizationsService.enableMany(organizationIds);
+  }
 }

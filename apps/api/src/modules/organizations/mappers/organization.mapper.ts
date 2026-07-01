@@ -42,6 +42,7 @@ export class OrganizationMapper
           messages: { description: entry.messages.description },
         })) ?? [],
       category: model.category as OrganizationCategory,
+      disabled: model.disabled,
     };
   }
 

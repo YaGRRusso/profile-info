@@ -16,7 +16,10 @@ export class OrganizationModel extends BaseModel {
   @Prop({ type: Number, required: true, default: 0 })
   relevance: number;
 
-  @Prop({ type: String, required: true, unique: true })
+  @Prop({ type: Boolean, required: true, default: false, index: true })
+  disabled: boolean;
+
+  @Prop({ type: String, required: true })
   slug: string;
 
   @Prop({ type: String, required: true })
@@ -45,3 +48,13 @@ export class OrganizationModel extends BaseModel {
 
 export const OrganizationSchema =
   SchemaFactory.createForClass(OrganizationModel);
+
+// OrganizationSchema.index(
+//   { slug: 1 },
+//   {
+//     unique: true,
+//     partialFilterExpression: {
+//       $or: [{ disabled: false }, { disabled: { $exists: false } }],
+//     },
+//   }
+// );

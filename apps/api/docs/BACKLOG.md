@@ -4,7 +4,8 @@ Deferred API and admin work, ordered by criticality, then value, then effort.
 
 ## High Priority
 
-- **Organization delete (softer alternative)** — Today hard-deletes every tenant's Experience/Education/Course tied to the org
+- **Organization disable (admin)** — API pronta; admin ainda usa `remove*`. Trocar UI para disable. Hard delete (`remove*`) permanece com cascata.
+- **Skill disable (admin)** — API alinhada ao padrão Organization; admin ainda usa `remove*`. Trocar UI para disable. Hard delete (`remove*`) permanece com `skill.deleted` + `detachSkill`.
 - **Private CV + REST auth** — `GET /resume.pdf` is public today; REST routes should accept session JWT or `X-Api-Key`
 
 ## Medium Priority

@@ -16,23 +16,36 @@ const fakeEntity = {
   name: "TypeScript",
   slug: "typescript",
   category: "LANGUAGE",
+  disabled: false,
 };
 
 describe("SkillsService", () => {
   let service: SkillsService;
   let crud: ReturnType<typeof createMockCrud>;
+  let repository: {
+    crud: ReturnType<typeof createMockCrud>;
+    countActive: jest.Mock;
+    findRecentlyUpdatedActive: jest.Mock;
+    stats: ReturnType<typeof createMockStats>;
+  };
   let eventEmitter: jest.Mocked<Pick<EventEmitter2, "emitAsync">>;
 
   beforeEach(async () => {
     jest.clearAllMocks();
     crud = createMockCrud();
+    repository = {
+      crud,
+      countActive: jest.fn().mockResolvedValue(2),
+      findRecentlyUpdatedActive: jest.fn(),
+      stats: createMockStats(),
+    };
 
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         SkillsService,
         {
           provide: SkillsRepository,
-          useValue: { crud, stats: createMockStats() },
+          useValue: repository,
         },
         {
           provide: EventEmitter2,
@@ -47,6 +60,39 @@ describe("SkillsService", () => {
 
   it("should be defined", () => {
     expect(service).toBeDefined();
+  });
+
+  describe("disableOne", () => {
+    it("sets disabled to true without emitting delete", async () => {
+      crud.updateOneById.mockResolvedValue({ ...fakeEntity, disabled: true });
+
+      await expect(service.disableOne(validId)).resolves.toEqual({
+        ...fakeEntity,
+        disabled: true,
+      });
+      expect(crud.updateOneById).toHaveBeenCalledWith(validId, {
+        disabled: true,
+      });
+      expect(eventEmitter.emitAsync).not.toHaveBeenCalled();
+    });
+  });
+
+  describe("enableOne", () => {
+    it("re-enables by setting disabled to false", async () => {
+      crud.updateOneById.mockResolvedValue(fakeEntity);
+
+      await expect(service.enableOne(validId)).resolves.toEqual(fakeEntity);
+      expect(crud.updateOneById).toHaveBeenCalledWith(validId, {
+        disabled: false,
+      });
+    });
+  });
+
+  describe("count", () => {
+    it("delegates to repository.countActive", async () => {
+      await expect(service.count()).resolves.toBe(2);
+      expect(repository.countActive).toHaveBeenCalled();
+    });
   });
 
   describe("findOneById", () => {

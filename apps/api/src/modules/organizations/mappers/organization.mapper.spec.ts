@@ -16,6 +16,7 @@ describe("OrganizationMapper", () => {
       slug: "google",
       website: "https://www.google.com",
       logo: "https://example.com/logo.png",
+      disabled: false,
       i18n: [
         {
           locale: "en",
@@ -42,6 +43,7 @@ describe("OrganizationMapper", () => {
       slug: "google",
       website: "https://www.google.com",
       logo: "https://example.com/logo.png",
+      disabled: false,
       i18n: [
         {
           locale: "en",

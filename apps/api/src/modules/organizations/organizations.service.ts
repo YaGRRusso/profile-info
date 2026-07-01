@@ -28,11 +28,19 @@ export class OrganizationsService {
   }: {
     filters?: FilterOrganizationInput;
   }): Promise<OrganizationEntity> {
-    return this.repository.crud.findOne({ filters });
+    return this.repository.findOneActive({ filters });
+  }
+
+  findOneActiveById(id: string): Promise<OrganizationEntity> {
+    return this.repository.findOneActiveById(id);
   }
 
   findManyById(ids: string[]): Promise<OrganizationEntity[]> {
     return this.repository.crud.findManyById(ids);
+  }
+
+  findManyActiveById(ids: string[]): Promise<OrganizationEntity[]> {
+    return this.repository.findManyActiveById(ids);
   }
 
   findMany({
@@ -46,7 +54,7 @@ export class OrganizationsService {
     limit?: number;
     skip?: number;
   }): Promise<MultiPaged<OrganizationEntity>> {
-    return this.repository.crud.findMany({ filters, sort, skip, limit });
+    return this.repository.findManyActive({ filters, sort, skip, limit });
   }
 
   createOne(createInput: CreateOrganizationInput): Promise<OrganizationEntity> {
@@ -69,6 +77,22 @@ export class OrganizationsService {
     updateInput: UpdateOrganizationInput
   ): Promise<BatchEntity> {
     return this.repository.crud.updateManyById(ids, updateInput);
+  }
+
+  disableOne(id: string): Promise<OrganizationEntity> {
+    return this.repository.crud.updateOneById(id, { disabled: true });
+  }
+
+  disableMany(ids: string[]): Promise<BatchEntity> {
+    return this.repository.crud.updateManyById(ids, { disabled: true });
+  }
+
+  enableOne(id: string): Promise<OrganizationEntity> {
+    return this.repository.crud.updateOneById(id, { disabled: false });
+  }
+
+  enableMany(ids: string[]): Promise<BatchEntity> {
+    return this.repository.crud.updateManyById(ids, { disabled: false });
   }
 
   async removeOne(id: string): Promise<OrganizationEntity> {
@@ -97,11 +121,11 @@ export class OrganizationsService {
   }
 
   count(): Promise<number> {
-    return this.repository.stats.count();
+    return this.repository.countActive();
   }
 
   async findRecentActivity(limit: number): Promise<RecentActivityRecord[]> {
-    const rows = await this.repository.stats.findRecentlyUpdated(
+    const rows = await this.repository.findRecentlyUpdatedActive(
       limit,
       "name updatedAt"
     );

@@ -34,6 +34,7 @@ export class SkillMapper
       slug: model.slug,
       name: model.name,
       category: model.category as SkillCategory,
+      disabled: model.disabled,
     };
   }
 

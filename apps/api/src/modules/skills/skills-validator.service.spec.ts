@@ -1,6 +1,7 @@
-import { BadRequestException } from "@nestjs/common";
+import { BadRequestException, NotFoundException } from "@nestjs/common";
 import { Test, TestingModule } from "@nestjs/testing";
 import { REFERENCES_NOT_FOUND } from "@/common/helpers/assert.helper";
+import { PERSISTENCE_NOT_FOUND } from "@/core/persistence/persistence.messages";
 import { SkillsService } from "./skills.service";
 import { SkillsValidatorService } from "./skills-validator.service";
 
@@ -9,11 +10,13 @@ const missingId = "507f1f77bcf86cd799439099";
 
 describe("SkillsValidatorService", () => {
   let validator: SkillsValidatorService;
-  let skillsService: { findManyById: jest.Mock };
+  let skillsService: { findManyActiveById: jest.Mock };
 
   beforeEach(async () => {
     skillsService = {
-      findManyById: jest.fn().mockResolvedValue([{ id: skillId }]),
+      findManyActiveById: jest
+        .fn()
+        .mockResolvedValue([{ id: skillId, disabled: false }]),
     };
 
     const module: TestingModule = await Test.createTestingModule({
@@ -30,7 +33,7 @@ describe("SkillsValidatorService", () => {
     it("delegates to assertSkillsExist", async () => {
       await validator.assertSkillExists(skillId);
 
-      expect(skillsService.findManyById).toHaveBeenCalledWith([skillId]);
+      expect(skillsService.findManyActiveById).toHaveBeenCalledWith([skillId]);
     });
   });
 
@@ -42,10 +45,20 @@ describe("SkillsValidatorService", () => {
     });
 
     it("rejects when any skill is missing", async () => {
-      skillsService.findManyById.mockResolvedValue([]);
+      skillsService.findManyActiveById.mockResolvedValue([]);
 
       await expect(validator.assertSkillsExist([missingId])).rejects.toThrow(
         new BadRequestException(REFERENCES_NOT_FOUND)
+      );
+    });
+
+    it("rejects when any skill is disabled", async () => {
+      skillsService.findManyActiveById.mockRejectedValue(
+        new NotFoundException(PERSISTENCE_NOT_FOUND)
+      );
+
+      await expect(validator.assertSkillsExist([skillId])).rejects.toThrow(
+        new NotFoundException(PERSISTENCE_NOT_FOUND)
       );
     });
   });

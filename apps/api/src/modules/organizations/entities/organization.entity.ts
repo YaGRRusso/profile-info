@@ -40,6 +40,9 @@ export class OrganizationEntity extends BaseEntity {
 
   @Field(() => OrganizationCategory)
   category: OrganizationCategory;
+
+  @Field(() => Boolean)
+  disabled: boolean;
 }
 
 export const PaginatedOrganizationEntity =

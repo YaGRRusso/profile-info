@@ -14,6 +14,7 @@ describe("SkillMapper", () => {
       slug: "typescript",
       name: "TypeScript",
       category: "LANGUAGE",
+      disabled: false,
     } as SkillModel;
 
     expect(mapper.toDomain(model)).toEqual({
@@ -24,6 +25,7 @@ describe("SkillMapper", () => {
       slug: "typescript",
       name: "TypeScript",
       category: SkillCategory.LANGUAGE,
+      disabled: false,
     });
   });
 

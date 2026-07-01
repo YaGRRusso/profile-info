@@ -16,6 +16,9 @@ export class SkillEntity extends BaseEntity {
 
   @Field(() => SkillCategory)
   category: SkillCategory;
+
+  @Field(() => Boolean)
+  disabled: boolean;
 }
 
 export const PaginatedSkillEntity = createPaginatedModel(SkillEntity);
