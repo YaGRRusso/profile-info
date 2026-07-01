@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable, UnauthorizedException } from "@nestjs/common";
 import { hash } from "bcryptjs";
 import { toTenantScope } from "@/core/context/auth-context.helper";
 import type { AuthContext } from "@/core/context/auth-context.interface";
@@ -10,7 +10,11 @@ import { FilterApiTokenInput } from "./dto/filter-api-token.input";
 import { SortApiTokenInput } from "./dto/sort-api-token.input";
 import { UpdateApiTokenInput } from "./dto/update-api-token.input";
 import { ApiTokenEntity, NewApiTokenEntity } from "./entities/api-token.entity";
-import { emitApiToken } from "./helpers/api-token-secret.helper";
+import {
+  emitApiToken,
+  parseApiToken,
+  verifyApiToken,
+} from "./helpers/api-token-secret.helper";
 import type { ApiTokenCreateRecord } from "./mappers/api-token.mapper";
 
 @Injectable()
@@ -99,5 +103,34 @@ export class ApiTokensService {
 
   removeMany(ctx: AuthContext, ids: string[]): Promise<BatchEntity> {
     return this.repository.crud.scoped(toTenantScope(ctx)).deleteManyById(ids);
+  }
+
+  async verify(plaintext: string) {
+    const parsed = parseApiToken(plaintext);
+    if (!parsed) {
+      throw new UnauthorizedException();
+    }
+
+    const record = await this.repository.findByIdForAuth(parsed.tokenId);
+    if (!record) {
+      throw new UnauthorizedException();
+    }
+
+    if (record.expiresAt && record.expiresAt.getTime() <= Date.now()) {
+      throw new UnauthorizedException();
+    }
+
+    const secretMatches = await verifyApiToken(
+      parsed.secret,
+      record.hashedSecret
+    );
+    if (!secretMatches) {
+      throw new UnauthorizedException();
+    }
+
+    return {
+      ownerId: record.ownerId,
+      permissions: record.permissions,
+    };
   }
 }

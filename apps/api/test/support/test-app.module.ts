@@ -4,6 +4,7 @@ import { EventEmitterModule } from "@nestjs/event-emitter";
 import { MongooseModule } from "@nestjs/mongoose";
 import { AppController } from "@/app.controller";
 import { AppService } from "@/app.service";
+import { ApiTokensModule } from "@/modules/api-tokens/api-tokens.module";
 import { AuthModule } from "@/modules/auth/auth.module";
 import { CoursesModule } from "@/modules/courses/courses.module";
 import { DashboardModule } from "@/modules/dashboard/dashboard.module";
@@ -31,6 +32,7 @@ import { GraphqlModule } from "@/platform/graphql/graphql.module";
     }),
     GraphqlModule,
     AuthModule,
+    ApiTokensModule,
     SkillsModule,
     OrganizationsModule,
     UsersModule,

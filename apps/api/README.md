@@ -10,7 +10,7 @@ by the `@profile-info/admin` dashboard.
 - **NestJS 11**: modules, resolvers, services, DI.
 - **Apollo GraphQL (code-first)**: schema generated to `src/schema.gql`.
 - **MongoDB + Mongoose**: ODM schemas in `src/modules/<name>/schemas/`.
-- **Passport JWT**: global `GqlAuthGuard` with `@Public()` opt-out and `RolesGuard` for admin-only writes.
+- **Passport JWT**: global `GqlAuthenticationGuard` with `@Public()` opt-out and `GqlAuthorizationGuard` for roles and API token permissions.
 - **DataLoader**: batches skill and organization lookups on nested fields.
 - **Jest**: unit (`src/**/*.spec.ts`, including `core/persistence/repositories/*.spec.ts`), e2e (`test/e2e/`), and integration (`test/integration/`). E2e/integration require MongoDB on `localhost:27017`. Coverage: `npm run test:coverage`.
 
@@ -39,7 +39,7 @@ platform        ← transport composition (GraphQL wiring, DataLoader aggregatio
 | **`integrations/tavily/`** | Tavily adapter for web content extraction (`WebContentProvider`). | Used by resource-detail extractors. |
 | **`modules/`** | Business domains. Each CRUD entity = resolver + service + schema + entity + dto. | Where profile rules and GraphQL operations live. |
 | **`platform/graphql/`** | GraphQL transport: `GraphqlModule`, `LoadersService`, loader registry augmentation. | Apollo wiring and per-request context. |
-| **`modules/auth/`** | JWT guard, `signIn`, `getMe`. Global auth, not a CRUD entity. | Security cross-cut; uses `UsersService.findOneByEmailWithPassword`. |
+| **`modules/auth/`** | JWT strategies, `signIn`, `getMe`. `GqlAuthenticationGuard` + `GqlAuthorizationGuard`. | Security cross-cut; uses `UsersService.findOneByEmailWithPassword`. |
 | **`modules/dashboard/`** | Read-only stats; imports other modules' **services** (not Mongoose models). | Aggregation without bypassing service boundaries. |
 | **`modules/resume/`** | Aggregates a user's profile data and renders a PDF via `GET /resume.pdf?userId=&locale=`. Uses `pdfkit`; imports feature services like dashboard. | CV export for admin and external portfolio clients. |
 | **`modules/ai-tools/`** | AI use-cases (summarize, translate, ATS). Owns `AiEntity`, enums, and mappers. | Converts `IntegrationChatResult` → GraphQL; orchestrates `*ExtractorService` before calling `AiChatProvider`. |
@@ -47,7 +47,7 @@ platform        ← transport composition (GraphQL wiring, DataLoader aggregatio
 ### Request flow (typical)
 
 ```
-HTTP → Apollo → GqlAuthGuard → RolesGuard → Resolver → Service → Repository (CrudRepository + mapper) → Mongoose
+HTTP → Apollo → GqlAuthenticationGuard → GqlAuthorizationGuard → Resolver → Service → Repository (CrudRepository + mapper) → Mongoose
                               ↘ @ResolveField → DataLoader → Service
 ```
 

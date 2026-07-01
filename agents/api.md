@@ -32,7 +32,7 @@ Entry point `src/main.ts`:
 - `GraphqlModule` (`platform/graphql/graphql.module.ts`): wraps `GraphQLModule.forRootAsync` with `ApolloDriver`, schema at `src/schema.gql`, and per-request DataLoaders via `LoadersService`.
 - Feature modules: `AuthModule`, CRUD entities, `DashboardModule` (read-only aggregation), `ResumeModule` (PDF export), `AiToolsModule`.
 
-Request flow: Apollo → `GqlAuthGuard` (unless `@Public()`) → `GqlAuthorizationGuard` → resolver → service → repository (`CrudRepository` + mapper) → Mongoose. Nested fields use `@ResolveField` + per-request DataLoaders. REST routes (e.g. `GET /resume.pdf`) skip GraphQL guards when `context.getType() !== "graphql"`.
+Request flow: Apollo → `GqlAuthenticationGuard` (unless `@Public()`) → `GqlAuthorizationGuard` → resolver → service → repository (`CrudRepository` + mapper) → Mongoose. Nested fields use `@ResolveField` + per-request DataLoaders. REST routes (e.g. `GET /resume.pdf`) skip GraphQL guards when `context.getType() !== "graphql"`.
 
 ## Data model (ER)
 
@@ -46,7 +46,7 @@ Full diagram and field detail: `apps/api/docs/ER_MODEL.md`.
 
 - **@nestjs/graphql + @nestjs/apollo**: code-first schema in `src/schema.gql`.
 - **@nestjs/mongoose + mongoose**: models in `src/schemas/`, registered per feature module.
-- **@nestjs/jwt + passport**: global 8h JWT in `src/auth/`.
+- **@nestjs/jwt + passport**: global 8h JWT in `modules/auth/`.
 - **@nestjs/event-emitter**: domain events on delete (see below).
 - **bcryptjs**: password hashing in `users/users.service.ts`.
 - **dataloader + lodash**: per-entity `*LoaderService` in feature modules; `platform/graphql/loaders.service.ts` composes them per request.
@@ -93,7 +93,7 @@ DI pattern is the NestJS-idiomatic **abstract class as token**: ports are abstra
 - `graphql/`: `graphql.module.ts` (Apollo `forRootAsync`, `formatError` maps auth HTTP status → `UNAUTHENTICATED`/`FORBIDDEN`), `loaders.service.ts` (loader composition), `loaders.registry.ts` (augments `AppLoaders` on `core/context/graphql-context.interface`). Batching logic stays in each entity's `*LoaderService`.
 
 `modules/` (business domains):
-- `auth/`: `strategies/` (`JwtStrategy` + `passport-jwt`, `ApiTokenStrategy` + `passport-headerapikey`), `guards/` (`GqlAuthGuard`, `GqlAuthorizationGuard`), `decorators/` (`@Auth`). Session: `Authorization: Bearer <jwt>`. API token: `X-Api-Key: pi_…`. `GqlAuthGuard`: Passport `[api-token, jwt]`.
+- `auth/`: `strategies/` (`JwtStrategy`, `ApiTokenStrategy`), `guards/` (`GqlAuthenticationGuard`, `GqlAuthorizationGuard`), `decorators/` (`@Auth`). Session: `Authorization: Bearer <jwt>`. API token: `X-Api-Key: pi_…`.
 - `ai-tools/`: AI use-cases (`atsSummarize`, `summarize`, `translate`). Any authenticated user (JWT); `@Roles(SUPER_ADMIN)` removed in phase 5b. `GqlThrottlerGuard` + `@Throttle` on resolver. Owns `AiEntity` GraphQL types, enums (`ChatRole`, `ChatFinishReason`), and mappers (`IntegrationChatResult` → `AiEntity`). `resource-detail/` orchestrates `*ExtractorService` classes. Injects `AiChatProvider`, `RepositoryMetadataProvider`, `WebContentProvider`. `AiToolsModule` imports `OpenRouterModule`, `GithubModule`, `TavilyModule`.
 - `dashboard/`: read-only aggregation via feature **services**. `@Auth() ctx` on `dashboard` query. Private entities: `count(ctx)` / `countByField(ctx)` / `findRecentActivity(ctx)` (tenant-scoped). Catalog (`skills`, `organizations`): global `count()` / stats. USER sees own private totals + full catalog; `SUPER_ADMIN` sees all private data (`crossTenant`).
 - `resume/`: `ResumeService.buildResume(userId, locale)` aggregates one user's profile (top by `relevance`, completed educations/courses); skills use top `skillsPerCategory` per category (empty categories omitted). PDF export via public `GET /resume.pdf?userId=&locale=` (`normalizeLocale`, `pickTranslation`, `formatPeriod`, `resolveResumeLabels` in `resume.labels.ts`). Filename is always `resume.pdf`. Private entities use owner-scoped `ctx` for the requested `userId` (forced `USER` role so `SUPER_ADMIN` profiles do not pull cross-tenant data). Org refs resolved via `OrganizationsService.findManyById`. CV-specific rendering in `resume/pdf/` (`renderResumeDocument`, section renderers); uses `PdfRenderService` from `core/pdf/PdfModule`.
