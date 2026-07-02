@@ -2,7 +2,6 @@ import { useForm } from "@tanstack/react-form";
 import lodash from "lodash";
 import { useState } from "react";
 import z from "zod";
-import { RangeInput } from "@/components/inputs/range";
 import { TextInput } from "@/components/inputs/text";
 import { PLACEHOLDERS } from "@/consts/placeholders";
 import { SLUG_REGEX } from "@/consts/regex";
@@ -17,7 +16,6 @@ const skillSchema = z.object({
     .regex(SLUG_REGEX, "invalid field format"),
   name: z.string().min(1, "required field"),
   category: z.string(),
-  relevance: z.number().min(1, "must be a positive number"),
 });
 
 export type SkillSchema = z.infer<typeof skillSchema>;
@@ -42,7 +40,6 @@ export function SkillForm({
       name: "",
       slug: "",
       category: "",
-      relevance: 1,
       ...defaultValues,
     },
     onSubmit: ({ value }) => onSubmit?.(value),
@@ -113,22 +110,6 @@ export function SkillForm({
             onChange={field.handleChange}
             placeholder={PLACEHOLDERS.category}
             value={field.state.value ?? ""}
-          />
-        )}
-      </Field>
-      <Field name="relevance">
-        {(field) => (
-          <RangeInput
-            className="range-xs"
-            error={fieldError(field.state.meta)}
-            label="Relevance"
-            max={5}
-            min={1}
-            name={field.name}
-            onChange={field.handleChange}
-            ruler
-            step={1}
-            value={field.state.value}
           />
         )}
       </Field>

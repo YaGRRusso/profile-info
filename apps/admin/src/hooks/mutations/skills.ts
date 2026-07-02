@@ -13,7 +13,6 @@ const createOneSkill = graphql(`
       name
       slug
       category
-      relevance
       createdAt
       updatedAt
     }
@@ -27,7 +26,6 @@ const updateOneSkill = graphql(`
       name
       slug
       category
-      relevance
       createdAt
       updatedAt
     }

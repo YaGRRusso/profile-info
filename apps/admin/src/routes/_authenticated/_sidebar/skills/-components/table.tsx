@@ -33,12 +33,11 @@ import { z } from "zod";
 import { BadgeList } from "@/components/display/badge-list";
 import { useActiveFilters } from "@/hooks/custom/use-active-filters";
 import { usePersistedState } from "@/hooks/custom/use-persisted-state";
-import { useStableValue } from "@/hooks/custom/use-stable-value";
 import type { SkillRow } from "@/hooks/queries/skills";
 import { cn } from "@/lib/cn";
-import { getMinMaxFacets, getUniqueFacets } from "@/lib/facets";
+import { getUniqueFacets } from "@/lib/facets";
 import { parseAsShape } from "@/lib/parsers";
-import { dateRangeFilter, numberRangeFilter } from "@/lib/table-filters";
+import { dateRangeFilter } from "@/lib/table-filters";
 
 const debouncedUrlUpdates = { method: "debounce" as const, timeMs: 500 };
 const persistentOptions = { clearOnDefault: true, history: "push" as const };
@@ -56,16 +55,6 @@ const sortParser = parseAsShape(
 const categoryParser = parseAsShape(z.string()).withOptions(persistentOptions);
 const createdAtParser = parseAsShape(z.string()).withOptions(persistentOptions);
 const updatedAtParser = parseAsShape(z.string()).withOptions(persistentOptions);
-
-const relevanceParser = parseAsShape(
-  z.object({
-    min: z.number().optional(),
-    max: z.number().optional(),
-  })
-).withOptions({
-  ...persistentOptions,
-  limitUrlUpdates: debouncedUrlUpdates,
-});
 
 const DATE_OPTIONS = [
   { value: "", label: "Any date" },
@@ -116,19 +105,6 @@ const getColumns = (
       <span className="font-mono text-xs">{data.getValue()}</span>
     ),
   }),
-  columnHelper.display({
-    id: "icon",
-    header: "Icon",
-    cell: (data) => (
-      <img
-        alt={data.row.original.slug}
-        className="size-4"
-        height={16}
-        src={`https://cdn.simpleicons.org/${data.row.original.slug}`}
-        width={16}
-      />
-    ),
-  }),
   columnHelper.accessor("name", {
     header: "Name",
   }),
@@ -146,15 +122,6 @@ const getColumns = (
       if (!value) return <span className="opacity-50">—</span>;
       return <BadgeList values={[value]} />;
     },
-  }),
-  columnHelper.accessor("relevance", {
-    header: "Relevance",
-    enableColumnFilter: true,
-    enableGlobalFilter: false,
-    filterFn: numberRangeFilter,
-    cell: (data) => (
-      <span className="badge badge-soft badge-sm">{data.getValue()}</span>
-    ),
   }),
   columnHelper.accessor("disabled", {
     header: "Status",
@@ -256,29 +223,18 @@ export function SkillsTable({
   const [category, setCategory] = useQueryState("category", categoryParser);
   const [createdAt, setCreatedAt] = useQueryState("createdAt", createdAtParser);
   const [updatedAt, setUpdatedAt] = useQueryState("updatedAt", updatedAtParser);
-  const [relevance, setRelevance] = useQueryState("relevance", relevanceParser);
 
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
   const [columnVisibility, setColumnVisibility] =
     usePersistedState<VisibilityState>("skills-table-columns", {});
 
-  const stableRelevance = useStableValue(relevance);
   const columnFilters = useMemo<ColumnFiltersState>(() => {
     const activeFilters: ColumnFiltersState = [];
     if (category) activeFilters.push({ id: "category", value: category });
     if (createdAt) activeFilters.push({ id: "createdAt", value: createdAt });
     if (updatedAt) activeFilters.push({ id: "updatedAt", value: updatedAt });
-    if (stableRelevance) {
-      activeFilters.push({
-        id: "relevance",
-        value: [stableRelevance.min, stableRelevance.max] as [
-          number | undefined,
-          number | undefined,
-        ],
-      });
-    }
     return activeFilters;
-  }, [category, createdAt, updatedAt, stableRelevance]);
+  }, [category, createdAt, updatedAt]);
 
   const { filters: activeFilters, clearAll: clearAllFilters } =
     useActiveFilters([
@@ -299,12 +255,6 @@ export function SkillsTable({
         label: "Updated",
         state: updatedAt,
         setState: setUpdatedAt,
-      },
-      {
-        id: "relevance",
-        label: "Relevance",
-        state: stableRelevance,
-        setState: setRelevance,
       },
     ]);
 
@@ -344,26 +294,11 @@ export function SkillsTable({
     onColumnVisibilityChange: setColumnVisibility,
   });
 
-  function setRelevanceFilter(inputIndex: 0 | 1, rawValue: string) {
-    const parsedValue = rawValue === "" ? undefined : Number(rawValue);
-    const nextRange: [number | undefined, number | undefined] = [
-      relevance?.min,
-      relevance?.max,
-    ];
-    nextRange[inputIndex] = parsedValue;
-    const [nextMin, nextMax] = nextRange;
-    const hasAnyValue = nextMin !== undefined || nextMax !== undefined;
-    setRelevance(hasAnyValue ? { min: nextMin, max: nextMax } : null);
-  }
-
   const selected = data.filter((skill) => rowSelection[skill.id]);
 
   const categoryFacets = getUniqueFacets(
     table.getColumn("category")!.getFacetedUniqueValues()
   ).filter(({ value }) => value != null && value !== "");
-  const relevanceFacets = getMinMaxFacets(
-    table.getColumn("relevance")?.getFacetedMinMaxValues()
-  );
 
   return (
     <div className="flex flex-col gap-4">
@@ -440,30 +375,6 @@ export function SkillsTable({
               <SlidersHorizontalIcon />
             </button>
             <div className="dropdown-content z-10 w-52 rounded-box bg-base-200 p-4">
-              <fieldset className="flex flex-col gap-2">
-                <span className="font-semibold">Relevance</span>
-                <div className="flex items-center gap-2">
-                  <input
-                    className="input input-sm w-full"
-                    max={relevanceFacets.max ?? 100}
-                    min={relevanceFacets.min ?? 0}
-                    onChange={(e) => setRelevanceFilter(0, e.target.value)}
-                    placeholder={`Min (${relevanceFacets.min ?? "–"})`}
-                    type="number"
-                    value={relevance?.min ?? ""}
-                  />
-                  <input
-                    className="input input-sm w-full"
-                    max={relevanceFacets.max ?? 100}
-                    min={relevanceFacets.min ?? 0}
-                    onChange={(e) => setRelevanceFilter(1, e.target.value)}
-                    placeholder={`Max (${relevanceFacets.max ?? "–"})`}
-                    type="number"
-                    value={relevance?.max ?? ""}
-                  />
-                </div>
-              </fieldset>
-              <div className="divider mt-2 mb-0" />
               <fieldset className="flex flex-col gap-2">
                 <span className="font-semibold">Created</span>
                 {DATE_OPTIONS.map(({ value, label }) => (

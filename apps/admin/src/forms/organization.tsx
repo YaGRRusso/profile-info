@@ -4,7 +4,6 @@ import { useCallback, useState } from "react";
 import { toast } from "react-toastify";
 import z from "zod";
 import { FieldArray } from "@/components/inputs/field-array";
-import { RangeInput } from "@/components/inputs/range";
 import { SelectInput } from "@/components/inputs/select";
 import { TextInput } from "@/components/inputs/text";
 import { TextareaInput } from "@/components/inputs/textarea";
@@ -34,7 +33,6 @@ const organizationSchema = z.object({
   category: z.enum(OrganizationCategory, "required field"),
   logo: z.union([z.url(), z.literal("")]),
   website: z.union([z.url(), z.literal("")]),
-  relevance: z.number().min(1, "must be a positive number"),
   i18n: z
     .array(
       z.object({
@@ -68,7 +66,6 @@ export function organizationToInput(
     category: data.category,
     logo: data.logo,
     website: data.website,
-    relevance: data.relevance,
     i18n: data.i18n.map((translation) => ({
       locale: translation.locale,
       messages: {
@@ -87,7 +84,6 @@ export function organizationToForm(
     category: organization.category,
     logo: organization.logo ?? "",
     website: organization.website ?? "",
-    relevance: organization.relevance,
     i18n: organization.i18n.map((translation) => ({
       locale: translation.locale,
       description: translation.messages.description,
@@ -123,7 +119,6 @@ export function OrganizationForm({
       category: OrganizationCategory.Company,
       logo: "",
       website: "",
-      relevance: 1,
       i18n: createEmptyI18n({ description: "" }),
       ...defaultValues,
     },
@@ -290,22 +285,6 @@ export function OrganizationForm({
             name={field.name}
             onChange={field.handleChange}
             placeholder={PLACEHOLDERS.url}
-            value={field.state.value}
-          />
-        )}
-      </Field>
-      <Field name="relevance">
-        {(field) => (
-          <RangeInput
-            className="range-xs"
-            error={fieldError(field.state.meta)}
-            label="Relevance"
-            max={5}
-            min={1}
-            name={field.name}
-            onChange={field.handleChange}
-            ruler
-            step={1}
             value={field.state.value}
           />
         )}

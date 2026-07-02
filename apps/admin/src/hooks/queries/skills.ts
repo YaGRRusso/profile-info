@@ -34,7 +34,6 @@ const findManySkills = graphql(`
         name
         slug
         category
-        relevance
         disabled
         createdAt
         updatedAt
@@ -60,7 +59,6 @@ const findManyActiveSkills = graphql(`
         name
         slug
         category
-        relevance
         disabled
         createdAt
         updatedAt

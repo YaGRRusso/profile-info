@@ -78,7 +78,6 @@ function RouteComponent() {
               updateSkillInput: {
                 category: data.category,
                 name: data.name,
-                relevance: data.relevance,
                 slug: data.slug,
               },
             },

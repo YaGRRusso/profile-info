@@ -16,9 +16,8 @@ import {
   ResourceType,
   type UpdateMeInput,
 } from "@/generated/graphql/graphql";
-import { useQueryAllPages } from "@/hooks/custom/use-query-all-pages";
 import { useAtsSummarize, useTranslate } from "@/hooks/mutations/ai";
-import { useFindManyActiveSkills } from "@/hooks/queries/skills";
+import { useGetMe } from "@/hooks/queries/auth";
 import { toDateInput, toIsoDate } from "@/lib/date";
 import { fieldError } from "@/lib/field-error";
 import { createEmptyI18n } from "@/lib/i18n";
@@ -125,9 +124,7 @@ export function ProfileForm({
   isDisabled,
   isLoading,
 }: ProfileFormProps) {
-  const findManySkills = useFindManyActiveSkills();
-  useQueryAllPages(findManySkills);
-
+  const getMe = useGetMe();
   const atsSummarize = useAtsSummarize();
   const translate = useTranslate();
 
@@ -163,10 +160,9 @@ export function ProfileForm({
       if (raw.trim().length <= RawSizeEnum.XSMALL)
         return toast.error("Description must be at least 64 characters long");
 
-      const skills = [...(findManySkills.data?.nodes ?? [])]
-        .sort((a, b) => b.relevance - a.relevance)
-        .slice(0, 32)
-        .map((skill) => skill.name);
+      const skills = (getMe.data?.getMe.skills ?? [])
+        .map((skill) => skill.name)
+        .slice(0, 32);
       if (!skills.length) return toast.error("At least one skill is required");
 
       const name = form.getFieldValue("name");
@@ -195,7 +191,7 @@ export function ProfileForm({
     },
     [
       atsSummarize.mutateAsync,
-      findManySkills.data?.nodes,
+      getMe.data?.getMe.skills,
       form.getFieldValue,
       form.setFieldValue,
     ]

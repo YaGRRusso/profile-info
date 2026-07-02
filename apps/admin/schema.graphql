@@ -171,7 +171,6 @@ input CreateOrganizationInput {
   i18n: [CreateOrganizationMessagesInputTranslationInput!]!
   logo: String
   name: String!
-  relevance: Float
   slug: String!
   website: String
 }
@@ -207,7 +206,6 @@ input CreateProjectMessagesInputTranslationInput {
 input CreateSkillInput {
   category: String
   name: String!
-  relevance: Float
   slug: String!
 }
 
@@ -222,6 +220,7 @@ input CreateUserInput {
   password: String!
   phone: String
   role: UserRole
+  skillIds: [String!]
   urls: [UrlInput!]
 }
 
@@ -420,7 +419,6 @@ input FilterOrganizationInput {
   i18n: [CreateOrganizationMessagesInputTranslationInput!]
   logo: String
   name: String
-  relevance: Float
   slug: String
   website: String
 }
@@ -438,7 +436,6 @@ input FilterSkillInput {
   category: String
   disabled: Boolean
   name: String
-  relevance: Float
   slug: String
 }
 
@@ -544,7 +541,6 @@ type OrganizationEntity {
   id: ID!
   logo: String
   name: String!
-  relevance: Float!
   slug: String!
   updatedAt: DateTime!
   website: String
@@ -688,7 +684,6 @@ type SkillEntity {
   disabled: Boolean!
   id: ID!
   name: String!
-  relevance: Float!
   slug: String!
   updatedAt: DateTime!
 }
@@ -726,7 +721,6 @@ input SortExperienceInput {
 input SortOrganizationInput {
   createdAt: SortEnum
   name: SortEnum
-  relevance: SortEnum
   updatedAt: SortEnum
 }
 
@@ -739,7 +733,6 @@ input SortProjectInput {
 input SortSkillInput {
   createdAt: SortEnum
   name: SortEnum
-  relevance: SortEnum
   updatedAt: SortEnum
 }
 
@@ -810,6 +803,7 @@ input UpdateMeInput {
   nickname: String
   password: String
   phone: String
+  skillIds: [String!]
   urls: [UrlInput!]
 }
 
@@ -819,7 +813,6 @@ input UpdateOrganizationInput {
   i18n: [CreateOrganizationMessagesInputTranslationInput!]
   logo: String
   name: String
-  relevance: Float
   slug: String
   website: String
 }
@@ -837,7 +830,6 @@ input UpdateSkillInput {
   category: String
   disabled: Boolean
   name: String
-  relevance: Float
   slug: String
 }
 
@@ -852,6 +844,7 @@ input UpdateUserInput {
   password: String
   phone: String
   role: UserRole
+  skillIds: [String!]
   urls: [UrlInput!]
 }
 
@@ -884,6 +877,8 @@ type UserEntity {
   nickname: String!
   phone: String
   role: UserRole!
+  skillIds: [ID!]
+  skills: [SkillEntity!]
   updatedAt: DateTime!
   urls: [UrlEntity!]
 }

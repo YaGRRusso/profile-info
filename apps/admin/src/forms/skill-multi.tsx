@@ -2,7 +2,6 @@ import { useForm } from "@tanstack/react-form";
 import { useState } from "react";
 import z from "zod";
 import { CheckboxInput } from "@/components/inputs/checkbox";
-import { RangeInput } from "@/components/inputs/range";
 import { TextInput } from "@/components/inputs/text";
 import { PLACEHOLDERS } from "@/consts/placeholders";
 import type { UpdateSkillInput } from "@/generated/graphql/graphql";
@@ -11,7 +10,6 @@ import { CommonFormProps } from "./common";
 
 const skillMultiSchema = z.object({
   category: z.string(),
-  relevance: z.number().min(1, "must be a positive number"),
 });
 
 export type SkillMultiSchema = z.infer<typeof skillMultiSchema>;
@@ -26,20 +24,14 @@ export function SkillMultiForm({
   isLoading,
 }: SkillMultiFormProps) {
   const [changeCategory, setChangeCategory] = useState(false);
-  const [changeRelevance, setChangeRelevance] = useState(false);
 
   const form = useForm({
     defaultValues: {
       category: "",
-      relevance: 1,
     },
     onSubmit: ({ value }) => {
-      const updateSkillInput: UpdateSkillInput = {};
-      if (changeCategory) {
-        updateSkillInput.category = value.category;
-      }
-      if (changeRelevance) updateSkillInput.relevance = value.relevance;
-      onSubmit?.(updateSkillInput);
+      if (!changeCategory) return;
+      onSubmit?.({ category: value.category });
     },
     validators: { onChange: skillMultiSchema },
   });
@@ -75,32 +67,6 @@ export function SkillMultiForm({
         )}
       </Field>
 
-      <div className="divider" />
-
-      <CheckboxInput
-        checked={changeRelevance}
-        label="Change Relevance"
-        onChange={setChangeRelevance}
-      />
-
-      <Field name="relevance">
-        {(field) => (
-          <RangeInput
-            className="range-xs"
-            disabled={!changeRelevance}
-            error={fieldError(field.state.meta)}
-            label="Relevance"
-            max={5}
-            min={1}
-            name={field.name}
-            onChange={field.handleChange}
-            ruler
-            step={1}
-            value={field.state.value}
-          />
-        )}
-      </Field>
-
       <div className="form-footer">
         {onCancel && (
           <button
@@ -117,7 +83,7 @@ export function SkillMultiForm({
               className="btn btn-soft btn-primary flex-1"
               disabled={
                 !canSubmit ||
-                !(changeCategory || changeRelevance) ||
+                !changeCategory ||
                 isSubmitting ||
                 isDisabled ||
                 isLoading

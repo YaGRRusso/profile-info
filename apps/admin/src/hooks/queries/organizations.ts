@@ -44,7 +44,7 @@ const findManyOrganizations = graphql(`
             description
           }
         }
-        relevance
+        disabled
         createdAt
         updatedAt
       }
@@ -78,7 +78,7 @@ const findManyActiveOrganizations = graphql(`
             description
           }
         }
-        relevance
+        disabled
         createdAt
         updatedAt
       }
