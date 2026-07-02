@@ -21,6 +21,10 @@ Deferred API and admin work, ordered by criticality, then value, then effort.
 
 - **Admin panel multi-tenant** — Role-aware UI, token management, super-admin tenant view.
 - **Users table (admin)** — Super-admin user list/management.
+- **Profile skill suggestions** (ADR 003) — On profile edit, surface skills already
+  linked on the user's experiences, educations, courses, and projects as suggestions
+  when picking `skillIds`. Read-only hints only; user still opts in manually (no
+  auto-sync to profile).
 
 ## Low Priority
 
