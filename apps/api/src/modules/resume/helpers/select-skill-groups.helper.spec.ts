@@ -1,15 +1,15 @@
 import { selectResumeSkillGroups } from "./select-skill-groups.helper";
 
 describe("selectResumeSkillGroups", () => {
-  it("caps skills per category by relevance", () => {
+  it("caps skills per category preserving input order", () => {
     const groups = selectResumeSkillGroups([
-      { name: "NestJS", category: "BACKEND", relevance: 5 },
-      { name: "Express", category: "BACKEND", relevance: 4 },
-      { name: "Fastify", category: "BACKEND", relevance: 3 },
-      { name: "Koa", category: "BACKEND", relevance: 2 },
-      { name: "Hapi", category: "BACKEND", relevance: 1 },
-      { name: "React", category: "FRONTEND", relevance: 5 },
-      { name: "Vue", category: "FRONTEND", relevance: 4 },
+      { id: "1", name: "NestJS", category: "BACKEND" },
+      { id: "2", name: "Express", category: "BACKEND" },
+      { id: "3", name: "Fastify", category: "BACKEND" },
+      { id: "4", name: "Koa", category: "BACKEND" },
+      { id: "5", name: "Hapi", category: "BACKEND" },
+      { id: "6", name: "React", category: "FRONTEND" },
+      { id: "7", name: "Vue", category: "FRONTEND" },
     ] as never);
 
     expect(groups).toEqual([
@@ -26,7 +26,7 @@ describe("selectResumeSkillGroups", () => {
 
   it("omits categories with no skills", () => {
     const groups = selectResumeSkillGroups([
-      { name: "TypeScript", category: "LANGUAGE", relevance: 5 },
+      { id: "1", name: "TypeScript", category: "LANGUAGE" },
     ] as never);
 
     expect(groups).toEqual([{ category: "LANGUAGE", skills: ["TypeScript"] }]);

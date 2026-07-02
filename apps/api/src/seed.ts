@@ -200,12 +200,7 @@ async function seed() {
     users.deleteMany({}),
   ]);
 
-  const skillDocs = await skills.create(
-    SEED_SKILLS.map((skill) => ({
-      ...skill,
-      relevance: relevance(),
-    }))
-  );
+  const skillDocs = await skills.create(SEED_SKILLS);
   const skillIds = skillDocs.map((doc) => doc._id);
 
   const organizationDocs = await organizations.create(
@@ -217,7 +212,6 @@ async function seed() {
         category: faker.helpers.arrayElement(ORGANIZATION_CATEGORIES),
         logo: faker.image.urlPicsumPhotos({ width: 96, height: 96 }),
         website: faker.internet.url(),
-        relevance: relevance(),
         i18n: i18n({
           description: faker.lorem.sentences({ min: 8, max: 32 }),
         }),

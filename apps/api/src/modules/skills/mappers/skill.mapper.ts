@@ -29,7 +29,6 @@ export class SkillMapper
   toDomain(model: SkillModel): SkillEntity {
     return {
       ...toBaseEntityFields(model),
-      relevance: model.relevance,
       slug: model.slug,
       name: model.name,
       category: model.category,

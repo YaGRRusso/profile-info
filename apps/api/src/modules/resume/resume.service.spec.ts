@@ -19,7 +19,7 @@ describe("ResumeService", () => {
   let educationsService: { findMany: jest.Mock };
   let coursesService: { findMany: jest.Mock };
   let projectsService: { findMany: jest.Mock };
-  let skillsService: { findMany: jest.Mock };
+  let skillsService: { findManyById: jest.Mock };
   let organizationsService: { findManyById: jest.Mock };
 
   beforeEach(async () => {
@@ -28,7 +28,7 @@ describe("ResumeService", () => {
     educationsService = { findMany: jest.fn() };
     coursesService = { findMany: jest.fn() };
     projectsService = { findMany: jest.fn() };
-    skillsService = { findMany: jest.fn() };
+    skillsService = { findManyById: jest.fn() };
     organizationsService = { findManyById: jest.fn() };
 
     const module: TestingModule = await Test.createTestingModule({
@@ -55,9 +55,10 @@ describe("ResumeService", () => {
       role: UserRole.SUPER_ADMIN,
       i18n: [],
       urls: [],
+      skillIds: [],
     });
 
-    skillsService.findMany.mockResolvedValue({ nodes: [] });
+    skillsService.findManyById.mockResolvedValue([]);
     experiencesService.findMany.mockResolvedValue({ nodes: [] });
     educationsService.findMany.mockResolvedValue({ nodes: [] });
     coursesService.findMany.mockResolvedValue({ nodes: [] });
@@ -104,9 +105,10 @@ describe("ResumeService", () => {
         },
       ],
       urls: [{ title: "GitHub", value: "https://github.com/alice" }],
+      skillIds: [],
     });
 
-    skillsService.findMany.mockResolvedValue({ nodes: [] });
+    skillsService.findManyById.mockResolvedValue([]);
     experiencesService.findMany.mockResolvedValue({ nodes: [] });
     educationsService.findMany.mockResolvedValue({ nodes: [] });
     coursesService.findMany.mockResolvedValue({ nodes: [] });

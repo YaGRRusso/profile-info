@@ -4,7 +4,11 @@ import {
   type SortOrder,
   type UpdateQuery,
 } from "mongoose";
-import { toBaseEntityFields } from "@/core/mappers/base.mapper";
+import {
+  toBaseEntityFields,
+  toIdStrings,
+  toObjectIds,
+} from "@/core/mappers/base.mapper";
 import { toTranslationEntityList } from "@/core/mappers/translation.mapper";
 import { toUrlEntityList } from "@/core/mappers/url.mapper";
 import { withObjectIdRefs } from "@/core/persistence/helpers/filter-ref.helper";
@@ -49,15 +53,22 @@ export class UserMapper
       i18n: toTranslationEntityList(model.i18n),
       role: model.role,
       urls: toUrlEntityList(model.urls),
+      skillIds: toIdStrings(model.skillIds),
     };
   }
 
   toPersistenceForCreate(entity: UserCreateRecord): AnyKeys<UserModel> {
-    return { ...entity };
+    return {
+      ...entity,
+      skillIds: toObjectIds(entity.skillIds),
+    };
   }
 
   toPersistenceForUpdate(entity: UserUpdateRecord): UpdateQuery<UserModel> {
-    return { ...entity };
+    return {
+      ...entity,
+      skillIds: toObjectIds(entity.skillIds),
+    };
   }
 
   toPersistenceForFilter(entity: FilterUserInput): QueryFilter<UserModel> {

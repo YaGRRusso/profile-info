@@ -5,6 +5,7 @@ import { UserRole } from "@/core/enums/user-role.enum";
 import { DomainEvents } from "@/core/events/domain-events";
 import { UserDeletedEvent } from "@/core/events/user-deleted.event";
 import { createMockCrud } from "@/core/persistence/repositories/testing/service-spec.mock";
+import { SkillsValidatorService } from "@/modules/skills/skills-validator.service";
 import { UsersRepository } from "./users.repository";
 import { UsersService } from "./users.service";
 
@@ -33,6 +34,9 @@ describe("UsersService", () => {
   let service: UsersService;
   let crud: ReturnType<typeof createMockCrud>;
   let eventEmitter: jest.Mocked<Pick<EventEmitter2, "emitAsync">>;
+  let skillsValidator: jest.Mocked<
+    Pick<SkillsValidatorService, "assertSkillsExist">
+  >;
   let repository: {
     crud: ReturnType<typeof createMockCrud>;
     findOneByEmailWithPassword: jest.Mock;
@@ -54,11 +58,18 @@ describe("UsersService", () => {
           provide: EventEmitter2,
           useValue: { emitAsync: jest.fn().mockResolvedValue([]) },
         },
+        {
+          provide: SkillsValidatorService,
+          useValue: {
+            assertSkillsExist: jest.fn().mockResolvedValue(undefined),
+          },
+        },
       ],
     }).compile();
 
     service = module.get(UsersService);
     eventEmitter = module.get(EventEmitter2);
+    skillsValidator = module.get(SkillsValidatorService);
   });
 
   it("should be defined", () => {
@@ -123,6 +134,24 @@ describe("UsersService", () => {
         email: "john@example.com",
         role: UserRole.USER,
         password: "hashed-password",
+      });
+      expect(skillsValidator.assertSkillsExist).not.toHaveBeenCalled();
+    });
+
+    it("validates skillIds when provided", async () => {
+      const skillId = "507f1f77bcf86cd799439014";
+      crud.createOne.mockResolvedValue(fakeUser);
+
+      await service.createOne({ ...createInput, skillIds: [skillId] });
+
+      expect(skillsValidator.assertSkillsExist).toHaveBeenCalledWith([skillId]);
+      expect(crud.createOne).toHaveBeenCalledWith({
+        name: "John",
+        nickname: "john",
+        email: "john@example.com",
+        role: UserRole.USER,
+        password: "hashed-password",
+        skillIds: [skillId],
       });
     });
   });

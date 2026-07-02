@@ -43,7 +43,6 @@ describe("ResumeController (e2e)", () => {
       name: "TypeScript",
       slug: "typescript",
       category: "Programming",
-      relevance: 5,
     });
   });
 

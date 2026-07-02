@@ -5,7 +5,6 @@ import { SkillEntity } from "../entities/skill.entity";
 @InputType()
 export class SortSkillInput extends SortType(SkillEntity, [
   "name",
-  "relevance",
   "createdAt",
   "updatedAt",
 ]) {}

@@ -30,6 +30,7 @@ erDiagram
     string email UK
     string role
     object i18n "embed"
+    ObjectId skillIds FK "array ordered"
   }
   UrlEmbed {
     string title
@@ -103,6 +104,7 @@ erDiagram
   User ||--o{ Course : ownerId
   User ||--o{ Project : ownerId
   User ||--o{ ApiToken : ownerId
+  User ||--o{ Skill : skillIds
   User ||--o{ Skill : "ownerId local"
   User ||--o{ Organization : "ownerId local"
   Project ||--o{ UrlEmbed : urls
@@ -114,6 +116,7 @@ erDiagram
   Skill ||--o{ Education : skillIds
   Skill ||--o{ Course : skillIds
   Skill ||--o{ Project : skillIds
+  Skill ||--o{ User : skillIds
 ```
 
 ### Catalog references (`organizationId`, `skillIds`)
@@ -144,7 +147,7 @@ inputs use `organizationId` and `skillIds` (no `ownerId` — injected from conte
   `avatar`, `birth`, `address`, `i18n[]` (embed: `locale`, `messages.title`,
   `messages.description`)
 - **Embedded:** `urls[]` (`UrlEmbed`: `title`, `value`), `i18n[]` translations
-- **References:** none (tenant root; referenced by private entities and `ApiToken`)
+- **References:** `skillIds[]` → Skill (ordered; CV display priority per ADR 003)
 - **Delete:** `SUPER_ADMIN` accounts cannot be deleted. Deleting a `USER` emits
   `user.deleted`, which hard-deletes all private entities and API tokens for that `ownerId`.
 
@@ -154,7 +157,7 @@ inputs use `organizationId` and `skillIds` (no `ownerId` — injected from conte
 - **Key fields:** `scope` (enum: `GLOBAL`, `LOCAL`; default `GLOBAL`, indexed),
   `ownerId` (ref → User; required when `scope` is `LOCAL`, absent when `GLOBAL`),
   `slug` (unique per `{ scope, ownerId }` — disabled rows still occupy the slug; re-enable to reuse),
-  `name`, `category` (optional free string, indexed), `relevance`, `disabled`
+  `name`, `category` (optional free string, indexed), `disabled`
 - **Embedded:** none
 - **References:** optional `ownerId` → User (local catalog only; referenced by private entities via `skillIds`)
 
@@ -165,7 +168,7 @@ inputs use `organizationId` and `skillIds` (no `ownerId` — injected from conte
   `ownerId` (ref → User; required when `scope` is `LOCAL`, absent when `GLOBAL`),
   `slug` (unique per `{ scope, ownerId }` — disabled rows still occupy the slug; re-enable to reuse),
   `name`, `website` (optional), `logo` (optional), `category` (enum, indexed),
-  `relevance`, `disabled`, `i18n[]` (embed: `locale`, `messages.description`)
+  `disabled`, `i18n[]` (embed: `locale`, `messages.description`)
 - **Embedded:** `i18n[]` translations
 - **References:** optional `ownerId` → User (local catalog only; referenced by Experience, Education, Course)
 
@@ -228,8 +231,9 @@ inputs use `organizationId` and `skillIds` (no `ownerId` — injected from conte
    `ownerId`. Same slug may exist on different users (compound unique index).
 2. Experience, Education, Course optionally reference **one** Organization (`organizationId`:
    scalar `ObjectId`).
-3. Education, Course, Project, and embedded Experience roles reference **many** Skills
-   (`skillIds`: `ObjectId[]`). Same skill `_id` can appear on multiple owners (many-to-many).
+3. Education, Course, Project, User, and embedded Experience roles reference **many**
+   Skills (`skillIds`: `ObjectId[]`). Same skill `_id` can appear on multiple owners
+   (many-to-many). User `skillIds` order is CV display priority (ADR 003).
 4. User and Project embed URL pairs; no separate `urls` collection.
 5. Experience embeds an ordered list of roles; each role embeds its own i18n, period, and
    `skillIds[]`.
@@ -239,7 +243,7 @@ inputs use `organizationId` and `skillIds` (no `ownerId` — injected from conte
 ## Delete and lifecycle notes
 
 - `skill.deleted` event: consumers `$pull` skill refs from Project, Course, Education,
-  and nested Experience role arrays (`detachSkill`).
+  User (`skillIds`), and nested Experience role arrays (`detachSkill`).
 - `organization.deleted` event: hard `deleteMany` on Course, Education, Experience tied
   to that organization **across all tenants** (`purgeByOrganization`) — intentional;
   softer detach is [backlog](./BACKLOG.md).

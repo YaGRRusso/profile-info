@@ -161,6 +161,45 @@ describe("GraphQL (e2e)", () => {
     expect(response.data?.updateMe.phone).toBe("+5511999999999");
   });
 
+  it("should allow authenticated users to set profile skillIds via updateMe", async () => {
+    const skill = await skillsService.createOne({
+      slug: "profile-skill",
+      name: "Profile Skill",
+      category: "Programming",
+    });
+
+    const response = await graphqlRequest<{
+      updateMe: {
+        id: string;
+        skillIds: string[];
+        skills: Array<{ id: string; name: string }>;
+      };
+    }>(app, {
+      query: `
+        mutation UpdateMe($updateMeInput: UpdateMeInput!) {
+          updateMe(updateMeInput: $updateMeInput) {
+            id
+            skillIds
+            skills {
+              id
+              name
+            }
+          }
+        }
+      `,
+      variables: {
+        updateMeInput: { skillIds: [skill.id] },
+      },
+      token: userToken,
+    });
+
+    expect(response.errors).toBeUndefined();
+    expect(response.data?.updateMe.skillIds).toEqual([skill.id]);
+    expect(response.data?.updateMe.skills).toEqual([
+      { id: skill.id, name: "Profile Skill" },
+    ]);
+  });
+
   it("should allow admin to create a skill", async () => {
     const response = await graphqlRequest<{
       createOneSkill: { id: string; name: string };

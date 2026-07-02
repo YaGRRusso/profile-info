@@ -4,9 +4,6 @@ import { BaseEntity } from "@/core/entities/base.entity";
 import { createPaginatedModel } from "@/core/schemas/paginated.schema";
 @ObjectType()
 export class SkillEntity extends BaseEntity {
-  @Field(() => Number)
-  relevance: number;
-
   @Field(() => String)
   slug: string;
 

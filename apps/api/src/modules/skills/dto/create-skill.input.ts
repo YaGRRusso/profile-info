@@ -5,9 +5,6 @@ import { RequiredField } from "@/core/decorators/required-field.decorator";
 
 @InputType()
 export class CreateSkillInput {
-  @OptionalField(() => Number)
-  relevance?: number;
-
   @RequiredField(() => String)
   @IsString()
   @IsNotEmpty()

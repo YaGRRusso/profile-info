@@ -17,6 +17,7 @@ import { ProjectsService } from "@/modules/projects/projects.service";
 import { SkillsService } from "@/modules/skills/skills.service";
 import { UsersService } from "@/modules/users/users.service";
 import { RESUME_LIMITS } from "./const/resume-limits.const";
+import { orderSkillsByIds } from "./helpers/order-skills.helper";
 import { selectResumeSkillGroups } from "./helpers/select-skill-groups.helper";
 import type {
   ResumeCertification,
@@ -56,16 +57,18 @@ export class ResumeService {
       role: UserRole.USER,
     });
 
+    const skillIds = user.skillIds ?? [];
+
     const [
-      skillsResult,
+      profileSkills,
       experiencesResult,
       educationsResult,
       coursesResult,
       projectsResult,
     ] = await Promise.all([
-      this.skillsService.findMany({
-        sort: { relevance: -1 },
-      }),
+      skillIds.length
+        ? this.skillsService.findManyById(skillIds)
+        : Promise.resolve([]),
       this.experiencesService.findMany(ctx, {
         sort: { relevance: -1 },
         limit: RESUME_LIMITS.experiences,
@@ -127,7 +130,9 @@ export class ResumeService {
       urls: (user.urls ?? []).map(({ title, value }) => ({ title, value })),
     };
 
-    const skills = selectResumeSkillGroups(skillsResult.nodes);
+    const skills = selectResumeSkillGroups(
+      orderSkillsByIds(skillIds, profileSkills)
+    );
     const experiences = this.buildExperiences(
       experiencesResult.nodes,
       organizationMap,

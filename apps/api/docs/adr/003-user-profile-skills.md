@@ -1,6 +1,6 @@
 # ADR 003 — User profile skills (CV ownership)
 
-**Status:** Accepted  
+**Status:** Accepted (user `skillIds` schema done; catalog `relevance` removed)  
 **Date:** 2026-07-01
 
 ## Context
@@ -49,9 +49,9 @@ The system does not infer profile skills from those links.
 
 | # | What | Notes |
 |---|------|-------|
-| 1 | **User schema** | `skillIds` on `UserModel`; mapper; `UpdateMeInput`; GraphQL field + `@ResolveField` `skills` |
-| 2 | **Remove catalog relevance** | `Skill` + `Organization`: schema, inputs, filter/sort, admin forms/tables, seed |
-| 3 | **Resume** | Build skills from `user.skillIds`; update `select-skill-groups` / tests |
+| 1 | **User schema** | `skillIds` on `UserModel`; mapper; `UpdateMeInput`; GraphQL field + `@ResolveField` `skills` — **done** |
+| 2 | **Remove catalog relevance** | `Skill` + `Organization`: schema, inputs, filter/sort, admin forms/tables, seed — **done** |
+| 3 | **Resume** | Build skills from `user.skillIds`; update `select-skill-groups` / tests — **done** |
 | 4 | **Admin profile** | Skill picker + order on profile form; remove catalog dump in ATS helper |
 | 5 | **Cascade** | Pull deleted skill id from `User.skillIds`; e2e |
 

@@ -20,9 +20,6 @@ export class OrganizationTranslationLocale {
 
 @ObjectType()
 export class OrganizationEntity extends BaseEntity {
-  @Field(() => Number)
-  relevance: number;
-
   @Field(() => String)
   slug: string;
 

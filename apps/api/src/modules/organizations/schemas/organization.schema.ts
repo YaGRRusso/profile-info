@@ -16,9 +16,6 @@ export class OrganizationMessagesModel {
 
 @Schema({ timestamps: true })
 export class OrganizationModel extends BaseModel {
-  @Prop({ type: Number, required: true, default: 0 })
-  relevance: number;
-
   @Prop({ type: Boolean, required: true, default: false, index: true })
   disabled: boolean;
 

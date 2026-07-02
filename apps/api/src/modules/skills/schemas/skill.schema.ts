@@ -6,9 +6,6 @@ import { UserModel } from "@/modules/users/schemas/user.schema";
 
 @Schema({ timestamps: true })
 export class SkillModel extends BaseModel {
-  @Prop({ type: Number, required: true, default: 0 })
-  relevance: number;
-
   @Prop({ type: Boolean, required: true, default: false, index: true })
   disabled: boolean;
 

@@ -6,6 +6,7 @@ import { UserRole } from "@/core/enums/user-role.enum";
 import { DomainEvents } from "@/core/events/domain-events";
 import { UserDeletedEvent } from "@/core/events/user-deleted.event";
 import type { MultiPaged } from "@/core/persistence/types/output.type";
+import { SkillsValidatorService } from "@/modules/skills/skills-validator.service";
 import { CreateUserInput } from "./dto/create-user.input";
 import { FilterUserInput } from "./dto/filter-user.input";
 import { SortUserInput } from "./dto/sort-user.input";
@@ -19,7 +20,8 @@ import { UsersRepository } from "./users.repository";
 export class UsersService {
   constructor(
     private readonly repository: UsersRepository,
-    private readonly eventEmitter: EventEmitter2
+    private readonly eventEmitter: EventEmitter2,
+    private readonly skillsValidator: SkillsValidatorService
   ) {}
 
   findOneById(id: string): Promise<UserEntity> {
@@ -56,6 +58,8 @@ export class UsersService {
     password,
     ...createUserInput
   }: CreateUserInput): Promise<UserEntity> {
+    await this.assertSkillsExist(createUserInput.skillIds);
+
     return this.repository.crud.createOne({
       ...createUserInput,
       password: await hash(password, 8),
@@ -63,6 +67,11 @@ export class UsersService {
   }
 
   async createMany(createUserInputs: CreateUserInput[]): Promise<BatchEntity> {
+    const skillIds = [
+      ...new Set(createUserInputs.flatMap((item) => item.skillIds ?? [])),
+    ];
+    await this.assertSkillsExist(skillIds);
+
     const inputs: UserCreateRecord[] = await Promise.all(
       createUserInputs.map(async ({ password, ...createUserInput }) => ({
         ...createUserInput,
@@ -78,6 +87,7 @@ export class UsersService {
     updateInput: UpdateUserInput
   ): Promise<UserEntity> {
     const { password, ...rest } = updateInput;
+    await this.assertSkillsExist(rest.skillIds);
 
     if (!password) {
       return this.repository.crud.updateOneById(id, rest);
@@ -94,6 +104,7 @@ export class UsersService {
     updateInput: UpdateUserInput
   ): Promise<BatchEntity> {
     const { password, ...rest } = updateInput;
+    await this.assertSkillsExist(rest.skillIds);
 
     if (!password) {
       return this.repository.crud.updateManyById(ids, rest);
@@ -142,5 +153,10 @@ export class UsersService {
     if (user.role === UserRole.SUPER_ADMIN) {
       throw new ForbiddenException("SUPER_ADMIN users cannot be deleted");
     }
+  }
+
+  private assertSkillsExist(skillIds?: string[]): Promise<void> {
+    if (skillIds === undefined) return Promise.resolve();
+    return this.skillsValidator.assertSkillsExist(skillIds);
   }
 }

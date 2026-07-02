@@ -31,9 +31,6 @@ const OrganizationTranslationInput = createTranslationInput(
 
 @InputType()
 export class CreateOrganizationInput {
-  @OptionalField(() => Number)
-  relevance?: number;
-
   @RequiredField(() => String)
   @IsString()
   @IsNotEmpty()

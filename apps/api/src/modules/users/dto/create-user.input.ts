@@ -4,6 +4,7 @@ import {
   IsArray,
   IsDateString,
   IsEmail,
+  IsMongoId,
   IsNotEmpty,
   IsString,
   IsUrl,
@@ -76,4 +77,8 @@ export class CreateUserInput {
 
   @OptionalField(() => [UrlInput])
   urls?: UrlInput[];
+
+  @OptionalField(() => [String])
+  @IsMongoId({ each: true })
+  skillIds?: string[];
 }

@@ -31,7 +31,6 @@ export class OrganizationMapper
   toDomain(model: OrganizationModel): OrganizationEntity {
     return {
       ...toBaseEntityFields(model),
-      relevance: model.relevance,
       slug: model.slug,
       name: model.name,
       website: model.website,

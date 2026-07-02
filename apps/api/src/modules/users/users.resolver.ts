@@ -1,13 +1,28 @@
-import { Args, ID, Mutation, Query, Resolver } from "@nestjs/graphql";
+import {
+  Args,
+  Context,
+  ID,
+  Mutation,
+  Parent,
+  Query,
+  ResolveField,
+  Resolver,
+} from "@nestjs/graphql";
+import type { GraphqlContext } from "@/core/context/graphql-context.interface";
 import { Roles } from "@/core/decorators/roles.decorator";
 import { BatchEntity } from "@/core/entities/batch.entity";
 import { UserRole } from "@/core/enums/user-role.enum";
 import { PaginationInput } from "@/core/inputs/pagination.input";
+import { SkillEntity } from "@/modules/skills/entities/skill.entity";
 import { CreateUserInput } from "./dto/create-user.input";
 import { FilterUserInput } from "./dto/filter-user.input";
 import { SortUserInput } from "./dto/sort-user.input";
 import { UpdateUserInput } from "./dto/update-user.input";
-import { PaginatedUserEntity, UserEntity } from "./entities/user.entity";
+import {
+  PaginatedUserEntity,
+  UserEntity,
+  type UserEntityRecord,
+} from "./entities/user.entity";
 import { UsersService } from "./users.service";
 
 @Resolver(() => UserEntity)
@@ -113,5 +128,12 @@ export class UsersResolver {
   @Mutation(() => BatchEntity)
   removeManyUsers(@Args("userIds", { type: () => [ID] }) userIds: string[]) {
     return this.usersService.removeMany(userIds);
+  }
+
+  @ResolveField(() => [SkillEntity])
+  skills(@Parent() user: UserEntityRecord, @Context() ctx: GraphqlContext) {
+    const ids = user.skillIds;
+    if (!ids?.length) return [];
+    return ctx.loaders.batchSkills.loadMany(ids);
   }
 }
