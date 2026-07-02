@@ -3,17 +3,14 @@ import { useState } from "react";
 import z from "zod";
 import { CheckboxInput } from "@/components/inputs/checkbox";
 import { RangeInput } from "@/components/inputs/range";
-import { SelectInput } from "@/components/inputs/select";
+import { TextInput } from "@/components/inputs/text";
 import { PLACEHOLDERS } from "@/consts/placeholders";
-import {
-  SkillCategory,
-  type UpdateSkillInput,
-} from "@/generated/graphql/graphql";
+import type { UpdateSkillInput } from "@/generated/graphql/graphql";
 import { fieldError } from "@/lib/field-error";
 import { CommonFormProps } from "./common";
 
 const skillMultiSchema = z.object({
-  category: z.enum(SkillCategory),
+  category: z.string(),
   relevance: z.number().min(1, "must be a positive number"),
 });
 
@@ -21,11 +18,6 @@ export type SkillMultiSchema = z.infer<typeof skillMultiSchema>;
 
 export interface SkillMultiFormProps
   extends CommonFormProps<UpdateSkillInput> {}
-
-const CATEGORY_OPTIONS = Object.values(SkillCategory).map((category) => ({
-  label: category,
-  value: category,
-}));
 
 export function SkillMultiForm({
   onSubmit,
@@ -38,12 +30,14 @@ export function SkillMultiForm({
 
   const form = useForm({
     defaultValues: {
-      category: SkillCategory.Language,
+      category: "",
       relevance: 1,
     },
     onSubmit: ({ value }) => {
       const updateSkillInput: UpdateSkillInput = {};
-      if (changeCategory) updateSkillInput.category = value.category;
+      if (changeCategory) {
+        updateSkillInput.category = value.category;
+      }
       if (changeRelevance) updateSkillInput.relevance = value.relevance;
       onSubmit?.(updateSkillInput);
     },
@@ -69,15 +63,14 @@ export function SkillMultiForm({
 
       <Field name="category">
         {(field) => (
-          <SelectInput
+          <TextInput
             disabled={!changeCategory}
             error={fieldError(field.state.meta)}
             label="Category"
             name={field.name}
-            onChange={(value) => field.handleChange(value as SkillCategory)}
-            options={CATEGORY_OPTIONS}
-            placeholder={PLACEHOLDERS.chooseOne}
-            value={field.state.value}
+            onChange={field.handleChange}
+            placeholder={PLACEHOLDERS.category}
+            value={field.state.value ?? ""}
           />
         )}
       </Field>

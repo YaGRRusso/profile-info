@@ -145,22 +145,22 @@ const getColumns = (
     enableSorting: false,
     cell: (data) => {
       const url = data.getValue();
+      if (!url) return null;
       return <Link href={url} />;
     },
   }),
   columnHelper.accessor("website", {
     header: "Website",
     enableGlobalFilter: false,
-    cell: (data) => (
-      <a
-        className="link"
-        href={data.getValue()}
-        rel="noreferrer"
-        target="_blank"
-      >
-        {data.getValue()}
-      </a>
-    ),
+    cell: (data) => {
+      const url = data.getValue();
+      if (!url) return null;
+      return (
+        <a className="link" href={url} rel="noreferrer" target="_blank">
+          {url}
+        </a>
+      );
+    },
   }),
   columnHelper.accessor("relevance", {
     header: "Relevance",

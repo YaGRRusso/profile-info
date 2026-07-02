@@ -3,11 +3,9 @@ import lodash from "lodash";
 import { useState } from "react";
 import z from "zod";
 import { RangeInput } from "@/components/inputs/range";
-import { SelectInput } from "@/components/inputs/select";
 import { TextInput } from "@/components/inputs/text";
 import { PLACEHOLDERS } from "@/consts/placeholders";
 import { SLUG_REGEX } from "@/consts/regex";
-import { SkillCategory } from "@/generated/graphql/graphql";
 import { fieldError } from "@/lib/field-error";
 import { isSlugTaken } from "@/lib/slug";
 import { CommonFormProps } from "./common";
@@ -18,7 +16,7 @@ const skillSchema = z.object({
     .min(1, "required field")
     .regex(SLUG_REGEX, "invalid field format"),
   name: z.string().min(1, "required field"),
-  category: z.enum(SkillCategory, "required field"),
+  category: z.string(),
   relevance: z.number().min(1, "must be a positive number"),
 });
 
@@ -27,11 +25,6 @@ export type SkillSchema = z.infer<typeof skillSchema>;
 export interface SkillFormProps extends CommonFormProps<SkillSchema> {
   slugsList?: string[];
 }
-
-const CATEGORY_OPTIONS = Object.values(SkillCategory).map((category) => ({
-  label: category,
-  value: category,
-}));
 
 export function SkillForm({
   onSubmit,
@@ -48,7 +41,7 @@ export function SkillForm({
     defaultValues: {
       name: "",
       slug: "",
-      category: SkillCategory.Language,
+      category: "",
       relevance: 1,
       ...defaultValues,
     },
@@ -113,14 +106,13 @@ export function SkillForm({
 
       <Field name="category">
         {(field) => (
-          <SelectInput
+          <TextInput
             error={fieldError(field.state.meta)}
             label="Category"
             name={field.name}
-            onChange={(value) => field.handleChange(value as SkillCategory)}
-            options={CATEGORY_OPTIONS}
-            placeholder={PLACEHOLDERS.chooseOne}
-            value={field.state.value}
+            onChange={field.handleChange}
+            placeholder={PLACEHOLDERS.category}
+            value={field.state.value ?? ""}
           />
         )}
       </Field>

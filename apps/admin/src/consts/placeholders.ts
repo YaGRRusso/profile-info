@@ -8,6 +8,7 @@ export const PLACEHOLDERS = {
   url: "e.g. https://example.com",
   hours: "e.g. 24",
   password: "e.g. abc#123",
+  category: "e.g. Backend, Soft Skills, Office",
 
   // names
   profileName: "e.g. John Doe",

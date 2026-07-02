@@ -13,10 +13,6 @@ const dashboard = graphql(`
         projects
         experiences
       }
-      skillsByCategory {
-        label
-        value
-      }
       experiencesByCategory {
         label
         value

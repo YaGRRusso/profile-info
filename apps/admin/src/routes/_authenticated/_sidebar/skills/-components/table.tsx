@@ -30,7 +30,7 @@ import {
 import { useQueryState } from "nuqs";
 import { useMemo, useState } from "react";
 import { z } from "zod";
-import { SkillCategory } from "@/generated/graphql/graphql";
+import { BadgeList } from "@/components/display/badge-list";
 import { useActiveFilters } from "@/hooks/custom/use-active-filters";
 import { usePersistedState } from "@/hooks/custom/use-persisted-state";
 import { useStableValue } from "@/hooks/custom/use-stable-value";
@@ -66,14 +66,6 @@ const relevanceParser = parseAsShape(
   ...persistentOptions,
   limitUrlUpdates: debouncedUrlUpdates,
 });
-
-const CATEGORY_LABELS: Array<{ value: SkillCategory; label: string }> = [
-  { value: SkillCategory.Backend, label: "Backend" },
-  { value: SkillCategory.Data, label: "Data" },
-  { value: SkillCategory.Devops, label: "DevOps" },
-  { value: SkillCategory.Frontend, label: "Frontend" },
-  { value: SkillCategory.Language, label: "Language" },
-];
 
 const DATE_OPTIONS = [
   { value: "", label: "Any date" },
@@ -149,9 +141,11 @@ const getColumns = (
     enableSorting: false,
     enableGlobalFilter: false,
     filterFn: "equals",
-    cell: (data) => (
-      <span className="badge badge-soft badge-sm">{data.getValue()}</span>
-    ),
+    cell: (data) => {
+      const value = data.getValue();
+      if (!value) return <span className="opacity-50">—</span>;
+      return <BadgeList values={[value]} />;
+    },
   }),
   columnHelper.accessor("relevance", {
     header: "Relevance",
@@ -365,9 +359,8 @@ export function SkillsTable({
   const selected = data.filter((skill) => rowSelection[skill.id]);
 
   const categoryFacets = getUniqueFacets(
-    table.getColumn("category")!.getFacetedUniqueValues(),
-    CATEGORY_LABELS
-  );
+    table.getColumn("category")!.getFacetedUniqueValues()
+  ).filter(({ value }) => value != null && value !== "");
   const relevanceFacets = getMinMaxFacets(
     table.getColumn("relevance")?.getFacetedMinMaxValues()
   );
@@ -436,8 +429,8 @@ export function SkillsTable({
           >
             <option value="">All categories</option>
             {categoryFacets.map(({ value, label, count }) => (
-              <option key={value} value={value}>
-                {label} ({count})
+              <option key={String(value)} value={String(value)}>
+                {label || "—"} ({count})
               </option>
             ))}
           </select>

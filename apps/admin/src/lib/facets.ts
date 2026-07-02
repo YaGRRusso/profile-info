@@ -17,7 +17,9 @@ export function getUniqueFacets<T = string>(
   const mapper = new Map(labels?.map(({ value, label }) => [value, label]));
   return [...map].map(([value, count]) => ({
     value: value as T,
-    label: mapper.get(value as T) ?? String(value),
+    label:
+      mapper.get(value as T) ??
+      (value == null || value === "" ? "—" : String(value)),
     count,
   }));
 }

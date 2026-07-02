@@ -346,7 +346,10 @@ function RouteComponent() {
             }
             onEdit={(skill) =>
               setFormValues({
-                defaultValues: skill,
+                defaultValues: {
+                  ...skill,
+                  category: skill.category ?? "",
+                },
                 state: "UPDATING",
                 customValues: [skill],
               })

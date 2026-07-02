@@ -191,11 +191,11 @@ export type CreateExperienceRoleInput = {
 export type CreateOrganizationInput = {
   category: OrganizationCategory;
   i18n: Array<CreateOrganizationMessagesInputTranslationInput>;
-  logo: Scalars['String']['input'];
+  logo?: InputMaybe<Scalars['String']['input']>;
   name: Scalars['String']['input'];
   relevance?: InputMaybe<Scalars['Float']['input']>;
   slug: Scalars['String']['input'];
-  website: Scalars['String']['input'];
+  website?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type CreateOrganizationMessagesInput = {
@@ -227,7 +227,7 @@ export type CreateProjectMessagesInputTranslationInput = {
 };
 
 export type CreateSkillInput = {
-  category: SkillCategory;
+  category?: InputMaybe<Scalars['String']['input']>;
   name: Scalars['String']['input'];
   relevance?: InputMaybe<Scalars['Float']['input']>;
   slug: Scalars['String']['input'];
@@ -284,7 +284,6 @@ export type DashboardEntity = {
   coursesByStatus: Array<DashboardCount>;
   experiencesByCategory: Array<DashboardCount>;
   recentActivity: Array<DashboardActivityItem>;
-  skillsByCategory: Array<DashboardCount>;
   totals: DashboardTotals;
 };
 
@@ -465,7 +464,7 @@ export type FilterProjectInput = {
 };
 
 export type FilterSkillInput = {
-  category?: InputMaybe<SkillCategory>;
+  category?: InputMaybe<Scalars['String']['input']>;
   disabled?: InputMaybe<Scalars['Boolean']['input']>;
   name?: InputMaybe<Scalars['String']['input']>;
   relevance?: InputMaybe<Scalars['Float']['input']>;
@@ -892,12 +891,12 @@ export type OrganizationEntity = {
   disabled: Scalars['Boolean']['output'];
   i18n: Array<OrganizationTranslationLocale>;
   id: Scalars['ID']['output'];
-  logo: Scalars['String']['output'];
+  logo?: Maybe<Scalars['String']['output']>;
   name: Scalars['String']['output'];
   relevance: Scalars['Float']['output'];
   slug: Scalars['String']['output'];
   updatedAt: Scalars['DateTime']['output'];
-  website: Scalars['String']['output'];
+  website?: Maybe<Scalars['String']['output']>;
 };
 
 export type OrganizationMessages = {
@@ -1236,17 +1235,9 @@ export type SignInInput = {
   password: Scalars['String']['input'];
 };
 
-export enum SkillCategory {
-  Backend = 'BACKEND',
-  Data = 'DATA',
-  Devops = 'DEVOPS',
-  Frontend = 'FRONTEND',
-  Language = 'LANGUAGE'
-}
-
 export type SkillEntity = {
   __typename?: 'SkillEntity';
-  category: SkillCategory;
+  category?: Maybe<Scalars['String']['output']>;
   createdAt: Scalars['DateTime']['output'];
   disabled: Scalars['Boolean']['output'];
   id: Scalars['ID']['output'];
@@ -1397,7 +1388,7 @@ export type UpdateProjectInput = {
 };
 
 export type UpdateSkillInput = {
-  category?: InputMaybe<SkillCategory>;
+  category?: InputMaybe<Scalars['String']['input']>;
   disabled?: InputMaybe<Scalars['Boolean']['input']>;
   name?: InputMaybe<Scalars['String']['input']>;
   relevance?: InputMaybe<Scalars['Float']['input']>;
@@ -1740,7 +1731,7 @@ export type CreateOneSkillMutationVariables = Exact<{
 }>;
 
 
-export type CreateOneSkillMutation = { __typename?: 'Mutation', createOneSkill: { __typename?: 'SkillEntity', id: string, name: string, slug: string, category: SkillCategory, relevance: number, createdAt: any, updatedAt: any } };
+export type CreateOneSkillMutation = { __typename?: 'Mutation', createOneSkill: { __typename?: 'SkillEntity', id: string, name: string, slug: string, category?: string | null, relevance: number, createdAt: any, updatedAt: any } };
 
 export type UpdateOneSkillMutationVariables = Exact<{
   skillId: Scalars['ID']['input'];
@@ -1748,7 +1739,7 @@ export type UpdateOneSkillMutationVariables = Exact<{
 }>;
 
 
-export type UpdateOneSkillMutation = { __typename?: 'Mutation', updateOneSkill: { __typename?: 'SkillEntity', id: string, name: string, slug: string, category: SkillCategory, relevance: number, createdAt: any, updatedAt: any } };
+export type UpdateOneSkillMutation = { __typename?: 'Mutation', updateOneSkill: { __typename?: 'SkillEntity', id: string, name: string, slug: string, category?: string | null, relevance: number, createdAt: any, updatedAt: any } };
 
 export type UpdateManySkillsMutationVariables = Exact<{
   skillIds: Array<Scalars['ID']['input']> | Scalars['ID']['input'];
@@ -1819,7 +1810,7 @@ export type FindManyCoursesQuery = { __typename?: 'Query', findManyCourses: { __
 export type DashboardQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type DashboardQuery = { __typename?: 'Query', dashboard: { __typename?: 'DashboardEntity', totals: { __typename?: 'DashboardTotals', skills: number, courses: number, educations: number, organizations: number, projects: number, experiences: number }, skillsByCategory: Array<{ __typename?: 'DashboardCount', label: string, value: number }>, experiencesByCategory: Array<{ __typename?: 'DashboardCount', label: string, value: number }>, coursesByStatus: Array<{ __typename?: 'DashboardCount', label: string, value: number }>, recentActivity: Array<{ __typename?: 'DashboardActivityItem', type: DashboardActivityType, label: string, updatedAt: any }> } };
+export type DashboardQuery = { __typename?: 'Query', dashboard: { __typename?: 'DashboardEntity', totals: { __typename?: 'DashboardTotals', skills: number, courses: number, educations: number, organizations: number, projects: number, experiences: number }, experiencesByCategory: Array<{ __typename?: 'DashboardCount', label: string, value: number }>, coursesByStatus: Array<{ __typename?: 'DashboardCount', label: string, value: number }>, recentActivity: Array<{ __typename?: 'DashboardActivityItem', type: DashboardActivityType, label: string, updatedAt: any }> } };
 
 export type FindManyEducationsQueryVariables = Exact<{
   educationFilters?: InputMaybe<FilterEducationInput>;
@@ -1846,7 +1837,7 @@ export type FindManyOrganizationsQueryVariables = Exact<{
 }>;
 
 
-export type FindManyOrganizationsQuery = { __typename?: 'Query', findManyOrganizations: { __typename?: 'PaginatedOrganizationEntity', found: number, nodes: Array<{ __typename?: 'OrganizationEntity', id: string, name: string, slug: string, category: OrganizationCategory, logo: string, website: string, disabled: boolean, relevance: number, createdAt: any, updatedAt: any, i18n: Array<{ __typename?: 'OrganizationTranslationLocale', locale: string, messages: { __typename?: 'OrganizationMessages', description: string } }> }> } };
+export type FindManyOrganizationsQuery = { __typename?: 'Query', findManyOrganizations: { __typename?: 'PaginatedOrganizationEntity', found: number, nodes: Array<{ __typename?: 'OrganizationEntity', id: string, name: string, slug: string, category: OrganizationCategory, logo?: string | null, website?: string | null, disabled: boolean, relevance: number, createdAt: any, updatedAt: any, i18n: Array<{ __typename?: 'OrganizationTranslationLocale', locale: string, messages: { __typename?: 'OrganizationMessages', description: string } }> }> } };
 
 export type FindManyActiveOrganizationsQueryVariables = Exact<{
   organizationFilters?: InputMaybe<FilterOrganizationInput>;
@@ -1855,7 +1846,7 @@ export type FindManyActiveOrganizationsQueryVariables = Exact<{
 }>;
 
 
-export type FindManyActiveOrganizationsQuery = { __typename?: 'Query', findManyActiveOrganizations: { __typename?: 'PaginatedOrganizationEntity', found: number, nodes: Array<{ __typename?: 'OrganizationEntity', id: string, name: string, slug: string, category: OrganizationCategory, logo: string, website: string, disabled: boolean, relevance: number, createdAt: any, updatedAt: any, i18n: Array<{ __typename?: 'OrganizationTranslationLocale', locale: string, messages: { __typename?: 'OrganizationMessages', description: string } }> }> } };
+export type FindManyActiveOrganizationsQuery = { __typename?: 'Query', findManyActiveOrganizations: { __typename?: 'PaginatedOrganizationEntity', found: number, nodes: Array<{ __typename?: 'OrganizationEntity', id: string, name: string, slug: string, category: OrganizationCategory, logo?: string | null, website?: string | null, disabled: boolean, relevance: number, createdAt: any, updatedAt: any, i18n: Array<{ __typename?: 'OrganizationTranslationLocale', locale: string, messages: { __typename?: 'OrganizationMessages', description: string } }> }> } };
 
 export type FindManyProjectsQueryVariables = Exact<{
   projectFilters?: InputMaybe<FilterProjectInput>;
@@ -1873,7 +1864,7 @@ export type FindManySkillsQueryVariables = Exact<{
 }>;
 
 
-export type FindManySkillsQuery = { __typename?: 'Query', findManySkills: { __typename?: 'PaginatedSkillEntity', found: number, nodes: Array<{ __typename?: 'SkillEntity', id: string, name: string, slug: string, category: SkillCategory, relevance: number, disabled: boolean, createdAt: any, updatedAt: any }> } };
+export type FindManySkillsQuery = { __typename?: 'Query', findManySkills: { __typename?: 'PaginatedSkillEntity', found: number, nodes: Array<{ __typename?: 'SkillEntity', id: string, name: string, slug: string, category?: string | null, relevance: number, disabled: boolean, createdAt: any, updatedAt: any }> } };
 
 export type FindManyActiveSkillsQueryVariables = Exact<{
   skillFilters?: InputMaybe<FilterSkillInput>;
@@ -1882,7 +1873,7 @@ export type FindManyActiveSkillsQueryVariables = Exact<{
 }>;
 
 
-export type FindManyActiveSkillsQuery = { __typename?: 'Query', findManyActiveSkills: { __typename?: 'PaginatedSkillEntity', found: number, nodes: Array<{ __typename?: 'SkillEntity', id: string, name: string, slug: string, category: SkillCategory, relevance: number, disabled: boolean, createdAt: any, updatedAt: any }> } };
+export type FindManyActiveSkillsQuery = { __typename?: 'Query', findManyActiveSkills: { __typename?: 'PaginatedSkillEntity', found: number, nodes: Array<{ __typename?: 'SkillEntity', id: string, name: string, slug: string, category?: string | null, relevance: number, disabled: boolean, createdAt: any, updatedAt: any }> } };
 
 export class TypedDocumentString<TResult, TVariables>
   extends String
@@ -2466,10 +2457,6 @@ export const DashboardDocument = new TypedDocumentString(`
       organizations
       projects
       experiences
-    }
-    skillsByCategory {
-      label
-      value
     }
     experiencesByCategory {
       label

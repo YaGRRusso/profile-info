@@ -32,8 +32,8 @@ const organizationSchema = z.object({
     .regex(SLUG_REGEX, "invalid field format"),
   name: z.string().min(1, "required field"),
   category: z.enum(OrganizationCategory, "required field"),
-  logo: z.url(),
-  website: z.url(),
+  logo: z.union([z.url(), z.literal("")]),
+  website: z.union([z.url(), z.literal("")]),
   relevance: z.number().min(1, "must be a positive number"),
   i18n: z
     .array(
@@ -85,8 +85,8 @@ export function organizationToForm(
     name: organization.name,
     slug: organization.slug,
     category: organization.category,
-    logo: organization.logo,
-    website: organization.website,
+    logo: organization.logo ?? "",
+    website: organization.website ?? "",
     relevance: organization.relevance,
     i18n: organization.i18n.map((translation) => ({
       locale: translation.locale,
