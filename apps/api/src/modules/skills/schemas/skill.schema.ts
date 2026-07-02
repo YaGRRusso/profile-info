@@ -2,7 +2,17 @@ import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import mongoose from "mongoose";
 import { CatalogScope } from "@/core/enums/catalog-scope.enum";
 import { BaseModel } from "@/core/schemas/base.schema";
+import {
+  createTranslationModel,
+  TranslationModel,
+} from "@/core/schemas/translation.schema";
 import { UserModel } from "@/modules/users/schemas/user.schema";
+
+@Schema({ _id: false })
+export class SkillMessagesModel {
+  @Prop({ type: String, required: true })
+  title: string;
+}
 
 @Schema({ timestamps: true })
 export class SkillModel extends BaseModel {
@@ -26,8 +36,11 @@ export class SkillModel extends BaseModel {
   @Prop({ type: String, required: true })
   slug: string;
 
-  @Prop({ type: String, required: true })
-  name: string;
+  @Prop({
+    type: [createTranslationModel(SkillMessagesModel)],
+    required: true,
+  })
+  i18n: TranslationModel<SkillMessagesModel>[];
 
   @Prop({ type: String, index: true })
   category?: string;

@@ -1,6 +1,9 @@
 import { Injectable } from "@nestjs/common";
 import { EventEmitter2 } from "@nestjs/event-emitter";
-import { RecentActivityRecord } from "@/common/helpers/recent-activity.helper";
+import {
+  labelFromI18nTitle,
+  type RecentActivityRecord,
+} from "@/common/helpers/recent-activity.helper";
 import { BatchEntity } from "@/core/entities/batch.entity";
 import { DomainEvents } from "@/core/events/domain-events";
 import { SkillDeletedEvent } from "@/core/events/skill-deleted.event";
@@ -141,10 +144,13 @@ export class SkillsService {
   async findRecentActivity(limit: number): Promise<RecentActivityRecord[]> {
     const rows = await this.repository.findRecentlyUpdatedActive(
       limit,
-      "name updatedAt"
+      "slug i18n updatedAt"
     );
     return rows.map((row) => ({
-      label: row.name as string,
+      label: labelFromI18nTitle(
+        row.slug as string,
+        row.i18n as Parameters<typeof labelFromI18nTitle>[1]
+      ),
       updatedAt: row.updatedAt,
     }));
   }

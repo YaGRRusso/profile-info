@@ -11,6 +11,7 @@ import { UsersService } from "@/modules/users/users.service";
 import { clearTestDatabase } from "../support/clear-test-database";
 import { createTestApp } from "../support/create-test-app";
 import { graphqlRequest } from "../support/graphql-request";
+import { skillI18n } from "../support/skill-i18n";
 
 describe("GraphQL (e2e)", () => {
   let app: INestApplication<App>;
@@ -91,7 +92,7 @@ describe("GraphQL (e2e)", () => {
       variables: {
         createSkillInput: {
           slug: "graphql-skill",
-          name: "GraphQL",
+          i18n: skillI18n("GraphQL"),
           category: "Programming",
         },
       },
@@ -112,7 +113,7 @@ describe("GraphQL (e2e)", () => {
       variables: {
         createSkillInput: {
           slug: "forbidden-skill",
-          name: "Forbidden",
+          i18n: skillI18n("Forbidden"),
           category: "Programming",
         },
       },
@@ -164,7 +165,7 @@ describe("GraphQL (e2e)", () => {
   it("should allow authenticated users to set profile skillIds via updateMe", async () => {
     const skill = await skillsService.createOne({
       slug: "profile-skill",
-      name: "Profile Skill",
+      i18n: skillI18n("Profile Skill"),
       category: "Programming",
     });
 
@@ -172,7 +173,7 @@ describe("GraphQL (e2e)", () => {
       updateMe: {
         id: string;
         skillIds: string[];
-        skills: Array<{ id: string; name: string }>;
+        skills: Array<{ id: string; slug: string }>;
       };
     }>(app, {
       query: `
@@ -182,7 +183,7 @@ describe("GraphQL (e2e)", () => {
             skillIds
             skills {
               id
-              name
+              slug
             }
           }
         }
@@ -196,26 +197,26 @@ describe("GraphQL (e2e)", () => {
     expect(response.errors).toBeUndefined();
     expect(response.data?.updateMe.skillIds).toEqual([skill.id]);
     expect(response.data?.updateMe.skills).toEqual([
-      { id: skill.id, name: "Profile Skill" },
+      { id: skill.id, slug: "profile-skill" },
     ]);
   });
 
   it("should allow admin to create a skill", async () => {
     const response = await graphqlRequest<{
-      createOneSkill: { id: string; name: string };
+      createOneSkill: { id: string; slug: string };
     }>(app, {
       query: `
         mutation CreateOneSkill($createSkillInput: CreateSkillInput!) {
           createOneSkill(createSkillInput: $createSkillInput) {
             id
-            name
+            slug
           }
         }
       `,
       variables: {
         createSkillInput: {
           slug: "nestjs-skill",
-          name: "NestJS",
+          i18n: skillI18n("NestJS"),
           category: "Programming",
         },
       },
@@ -223,7 +224,7 @@ describe("GraphQL (e2e)", () => {
     });
 
     expect(response.errors).toBeUndefined();
-    expect(response.data?.createOneSkill.name).toBe("NestJS");
+    expect(response.data?.createOneSkill.slug).toBe("nestjs-skill");
   });
 
   it("should resolve nested organization via DataLoader on authenticated read", async () => {
@@ -264,7 +265,7 @@ describe("GraphQL (e2e)", () => {
 
     await skillsService.createOne({
       slug: "loader-skill",
-      name: "Loader Skill",
+      i18n: skillI18n("Loader Skill"),
       category: "Programming",
     });
 

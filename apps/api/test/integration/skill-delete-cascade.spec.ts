@@ -11,6 +11,7 @@ import { SkillsService } from "@/modules/skills/skills.service";
 import { UsersService } from "@/modules/users/users.service";
 import { clearTestDatabase } from "../support/clear-test-database";
 import { createTestApp } from "../support/create-test-app";
+import { skillI18n } from "../support/skill-i18n";
 
 describe("Skill delete cascade (integration)", () => {
   let app: INestApplication<App> | undefined;
@@ -58,7 +59,7 @@ describe("Skill delete cascade (integration)", () => {
 
     const skill = await skillsService.createOne({
       slug: "typescript",
-      name: "TypeScript",
+      i18n: skillI18n("TypeScript"),
       category: "Programming",
     });
 

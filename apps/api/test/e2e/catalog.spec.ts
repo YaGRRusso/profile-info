@@ -8,6 +8,7 @@ import { UsersService } from "@/modules/users/users.service";
 import { clearTestDatabase } from "../support/clear-test-database";
 import { createTestApp } from "../support/create-test-app";
 import { graphqlRequest } from "../support/graphql-request";
+import { skillI18n } from "../support/skill-i18n";
 
 const FIND_MANY_SKILLS = `
   query FindManySkills {
@@ -85,7 +86,7 @@ describe("Catalog reads (e2e)", () => {
 
     await skillsService.createOne({
       slug: "catalog-skill",
-      name: "Catalog Skill",
+      i18n: skillI18n("Catalog Skill"),
       category: "Programming",
     });
 

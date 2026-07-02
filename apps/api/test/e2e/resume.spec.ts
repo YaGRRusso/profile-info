@@ -6,6 +6,7 @@ import { SkillsService } from "@/modules/skills/skills.service";
 import { UsersService } from "@/modules/users/users.service";
 import { clearTestDatabase } from "../support/clear-test-database";
 import { createTestApp } from "../support/create-test-app";
+import { skillI18n } from "../support/skill-i18n";
 
 const PDF_CONTENT_TYPE = /application\/pdf/;
 
@@ -40,8 +41,8 @@ describe("ResumeController (e2e)", () => {
     profileUserId = profileUser.id;
 
     await skillsService.createOne({
-      name: "TypeScript",
       slug: "typescript",
+      i18n: skillI18n("TypeScript"),
       category: "Programming",
     });
   });

@@ -157,8 +157,8 @@ inputs use `organizationId` and `skillIds` (no `ownerId` — injected from conte
 - **Key fields:** `scope` (enum: `GLOBAL`, `LOCAL`; default `GLOBAL`, indexed),
   `ownerId` (ref → User; required when `scope` is `LOCAL`, absent when `GLOBAL`),
   `slug` (unique per `{ scope, ownerId }` — disabled rows still occupy the slug; re-enable to reuse),
-  `name`, `category` (optional free string, indexed), `disabled`
-- **Embedded:** none
+  `category` (optional free string, indexed), `disabled`, `i18n[]` (embed: `locale`, `messages.title`)
+- **Embedded:** `i18n[]` translations
 - **References:** optional `ownerId` → User (local catalog only; referenced by private entities via `skillIds`)
 
 ### Organization (`organizations`)

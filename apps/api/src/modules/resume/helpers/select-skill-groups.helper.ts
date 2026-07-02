@@ -1,10 +1,13 @@
 import { groupBy, orderBy } from "lodash";
+import type { LocaleCode } from "@/common/i18n/locales";
 import type { SkillEntity } from "@/modules/skills/entities/skill.entity";
+import { resolveSkillTitle } from "@/modules/skills/helpers/resolve-skill-title.helper";
 import { RESUME_LIMITS } from "../const/resume-limits.const";
 import type { ResumeSkillGroup } from "../types/resume-document.type";
 
 export function selectResumeSkillGroups(
-  skills: SkillEntity[]
+  skills: SkillEntity[],
+  locale: LocaleCode | string
 ): ResumeSkillGroup[] {
   const orderIndex = new Map(skills.map((skill, index) => [skill.id, index]));
   const grouped = groupBy(skills, (skill) => skill.category ?? "");
@@ -19,7 +22,7 @@ export function selectResumeSkillGroups(
           ["asc"]
         )
           .slice(0, RESUME_LIMITS.skillsPerCategory)
-          .map((item) => item.name),
+          .map((item) => resolveSkillTitle(item, locale)),
       }))
       .filter((group) => group.skills.length > 0),
     [(group) => group.category ?? ""],

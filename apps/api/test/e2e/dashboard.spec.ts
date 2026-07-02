@@ -19,6 +19,7 @@ import { UsersService } from "@/modules/users/users.service";
 import { clearTestDatabase } from "../support/clear-test-database";
 import { createTestApp } from "../support/create-test-app";
 import { graphqlRequest } from "../support/graphql-request";
+import { skillI18n } from "../support/skill-i18n";
 
 const DASHBOARD_QUERY = `
   query Dashboard {
@@ -118,7 +119,7 @@ describe("Dashboard (e2e)", () => {
 
     await skillsService.createOne({
       slug: "dashboard-skill",
-      name: "Dashboard Skill",
+      i18n: skillI18n("Dashboard Skill"),
       category: "Programming",
     });
 

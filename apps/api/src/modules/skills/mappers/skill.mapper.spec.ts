@@ -10,7 +10,7 @@ describe("SkillMapper", () => {
       createdAt: new Date("2024-01-01"),
       updatedAt: new Date("2024-01-02"),
       slug: "typescript",
-      name: "TypeScript",
+      i18n: [{ locale: "en", messages: { title: "TypeScript" } }],
       category: "Programming",
       disabled: false,
     } as SkillModel;
@@ -20,19 +20,19 @@ describe("SkillMapper", () => {
       createdAt: model.createdAt,
       updatedAt: model.updatedAt,
       slug: "typescript",
-      name: "TypeScript",
+      i18n: [{ locale: "en", messages: { title: "TypeScript" } }],
       category: "Programming",
       disabled: false,
     });
   });
 
   it("maps filter input to a persistence query", () => {
-    expect(mapper.toPersistenceForFilter({ name: "TypeScript" })).toEqual({
-      name: "TypeScript",
+    expect(mapper.toPersistenceForFilter({ slug: "typescript" })).toEqual({
+      slug: "typescript",
     });
   });
 
   it("maps sort input to a persistence sort", () => {
-    expect(mapper.toPersistenceForSort({ name: 1 })).toEqual({ name: 1 });
+    expect(mapper.toPersistenceForSort({ slug: 1 })).toEqual({ slug: 1 });
   });
 });

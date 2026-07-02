@@ -204,8 +204,17 @@ input CreateProjectMessagesInputTranslationInput {
 
 input CreateSkillInput {
   category: String
-  name: String!
+  i18n: [CreateSkillMessagesInputTranslationInput!]!
   slug: String!
+}
+
+input CreateSkillMessagesInput {
+  title: String!
+}
+
+input CreateSkillMessagesInputTranslationInput {
+  locale: String!
+  messages: CreateSkillMessagesInput!
 }
 
 input CreateUserInput {
@@ -434,7 +443,6 @@ input FilterProjectInput {
 input FilterSkillInput {
   category: String
   disabled: Boolean
-  name: String
   slug: String
 }
 
@@ -681,10 +689,19 @@ type SkillEntity {
   category: String
   createdAt: DateTime!
   disabled: Boolean!
+  i18n: [SkillTranslationLocale!]!
   id: ID!
-  name: String!
   slug: String!
   updatedAt: DateTime!
+}
+
+type SkillMessages {
+  title: String!
+}
+
+type SkillTranslationLocale {
+  locale: String!
+  messages: SkillMessages!
 }
 
 input SortApiTokenInput {
@@ -731,7 +748,7 @@ input SortProjectInput {
 
 input SortSkillInput {
   createdAt: SortEnum
-  name: SortEnum
+  slug: SortEnum
   updatedAt: SortEnum
 }
 
@@ -828,7 +845,7 @@ input UpdateProjectInput {
 input UpdateSkillInput {
   category: String
   disabled: Boolean
-  name: String
+  i18n: [CreateSkillMessagesInputTranslationInput!]
   slug: String
 }
 

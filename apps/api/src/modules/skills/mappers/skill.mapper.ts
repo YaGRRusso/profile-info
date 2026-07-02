@@ -5,6 +5,7 @@ import {
   type UpdateQuery,
 } from "mongoose";
 import { toBaseEntityFields } from "@/core/mappers/base.mapper";
+import { toTranslationEntityList } from "@/core/mappers/translation.mapper";
 import { withObjectIdRefs } from "@/core/persistence/helpers/filter-ref.helper";
 import { toPersistenceSort } from "@/core/persistence/helpers/sort-ref.helper";
 import type { CrudMapperInterface } from "@/core/persistence/repositories/crud/crud.interface";
@@ -30,7 +31,11 @@ export class SkillMapper
     return {
       ...toBaseEntityFields(model),
       slug: model.slug,
-      name: model.name,
+      i18n:
+        toTranslationEntityList(model.i18n)?.map((entry) => ({
+          locale: entry.locale,
+          messages: { title: entry.messages.title },
+        })) ?? [],
       category: model.category,
       disabled: model.disabled,
     };

@@ -4,7 +4,7 @@ import { CreateSkillInput } from "./create-skill.input";
 
 @InputType()
 export class FilterSkillInput extends PartialType(
-  PickType(CreateSkillInput, ["slug", "name", "category"] as const)
+  PickType(CreateSkillInput, ["slug", "category"] as const)
 ) {
   @OptionalField(() => Boolean)
   disabled?: boolean;

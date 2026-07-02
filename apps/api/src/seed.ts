@@ -29,44 +29,120 @@ const URL_TYPES = [
   "demo",
 ];
 
-const SEED_SKILLS: Array<{ slug: string; name: string; category?: string }> = [
-  { slug: "typescript", name: "TypeScript", category: "Programming" },
-  { slug: "react", name: "React", category: "Programming" },
-  { slug: "excel", name: "Excel", category: "Office" },
-  {
-    slug: "customer-service",
-    name: "Customer Service",
-    category: "Soft Skills",
+const SEED_LOCALES = [Locale.EN, Locale.PT];
+
+const SEED_SKILL_TRANSLATIONS = {
+  typescript: {
+    [Locale.EN]: "TypeScript",
+    [Locale.PT]: "TypeScript",
   },
-  { slug: "bricklaying", name: "Bricklaying", category: "Construction" },
-  {
-    slug: "blueprint-reading",
-    name: "Blueprint Reading",
-    category: "Construction",
+  react: {
+    [Locale.EN]: "React",
+    [Locale.PT]: "React",
   },
-  { slug: "accounts-payable", name: "Accounts Payable", category: "Finance" },
-  { slug: "team-leadership", name: "Team Leadership", category: "Management" },
-  { slug: "first-aid", name: "First Aid", category: "Safety" },
-  { slug: "portuguese", name: "Portuguese", category: "Languages" },
-  { slug: "english", name: "English", category: "Languages" },
-  { slug: "sales-negotiation", name: "Sales Negotiation", category: "Sales" },
-  {
-    slug: "inventory-control",
-    name: "Inventory Control",
-    category: "Logistics",
+  excel: {
+    [Locale.EN]: "Excel",
+    [Locale.PT]: "Excel",
   },
-  { slug: "food-safety", name: "Food Safety", category: "Hospitality" },
-  { slug: "nursing-care", name: "Nursing Care", category: "Healthcare" },
-  { slug: "electrical-wiring", name: "Electrical Wiring", category: "Trades" },
-  { slug: "public-speaking", name: "Public Speaking" },
-  {
-    slug: "project-planning",
-    name: "Project Planning",
-    category: "Management",
+  "customer-service": {
+    [Locale.EN]: "Customer Service",
+    [Locale.PT]: "Atendimento ao Cliente",
   },
-  { slug: "docker", name: "Docker", category: "Programming" },
-  { slug: "postgresql", name: "PostgreSQL", category: "Programming" },
-];
+  bricklaying: {
+    [Locale.EN]: "Bricklaying",
+    [Locale.PT]: "Alvenaria",
+  },
+  "blueprint-reading": {
+    [Locale.EN]: "Blueprint Reading",
+    [Locale.PT]: "Leitura de Plantas",
+  },
+  "accounts-payable": {
+    [Locale.EN]: "Accounts Payable",
+    [Locale.PT]: "Contas a Pagar",
+  },
+  "team-leadership": {
+    [Locale.EN]: "Team Leadership",
+    [Locale.PT]: "Liderança de Equipe",
+  },
+  "first-aid": {
+    [Locale.EN]: "First Aid",
+    [Locale.PT]: "Primeiros Socorros",
+  },
+  portuguese: {
+    [Locale.EN]: "Portuguese",
+    [Locale.PT]: "Português",
+  },
+  english: {
+    [Locale.EN]: "English",
+    [Locale.PT]: "Inglês",
+  },
+  "sales-negotiation": {
+    [Locale.EN]: "Sales Negotiation",
+    [Locale.PT]: "Negociação de Vendas",
+  },
+  "inventory-control": {
+    [Locale.EN]: "Inventory Control",
+    [Locale.PT]: "Controle de Estoque",
+  },
+  "food-safety": {
+    [Locale.EN]: "Food Safety",
+    [Locale.PT]: "Segurança Alimentar",
+  },
+  "nursing-care": {
+    [Locale.EN]: "Nursing Care",
+    [Locale.PT]: "Cuidados de Enfermagem",
+  },
+  "electrical-wiring": {
+    [Locale.EN]: "Electrical Wiring",
+    [Locale.PT]: "Instalação Elétrica",
+  },
+  "public-speaking": {
+    [Locale.EN]: "Public Speaking",
+    [Locale.PT]: "Oratória",
+  },
+  "project-planning": {
+    [Locale.EN]: "Project Planning",
+    [Locale.PT]: "Planejamento de Projetos",
+  },
+  docker: {
+    [Locale.EN]: "Docker",
+    [Locale.PT]: "Docker",
+  },
+  postgresql: {
+    [Locale.EN]: "PostgreSQL",
+    [Locale.PT]: "PostgreSQL",
+  },
+} satisfies Record<string, Record<(typeof SEED_LOCALES)[number], string>>;
+
+const SEED_SKILLS = [
+  { slug: "typescript", category: "Programming" },
+  { slug: "react", category: "Programming" },
+  { slug: "excel", category: "Office" },
+  { slug: "customer-service", category: "Soft Skills" },
+  { slug: "bricklaying", category: "Construction" },
+  { slug: "blueprint-reading", category: "Construction" },
+  { slug: "accounts-payable", category: "Finance" },
+  { slug: "team-leadership", category: "Management" },
+  { slug: "first-aid", category: "Safety" },
+  { slug: "portuguese", category: "Languages" },
+  { slug: "english", category: "Languages" },
+  { slug: "sales-negotiation", category: "Sales" },
+  { slug: "inventory-control", category: "Logistics" },
+  { slug: "food-safety", category: "Hospitality" },
+  { slug: "nursing-care", category: "Healthcare" },
+  { slug: "electrical-wiring", category: "Trades" },
+  { slug: "public-speaking" },
+  { slug: "project-planning", category: "Management" },
+  { slug: "docker", category: "Programming" },
+  { slug: "postgresql", category: "Programming" },
+].map((skill) => ({
+  slug: skill.slug,
+  category: skill.category,
+  i18n: SEED_LOCALES.map((locale) => ({
+    locale,
+    messages: { title: SEED_SKILL_TRANSLATIONS[skill.slug][locale] },
+  })),
+}));
 const ORGANIZATION_CATEGORIES = ["COMPANY", "SCHOOL", "OTHER"];
 const STATUSES = ["COMPLETE", "INCOMPLETE", "IN_PROGRESS"];
 const EDUCATION_LEVELS = [
@@ -83,7 +159,6 @@ const EXPERIENCE_CATEGORIES = [
   "FREELANCE",
   "VOLUNTEER",
 ];
-const SEED_LOCALES = [Locale.EN, Locale.PT];
 
 const SEED_API_TOKENS = [
   {

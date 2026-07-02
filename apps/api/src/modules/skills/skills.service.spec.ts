@@ -13,8 +13,8 @@ const validId = "507f1f77bcf86cd799439013";
 
 const fakeEntity = {
   id: validId,
-  name: "TypeScript",
   slug: "typescript",
+  i18n: [{ locale: "en", messages: { title: "TypeScript" } }],
   category: "Programming",
   disabled: false,
 };
@@ -107,8 +107,8 @@ describe("SkillsService", () => {
   describe("createOne", () => {
     it("delegates to crud", async () => {
       const createInput = {
-        name: "TypeScript",
         slug: "typescript",
+        i18n: [{ locale: "en", messages: { title: "TypeScript" } }],
         category: "Programming",
       };
       crud.createOne.mockResolvedValue(fakeEntity);
@@ -122,10 +122,10 @@ describe("SkillsService", () => {
     it("delegates to crud", async () => {
       crud.updateOneById.mockResolvedValue(fakeEntity);
 
-      await expect(service.updateOne(validId, { name: "TS" })).resolves.toEqual(
+      await expect(service.updateOne(validId, { slug: "ts" })).resolves.toEqual(
         fakeEntity
       );
-      expect(crud.updateOneById).toHaveBeenCalledWith(validId, { name: "TS" });
+      expect(crud.updateOneById).toHaveBeenCalledWith(validId, { slug: "ts" });
     });
   });
 

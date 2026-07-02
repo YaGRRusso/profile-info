@@ -131,7 +131,8 @@ export class ResumeService {
     };
 
     const skills = selectResumeSkillGroups(
-      orderSkillsByIds(skillIds, profileSkills)
+      orderSkillsByIds(skillIds, profileSkills),
+      locale
     );
     const experiences = this.buildExperiences(
       experiencesResult.nodes,

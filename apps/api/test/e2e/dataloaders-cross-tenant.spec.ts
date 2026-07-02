@@ -17,6 +17,7 @@ import { UsersService } from "@/modules/users/users.service";
 import { clearTestDatabase } from "../support/clear-test-database";
 import { createTestApp } from "../support/create-test-app";
 import { graphqlRequest } from "../support/graphql-request";
+import { skillI18n } from "../support/skill-i18n";
 
 const NESTED_PRIVATE_ENTITIES = `
   query NestedPrivateEntities {
@@ -109,7 +110,7 @@ interface NestedPrivateEntitiesData {
       slug: string;
       owner: { id: string; email: string };
       organization: { id: string; name: string };
-      skills: Array<{ id: string; name: string }>;
+      skills: Array<{ id: string; slug: string }>;
     }>;
   };
   educations: {
@@ -119,7 +120,7 @@ interface NestedPrivateEntitiesData {
       slug: string;
       owner: { id: string; email: string };
       organization: { id: string; name: string };
-      skills: Array<{ id: string; name: string }>;
+      skills: Array<{ id: string; slug: string }>;
     }>;
   };
   experiences: {
@@ -129,8 +130,8 @@ interface NestedPrivateEntitiesData {
       slug: string;
       owner: { id: string; email: string };
       organization: { id: string; name: string };
-      skills: Array<{ id: string; name: string }>;
-      roles: Array<{ skills: Array<{ id: string; name: string }> }>;
+      skills: Array<{ id: string; slug: string }>;
+      roles: Array<{ skills: Array<{ id: string; slug: string }> }>;
     }>;
   };
   projects: {
@@ -139,7 +140,7 @@ interface NestedPrivateEntitiesData {
       id: string;
       slug: string;
       owner: { id: string; email: string };
-      skills: Array<{ id: string; name: string }>;
+      skills: Array<{ id: string; slug: string }>;
     }>;
   };
 }
@@ -154,7 +155,7 @@ const crossTenantFindOneCases = [
           slug
           owner { email }
           organization { name }
-          skills { name }
+          skills { id slug }
         }
       }
     `,
@@ -170,7 +171,7 @@ const crossTenantFindOneCases = [
           slug
           owner { email }
           organization { name }
-          skills { name }
+          skills { id slug }
         }
       }
     `,
@@ -186,7 +187,7 @@ const crossTenantFindOneCases = [
           slug
           owner { email }
           organization { name }
-          skills { name }
+          skills { id slug }
         }
       }
     `,
@@ -201,7 +202,7 @@ const crossTenantFindOneCases = [
           id
           slug
           owner { email }
-          skills { name }
+          skills { id slug }
         }
       }
     `,
@@ -220,7 +221,7 @@ const crossTenantFindManyByIdCases = [
           slug
           owner { email }
           organization { name }
-          skills { name }
+          skills { id slug }
         }
       }
     `,
@@ -236,7 +237,7 @@ const crossTenantFindManyByIdCases = [
           slug
           owner { email }
           organization { name }
-          skills { name }
+          skills { id slug }
         }
       }
     `,
@@ -252,7 +253,7 @@ const crossTenantFindManyByIdCases = [
           slug
           owner { email }
           organization { name }
-          skills { name }
+          skills { id slug }
         }
       }
     `,
@@ -267,7 +268,7 @@ const crossTenantFindManyByIdCases = [
           id
           slug
           owner { email }
-          skills { name }
+          skills { id slug }
         }
       }
     `,
@@ -282,7 +283,7 @@ describe("Cross-tenant DataLoader isolation (e2e)", () => {
   let organizationId: string;
   let organizationName: string;
   let skillId: string;
-  let skillName: string;
+  let skillSlug: string;
   let bobUserId: string;
   let aliceEntityIds: {
     experienceId: string;
@@ -350,11 +351,11 @@ describe("Cross-tenant DataLoader isolation (e2e)", () => {
 
     const skill = await skillsService.createOne({
       slug: "shared-skill",
-      name: "Shared Skill",
+      i18n: skillI18n("Shared Skill"),
       category: "Programming",
     });
     skillId = skill.id;
-    skillName = skill.name;
+    skillSlug = skill.slug;
 
     const aliceCtx = testAuthContext({ id: alice.id });
     const bobCtx = testAuthContext({ id: bob.id });
@@ -496,7 +497,7 @@ describe("Cross-tenant DataLoader isolation (e2e)", () => {
       expect(collection.nodes[0]?.owner.email).toBe("bob@profile.info");
       expect(collection.nodes[0]?.owner.id).toBe(bobUserId);
       expect(collection.nodes[0]?.skills).toEqual([
-        { id: skillId, name: skillName },
+        { id: skillId, slug: skillSlug },
       ]);
     }
 
@@ -513,7 +514,7 @@ describe("Cross-tenant DataLoader isolation (e2e)", () => {
       name: organizationName,
     });
     expect(data!.experiences.nodes[0]?.roles[0]?.skills).toEqual([
-      { id: skillId, name: skillName },
+      { id: skillId, slug: skillSlug },
     ]);
   });
 
