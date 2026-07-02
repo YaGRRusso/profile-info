@@ -120,7 +120,7 @@ Notable specifics:
 - `modules/api-tokens/api-tokens.service.ts`: hashes secret on create; `findOneByIdWithHashedSecret` (with `select("+hashedSecret")`) is auth-only — public CRUD methods never load `hashedSecret`. Credential validation (parse, expiry, bcrypt compare) lives in `ApiTokenStrategy.validate`; `parseApiToken` is shared with create formatting.
 - `modules/experiences/experiences.resolver.ts`: `@ResolveField` for `organization`, `skills`, sorted `roles`.
 - `modules/skills/` and `modules/organizations/` export `SkillsLoaderService` / `OrganizationsLoaderService` and `SkillsValidatorService` / `OrganizationsValidatorService` (`assertSkillExists`, `assertSkillsExist`, `assertOrganizationExists`, `assertOrganizationsExist`); private-entity services call validators on create/update. Validators use `findManyActiveById` (disabled refs fail as `REFERENCES_NOT_FOUND`). Loaders and `find*ById` queries use unscoped `crud.find*ById` so historical refs still resolve. `platform/graphql/loaders.service.ts` composes loaders per request.
-- **Catalog** (`skills`, `organizations`): `scope` (`GLOBAL` | `LOCAL`, default `GLOBAL`); `ownerId` only when `scope` is `LOCAL`. Unique `{ scope, ownerId, slug }` — disabled rows still hold the slug (re-enable to reuse). `disabled` boolean (default `false`). **Skill:** slug + required `i18n[].messages.title` (ADR 004; no root `name`). **Organization:** root `name` + `i18n[].messages.description`. `findManyOrganizations` / `findManySkills` list all rows; `findManyActiveOrganizations` / `findManyActiveSkills` (and filtered `findOne*`) return active only. Validators use `findManyActiveById`. `disable*` / `enable*` mutate `disabled` without domain events. `remove*` stays hard delete + cascade events.
+- **Catalog** (`skills`, `organizations`): `scope` (`GLOBAL` | `LOCAL`, default `GLOBAL`); `ownerId` only when `scope` is `LOCAL`. Unique `{ scope, ownerId, slug }` — disabled rows still hold the slug (re-enable to reuse). `disabled` boolean (default `false`). **Skill:** slug + required `i18n[].messages.title` (ADR 003; no root `name`). **Organization:** root `name` + `i18n[].messages.description`. `findManyOrganizations` / `findManySkills` list all rows; `findManyActiveOrganizations` / `findManyActiveSkills` (and filtered `findOne*`) return active only. Validators use `findManyActiveById`. `disable*` / `enable*` mutate `disabled` without domain events. `remove*` stays hard delete + cascade events.
 
 ## Domain events (delete cascade)
 
@@ -132,6 +132,7 @@ Listeners are thin (`@OnEvent` + delegate to a service method). All MongoDB writ
 - `skill.deleted` (`skills` → `courses`): `$pull` from `skillIds` array via `detachSkill`
 - `skill.deleted` (`skills` → `educations`): `$pull` from `skillIds` array via `detachSkill`
 - `skill.deleted` (`skills` → `experiences`): `$pull` from nested `roles.skillIds` via `detachSkill`
+- `skill.deleted` (`skills` → `users`): `$pull` from `skillIds` array via `detachSkill`
 - `organization.deleted` (`organizations` → `courses`): hard `deleteMany` via `purgeByOrganization`
 - `organization.deleted` (`organizations` → `educations`): hard `deleteMany` via `purgeByOrganization`
 - `organization.deleted` (`organizations` → `experiences`): hard `deleteMany` via `purgeByOrganization`

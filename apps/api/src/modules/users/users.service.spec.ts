@@ -40,6 +40,7 @@ describe("UsersService", () => {
   let repository: {
     crud: ReturnType<typeof createMockCrud>;
     findOneByEmailWithPassword: jest.Mock;
+    detachSkill: jest.Mock;
   };
 
   beforeEach(async () => {
@@ -48,6 +49,7 @@ describe("UsersService", () => {
     repository = {
       crud,
       findOneByEmailWithPassword: jest.fn(),
+      detachSkill: jest.fn().mockResolvedValue(undefined),
     };
 
     const module: TestingModule = await Test.createTestingModule({
@@ -286,6 +288,13 @@ describe("UsersService", () => {
       ).rejects.toThrow("SUPER_ADMIN users cannot be deleted");
       expect(eventEmitter.emitAsync).not.toHaveBeenCalled();
       expect(crud.deleteManyById).not.toHaveBeenCalled();
+    });
+  });
+
+  describe("detachSkill", () => {
+    it("delegates to repository helper", async () => {
+      await service.detachSkill(validId);
+      expect(repository.detachSkill).toHaveBeenCalledWith(validId);
     });
   });
 });

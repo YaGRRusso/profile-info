@@ -90,4 +90,32 @@ describe("Skill delete cascade (integration)", () => {
     const skillIds = (updatedCourse.skillIds ?? []).map((id) => id.toString());
     expect(skillIds).not.toContain(skill.id);
   });
+
+  it("should detach a deleted skill from user profile skillIds", async () => {
+    const usersService = app!.get(UsersService);
+
+    const skill = await skillsService.createOne({
+      slug: "first-aid",
+      i18n: skillI18n("First Aid"),
+      category: "Healthcare",
+    });
+
+    const user = await usersService.createOne({
+      name: "Profile Owner",
+      nickname: "profile-owner",
+      email: "profile-owner@profile.info",
+      password: "owner.123",
+      role: UserRole.USER,
+      skillIds: [skill.id],
+    });
+
+    expect(user.skillIds?.map((id) => id.toString())).toContain(skill.id);
+
+    await skillsService.removeOne(skill.id);
+
+    const updatedUser = await usersService.findOneById(user.id);
+    const skillIds = (updatedUser.skillIds ?? []).map((id) => id.toString());
+
+    expect(skillIds).not.toContain(skill.id);
+  });
 });

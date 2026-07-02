@@ -149,6 +149,10 @@ export class UsersService {
     return this.repository.crud.deleteManyById(ids);
   }
 
+  async detachSkill(skillId: string): Promise<void> {
+    await this.repository.detachSkill(skillId);
+  }
+
   private assertDeletable(user: UserEntity): void {
     if (user.role === UserRole.SUPER_ADMIN) {
       throw new ForbiddenException("SUPER_ADMIN users cannot be deleted");

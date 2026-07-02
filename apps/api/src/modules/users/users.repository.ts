@@ -48,4 +48,10 @@ export class UsersRepository {
       password: document.password,
     };
   }
+
+  async detachSkill(skillId: string): Promise<void> {
+    await this.model
+      .updateMany({ skillIds: skillId }, { $pull: { skillIds: skillId } })
+      .exec();
+  }
 }
