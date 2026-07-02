@@ -31,6 +31,7 @@ import { useQueryState } from "nuqs";
 import { useMemo, useState } from "react";
 import { z } from "zod";
 import { BadgeList } from "@/components/display/badge-list";
+import { PLACEHOLDERS } from "@/consts/placeholders";
 import { useActiveFilters } from "@/hooks/custom/use-active-filters";
 import { usePersistedState } from "@/hooks/custom/use-persisted-state";
 import type { SkillRow } from "@/hooks/queries/skills";
@@ -105,9 +106,6 @@ const getColumns = (
       <span className="font-mono text-xs">{data.getValue()}</span>
     ),
   }),
-  columnHelper.accessor("name", {
-    header: "Name",
-  }),
   columnHelper.accessor("slug", {
     header: "Slug",
   }),
@@ -122,6 +120,13 @@ const getColumns = (
       if (!value) return <span className="opacity-50">—</span>;
       return <BadgeList values={[value]} />;
     },
+  }),
+  columnHelper.accessor((row) => row.i18n.map((entry) => entry.locale), {
+    id: "languages",
+    header: "Languages",
+    enableGlobalFilter: false,
+    enableSorting: false,
+    cell: (data) => <BadgeList values={data.getValue()} />,
   }),
   columnHelper.accessor("disabled", {
     header: "Status",
@@ -348,7 +353,7 @@ export function SkillsTable({
             <MagnifyingGlassIcon className="opacity-md" />
             <input
               onChange={(event) => setSearchQuery(event.target.value)}
-              placeholder="Search by name or slug..."
+              placeholder={PLACEHOLDERS.search}
               type="search"
               value={searchQuery}
             />

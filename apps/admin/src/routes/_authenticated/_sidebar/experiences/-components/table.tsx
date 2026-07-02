@@ -30,6 +30,7 @@ import { useQueryState } from "nuqs";
 import { useMemo, useState } from "react";
 import { z } from "zod";
 import { BadgeList } from "@/components/display/badge-list";
+import { PLACEHOLDERS } from "@/consts/placeholders";
 import { ExperienceCategory, UserRole } from "@/generated/graphql/graphql";
 import { useActiveFilters } from "@/hooks/custom/use-active-filters";
 import { usePersistedState } from "@/hooks/custom/use-persisted-state";
@@ -37,6 +38,7 @@ import { useStableValue } from "@/hooks/custom/use-stable-value";
 import type { ExperienceRow } from "@/hooks/queries/experiences";
 import { cn } from "@/lib/cn";
 import { getMinMaxFacets, getUniqueFacets } from "@/lib/facets";
+import { i18nLabel } from "@/lib/i18n";
 import { parseAsShape } from "@/lib/parsers";
 import {
   canSeeColumn,
@@ -178,7 +180,9 @@ const getColumns = (
   }),
   columnHelper.accessor(
     (row) =>
-      row.roles?.flatMap((role) => role.skills?.map((s) => s.name) ?? []) ?? [],
+      row.roles?.flatMap(
+        (role) => role.skills?.map((s) => i18nLabel(s)) ?? []
+      ) ?? [],
     {
       id: "skills",
       header: "Skills",
@@ -414,7 +418,7 @@ export function ExperiencesTable({
             <MagnifyingGlassIcon className="opacity-md" />
             <input
               onChange={(event) => setSearchQuery(event.target.value)}
-              placeholder="Search by name or slug..."
+              placeholder={PLACEHOLDERS.search}
               type="search"
               value={searchQuery}
             />

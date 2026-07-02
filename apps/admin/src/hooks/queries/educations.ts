@@ -59,7 +59,13 @@ const findManyEducations = graphql(`
         }
         skills {
           id
-          name
+          slug
+          i18n {
+            locale
+            messages {
+              title
+            }
+          }
         }
         period {
           from

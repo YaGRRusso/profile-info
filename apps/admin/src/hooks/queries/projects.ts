@@ -55,7 +55,13 @@ const findManyProjects = graphql(`
         }
         skills {
           id
-          name
+          slug
+          i18n {
+            locale
+            messages {
+              title
+            }
+          }
         }
         createdAt
         updatedAt

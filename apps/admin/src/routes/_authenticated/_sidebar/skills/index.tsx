@@ -12,7 +12,12 @@ import { Json } from "@/components/display/json";
 import { Modal } from "@/components/display/modal";
 import { PageTitle } from "@/components/display/page-title";
 import type { CommonFormValuesProps } from "@/forms/common";
-import { SkillForm, type SkillSchema } from "@/forms/skill";
+import {
+  SkillForm,
+  type SkillSchema,
+  skillToForm,
+  skillToInput,
+} from "@/forms/skill";
 import { SkillMultiForm } from "@/forms/skill-multi";
 import { useQueryAllPages } from "@/hooks/custom/use-query-all-pages";
 import {
@@ -26,6 +31,7 @@ import {
 } from "@/hooks/mutations/skills";
 import { type SkillRow, useFindManySkills } from "@/hooks/queries/skills";
 import { cn } from "@/lib/cn";
+import { i18nLabel } from "@/lib/i18n";
 import { SkillsTable } from "./-components/table";
 
 export const Route = createFileRoute("/_authenticated/_sidebar/skills/")({
@@ -64,7 +70,7 @@ function RouteComponent() {
     (data: SkillSchema) => {
       switch (formValues?.state) {
         case "CREATING":
-          createOneSkill.mutate(data, {
+          createOneSkill.mutate(skillToInput(data), {
             onSuccess: () => {
               closeAndRefetch();
               toast.success("Skill created successfully");
@@ -75,11 +81,7 @@ function RouteComponent() {
           updateOneSkill.mutate(
             {
               skillId: selectedSkillIds[0],
-              updateSkillInput: {
-                category: data.category,
-                name: data.name,
-                slug: data.slug,
-              },
+              updateSkillInput: skillToInput(data),
             },
             {
               onSuccess: () => {
@@ -280,7 +282,7 @@ function RouteComponent() {
         <ul className="flex flex-wrap items-center gap-1">
           {formValues?.customValues?.map((skill) => (
             <li className="badge badge-sm badge-soft" key={skill?.id}>
-              {skill?.name}
+              {skill ? i18nLabel(skill) : null}
             </li>
           ))}
         </ul>
@@ -311,7 +313,7 @@ function RouteComponent() {
         <ul className="flex flex-wrap items-center gap-1">
           {formValues?.customValues?.map((skill) => (
             <li className="badge badge-sm badge-soft" key={skill?.id}>
-              {skill?.name}
+              {skill ? i18nLabel(skill) : null}
             </li>
           ))}
         </ul>
@@ -345,10 +347,7 @@ function RouteComponent() {
             }
             onEdit={(skill) =>
               setFormValues({
-                defaultValues: {
-                  ...skill,
-                  category: skill.category ?? "",
-                },
+                defaultValues: skillToForm(skill),
                 state: "UPDATING",
                 customValues: [skill],
               })

@@ -59,7 +59,13 @@ const findManyCourses = graphql(`
         }
         skills {
           id
-          name
+          slug
+          i18n {
+            locale
+            messages {
+              title
+            }
+          }
         }
         createdAt
         updatedAt

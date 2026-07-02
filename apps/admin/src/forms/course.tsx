@@ -25,8 +25,12 @@ import type { CourseRow } from "@/hooks/queries/courses";
 import { useFindManyActiveOrganizations } from "@/hooks/queries/organizations";
 import { useFindManyActiveSkills } from "@/hooks/queries/skills";
 import { fieldError } from "@/lib/field-error";
-import { createEmptyI18n, pickTranslation } from "@/lib/i18n";
-import { findLabelsByIds } from "@/lib/mappers";
+import {
+  createEmptyI18n,
+  i18nLabel,
+  i18nLabelsByIds,
+  pickTranslation,
+} from "@/lib/i18n";
 import { isSlugTaken } from "@/lib/slug";
 import { CommonFormProps } from "./common";
 
@@ -132,7 +136,7 @@ export function CourseForm({
   );
 
   const skillOptions = (findManySkills.data?.nodes ?? []).map((skill) => ({
-    label: skill.name,
+    label: i18nLabel(skill),
     value: skill.id,
   }));
 
@@ -167,12 +171,10 @@ export function CourseForm({
       if (raw.trim().length <= RawSizeEnum.XSMALL)
         return toast.error("Description must be at least 64 characters long");
 
-      const skills = findLabelsByIds({
-        items: findManySkills.data?.nodes,
-        lookupKey: "id",
-        labelKey: "name",
-        targetValues: form.getFieldValue("skillIds"),
-      });
+      const skills = i18nLabelsByIds(
+        findManySkills.data?.nodes,
+        form.getFieldValue("skillIds")
+      );
       if (!skills.length) return toast.error("At least one skill is required");
 
       const title = fieldGroup.title;

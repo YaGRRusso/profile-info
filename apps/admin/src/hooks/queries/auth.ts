@@ -30,7 +30,13 @@ const getMe = graphql(`
       skillIds
       skills {
         id
-        name
+        slug
+        i18n {
+          locale
+          messages {
+            title
+          }
+        }
       }
     }
   }

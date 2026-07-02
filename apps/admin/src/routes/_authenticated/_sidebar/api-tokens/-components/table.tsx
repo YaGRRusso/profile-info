@@ -30,6 +30,7 @@ import { useQueryState } from "nuqs";
 import { useMemo, useState } from "react";
 import { z } from "zod";
 import { BadgeList } from "@/components/display/badge-list";
+import { PLACEHOLDERS } from "@/consts/placeholders";
 import { ApiTokenPermission } from "@/generated/graphql/graphql";
 import { useActiveFilters } from "@/hooks/custom/use-active-filters";
 import { usePersistedState } from "@/hooks/custom/use-persisted-state";
@@ -448,7 +449,7 @@ export function ApiTokensTable({
             <MagnifyingGlassIcon className="opacity-md" />
             <input
               onChange={(event) => setSearchQuery(event.target.value)}
-              placeholder="Search by name..."
+              placeholder={PLACEHOLDERS.search}
               type="search"
               value={searchQuery}
             />

@@ -31,10 +31,15 @@ const findManySkills = graphql(`
       found
       nodes {
         id
-        name
         slug
         category
         disabled
+        i18n {
+          locale
+          messages {
+            title
+          }
+        }
         createdAt
         updatedAt
       }
@@ -56,10 +61,15 @@ const findManyActiveSkills = graphql(`
       found
       nodes {
         id
-        name
         slug
         category
         disabled
+        i18n {
+          locale
+          messages {
+            title
+          }
+        }
         createdAt
         updatedAt
       }

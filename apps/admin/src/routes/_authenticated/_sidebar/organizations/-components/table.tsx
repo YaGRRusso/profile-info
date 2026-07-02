@@ -31,6 +31,7 @@ import { useQueryState } from "nuqs";
 import { useMemo, useState } from "react";
 import { z } from "zod";
 import { Link } from "@/components/display/link";
+import { PLACEHOLDERS } from "@/consts/placeholders";
 import { OrganizationCategory } from "@/generated/graphql/graphql";
 import { useActiveFilters } from "@/hooks/custom/use-active-filters";
 import { usePersistedState } from "@/hooks/custom/use-persisted-state";
@@ -369,7 +370,7 @@ export function OrganizationsTable({
             <MagnifyingGlassIcon className="opacity-md" />
             <input
               onChange={(event) => setSearchQuery(event.target.value)}
-              placeholder="Search by name or slug..."
+              placeholder={PLACEHOLDERS.search}
               type="search"
               value={searchQuery}
             />

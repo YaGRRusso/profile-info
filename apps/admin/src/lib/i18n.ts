@@ -28,3 +28,28 @@ export function pickTranslation<T extends { locale: string }>(
 
   return i18n[0];
 }
+
+interface I18nSource {
+  i18n?: Array<{ locale: string; messages: { title: string } }>;
+  slug: string;
+}
+
+export function i18nLabel(item: I18nSource, locale?: string): string {
+  return (
+    pickTranslation(item.i18n, locale ?? "en")?.messages.title ?? item.slug
+  );
+}
+
+export function i18nLabelsByIds(
+  items: Array<I18nSource & { id: string }> | null | undefined,
+  ids: string[] | null | undefined
+): string[] {
+  if (!ids?.length || !items?.length) return [];
+
+  const byId = new Map(items.map((item) => [item.id, item]));
+
+  return ids.map((id) => {
+    const item = byId.get(id);
+    return item ? i18nLabel(item) : "";
+  });
+}

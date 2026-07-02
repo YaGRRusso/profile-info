@@ -34,6 +34,6 @@ separate root display field. Skill should follow that pattern, not Organization
 | # | What | Notes |
 |---|------|-------|
 | 1 | **API** | Schema, entity, inputs, mapper, seed, resume, tests — **done** |
-| 2 | **Admin** | Skill form i18n block; `skillLabel()` helper for pickers/tables |
+| 2 | **Admin** | Skill form i18n block; `i18nLabel()` / `i18nLabelsByIds()` for pickers/tables |
 
 **Relates to:** ADR 001 (generic profile), ADR 003 (`user.skillIds` + resume skills section).

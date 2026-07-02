@@ -10,11 +10,16 @@ const createOneSkill = graphql(`
   mutation CreateOneSkill($createSkillInput: CreateSkillInput!) {
     createOneSkill(createSkillInput: $createSkillInput) {
       id
-      name
       slug
       category
       createdAt
       updatedAt
+      i18n {
+        locale
+        messages {
+          title
+        }
+      }
     }
   }
 `);
@@ -23,11 +28,16 @@ const updateOneSkill = graphql(`
   mutation UpdateOneSkill($skillId: ID!, $updateSkillInput: UpdateSkillInput!) {
     updateOneSkill(skillId: $skillId, updateSkillInput: $updateSkillInput) {
       id
-      name
       slug
       category
       createdAt
       updatedAt
+      i18n {
+        locale
+        messages {
+          title
+        }
+      }
     }
   }
 `);

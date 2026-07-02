@@ -20,7 +20,7 @@ import { useAtsSummarize, useTranslate } from "@/hooks/mutations/ai";
 import { useGetMe } from "@/hooks/queries/auth";
 import { toDateInput, toIsoDate } from "@/lib/date";
 import { fieldError } from "@/lib/field-error";
-import { createEmptyI18n } from "@/lib/i18n";
+import { createEmptyI18n, i18nLabel } from "@/lib/i18n";
 import { CommonFormProps } from "./common";
 
 const urlSchema = z.object({
@@ -161,7 +161,7 @@ export function ProfileForm({
         return toast.error("Description must be at least 64 characters long");
 
       const skills = (getMe.data?.getMe.skills ?? [])
-        .map((skill) => skill.name)
+        .map((skill) => i18nLabel(skill))
         .slice(0, 32);
       if (!skills.length) return toast.error("At least one skill is required");
 
@@ -272,7 +272,7 @@ export function ProfileForm({
                 label="Birth date"
                 name={field.name}
                 onChange={field.handleChange}
-                placeholder="YYYY-MM-DD"
+                placeholder={PLACEHOLDERS.date}
                 type="date"
                 value={field.state.value}
               />

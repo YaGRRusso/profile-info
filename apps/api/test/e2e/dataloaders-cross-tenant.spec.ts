@@ -36,12 +36,12 @@ const NESTED_PRIVATE_ENTITIES = `
         }
         skills {
           id
-          name
+          slug
         }
         roles {
           skills {
             id
-            name
+            slug
           }
         }
       }
@@ -61,7 +61,7 @@ const NESTED_PRIVATE_ENTITIES = `
         }
         skills {
           id
-          name
+          slug
         }
       }
     }
@@ -80,7 +80,7 @@ const NESTED_PRIVATE_ENTITIES = `
         }
         skills {
           id
-          name
+          slug
         }
       }
     }
@@ -95,7 +95,7 @@ const NESTED_PRIVATE_ENTITIES = `
         }
         skills {
           id
-          name
+          slug
         }
       }
     }

@@ -16,7 +16,7 @@ const FIND_MANY_SKILLS = `
       found
       nodes {
         id
-        name
+        slug
       }
     }
   }

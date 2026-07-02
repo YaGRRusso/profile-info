@@ -61,7 +61,13 @@ const findManyExperiences = graphql(`
           }
           skills {
             id
-            name
+            slug
+            i18n {
+              locale
+              messages {
+                title
+              }
+            }
           }
         }
         createdAt

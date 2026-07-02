@@ -31,6 +31,7 @@ import { useMemo, useState } from "react";
 import { z } from "zod";
 import { BadgeList } from "@/components/display/badge-list";
 import { Link } from "@/components/display/link";
+import { PLACEHOLDERS } from "@/consts/placeholders";
 import { CourseStatus, UserRole } from "@/generated/graphql/graphql";
 import { useActiveFilters } from "@/hooks/custom/use-active-filters";
 import { usePersistedState } from "@/hooks/custom/use-persisted-state";
@@ -38,6 +39,7 @@ import { useStableValue } from "@/hooks/custom/use-stable-value";
 import type { CourseRow } from "@/hooks/queries/courses";
 import { cn } from "@/lib/cn";
 import { getMinMaxFacets, getUniqueFacets } from "@/lib/facets";
+import { i18nLabel } from "@/lib/i18n";
 import { parseAsShape } from "@/lib/parsers";
 import {
   canSeeColumn,
@@ -191,13 +193,16 @@ const getColumns = (
       <span className="badge badge-soft badge-sm">{data.getValue()}</span>
     ),
   }),
-  columnHelper.accessor((row) => row.skills?.map((skill) => skill.name) ?? [], {
-    id: "skills",
-    header: "Skills",
-    enableGlobalFilter: false,
-    enableSorting: false,
-    cell: (data) => <BadgeList values={data.getValue()} />,
-  }),
+  columnHelper.accessor(
+    (row) => row.skills?.map((skill) => i18nLabel(skill)) ?? [],
+    {
+      id: "skills",
+      header: "Skills",
+      enableGlobalFilter: false,
+      enableSorting: false,
+      cell: (data) => <BadgeList values={data.getValue()} />,
+    }
+  ),
   columnHelper.accessor((row) => row.i18n.map((entry) => entry.locale), {
     id: "languages",
     header: "Languages",
@@ -417,7 +422,7 @@ export function CoursesTable({
             <MagnifyingGlassIcon className="opacity-md" />
             <input
               onChange={(event) => setSearchQuery(event.target.value)}
-              placeholder="Search by name or slug..."
+              placeholder={PLACEHOLDERS.search}
               type="search"
               value={searchQuery}
             />
