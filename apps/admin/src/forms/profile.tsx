@@ -2,6 +2,7 @@ import { DeepKeys, DeepValue, useForm } from "@tanstack/react-form";
 import { useCallback } from "react";
 import { toast } from "react-toastify";
 import z from "zod";
+import { DraggableList } from "@/components/inputs/draggable-list";
 import { FieldArray } from "@/components/inputs/field-array";
 import { MultiSelectInput } from "@/components/inputs/multi-select";
 import { PasswordInput } from "@/components/inputs/password";
@@ -453,17 +454,25 @@ export function ProfileForm({
       </section>
 
       <section className="rounded-box bg-base-200 p-4 sm:p-6">
-        <h2 className="mb-4 font-semibold text-lg">Skills</h2>
+        <h2 className="mb-4 font-semibold text-lg">Main Skills</h2>
         <Field name="skillIds">
           {(field) => (
-            <MultiSelectInput
-              error={fieldError(field.state.meta)}
-              label="Skills"
-              onChange={field.handleChange}
-              options={skillOptions}
-              placeholder={PLACEHOLDERS.search}
-              value={field.state.value}
-            />
+            <>
+              <MultiSelectInput
+                error={fieldError(field.state.meta)}
+                label="Skills"
+                onChange={field.handleChange}
+                options={skillOptions}
+                placeholder={PLACEHOLDERS.search}
+                showSelected={false}
+                value={field.state.value}
+              />
+              <DraggableList
+                onChange={field.handleChange}
+                options={skillOptions}
+                value={field.state.value}
+              />
+            </>
           )}
         </Field>
       </section>

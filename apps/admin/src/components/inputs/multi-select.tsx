@@ -7,9 +7,11 @@ export interface MultiSelectInputProps {
   disabled?: boolean;
   error?: string;
   label?: string;
+  maxSelected?: number;
   onChange?: (value: string[]) => void;
   options: { label: string; value: string }[];
   placeholder?: string;
+  showSelected?: boolean;
   value?: string[];
 }
 
@@ -22,6 +24,8 @@ export function MultiSelectInput({
   options,
   placeholder,
   value = [],
+  maxSelected = 50,
+  showSelected = true,
 }: MultiSelectInputProps) {
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -83,6 +87,11 @@ export function MultiSelectInput({
                     <input
                       checked={value.includes(option.value)}
                       className="checkbox checkbox-xs"
+                      disabled={
+                        maxSelected !== undefined &&
+                        value.length >= maxSelected &&
+                        !value.includes(option.value)
+                      }
                       onChange={() => toggle(option.value)}
                       type="checkbox"
                     />
@@ -97,7 +106,7 @@ export function MultiSelectInput({
           </div>
         )}
       </div>
-      {selectedOptions.length > 0 && (
+      {showSelected && selectedOptions.length > 0 && (
         <div className="flex flex-wrap items-center gap-1">
           {selectedOptions.map((option) => (
             <button
