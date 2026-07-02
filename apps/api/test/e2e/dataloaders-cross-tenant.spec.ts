@@ -12,7 +12,6 @@ import { ExperiencesService } from "@/modules/experiences/experiences.service";
 import { OrganizationCategory } from "@/modules/organizations/enums/category.enum";
 import { OrganizationsService } from "@/modules/organizations/organizations.service";
 import { ProjectsService } from "@/modules/projects/projects.service";
-import { SkillCategory } from "@/modules/skills/enums/category.enum";
 import { SkillsService } from "@/modules/skills/skills.service";
 import { UsersService } from "@/modules/users/users.service";
 import { clearTestDatabase } from "../support/clear-test-database";
@@ -352,7 +351,7 @@ describe("Cross-tenant DataLoader isolation (e2e)", () => {
     const skill = await skillsService.createOne({
       slug: "shared-skill",
       name: "Shared Skill",
-      category: SkillCategory.BACKEND,
+      category: "Programming",
     });
     skillId = skill.id;
     skillName = skill.name;

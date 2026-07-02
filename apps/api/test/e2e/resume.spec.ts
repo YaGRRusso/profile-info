@@ -2,7 +2,6 @@ import { INestApplication } from "@nestjs/common";
 import request from "supertest";
 import { App } from "supertest/types";
 import { UserRole } from "@/core/enums/user-role.enum";
-import { SkillCategory } from "@/modules/skills/enums/category.enum";
 import { SkillsService } from "@/modules/skills/skills.service";
 import { UsersService } from "@/modules/users/users.service";
 import { clearTestDatabase } from "../support/clear-test-database";
@@ -43,7 +42,7 @@ describe("ResumeController (e2e)", () => {
     await skillsService.createOne({
       name: "TypeScript",
       slug: "typescript",
-      category: SkillCategory.BACKEND,
+      category: "Programming",
       relevance: 5,
     });
   });

@@ -32,7 +32,6 @@ export class DashboardService {
       organizations,
       projects,
       experiences,
-      skillsByCategory,
       experiencesByCategory,
       coursesByStatus,
       skillActivity,
@@ -48,7 +47,6 @@ export class DashboardService {
       this.organizationsService.count(),
       this.projectsService.count(ctx),
       this.experiencesService.count(ctx),
-      this.skillsService.countByField("category"),
       this.experiencesService.countByField(ctx, "category"),
       this.coursesService.countByField(ctx, "status"),
       this.skillsService.findRecentActivity(RECENT_ACTIVITY_PER_ENTITY),
@@ -74,7 +72,6 @@ export class DashboardService {
         projects,
         experiences,
       },
-      skillsByCategory,
       experiencesByCategory,
       coursesByStatus,
       recentActivity: this.mergeRecentActivity([

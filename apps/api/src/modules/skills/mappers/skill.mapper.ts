@@ -13,7 +13,6 @@ import { FilterSkillInput } from "../dto/filter-skill.input";
 import { SortSkillInput } from "../dto/sort-skill.input";
 import { UpdateSkillInput } from "../dto/update-skill.input";
 import type { SkillEntity } from "../entities/skill.entity";
-import type { SkillCategory } from "../enums/category.enum";
 import type { SkillModel } from "../schemas/skill.schema";
 
 export class SkillMapper
@@ -33,7 +32,7 @@ export class SkillMapper
       relevance: model.relevance,
       slug: model.slug,
       name: model.name,
-      category: model.category as SkillCategory,
+      category: model.category,
       disabled: model.disabled,
     };
   }

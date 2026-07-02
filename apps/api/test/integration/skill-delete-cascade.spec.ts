@@ -7,7 +7,6 @@ import { CreateCourseInput } from "@/modules/courses/dto/create-course.input";
 import { CourseStatus } from "@/modules/courses/enums/status.enum";
 import { OrganizationCategory } from "@/modules/organizations/enums/category.enum";
 import { OrganizationsService } from "@/modules/organizations/organizations.service";
-import { SkillCategory } from "@/modules/skills/enums/category.enum";
 import { SkillsService } from "@/modules/skills/skills.service";
 import { UsersService } from "@/modules/users/users.service";
 import { clearTestDatabase } from "../support/clear-test-database";
@@ -60,7 +59,7 @@ describe("Skill delete cascade (integration)", () => {
     const skill = await skillsService.createOne({
       slug: "typescript",
       name: "TypeScript",
-      category: SkillCategory.LANGUAGE,
+      category: "Programming",
     });
 
     const ownerCtx = testAuthContext({ id: owner.id });

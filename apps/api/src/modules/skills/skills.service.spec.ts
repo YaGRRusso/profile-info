@@ -15,7 +15,7 @@ const fakeEntity = {
   id: validId,
   name: "TypeScript",
   slug: "typescript",
-  category: "LANGUAGE",
+  category: "Programming",
   disabled: false,
 };
 
@@ -109,7 +109,7 @@ describe("SkillsService", () => {
       const createInput = {
         name: "TypeScript",
         slug: "typescript",
-        category: "LANGUAGE" as never,
+        category: "Programming",
       };
       crud.createOne.mockResolvedValue(fakeEntity);
 

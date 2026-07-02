@@ -154,7 +154,7 @@ inputs use `organizationId` and `skillIds` (no `ownerId` — injected from conte
 - **Key fields:** `scope` (enum: `GLOBAL`, `LOCAL`; default `GLOBAL`, indexed),
   `ownerId` (ref → User; required when `scope` is `LOCAL`, absent when `GLOBAL`),
   `slug` (unique per `{ scope, ownerId }` — disabled rows still occupy the slug; re-enable to reuse),
-  `name`, `category` (enum, indexed), `relevance`, `disabled`
+  `name`, `category` (optional free string, indexed), `relevance`, `disabled`
 - **Embedded:** none
 - **References:** optional `ownerId` → User (local catalog only; referenced by private entities via `skillIds`)
 
@@ -164,7 +164,7 @@ inputs use `organizationId` and `skillIds` (no `ownerId` — injected from conte
 - **Key fields:** `scope` (enum: `GLOBAL`, `LOCAL`; default `GLOBAL`, indexed),
   `ownerId` (ref → User; required when `scope` is `LOCAL`, absent when `GLOBAL`),
   `slug` (unique per `{ scope, ownerId }` — disabled rows still occupy the slug; re-enable to reuse),
-  `name`, `website`, `logo`, `category` (enum, indexed),
+  `name`, `website` (optional), `logo` (optional), `category` (enum, indexed),
   `relevance`, `disabled`, `i18n[]` (embed: `locale`, `messages.description`)
 - **Embedded:** `i18n[]` translations
 - **References:** optional `ownerId` → User (local catalog only; referenced by Experience, Education, Course)

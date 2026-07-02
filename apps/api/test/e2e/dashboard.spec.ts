@@ -14,7 +14,6 @@ import { ExperienceCategory } from "@/modules/experiences/enums/category.enum";
 import { ExperiencesService } from "@/modules/experiences/experiences.service";
 import { OrganizationCategory } from "@/modules/organizations/enums/category.enum";
 import { OrganizationsService } from "@/modules/organizations/organizations.service";
-import { SkillCategory } from "@/modules/skills/enums/category.enum";
 import { SkillsService } from "@/modules/skills/skills.service";
 import { UsersService } from "@/modules/users/users.service";
 import { clearTestDatabase } from "../support/clear-test-database";
@@ -37,10 +36,6 @@ const DASHBOARD_QUERY = `
         value
       }
       experiencesByCategory {
-        label
-        value
-      }
-      skillsByCategory {
         label
         value
       }
@@ -124,7 +119,7 @@ describe("Dashboard (e2e)", () => {
     await skillsService.createOne({
       slug: "dashboard-skill",
       name: "Dashboard Skill",
-      category: SkillCategory.BACKEND,
+      category: "Programming",
     });
 
     const aliceCtx = testAuthContext({ id: alice.id });
@@ -263,9 +258,6 @@ describe("Dashboard (e2e)", () => {
         { label: ExperienceCategory.FREELANCE, value: 1 },
       ])
     );
-    expect(dashboard?.skillsByCategory).toEqual([
-      { label: SkillCategory.BACKEND, value: 1 },
-    ]);
   });
 
   it("should show another tenant only their private totals", async () => {

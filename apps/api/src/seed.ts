@@ -29,80 +29,44 @@ const URL_TYPES = [
   "demo",
 ];
 
-const SKILLS_SLUGS = [
-  "javascript",
-  "typescript",
-  "nodedotjs",
-  "bun",
-  "deno",
-  "react",
-  "nextdotjs",
-  "remix",
-  "astro",
-  "vuedotjs",
-  "angular",
-  "svelte",
-  "solid",
-  "nestjs",
-  "express",
-  "fastify",
-  "hono",
-  "trpc",
-  "graphql",
-  "apollographql",
-  "tailwindcss",
-  "sass",
-  "styledcomponents",
-  "css",
-  "html5",
-  "vite",
-  "webpack",
-  "esbuild",
-  "turborepo",
-  "eslint",
-  "prettier",
-  "biome",
-  "vitest",
-  "jest",
-  "cypress",
-  "testinglibrary",
-  "prisma",
-  "drizzle",
-  "typeorm",
-  "mongoose",
-  "postgresql",
-  "mongodb",
-  "redis",
-  "supabase",
-  "docker",
-  "kubernetes",
-  "terraform",
-  "nginx",
-  "githubactions",
-  "npm",
-  "pnpm",
-  "yarn",
-  "git",
-  "github",
-  "redux",
-  "tanstack",
-  "reactquery",
-  "reactrouter",
-  "zod",
-  "radixui",
-  "shadcnui",
-  "mui",
-  "expo",
-  "electron",
-  "storybook",
-  "socketdotio",
-  "axios",
-  "lodash",
-  "mdx",
-  "linux",
+const SEED_SKILLS: Array<{ slug: string; name: string; category?: string }> = [
+  { slug: "typescript", name: "TypeScript", category: "Programming" },
+  { slug: "react", name: "React", category: "Programming" },
+  { slug: "excel", name: "Excel", category: "Office" },
+  {
+    slug: "customer-service",
+    name: "Customer Service",
+    category: "Soft Skills",
+  },
+  { slug: "bricklaying", name: "Bricklaying", category: "Construction" },
+  {
+    slug: "blueprint-reading",
+    name: "Blueprint Reading",
+    category: "Construction",
+  },
+  { slug: "accounts-payable", name: "Accounts Payable", category: "Finance" },
+  { slug: "team-leadership", name: "Team Leadership", category: "Management" },
+  { slug: "first-aid", name: "First Aid", category: "Safety" },
+  { slug: "portuguese", name: "Portuguese", category: "Languages" },
+  { slug: "english", name: "English", category: "Languages" },
+  { slug: "sales-negotiation", name: "Sales Negotiation", category: "Sales" },
+  {
+    slug: "inventory-control",
+    name: "Inventory Control",
+    category: "Logistics",
+  },
+  { slug: "food-safety", name: "Food Safety", category: "Hospitality" },
+  { slug: "nursing-care", name: "Nursing Care", category: "Healthcare" },
+  { slug: "electrical-wiring", name: "Electrical Wiring", category: "Trades" },
+  { slug: "public-speaking", name: "Public Speaking" },
+  {
+    slug: "project-planning",
+    name: "Project Planning",
+    category: "Management",
+  },
+  { slug: "docker", name: "Docker", category: "Programming" },
+  { slug: "postgresql", name: "PostgreSQL", category: "Programming" },
 ];
-
-const SKILL_CATEGORIES = ["LANGUAGE", "FRONTEND", "BACKEND", "DATA", "DEVOPS"];
 const ORGANIZATION_CATEGORIES = ["COMPANY", "SCHOOL", "OTHER"];
 const STATUSES = ["COMPLETE", "INCOMPLETE", "IN_PROGRESS"];
 const EDUCATION_LEVELS = [
@@ -146,9 +110,6 @@ const SEED_API_TOKENS = [
 ] as const;
 
 const relevance = () => faker.number.int({ min: 1, max: 5 });
-
-const capitalize = (value: string) =>
-  value.charAt(0).toUpperCase() + value.slice(1);
 
 const slugFor = (name: string, index: number) =>
   `${faker.helpers.slugify(name).toLowerCase()}-${index}`;
@@ -240,15 +201,10 @@ async function seed() {
   ]);
 
   const skillDocs = await skills.create(
-    SKILLS_SLUGS.map((slug) => {
-      const name = capitalize(slug);
-      return {
-        name,
-        slug,
-        category: faker.helpers.arrayElement(SKILL_CATEGORIES),
-        relevance: relevance(),
-      };
-    })
+    SEED_SKILLS.map((skill) => ({
+      ...skill,
+      relevance: relevance(),
+    }))
   );
   const skillIds = skillDocs.map((doc) => doc._id);
 

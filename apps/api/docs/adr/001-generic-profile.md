@@ -1,6 +1,6 @@
 # ADR 001 — Generic profile (taxonomy & optional fields)
 
-**Status:** Accepted  
+**Status:** Accepted (implemented)  
 **Date:** 2026-07-01
 
 ## Context

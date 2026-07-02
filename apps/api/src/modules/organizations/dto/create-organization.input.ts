@@ -4,6 +4,7 @@ import {
   IsArray,
   IsEnum,
   IsNotEmpty,
+  IsOptional,
   IsString,
   IsUrl,
   ValidateNested,
@@ -43,13 +44,15 @@ export class CreateOrganizationInput {
   @IsNotEmpty()
   name: string;
 
-  @RequiredField(() => String)
+  @OptionalField(() => String)
+  @IsOptional()
   @IsUrl()
-  website: string;
+  website?: string;
 
-  @RequiredField(() => String)
+  @OptionalField(() => String)
+  @IsOptional()
   @IsUrl()
-  logo: string;
+  logo?: string;
 
   @RequiredField(() => [OrganizationTranslationInput])
   @IsArray()

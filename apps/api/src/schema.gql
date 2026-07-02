@@ -168,11 +168,11 @@ input CreateExperienceRoleInput {
 input CreateOrganizationInput {
   category: OrganizationCategory!
   i18n: [CreateOrganizationMessagesInputTranslationInput!]!
-  logo: String!
+  logo: String
   name: String!
   relevance: Float
   slug: String!
-  website: String!
+  website: String
 }
 
 input CreateOrganizationMessagesInput {
@@ -204,7 +204,7 @@ input CreateProjectMessagesInputTranslationInput {
 }
 
 input CreateSkillInput {
-  category: SkillCategory!
+  category: String
   name: String!
   relevance: Float
   slug: String!
@@ -258,7 +258,6 @@ type DashboardEntity {
   coursesByStatus: [DashboardCount!]!
   experiencesByCategory: [DashboardCount!]!
   recentActivity: [DashboardActivityItem!]!
-  skillsByCategory: [DashboardCount!]!
   totals: DashboardTotals!
 }
 
@@ -435,7 +434,7 @@ input FilterProjectInput {
 }
 
 input FilterSkillInput {
-  category: SkillCategory
+  category: String
   disabled: Boolean
   name: String
   relevance: Float
@@ -542,12 +541,12 @@ type OrganizationEntity {
   disabled: Boolean!
   i18n: [OrganizationTranslationLocale!]!
   id: ID!
-  logo: String!
+  logo: String
   name: String!
   relevance: Float!
   slug: String!
   updatedAt: DateTime!
-  website: String!
+  website: String
 }
 
 type OrganizationMessages {
@@ -682,16 +681,8 @@ input SignInInput {
   password: String!
 }
 
-enum SkillCategory {
-  BACKEND
-  DATA
-  DEVOPS
-  FRONTEND
-  LANGUAGE
-}
-
 type SkillEntity {
-  category: SkillCategory!
+  category: String
   createdAt: DateTime!
   disabled: Boolean!
   id: ID!
@@ -842,7 +833,7 @@ input UpdateProjectInput {
 }
 
 input UpdateSkillInput {
-  category: SkillCategory
+  category: String
   disabled: Boolean
   name: String
   relevance: Float

@@ -49,9 +49,6 @@ export class DashboardEntity {
   totals: DashboardTotals;
 
   @Field(() => [DashboardCount])
-  skillsByCategory: DashboardCount[];
-
-  @Field(() => [DashboardCount])
   experiencesByCategory: DashboardCount[];
 
   @Field(() => [DashboardCount])

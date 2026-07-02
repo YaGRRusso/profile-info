@@ -3,7 +3,6 @@ import { App } from "supertest/types";
 import { UserRole } from "@/core/enums/user-role.enum";
 import { OrganizationCategory } from "@/modules/organizations/enums/category.enum";
 import { OrganizationsService } from "@/modules/organizations/organizations.service";
-import { SkillCategory } from "@/modules/skills/enums/category.enum";
 import { SkillsService } from "@/modules/skills/skills.service";
 import { UsersService } from "@/modules/users/users.service";
 import { clearTestDatabase } from "../support/clear-test-database";
@@ -87,7 +86,7 @@ describe("Catalog reads (e2e)", () => {
     await skillsService.createOne({
       slug: "catalog-skill",
       name: "Catalog Skill",
-      category: SkillCategory.BACKEND,
+      category: "Programming",
     });
 
     const signIn = await graphqlRequest<{ signIn: string }>(app, {

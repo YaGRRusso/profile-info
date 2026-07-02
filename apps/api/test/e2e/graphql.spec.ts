@@ -6,7 +6,6 @@ import { ExperienceCategory } from "@/modules/experiences/enums/category.enum";
 import { ExperiencesService } from "@/modules/experiences/experiences.service";
 import { OrganizationCategory } from "@/modules/organizations/enums/category.enum";
 import { OrganizationsService } from "@/modules/organizations/organizations.service";
-import { SkillCategory } from "@/modules/skills/enums/category.enum";
 import { SkillsService } from "@/modules/skills/skills.service";
 import { UsersService } from "@/modules/users/users.service";
 import { clearTestDatabase } from "../support/clear-test-database";
@@ -93,7 +92,7 @@ describe("GraphQL (e2e)", () => {
         createSkillInput: {
           slug: "graphql-skill",
           name: "GraphQL",
-          category: "LANGUAGE",
+          category: "Programming",
         },
       },
     });
@@ -114,7 +113,7 @@ describe("GraphQL (e2e)", () => {
         createSkillInput: {
           slug: "forbidden-skill",
           name: "Forbidden",
-          category: "LANGUAGE",
+          category: "Programming",
         },
       },
       token: userToken,
@@ -178,7 +177,7 @@ describe("GraphQL (e2e)", () => {
         createSkillInput: {
           slug: "nestjs-skill",
           name: "NestJS",
-          category: "BACKEND",
+          category: "Programming",
         },
       },
       token: adminToken,
@@ -227,7 +226,7 @@ describe("GraphQL (e2e)", () => {
     await skillsService.createOne({
       slug: "loader-skill",
       name: "Loader Skill",
-      category: SkillCategory.LANGUAGE,
+      category: "Programming",
     });
 
     const response = await graphqlRequest<{

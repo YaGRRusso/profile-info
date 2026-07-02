@@ -1,8 +1,7 @@
 import { InputType } from "@nestjs/graphql";
-import { IsEnum, IsNotEmpty, IsString } from "class-validator";
+import { IsNotEmpty, IsOptional, IsString } from "class-validator";
 import { OptionalField } from "@/core/decorators/optional-field.decorator";
 import { RequiredField } from "@/core/decorators/required-field.decorator";
-import { SkillCategory } from "../enums/category.enum";
 
 @InputType()
 export class CreateSkillInput {
@@ -19,7 +18,8 @@ export class CreateSkillInput {
   @IsNotEmpty()
   name: string;
 
-  @RequiredField(() => SkillCategory)
-  @IsEnum(SkillCategory)
-  category: SkillCategory;
+  @OptionalField(() => String)
+  @IsOptional()
+  @IsString()
+  category?: string;
 }

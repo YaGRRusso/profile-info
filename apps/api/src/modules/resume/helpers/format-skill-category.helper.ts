@@ -1,18 +1,9 @@
-const SKILL_CATEGORY_LABELS: Record<string, string> = {
-  BACKEND: "Backend",
-  DATA: "Data",
-  DEVOPS: "DevOps",
-  FRONTEND: "Frontend",
-  LANGUAGE: "Languages",
-};
+const SKILL_CATEGORY_REGEX = /[\s_-]+/;
 
 export function formatSkillCategoryLabel(category: string): string {
-  return (
-    SKILL_CATEGORY_LABELS[category] ??
-    category
-      .toLowerCase()
-      .split("_")
-      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-      .join(" ")
-  );
+  return category
+    .toLowerCase()
+    .split(SKILL_CATEGORY_REGEX)
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(" ");
 }

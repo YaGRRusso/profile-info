@@ -1,4 +1,3 @@
-import { SkillCategory } from "../enums/category.enum";
 import type { SkillModel } from "../schemas/skill.schema";
 import { SkillMapper } from "./skill.mapper";
 
@@ -13,7 +12,7 @@ describe("SkillMapper", () => {
       relevance: 10,
       slug: "typescript",
       name: "TypeScript",
-      category: "LANGUAGE",
+      category: "Programming",
       disabled: false,
     } as SkillModel;
 
@@ -24,7 +23,7 @@ describe("SkillMapper", () => {
       relevance: 10,
       slug: "typescript",
       name: "TypeScript",
-      category: SkillCategory.LANGUAGE,
+      category: "Programming",
       disabled: false,
     });
   });

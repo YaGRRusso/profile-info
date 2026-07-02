@@ -32,13 +32,8 @@ export class SkillModel extends BaseModel {
   @Prop({ type: String, required: true })
   name: string;
 
-  @Prop({
-    type: String,
-    required: true,
-    enum: ["LANGUAGE", "FRONTEND", "BACKEND", "DATA", "DEVOPS"],
-    index: true,
-  })
-  category: string;
+  @Prop({ type: String, index: true })
+  category?: string;
 }
 
 export const SkillSchema = SchemaFactory.createForClass(SkillModel);

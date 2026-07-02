@@ -42,11 +42,11 @@ export class OrganizationModel extends BaseModel {
   @Prop({ type: String, required: true })
   name: string;
 
-  @Prop({ type: String, required: true })
-  website: string;
+  @Prop({ type: String })
+  website?: string;
 
-  @Prop({ type: String, required: true })
-  logo: string;
+  @Prop({ type: String })
+  logo?: string;
 
   @Prop({
     type: [createTranslationModel(OrganizationMessagesModel)],

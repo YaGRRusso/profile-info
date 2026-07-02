@@ -1,8 +1,7 @@
 import { Field, ObjectType } from "@nestjs/graphql";
+import { OptionalField } from "@/core/decorators/optional-field.decorator";
 import { BaseEntity } from "@/core/entities/base.entity";
 import { createPaginatedModel } from "@/core/schemas/paginated.schema";
-import { SkillCategory } from "../enums/category.enum";
-
 @ObjectType()
 export class SkillEntity extends BaseEntity {
   @Field(() => Number)
@@ -14,8 +13,8 @@ export class SkillEntity extends BaseEntity {
   @Field(() => String)
   name: string;
 
-  @Field(() => SkillCategory)
-  category: SkillCategory;
+  @OptionalField(() => String)
+  category?: string;
 
   @Field(() => Boolean)
   disabled: boolean;

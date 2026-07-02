@@ -29,11 +29,11 @@ export class OrganizationEntity extends BaseEntity {
   @Field(() => String)
   name: string;
 
-  @Field(() => String)
-  website: string;
+  @Field(() => String, { nullable: true })
+  website?: string;
 
-  @Field(() => String)
-  logo: string;
+  @Field(() => String, { nullable: true })
+  logo?: string;
 
   @Field(() => [OrganizationTranslationLocale])
   i18n: OrganizationTranslationLocale[];
