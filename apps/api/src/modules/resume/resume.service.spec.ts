@@ -126,4 +126,53 @@ describe("ResumeService", () => {
       })
     );
   });
+
+  it("should include course descriptions in certifications", async () => {
+    usersService.findOneById.mockResolvedValue({
+      id: userId,
+      name: "Alice",
+      email: "alice@profile.info",
+      role: UserRole.USER,
+      i18n: [],
+      urls: [],
+      skillIds: [],
+    });
+
+    skillsService.findManyById.mockResolvedValue([]);
+    experiencesService.findMany.mockResolvedValue({ nodes: [] });
+    educationsService.findMany.mockResolvedValue({ nodes: [] });
+    projectsService.findMany.mockResolvedValue({ nodes: [] });
+    organizationsService.findManyById.mockResolvedValue([
+      { id: "org-1", name: "Example Org" },
+    ]);
+
+    coursesService.findMany.mockResolvedValue({
+      nodes: [
+        {
+          organizationId: "org-1",
+          hours: 40,
+          i18n: [
+            {
+              locale: "en",
+              messages: {
+                title: "Advanced TypeScript",
+                description: "Deep dive into generics and utility types.",
+              },
+            },
+          ],
+        },
+      ],
+    });
+
+    const document = await service.buildResume(userId, "en");
+
+    expect(document.certifications).toEqual([
+      {
+        title: "Advanced TypeScript",
+        organization: "Example Org",
+        hours: 40,
+        description: "Deep dive into generics and utility types.",
+      },
+    ]);
+  });
 });

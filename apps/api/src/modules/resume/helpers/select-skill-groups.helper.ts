@@ -25,7 +25,7 @@ export function selectResumeSkillGroups(
           .map((item) => resolveSkillTitle(item, locale)),
       }))
       .filter((group) => group.skills.length > 0),
-    [(group) => group.category ?? ""],
-    ["asc"]
+    [(group) => (group.category ? 1 : 0), (group) => group.category],
+    ["asc", "asc"]
   );
 }

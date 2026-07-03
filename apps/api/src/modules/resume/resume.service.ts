@@ -2,7 +2,6 @@ import { Injectable } from "@nestjs/common";
 import { sortDateRange } from "@/common/helpers/daterange.helper";
 import { formatPeriod } from "@/common/helpers/format-period.helper";
 import { pickTranslation } from "@/common/helpers/pick-translation.helper";
-import { truncateText } from "@/common/helpers/truncate-text.helper";
 import { DEFAULT_LOCALE, type LocaleCode } from "@/common/i18n/locales";
 import { toSessionAuthContext } from "@/core/context/auth-context.helper";
 import { UserRole } from "@/core/enums/user-role.enum";
@@ -121,12 +120,7 @@ export class ResumeService {
       title: userTranslation?.messages.title,
       email: user.email,
       phone: user.phone,
-      description: userTranslation?.messages.description
-        ? truncateText(
-            userTranslation.messages.description,
-            RESUME_LIMITS.descriptionMaxLength
-          )
-        : undefined,
+      description: userTranslation?.messages.description || undefined,
       urls: (user.urls ?? []).map(({ title, value }) => ({ title, value })),
     };
 
@@ -181,10 +175,7 @@ export class ResumeService {
           return [
             {
               title: translation.messages.title,
-              description: truncateText(
-                translation.messages.description,
-                RESUME_LIMITS.descriptionMaxLength
-              ),
+              description: translation.messages.description,
               period: formatPeriod(role.period, locale),
             },
           ];
@@ -210,10 +201,7 @@ export class ResumeService {
         String(education.organizationId ?? "")
       );
 
-      const description = truncateText(
-        translation.messages.description,
-        RESUME_LIMITS.descriptionMaxLength
-      );
+      const description = translation.messages.description;
 
       return [
         {
@@ -239,11 +227,14 @@ export class ResumeService {
         String(course.organizationId ?? "")
       );
 
+      const description = translation.messages.description;
+
       return [
         {
           title: translation.messages.title,
           organization: organization?.name ?? "Unknown organization",
           hours: course.hours,
+          description: description || undefined,
         },
       ];
     });
@@ -260,10 +251,7 @@ export class ResumeService {
       return [
         {
           title: translation.messages.title,
-          description: truncateText(
-            translation.messages.description,
-            RESUME_LIMITS.descriptionMaxLength
-          ),
+          description: translation.messages.description,
           url: project.urls?.[0]?.value,
         },
       ];

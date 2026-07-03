@@ -119,4 +119,38 @@ describe("selectResumeSkillGroups", () => {
 
     expect(groups).toEqual([{ category: "OTHER", skills: ["legacy-skill"] }]);
   });
+
+  it("lists uncategorized skills first without mixing categories", () => {
+    const groups = selectResumeSkillGroups(
+      [
+        {
+          id: "1",
+          slug: "nestjs",
+          category: "BACKEND",
+          i18n: [{ locale: "en", messages: { title: "NestJS" } }],
+        },
+        {
+          id: "2",
+          slug: "oratoria",
+          i18n: [{ locale: "pt", messages: { title: "Oratória" } }],
+        },
+        {
+          id: "3",
+          slug: "exemplo",
+          i18n: [{ locale: "pt", messages: { title: "Exemplo" } }],
+        },
+        {
+          id: "4",
+          slug: "abc",
+          i18n: [{ locale: "pt", messages: { title: "Abc" } }],
+        },
+      ] as never,
+      Locale.PT
+    );
+
+    expect(groups).toEqual([
+      { category: "", skills: ["Oratória", "Exemplo", "Abc"] },
+      { category: "BACKEND", skills: ["NestJS"] },
+    ]);
+  });
 });

@@ -147,7 +147,7 @@ inputs use `organizationId` and `skillIds` (no `ownerId` — injected from conte
   `avatar`, `birth`, `address`, `i18n[]` (embed: `locale`, `messages.title`,
   `messages.description`)
 - **Embedded:** `urls[]` (`UrlEmbed`: `title`, `value`), `i18n[]` translations
-- **References:** `skillIds[]` → Skill (ordered; CV display priority per ADR 003)
+- **References:** `skillIds[]` → Skill (ordered; CV display priority)
 - **Delete:** `SUPER_ADMIN` accounts cannot be deleted. Deleting a `USER` emits
   `user.deleted`, which hard-deletes all private entities and API tokens for that `ownerId`.
 
@@ -233,7 +233,7 @@ inputs use `organizationId` and `skillIds` (no `ownerId` — injected from conte
    scalar `ObjectId`).
 3. Education, Course, Project, User, and embedded Experience roles reference **many**
    Skills (`skillIds`: `ObjectId[]`). Same skill `_id` can appear on multiple owners
-   (many-to-many). User `skillIds` order is CV display priority (ADR 003).
+   (many-to-many). User `skillIds` order is CV display priority.
 4. User and Project embed URL pairs; no separate `urls` collection.
 5. Experience embeds an ordered list of roles; each role embeds its own i18n, period, and
    `skillIds[]`.

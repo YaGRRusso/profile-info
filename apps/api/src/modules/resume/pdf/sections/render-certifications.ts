@@ -26,6 +26,7 @@ export function renderCertifications(
       return {
         title: certification.title,
         meta: [certification.organization, hoursLabel],
+        description: certification.description,
       };
     }),
   });

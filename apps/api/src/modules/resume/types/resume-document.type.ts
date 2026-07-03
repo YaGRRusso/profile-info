@@ -38,6 +38,7 @@ export interface ResumeEducation {
 }
 
 export interface ResumeCertification {
+  description?: string;
   hours?: number;
   organization: string;
   title: string;
