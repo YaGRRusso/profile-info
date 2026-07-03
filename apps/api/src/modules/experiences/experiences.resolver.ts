@@ -171,7 +171,7 @@ export class ExperiencesResolver {
     }
   }
 
-  @ResolveField(() => OrganizationEntity)
+  @ResolveField(() => OrganizationEntity, { nullable: true })
   organization(
     @Parent() experience: ExperienceEntity,
     @Context() ctx: GraphqlContext

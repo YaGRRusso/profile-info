@@ -39,11 +39,11 @@ export class CourseEntity extends BaseEntity {
   @Field(() => UserEntity)
   owner: UserEntity;
 
-  @Field(() => ID)
-  organizationId: string;
+  @OptionalField(() => ID)
+  organizationId?: string;
 
-  @Field(() => OrganizationEntity)
-  organization: OrganizationEntity;
+  @OptionalField(() => OrganizationEntity)
+  organization?: OrganizationEntity;
 
   @Field(() => CourseStatus)
   status: CourseStatus;

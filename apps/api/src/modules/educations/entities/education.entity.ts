@@ -41,11 +41,11 @@ export class EducationEntity extends BaseEntity {
   @Field(() => UserEntity)
   owner: UserEntity;
 
-  @Field(() => ID)
-  organizationId: string;
+  @OptionalField(() => ID)
+  organizationId?: string;
 
-  @Field(() => OrganizationEntity)
-  organization: OrganizationEntity;
+  @OptionalField(() => OrganizationEntity)
+  organization?: OrganizationEntity;
 
   @Field(() => EducationLevel)
   level: EducationLevel;

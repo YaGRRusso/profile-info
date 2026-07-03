@@ -68,6 +68,27 @@ describe("EducationMapper", () => {
     });
   });
 
+  it("omits organizationId when the persistence record has no organization", () => {
+    const model = {
+      id: "507f1f77bcf86cd799439011",
+      createdAt: new Date("2024-01-01"),
+      updatedAt: new Date("2024-01-02"),
+      relevance: 0,
+      slug: "informal-course",
+      ownerId,
+      status: EducationStatus.IN_PROGRESS,
+      level: EducationLevel.OTHER,
+      i18n: [
+        {
+          locale: "en",
+          messages: { title: "Informal", description: "No org" },
+        },
+      ],
+    } as EducationModel;
+
+    expect(mapper.toDomain(model).organizationId).toBeUndefined();
+  });
+
   it("maps create input to a persistence payload", () => {
     expect(
       mapper.toPersistenceForCreate({

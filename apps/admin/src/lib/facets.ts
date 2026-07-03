@@ -1,4 +1,5 @@
 /** biome-ignore-all lint/suspicious/noExplicitAny: generic function */
+import { EMPTY_MARKER, isEmptyValue } from "@/lib/empty-value";
 export interface UniqueFacets<T> {
   count: number;
   label: string;
@@ -19,7 +20,7 @@ export function getUniqueFacets<T = string>(
     value: value as T,
     label:
       mapper.get(value as T) ??
-      (value == null || value === "" ? "—" : String(value)),
+      (isEmptyValue(value) ? EMPTY_MARKER : String(value)),
     count,
   }));
 }

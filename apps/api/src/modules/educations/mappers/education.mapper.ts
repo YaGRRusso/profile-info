@@ -42,7 +42,7 @@ export class EducationMapper
       relevance: model.relevance,
       slug: model.slug,
       ownerId: toIdString(model.ownerId) ?? "",
-      organizationId: toIdString(model.organizationId) ?? "",
+      organizationId: toIdString(model.organizationId),
       level: model.level as EducationLevel,
       status: model.status as EducationStatus,
       url: model.url,

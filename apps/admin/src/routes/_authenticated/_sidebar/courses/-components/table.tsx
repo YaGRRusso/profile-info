@@ -30,6 +30,7 @@ import { useQueryState } from "nuqs";
 import { useMemo, useState } from "react";
 import { z } from "zod";
 import { BadgeList } from "@/components/display/badge-list";
+import { EmptyValue } from "@/components/display/empty-value";
 import { Link } from "@/components/display/link";
 import { PLACEHOLDERS } from "@/consts/placeholders";
 import { CourseStatus, UserRole } from "@/generated/graphql/graphql";
@@ -38,6 +39,7 @@ import { usePersistedState } from "@/hooks/custom/use-persisted-state";
 import { useStableValue } from "@/hooks/custom/use-stable-value";
 import type { CourseRow } from "@/hooks/queries/courses";
 import { cn } from "@/lib/cn";
+import { formatDisplayValue, isEmptyValue } from "@/lib/empty-value";
 import { getMinMaxFacets, getUniqueFacets } from "@/lib/facets";
 import { i18nLabel } from "@/lib/i18n";
 import { parseAsShape } from "@/lib/parsers";
@@ -142,9 +144,11 @@ const getColumns = (
     header: "Owner",
     enableGlobalFilter: false,
     enableSorting: false,
-    cell: (data) => (
-      <span className="badge badge-soft badge-sm">{data.getValue()}</span>
-    ),
+    cell: (data) => {
+      const value = data.getValue();
+      if (isEmptyValue(value)) return <EmptyValue />;
+      return <span className="badge badge-soft badge-sm">{value}</span>;
+    },
   }),
   columnHelper.accessor((row) => row.organization?.name ?? "", {
     id: "organization",
@@ -182,7 +186,7 @@ const getColumns = (
   columnHelper.accessor("hours", {
     header: "Hours",
     enableGlobalFilter: false,
-    cell: (data) => data.getValue() ?? "–",
+    cell: (data) => formatDisplayValue(data.getValue()),
   }),
   columnHelper.accessor("relevance", {
     header: "Relevance",

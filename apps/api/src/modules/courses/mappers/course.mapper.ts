@@ -44,7 +44,7 @@ export class CourseMapper
       image: model.image,
       hours: model.hours,
       ownerId: toIdString(model.ownerId) ?? "",
-      organizationId: toIdString(model.organizationId) ?? "",
+      organizationId: toIdString(model.organizationId),
       skillIds: toIdStrings(model.skillIds),
       i18n:
         toTranslationEntityList(model.i18n)?.map((entry) => ({

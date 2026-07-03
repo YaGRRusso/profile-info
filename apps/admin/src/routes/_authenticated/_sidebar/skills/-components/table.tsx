@@ -31,11 +31,13 @@ import { useQueryState } from "nuqs";
 import { useMemo, useState } from "react";
 import { z } from "zod";
 import { BadgeList } from "@/components/display/badge-list";
+import { EmptyValue } from "@/components/display/empty-value";
 import { PLACEHOLDERS } from "@/consts/placeholders";
 import { useActiveFilters } from "@/hooks/custom/use-active-filters";
 import { usePersistedState } from "@/hooks/custom/use-persisted-state";
 import type { SkillRow } from "@/hooks/queries/skills";
 import { cn } from "@/lib/cn";
+import { EMPTY_MARKER } from "@/lib/empty-value";
 import { getUniqueFacets } from "@/lib/facets";
 import { parseAsShape } from "@/lib/parsers";
 import { dateRangeFilter } from "@/lib/table-filters";
@@ -117,7 +119,7 @@ const getColumns = (
     filterFn: "equals",
     cell: (data) => {
       const value = data.getValue();
-      if (!value) return <span className="opacity-50">—</span>;
+      if (!value) return <EmptyValue />;
       return <BadgeList values={[value]} />;
     },
   }),
@@ -370,7 +372,7 @@ export function SkillsTable({
             <option value="">All categories</option>
             {categoryFacets.map(({ value, label, count }) => (
               <option key={String(value)} value={String(value)}>
-                {label || "—"} ({count})
+                {label || EMPTY_MARKER} ({count})
               </option>
             ))}
           </select>

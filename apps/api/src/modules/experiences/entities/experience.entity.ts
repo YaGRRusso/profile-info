@@ -55,11 +55,11 @@ export class ExperienceEntity extends BaseEntity {
   @Field(() => UserEntity)
   owner: UserEntity;
 
-  @Field(() => ID)
-  organizationId: string;
+  @OptionalField(() => ID)
+  organizationId?: string;
 
-  @Field(() => OrganizationEntity)
-  organization: OrganizationEntity;
+  @OptionalField(() => OrganizationEntity)
+  organization?: OrganizationEntity;
 
   @Field(() => ExperienceCategory)
   category: ExperienceCategory;

@@ -73,7 +73,7 @@ export class ExperienceMapper
       relevance: model.relevance,
       slug: model.slug,
       ownerId: toIdString(model.ownerId) ?? "",
-      organizationId: toIdString(model.organizationId) ?? "",
+      organizationId: toIdString(model.organizationId),
       category: model.category as ExperienceCategory,
       roles: model.roles.map(toExperienceRoleRecord),
     };

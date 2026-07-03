@@ -30,6 +30,7 @@ import {
 import { useQueryState } from "nuqs";
 import { useMemo, useState } from "react";
 import { z } from "zod";
+import { EmptyValue } from "@/components/display/empty-value";
 import { Link } from "@/components/display/link";
 import { PLACEHOLDERS } from "@/consts/placeholders";
 import { OrganizationCategory } from "@/generated/graphql/graphql";
@@ -135,7 +136,7 @@ const getColumns = (
     enableSorting: false,
     cell: (data) => {
       const url = data.getValue();
-      if (!url) return null;
+      if (!url) return <EmptyValue />;
       return <Link href={url} />;
     },
   }),
@@ -144,7 +145,7 @@ const getColumns = (
     enableGlobalFilter: false,
     cell: (data) => {
       const url = data.getValue();
-      if (!url) return null;
+      if (!url) return <EmptyValue />;
       return (
         <a className="link" href={url} rel="noreferrer" target="_blank">
           {url}

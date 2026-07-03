@@ -157,7 +157,7 @@ export class EducationsResolver {
     return ctx.loaders.batchUsers.load(education.ownerId);
   }
 
-  @ResolveField(() => OrganizationEntity)
+  @ResolveField(() => OrganizationEntity, { nullable: true })
   organization(
     @Parent() education: EducationEntity,
     @Context() ctx: GraphqlContext

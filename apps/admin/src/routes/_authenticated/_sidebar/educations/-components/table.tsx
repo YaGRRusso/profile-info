@@ -30,6 +30,7 @@ import { useQueryState } from "nuqs";
 import { useMemo, useState } from "react";
 import { z } from "zod";
 import { BadgeList } from "@/components/display/badge-list";
+import { EmptyValue } from "@/components/display/empty-value";
 import { Link } from "@/components/display/link";
 import { PLACEHOLDERS } from "@/consts/placeholders";
 import {
@@ -42,6 +43,7 @@ import { usePersistedState } from "@/hooks/custom/use-persisted-state";
 import { useStableValue } from "@/hooks/custom/use-stable-value";
 import type { EducationRow } from "@/hooks/queries/educations";
 import { cn } from "@/lib/cn";
+import { isEmptyValue } from "@/lib/empty-value";
 import { getMinMaxFacets, getUniqueFacets } from "@/lib/facets";
 import { i18nLabel } from "@/lib/i18n";
 import { parseAsShape } from "@/lib/parsers";
@@ -156,9 +158,11 @@ const getColumns = (
     header: "Owner",
     enableGlobalFilter: false,
     enableSorting: false,
-    cell: (data) => (
-      <span className="badge badge-soft badge-sm">{data.getValue()}</span>
-    ),
+    cell: (data) => {
+      const value = data.getValue();
+      if (isEmptyValue(value)) return <EmptyValue />;
+      return <span className="badge badge-soft badge-sm">{value}</span>;
+    },
   }),
   columnHelper.accessor((row) => row.organization?.name ?? "", {
     id: "organization",
@@ -210,7 +214,7 @@ const getColumns = (
     enableSorting: false,
     cell: (data) => {
       const period = data.getValue();
-      if (!(period?.from || period?.to)) return "–";
+      if (!(period?.from || period?.to)) return <EmptyValue />;
       const from = period.from
         ? new Date(period.from).toLocaleDateString()
         : "?";

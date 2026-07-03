@@ -72,6 +72,30 @@ describe("ExperienceMapper", () => {
     });
   });
 
+  it("omits organizationId when the persistence record has no organization", () => {
+    const model = {
+      id: "507f1f77bcf86cd799439011",
+      createdAt: new Date("2024-01-01"),
+      updatedAt: new Date("2024-01-02"),
+      relevance: 0,
+      slug: "freelance",
+      ownerId,
+      category: ExperienceCategory.FREELANCE,
+      roles: [
+        {
+          i18n: [
+            {
+              locale: "en",
+              messages: { title: "Consultant", description: "No org" },
+            },
+          ],
+        },
+      ],
+    } as ExperienceModel;
+
+    expect(mapper.toDomain(model).organizationId).toBeUndefined();
+  });
+
   it("maps create input to a persistence payload", () => {
     expect(
       mapper.toPersistenceForCreate({

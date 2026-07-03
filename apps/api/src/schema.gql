@@ -61,8 +61,8 @@ type CourseEntity {
   i18n: [CourseTranslationLocale!]!
   id: ID!
   image: String
-  organization: OrganizationEntity!
-  organizationId: ID!
+  organization: OrganizationEntity
+  organizationId: ID
   owner: UserEntity!
   ownerId: ID!
   relevance: Float!
@@ -304,8 +304,8 @@ type EducationEntity {
   id: ID!
   image: String
   level: EducationLevel!
-  organization: OrganizationEntity!
-  organizationId: ID!
+  organization: OrganizationEntity
+  organizationId: ID
   owner: UserEntity!
   ownerId: ID!
   period: DateRangeEntity
@@ -354,8 +354,8 @@ type ExperienceEntity {
   category: ExperienceCategory!
   createdAt: DateTime!
   id: ID!
-  organization: OrganizationEntity!
-  organizationId: ID!
+  organization: OrganizationEntity
+  organizationId: ID
   owner: UserEntity!
   ownerId: ID!
   relevance: Float!

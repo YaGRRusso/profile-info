@@ -82,8 +82,8 @@ export type CourseEntity = {
   i18n: Array<CourseTranslationLocale>;
   id: Scalars['ID']['output'];
   image?: Maybe<Scalars['String']['output']>;
-  organization: OrganizationEntity;
-  organizationId: Scalars['ID']['output'];
+  organization?: Maybe<OrganizationEntity>;
+  organizationId?: Maybe<Scalars['ID']['output']>;
   owner: UserEntity;
   ownerId: Scalars['ID']['output'];
   relevance: Scalars['Float']['output'];
@@ -328,8 +328,8 @@ export type EducationEntity = {
   id: Scalars['ID']['output'];
   image?: Maybe<Scalars['String']['output']>;
   level: EducationLevel;
-  organization: OrganizationEntity;
-  organizationId: Scalars['ID']['output'];
+  organization?: Maybe<OrganizationEntity>;
+  organizationId?: Maybe<Scalars['ID']['output']>;
   owner: UserEntity;
   ownerId: Scalars['ID']['output'];
   period?: Maybe<DateRangeEntity>;
@@ -381,8 +381,8 @@ export type ExperienceEntity = {
   category: ExperienceCategory;
   createdAt: Scalars['DateTime']['output'];
   id: Scalars['ID']['output'];
-  organization: OrganizationEntity;
-  organizationId: Scalars['ID']['output'];
+  organization?: Maybe<OrganizationEntity>;
+  organizationId?: Maybe<Scalars['ID']['output']>;
   owner: UserEntity;
   ownerId: Scalars['ID']['output'];
   relevance: Scalars['Float']['output'];
@@ -1819,7 +1819,7 @@ export type FindManyCoursesQueryVariables = Exact<{
 }>;
 
 
-export type FindManyCoursesQuery = { __typename?: 'Query', findManyCourses: { __typename?: 'PaginatedCourseEntity', found: number, nodes: Array<{ __typename?: 'CourseEntity', id: string, slug: string, status: CourseStatus, relevance: number, url?: string | null, image?: string | null, hours?: number | null, createdAt: any, updatedAt: any, owner: { __typename?: 'UserEntity', id: string, nickname: string, name: string, role: UserRole, email: string, phone?: string | null, avatar?: string | null }, organization: { __typename?: 'OrganizationEntity', id: string, name: string, slug: string }, i18n: Array<{ __typename?: 'CourseTranslationLocale', locale: string, messages: { __typename?: 'CourseMessages', title: string, description: string } }>, skills?: Array<{ __typename?: 'SkillEntity', id: string, slug: string, i18n: Array<{ __typename?: 'SkillTranslationLocale', locale: string, messages: { __typename?: 'SkillMessages', title: string } }> }> | null }> } };
+export type FindManyCoursesQuery = { __typename?: 'Query', findManyCourses: { __typename?: 'PaginatedCourseEntity', found: number, nodes: Array<{ __typename?: 'CourseEntity', id: string, slug: string, status: CourseStatus, relevance: number, url?: string | null, image?: string | null, hours?: number | null, createdAt: any, updatedAt: any, owner: { __typename?: 'UserEntity', id: string, nickname: string, name: string, role: UserRole, email: string, phone?: string | null, avatar?: string | null }, organization?: { __typename?: 'OrganizationEntity', id: string, name: string, slug: string } | null, i18n: Array<{ __typename?: 'CourseTranslationLocale', locale: string, messages: { __typename?: 'CourseMessages', title: string, description: string } }>, skills?: Array<{ __typename?: 'SkillEntity', id: string, slug: string, i18n: Array<{ __typename?: 'SkillTranslationLocale', locale: string, messages: { __typename?: 'SkillMessages', title: string } }> }> | null }> } };
 
 export type DashboardQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -1833,7 +1833,7 @@ export type FindManyEducationsQueryVariables = Exact<{
 }>;
 
 
-export type FindManyEducationsQuery = { __typename?: 'Query', findManyEducations: { __typename?: 'PaginatedEducationEntity', found: number, nodes: Array<{ __typename?: 'EducationEntity', id: string, slug: string, level: EducationLevel, status: EducationStatus, relevance: number, url?: string | null, image?: string | null, createdAt: any, updatedAt: any, owner: { __typename?: 'UserEntity', id: string, nickname: string, name: string, role: UserRole, email: string, phone?: string | null, avatar?: string | null }, organization: { __typename?: 'OrganizationEntity', id: string, name: string, slug: string }, i18n: Array<{ __typename?: 'EducationTranslationLocale', locale: string, messages: { __typename?: 'EducationMessages', title: string, description: string } }>, skills?: Array<{ __typename?: 'SkillEntity', id: string, slug: string, i18n: Array<{ __typename?: 'SkillTranslationLocale', locale: string, messages: { __typename?: 'SkillMessages', title: string } }> }> | null, period?: { __typename?: 'DateRangeEntity', from?: any | null, to?: any | null } | null }> } };
+export type FindManyEducationsQuery = { __typename?: 'Query', findManyEducations: { __typename?: 'PaginatedEducationEntity', found: number, nodes: Array<{ __typename?: 'EducationEntity', id: string, slug: string, level: EducationLevel, status: EducationStatus, relevance: number, url?: string | null, image?: string | null, createdAt: any, updatedAt: any, owner: { __typename?: 'UserEntity', id: string, nickname: string, name: string, role: UserRole, email: string, phone?: string | null, avatar?: string | null }, organization?: { __typename?: 'OrganizationEntity', id: string, name: string, slug: string } | null, i18n: Array<{ __typename?: 'EducationTranslationLocale', locale: string, messages: { __typename?: 'EducationMessages', title: string, description: string } }>, skills?: Array<{ __typename?: 'SkillEntity', id: string, slug: string, i18n: Array<{ __typename?: 'SkillTranslationLocale', locale: string, messages: { __typename?: 'SkillMessages', title: string } }> }> | null, period?: { __typename?: 'DateRangeEntity', from?: any | null, to?: any | null } | null }> } };
 
 export type FindManyExperiencesQueryVariables = Exact<{
   experienceFilters?: InputMaybe<FilterExperienceInput>;
@@ -1842,7 +1842,7 @@ export type FindManyExperiencesQueryVariables = Exact<{
 }>;
 
 
-export type FindManyExperiencesQuery = { __typename?: 'Query', findManyExperiences: { __typename?: 'PaginatedExperienceEntity', found: number, nodes: Array<{ __typename?: 'ExperienceEntity', id: string, slug: string, category: ExperienceCategory, relevance: number, createdAt: any, updatedAt: any, owner: { __typename?: 'UserEntity', id: string, nickname: string, name: string, role: UserRole, email: string, phone?: string | null, avatar?: string | null }, organization: { __typename?: 'OrganizationEntity', id: string, name: string, slug: string }, roles: Array<{ __typename?: 'ExperienceRole', i18n: Array<{ __typename?: 'ExperienceTranslationLocale', locale: string, messages: { __typename?: 'ExperienceMessages', title: string, description: string } }>, period?: { __typename?: 'DateRangeEntity', from?: any | null, to?: any | null } | null, skills?: Array<{ __typename?: 'SkillEntity', id: string, slug: string, i18n: Array<{ __typename?: 'SkillTranslationLocale', locale: string, messages: { __typename?: 'SkillMessages', title: string } }> }> | null }> }> } };
+export type FindManyExperiencesQuery = { __typename?: 'Query', findManyExperiences: { __typename?: 'PaginatedExperienceEntity', found: number, nodes: Array<{ __typename?: 'ExperienceEntity', id: string, slug: string, category: ExperienceCategory, relevance: number, createdAt: any, updatedAt: any, owner: { __typename?: 'UserEntity', id: string, nickname: string, name: string, role: UserRole, email: string, phone?: string | null, avatar?: string | null }, organization?: { __typename?: 'OrganizationEntity', id: string, name: string, slug: string } | null, roles: Array<{ __typename?: 'ExperienceRole', i18n: Array<{ __typename?: 'ExperienceTranslationLocale', locale: string, messages: { __typename?: 'ExperienceMessages', title: string, description: string } }>, period?: { __typename?: 'DateRangeEntity', from?: any | null, to?: any | null } | null, skills?: Array<{ __typename?: 'SkillEntity', id: string, slug: string, i18n: Array<{ __typename?: 'SkillTranslationLocale', locale: string, messages: { __typename?: 'SkillMessages', title: string } }> }> | null }> }> } };
 
 export type FindManyOrganizationsQueryVariables = Exact<{
   organizationFilters?: InputMaybe<FilterOrganizationInput>;
