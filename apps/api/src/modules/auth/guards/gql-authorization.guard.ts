@@ -6,6 +6,11 @@ import {
 } from "@nestjs/common";
 import { Reflector } from "@nestjs/core";
 import { GqlExecutionContext } from "@nestjs/graphql";
+import {
+  AUTHORIZATION_INSUFFICIENT_API_TOKEN_PERMISSIONS,
+  AUTHORIZATION_INSUFFICIENT_PERMISSIONS,
+  AUTHORIZATION_SESSION_REQUIRED,
+} from "@/core/auth/authorization.messages";
 import { hasPermission, isApiToken } from "@/core/context/auth-context.helper";
 import { getGraphqlRequest } from "@/core/context/graphql-context.helper";
 import { ROLES_KEY } from "@/core/decorators/roles.decorator";
@@ -28,7 +33,7 @@ export class GqlAuthorizationGuard implements CanActivate {
       getRouteMetadata<boolean>(this.reflector, context, SESSION_ONLY_KEY) &&
       isApiToken(user)
     ) {
-      throw new ForbiddenException("Session required");
+      throw new ForbiddenException(AUTHORIZATION_SESSION_REQUIRED);
     }
 
     if (isApiToken(user)) {
@@ -40,7 +45,9 @@ export class GqlAuthorizationGuard implements CanActivate {
           : ApiTokenPermission.QUERY;
 
       if (!hasPermission(user, required)) {
-        throw new ForbiddenException("Insufficient API token permissions");
+        throw new ForbiddenException(
+          AUTHORIZATION_INSUFFICIENT_API_TOKEN_PERMISSIONS
+        );
       }
     }
 
@@ -54,7 +61,7 @@ export class GqlAuthorizationGuard implements CanActivate {
       requiredRoles?.length &&
       (!user.role || !requiredRoles.includes(user.role))
     ) {
-      throw new ForbiddenException("Insufficient permissions");
+      throw new ForbiddenException(AUTHORIZATION_INSUFFICIENT_PERMISSIONS);
     }
 
     return true;
