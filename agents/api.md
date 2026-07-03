@@ -173,7 +173,7 @@ Loaded via `--env-file .env.development` / `.env.production` and `ConfigModule`.
 
 Run from `apps/api/` or via root `api:*` aliases: `dev`, `prod`, `build`, `start`, `seed`, `test`, `test:coverage`, `test:e2e`, `typecheck`, `lint`, `format`.
 
-`npm run seed`: wipes profile collections and inserts faker dev data plus `alice@profile.info` / `alice.pass`, `bob@profile.info` / `bob.pass` (USER), and `admin@profile.info` / `pass.123` (SUPER_ADMIN). Logs fixed dev API tokens (`pi_…`) — send as `X-Api-Key` header.
+`npm run seed`: wipes profile collections and inserts faker dev data plus personas (`empty`, `lite`, `joao`, `maria`, `full`, `admin` @ `profile.info`, password `123123`). Deterministic via `faker.seed(20260702)`. Entry: `apps/api/seed/index.ts` (excluded from Nest build). Logs fixed dev API tokens (`pi_…`) — send as `X-Api-Key` header. Persona table and variation rules: `seed/personas.ts`, `seed/helpers/variation.helper.ts`.
 
 - `GET /health`: Terminus health check with MongoDB ping.
 - Test layout: `test/fixtures/` (shared builders — import `@test/fixtures/…` from unit specs), `test/config/` (Jest e2e config, setup/teardown), `test/support/` (Nest bootstrap + `TestAppModule`), `test/e2e/`, `test/integration/`. Path aliases: `@/*` → `src/`, `@test/*` → `test/` (Jest + `tsconfig.json`).

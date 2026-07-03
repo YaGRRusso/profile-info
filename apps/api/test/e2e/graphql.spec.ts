@@ -36,7 +36,7 @@ describe("GraphQL (e2e)", () => {
       name: "Admin",
       nickname: "admin",
       email: "admin@profile.info",
-      password: "pass.123",
+      password: "123123",
       role: UserRole.SUPER_ADMIN,
     });
 
@@ -56,7 +56,7 @@ describe("GraphQL (e2e)", () => {
         }
       `,
       variables: {
-        signInInput: { email: "admin@profile.info", password: "pass.123" },
+        signInInput: { email: "admin@profile.info", password: "123123" },
       },
     });
 

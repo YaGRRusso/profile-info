@@ -105,6 +105,7 @@ See **NestJS GraphQL resolver hot-reload** in `agents/api.md` for a concrete exa
   Configured in root `package.json` `lint-staged`.
 - Types: `tsconfig.base.json` sets `strictNullChecks: true` (not full `strict`). The API package loosens `noImplicitAny` and `strictBindCallApply` to `false`.
 - Naming: files and folders are kebab-case; suffixes signal role (`*.resolver.ts`, `*.service.ts`, `*.schema.ts`, `*.entity.ts`, `*.input.ts`).
+- **No barrel files:** do not add `index.ts` (or similar) modules that re-export siblings (`export * from`, `export { … } from`). Import from the concrete file path instead — barrels widen the module graph and pull in unused code. Exceptions: framework entry points (e.g. `seed/index.ts` CLI), and generated output (e.g. GraphQL codegen).
 - Code artifacts (names, comments, files) are written in English even though project discussion may be in Portuguese.
 - Testing: API uses Jest — unit tests in `src/**/*.spec.ts`; e2e/integration in `test/**/*.spec.ts` (`npm run test` vs `npm run test:e2e`). The admin has no test setup yet.
 
@@ -126,7 +127,7 @@ Root scripts (run from the repo root):
 - `npm run prod`: runs both apps in their `prod` mode.
 - `npm run docker:up` / `npm run docker:down`: start / stop MongoDB via Compose (uses `sudo docker compose`).
 - `npm run api:dev` / `npm run admin:dev`: run a single app in watch mode.
-- `npm run api:seed`: wipe and repopulate MongoDB with a coherent dev dataset (`alice@profile.info` / `alice.pass`, `bob@profile.info` / `bob.pass`, `admin@profile.info` / `pass.123`). See `apps/api/src/seed.ts`.
+- `npm run api:seed`: wipe and repopulate MongoDB with dev personas (`empty`, `lite`, `joao`, `maria`, `full`, `admin` @ `profile.info`, password `123123`). See `apps/api/seed/`.
 - CI (`.github/workflows/deploy.yml`): builds the admin and deploys to GitHub Pages on push to `main`.
 - `npm run api:build` / `npm run admin:build`: build a single app.
 - `npm run api:start` / `npm run admin:start`: start a single app.

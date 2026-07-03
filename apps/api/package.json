@@ -14,7 +14,7 @@
     "prod": "nest start --watch --env-file .env.production",
     "build": "nest build",
     "start": "node --max-old-space-size=512 dist/main",
-    "seed": "node --env-file=.env.development -r ts-node/register -r tsconfig-paths/register src/seed.ts",
+    "seed": "node --env-file=.env.development -r ts-node/register -r tsconfig-paths/register seed/index.ts",
     "test": "jest",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
@@ -98,6 +98,9 @@
       "@/(.*)": [
         "<rootDir>/src/$1"
       ],
+      "@seed/(.*)": [
+        "<rootDir>/seed/$1"
+      ],
       "@test/(.*)": [
         "<rootDir>/test/$1"
       ]
@@ -106,7 +109,7 @@
     "testPathIgnorePatterns": [
       "/node_modules/",
       "/dist/",
-      "/test/"
+      "/test/(?!seed/)"
     ],
     "transform": {
       "^.+\\.(t|j)s$": [
@@ -129,7 +132,8 @@
     "coveragePathIgnorePatterns": [
       "/node_modules/",
       "/dist/",
-      "/test/"
+      "/test/",
+      "/seed/"
     ],
     "testEnvironment": "node"
   }

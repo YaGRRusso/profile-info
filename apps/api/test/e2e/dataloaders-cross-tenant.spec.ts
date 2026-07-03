@@ -315,23 +315,23 @@ describe("Cross-tenant DataLoader isolation (e2e)", () => {
       name: "Admin",
       nickname: "admin",
       email: "admin@profile.info",
-      password: "pass.123",
+      password: "123123",
       role: UserRole.SUPER_ADMIN,
     });
 
-    const alice = await usersService.createOne({
-      name: "Alice",
-      nickname: "alice",
-      email: "alice@profile.info",
-      password: "alice.pass",
+    const joao = await usersService.createOne({
+      name: "João",
+      nickname: "joao",
+      email: "joao@profile.info",
+      password: "123123",
       role: UserRole.USER,
     });
 
     const bob = await usersService.createOne({
-      name: "Bob",
-      nickname: "bob",
-      email: "bob@profile.info",
-      password: "bob.pass",
+      name: "Maria",
+      nickname: "maria",
+      email: "maria@profile.info",
+      password: "123123",
       role: UserRole.USER,
     });
     bobUserId = bob.id;
@@ -357,7 +357,7 @@ describe("Cross-tenant DataLoader isolation (e2e)", () => {
     skillId = skill.id;
     skillSlug = skill.slug;
 
-    const aliceCtx = testAuthContext({ id: alice.id });
+    const joaoCtx = testAuthContext({ id: joao.id });
     const bobCtx = testAuthContext({ id: bob.id });
 
     const rolePayload = {
@@ -371,7 +371,7 @@ describe("Cross-tenant DataLoader isolation (e2e)", () => {
     };
 
     const [aliceExperience, bobExperience] = await Promise.all([
-      experiencesService.createOne(aliceCtx, {
+      experiencesService.createOne(joaoCtx, {
         slug: "shared-exp",
         organizationId,
         category: ExperienceCategory.FULL_TIME,
@@ -398,7 +398,7 @@ describe("Cross-tenant DataLoader isolation (e2e)", () => {
     };
 
     const [aliceCourse, bobCourse] = await Promise.all([
-      coursesService.createOne(aliceCtx, {
+      coursesService.createOne(joaoCtx, {
         slug: "shared-course",
         organizationId,
         status: CourseStatus.COMPLETE,
@@ -415,7 +415,7 @@ describe("Cross-tenant DataLoader isolation (e2e)", () => {
     ]);
 
     const [aliceEducation, bobEducation] = await Promise.all([
-      educationsService.createOne(aliceCtx, {
+      educationsService.createOne(joaoCtx, {
         slug: "shared-education",
         organizationId,
         level: EducationLevel.BACHELOR,
@@ -434,7 +434,7 @@ describe("Cross-tenant DataLoader isolation (e2e)", () => {
     ]);
 
     const [aliceProject, bobProject] = await Promise.all([
-      projectsService.createOne(aliceCtx, {
+      projectsService.createOne(joaoCtx, {
         slug: "shared-project",
         skillIds: [skillId],
         ...localizedContent,
@@ -466,7 +466,7 @@ describe("Cross-tenant DataLoader isolation (e2e)", () => {
         }
       `,
       variables: {
-        signInInput: { email: "bob@profile.info", password: "bob.pass" },
+        signInInput: { email: "maria@profile.info", password: "123123" },
       },
     });
     userBToken = signIn.data?.signIn ?? "";
@@ -494,7 +494,7 @@ describe("Cross-tenant DataLoader isolation (e2e)", () => {
     ]) {
       expect(collection.found).toBe(1);
       expect(collection.nodes).toHaveLength(1);
-      expect(collection.nodes[0]?.owner.email).toBe("bob@profile.info");
+      expect(collection.nodes[0]?.owner.email).toBe("maria@profile.info");
       expect(collection.nodes[0]?.owner.id).toBe(bobUserId);
       expect(collection.nodes[0]?.skills).toEqual([
         { id: skillId, slug: skillSlug },
@@ -566,6 +566,6 @@ describe("Cross-tenant DataLoader isolation (e2e)", () => {
     const nodes = response.data?.[dataKey];
     expect(nodes).toHaveLength(1);
     expect(nodes?.[0]?.id).toBe(bobId);
-    expect(nodes?.[0]?.owner.email).toBe("bob@profile.info");
+    expect(nodes?.[0]?.owner.email).toBe("maria@profile.info");
   });
 });

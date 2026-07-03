@@ -90,18 +90,18 @@ describe("Educations tenant isolation (e2e)", () => {
     organizationsService = testApp.module.get(OrganizationsService);
 
     await usersService.createOne({
-      name: "Alice",
-      nickname: "alice",
-      email: "alice@profile.info",
-      password: "alice.pass",
+      name: "João",
+      nickname: "joao",
+      email: "joao@profile.info",
+      password: "123123",
       role: UserRole.USER,
     });
 
     await usersService.createOne({
-      name: "Bob",
-      nickname: "bob",
-      email: "bob@profile.info",
-      password: "bob.pass",
+      name: "Maria",
+      nickname: "maria",
+      email: "maria@profile.info",
+      password: "123123",
       role: UserRole.USER,
     });
 
@@ -109,7 +109,7 @@ describe("Educations tenant isolation (e2e)", () => {
       name: "Admin",
       nickname: "admin",
       email: "admin@profile.info",
-      password: "pass.123",
+      password: "123123",
       role: UserRole.SUPER_ADMIN,
     });
 
@@ -135,9 +135,9 @@ describe("Educations tenant isolation (e2e)", () => {
       return response.data?.signIn ?? "";
     };
 
-    userAToken = await signIn("alice@profile.info", "alice.pass");
-    userBToken = await signIn("bob@profile.info", "bob.pass");
-    adminToken = await signIn("admin@profile.info", "pass.123");
+    userAToken = await signIn("joao@profile.info", "123123");
+    userBToken = await signIn("maria@profile.info", "123123");
+    adminToken = await signIn("admin@profile.info", "123123");
   });
 
   afterAll(async () => {

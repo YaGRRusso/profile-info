@@ -77,15 +77,15 @@ describe("Ai tools (e2e)", () => {
       name: "Admin",
       nickname: "admin",
       email: "admin@profile.info",
-      password: "pass.123",
+      password: "123123",
       role: UserRole.SUPER_ADMIN,
     });
 
     await usersService.createOne({
-      name: "Alice",
-      nickname: "alice",
-      email: "alice@profile.info",
-      password: "alice.pass",
+      name: "João",
+      nickname: "joao",
+      email: "joao@profile.info",
+      password: "123123",
       role: UserRole.USER,
     });
 
@@ -101,8 +101,8 @@ describe("Ai tools (e2e)", () => {
       return response.data?.signIn ?? "";
     };
 
-    adminToken = await signIn("admin@profile.info", "pass.123");
-    userToken = await signIn("alice@profile.info", "alice.pass");
+    adminToken = await signIn("admin@profile.info", "123123");
+    userToken = await signIn("joao@profile.info", "123123");
   });
 
   afterAll(async () => {

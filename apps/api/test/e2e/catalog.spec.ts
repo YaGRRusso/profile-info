@@ -63,15 +63,15 @@ describe("Catalog reads (e2e)", () => {
       name: "Admin",
       nickname: "admin",
       email: "admin@profile.info",
-      password: "pass.123",
+      password: "123123",
       role: UserRole.SUPER_ADMIN,
     });
 
     await usersService.createOne({
-      name: "Alice",
-      nickname: "alice",
-      email: "alice@profile.info",
-      password: "alice.pass",
+      name: "João",
+      nickname: "joao",
+      email: "joao@profile.info",
+      password: "123123",
       role: UserRole.USER,
     });
 
@@ -97,7 +97,7 @@ describe("Catalog reads (e2e)", () => {
         }
       `,
       variables: {
-        signInInput: { email: "alice@profile.info", password: "alice.pass" },
+        signInInput: { email: "joao@profile.info", password: "123123" },
       },
     });
 

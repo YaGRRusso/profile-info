@@ -17,13 +17,14 @@ test/
 ├── config/           # Jest wiring (lifecycle hooks, env)
 ├── e2e/              # HTTP / GraphQL tests (*.spec.ts)
 ├── fixtures/         # test data builders (import via @test/fixtures/…)
+├── seed/             # seed contract tests (import via @seed/…)
 ├── integration/      # service-level tests (*.spec.ts)
 └── support/          # Nest bootstrap, DB, HTTP helpers (e2e/integration only)
 ```
 
 | Path | Role |
 |------|------|
-| `fixtures/` | Pure builders/fakes shared by unit specs (`src/**/*.spec.ts`) and e2e. Import with `@test/fixtures/…` — not shipped in production. |
+| `fixtures/` | E2e helpers: `signInPersona`, `createTenantUsers` (`@test/fixtures/…`). Credentials match dev seed via `@seed/constants` and `@seed/personas`. |
 | `config/jest-e2e.json` | Jest config **only** for e2e/integration |
 | `config/global-setup.ts` | Runs once before all suites (Mongo in-memory, cache cleanup) |
 | `config/global-teardown.ts` | Runs once after all suites (stop Mongo, cache cleanup) |
@@ -39,11 +40,11 @@ test/
 | Alias | Maps to | Use in |
 |-------|---------|--------|
 | `@/*` | `src/*` | Production code and tests |
+| `@seed/*` | `seed/*` | Dev seed scripts (excluded from Nest build) |
 | `@test/*` | `test/*` | Tests only — fixtures and (from e2e) support helpers |
 
-Unit specs under `src/**/*.spec.ts` import shared builders from `@test/fixtures/…`
-instead of relative paths into `test/`. Fixtures may import production types via `@/`
-but are never compiled into the Nest app (`sourceRoot` is `src/` only).
+Unit specs under `src/**/*.spec.ts` and `test/seed/**/*.spec.ts` import seed builders
+from `@seed/…`. E2e/integration use `@test/fixtures/…` for sign-in and tenant setup.
 
 ---
 
@@ -55,7 +56,7 @@ Jest is configured **twice** on purpose:
 |---|------------|-------------------|
 | Config | `package.json` → `"jest"` | `test/config/jest-e2e.json` |
 | Command | `npm run test` | `npm run test:e2e` |
-| Files | `src/**/*.spec.ts` | `test/e2e/**`, `test/integration/**` (all `*.spec.ts`) |
+| Files | `src/**/*.spec.ts`, `test/seed/**/*.spec.ts` | `test/e2e/**`, `test/integration/**` (all `*.spec.ts`) |
 | App | mocks / isolated modules | full `TestAppModule` + real Mongo |
 
 They do not share setup files. Changes here affect **only** `test:e2e`.

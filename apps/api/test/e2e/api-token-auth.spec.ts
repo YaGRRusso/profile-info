@@ -54,8 +54,8 @@ const GET_ME = `
 
 const QUERY_TOKEN_ID = "674a00000000000000000001";
 const MUTATE_TOKEN_ID = "674a00000000000000000002";
-const QUERY_TOKEN_SECRET = "alice-query-dev-secret-32-chars!!";
-const MUTATE_TOKEN_SECRET = "alice-mutate-dev-secret-32-chars!!";
+const QUERY_TOKEN_SECRET = "joao-query-dev-secret-32-chars!!";
+const MUTATE_TOKEN_SECRET = "joao-mutate-dev-secret-32-chars!!";
 
 describe("API token authentication (e2e)", () => {
   let app: INestApplication<App>;
@@ -74,11 +74,11 @@ describe("API token authentication (e2e)", () => {
       getModelToken(ApiTokenModel.name)
     );
 
-    const alice = await usersService.createOne({
-      name: "Alice",
-      nickname: "alice",
-      email: "alice@profile.info",
-      password: "alice.pass",
+    const joao = await usersService.createOne({
+      name: "João",
+      nickname: "joao",
+      email: "joao@profile.info",
+      password: "123123",
       role: UserRole.USER,
     });
 
@@ -95,14 +95,14 @@ describe("API token authentication (e2e)", () => {
     await apiTokenModel.create([
       {
         _id: QUERY_TOKEN_ID,
-        ownerId: alice.id,
+        ownerId: joao.id,
         name: "Alice query",
         hashedSecret: await hash(QUERY_TOKEN_SECRET, 8),
         permissions: [ApiTokenPermission.QUERY],
       },
       {
         _id: MUTATE_TOKEN_ID,
-        ownerId: alice.id,
+        ownerId: joao.id,
         name: "Alice mutate",
         hashedSecret: await hash(MUTATE_TOKEN_SECRET, 8),
         permissions: [ApiTokenPermission.MUTATE],
@@ -119,7 +119,7 @@ describe("API token authentication (e2e)", () => {
         }
       `,
       variables: {
-        signInInput: { email: "alice@profile.info", password: "alice.pass" },
+        signInInput: { email: "joao@profile.info", password: "123123" },
       },
     });
 
@@ -174,7 +174,7 @@ describe("API token authentication (e2e)", () => {
     });
 
     expect(response.errors).toBeUndefined();
-    expect(response.data?.getMe.email).toBe("alice@profile.info");
+    expect(response.data?.getMe.email).toBe("joao@profile.info");
   });
 
   it("should forbid QUERY tokens from mutations", async () => {

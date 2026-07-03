@@ -26,7 +26,7 @@ describe("ResumeController (e2e)", () => {
       name: "Admin User",
       nickname: "admin",
       email: "admin@profile.info",
-      password: "pass.123",
+      password: "123123",
       role: UserRole.SUPER_ADMIN,
       i18n: [
         {

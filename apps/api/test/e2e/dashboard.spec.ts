@@ -47,8 +47,8 @@ const DASHBOARD_QUERY = `
 describe("Dashboard (e2e)", () => {
   let app: INestApplication<App>;
   let adminToken: string;
-  let aliceToken: string;
-  let bobToken: string;
+  let joaoToken: string;
+  let mariaToken: string;
   let coursesService: CoursesService;
   let educationsService: EducationsService;
   let experiencesService: ExperiencesService;
@@ -71,23 +71,23 @@ describe("Dashboard (e2e)", () => {
       name: "Admin",
       nickname: "admin",
       email: "admin@profile.info",
-      password: "pass.123",
+      password: "123123",
       role: UserRole.SUPER_ADMIN,
     });
 
-    const alice = await usersService.createOne({
-      name: "Alice",
-      nickname: "alice",
-      email: "alice@profile.info",
-      password: "alice.pass",
+    const joao = await usersService.createOne({
+      name: "João",
+      nickname: "joao",
+      email: "joao@profile.info",
+      password: "123123",
       role: UserRole.USER,
     });
 
-    const bob = await usersService.createOne({
-      name: "Bob",
-      nickname: "bob",
-      email: "bob@profile.info",
-      password: "bob.pass",
+    const maria = await usersService.createOne({
+      name: "Maria",
+      nickname: "maria",
+      email: "maria@profile.info",
+      password: "123123",
       role: UserRole.USER,
     });
 
@@ -103,9 +103,9 @@ describe("Dashboard (e2e)", () => {
       return response.data?.signIn ?? "";
     };
 
-    adminToken = await signIn("admin@profile.info", "pass.123");
-    aliceToken = await signIn("alice@profile.info", "alice.pass");
-    bobToken = await signIn("bob@profile.info", "bob.pass");
+    adminToken = await signIn("admin@profile.info", "123123");
+    joaoToken = await signIn("joao@profile.info", "123123");
+    mariaToken = await signIn("maria@profile.info", "123123");
 
     const organization = await organizationsService.createOne({
       slug: "dashboard-org",
@@ -123,10 +123,10 @@ describe("Dashboard (e2e)", () => {
       category: "Programming",
     });
 
-    const aliceCtx = testAuthContext({ id: alice.id });
-    const bobCtx = testAuthContext({ id: bob.id });
+    const joaoCtx = testAuthContext({ id: joao.id });
+    const bobCtx = testAuthContext({ id: maria.id });
 
-    await coursesService.createOne(aliceCtx, {
+    await coursesService.createOne(joaoCtx, {
       slug: "alice-course-complete",
       organizationId,
       status: CourseStatus.COMPLETE,
@@ -138,7 +138,7 @@ describe("Dashboard (e2e)", () => {
       ],
     } as CreateCourseInput);
 
-    await coursesService.createOne(aliceCtx, {
+    await coursesService.createOne(joaoCtx, {
       slug: "alice-course-progress",
       organizationId,
       status: CourseStatus.IN_PROGRESS,
@@ -150,7 +150,7 @@ describe("Dashboard (e2e)", () => {
       ],
     } as CreateCourseInput);
 
-    await educationsService.createOne(aliceCtx, {
+    await educationsService.createOne(joaoCtx, {
       slug: "alice-education",
       organizationId,
       level: EducationLevel.BACHELOR,
@@ -163,7 +163,7 @@ describe("Dashboard (e2e)", () => {
       ],
     } as CreateEducationInput);
 
-    await experiencesService.createOne(aliceCtx, {
+    await experiencesService.createOne(joaoCtx, {
       slug: "alice-experience-full-time",
       organizationId,
       category: ExperienceCategory.FULL_TIME,
@@ -179,7 +179,7 @@ describe("Dashboard (e2e)", () => {
       ],
     } as CreateExperienceInput);
 
-    await experiencesService.createOne(aliceCtx, {
+    await experiencesService.createOne(joaoCtx, {
       slug: "alice-experience-freelance",
       organizationId,
       category: ExperienceCategory.FREELANCE,
@@ -235,7 +235,7 @@ describe("Dashboard (e2e)", () => {
       };
     }>(app, {
       query: DASHBOARD_QUERY,
-      token: aliceToken,
+      token: joaoToken,
     });
 
     expect(response.errors).toBeUndefined();
@@ -266,7 +266,7 @@ describe("Dashboard (e2e)", () => {
       dashboard: { totals: { courses: number; educations: number } };
     }>(app, {
       query: DASHBOARD_QUERY,
-      token: bobToken,
+      token: mariaToken,
     });
 
     expect(response.errors).toBeUndefined();
