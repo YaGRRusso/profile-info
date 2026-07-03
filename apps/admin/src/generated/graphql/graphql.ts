@@ -1,56 +1,19 @@
 /* eslint-disable */
-import { DocumentTypeDecoration } from '@graphql-typed-document-node/core';
-export type Maybe<T> = T | null;
-export type InputMaybe<T> = T | null | undefined;
-export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
-export type MakeOptional<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]?: Maybe<T[SubKey]> };
-export type MakeMaybe<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]: Maybe<T[SubKey]> };
-export type MakeEmpty<T extends { [key: string]: unknown }, K extends keyof T> = { [_ in K]?: never };
+/** Internal type. DO NOT USE DIRECTLY. */
+type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
+/** Internal type. DO NOT USE DIRECTLY. */
 export type Incremental<T> = T | { [P in keyof T]?: P extends ' $fragmentName' | '__typename' ? T[P] : never };
-/** All built-in and custom scalars, mapped to their actual values */
-export type Scalars = {
-  ID: { input: string; output: string; }
-  String: { input: string; output: string; }
-  Boolean: { input: boolean; output: boolean; }
-  Int: { input: number; output: number; }
-  Float: { input: number; output: number; }
-  /** A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format. */
-  DateTime: { input: any; output: any; }
-};
-
-export type AiEntity = {
-  __typename?: 'AiEntity';
-  messages: Array<ChoiceEntity>;
-  usage?: Maybe<UsageEntity>;
-};
-
-export type ApiTokenEntity = {
-  __typename?: 'ApiTokenEntity';
-  createdAt: Scalars['DateTime']['output'];
-  expiresAt?: Maybe<Scalars['DateTime']['output']>;
-  id: Scalars['ID']['output'];
-  name: Scalars['String']['output'];
-  ownerId: Scalars['String']['output'];
-  permissions: Array<ApiTokenPermission>;
-  updatedAt: Scalars['DateTime']['output'];
-};
-
+import { DocumentTypeDecoration } from '@graphql-typed-document-node/core';
 export enum ApiTokenPermission {
   Mutate = 'MUTATE',
   Query = 'QUERY'
 }
 
 export type AtsSummarizeInput = {
-  details?: InputMaybe<Array<DetailInput>>;
-  raw: Scalars['String']['input'];
-  skills: Array<Scalars['String']['input']>;
+  details?: Array<DetailInput> | null | undefined;
+  raw: string;
+  skills: Array<string>;
   type: ResourceType;
-};
-
-export type BatchEntity = {
-  __typename?: 'BatchEntity';
-  failed: Scalars['Int']['output'];
-  succeeded: Scalars['Int']['output'];
 };
 
 export enum ChatFinishReason {
@@ -69,207 +32,147 @@ export enum ChatRole {
   User = 'USER'
 }
 
-export type ChoiceEntity = {
-  __typename?: 'ChoiceEntity';
-  finishReason?: Maybe<ChatFinishReason>;
-  message: MessageEntity;
-};
-
-export type CourseEntity = {
-  __typename?: 'CourseEntity';
-  createdAt: Scalars['DateTime']['output'];
-  hours?: Maybe<Scalars['Int']['output']>;
-  i18n: Array<CourseTranslationLocale>;
-  id: Scalars['ID']['output'];
-  image?: Maybe<Scalars['String']['output']>;
-  organization?: Maybe<OrganizationEntity>;
-  organizationId?: Maybe<Scalars['ID']['output']>;
-  owner: UserEntity;
-  ownerId: Scalars['ID']['output'];
-  relevance: Scalars['Float']['output'];
-  skillIds?: Maybe<Array<Scalars['ID']['output']>>;
-  skills?: Maybe<Array<SkillEntity>>;
-  slug: Scalars['String']['output'];
-  status: CourseStatus;
-  updatedAt: Scalars['DateTime']['output'];
-  url?: Maybe<Scalars['String']['output']>;
-};
-
-export type CourseMessages = {
-  __typename?: 'CourseMessages';
-  description: Scalars['String']['output'];
-  title: Scalars['String']['output'];
-};
-
 export enum CourseStatus {
   Complete = 'COMPLETE',
   Incomplete = 'INCOMPLETE',
   InProgress = 'IN_PROGRESS'
 }
 
-export type CourseTranslationLocale = {
-  __typename?: 'CourseTranslationLocale';
-  locale: Scalars['String']['output'];
-  messages: CourseMessages;
-};
-
 export type CreateApiTokenInput = {
-  expiresAt?: InputMaybe<Scalars['DateTime']['input']>;
-  name: Scalars['String']['input'];
+  expiresAt?: string | null | undefined;
+  name: string;
   permissions: Array<ApiTokenPermission>;
 };
 
 export type CreateCourseInput = {
-  hours?: InputMaybe<Scalars['Int']['input']>;
+  hours?: number | null | undefined;
   i18n: Array<CreateCourseMessagesInputTranslationInput>;
-  image?: InputMaybe<Scalars['String']['input']>;
-  organizationId: Scalars['String']['input'];
-  relevance?: InputMaybe<Scalars['Float']['input']>;
-  skillIds?: InputMaybe<Array<Scalars['String']['input']>>;
-  slug: Scalars['String']['input'];
+  image?: string | null | undefined;
+  organizationId: string;
+  relevance?: number | null | undefined;
+  skillIds?: Array<string> | null | undefined;
+  slug: string;
   status: CourseStatus;
-  url?: InputMaybe<Scalars['String']['input']>;
+  url?: string | null | undefined;
 };
 
 export type CreateCourseMessagesInput = {
-  description: Scalars['String']['input'];
-  title: Scalars['String']['input'];
+  description: string;
+  title: string;
 };
 
 export type CreateCourseMessagesInputTranslationInput = {
-  locale: Scalars['String']['input'];
+  locale: string;
   messages: CreateCourseMessagesInput;
 };
 
 export type CreateEducationInput = {
   i18n: Array<CreateEducationMessagesInputTranslationInput>;
-  image?: InputMaybe<Scalars['String']['input']>;
+  image?: string | null | undefined;
   level: EducationLevel;
-  organizationId: Scalars['String']['input'];
-  period?: InputMaybe<DateRangeInput>;
-  relevance?: InputMaybe<Scalars['Float']['input']>;
-  skillIds?: InputMaybe<Array<Scalars['String']['input']>>;
-  slug: Scalars['String']['input'];
+  organizationId: string;
+  period?: DateRangeInput | null | undefined;
+  relevance?: number | null | undefined;
+  skillIds?: Array<string> | null | undefined;
+  slug: string;
   status: EducationStatus;
-  url?: InputMaybe<Scalars['String']['input']>;
+  url?: string | null | undefined;
 };
 
 export type CreateEducationMessagesInput = {
-  description: Scalars['String']['input'];
-  title: Scalars['String']['input'];
+  description: string;
+  title: string;
 };
 
 export type CreateEducationMessagesInputTranslationInput = {
-  locale: Scalars['String']['input'];
+  locale: string;
   messages: CreateEducationMessagesInput;
 };
 
 export type CreateExperienceInput = {
   category: ExperienceCategory;
-  organizationId: Scalars['String']['input'];
-  relevance?: InputMaybe<Scalars['Float']['input']>;
+  organizationId: string;
+  relevance?: number | null | undefined;
   roles: Array<CreateExperienceRoleInput>;
-  slug: Scalars['String']['input'];
+  slug: string;
 };
 
 export type CreateExperienceMessagesInput = {
-  description: Scalars['String']['input'];
-  title: Scalars['String']['input'];
+  description: string;
+  title: string;
 };
 
 export type CreateExperienceMessagesInputTranslationInput = {
-  locale: Scalars['String']['input'];
+  locale: string;
   messages: CreateExperienceMessagesInput;
 };
 
 export type CreateExperienceRoleInput = {
   i18n: Array<CreateExperienceMessagesInputTranslationInput>;
-  period?: InputMaybe<DateRangeInput>;
-  skillIds?: InputMaybe<Array<Scalars['String']['input']>>;
+  period?: DateRangeInput | null | undefined;
+  skillIds?: Array<string> | null | undefined;
 };
 
 export type CreateOrganizationInput = {
   category: OrganizationCategory;
   i18n: Array<CreateOrganizationMessagesInputTranslationInput>;
-  logo?: InputMaybe<Scalars['String']['input']>;
-  name: Scalars['String']['input'];
-  slug: Scalars['String']['input'];
-  website?: InputMaybe<Scalars['String']['input']>;
+  logo?: string | null | undefined;
+  name: string;
+  slug: string;
+  website?: string | null | undefined;
 };
 
 export type CreateOrganizationMessagesInput = {
-  description: Scalars['String']['input'];
+  description: string;
 };
 
 export type CreateOrganizationMessagesInputTranslationInput = {
-  locale: Scalars['String']['input'];
+  locale: string;
   messages: CreateOrganizationMessagesInput;
 };
 
 export type CreateProjectInput = {
   i18n: Array<CreateProjectMessagesInputTranslationInput>;
-  images?: InputMaybe<Array<Scalars['String']['input']>>;
-  relevance?: InputMaybe<Scalars['Float']['input']>;
-  skillIds?: InputMaybe<Array<Scalars['String']['input']>>;
-  slug: Scalars['String']['input'];
-  urls?: InputMaybe<Array<UrlInput>>;
+  images?: Array<string> | null | undefined;
+  relevance?: number | null | undefined;
+  skillIds?: Array<string> | null | undefined;
+  slug: string;
+  urls?: Array<UrlInput> | null | undefined;
 };
 
 export type CreateProjectMessagesInput = {
-  description: Scalars['String']['input'];
-  title: Scalars['String']['input'];
+  description: string;
+  title: string;
 };
 
 export type CreateProjectMessagesInputTranslationInput = {
-  locale: Scalars['String']['input'];
+  locale: string;
   messages: CreateProjectMessagesInput;
 };
 
 export type CreateSkillInput = {
-  category?: InputMaybe<Scalars['String']['input']>;
+  category?: string | null | undefined;
   i18n: Array<CreateSkillMessagesInputTranslationInput>;
-  slug: Scalars['String']['input'];
+  slug: string;
 };
 
 export type CreateSkillMessagesInput = {
-  title: Scalars['String']['input'];
+  title: string;
 };
 
 export type CreateSkillMessagesInputTranslationInput = {
-  locale: Scalars['String']['input'];
+  locale: string;
   messages: CreateSkillMessagesInput;
 };
 
-export type CreateUserInput = {
-  address?: InputMaybe<Scalars['String']['input']>;
-  avatar?: InputMaybe<Scalars['String']['input']>;
-  birth?: InputMaybe<Scalars['String']['input']>;
-  email: Scalars['String']['input'];
-  i18n?: InputMaybe<Array<CreateUserMessagesInputTranslationInput>>;
-  name: Scalars['String']['input'];
-  nickname: Scalars['String']['input'];
-  password: Scalars['String']['input'];
-  phone?: InputMaybe<Scalars['String']['input']>;
-  role?: InputMaybe<UserRole>;
-  skillIds?: InputMaybe<Array<Scalars['String']['input']>>;
-  urls?: InputMaybe<Array<UrlInput>>;
-};
-
 export type CreateUserMessagesInput = {
-  description?: InputMaybe<Scalars['String']['input']>;
-  title?: InputMaybe<Scalars['String']['input']>;
+  description?: string | null | undefined;
+  title?: string | null | undefined;
 };
 
 export type CreateUserMessagesInputTranslationInput = {
-  locale: Scalars['String']['input'];
+  locale: string;
   messages: CreateUserMessagesInput;
-};
-
-export type DashboardActivityItem = {
-  __typename?: 'DashboardActivityItem';
-  label: Scalars['String']['output'];
-  type: DashboardActivityType;
-  updatedAt: Scalars['DateTime']['output'];
 };
 
 export enum DashboardActivityType {
@@ -281,65 +184,14 @@ export enum DashboardActivityType {
   Skill = 'SKILL'
 }
 
-export type DashboardCount = {
-  __typename?: 'DashboardCount';
-  label: Scalars['String']['output'];
-  value: Scalars['Int']['output'];
-};
-
-export type DashboardEntity = {
-  __typename?: 'DashboardEntity';
-  coursesByStatus: Array<DashboardCount>;
-  experiencesByCategory: Array<DashboardCount>;
-  recentActivity: Array<DashboardActivityItem>;
-  totals: DashboardTotals;
-};
-
-export type DashboardTotals = {
-  __typename?: 'DashboardTotals';
-  courses: Scalars['Int']['output'];
-  educations: Scalars['Int']['output'];
-  experiences: Scalars['Int']['output'];
-  organizations: Scalars['Int']['output'];
-  projects: Scalars['Int']['output'];
-  skills: Scalars['Int']['output'];
-};
-
-export type DateRangeEntity = {
-  __typename?: 'DateRangeEntity';
-  from?: Maybe<Scalars['DateTime']['output']>;
-  to?: Maybe<Scalars['DateTime']['output']>;
-};
-
 export type DateRangeInput = {
-  from?: InputMaybe<Scalars['DateTime']['input']>;
-  to?: InputMaybe<Scalars['DateTime']['input']>;
+  from?: string | null | undefined;
+  to?: string | null | undefined;
 };
 
 export type DetailInput = {
-  key: Scalars['String']['input'];
-  value: Array<Scalars['String']['input']>;
-};
-
-export type EducationEntity = {
-  __typename?: 'EducationEntity';
-  createdAt: Scalars['DateTime']['output'];
-  i18n: Array<EducationTranslationLocale>;
-  id: Scalars['ID']['output'];
-  image?: Maybe<Scalars['String']['output']>;
-  level: EducationLevel;
-  organization?: Maybe<OrganizationEntity>;
-  organizationId?: Maybe<Scalars['ID']['output']>;
-  owner: UserEntity;
-  ownerId: Scalars['ID']['output'];
-  period?: Maybe<DateRangeEntity>;
-  relevance: Scalars['Float']['output'];
-  skillIds?: Maybe<Array<Scalars['ID']['output']>>;
-  skills?: Maybe<Array<SkillEntity>>;
-  slug: Scalars['String']['output'];
-  status: EducationStatus;
-  updatedAt: Scalars['DateTime']['output'];
-  url?: Maybe<Scalars['String']['output']>;
+  key: string;
+  value: Array<string>;
 };
 
 export enum EducationLevel {
@@ -351,23 +203,11 @@ export enum EducationLevel {
   Technical = 'TECHNICAL'
 }
 
-export type EducationMessages = {
-  __typename?: 'EducationMessages';
-  description: Scalars['String']['output'];
-  title: Scalars['String']['output'];
-};
-
 export enum EducationStatus {
   Complete = 'COMPLETE',
   Incomplete = 'INCOMPLETE',
   InProgress = 'IN_PROGRESS'
 }
-
-export type EducationTranslationLocale = {
-  __typename?: 'EducationTranslationLocale';
-  locale: Scalars['String']['output'];
-  messages: EducationMessages;
-};
 
 export enum ExperienceCategory {
   Freelance = 'FREELANCE',
@@ -376,511 +216,68 @@ export enum ExperienceCategory {
   Volunteer = 'VOLUNTEER'
 }
 
-export type ExperienceEntity = {
-  __typename?: 'ExperienceEntity';
-  category: ExperienceCategory;
-  createdAt: Scalars['DateTime']['output'];
-  id: Scalars['ID']['output'];
-  organization?: Maybe<OrganizationEntity>;
-  organizationId?: Maybe<Scalars['ID']['output']>;
-  owner: UserEntity;
-  ownerId: Scalars['ID']['output'];
-  relevance: Scalars['Float']['output'];
-  roles: Array<ExperienceRole>;
-  skills?: Maybe<Array<SkillEntity>>;
-  slug: Scalars['String']['output'];
-  updatedAt: Scalars['DateTime']['output'];
-};
-
-export type ExperienceMessages = {
-  __typename?: 'ExperienceMessages';
-  description: Scalars['String']['output'];
-  title: Scalars['String']['output'];
-};
-
-export type ExperienceRole = {
-  __typename?: 'ExperienceRole';
-  i18n: Array<ExperienceTranslationLocale>;
-  period?: Maybe<DateRangeEntity>;
-  skillIds?: Maybe<Array<Scalars['ID']['output']>>;
-  skills?: Maybe<Array<SkillEntity>>;
-};
-
-export type ExperienceTranslationLocale = {
-  __typename?: 'ExperienceTranslationLocale';
-  locale: Scalars['String']['output'];
-  messages: ExperienceMessages;
-};
-
 export type FilterApiTokenInput = {
-  expiresAt?: InputMaybe<Scalars['DateTime']['input']>;
-  name?: InputMaybe<Scalars['String']['input']>;
-  permissions?: InputMaybe<Array<ApiTokenPermission>>;
+  expiresAt?: string | null | undefined;
+  name?: string | null | undefined;
+  permissions?: Array<ApiTokenPermission> | null | undefined;
 };
 
 export type FilterCourseInput = {
-  hours?: InputMaybe<Scalars['Int']['input']>;
-  i18n?: InputMaybe<Array<CreateCourseMessagesInputTranslationInput>>;
-  image?: InputMaybe<Scalars['String']['input']>;
-  organizationId?: InputMaybe<Scalars['String']['input']>;
-  relevance?: InputMaybe<Scalars['Float']['input']>;
-  skillIds?: InputMaybe<Array<Scalars['String']['input']>>;
-  slug?: InputMaybe<Scalars['String']['input']>;
-  status?: InputMaybe<CourseStatus>;
-  url?: InputMaybe<Scalars['String']['input']>;
+  hours?: number | null | undefined;
+  i18n?: Array<CreateCourseMessagesInputTranslationInput> | null | undefined;
+  image?: string | null | undefined;
+  organizationId?: string | null | undefined;
+  relevance?: number | null | undefined;
+  skillIds?: Array<string> | null | undefined;
+  slug?: string | null | undefined;
+  status?: CourseStatus | null | undefined;
+  url?: string | null | undefined;
 };
 
 export type FilterEducationInput = {
-  i18n?: InputMaybe<Array<CreateEducationMessagesInputTranslationInput>>;
-  image?: InputMaybe<Scalars['String']['input']>;
-  level?: InputMaybe<EducationLevel>;
-  organizationId?: InputMaybe<Scalars['String']['input']>;
-  period?: InputMaybe<DateRangeInput>;
-  relevance?: InputMaybe<Scalars['Float']['input']>;
-  skillIds?: InputMaybe<Array<Scalars['String']['input']>>;
-  slug?: InputMaybe<Scalars['String']['input']>;
-  status?: InputMaybe<EducationStatus>;
-  url?: InputMaybe<Scalars['String']['input']>;
+  i18n?: Array<CreateEducationMessagesInputTranslationInput> | null | undefined;
+  image?: string | null | undefined;
+  level?: EducationLevel | null | undefined;
+  organizationId?: string | null | undefined;
+  period?: DateRangeInput | null | undefined;
+  relevance?: number | null | undefined;
+  skillIds?: Array<string> | null | undefined;
+  slug?: string | null | undefined;
+  status?: EducationStatus | null | undefined;
+  url?: string | null | undefined;
 };
 
 export type FilterExperienceInput = {
-  category?: InputMaybe<ExperienceCategory>;
-  organizationId?: InputMaybe<Scalars['String']['input']>;
-  relevance?: InputMaybe<Scalars['Float']['input']>;
-  roles?: InputMaybe<Array<CreateExperienceRoleInput>>;
-  slug?: InputMaybe<Scalars['String']['input']>;
+  category?: ExperienceCategory | null | undefined;
+  organizationId?: string | null | undefined;
+  relevance?: number | null | undefined;
+  roles?: Array<CreateExperienceRoleInput> | null | undefined;
+  slug?: string | null | undefined;
 };
 
 export type FilterOrganizationInput = {
-  category?: InputMaybe<OrganizationCategory>;
-  disabled?: InputMaybe<Scalars['Boolean']['input']>;
-  i18n?: InputMaybe<Array<CreateOrganizationMessagesInputTranslationInput>>;
-  logo?: InputMaybe<Scalars['String']['input']>;
-  name?: InputMaybe<Scalars['String']['input']>;
-  slug?: InputMaybe<Scalars['String']['input']>;
-  website?: InputMaybe<Scalars['String']['input']>;
+  category?: OrganizationCategory | null | undefined;
+  disabled?: boolean | null | undefined;
+  i18n?: Array<CreateOrganizationMessagesInputTranslationInput> | null | undefined;
+  logo?: string | null | undefined;
+  name?: string | null | undefined;
+  slug?: string | null | undefined;
+  website?: string | null | undefined;
 };
 
 export type FilterProjectInput = {
-  i18n?: InputMaybe<Array<CreateProjectMessagesInputTranslationInput>>;
-  images?: InputMaybe<Array<Scalars['String']['input']>>;
-  relevance?: InputMaybe<Scalars['Float']['input']>;
-  skillIds?: InputMaybe<Array<Scalars['String']['input']>>;
-  slug?: InputMaybe<Scalars['String']['input']>;
-  urls?: InputMaybe<Array<UrlInput>>;
+  i18n?: Array<CreateProjectMessagesInputTranslationInput> | null | undefined;
+  images?: Array<string> | null | undefined;
+  relevance?: number | null | undefined;
+  skillIds?: Array<string> | null | undefined;
+  slug?: string | null | undefined;
+  urls?: Array<UrlInput> | null | undefined;
 };
 
 export type FilterSkillInput = {
-  category?: InputMaybe<Scalars['String']['input']>;
-  disabled?: InputMaybe<Scalars['Boolean']['input']>;
-  slug?: InputMaybe<Scalars['String']['input']>;
-};
-
-export type FilterUserInput = {
-  address?: InputMaybe<Scalars['String']['input']>;
-  avatar?: InputMaybe<Scalars['String']['input']>;
-  birth?: InputMaybe<Scalars['String']['input']>;
-  email?: InputMaybe<Scalars['String']['input']>;
-  i18n?: InputMaybe<Array<CreateUserMessagesInputTranslationInput>>;
-  name?: InputMaybe<Scalars['String']['input']>;
-  nickname?: InputMaybe<Scalars['String']['input']>;
-  phone?: InputMaybe<Scalars['String']['input']>;
-  role?: InputMaybe<UserRole>;
-  urls?: InputMaybe<Array<UrlInput>>;
-};
-
-export type MessageEntity = {
-  __typename?: 'MessageEntity';
-  content: Scalars['String']['output'];
-  reasoning?: Maybe<Scalars['String']['output']>;
-  refusal?: Maybe<Scalars['String']['output']>;
-  role: ChatRole;
-};
-
-export type Mutation = {
-  __typename?: 'Mutation';
-  atsSummarize: AiEntity;
-  createManyCourses: BatchEntity;
-  createManyEducations: BatchEntity;
-  createManyExperiences: BatchEntity;
-  createManyOrganizations: BatchEntity;
-  createManyProjects: BatchEntity;
-  createManySkills: BatchEntity;
-  createManyUsers: BatchEntity;
-  createOneApiToken: NewApiTokenEntity;
-  createOneCourse: CourseEntity;
-  createOneEducation: EducationEntity;
-  createOneExperience: ExperienceEntity;
-  createOneOrganization: OrganizationEntity;
-  createOneProject: ProjectEntity;
-  createOneSkill: SkillEntity;
-  createOneUser: UserEntity;
-  disableManyOrganizations: BatchEntity;
-  disableManySkills: BatchEntity;
-  disableOneOrganization: OrganizationEntity;
-  disableOneSkill: SkillEntity;
-  enableManyOrganizations: BatchEntity;
-  enableManySkills: BatchEntity;
-  enableOneOrganization: OrganizationEntity;
-  enableOneSkill: SkillEntity;
-  removeManyApiTokens: BatchEntity;
-  removeManyCourses: BatchEntity;
-  removeManyEducations: BatchEntity;
-  removeManyExperiences: BatchEntity;
-  removeManyOrganizations: BatchEntity;
-  removeManyProjects: BatchEntity;
-  removeManySkills: BatchEntity;
-  removeManyUsers: BatchEntity;
-  removeOneApiToken: ApiTokenEntity;
-  removeOneCourse: CourseEntity;
-  removeOneEducation: EducationEntity;
-  removeOneExperience: ExperienceEntity;
-  removeOneOrganization: OrganizationEntity;
-  removeOneProject: ProjectEntity;
-  removeOneSkill: SkillEntity;
-  removeOneUser: UserEntity;
-  signIn: Scalars['String']['output'];
-  summarize: AiEntity;
-  translate: AiEntity;
-  updateManyApiTokens: BatchEntity;
-  updateManyCourses: BatchEntity;
-  updateManyEducations: BatchEntity;
-  updateManyExperiences: BatchEntity;
-  updateManyOrganizations: BatchEntity;
-  updateManyProjects: BatchEntity;
-  updateManySkills: BatchEntity;
-  updateManyUsers: BatchEntity;
-  updateMe: UserEntity;
-  updateOneApiToken: ApiTokenEntity;
-  updateOneCourse: CourseEntity;
-  updateOneEducation: EducationEntity;
-  updateOneExperience: ExperienceEntity;
-  updateOneOrganization: OrganizationEntity;
-  updateOneProject: ProjectEntity;
-  updateOneSkill: SkillEntity;
-  updateOneUser: UserEntity;
-};
-
-
-export type MutationAtsSummarizeArgs = {
-  atsSummarizeInput: AtsSummarizeInput;
-};
-
-
-export type MutationCreateManyCoursesArgs = {
-  createCourseInputs: Array<CreateCourseInput>;
-};
-
-
-export type MutationCreateManyEducationsArgs = {
-  createEducationInputs: Array<CreateEducationInput>;
-};
-
-
-export type MutationCreateManyExperiencesArgs = {
-  createExperienceInputs: Array<CreateExperienceInput>;
-};
-
-
-export type MutationCreateManyOrganizationsArgs = {
-  createOrganizationInputs: Array<CreateOrganizationInput>;
-};
-
-
-export type MutationCreateManyProjectsArgs = {
-  createProjectInputs: Array<CreateProjectInput>;
-};
-
-
-export type MutationCreateManySkillsArgs = {
-  createSkillInputs: Array<CreateSkillInput>;
-};
-
-
-export type MutationCreateManyUsersArgs = {
-  createUserInputs: Array<CreateUserInput>;
-};
-
-
-export type MutationCreateOneApiTokenArgs = {
-  createApiTokenInput: CreateApiTokenInput;
-};
-
-
-export type MutationCreateOneCourseArgs = {
-  createCourseInput: CreateCourseInput;
-};
-
-
-export type MutationCreateOneEducationArgs = {
-  createEducationInput: CreateEducationInput;
-};
-
-
-export type MutationCreateOneExperienceArgs = {
-  createExperienceInput: CreateExperienceInput;
-};
-
-
-export type MutationCreateOneOrganizationArgs = {
-  createOrganizationInput: CreateOrganizationInput;
-};
-
-
-export type MutationCreateOneProjectArgs = {
-  createProjectInput: CreateProjectInput;
-};
-
-
-export type MutationCreateOneSkillArgs = {
-  createSkillInput: CreateSkillInput;
-};
-
-
-export type MutationCreateOneUserArgs = {
-  createUserInput: CreateUserInput;
-};
-
-
-export type MutationDisableManyOrganizationsArgs = {
-  organizationIds: Array<Scalars['ID']['input']>;
-};
-
-
-export type MutationDisableManySkillsArgs = {
-  skillIds: Array<Scalars['ID']['input']>;
-};
-
-
-export type MutationDisableOneOrganizationArgs = {
-  organizationId: Scalars['ID']['input'];
-};
-
-
-export type MutationDisableOneSkillArgs = {
-  skillId: Scalars['ID']['input'];
-};
-
-
-export type MutationEnableManyOrganizationsArgs = {
-  organizationIds: Array<Scalars['ID']['input']>;
-};
-
-
-export type MutationEnableManySkillsArgs = {
-  skillIds: Array<Scalars['ID']['input']>;
-};
-
-
-export type MutationEnableOneOrganizationArgs = {
-  organizationId: Scalars['ID']['input'];
-};
-
-
-export type MutationEnableOneSkillArgs = {
-  skillId: Scalars['ID']['input'];
-};
-
-
-export type MutationRemoveManyApiTokensArgs = {
-  apiTokenIds: Array<Scalars['ID']['input']>;
-};
-
-
-export type MutationRemoveManyCoursesArgs = {
-  courseIds: Array<Scalars['ID']['input']>;
-};
-
-
-export type MutationRemoveManyEducationsArgs = {
-  educationIds: Array<Scalars['ID']['input']>;
-};
-
-
-export type MutationRemoveManyExperiencesArgs = {
-  experienceIds: Array<Scalars['ID']['input']>;
-};
-
-
-export type MutationRemoveManyOrganizationsArgs = {
-  organizationIds: Array<Scalars['ID']['input']>;
-};
-
-
-export type MutationRemoveManyProjectsArgs = {
-  projectIds: Array<Scalars['ID']['input']>;
-};
-
-
-export type MutationRemoveManySkillsArgs = {
-  skillIds: Array<Scalars['ID']['input']>;
-};
-
-
-export type MutationRemoveManyUsersArgs = {
-  userIds: Array<Scalars['ID']['input']>;
-};
-
-
-export type MutationRemoveOneApiTokenArgs = {
-  apiTokenId: Scalars['ID']['input'];
-};
-
-
-export type MutationRemoveOneCourseArgs = {
-  courseId: Scalars['ID']['input'];
-};
-
-
-export type MutationRemoveOneEducationArgs = {
-  educationId: Scalars['ID']['input'];
-};
-
-
-export type MutationRemoveOneExperienceArgs = {
-  experienceId: Scalars['ID']['input'];
-};
-
-
-export type MutationRemoveOneOrganizationArgs = {
-  organizationId: Scalars['ID']['input'];
-};
-
-
-export type MutationRemoveOneProjectArgs = {
-  projectId: Scalars['ID']['input'];
-};
-
-
-export type MutationRemoveOneSkillArgs = {
-  skillId: Scalars['ID']['input'];
-};
-
-
-export type MutationRemoveOneUserArgs = {
-  userId: Scalars['ID']['input'];
-};
-
-
-export type MutationSignInArgs = {
-  signInInput: SignInInput;
-};
-
-
-export type MutationSummarizeArgs = {
-  summarizeInput: SummarizeInput;
-};
-
-
-export type MutationTranslateArgs = {
-  translateInput: TranslateInput;
-};
-
-
-export type MutationUpdateManyApiTokensArgs = {
-  apiTokenIds: Array<Scalars['ID']['input']>;
-  updateApiTokenInput: UpdateApiTokenInput;
-};
-
-
-export type MutationUpdateManyCoursesArgs = {
-  courseIds: Array<Scalars['ID']['input']>;
-  updateCourseInput: UpdateCourseInput;
-};
-
-
-export type MutationUpdateManyEducationsArgs = {
-  educationIds: Array<Scalars['ID']['input']>;
-  updateEducationInput: UpdateEducationInput;
-};
-
-
-export type MutationUpdateManyExperiencesArgs = {
-  experienceIds: Array<Scalars['ID']['input']>;
-  updateExperienceInput: UpdateExperienceInput;
-};
-
-
-export type MutationUpdateManyOrganizationsArgs = {
-  organizationIds: Array<Scalars['ID']['input']>;
-  updateOrganizationInput: UpdateOrganizationInput;
-};
-
-
-export type MutationUpdateManyProjectsArgs = {
-  projectIds: Array<Scalars['ID']['input']>;
-  updateProjectInput: UpdateProjectInput;
-};
-
-
-export type MutationUpdateManySkillsArgs = {
-  skillIds: Array<Scalars['ID']['input']>;
-  updateSkillInput: UpdateSkillInput;
-};
-
-
-export type MutationUpdateManyUsersArgs = {
-  updateUserInput: UpdateUserInput;
-  userIds: Array<Scalars['ID']['input']>;
-};
-
-
-export type MutationUpdateMeArgs = {
-  updateMeInput: UpdateMeInput;
-};
-
-
-export type MutationUpdateOneApiTokenArgs = {
-  apiTokenId: Scalars['ID']['input'];
-  updateApiTokenInput: UpdateApiTokenInput;
-};
-
-
-export type MutationUpdateOneCourseArgs = {
-  courseId: Scalars['ID']['input'];
-  updateCourseInput: UpdateCourseInput;
-};
-
-
-export type MutationUpdateOneEducationArgs = {
-  educationId: Scalars['ID']['input'];
-  updateEducationInput: UpdateEducationInput;
-};
-
-
-export type MutationUpdateOneExperienceArgs = {
-  experienceId: Scalars['ID']['input'];
-  updateExperienceInput: UpdateExperienceInput;
-};
-
-
-export type MutationUpdateOneOrganizationArgs = {
-  organizationId: Scalars['ID']['input'];
-  updateOrganizationInput: UpdateOrganizationInput;
-};
-
-
-export type MutationUpdateOneProjectArgs = {
-  projectId: Scalars['ID']['input'];
-  updateProjectInput: UpdateProjectInput;
-};
-
-
-export type MutationUpdateOneSkillArgs = {
-  skillId: Scalars['ID']['input'];
-  updateSkillInput: UpdateSkillInput;
-};
-
-
-export type MutationUpdateOneUserArgs = {
-  updateUserInput: UpdateUserInput;
-  userId: Scalars['ID']['input'];
-};
-
-export type NewApiTokenEntity = {
-  __typename?: 'NewApiTokenEntity';
-  apiToken: ApiTokenEntity;
-  token: Scalars['String']['output'];
+  category?: string | null | undefined;
+  disabled?: boolean | null | undefined;
+  slug?: string | null | undefined;
 };
 
 export enum OrganizationCategory {
@@ -889,340 +286,9 @@ export enum OrganizationCategory {
   School = 'SCHOOL'
 }
 
-export type OrganizationEntity = {
-  __typename?: 'OrganizationEntity';
-  category: OrganizationCategory;
-  createdAt: Scalars['DateTime']['output'];
-  disabled: Scalars['Boolean']['output'];
-  i18n: Array<OrganizationTranslationLocale>;
-  id: Scalars['ID']['output'];
-  logo?: Maybe<Scalars['String']['output']>;
-  name: Scalars['String']['output'];
-  slug: Scalars['String']['output'];
-  updatedAt: Scalars['DateTime']['output'];
-  website?: Maybe<Scalars['String']['output']>;
-};
-
-export type OrganizationMessages = {
-  __typename?: 'OrganizationMessages';
-  description: Scalars['String']['output'];
-};
-
-export type OrganizationTranslationLocale = {
-  __typename?: 'OrganizationTranslationLocale';
-  locale: Scalars['String']['output'];
-  messages: OrganizationMessages;
-};
-
-export type PaginatedApiTokenEntity = {
-  __typename?: 'PaginatedApiTokenEntity';
-  found: Scalars['Float']['output'];
-  nodes: Array<ApiTokenEntity>;
-};
-
-export type PaginatedCourseEntity = {
-  __typename?: 'PaginatedCourseEntity';
-  found: Scalars['Float']['output'];
-  nodes: Array<CourseEntity>;
-};
-
-export type PaginatedEducationEntity = {
-  __typename?: 'PaginatedEducationEntity';
-  found: Scalars['Float']['output'];
-  nodes: Array<EducationEntity>;
-};
-
-export type PaginatedExperienceEntity = {
-  __typename?: 'PaginatedExperienceEntity';
-  found: Scalars['Float']['output'];
-  nodes: Array<ExperienceEntity>;
-};
-
-export type PaginatedOrganizationEntity = {
-  __typename?: 'PaginatedOrganizationEntity';
-  found: Scalars['Float']['output'];
-  nodes: Array<OrganizationEntity>;
-};
-
-export type PaginatedProjectEntity = {
-  __typename?: 'PaginatedProjectEntity';
-  found: Scalars['Float']['output'];
-  nodes: Array<ProjectEntity>;
-};
-
-export type PaginatedSkillEntity = {
-  __typename?: 'PaginatedSkillEntity';
-  found: Scalars['Float']['output'];
-  nodes: Array<SkillEntity>;
-};
-
-export type PaginatedUserEntity = {
-  __typename?: 'PaginatedUserEntity';
-  found: Scalars['Float']['output'];
-  nodes: Array<UserEntity>;
-};
-
 export type PaginationInput = {
-  limit?: InputMaybe<Scalars['Int']['input']>;
-  skip?: InputMaybe<Scalars['Int']['input']>;
-};
-
-export type ProjectEntity = {
-  __typename?: 'ProjectEntity';
-  createdAt: Scalars['DateTime']['output'];
-  i18n: Array<ProjectMessagesTranslationEntity>;
-  id: Scalars['ID']['output'];
-  images?: Maybe<Array<Scalars['String']['output']>>;
-  owner: UserEntity;
-  ownerId: Scalars['ID']['output'];
-  relevance: Scalars['Float']['output'];
-  skillIds?: Maybe<Array<Scalars['ID']['output']>>;
-  skills?: Maybe<Array<SkillEntity>>;
-  slug: Scalars['String']['output'];
-  updatedAt: Scalars['DateTime']['output'];
-  urls?: Maybe<Array<UrlEntity>>;
-};
-
-export type ProjectMessages = {
-  __typename?: 'ProjectMessages';
-  description: Scalars['String']['output'];
-  title: Scalars['String']['output'];
-};
-
-export type ProjectMessagesTranslationEntity = {
-  __typename?: 'ProjectMessagesTranslationEntity';
-  locale: Scalars['String']['output'];
-  messages: ProjectMessages;
-};
-
-export type Query = {
-  __typename?: 'Query';
-  dashboard: DashboardEntity;
-  findManyActiveOrganizations: PaginatedOrganizationEntity;
-  findManyActiveSkills: PaginatedSkillEntity;
-  findManyApiTokenById: Array<ApiTokenEntity>;
-  findManyApiTokens: PaginatedApiTokenEntity;
-  findManyCourseById: Array<CourseEntity>;
-  findManyCourses: PaginatedCourseEntity;
-  findManyEducationById: Array<EducationEntity>;
-  findManyEducations: PaginatedEducationEntity;
-  findManyExperienceById: Array<ExperienceEntity>;
-  findManyExperiences: PaginatedExperienceEntity;
-  findManyOrganizationById: Array<OrganizationEntity>;
-  findManyOrganizations: PaginatedOrganizationEntity;
-  findManyProjectById: Array<ProjectEntity>;
-  findManyProjects: PaginatedProjectEntity;
-  findManySkillById: Array<SkillEntity>;
-  findManySkills: PaginatedSkillEntity;
-  findManyUserById: Array<UserEntity>;
-  findManyUsers: PaginatedUserEntity;
-  findOneApiToken: ApiTokenEntity;
-  findOneApiTokenById: ApiTokenEntity;
-  findOneCourse: CourseEntity;
-  findOneCourseById: CourseEntity;
-  findOneEducation: EducationEntity;
-  findOneEducationById: EducationEntity;
-  findOneExperience: ExperienceEntity;
-  findOneExperienceById: ExperienceEntity;
-  findOneOrganization: OrganizationEntity;
-  findOneOrganizationById: OrganizationEntity;
-  findOneProject: ProjectEntity;
-  findOneProjectById: ProjectEntity;
-  findOneSkill: SkillEntity;
-  findOneSkillById: SkillEntity;
-  findOneUser: UserEntity;
-  findOneUserById: UserEntity;
-  getMe: UserEntity;
-};
-
-
-export type QueryFindManyActiveOrganizationsArgs = {
-  organizationFilters?: InputMaybe<FilterOrganizationInput>;
-  organizationPagination?: InputMaybe<PaginationInput>;
-  organizationSort?: InputMaybe<SortOrganizationInput>;
-};
-
-
-export type QueryFindManyActiveSkillsArgs = {
-  skillFilters?: InputMaybe<FilterSkillInput>;
-  skillPagination?: InputMaybe<PaginationInput>;
-  skillSort?: InputMaybe<SortSkillInput>;
-};
-
-
-export type QueryFindManyApiTokenByIdArgs = {
-  apiTokenIds: Array<Scalars['ID']['input']>;
-};
-
-
-export type QueryFindManyApiTokensArgs = {
-  apiTokenFilters?: InputMaybe<FilterApiTokenInput>;
-  apiTokenPagination?: InputMaybe<PaginationInput>;
-  apiTokenSort?: InputMaybe<SortApiTokenInput>;
-};
-
-
-export type QueryFindManyCourseByIdArgs = {
-  courseIds: Array<Scalars['ID']['input']>;
-};
-
-
-export type QueryFindManyCoursesArgs = {
-  courseFilters?: InputMaybe<FilterCourseInput>;
-  coursePagination?: InputMaybe<PaginationInput>;
-  courseSort?: InputMaybe<SortCourseInput>;
-};
-
-
-export type QueryFindManyEducationByIdArgs = {
-  educationIds: Array<Scalars['ID']['input']>;
-};
-
-
-export type QueryFindManyEducationsArgs = {
-  educationFilters?: InputMaybe<FilterEducationInput>;
-  educationPagination?: InputMaybe<PaginationInput>;
-  educationSort?: InputMaybe<SortEducationInput>;
-};
-
-
-export type QueryFindManyExperienceByIdArgs = {
-  experienceIds: Array<Scalars['ID']['input']>;
-};
-
-
-export type QueryFindManyExperiencesArgs = {
-  experienceFilters?: InputMaybe<FilterExperienceInput>;
-  experiencePagination?: InputMaybe<PaginationInput>;
-  experienceSort?: InputMaybe<SortExperienceInput>;
-};
-
-
-export type QueryFindManyOrganizationByIdArgs = {
-  organizationIds: Array<Scalars['ID']['input']>;
-};
-
-
-export type QueryFindManyOrganizationsArgs = {
-  organizationFilters?: InputMaybe<FilterOrganizationInput>;
-  organizationPagination?: InputMaybe<PaginationInput>;
-  organizationSort?: InputMaybe<SortOrganizationInput>;
-};
-
-
-export type QueryFindManyProjectByIdArgs = {
-  projectIds: Array<Scalars['ID']['input']>;
-};
-
-
-export type QueryFindManyProjectsArgs = {
-  projectFilters?: InputMaybe<FilterProjectInput>;
-  projectPagination?: InputMaybe<PaginationInput>;
-  projectSort?: InputMaybe<SortProjectInput>;
-};
-
-
-export type QueryFindManySkillByIdArgs = {
-  skillIds: Array<Scalars['ID']['input']>;
-};
-
-
-export type QueryFindManySkillsArgs = {
-  skillFilters?: InputMaybe<FilterSkillInput>;
-  skillPagination?: InputMaybe<PaginationInput>;
-  skillSort?: InputMaybe<SortSkillInput>;
-};
-
-
-export type QueryFindManyUserByIdArgs = {
-  userIds: Array<Scalars['ID']['input']>;
-};
-
-
-export type QueryFindManyUsersArgs = {
-  userFilters?: InputMaybe<FilterUserInput>;
-  userPagination?: InputMaybe<PaginationInput>;
-  userSort?: InputMaybe<SortUserInput>;
-};
-
-
-export type QueryFindOneApiTokenArgs = {
-  apiTokenFilters?: InputMaybe<FilterApiTokenInput>;
-};
-
-
-export type QueryFindOneApiTokenByIdArgs = {
-  apiTokenId: Scalars['ID']['input'];
-};
-
-
-export type QueryFindOneCourseArgs = {
-  courseFilters?: InputMaybe<FilterCourseInput>;
-};
-
-
-export type QueryFindOneCourseByIdArgs = {
-  courseId: Scalars['ID']['input'];
-};
-
-
-export type QueryFindOneEducationArgs = {
-  educationFilters?: InputMaybe<FilterEducationInput>;
-};
-
-
-export type QueryFindOneEducationByIdArgs = {
-  educationId: Scalars['ID']['input'];
-};
-
-
-export type QueryFindOneExperienceArgs = {
-  experienceFilters?: InputMaybe<FilterExperienceInput>;
-};
-
-
-export type QueryFindOneExperienceByIdArgs = {
-  experienceId: Scalars['ID']['input'];
-};
-
-
-export type QueryFindOneOrganizationArgs = {
-  organizationFilters?: InputMaybe<FilterOrganizationInput>;
-};
-
-
-export type QueryFindOneOrganizationByIdArgs = {
-  organizationId: Scalars['ID']['input'];
-};
-
-
-export type QueryFindOneProjectArgs = {
-  projectFilters?: InputMaybe<FilterProjectInput>;
-};
-
-
-export type QueryFindOneProjectByIdArgs = {
-  projectId: Scalars['ID']['input'];
-};
-
-
-export type QueryFindOneSkillArgs = {
-  skillFilters?: InputMaybe<FilterSkillInput>;
-};
-
-
-export type QueryFindOneSkillByIdArgs = {
-  skillId: Scalars['ID']['input'];
-};
-
-
-export type QueryFindOneUserArgs = {
-  userFilters?: InputMaybe<FilterUserInput>;
-};
-
-
-export type QueryFindOneUserByIdArgs = {
-  userId: Scalars['ID']['input'];
+  limit?: number | null | undefined;
+  skip?: number | null | undefined;
 };
 
 export enum ResourceType {
@@ -1235,49 +301,27 @@ export enum ResourceType {
 }
 
 export type SignInInput = {
-  email: Scalars['String']['input'];
-  password: Scalars['String']['input'];
-};
-
-export type SkillEntity = {
-  __typename?: 'SkillEntity';
-  category?: Maybe<Scalars['String']['output']>;
-  createdAt: Scalars['DateTime']['output'];
-  disabled: Scalars['Boolean']['output'];
-  i18n: Array<SkillTranslationLocale>;
-  id: Scalars['ID']['output'];
-  slug: Scalars['String']['output'];
-  updatedAt: Scalars['DateTime']['output'];
-};
-
-export type SkillMessages = {
-  __typename?: 'SkillMessages';
-  title: Scalars['String']['output'];
-};
-
-export type SkillTranslationLocale = {
-  __typename?: 'SkillTranslationLocale';
-  locale: Scalars['String']['output'];
-  messages: SkillMessages;
+  email: string;
+  password: string;
 };
 
 export type SortApiTokenInput = {
-  createdAt?: InputMaybe<SortEnum>;
-  expiresAt?: InputMaybe<SortEnum>;
-  name?: InputMaybe<SortEnum>;
-  updatedAt?: InputMaybe<SortEnum>;
+  createdAt?: SortEnum | null | undefined;
+  expiresAt?: SortEnum | null | undefined;
+  name?: SortEnum | null | undefined;
+  updatedAt?: SortEnum | null | undefined;
 };
 
 export type SortCourseInput = {
-  createdAt?: InputMaybe<SortEnum>;
-  relevance?: InputMaybe<SortEnum>;
-  updatedAt?: InputMaybe<SortEnum>;
+  createdAt?: SortEnum | null | undefined;
+  relevance?: SortEnum | null | undefined;
+  updatedAt?: SortEnum | null | undefined;
 };
 
 export type SortEducationInput = {
-  createdAt?: InputMaybe<SortEnum>;
-  relevance?: InputMaybe<SortEnum>;
-  updatedAt?: InputMaybe<SortEnum>;
+  createdAt?: SortEnum | null | undefined;
+  relevance?: SortEnum | null | undefined;
+  updatedAt?: SortEnum | null | undefined;
 };
 
 export enum SortEnum {
@@ -1286,183 +330,123 @@ export enum SortEnum {
 }
 
 export type SortExperienceInput = {
-  createdAt?: InputMaybe<SortEnum>;
-  relevance?: InputMaybe<SortEnum>;
-  updatedAt?: InputMaybe<SortEnum>;
+  createdAt?: SortEnum | null | undefined;
+  relevance?: SortEnum | null | undefined;
+  updatedAt?: SortEnum | null | undefined;
 };
 
 export type SortOrganizationInput = {
-  createdAt?: InputMaybe<SortEnum>;
-  name?: InputMaybe<SortEnum>;
-  updatedAt?: InputMaybe<SortEnum>;
+  createdAt?: SortEnum | null | undefined;
+  name?: SortEnum | null | undefined;
+  updatedAt?: SortEnum | null | undefined;
 };
 
 export type SortProjectInput = {
-  createdAt?: InputMaybe<SortEnum>;
-  relevance?: InputMaybe<SortEnum>;
-  updatedAt?: InputMaybe<SortEnum>;
+  createdAt?: SortEnum | null | undefined;
+  relevance?: SortEnum | null | undefined;
+  updatedAt?: SortEnum | null | undefined;
 };
 
 export type SortSkillInput = {
-  createdAt?: InputMaybe<SortEnum>;
-  slug?: InputMaybe<SortEnum>;
-  updatedAt?: InputMaybe<SortEnum>;
-};
-
-export type SortUserInput = {
-  createdAt?: InputMaybe<SortEnum>;
-  name?: InputMaybe<SortEnum>;
-  updatedAt?: InputMaybe<SortEnum>;
+  createdAt?: SortEnum | null | undefined;
+  slug?: SortEnum | null | undefined;
+  updatedAt?: SortEnum | null | undefined;
 };
 
 export type SummarizeInput = {
-  details?: InputMaybe<Array<DetailInput>>;
-  raw: Scalars['String']['input'];
+  details?: Array<DetailInput> | null | undefined;
+  raw: string;
   type: ResourceType;
 };
 
 export type TranslateInput = {
-  raw: Scalars['String']['input'];
-  sourceLanguage?: InputMaybe<Scalars['String']['input']>;
-  targetLanguage: Scalars['String']['input'];
+  raw: string;
+  sourceLanguage?: string | null | undefined;
+  targetLanguage: string;
 };
 
 export type UpdateApiTokenInput = {
-  expiresAt?: InputMaybe<Scalars['DateTime']['input']>;
-  name?: InputMaybe<Scalars['String']['input']>;
-  permissions?: InputMaybe<Array<ApiTokenPermission>>;
+  expiresAt?: string | null | undefined;
+  name?: string | null | undefined;
+  permissions?: Array<ApiTokenPermission> | null | undefined;
 };
 
 export type UpdateCourseInput = {
-  hours?: InputMaybe<Scalars['Int']['input']>;
-  i18n?: InputMaybe<Array<CreateCourseMessagesInputTranslationInput>>;
-  image?: InputMaybe<Scalars['String']['input']>;
-  organizationId?: InputMaybe<Scalars['String']['input']>;
-  relevance?: InputMaybe<Scalars['Float']['input']>;
-  skillIds?: InputMaybe<Array<Scalars['String']['input']>>;
-  slug?: InputMaybe<Scalars['String']['input']>;
-  status?: InputMaybe<CourseStatus>;
-  url?: InputMaybe<Scalars['String']['input']>;
+  hours?: number | null | undefined;
+  i18n?: Array<CreateCourseMessagesInputTranslationInput> | null | undefined;
+  image?: string | null | undefined;
+  organizationId?: string | null | undefined;
+  relevance?: number | null | undefined;
+  skillIds?: Array<string> | null | undefined;
+  slug?: string | null | undefined;
+  status?: CourseStatus | null | undefined;
+  url?: string | null | undefined;
 };
 
 export type UpdateEducationInput = {
-  i18n?: InputMaybe<Array<CreateEducationMessagesInputTranslationInput>>;
-  image?: InputMaybe<Scalars['String']['input']>;
-  level?: InputMaybe<EducationLevel>;
-  organizationId?: InputMaybe<Scalars['String']['input']>;
-  period?: InputMaybe<DateRangeInput>;
-  relevance?: InputMaybe<Scalars['Float']['input']>;
-  skillIds?: InputMaybe<Array<Scalars['String']['input']>>;
-  slug?: InputMaybe<Scalars['String']['input']>;
-  status?: InputMaybe<EducationStatus>;
-  url?: InputMaybe<Scalars['String']['input']>;
+  i18n?: Array<CreateEducationMessagesInputTranslationInput> | null | undefined;
+  image?: string | null | undefined;
+  level?: EducationLevel | null | undefined;
+  organizationId?: string | null | undefined;
+  period?: DateRangeInput | null | undefined;
+  relevance?: number | null | undefined;
+  skillIds?: Array<string> | null | undefined;
+  slug?: string | null | undefined;
+  status?: EducationStatus | null | undefined;
+  url?: string | null | undefined;
 };
 
 export type UpdateExperienceInput = {
-  category?: InputMaybe<ExperienceCategory>;
-  organizationId?: InputMaybe<Scalars['String']['input']>;
-  relevance?: InputMaybe<Scalars['Float']['input']>;
-  roles?: InputMaybe<Array<CreateExperienceRoleInput>>;
-  slug?: InputMaybe<Scalars['String']['input']>;
+  category?: ExperienceCategory | null | undefined;
+  organizationId?: string | null | undefined;
+  relevance?: number | null | undefined;
+  roles?: Array<CreateExperienceRoleInput> | null | undefined;
+  slug?: string | null | undefined;
 };
 
 export type UpdateMeInput = {
-  address?: InputMaybe<Scalars['String']['input']>;
-  avatar?: InputMaybe<Scalars['String']['input']>;
-  birth?: InputMaybe<Scalars['String']['input']>;
-  email?: InputMaybe<Scalars['String']['input']>;
-  i18n?: InputMaybe<Array<CreateUserMessagesInputTranslationInput>>;
-  name?: InputMaybe<Scalars['String']['input']>;
-  nickname?: InputMaybe<Scalars['String']['input']>;
-  password?: InputMaybe<Scalars['String']['input']>;
-  phone?: InputMaybe<Scalars['String']['input']>;
-  skillIds?: InputMaybe<Array<Scalars['String']['input']>>;
-  urls?: InputMaybe<Array<UrlInput>>;
+  address?: string | null | undefined;
+  avatar?: string | null | undefined;
+  birth?: string | null | undefined;
+  email?: string | null | undefined;
+  i18n?: Array<CreateUserMessagesInputTranslationInput> | null | undefined;
+  name?: string | null | undefined;
+  nickname?: string | null | undefined;
+  password?: string | null | undefined;
+  phone?: string | null | undefined;
+  skillIds?: Array<string> | null | undefined;
+  urls?: Array<UrlInput> | null | undefined;
 };
 
 export type UpdateOrganizationInput = {
-  category?: InputMaybe<OrganizationCategory>;
-  disabled?: InputMaybe<Scalars['Boolean']['input']>;
-  i18n?: InputMaybe<Array<CreateOrganizationMessagesInputTranslationInput>>;
-  logo?: InputMaybe<Scalars['String']['input']>;
-  name?: InputMaybe<Scalars['String']['input']>;
-  slug?: InputMaybe<Scalars['String']['input']>;
-  website?: InputMaybe<Scalars['String']['input']>;
+  category?: OrganizationCategory | null | undefined;
+  disabled?: boolean | null | undefined;
+  i18n?: Array<CreateOrganizationMessagesInputTranslationInput> | null | undefined;
+  logo?: string | null | undefined;
+  name?: string | null | undefined;
+  slug?: string | null | undefined;
+  website?: string | null | undefined;
 };
 
 export type UpdateProjectInput = {
-  i18n?: InputMaybe<Array<CreateProjectMessagesInputTranslationInput>>;
-  images?: InputMaybe<Array<Scalars['String']['input']>>;
-  relevance?: InputMaybe<Scalars['Float']['input']>;
-  skillIds?: InputMaybe<Array<Scalars['String']['input']>>;
-  slug?: InputMaybe<Scalars['String']['input']>;
-  urls?: InputMaybe<Array<UrlInput>>;
+  i18n?: Array<CreateProjectMessagesInputTranslationInput> | null | undefined;
+  images?: Array<string> | null | undefined;
+  relevance?: number | null | undefined;
+  skillIds?: Array<string> | null | undefined;
+  slug?: string | null | undefined;
+  urls?: Array<UrlInput> | null | undefined;
 };
 
 export type UpdateSkillInput = {
-  category?: InputMaybe<Scalars['String']['input']>;
-  disabled?: InputMaybe<Scalars['Boolean']['input']>;
-  i18n?: InputMaybe<Array<CreateSkillMessagesInputTranslationInput>>;
-  slug?: InputMaybe<Scalars['String']['input']>;
-};
-
-export type UpdateUserInput = {
-  address?: InputMaybe<Scalars['String']['input']>;
-  avatar?: InputMaybe<Scalars['String']['input']>;
-  birth?: InputMaybe<Scalars['String']['input']>;
-  email?: InputMaybe<Scalars['String']['input']>;
-  i18n?: InputMaybe<Array<CreateUserMessagesInputTranslationInput>>;
-  name?: InputMaybe<Scalars['String']['input']>;
-  nickname?: InputMaybe<Scalars['String']['input']>;
-  password?: InputMaybe<Scalars['String']['input']>;
-  phone?: InputMaybe<Scalars['String']['input']>;
-  role?: InputMaybe<UserRole>;
-  skillIds?: InputMaybe<Array<Scalars['String']['input']>>;
-  urls?: InputMaybe<Array<UrlInput>>;
-};
-
-export type UrlEntity = {
-  __typename?: 'UrlEntity';
-  title: Scalars['String']['output'];
-  value: Scalars['String']['output'];
+  category?: string | null | undefined;
+  disabled?: boolean | null | undefined;
+  i18n?: Array<CreateSkillMessagesInputTranslationInput> | null | undefined;
+  slug?: string | null | undefined;
 };
 
 export type UrlInput = {
-  title: Scalars['String']['input'];
-  value: Scalars['String']['input'];
-};
-
-export type UsageEntity = {
-  __typename?: 'UsageEntity';
-  completionTokens?: Maybe<Scalars['Float']['output']>;
-  cost?: Maybe<Scalars['Float']['output']>;
-  promptTokens?: Maybe<Scalars['Float']['output']>;
-  totalTokens?: Maybe<Scalars['Float']['output']>;
-};
-
-export type UserEntity = {
-  __typename?: 'UserEntity';
-  address?: Maybe<Scalars['String']['output']>;
-  avatar?: Maybe<Scalars['String']['output']>;
-  birth?: Maybe<Scalars['String']['output']>;
-  createdAt: Scalars['DateTime']['output'];
-  email: Scalars['String']['output'];
-  i18n?: Maybe<Array<UserTranslationLocale>>;
-  id: Scalars['ID']['output'];
-  name: Scalars['String']['output'];
-  nickname: Scalars['String']['output'];
-  phone?: Maybe<Scalars['String']['output']>;
-  role: UserRole;
-  skillIds?: Maybe<Array<Scalars['ID']['output']>>;
-  skills?: Maybe<Array<SkillEntity>>;
-  updatedAt: Scalars['DateTime']['output'];
-  urls?: Maybe<Array<UrlEntity>>;
-};
-
-export type UserMessages = {
-  __typename?: 'UserMessages';
-  description?: Maybe<Scalars['String']['output']>;
-  title?: Maybe<Scalars['String']['output']>;
+  title: string;
+  value: string;
 };
 
 export enum UserRole {
@@ -1470,424 +454,418 @@ export enum UserRole {
   User = 'USER'
 }
 
-export type UserTranslationLocale = {
-  __typename?: 'UserTranslationLocale';
-  locale: Scalars['String']['output'];
-  messages: UserMessages;
-};
-
 export type AtsSummarizeMutationVariables = Exact<{
   atsSummarizeInput: AtsSummarizeInput;
 }>;
 
 
-export type AtsSummarizeMutation = { __typename?: 'Mutation', atsSummarize: { __typename?: 'AiEntity', messages: Array<{ __typename?: 'ChoiceEntity', finishReason?: ChatFinishReason | null, message: { __typename?: 'MessageEntity', content: string, reasoning?: string | null, refusal?: string | null, role: ChatRole } }>, usage?: { __typename?: 'UsageEntity', completionTokens?: number | null, cost?: number | null, promptTokens?: number | null, totalTokens?: number | null } | null } };
+export type AtsSummarizeMutation = { atsSummarize: { messages: Array<{ finishReason: ChatFinishReason | null, message: { content: string, reasoning: string | null, refusal: string | null, role: ChatRole } }>, usage: { completionTokens: number | null, cost: number | null, promptTokens: number | null, totalTokens: number | null } | null } };
 
 export type SummarizeMutationVariables = Exact<{
   summarizeInput: SummarizeInput;
 }>;
 
 
-export type SummarizeMutation = { __typename?: 'Mutation', summarize: { __typename?: 'AiEntity', messages: Array<{ __typename?: 'ChoiceEntity', finishReason?: ChatFinishReason | null, message: { __typename?: 'MessageEntity', content: string, reasoning?: string | null, refusal?: string | null, role: ChatRole } }>, usage?: { __typename?: 'UsageEntity', completionTokens?: number | null, cost?: number | null, promptTokens?: number | null, totalTokens?: number | null } | null } };
+export type SummarizeMutation = { summarize: { messages: Array<{ finishReason: ChatFinishReason | null, message: { content: string, reasoning: string | null, refusal: string | null, role: ChatRole } }>, usage: { completionTokens: number | null, cost: number | null, promptTokens: number | null, totalTokens: number | null } | null } };
 
 export type TranslateMutationVariables = Exact<{
   translateInput: TranslateInput;
 }>;
 
 
-export type TranslateMutation = { __typename?: 'Mutation', translate: { __typename?: 'AiEntity', messages: Array<{ __typename?: 'ChoiceEntity', finishReason?: ChatFinishReason | null, message: { __typename?: 'MessageEntity', content: string, reasoning?: string | null, refusal?: string | null, role: ChatRole } }>, usage?: { __typename?: 'UsageEntity', completionTokens?: number | null, cost?: number | null, promptTokens?: number | null, totalTokens?: number | null } | null } };
+export type TranslateMutation = { translate: { messages: Array<{ finishReason: ChatFinishReason | null, message: { content: string, reasoning: string | null, refusal: string | null, role: ChatRole } }>, usage: { completionTokens: number | null, cost: number | null, promptTokens: number | null, totalTokens: number | null } | null } };
 
 export type CreateOneApiTokenMutationVariables = Exact<{
   createApiTokenInput: CreateApiTokenInput;
 }>;
 
 
-export type CreateOneApiTokenMutation = { __typename?: 'Mutation', createOneApiToken: { __typename?: 'NewApiTokenEntity', token: string, apiToken: { __typename?: 'ApiTokenEntity', id: string, ownerId: string, name: string, permissions: Array<ApiTokenPermission>, expiresAt?: any | null, createdAt: any, updatedAt: any } } };
+export type CreateOneApiTokenMutation = { createOneApiToken: { token: string, apiToken: { id: string, ownerId: string, name: string, permissions: Array<ApiTokenPermission>, expiresAt: string | null, createdAt: string, updatedAt: string } } };
 
 export type UpdateOneApiTokenMutationVariables = Exact<{
-  apiTokenId: Scalars['ID']['input'];
+  apiTokenId: string | number;
   updateApiTokenInput: UpdateApiTokenInput;
 }>;
 
 
-export type UpdateOneApiTokenMutation = { __typename?: 'Mutation', updateOneApiToken: { __typename?: 'ApiTokenEntity', id: string, ownerId: string, name: string, permissions: Array<ApiTokenPermission>, expiresAt?: any | null, createdAt: any, updatedAt: any } };
+export type UpdateOneApiTokenMutation = { updateOneApiToken: { id: string, ownerId: string, name: string, permissions: Array<ApiTokenPermission>, expiresAt: string | null, createdAt: string, updatedAt: string } };
 
 export type UpdateManyApiTokensMutationVariables = Exact<{
-  apiTokenIds: Array<Scalars['ID']['input']> | Scalars['ID']['input'];
+  apiTokenIds: Array<string | number> | string | number;
   updateApiTokenInput: UpdateApiTokenInput;
 }>;
 
 
-export type UpdateManyApiTokensMutation = { __typename?: 'Mutation', updateManyApiTokens: { __typename?: 'BatchEntity', succeeded: number, failed: number } };
+export type UpdateManyApiTokensMutation = { updateManyApiTokens: { succeeded: number, failed: number } };
 
 export type RemoveOneApiTokenMutationVariables = Exact<{
-  apiTokenId: Scalars['ID']['input'];
+  apiTokenId: string | number;
 }>;
 
 
-export type RemoveOneApiTokenMutation = { __typename?: 'Mutation', removeOneApiToken: { __typename?: 'ApiTokenEntity', id: string, name: string, permissions: Array<ApiTokenPermission>, expiresAt?: any | null, createdAt: any, updatedAt: any } };
+export type RemoveOneApiTokenMutation = { removeOneApiToken: { id: string, name: string, permissions: Array<ApiTokenPermission>, expiresAt: string | null, createdAt: string, updatedAt: string } };
 
 export type RemoveManyApiTokensMutationVariables = Exact<{
-  apiTokenIds: Array<Scalars['ID']['input']> | Scalars['ID']['input'];
+  apiTokenIds: Array<string | number> | string | number;
 }>;
 
 
-export type RemoveManyApiTokensMutation = { __typename?: 'Mutation', removeManyApiTokens: { __typename?: 'BatchEntity', succeeded: number, failed: number } };
+export type RemoveManyApiTokensMutation = { removeManyApiTokens: { succeeded: number, failed: number } };
 
 export type SignInMutationVariables = Exact<{
   signInInput: SignInInput;
 }>;
 
 
-export type SignInMutation = { __typename?: 'Mutation', signIn: string };
+export type SignInMutation = { signIn: string };
 
 export type CreateOneCourseMutationVariables = Exact<{
   createCourseInput: CreateCourseInput;
 }>;
 
 
-export type CreateOneCourseMutation = { __typename?: 'Mutation', createOneCourse: { __typename?: 'CourseEntity', id: string, slug: string } };
+export type CreateOneCourseMutation = { createOneCourse: { id: string, slug: string } };
 
 export type UpdateOneCourseMutationVariables = Exact<{
-  courseId: Scalars['ID']['input'];
+  courseId: string | number;
   updateCourseInput: UpdateCourseInput;
 }>;
 
 
-export type UpdateOneCourseMutation = { __typename?: 'Mutation', updateOneCourse: { __typename?: 'CourseEntity', id: string, slug: string } };
+export type UpdateOneCourseMutation = { updateOneCourse: { id: string, slug: string } };
 
 export type UpdateManyCoursesMutationVariables = Exact<{
-  courseIds: Array<Scalars['ID']['input']> | Scalars['ID']['input'];
+  courseIds: Array<string | number> | string | number;
   updateCourseInput: UpdateCourseInput;
 }>;
 
 
-export type UpdateManyCoursesMutation = { __typename?: 'Mutation', updateManyCourses: { __typename?: 'BatchEntity', succeeded: number, failed: number } };
+export type UpdateManyCoursesMutation = { updateManyCourses: { succeeded: number, failed: number } };
 
 export type RemoveOneCourseMutationVariables = Exact<{
-  courseId: Scalars['ID']['input'];
+  courseId: string | number;
 }>;
 
 
-export type RemoveOneCourseMutation = { __typename?: 'Mutation', removeOneCourse: { __typename?: 'CourseEntity', id: string, slug: string } };
+export type RemoveOneCourseMutation = { removeOneCourse: { id: string, slug: string } };
 
 export type RemoveManyCoursesMutationVariables = Exact<{
-  courseIds: Array<Scalars['ID']['input']> | Scalars['ID']['input'];
+  courseIds: Array<string | number> | string | number;
 }>;
 
 
-export type RemoveManyCoursesMutation = { __typename?: 'Mutation', removeManyCourses: { __typename?: 'BatchEntity', succeeded: number, failed: number } };
+export type RemoveManyCoursesMutation = { removeManyCourses: { succeeded: number, failed: number } };
 
 export type CreateOneEducationMutationVariables = Exact<{
   createEducationInput: CreateEducationInput;
 }>;
 
 
-export type CreateOneEducationMutation = { __typename?: 'Mutation', createOneEducation: { __typename?: 'EducationEntity', id: string, slug: string } };
+export type CreateOneEducationMutation = { createOneEducation: { id: string, slug: string } };
 
 export type UpdateOneEducationMutationVariables = Exact<{
-  educationId: Scalars['ID']['input'];
+  educationId: string | number;
   updateEducationInput: UpdateEducationInput;
 }>;
 
 
-export type UpdateOneEducationMutation = { __typename?: 'Mutation', updateOneEducation: { __typename?: 'EducationEntity', id: string, slug: string } };
+export type UpdateOneEducationMutation = { updateOneEducation: { id: string, slug: string } };
 
 export type UpdateManyEducationsMutationVariables = Exact<{
-  educationIds: Array<Scalars['ID']['input']> | Scalars['ID']['input'];
+  educationIds: Array<string | number> | string | number;
   updateEducationInput: UpdateEducationInput;
 }>;
 
 
-export type UpdateManyEducationsMutation = { __typename?: 'Mutation', updateManyEducations: { __typename?: 'BatchEntity', succeeded: number, failed: number } };
+export type UpdateManyEducationsMutation = { updateManyEducations: { succeeded: number, failed: number } };
 
 export type RemoveOneEducationMutationVariables = Exact<{
-  educationId: Scalars['ID']['input'];
+  educationId: string | number;
 }>;
 
 
-export type RemoveOneEducationMutation = { __typename?: 'Mutation', removeOneEducation: { __typename?: 'EducationEntity', id: string, slug: string } };
+export type RemoveOneEducationMutation = { removeOneEducation: { id: string, slug: string } };
 
 export type RemoveManyEducationsMutationVariables = Exact<{
-  educationIds: Array<Scalars['ID']['input']> | Scalars['ID']['input'];
+  educationIds: Array<string | number> | string | number;
 }>;
 
 
-export type RemoveManyEducationsMutation = { __typename?: 'Mutation', removeManyEducations: { __typename?: 'BatchEntity', succeeded: number, failed: number } };
+export type RemoveManyEducationsMutation = { removeManyEducations: { succeeded: number, failed: number } };
 
 export type CreateOneExperienceMutationVariables = Exact<{
   createExperienceInput: CreateExperienceInput;
 }>;
 
 
-export type CreateOneExperienceMutation = { __typename?: 'Mutation', createOneExperience: { __typename?: 'ExperienceEntity', id: string, slug: string } };
+export type CreateOneExperienceMutation = { createOneExperience: { id: string, slug: string } };
 
 export type UpdateOneExperienceMutationVariables = Exact<{
-  experienceId: Scalars['ID']['input'];
+  experienceId: string | number;
   updateExperienceInput: UpdateExperienceInput;
 }>;
 
 
-export type UpdateOneExperienceMutation = { __typename?: 'Mutation', updateOneExperience: { __typename?: 'ExperienceEntity', id: string, slug: string } };
+export type UpdateOneExperienceMutation = { updateOneExperience: { id: string, slug: string } };
 
 export type UpdateManyExperiencesMutationVariables = Exact<{
-  experienceIds: Array<Scalars['ID']['input']> | Scalars['ID']['input'];
+  experienceIds: Array<string | number> | string | number;
   updateExperienceInput: UpdateExperienceInput;
 }>;
 
 
-export type UpdateManyExperiencesMutation = { __typename?: 'Mutation', updateManyExperiences: { __typename?: 'BatchEntity', succeeded: number, failed: number } };
+export type UpdateManyExperiencesMutation = { updateManyExperiences: { succeeded: number, failed: number } };
 
 export type RemoveOneExperienceMutationVariables = Exact<{
-  experienceId: Scalars['ID']['input'];
+  experienceId: string | number;
 }>;
 
 
-export type RemoveOneExperienceMutation = { __typename?: 'Mutation', removeOneExperience: { __typename?: 'ExperienceEntity', id: string, slug: string } };
+export type RemoveOneExperienceMutation = { removeOneExperience: { id: string, slug: string } };
 
 export type RemoveManyExperiencesMutationVariables = Exact<{
-  experienceIds: Array<Scalars['ID']['input']> | Scalars['ID']['input'];
+  experienceIds: Array<string | number> | string | number;
 }>;
 
 
-export type RemoveManyExperiencesMutation = { __typename?: 'Mutation', removeManyExperiences: { __typename?: 'BatchEntity', succeeded: number, failed: number } };
+export type RemoveManyExperiencesMutation = { removeManyExperiences: { succeeded: number, failed: number } };
 
 export type CreateOneOrganizationMutationVariables = Exact<{
   createOrganizationInput: CreateOrganizationInput;
 }>;
 
 
-export type CreateOneOrganizationMutation = { __typename?: 'Mutation', createOneOrganization: { __typename?: 'OrganizationEntity', id: string, slug: string } };
+export type CreateOneOrganizationMutation = { createOneOrganization: { id: string, slug: string } };
 
 export type UpdateOneOrganizationMutationVariables = Exact<{
-  organizationId: Scalars['ID']['input'];
+  organizationId: string | number;
   updateOrganizationInput: UpdateOrganizationInput;
 }>;
 
 
-export type UpdateOneOrganizationMutation = { __typename?: 'Mutation', updateOneOrganization: { __typename?: 'OrganizationEntity', id: string, slug: string } };
+export type UpdateOneOrganizationMutation = { updateOneOrganization: { id: string, slug: string } };
 
 export type UpdateManyOrganizationsMutationVariables = Exact<{
-  organizationIds: Array<Scalars['ID']['input']> | Scalars['ID']['input'];
+  organizationIds: Array<string | number> | string | number;
   updateOrganizationInput: UpdateOrganizationInput;
 }>;
 
 
-export type UpdateManyOrganizationsMutation = { __typename?: 'Mutation', updateManyOrganizations: { __typename?: 'BatchEntity', succeeded: number, failed: number } };
+export type UpdateManyOrganizationsMutation = { updateManyOrganizations: { succeeded: number, failed: number } };
 
 export type DisableOneOrganizationMutationVariables = Exact<{
-  organizationId: Scalars['ID']['input'];
+  organizationId: string | number;
 }>;
 
 
-export type DisableOneOrganizationMutation = { __typename?: 'Mutation', disableOneOrganization: { __typename?: 'OrganizationEntity', id: string, slug: string } };
+export type DisableOneOrganizationMutation = { disableOneOrganization: { id: string, slug: string } };
 
 export type DisableManyOrganizationsMutationVariables = Exact<{
-  organizationIds: Array<Scalars['ID']['input']> | Scalars['ID']['input'];
+  organizationIds: Array<string | number> | string | number;
 }>;
 
 
-export type DisableManyOrganizationsMutation = { __typename?: 'Mutation', disableManyOrganizations: { __typename?: 'BatchEntity', succeeded: number, failed: number } };
+export type DisableManyOrganizationsMutation = { disableManyOrganizations: { succeeded: number, failed: number } };
 
 export type EnableOneOrganizationMutationVariables = Exact<{
-  organizationId: Scalars['ID']['input'];
+  organizationId: string | number;
 }>;
 
 
-export type EnableOneOrganizationMutation = { __typename?: 'Mutation', enableOneOrganization: { __typename?: 'OrganizationEntity', id: string, slug: string } };
+export type EnableOneOrganizationMutation = { enableOneOrganization: { id: string, slug: string } };
 
 export type EnableManyOrganizationsMutationVariables = Exact<{
-  organizationIds: Array<Scalars['ID']['input']> | Scalars['ID']['input'];
+  organizationIds: Array<string | number> | string | number;
 }>;
 
 
-export type EnableManyOrganizationsMutation = { __typename?: 'Mutation', enableManyOrganizations: { __typename?: 'BatchEntity', succeeded: number, failed: number } };
+export type EnableManyOrganizationsMutation = { enableManyOrganizations: { succeeded: number, failed: number } };
 
 export type CreateOneProjectMutationVariables = Exact<{
   createProjectInput: CreateProjectInput;
 }>;
 
 
-export type CreateOneProjectMutation = { __typename?: 'Mutation', createOneProject: { __typename?: 'ProjectEntity', id: string, slug: string } };
+export type CreateOneProjectMutation = { createOneProject: { id: string, slug: string } };
 
 export type UpdateOneProjectMutationVariables = Exact<{
-  projectId: Scalars['ID']['input'];
+  projectId: string | number;
   updateProjectInput: UpdateProjectInput;
 }>;
 
 
-export type UpdateOneProjectMutation = { __typename?: 'Mutation', updateOneProject: { __typename?: 'ProjectEntity', id: string, slug: string } };
+export type UpdateOneProjectMutation = { updateOneProject: { id: string, slug: string } };
 
 export type UpdateManyProjectsMutationVariables = Exact<{
-  projectIds: Array<Scalars['ID']['input']> | Scalars['ID']['input'];
+  projectIds: Array<string | number> | string | number;
   updateProjectInput: UpdateProjectInput;
 }>;
 
 
-export type UpdateManyProjectsMutation = { __typename?: 'Mutation', updateManyProjects: { __typename?: 'BatchEntity', succeeded: number, failed: number } };
+export type UpdateManyProjectsMutation = { updateManyProjects: { succeeded: number, failed: number } };
 
 export type RemoveOneProjectMutationVariables = Exact<{
-  projectId: Scalars['ID']['input'];
+  projectId: string | number;
 }>;
 
 
-export type RemoveOneProjectMutation = { __typename?: 'Mutation', removeOneProject: { __typename?: 'ProjectEntity', id: string, slug: string } };
+export type RemoveOneProjectMutation = { removeOneProject: { id: string, slug: string } };
 
 export type RemoveManyProjectsMutationVariables = Exact<{
-  projectIds: Array<Scalars['ID']['input']> | Scalars['ID']['input'];
+  projectIds: Array<string | number> | string | number;
 }>;
 
 
-export type RemoveManyProjectsMutation = { __typename?: 'Mutation', removeManyProjects: { __typename?: 'BatchEntity', succeeded: number, failed: number } };
+export type RemoveManyProjectsMutation = { removeManyProjects: { succeeded: number, failed: number } };
 
 export type CreateOneSkillMutationVariables = Exact<{
   createSkillInput: CreateSkillInput;
 }>;
 
 
-export type CreateOneSkillMutation = { __typename?: 'Mutation', createOneSkill: { __typename?: 'SkillEntity', id: string, slug: string, category?: string | null, createdAt: any, updatedAt: any, i18n: Array<{ __typename?: 'SkillTranslationLocale', locale: string, messages: { __typename?: 'SkillMessages', title: string } }> } };
+export type CreateOneSkillMutation = { createOneSkill: { id: string, slug: string, category: string | null, createdAt: string, updatedAt: string, i18n: Array<{ locale: string, messages: { title: string } }> } };
 
 export type UpdateOneSkillMutationVariables = Exact<{
-  skillId: Scalars['ID']['input'];
+  skillId: string | number;
   updateSkillInput: UpdateSkillInput;
 }>;
 
 
-export type UpdateOneSkillMutation = { __typename?: 'Mutation', updateOneSkill: { __typename?: 'SkillEntity', id: string, slug: string, category?: string | null, createdAt: any, updatedAt: any, i18n: Array<{ __typename?: 'SkillTranslationLocale', locale: string, messages: { __typename?: 'SkillMessages', title: string } }> } };
+export type UpdateOneSkillMutation = { updateOneSkill: { id: string, slug: string, category: string | null, createdAt: string, updatedAt: string, i18n: Array<{ locale: string, messages: { title: string } }> } };
 
 export type UpdateManySkillsMutationVariables = Exact<{
-  skillIds: Array<Scalars['ID']['input']> | Scalars['ID']['input'];
+  skillIds: Array<string | number> | string | number;
   updateSkillInput: UpdateSkillInput;
 }>;
 
 
-export type UpdateManySkillsMutation = { __typename?: 'Mutation', updateManySkills: { __typename?: 'BatchEntity', succeeded: number, failed: number } };
+export type UpdateManySkillsMutation = { updateManySkills: { succeeded: number, failed: number } };
 
 export type DisableOneSkillMutationVariables = Exact<{
-  skillId: Scalars['ID']['input'];
+  skillId: string | number;
 }>;
 
 
-export type DisableOneSkillMutation = { __typename?: 'Mutation', disableOneSkill: { __typename?: 'SkillEntity', id: string, slug: string } };
+export type DisableOneSkillMutation = { disableOneSkill: { id: string, slug: string } };
 
 export type DisableManySkillsMutationVariables = Exact<{
-  skillIds: Array<Scalars['ID']['input']> | Scalars['ID']['input'];
+  skillIds: Array<string | number> | string | number;
 }>;
 
 
-export type DisableManySkillsMutation = { __typename?: 'Mutation', disableManySkills: { __typename?: 'BatchEntity', succeeded: number, failed: number } };
+export type DisableManySkillsMutation = { disableManySkills: { succeeded: number, failed: number } };
 
 export type EnableOneSkillMutationVariables = Exact<{
-  skillId: Scalars['ID']['input'];
+  skillId: string | number;
 }>;
 
 
-export type EnableOneSkillMutation = { __typename?: 'Mutation', enableOneSkill: { __typename?: 'SkillEntity', id: string, slug: string } };
+export type EnableOneSkillMutation = { enableOneSkill: { id: string, slug: string } };
 
 export type EnableManySkillsMutationVariables = Exact<{
-  skillIds: Array<Scalars['ID']['input']> | Scalars['ID']['input'];
+  skillIds: Array<string | number> | string | number;
 }>;
 
 
-export type EnableManySkillsMutation = { __typename?: 'Mutation', enableManySkills: { __typename?: 'BatchEntity', succeeded: number, failed: number } };
+export type EnableManySkillsMutation = { enableManySkills: { succeeded: number, failed: number } };
 
 export type UpdateMeMutationVariables = Exact<{
   updateMeInput: UpdateMeInput;
 }>;
 
 
-export type UpdateMeMutation = { __typename?: 'Mutation', updateMe: { __typename?: 'UserEntity', id: string, email: string, name: string, nickname: string, role: UserRole, avatar?: string | null, phone?: string | null, birth?: string | null, address?: string | null, i18n?: Array<{ __typename?: 'UserTranslationLocale', locale: string, messages: { __typename?: 'UserMessages', title?: string | null, description?: string | null } }> | null, urls?: Array<{ __typename?: 'UrlEntity', title: string, value: string }> | null } };
+export type UpdateMeMutation = { updateMe: { id: string, email: string, name: string, nickname: string, role: UserRole, avatar: string | null, phone: string | null, birth: string | null, address: string | null, i18n: Array<{ locale: string, messages: { title: string | null, description: string | null } }> | null, urls: Array<{ title: string, value: string }> | null } };
 
 export type FindManyApiTokensQueryVariables = Exact<{
-  apiTokenFilters?: InputMaybe<FilterApiTokenInput>;
-  apiTokenPagination?: InputMaybe<PaginationInput>;
-  apiTokenSort?: InputMaybe<SortApiTokenInput>;
+  apiTokenFilters?: FilterApiTokenInput | null | undefined;
+  apiTokenPagination?: PaginationInput | null | undefined;
+  apiTokenSort?: SortApiTokenInput | null | undefined;
 }>;
 
 
-export type FindManyApiTokensQuery = { __typename?: 'Query', findManyApiTokens: { __typename?: 'PaginatedApiTokenEntity', found: number, nodes: Array<{ __typename?: 'ApiTokenEntity', id: string, ownerId: string, name: string, permissions: Array<ApiTokenPermission>, expiresAt?: any | null, createdAt: any, updatedAt: any }> } };
+export type FindManyApiTokensQuery = { findManyApiTokens: { found: number, nodes: Array<{ id: string, ownerId: string, name: string, permissions: Array<ApiTokenPermission>, expiresAt: string | null, createdAt: string, updatedAt: string }> } };
 
 export type GetMeQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetMeQuery = { __typename?: 'Query', getMe: { __typename?: 'UserEntity', id: string, email: string, name: string, nickname: string, role: UserRole, avatar?: string | null, phone?: string | null, birth?: string | null, address?: string | null, skillIds?: Array<string> | null, i18n?: Array<{ __typename?: 'UserTranslationLocale', locale: string, messages: { __typename?: 'UserMessages', title?: string | null, description?: string | null } }> | null, urls?: Array<{ __typename?: 'UrlEntity', title: string, value: string }> | null, skills?: Array<{ __typename?: 'SkillEntity', id: string, slug: string, i18n: Array<{ __typename?: 'SkillTranslationLocale', locale: string, messages: { __typename?: 'SkillMessages', title: string } }> }> | null } };
+export type GetMeQuery = { getMe: { id: string, email: string, name: string, nickname: string, role: UserRole, avatar: string | null, phone: string | null, birth: string | null, address: string | null, skillIds: Array<string> | null, i18n: Array<{ locale: string, messages: { title: string | null, description: string | null } }> | null, urls: Array<{ title: string, value: string }> | null, skills: Array<{ id: string, slug: string, i18n: Array<{ locale: string, messages: { title: string } }> }> | null } };
 
 export type FindManyCoursesQueryVariables = Exact<{
-  courseFilters?: InputMaybe<FilterCourseInput>;
-  coursePagination?: InputMaybe<PaginationInput>;
-  courseSort?: InputMaybe<SortCourseInput>;
+  courseFilters?: FilterCourseInput | null | undefined;
+  coursePagination?: PaginationInput | null | undefined;
+  courseSort?: SortCourseInput | null | undefined;
 }>;
 
 
-export type FindManyCoursesQuery = { __typename?: 'Query', findManyCourses: { __typename?: 'PaginatedCourseEntity', found: number, nodes: Array<{ __typename?: 'CourseEntity', id: string, slug: string, status: CourseStatus, relevance: number, url?: string | null, image?: string | null, hours?: number | null, createdAt: any, updatedAt: any, owner: { __typename?: 'UserEntity', id: string, nickname: string, name: string, role: UserRole, email: string, phone?: string | null, avatar?: string | null }, organization?: { __typename?: 'OrganizationEntity', id: string, name: string, slug: string } | null, i18n: Array<{ __typename?: 'CourseTranslationLocale', locale: string, messages: { __typename?: 'CourseMessages', title: string, description: string } }>, skills?: Array<{ __typename?: 'SkillEntity', id: string, slug: string, i18n: Array<{ __typename?: 'SkillTranslationLocale', locale: string, messages: { __typename?: 'SkillMessages', title: string } }> }> | null }> } };
+export type FindManyCoursesQuery = { findManyCourses: { found: number, nodes: Array<{ id: string, slug: string, status: CourseStatus, relevance: number, url: string | null, image: string | null, hours: number | null, createdAt: string, updatedAt: string, owner: { id: string, nickname: string, name: string, role: UserRole, email: string, phone: string | null, avatar: string | null }, organization: { id: string, name: string, slug: string } | null, i18n: Array<{ locale: string, messages: { title: string, description: string } }>, skills: Array<{ id: string, slug: string, i18n: Array<{ locale: string, messages: { title: string } }> }> | null }> } };
 
 export type DashboardQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type DashboardQuery = { __typename?: 'Query', dashboard: { __typename?: 'DashboardEntity', totals: { __typename?: 'DashboardTotals', skills: number, courses: number, educations: number, organizations: number, projects: number, experiences: number }, experiencesByCategory: Array<{ __typename?: 'DashboardCount', label: string, value: number }>, coursesByStatus: Array<{ __typename?: 'DashboardCount', label: string, value: number }>, recentActivity: Array<{ __typename?: 'DashboardActivityItem', type: DashboardActivityType, label: string, updatedAt: any }> } };
+export type DashboardQuery = { dashboard: { totals: { skills: number, courses: number, educations: number, organizations: number, projects: number, experiences: number }, experiencesByCategory: Array<{ label: string, value: number }>, coursesByStatus: Array<{ label: string, value: number }>, recentActivity: Array<{ type: DashboardActivityType, label: string, updatedAt: string }> } };
 
 export type FindManyEducationsQueryVariables = Exact<{
-  educationFilters?: InputMaybe<FilterEducationInput>;
-  educationPagination?: InputMaybe<PaginationInput>;
-  educationSort?: InputMaybe<SortEducationInput>;
+  educationFilters?: FilterEducationInput | null | undefined;
+  educationPagination?: PaginationInput | null | undefined;
+  educationSort?: SortEducationInput | null | undefined;
 }>;
 
 
-export type FindManyEducationsQuery = { __typename?: 'Query', findManyEducations: { __typename?: 'PaginatedEducationEntity', found: number, nodes: Array<{ __typename?: 'EducationEntity', id: string, slug: string, level: EducationLevel, status: EducationStatus, relevance: number, url?: string | null, image?: string | null, createdAt: any, updatedAt: any, owner: { __typename?: 'UserEntity', id: string, nickname: string, name: string, role: UserRole, email: string, phone?: string | null, avatar?: string | null }, organization?: { __typename?: 'OrganizationEntity', id: string, name: string, slug: string } | null, i18n: Array<{ __typename?: 'EducationTranslationLocale', locale: string, messages: { __typename?: 'EducationMessages', title: string, description: string } }>, skills?: Array<{ __typename?: 'SkillEntity', id: string, slug: string, i18n: Array<{ __typename?: 'SkillTranslationLocale', locale: string, messages: { __typename?: 'SkillMessages', title: string } }> }> | null, period?: { __typename?: 'DateRangeEntity', from?: any | null, to?: any | null } | null }> } };
+export type FindManyEducationsQuery = { findManyEducations: { found: number, nodes: Array<{ id: string, slug: string, level: EducationLevel, status: EducationStatus, relevance: number, url: string | null, image: string | null, createdAt: string, updatedAt: string, owner: { id: string, nickname: string, name: string, role: UserRole, email: string, phone: string | null, avatar: string | null }, organization: { id: string, name: string, slug: string } | null, i18n: Array<{ locale: string, messages: { title: string, description: string } }>, skills: Array<{ id: string, slug: string, i18n: Array<{ locale: string, messages: { title: string } }> }> | null, period: { from: string | null, to: string | null } | null }> } };
 
 export type FindManyExperiencesQueryVariables = Exact<{
-  experienceFilters?: InputMaybe<FilterExperienceInput>;
-  experiencePagination?: InputMaybe<PaginationInput>;
-  experienceSort?: InputMaybe<SortExperienceInput>;
+  experienceFilters?: FilterExperienceInput | null | undefined;
+  experiencePagination?: PaginationInput | null | undefined;
+  experienceSort?: SortExperienceInput | null | undefined;
 }>;
 
 
-export type FindManyExperiencesQuery = { __typename?: 'Query', findManyExperiences: { __typename?: 'PaginatedExperienceEntity', found: number, nodes: Array<{ __typename?: 'ExperienceEntity', id: string, slug: string, category: ExperienceCategory, relevance: number, createdAt: any, updatedAt: any, owner: { __typename?: 'UserEntity', id: string, nickname: string, name: string, role: UserRole, email: string, phone?: string | null, avatar?: string | null }, organization?: { __typename?: 'OrganizationEntity', id: string, name: string, slug: string } | null, roles: Array<{ __typename?: 'ExperienceRole', i18n: Array<{ __typename?: 'ExperienceTranslationLocale', locale: string, messages: { __typename?: 'ExperienceMessages', title: string, description: string } }>, period?: { __typename?: 'DateRangeEntity', from?: any | null, to?: any | null } | null, skills?: Array<{ __typename?: 'SkillEntity', id: string, slug: string, i18n: Array<{ __typename?: 'SkillTranslationLocale', locale: string, messages: { __typename?: 'SkillMessages', title: string } }> }> | null }> }> } };
+export type FindManyExperiencesQuery = { findManyExperiences: { found: number, nodes: Array<{ id: string, slug: string, category: ExperienceCategory, relevance: number, createdAt: string, updatedAt: string, owner: { id: string, nickname: string, name: string, role: UserRole, email: string, phone: string | null, avatar: string | null }, organization: { id: string, name: string, slug: string } | null, roles: Array<{ i18n: Array<{ locale: string, messages: { title: string, description: string } }>, period: { from: string | null, to: string | null } | null, skills: Array<{ id: string, slug: string, i18n: Array<{ locale: string, messages: { title: string } }> }> | null }> }> } };
 
 export type FindManyOrganizationsQueryVariables = Exact<{
-  organizationFilters?: InputMaybe<FilterOrganizationInput>;
-  organizationPagination?: InputMaybe<PaginationInput>;
-  organizationSort?: InputMaybe<SortOrganizationInput>;
+  organizationFilters?: FilterOrganizationInput | null | undefined;
+  organizationPagination?: PaginationInput | null | undefined;
+  organizationSort?: SortOrganizationInput | null | undefined;
 }>;
 
 
-export type FindManyOrganizationsQuery = { __typename?: 'Query', findManyOrganizations: { __typename?: 'PaginatedOrganizationEntity', found: number, nodes: Array<{ __typename?: 'OrganizationEntity', id: string, name: string, slug: string, category: OrganizationCategory, logo?: string | null, website?: string | null, disabled: boolean, createdAt: any, updatedAt: any, i18n: Array<{ __typename?: 'OrganizationTranslationLocale', locale: string, messages: { __typename?: 'OrganizationMessages', description: string } }> }> } };
+export type FindManyOrganizationsQuery = { findManyOrganizations: { found: number, nodes: Array<{ id: string, name: string, slug: string, category: OrganizationCategory, logo: string | null, website: string | null, disabled: boolean, createdAt: string, updatedAt: string, i18n: Array<{ locale: string, messages: { description: string } }> }> } };
 
 export type FindManyActiveOrganizationsQueryVariables = Exact<{
-  organizationFilters?: InputMaybe<FilterOrganizationInput>;
-  organizationPagination?: InputMaybe<PaginationInput>;
-  organizationSort?: InputMaybe<SortOrganizationInput>;
+  organizationFilters?: FilterOrganizationInput | null | undefined;
+  organizationPagination?: PaginationInput | null | undefined;
+  organizationSort?: SortOrganizationInput | null | undefined;
 }>;
 
 
-export type FindManyActiveOrganizationsQuery = { __typename?: 'Query', findManyActiveOrganizations: { __typename?: 'PaginatedOrganizationEntity', found: number, nodes: Array<{ __typename?: 'OrganizationEntity', id: string, name: string, slug: string, category: OrganizationCategory, logo?: string | null, website?: string | null, disabled: boolean, createdAt: any, updatedAt: any, i18n: Array<{ __typename?: 'OrganizationTranslationLocale', locale: string, messages: { __typename?: 'OrganizationMessages', description: string } }> }> } };
+export type FindManyActiveOrganizationsQuery = { findManyActiveOrganizations: { found: number, nodes: Array<{ id: string, name: string, slug: string, category: OrganizationCategory, logo: string | null, website: string | null, disabled: boolean, createdAt: string, updatedAt: string, i18n: Array<{ locale: string, messages: { description: string } }> }> } };
 
 export type FindManyProjectsQueryVariables = Exact<{
-  projectFilters?: InputMaybe<FilterProjectInput>;
-  projectPagination?: InputMaybe<PaginationInput>;
-  projectSort?: InputMaybe<SortProjectInput>;
+  projectFilters?: FilterProjectInput | null | undefined;
+  projectPagination?: PaginationInput | null | undefined;
+  projectSort?: SortProjectInput | null | undefined;
 }>;
 
 
-export type FindManyProjectsQuery = { __typename?: 'Query', findManyProjects: { __typename?: 'PaginatedProjectEntity', found: number, nodes: Array<{ __typename?: 'ProjectEntity', id: string, slug: string, relevance: number, images?: Array<string> | null, createdAt: any, updatedAt: any, owner: { __typename?: 'UserEntity', id: string, nickname: string, name: string, role: UserRole, email: string, phone?: string | null, avatar?: string | null }, urls?: Array<{ __typename?: 'UrlEntity', title: string, value: string }> | null, i18n: Array<{ __typename?: 'ProjectMessagesTranslationEntity', locale: string, messages: { __typename?: 'ProjectMessages', title: string, description: string } }>, skills?: Array<{ __typename?: 'SkillEntity', id: string, slug: string, i18n: Array<{ __typename?: 'SkillTranslationLocale', locale: string, messages: { __typename?: 'SkillMessages', title: string } }> }> | null }> } };
+export type FindManyProjectsQuery = { findManyProjects: { found: number, nodes: Array<{ id: string, slug: string, relevance: number, images: Array<string> | null, createdAt: string, updatedAt: string, owner: { id: string, nickname: string, name: string, role: UserRole, email: string, phone: string | null, avatar: string | null }, urls: Array<{ title: string, value: string }> | null, i18n: Array<{ locale: string, messages: { title: string, description: string } }>, skills: Array<{ id: string, slug: string, i18n: Array<{ locale: string, messages: { title: string } }> }> | null }> } };
 
 export type FindManySkillsQueryVariables = Exact<{
-  skillFilters?: InputMaybe<FilterSkillInput>;
-  skillPagination?: InputMaybe<PaginationInput>;
-  skillSort?: InputMaybe<SortSkillInput>;
+  skillFilters?: FilterSkillInput | null | undefined;
+  skillPagination?: PaginationInput | null | undefined;
+  skillSort?: SortSkillInput | null | undefined;
 }>;
 
 
-export type FindManySkillsQuery = { __typename?: 'Query', findManySkills: { __typename?: 'PaginatedSkillEntity', found: number, nodes: Array<{ __typename?: 'SkillEntity', id: string, slug: string, category?: string | null, disabled: boolean, createdAt: any, updatedAt: any, i18n: Array<{ __typename?: 'SkillTranslationLocale', locale: string, messages: { __typename?: 'SkillMessages', title: string } }> }> } };
+export type FindManySkillsQuery = { findManySkills: { found: number, nodes: Array<{ id: string, slug: string, category: string | null, disabled: boolean, createdAt: string, updatedAt: string, i18n: Array<{ locale: string, messages: { title: string } }> }> } };
 
 export type FindManyActiveSkillsQueryVariables = Exact<{
-  skillFilters?: InputMaybe<FilterSkillInput>;
-  skillPagination?: InputMaybe<PaginationInput>;
-  skillSort?: InputMaybe<SortSkillInput>;
+  skillFilters?: FilterSkillInput | null | undefined;
+  skillPagination?: PaginationInput | null | undefined;
+  skillSort?: SortSkillInput | null | undefined;
 }>;
 
 
-export type FindManyActiveSkillsQuery = { __typename?: 'Query', findManyActiveSkills: { __typename?: 'PaginatedSkillEntity', found: number, nodes: Array<{ __typename?: 'SkillEntity', id: string, slug: string, category?: string | null, disabled: boolean, createdAt: any, updatedAt: any, i18n: Array<{ __typename?: 'SkillTranslationLocale', locale: string, messages: { __typename?: 'SkillMessages', title: string } }> }> } };
+export type FindManyActiveSkillsQuery = { findManyActiveSkills: { found: number, nodes: Array<{ id: string, slug: string, category: string | null, disabled: boolean, createdAt: string, updatedAt: string, i18n: Array<{ locale: string, messages: { title: string } }> }> } };
 
 export class TypedDocumentString<TResult, TVariables>
   extends String
