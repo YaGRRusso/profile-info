@@ -10,9 +10,9 @@ entries (local) without duplicating the global list.
 
 ## Decision
 
-- Add `scope`: `GLOBAL` | `LOCAL` (default `GLOBAL`).
-- `ownerId` → `User` only when `scope` is `LOCAL`; global rows have no owner.
-- Unique key: `{ scope, ownerId, slug }`. Disabled rows keep the slug — re-enable to reuse.
+- Add `partition`: `GLOBAL` | `LOCAL` (default `GLOBAL`; enum `CatalogPartition`).
+- `ownerId` → `User` only when `partition` is `LOCAL`; global rows have no owner.
+- Unique key: `{ partition, ownerId, slug }`. Disabled rows keep the slug — re-enable to reuse.
 - Invariants (`LOCAL` requires `ownerId`, etc.) live in **services**, not Mongoose hooks.
 - Visibility rule: a user sees **all global** + **own local** entries (active for refs/validators). A super admin sees **all global** + **all users' local** entries.
 
@@ -20,18 +20,18 @@ entries (local) without duplicating the global list.
 
 | Area | What |
 |------|------|
-| Persistence | `scope`, `ownerId`, unique `{ scope, ownerId, slug }` on Skill and Organization |
-| Shared types | `CatalogScope` enum (Mongoose + GraphQL registration) |
-| Docs | `ER_MODEL.md` reflects catalog scope fields |
+| Persistence | `partition`, `ownerId`, unique `{ partition, ownerId, slug }` on Skill and Organization |
+| Shared types | `CatalogPartition` enum (Mongoose + GraphQL); `CatalogScope` type for caller visibility (`scope.type.ts`) |
+| Docs | `ER_MODEL.md` reflects catalog partition fields |
 
 ## Remaining work
 
 | # | What | Notes |
 |---|------|-------|
-| 1 | **API surface** | Expose `scope` / `ownerId` on entities, mappers, inputs, and filters. `create` with `LOCAL` sets `ownerId` from `ctx`. One entity at a time: skills → organizations. |
+| 1 | **API surface** | Expose `partition` / `ownerId` on entities, mappers, inputs, and filters. `create` with `LOCAL` sets `ownerId` from `ctx`. One entity at a time: skills → organizations. |
 | 2 | **Queries & auth** | `findMany` / validators / loaders filter by visibility + `disabled`. `USER` mutates only own `LOCAL`; `SUPER_ADMIN` manages `GLOBAL`. |
 | 3 | **Consumers** | Resume, dashboard, and private-entity refs accept global or caller's local IDs. |
-| 4 | **Admin + tests** | UI for local create/list; seed examples; e2e for slug uniqueness across scopes. |
+| 4 | **Admin + tests** | UI for local create/list; seed examples; e2e for slug uniqueness across partitions. |
 
 **Out of scope for now:** moderation workflow, user-submitted global requests (see `BACKLOG.md` → Collaborative catalog).
 

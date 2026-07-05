@@ -8,11 +8,13 @@ import {
   ResolveField,
   Resolver,
 } from "@nestjs/graphql";
+import type { AuthContext } from "@/core/context/auth-context.interface";
 import type { GraphqlContext } from "@/core/context/graphql-context.interface";
 import { Roles } from "@/core/decorators/roles.decorator";
 import { BatchEntity } from "@/core/entities/batch.entity";
 import { UserRole } from "@/core/enums/user-role.enum";
 import { PaginationInput } from "@/core/inputs/pagination.input";
+import { Auth } from "@/modules/auth/decorators/auth-context.decorator";
 import { SkillEntity } from "@/modules/skills/entities/skill.entity";
 import { CreateUserInput } from "./dto/create-user.input";
 import { FilterUserInput } from "./dto/filter-user.input";
@@ -83,39 +85,43 @@ export class UsersResolver {
   @Roles(UserRole.SUPER_ADMIN)
   @Mutation(() => UserEntity)
   createOneUser(
+    @Auth() ctx: AuthContext,
     @Args("createUserInput", { type: () => CreateUserInput })
     createUserInput: CreateUserInput
   ) {
-    return this.usersService.createOne(createUserInput);
+    return this.usersService.createOne(ctx, createUserInput);
   }
 
   @Roles(UserRole.SUPER_ADMIN)
   @Mutation(() => BatchEntity)
   createManyUsers(
+    @Auth() ctx: AuthContext,
     @Args("createUserInputs", { type: () => [CreateUserInput] })
     createUserInputs: CreateUserInput[]
   ) {
-    return this.usersService.createMany(createUserInputs);
+    return this.usersService.createMany(ctx, createUserInputs);
   }
 
   @Roles(UserRole.SUPER_ADMIN)
   @Mutation(() => UserEntity)
   updateOneUser(
+    @Auth() ctx: AuthContext,
     @Args("userId", { type: () => ID }) userId: string,
     @Args("updateUserInput", { type: () => UpdateUserInput })
     updateUserInput: UpdateUserInput
   ) {
-    return this.usersService.updateOne(userId, updateUserInput);
+    return this.usersService.updateOne(ctx, userId, updateUserInput);
   }
 
   @Roles(UserRole.SUPER_ADMIN)
   @Mutation(() => BatchEntity)
   updateManyUsers(
+    @Auth() ctx: AuthContext,
     @Args("userIds", { type: () => [ID] }) userIds: string[],
     @Args("updateUserInput", { type: () => UpdateUserInput })
     updateUserInput: UpdateUserInput
   ) {
-    return this.usersService.updateMany(userIds, updateUserInput);
+    return this.usersService.updateMany(ctx, userIds, updateUserInput);
   }
 
   @Roles(UserRole.SUPER_ADMIN)

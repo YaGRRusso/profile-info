@@ -89,6 +89,10 @@ describe("ResumeService", () => {
       ownerCtx,
       expect.any(Object)
     );
+    expect(organizationsService.findManyById).toHaveBeenCalledWith(
+      ownerCtx,
+      []
+    );
   });
 
   it("should build header data from the requested user", async () => {

@@ -1,5 +1,8 @@
 import { INestApplication } from "@nestjs/common";
-import { testAuthContext } from "@test/fixtures/auth-context";
+import {
+  testAuthContext,
+  testSuperAdminContext,
+} from "@test/fixtures/auth-context";
 import { App } from "supertest/types";
 import { UserRole } from "@/core/enums/user-role.enum";
 import { CoursesService } from "@/modules/courses/courses.service";
@@ -67,7 +70,7 @@ describe("Dashboard (e2e)", () => {
     experiencesService = testApp.module.get(ExperiencesService);
     organizationsService = testApp.module.get(OrganizationsService);
 
-    await usersService.createOne({
+    await usersService.createOne(testSuperAdminContext(), {
       name: "Admin",
       nickname: "admin",
       email: "admin@profile.info",
@@ -75,7 +78,7 @@ describe("Dashboard (e2e)", () => {
       role: UserRole.SUPER_ADMIN,
     });
 
-    const joao = await usersService.createOne({
+    const joao = await usersService.createOne(testSuperAdminContext(), {
       name: "João",
       nickname: "joao",
       email: "joao@profile.info",
@@ -83,7 +86,7 @@ describe("Dashboard (e2e)", () => {
       role: UserRole.USER,
     });
 
-    const maria = await usersService.createOne({
+    const maria = await usersService.createOne(testSuperAdminContext(), {
       name: "Maria",
       nickname: "maria",
       email: "maria@profile.info",
@@ -107,17 +110,20 @@ describe("Dashboard (e2e)", () => {
     joaoToken = await signIn("joao@profile.info", "123123");
     mariaToken = await signIn("maria@profile.info", "123123");
 
-    const organization = await organizationsService.createOne({
-      slug: "dashboard-org",
-      name: "Dashboard Org",
-      website: "https://dashboard.example",
-      logo: "https://dashboard.example/logo.png",
-      category: OrganizationCategory.COMPANY,
-      i18n: [{ locale: "en", messages: { description: "Org" } }],
-    });
+    const organization = await organizationsService.createOne(
+      testSuperAdminContext(),
+      {
+        slug: "dashboard-org",
+        name: "Dashboard Org",
+        website: "https://dashboard.example",
+        logo: "https://dashboard.example/logo.png",
+        category: OrganizationCategory.COMPANY,
+        i18n: [{ locale: "en", messages: { description: "Org" } }],
+      }
+    );
     organizationId = organization.id;
 
-    await skillsService.createOne({
+    await skillsService.createOne(testSuperAdminContext(), {
       slug: "dashboard-skill",
       i18n: skillI18n("Dashboard Skill"),
       category: "Programming",

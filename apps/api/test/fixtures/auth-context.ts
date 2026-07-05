@@ -17,6 +17,12 @@ export function testAuthContext(
   };
 }
 
+export function testSuperAdminContext(
+  overrides: Partial<SessionAuthContext> = {}
+): SessionAuthContext {
+  return testAuthContext({ role: UserRole.SUPER_ADMIN, ...overrides });
+}
+
 export function testApiTokenAuthContext(
   permissions: ApiTokenPermission[],
   overrides: Partial<Omit<ApiTokenAuthContext, "permissions">> = {}

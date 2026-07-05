@@ -1,10 +1,12 @@
 import { BadRequestException, NotFoundException } from "@nestjs/common";
 import { Test, TestingModule } from "@nestjs/testing";
+import { testAuthContext } from "@test/fixtures/auth-context";
 import { REFERENCES_NOT_FOUND } from "@/common/helpers/assert.helper";
 import { PERSISTENCE_NOT_FOUND } from "@/core/persistence/persistence.messages";
 import { SkillsService } from "./skills.service";
 import { SkillsValidatorService } from "./skills-validator.service";
 
+const ctx = testAuthContext();
 const skillId = "507f1f77bcf86cd799439011";
 const missingId = "507f1f77bcf86cd799439099";
 
@@ -31,25 +33,27 @@ describe("SkillsValidatorService", () => {
 
   describe("assertSkillExists", () => {
     it("delegates to assertSkillsExist", async () => {
-      await validator.assertSkillExists(skillId);
+      await validator.assertSkillExists(ctx, skillId);
 
-      expect(skillsService.findManyActiveById).toHaveBeenCalledWith([skillId]);
+      expect(skillsService.findManyActiveById).toHaveBeenCalledWith(ctx, [
+        skillId,
+      ]);
     });
   });
 
   describe("assertSkillsExist", () => {
     it("accepts when every skill exists", async () => {
       await expect(
-        validator.assertSkillsExist([skillId])
+        validator.assertSkillsExist(ctx, [skillId])
       ).resolves.toBeUndefined();
     });
 
     it("rejects when any skill is missing", async () => {
       skillsService.findManyActiveById.mockResolvedValue([]);
 
-      await expect(validator.assertSkillsExist([missingId])).rejects.toThrow(
-        new BadRequestException(REFERENCES_NOT_FOUND)
-      );
+      await expect(
+        validator.assertSkillsExist(ctx, [missingId])
+      ).rejects.toThrow(new BadRequestException(REFERENCES_NOT_FOUND));
     });
 
     it("rejects when any skill is disabled", async () => {
@@ -57,7 +61,7 @@ describe("SkillsValidatorService", () => {
         new NotFoundException(PERSISTENCE_NOT_FOUND)
       );
 
-      await expect(validator.assertSkillsExist([skillId])).rejects.toThrow(
+      await expect(validator.assertSkillsExist(ctx, [skillId])).rejects.toThrow(
         new NotFoundException(PERSISTENCE_NOT_FOUND)
       );
     });

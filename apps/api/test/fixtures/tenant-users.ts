@@ -1,5 +1,6 @@
 import { DEV_PASSWORD } from "@seed/constants";
 import { PERSONAS, type PersonaKey } from "@seed/personas";
+import { testSuperAdminContext } from "@test/fixtures/auth-context";
 import { UserRole } from "@/core/enums/user-role.enum";
 import { UsersService } from "@/modules/users/users.service";
 
@@ -15,7 +16,7 @@ export async function createTenantUsers(
 ) {
   for (const key of keys) {
     const persona = PERSONAS[key];
-    await usersService.createOne({
+    await usersService.createOne(testSuperAdminContext(), {
       name: persona.name,
       nickname: persona.nickname,
       email: persona.email,

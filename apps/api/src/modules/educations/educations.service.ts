@@ -77,7 +77,7 @@ export class EducationsService {
     ctx: AuthContext,
     createInput: CreateEducationInput
   ): Promise<EducationEntityRecord> {
-    await this.assertCatalogReferences(createInput);
+    await this.assertCatalogReferences(ctx, createInput);
 
     return this.repository.crud
       .scoped(toTenantScope(ctx))
@@ -88,7 +88,7 @@ export class EducationsService {
     ctx: AuthContext,
     createInputs: CreateEducationInput[]
   ): Promise<BatchEntity> {
-    await this.assertCatalogReferencesMany(createInputs);
+    await this.assertCatalogReferencesMany(ctx, createInputs);
 
     return this.repository.crud
       .scoped(toTenantScope(ctx))
@@ -100,7 +100,7 @@ export class EducationsService {
     id: string,
     updateInput: UpdateEducationInput
   ): Promise<EducationEntityRecord> {
-    await this.assertCatalogReferences(updateInput);
+    await this.assertCatalogReferences(ctx, updateInput);
 
     return this.repository.crud
       .scoped(toTenantScope(ctx))
@@ -112,7 +112,7 @@ export class EducationsService {
     ids: string[],
     updateInput: UpdateEducationInput
   ): Promise<BatchEntity> {
-    await this.assertCatalogReferences(updateInput);
+    await this.assertCatalogReferences(ctx, updateInput);
 
     return this.repository.crud
       .scoped(toTenantScope(ctx))
@@ -160,20 +160,23 @@ export class EducationsService {
   }
 
   private async assertCatalogReferences(
+    ctx: AuthContext,
     input: EducationCatalogRefs
   ): Promise<void> {
     if (input.organizationId) {
       await this.organizationsValidator.assertOrganizationExists(
+        ctx,
         input.organizationId
       );
     }
 
     if (input.skillIds?.length) {
-      await this.skillsValidator.assertSkillsExist(input.skillIds);
+      await this.skillsValidator.assertSkillsExist(ctx, input.skillIds);
     }
   }
 
   private async assertCatalogReferencesMany(
+    ctx: AuthContext,
     inputs: EducationCatalogRefs[]
   ): Promise<void> {
     const organizationIds = [
@@ -189,12 +192,13 @@ export class EducationsService {
 
     if (organizationIds.length > 0) {
       await this.organizationsValidator.assertOrganizationsExist(
+        ctx,
         organizationIds
       );
     }
 
     if (skillIds.length > 0) {
-      await this.skillsValidator.assertSkillsExist(skillIds);
+      await this.skillsValidator.assertSkillsExist(ctx, skillIds);
     }
   }
 }

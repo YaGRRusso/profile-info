@@ -1,5 +1,5 @@
 import { faker } from "@faker-js/faker";
-import { CatalogScope } from "@/core/enums/catalog-scope.enum";
+import { CatalogPartition } from "@/core/enums/catalog-partition.enum";
 import type { SkillModel } from "@/modules/skills/schemas/skill.schema";
 import { CATALOG_SKILL_COUNT, SEED_LOCALES } from "../constants";
 import { slugFor } from "../helpers/faker-seed.helper";
@@ -25,7 +25,7 @@ function skillTitle(index: number): string {
 
 export function buildCatalogSkills(): Pick<
   SkillModel,
-  "slug" | "category" | "i18n" | "scope" | "disabled"
+  "slug" | "category" | "i18n" | "partition" | "disabled"
 >[] {
   return Array.from({ length: CATALOG_SKILL_COUNT }, (_, index) => {
     const title = skillTitle(index);
@@ -34,7 +34,7 @@ export function buildCatalogSkills(): Pick<
       index % 4 === 0 ? undefined : CATEGORY_POOL[index % CATEGORY_POOL.length];
 
     return {
-      scope: CatalogScope.GLOBAL,
+      partition: CatalogPartition.GLOBAL,
       disabled: index % 17 === 0,
       slug,
       category,

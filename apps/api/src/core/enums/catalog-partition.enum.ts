@@ -1,10 +1,10 @@
 import { registerEnumType } from "@nestjs/graphql";
 
-export enum CatalogScope {
+export enum CatalogPartition {
   GLOBAL = "GLOBAL",
   LOCAL = "LOCAL",
 }
 
-registerEnumType(CatalogScope, {
-  name: "CatalogScope",
+registerEnumType(CatalogPartition, {
+  name: "CatalogPartition",
 });

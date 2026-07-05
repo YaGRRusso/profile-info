@@ -1,6 +1,6 @@
 /** biome-ignore-all lint/style/noNestedTernary: test file */
 import { faker } from "@faker-js/faker";
-import { CatalogScope } from "@/core/enums/catalog-scope.enum";
+import { CatalogPartition } from "@/core/enums/catalog-partition.enum";
 import type { OrganizationModel } from "@/modules/organizations/schemas/organization.schema";
 import {
   CATALOG_ORGANIZATION_COUNT,
@@ -18,7 +18,7 @@ export function buildCatalogOrganizations(): Pick<
   | "website"
   | "logo"
   | "i18n"
-  | "scope"
+  | "partition"
   | "disabled"
 >[] {
   return Array.from({ length: CATALOG_ORGANIZATION_COUNT }, (_, index) => {
@@ -30,7 +30,7 @@ export function buildCatalogOrganizations(): Pick<
           : faker.company.name();
 
     return {
-      scope: CatalogScope.GLOBAL,
+      partition: CatalogPartition.GLOBAL,
       disabled: index % 19 === 0,
       name,
       slug: slugFor(name, index),

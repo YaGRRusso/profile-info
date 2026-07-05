@@ -1,5 +1,8 @@
 import { INestApplication } from "@nestjs/common";
-import { testAuthContext } from "@test/fixtures/auth-context";
+import {
+  testAuthContext,
+  testSuperAdminContext,
+} from "@test/fixtures/auth-context";
 import { App } from "supertest/types";
 import { UserRole } from "@/core/enums/user-role.enum";
 import { CoursesService } from "@/modules/courses/courses.service";
@@ -311,7 +314,7 @@ describe("Cross-tenant DataLoader isolation (e2e)", () => {
     const educationsService = testApp.module.get(EducationsService);
     const projectsService = testApp.module.get(ProjectsService);
 
-    await usersService.createOne({
+    await usersService.createOne(testSuperAdminContext(), {
       name: "Admin",
       nickname: "admin",
       email: "admin@profile.info",
@@ -319,7 +322,7 @@ describe("Cross-tenant DataLoader isolation (e2e)", () => {
       role: UserRole.SUPER_ADMIN,
     });
 
-    const joao = await usersService.createOne({
+    const joao = await usersService.createOne(testSuperAdminContext(), {
       name: "João",
       nickname: "joao",
       email: "joao@profile.info",
@@ -327,7 +330,7 @@ describe("Cross-tenant DataLoader isolation (e2e)", () => {
       role: UserRole.USER,
     });
 
-    const bob = await usersService.createOne({
+    const bob = await usersService.createOne(testSuperAdminContext(), {
       name: "Maria",
       nickname: "maria",
       email: "maria@profile.info",
@@ -336,20 +339,23 @@ describe("Cross-tenant DataLoader isolation (e2e)", () => {
     });
     bobUserId = bob.id;
 
-    const organization = await organizationsService.createOne({
-      slug: "shared-org",
-      name: "Shared Org",
-      website: "https://shared.example",
-      logo: "https://shared.example/logo.png",
-      category: OrganizationCategory.COMPANY,
-      i18n: [
-        { locale: "en", messages: { description: "Shared organization" } },
-      ],
-    });
+    const organization = await organizationsService.createOne(
+      testSuperAdminContext(),
+      {
+        slug: "shared-org",
+        name: "Shared Org",
+        website: "https://shared.example",
+        logo: "https://shared.example/logo.png",
+        category: OrganizationCategory.COMPANY,
+        i18n: [
+          { locale: "en", messages: { description: "Shared organization" } },
+        ],
+      }
+    );
     organizationId = organization.id;
     organizationName = organization.name;
 
-    const skill = await skillsService.createOne({
+    const skill = await skillsService.createOne(testSuperAdminContext(), {
       slug: "shared-skill",
       i18n: skillI18n("Shared Skill"),
       category: "Programming",

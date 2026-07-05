@@ -1,5 +1,6 @@
 import { Field, ObjectType } from "@nestjs/graphql";
 import { BaseEntity } from "@/core/entities/base.entity";
+import { CatalogPartition } from "@/core/enums/catalog-partition.enum";
 import { createPaginatedModel } from "@/core/schemas/paginated.schema";
 import { OrganizationCategory } from "../enums/category.enum";
 
@@ -40,6 +41,12 @@ export class OrganizationEntity extends BaseEntity {
 
   @Field(() => Boolean)
   disabled: boolean;
+
+  @Field(() => CatalogPartition)
+  partition: CatalogPartition;
+
+  @Field(() => String, { nullable: true })
+  ownerId?: string;
 }
 
 export const PaginatedOrganizationEntity =

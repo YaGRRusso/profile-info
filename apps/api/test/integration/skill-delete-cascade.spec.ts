@@ -1,5 +1,8 @@
 import { INestApplication } from "@nestjs/common";
-import { testAuthContext } from "@test/fixtures/auth-context";
+import {
+  testAuthContext,
+  testSuperAdminContext,
+} from "@test/fixtures/auth-context";
 import { App } from "supertest/types";
 import { UserRole } from "@/core/enums/user-role.enum";
 import { CoursesService } from "@/modules/courses/courses.service";
@@ -35,7 +38,7 @@ describe("Skill delete cascade (integration)", () => {
 
   it("should detach a deleted skill from courses", async () => {
     const usersService = app!.get(UsersService);
-    const owner = await usersService.createOne({
+    const owner = await usersService.createOne(testSuperAdminContext(), {
       name: "Owner",
       nickname: "owner",
       email: "owner@profile.info",
@@ -43,21 +46,24 @@ describe("Skill delete cascade (integration)", () => {
       role: UserRole.USER,
     });
 
-    const organization = await organizationsService.createOne({
-      slug: "acme-corp",
-      name: "Acme Corp",
-      website: "https://acme.example",
-      logo: "https://acme.example/logo.png",
-      category: OrganizationCategory.COMPANY,
-      i18n: [
-        {
-          locale: "en",
-          messages: { description: "Acme Corp description" },
-        },
-      ],
-    });
+    const organization = await organizationsService.createOne(
+      testSuperAdminContext(),
+      {
+        slug: "acme-corp",
+        name: "Acme Corp",
+        website: "https://acme.example",
+        logo: "https://acme.example/logo.png",
+        category: OrganizationCategory.COMPANY,
+        i18n: [
+          {
+            locale: "en",
+            messages: { description: "Acme Corp description" },
+          },
+        ],
+      }
+    );
 
-    const skill = await skillsService.createOne({
+    const skill = await skillsService.createOne(testSuperAdminContext(), {
       slug: "typescript",
       i18n: skillI18n("TypeScript"),
       category: "Programming",
@@ -83,7 +89,7 @@ describe("Skill delete cascade (integration)", () => {
 
     expect(course.skillIds?.map((id) => id.toString())).toContain(skill.id);
 
-    await skillsService.removeOne(skill.id);
+    await skillsService.removeOne(testSuperAdminContext(), skill.id);
 
     const updatedCourse = await coursesService.findOneById(ownerCtx, course.id);
 
@@ -94,13 +100,13 @@ describe("Skill delete cascade (integration)", () => {
   it("should detach a deleted skill from user profile skillIds", async () => {
     const usersService = app!.get(UsersService);
 
-    const skill = await skillsService.createOne({
+    const skill = await skillsService.createOne(testSuperAdminContext(), {
       slug: "first-aid",
       i18n: skillI18n("First Aid"),
       category: "Healthcare",
     });
 
-    const user = await usersService.createOne({
+    const user = await usersService.createOne(testSuperAdminContext(), {
       name: "Profile Owner",
       nickname: "profile-owner",
       email: "profile-owner@profile.info",
@@ -111,7 +117,7 @@ describe("Skill delete cascade (integration)", () => {
 
     expect(user.skillIds?.map((id) => id.toString())).toContain(skill.id);
 
-    await skillsService.removeOne(skill.id);
+    await skillsService.removeOne(testSuperAdminContext(), skill.id);
 
     const updatedUser = await usersService.findOneById(user.id);
     const skillIds = (updatedUser.skillIds ?? []).map((id) => id.toString());

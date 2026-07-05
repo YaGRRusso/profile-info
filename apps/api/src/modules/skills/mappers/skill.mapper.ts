@@ -4,7 +4,7 @@ import {
   type SortOrder,
   type UpdateQuery,
 } from "mongoose";
-import { toBaseEntityFields } from "@/core/mappers/base.mapper";
+import { toBaseEntityFields, toIdString } from "@/core/mappers/base.mapper";
 import { toTranslationEntityList } from "@/core/mappers/translation.mapper";
 import { withObjectIdRefs } from "@/core/persistence/helpers/filter-ref.helper";
 import { toPersistenceSort } from "@/core/persistence/helpers/sort-ref.helper";
@@ -38,6 +38,8 @@ export class SkillMapper
         })) ?? [],
       category: model.category,
       disabled: model.disabled,
+      partition: model.partition,
+      ownerId: toIdString(model.ownerId),
     };
   }
 
@@ -50,7 +52,7 @@ export class SkillMapper
   }
 
   toPersistenceForFilter(entity: FilterSkillInput): QueryFilter<SkillModel> {
-    return withObjectIdRefs(entity, {});
+    return withObjectIdRefs(entity, { single: ["ownerId"] });
   }
 
   toPersistenceForSort(

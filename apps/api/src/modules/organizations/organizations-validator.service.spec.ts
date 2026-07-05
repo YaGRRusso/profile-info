@@ -1,10 +1,12 @@
 import { BadRequestException, NotFoundException } from "@nestjs/common";
 import { Test, TestingModule } from "@nestjs/testing";
+import { testAuthContext } from "@test/fixtures/auth-context";
 import { REFERENCES_NOT_FOUND } from "@/common/helpers/assert.helper";
 import { PERSISTENCE_NOT_FOUND } from "@/core/persistence/persistence.messages";
 import { OrganizationsService } from "./organizations.service";
 import { OrganizationsValidatorService } from "./organizations-validator.service";
 
+const ctx = testAuthContext();
 const organizationId = "507f1f77bcf86cd799439011";
 const missingId = "507f1f77bcf86cd799439099";
 
@@ -31,18 +33,19 @@ describe("OrganizationsValidatorService", () => {
 
   describe("assertOrganizationExists", () => {
     it("delegates to assertOrganizationsExist", async () => {
-      await validator.assertOrganizationExists(organizationId);
+      await validator.assertOrganizationExists(ctx, organizationId);
 
-      expect(organizationsService.findManyActiveById).toHaveBeenCalledWith([
-        organizationId,
-      ]);
+      expect(organizationsService.findManyActiveById).toHaveBeenCalledWith(
+        ctx,
+        [organizationId]
+      );
     });
   });
 
   describe("assertOrganizationsExist", () => {
     it("accepts when every organization exists", async () => {
       await expect(
-        validator.assertOrganizationsExist([organizationId])
+        validator.assertOrganizationsExist(ctx, [organizationId])
       ).resolves.toBeUndefined();
     });
 
@@ -50,7 +53,7 @@ describe("OrganizationsValidatorService", () => {
       organizationsService.findManyActiveById.mockResolvedValue([]);
 
       await expect(
-        validator.assertOrganizationsExist([missingId])
+        validator.assertOrganizationsExist(ctx, [missingId])
       ).rejects.toThrow(new BadRequestException(REFERENCES_NOT_FOUND));
     });
 
@@ -60,7 +63,7 @@ describe("OrganizationsValidatorService", () => {
       );
 
       await expect(
-        validator.assertOrganizationsExist([organizationId])
+        validator.assertOrganizationsExist(ctx, [organizationId])
       ).rejects.toThrow(new NotFoundException(PERSISTENCE_NOT_FOUND));
     });
   });

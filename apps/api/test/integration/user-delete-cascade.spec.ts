@@ -1,6 +1,9 @@
 import { ForbiddenException, INestApplication } from "@nestjs/common";
 import { getModelToken } from "@nestjs/mongoose";
-import { testAuthContext } from "@test/fixtures/auth-context";
+import {
+  testAuthContext,
+  testSuperAdminContext,
+} from "@test/fixtures/auth-context";
 import { Model } from "mongoose";
 import { App } from "supertest/types";
 import { ApiTokenPermission } from "@/core/enums/api-token-permission.enum";
@@ -59,21 +62,24 @@ describe("User delete cascade (integration)", () => {
     const projectsService = app!.get(ProjectsService);
     const apiTokensService = app!.get(ApiTokensService);
 
-    const organization = await organizationsService.createOne({
-      slug: "acme-corp",
-      name: "Acme Corp",
-      website: "https://acme.example",
-      logo: "https://acme.example/logo.png",
-      category: OrganizationCategory.COMPANY,
-      i18n: [
-        {
-          locale: "en",
-          messages: { description: "Acme Corp description" },
-        },
-      ],
-    });
+    const organization = await organizationsService.createOne(
+      testSuperAdminContext(),
+      {
+        slug: "acme-corp",
+        name: "Acme Corp",
+        website: "https://acme.example",
+        logo: "https://acme.example/logo.png",
+        category: OrganizationCategory.COMPANY,
+        i18n: [
+          {
+            locale: "en",
+            messages: { description: "Acme Corp description" },
+          },
+        ],
+      }
+    );
 
-    const doomedUser = await usersService.createOne({
+    const doomedUser = await usersService.createOne(testSuperAdminContext(), {
       name: "Doomed",
       nickname: "doomed",
       email: "doomed@profile.info",
@@ -81,7 +87,7 @@ describe("User delete cascade (integration)", () => {
       role: UserRole.USER,
     });
 
-    const survivorUser = await usersService.createOne({
+    const survivorUser = await usersService.createOne(testSuperAdminContext(), {
       name: "Survivor",
       nickname: "survivor",
       email: "survivor@profile.info",
@@ -201,7 +207,7 @@ describe("User delete cascade (integration)", () => {
   });
 
   it("should reject SUPER_ADMIN deletion", async () => {
-    const admin = await usersService.createOne({
+    const admin = await usersService.createOne(testSuperAdminContext(), {
       name: "Admin",
       nickname: "admin-delete-test",
       email: "admin-delete-test@profile.info",

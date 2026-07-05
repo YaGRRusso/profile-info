@@ -1,5 +1,7 @@
 import { EventEmitter2 } from "@nestjs/event-emitter";
 import { Test, type TestingModule } from "@nestjs/testing";
+import { testAuthContext } from "@test/fixtures/auth-context";
+import { CatalogPartition } from "@/core/enums/catalog-partition.enum";
 import { DomainEvents } from "@/core/events/domain-events";
 import { SkillDeletedEvent } from "@/core/events/skill-deleted.event";
 import {
@@ -9,6 +11,7 @@ import {
 import { SkillsRepository } from "./skills.repository";
 import { SkillsService } from "./skills.service";
 
+const ctx = testAuthContext();
 const validId = "507f1f77bcf86cd799439013";
 
 const fakeEntity = {
@@ -17,6 +20,7 @@ const fakeEntity = {
   i18n: [{ locale: "en", messages: { title: "TypeScript" } }],
   category: "Programming",
   disabled: false,
+  partition: CatalogPartition.GLOBAL,
 };
 
 describe("SkillsService", () => {
@@ -66,7 +70,7 @@ describe("SkillsService", () => {
     it("sets disabled to true without emitting delete", async () => {
       crud.updateOneById.mockResolvedValue({ ...fakeEntity, disabled: true });
 
-      await expect(service.disableOne(validId)).resolves.toEqual({
+      await expect(service.disableOne(ctx, validId)).resolves.toEqual({
         ...fakeEntity,
         disabled: true,
       });
@@ -81,7 +85,9 @@ describe("SkillsService", () => {
     it("re-enables by setting disabled to false", async () => {
       crud.updateOneById.mockResolvedValue(fakeEntity);
 
-      await expect(service.enableOne(validId)).resolves.toEqual(fakeEntity);
+      await expect(service.enableOne(ctx, validId)).resolves.toEqual(
+        fakeEntity
+      );
       expect(crud.updateOneById).toHaveBeenCalledWith(validId, {
         disabled: false,
       });
@@ -90,7 +96,7 @@ describe("SkillsService", () => {
 
   describe("count", () => {
     it("delegates to repository.countActive", async () => {
-      await expect(service.count()).resolves.toBe(2);
+      await expect(service.count(ctx)).resolves.toBe(2);
       expect(repository.countActive).toHaveBeenCalled();
     });
   });
@@ -99,7 +105,9 @@ describe("SkillsService", () => {
     it("delegates to crud", async () => {
       crud.findOneById.mockResolvedValue(fakeEntity);
 
-      await expect(service.findOneById(validId)).resolves.toEqual(fakeEntity);
+      await expect(service.findOneById(ctx, validId)).resolves.toEqual(
+        fakeEntity
+      );
       expect(crud.findOneById).toHaveBeenCalledWith(validId);
     });
   });
@@ -113,7 +121,9 @@ describe("SkillsService", () => {
       };
       crud.createOne.mockResolvedValue(fakeEntity);
 
-      await expect(service.createOne(createInput)).resolves.toEqual(fakeEntity);
+      await expect(service.createOne(ctx, createInput)).resolves.toEqual(
+        fakeEntity
+      );
       expect(crud.createOne).toHaveBeenCalledWith(createInput);
     });
   });
@@ -122,9 +132,9 @@ describe("SkillsService", () => {
     it("delegates to crud", async () => {
       crud.updateOneById.mockResolvedValue(fakeEntity);
 
-      await expect(service.updateOne(validId, { slug: "ts" })).resolves.toEqual(
-        fakeEntity
-      );
+      await expect(
+        service.updateOne(ctx, validId, { slug: "ts" })
+      ).resolves.toEqual(fakeEntity);
       expect(crud.updateOneById).toHaveBeenCalledWith(validId, { slug: "ts" });
     });
   });
@@ -134,7 +144,9 @@ describe("SkillsService", () => {
       crud.findOneById.mockResolvedValue(fakeEntity);
       crud.deleteOneById.mockResolvedValue(fakeEntity);
 
-      await expect(service.removeOne(validId)).resolves.toEqual(fakeEntity);
+      await expect(service.removeOne(ctx, validId)).resolves.toEqual(
+        fakeEntity
+      );
 
       expect(eventEmitter.emitAsync).toHaveBeenCalledWith(
         DomainEvents.skill.deleted,
@@ -149,7 +161,7 @@ describe("SkillsService", () => {
       crud.findManyById.mockResolvedValue([fakeEntity]);
       crud.deleteManyById.mockResolvedValue({ succeeded: 1, failed: 0 });
 
-      await expect(service.removeMany([validId])).resolves.toEqual({
+      await expect(service.removeMany(ctx, [validId])).resolves.toEqual({
         succeeded: 1,
         failed: 0,
       });

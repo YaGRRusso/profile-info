@@ -1,6 +1,7 @@
 import { Injectable, UnauthorizedException } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
 import { compare } from "bcryptjs";
+import type { AuthContext } from "@/core/context/auth-context.interface";
 import { UsersService } from "@/modules/users/users.service";
 import { SignInInput } from "./dto/sign-in.input";
 import { UpdateMeInput } from "./dto/update-me.input";
@@ -30,7 +31,7 @@ export class AuthService {
     return await this.jwtService.signAsync(payload);
   }
 
-  updateMe(userId: string, updateMeInput: UpdateMeInput) {
-    return this.usersService.updateOne(userId, updateMeInput);
+  updateMe(ctx: AuthContext, updateMeInput: UpdateMeInput) {
+    return this.usersService.updateOne(ctx, ctx.id, updateMeInput);
   }
 }

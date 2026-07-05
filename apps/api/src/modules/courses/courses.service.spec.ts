@@ -113,7 +113,7 @@ describe("CoursesService", () => {
       );
       expect(
         organizationsValidator.assertOrganizationExists
-      ).toHaveBeenCalledWith(organizationId);
+      ).toHaveBeenCalledWith(ctx, organizationId);
       expect(crud.scoped).toHaveBeenCalledWith(toTenantScope(ctx));
       expect(crud.createOne).toHaveBeenCalledWith(createInput);
     });

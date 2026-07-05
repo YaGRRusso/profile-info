@@ -1,6 +1,7 @@
 import { INestApplication } from "@nestjs/common";
 import { Test, TestingModule } from "@nestjs/testing";
 import { ThrottlerModule } from "@nestjs/throttler";
+import { testSuperAdminContext } from "@test/fixtures/auth-context";
 import { App } from "supertest/types";
 import { validationConfig } from "@/core/configs/validation.config";
 import { UserRole } from "@/core/enums/user-role.enum";
@@ -73,7 +74,7 @@ describe("Ai tools (e2e)", () => {
 
     const usersService = testApp.module.get(UsersService);
 
-    await usersService.createOne({
+    await usersService.createOne(testSuperAdminContext(), {
       name: "Admin",
       nickname: "admin",
       email: "admin@profile.info",
@@ -81,7 +82,7 @@ describe("Ai tools (e2e)", () => {
       role: UserRole.SUPER_ADMIN,
     });
 
-    await usersService.createOne({
+    await usersService.createOne(testSuperAdminContext(), {
       name: "João",
       nickname: "joao",
       email: "joao@profile.info",

@@ -1,3 +1,4 @@
+import type { AuthContext } from "@/core/context/auth-context.interface";
 import type { AppLoaders } from "@/core/context/graphql-context.interface";
 import { OrganizationsLoaderService } from "@/modules/organizations/organizations-loader.service";
 import { SkillsLoaderService } from "@/modules/skills/skills-loader.service";
@@ -10,10 +11,10 @@ export class LoadersService {
     private readonly usersLoaderService: UsersLoaderService
   ) {}
 
-  createLoaders(): AppLoaders {
+  createLoaders(ctx?: AuthContext): AppLoaders {
     return {
-      batchSkills: this.skillsLoaderService.createLoader(),
-      batchOrganizations: this.organizationsLoaderService.createLoader(),
+      batchSkills: this.skillsLoaderService.createLoader(ctx),
+      batchOrganizations: this.organizationsLoaderService.createLoader(ctx),
       batchUsers: this.usersLoaderService.createLoader(),
     };
   }

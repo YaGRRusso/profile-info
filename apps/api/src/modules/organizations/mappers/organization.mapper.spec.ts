@@ -1,3 +1,4 @@
+import { CatalogPartition } from "@/core/enums/catalog-partition.enum";
 import { OrganizationCategory } from "../enums/category.enum";
 import type { OrganizationModel } from "../schemas/organization.schema";
 import { OrganizationMapper } from "./organization.mapper";
@@ -16,6 +17,7 @@ describe("OrganizationMapper", () => {
       website: "https://www.google.com",
       logo: "https://example.com/logo.png",
       disabled: false,
+      partition: CatalogPartition.GLOBAL,
       i18n: [
         {
           locale: "en",
@@ -42,6 +44,7 @@ describe("OrganizationMapper", () => {
       website: "https://www.google.com",
       logo: "https://example.com/logo.png",
       disabled: false,
+      partition: CatalogPartition.GLOBAL,
       i18n: [
         {
           locale: "en",

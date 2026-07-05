@@ -1,4 +1,5 @@
 import { INestApplication } from "@nestjs/common";
+import { testSuperAdminContext } from "@test/fixtures/auth-context";
 import { App } from "supertest/types";
 import { UserRole } from "@/core/enums/user-role.enum";
 import { OrganizationCategory } from "@/modules/organizations/enums/category.enum";
@@ -59,7 +60,7 @@ describe("Catalog reads (e2e)", () => {
     const skillsService = testApp.module.get(SkillsService);
     const organizationsService = testApp.module.get(OrganizationsService);
 
-    await usersService.createOne({
+    await usersService.createOne(testSuperAdminContext(), {
       name: "Admin",
       nickname: "admin",
       email: "admin@profile.info",
@@ -67,7 +68,7 @@ describe("Catalog reads (e2e)", () => {
       role: UserRole.SUPER_ADMIN,
     });
 
-    await usersService.createOne({
+    await usersService.createOne(testSuperAdminContext(), {
       name: "João",
       nickname: "joao",
       email: "joao@profile.info",
@@ -75,7 +76,7 @@ describe("Catalog reads (e2e)", () => {
       role: UserRole.USER,
     });
 
-    await organizationsService.createOne({
+    await organizationsService.createOne(testSuperAdminContext(), {
       slug: "catalog-org",
       name: "Catalog Org",
       website: "https://catalog.example",
@@ -84,7 +85,7 @@ describe("Catalog reads (e2e)", () => {
       i18n: [{ locale: "en", messages: { description: "Catalog org" } }],
     });
 
-    await skillsService.createOne({
+    await skillsService.createOne(testSuperAdminContext(), {
       slug: "catalog-skill",
       i18n: skillI18n("Catalog Skill"),
       category: "Programming",

@@ -4,7 +4,7 @@ import {
   type SortOrder,
   type UpdateQuery,
 } from "mongoose";
-import { toBaseEntityFields } from "@/core/mappers/base.mapper";
+import { toBaseEntityFields, toIdString } from "@/core/mappers/base.mapper";
 import { toTranslationEntityList } from "@/core/mappers/translation.mapper";
 import { withObjectIdRefs } from "@/core/persistence/helpers/filter-ref.helper";
 import { toPersistenceSort } from "@/core/persistence/helpers/sort-ref.helper";
@@ -42,6 +42,8 @@ export class OrganizationMapper
         })) ?? [],
       category: model.category as OrganizationCategory,
       disabled: model.disabled,
+      partition: model.partition,
+      ownerId: toIdString(model.ownerId),
     };
   }
 
@@ -60,7 +62,7 @@ export class OrganizationMapper
   toPersistenceForFilter(
     entity: FilterOrganizationInput
   ): QueryFilter<OrganizationModel> {
-    return withObjectIdRefs(entity, {});
+    return withObjectIdRefs(entity, { single: ["ownerId"] });
   }
 
   toPersistenceForSort(

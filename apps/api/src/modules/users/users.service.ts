@@ -1,6 +1,7 @@
 import { ForbiddenException, Injectable } from "@nestjs/common";
 import { EventEmitter2 } from "@nestjs/event-emitter";
 import { hash } from "bcryptjs";
+import type { AuthContext } from "@/core/context/auth-context.interface";
 import { BatchEntity } from "@/core/entities/batch.entity";
 import { UserRole } from "@/core/enums/user-role.enum";
 import { DomainEvents } from "@/core/events/domain-events";
@@ -54,11 +55,11 @@ export class UsersService {
     return this.repository.crud.findMany({ filters, sort, skip, limit });
   }
 
-  async createOne({
-    password,
-    ...createUserInput
-  }: CreateUserInput): Promise<UserEntity> {
-    await this.assertSkillsExist(createUserInput.skillIds);
+  async createOne(
+    ctx: AuthContext,
+    { password, ...createUserInput }: CreateUserInput
+  ): Promise<UserEntity> {
+    await this.assertSkillsExist(ctx, createUserInput.skillIds);
 
     return this.repository.crud.createOne({
       ...createUserInput,
@@ -66,11 +67,14 @@ export class UsersService {
     });
   }
 
-  async createMany(createUserInputs: CreateUserInput[]): Promise<BatchEntity> {
+  async createMany(
+    ctx: AuthContext,
+    createUserInputs: CreateUserInput[]
+  ): Promise<BatchEntity> {
     const skillIds = [
       ...new Set(createUserInputs.flatMap((item) => item.skillIds ?? [])),
     ];
-    await this.assertSkillsExist(skillIds);
+    await this.assertSkillsExist(ctx, skillIds);
 
     const inputs: UserCreateRecord[] = await Promise.all(
       createUserInputs.map(async ({ password, ...createUserInput }) => ({
@@ -83,11 +87,12 @@ export class UsersService {
   }
 
   async updateOne(
+    ctx: AuthContext,
     id: string,
     updateInput: UpdateUserInput
   ): Promise<UserEntity> {
     const { password, ...rest } = updateInput;
-    await this.assertSkillsExist(rest.skillIds);
+    await this.assertSkillsExist(ctx, rest.skillIds);
 
     if (!password) {
       return this.repository.crud.updateOneById(id, rest);
@@ -100,11 +105,12 @@ export class UsersService {
   }
 
   async updateMany(
+    ctx: AuthContext,
     ids: string[],
     updateInput: UpdateUserInput
   ): Promise<BatchEntity> {
     const { password, ...rest } = updateInput;
-    await this.assertSkillsExist(rest.skillIds);
+    await this.assertSkillsExist(ctx, rest.skillIds);
 
     if (!password) {
       return this.repository.crud.updateManyById(ids, rest);
@@ -159,8 +165,11 @@ export class UsersService {
     }
   }
 
-  private assertSkillsExist(skillIds?: string[]): Promise<void> {
+  private assertSkillsExist(
+    ctx: AuthContext,
+    skillIds?: string[]
+  ): Promise<void> {
     if (skillIds === undefined) return Promise.resolve();
-    return this.skillsValidator.assertSkillsExist(skillIds);
+    return this.skillsValidator.assertSkillsExist(ctx, skillIds);
   }
 }

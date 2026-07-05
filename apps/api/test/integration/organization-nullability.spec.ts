@@ -1,5 +1,6 @@
 import { INestApplication } from "@nestjs/common";
 import { getModelToken } from "@nestjs/mongoose";
+import { testSuperAdminContext } from "@test/fixtures/auth-context";
 import { Model } from "mongoose";
 import { App } from "supertest/types";
 import { UserRole } from "@/core/enums/user-role.enum";
@@ -71,7 +72,7 @@ describe("Organization nullability (integration)", () => {
     educationModel = testApp.module.get(getModelToken(EducationModel.name));
     experienceModel = testApp.module.get(getModelToken(ExperienceModel.name));
 
-    const user = await usersService.createOne({
+    const user = await usersService.createOne(testSuperAdminContext(), {
       name: "Owner",
       nickname: "owner",
       email: "owner@profile.info",

@@ -4,6 +4,7 @@ import {
   labelFromI18nTitle,
   type RecentActivityRecord,
 } from "@/common/helpers/recent-activity.helper";
+import type { AuthContext } from "@/core/context/auth-context.interface";
 import { BatchEntity } from "@/core/entities/batch.entity";
 import { DomainEvents } from "@/core/events/domain-events";
 import { SkillDeletedEvent } from "@/core/events/skill-deleted.event";
@@ -25,90 +26,110 @@ export class SkillsService {
     private readonly eventEmitter: EventEmitter2
   ) {}
 
-  findOneById(id: string): Promise<SkillEntity> {
+  findOneById(_ctx: AuthContext, id: string): Promise<SkillEntity> {
     return this.repository.crud.findOneById(id);
   }
 
-  findOne({ filters }: { filters?: FilterSkillInput }): Promise<SkillEntity> {
+  findOne(
+    _ctx: AuthContext,
+    { filters }: { filters?: FilterSkillInput }
+  ): Promise<SkillEntity> {
     return this.repository.findOneActive({ filters });
   }
 
-  findOneActiveById(id: string): Promise<SkillEntity> {
+  findOneActiveById(_ctx: AuthContext, id: string): Promise<SkillEntity> {
     return this.repository.findOneActiveById(id);
   }
 
-  findManyById(ids: string[]): Promise<SkillEntity[]> {
+  findManyById(_ctx: AuthContext, ids: string[]): Promise<SkillEntity[]> {
     return this.repository.crud.findManyById(ids);
   }
 
-  findManyActiveById(ids: string[]): Promise<SkillEntity[]> {
+  findManyActiveById(_ctx: AuthContext, ids: string[]): Promise<SkillEntity[]> {
     return this.repository.findManyActiveById(ids);
   }
 
-  findMany({
-    filters,
-    sort,
-    skip = 0,
-    limit = 50,
-  }: {
-    filters?: FilterSkillInput;
-    sort?: SortSkillInput;
-    limit?: number;
-    skip?: number;
-  }): Promise<MultiPaged<SkillEntity>> {
+  findMany(
+    _ctx: AuthContext,
+    {
+      filters,
+      sort,
+      skip = 0,
+      limit = 50,
+    }: {
+      filters?: FilterSkillInput;
+      sort?: SortSkillInput;
+      limit?: number;
+      skip?: number;
+    }
+  ): Promise<MultiPaged<SkillEntity>> {
     return this.repository.crud.findMany({ filters, sort, skip, limit });
   }
 
-  findManyActive({
-    filters,
-    sort,
-    skip = 0,
-    limit = 50,
-  }: {
-    filters?: FilterSkillInput;
-    sort?: SortSkillInput;
-    limit?: number;
-    skip?: number;
-  }): Promise<MultiPaged<SkillEntity>> {
+  findManyActive(
+    _ctx: AuthContext,
+    {
+      filters,
+      sort,
+      skip = 0,
+      limit = 50,
+    }: {
+      filters?: FilterSkillInput;
+      sort?: SortSkillInput;
+      limit?: number;
+      skip?: number;
+    }
+  ): Promise<MultiPaged<SkillEntity>> {
     return this.repository.findManyActive({ filters, sort, skip, limit });
   }
 
-  createOne(createInput: CreateSkillInput): Promise<SkillEntity> {
+  createOne(
+    _ctx: AuthContext,
+    createInput: CreateSkillInput
+  ): Promise<SkillEntity> {
     return this.repository.crud.createOne(createInput);
   }
 
-  createMany(createInputs: CreateSkillInput[]): Promise<BatchEntity> {
+  createMany(
+    _ctx: AuthContext,
+    createInputs: CreateSkillInput[]
+  ): Promise<BatchEntity> {
     return this.repository.crud.createMany(createInputs);
   }
 
-  updateOne(id: string, updateInput: UpdateSkillInput): Promise<SkillEntity> {
+  updateOne(
+    _ctx: AuthContext,
+    id: string,
+    updateInput: UpdateSkillInput
+  ): Promise<SkillEntity> {
     return this.repository.crud.updateOneById(id, updateInput);
   }
 
   updateMany(
+    _ctx: AuthContext,
     ids: string[],
     updateInput: UpdateSkillInput
   ): Promise<BatchEntity> {
     return this.repository.crud.updateManyById(ids, updateInput);
   }
 
-  disableOne(id: string): Promise<SkillEntity> {
+  disableOne(_ctx: AuthContext, id: string): Promise<SkillEntity> {
     return this.repository.crud.updateOneById(id, { disabled: true });
   }
 
-  disableMany(ids: string[]): Promise<BatchEntity> {
+  disableMany(_ctx: AuthContext, ids: string[]): Promise<BatchEntity> {
     return this.repository.crud.updateManyById(ids, { disabled: true });
   }
 
-  enableOne(id: string): Promise<SkillEntity> {
+  enableOne(_ctx: AuthContext, id: string): Promise<SkillEntity> {
     return this.repository.crud.updateOneById(id, { disabled: false });
   }
 
-  enableMany(ids: string[]): Promise<BatchEntity> {
+  enableMany(_ctx: AuthContext, ids: string[]): Promise<BatchEntity> {
     return this.repository.crud.updateManyById(ids, { disabled: false });
   }
 
-  async removeOne(id: string): Promise<SkillEntity> {
+  async removeOne(_ctx: AuthContext, id: string): Promise<SkillEntity> {
     const skill = await this.repository.crud.findOneById(id);
 
     await this.eventEmitter.emitAsync(
@@ -120,7 +141,7 @@ export class SkillsService {
     return skill;
   }
 
-  async removeMany(ids: string[]): Promise<BatchEntity> {
+  async removeMany(_ctx: AuthContext, ids: string[]): Promise<BatchEntity> {
     const skills = await this.repository.crud.findManyById(ids);
 
     for (const skill of skills) {
@@ -133,15 +154,18 @@ export class SkillsService {
     return this.repository.crud.deleteManyById(ids);
   }
 
-  count(): Promise<number> {
+  count(_ctx: AuthContext): Promise<number> {
     return this.repository.countActive();
   }
 
-  countByField(field: string): Promise<FieldCount[]> {
+  countByField(_ctx: AuthContext, field: string): Promise<FieldCount[]> {
     return this.repository.stats.countByField(field);
   }
 
-  async findRecentActivity(limit: number): Promise<RecentActivityRecord[]> {
+  async findRecentActivity(
+    _ctx: AuthContext,
+    limit: number
+  ): Promise<RecentActivityRecord[]> {
     const rows = await this.repository.findRecentlyUpdatedActive(
       limit,
       "slug i18n updatedAt"

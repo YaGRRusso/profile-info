@@ -1,5 +1,6 @@
 import { INestApplication } from "@nestjs/common";
 import { getModelToken } from "@nestjs/mongoose";
+import { testSuperAdminContext } from "@test/fixtures/auth-context";
 import { hash } from "bcryptjs";
 import { Model } from "mongoose";
 import { App } from "supertest/types";
@@ -74,7 +75,7 @@ describe("API token authentication (e2e)", () => {
       getModelToken(ApiTokenModel.name)
     );
 
-    const joao = await usersService.createOne({
+    const joao = await usersService.createOne(testSuperAdminContext(), {
       name: "João",
       nickname: "joao",
       email: "joao@profile.info",
@@ -82,14 +83,17 @@ describe("API token authentication (e2e)", () => {
       role: UserRole.USER,
     });
 
-    const organization = await organizationsService.createOne({
-      slug: "api-token-org",
-      name: "API Token Org",
-      website: "https://api-token.example",
-      logo: "https://api-token.example/logo.png",
-      category: OrganizationCategory.COMPANY,
-      i18n: [{ locale: "en", messages: { description: "Org" } }],
-    });
+    const organization = await organizationsService.createOne(
+      testSuperAdminContext(),
+      {
+        slug: "api-token-org",
+        name: "API Token Org",
+        website: "https://api-token.example",
+        logo: "https://api-token.example/logo.png",
+        category: OrganizationCategory.COMPANY,
+        i18n: [{ locale: "en", messages: { description: "Org" } }],
+      }
+    );
     organizationId = organization.id;
 
     await apiTokenModel.create([

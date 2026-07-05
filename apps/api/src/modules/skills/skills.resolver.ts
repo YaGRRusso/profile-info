@@ -1,8 +1,10 @@
 import { Args, ID, Mutation, Query, Resolver } from "@nestjs/graphql";
+import type { AuthContext } from "@/core/context/auth-context.interface";
 import { Roles } from "@/core/decorators/roles.decorator";
 import { BatchEntity } from "@/core/entities/batch.entity";
 import { UserRole } from "@/core/enums/user-role.enum";
 import { PaginationInput } from "@/core/inputs/pagination.input";
+import { Auth } from "@/modules/auth/decorators/auth-context.decorator";
 import { CreateSkillInput } from "./dto/create-skill.input";
 import { FilterSkillInput } from "./dto/filter-skill.input";
 import { SortSkillInput } from "./dto/sort-skill.input";
@@ -17,30 +19,36 @@ export class SkillsResolver {
   // QUERIES
 
   @Query(() => SkillEntity)
-  findOneSkillById(@Args("skillId", { type: () => ID }) skillId: string) {
-    return this.skillsService.findOneById(skillId);
+  findOneSkillById(
+    @Auth() ctx: AuthContext,
+    @Args("skillId", { type: () => ID }) skillId: string
+  ) {
+    return this.skillsService.findOneById(ctx, skillId);
   }
 
   @Query(() => SkillEntity)
   findOneSkill(
+    @Auth() ctx: AuthContext,
     @Args("skillFilters", {
       type: () => FilterSkillInput,
       nullable: true,
     })
     skillFilters?: FilterSkillInput
   ) {
-    return this.skillsService.findOne({ filters: skillFilters });
+    return this.skillsService.findOne(ctx, { filters: skillFilters });
   }
 
   @Query(() => [SkillEntity])
   findManySkillById(
+    @Auth() ctx: AuthContext,
     @Args("skillIds", { type: () => [ID] }) skillIds: string[]
   ) {
-    return this.skillsService.findManyById(skillIds);
+    return this.skillsService.findManyById(ctx, skillIds);
   }
 
   @Query(() => PaginatedSkillEntity)
   findManySkills(
+    @Auth() ctx: AuthContext,
     @Args("skillFilters", {
       type: () => FilterSkillInput,
       nullable: true,
@@ -57,7 +65,7 @@ export class SkillsResolver {
     })
     skillSort?: SortSkillInput
   ) {
-    return this.skillsService.findMany({
+    return this.skillsService.findMany(ctx, {
       filters: skillFilters,
       sort: skillSort,
       limit: skillPagination?.limit,
@@ -67,6 +75,7 @@ export class SkillsResolver {
 
   @Query(() => PaginatedSkillEntity)
   findManyActiveSkills(
+    @Auth() ctx: AuthContext,
     @Args("skillFilters", {
       type: () => FilterSkillInput,
       nullable: true,
@@ -83,7 +92,7 @@ export class SkillsResolver {
     })
     skillSort?: SortSkillInput
   ) {
-    return this.skillsService.findManyActive({
+    return this.skillsService.findManyActive(ctx, {
       filters: skillFilters,
       sort: skillSort,
       limit: skillPagination?.limit,
@@ -96,76 +105,96 @@ export class SkillsResolver {
   @Roles(UserRole.SUPER_ADMIN)
   @Mutation(() => SkillEntity)
   createOneSkill(
+    @Auth() ctx: AuthContext,
     @Args("createSkillInput", { type: () => CreateSkillInput })
     createSkillInput: CreateSkillInput
   ) {
-    return this.skillsService.createOne(createSkillInput);
+    return this.skillsService.createOne(ctx, createSkillInput);
   }
 
   @Roles(UserRole.SUPER_ADMIN)
   @Mutation(() => BatchEntity)
   createManySkills(
+    @Auth() ctx: AuthContext,
     @Args("createSkillInputs", { type: () => [CreateSkillInput] })
     createSkillInputs: CreateSkillInput[]
   ) {
-    return this.skillsService.createMany(createSkillInputs);
+    return this.skillsService.createMany(ctx, createSkillInputs);
   }
 
   @Roles(UserRole.SUPER_ADMIN)
   @Mutation(() => SkillEntity)
   updateOneSkill(
+    @Auth() ctx: AuthContext,
     @Args("skillId", { type: () => ID }) skillId: string,
     @Args("updateSkillInput", { type: () => UpdateSkillInput })
     updateSkillInput: UpdateSkillInput
   ) {
-    return this.skillsService.updateOne(skillId, updateSkillInput);
+    return this.skillsService.updateOne(ctx, skillId, updateSkillInput);
   }
 
   @Roles(UserRole.SUPER_ADMIN)
   @Mutation(() => BatchEntity)
   updateManySkills(
+    @Auth() ctx: AuthContext,
     @Args("skillIds", { type: () => [ID] }) skillIds: string[],
     @Args("updateSkillInput", { type: () => UpdateSkillInput })
     updateSkillInput: UpdateSkillInput
   ) {
-    return this.skillsService.updateMany(skillIds, updateSkillInput);
+    return this.skillsService.updateMany(ctx, skillIds, updateSkillInput);
   }
 
   @Roles(UserRole.SUPER_ADMIN)
   @Mutation(() => SkillEntity)
-  removeOneSkill(@Args("skillId", { type: () => ID }) skillId: string) {
-    return this.skillsService.removeOne(skillId);
+  removeOneSkill(
+    @Auth() ctx: AuthContext,
+    @Args("skillId", { type: () => ID }) skillId: string
+  ) {
+    return this.skillsService.removeOne(ctx, skillId);
   }
 
   @Roles(UserRole.SUPER_ADMIN)
   @Mutation(() => BatchEntity)
-  removeManySkills(@Args("skillIds", { type: () => [ID] }) skillIds: string[]) {
-    return this.skillsService.removeMany(skillIds);
+  removeManySkills(
+    @Auth() ctx: AuthContext,
+    @Args("skillIds", { type: () => [ID] }) skillIds: string[]
+  ) {
+    return this.skillsService.removeMany(ctx, skillIds);
   }
 
   @Roles(UserRole.SUPER_ADMIN)
   @Mutation(() => SkillEntity)
-  disableOneSkill(@Args("skillId", { type: () => ID }) skillId: string) {
-    return this.skillsService.disableOne(skillId);
+  disableOneSkill(
+    @Auth() ctx: AuthContext,
+    @Args("skillId", { type: () => ID }) skillId: string
+  ) {
+    return this.skillsService.disableOne(ctx, skillId);
   }
 
   @Roles(UserRole.SUPER_ADMIN)
   @Mutation(() => BatchEntity)
   disableManySkills(
+    @Auth() ctx: AuthContext,
     @Args("skillIds", { type: () => [ID] }) skillIds: string[]
   ) {
-    return this.skillsService.disableMany(skillIds);
+    return this.skillsService.disableMany(ctx, skillIds);
   }
 
   @Roles(UserRole.SUPER_ADMIN)
   @Mutation(() => SkillEntity)
-  enableOneSkill(@Args("skillId", { type: () => ID }) skillId: string) {
-    return this.skillsService.enableOne(skillId);
+  enableOneSkill(
+    @Auth() ctx: AuthContext,
+    @Args("skillId", { type: () => ID }) skillId: string
+  ) {
+    return this.skillsService.enableOne(ctx, skillId);
   }
 
   @Roles(UserRole.SUPER_ADMIN)
   @Mutation(() => BatchEntity)
-  enableManySkills(@Args("skillIds", { type: () => [ID] }) skillIds: string[]) {
-    return this.skillsService.enableMany(skillIds);
+  enableManySkills(
+    @Auth() ctx: AuthContext,
+    @Args("skillIds", { type: () => [ID] }) skillIds: string[]
+  ) {
+    return this.skillsService.enableMany(ctx, skillIds);
   }
 }

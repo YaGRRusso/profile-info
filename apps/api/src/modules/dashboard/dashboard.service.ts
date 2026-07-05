@@ -41,21 +41,24 @@ export class DashboardService {
       projectActivity,
       experienceActivity,
     ] = await Promise.all([
-      this.skillsService.count(),
+      this.skillsService.count(ctx),
       this.coursesService.count(ctx),
       this.educationsService.count(ctx),
-      this.organizationsService.count(),
+      this.organizationsService.count(ctx),
       this.projectsService.count(ctx),
       this.experiencesService.count(ctx),
       this.experiencesService.countByField(ctx, "category"),
       this.coursesService.countByField(ctx, "status"),
-      this.skillsService.findRecentActivity(RECENT_ACTIVITY_PER_ENTITY),
+      this.skillsService.findRecentActivity(ctx, RECENT_ACTIVITY_PER_ENTITY),
       this.coursesService.findRecentActivity(ctx, RECENT_ACTIVITY_PER_ENTITY),
       this.educationsService.findRecentActivity(
         ctx,
         RECENT_ACTIVITY_PER_ENTITY
       ),
-      this.organizationsService.findRecentActivity(RECENT_ACTIVITY_PER_ENTITY),
+      this.organizationsService.findRecentActivity(
+        ctx,
+        RECENT_ACTIVITY_PER_ENTITY
+      ),
       this.projectsService.findRecentActivity(ctx, RECENT_ACTIVITY_PER_ENTITY),
       this.experiencesService.findRecentActivity(
         ctx,

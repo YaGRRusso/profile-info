@@ -74,7 +74,7 @@ export class ProjectsService {
     ctx: AuthContext,
     createInput: CreateProjectInput
   ): Promise<ProjectEntityRecord> {
-    await this.assertCatalogReferences(createInput);
+    await this.assertCatalogReferences(ctx, createInput);
 
     return this.repository.crud
       .scoped(toTenantScope(ctx))
@@ -85,7 +85,7 @@ export class ProjectsService {
     ctx: AuthContext,
     createInputs: CreateProjectInput[]
   ): Promise<BatchEntity> {
-    await this.assertCatalogReferencesMany(createInputs);
+    await this.assertCatalogReferencesMany(ctx, createInputs);
 
     return this.repository.crud
       .scoped(toTenantScope(ctx))
@@ -97,7 +97,7 @@ export class ProjectsService {
     id: string,
     updateInput: UpdateProjectInput
   ): Promise<ProjectEntityRecord> {
-    await this.assertCatalogReferences(updateInput);
+    await this.assertCatalogReferences(ctx, updateInput);
 
     return this.repository.crud
       .scoped(toTenantScope(ctx))
@@ -109,7 +109,7 @@ export class ProjectsService {
     ids: string[],
     updateInput: UpdateProjectInput
   ): Promise<BatchEntity> {
-    await this.assertCatalogReferences(updateInput);
+    await this.assertCatalogReferences(ctx, updateInput);
 
     return this.repository.crud
       .scoped(toTenantScope(ctx))
@@ -153,14 +153,16 @@ export class ProjectsService {
   }
 
   private async assertCatalogReferences(
+    ctx: AuthContext,
     input: ProjectCatalogRefs
   ): Promise<void> {
     if (input.skillIds?.length) {
-      await this.skillsValidator.assertSkillsExist(input.skillIds);
+      await this.skillsValidator.assertSkillsExist(ctx, input.skillIds);
     }
   }
 
   private async assertCatalogReferencesMany(
+    ctx: AuthContext,
     inputs: ProjectCatalogRefs[]
   ): Promise<void> {
     const skillIds = [
@@ -168,7 +170,7 @@ export class ProjectsService {
     ];
 
     if (skillIds.length > 0) {
-      await this.skillsValidator.assertSkillsExist(skillIds);
+      await this.skillsValidator.assertSkillsExist(ctx, skillIds);
     }
   }
 }

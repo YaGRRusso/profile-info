@@ -1,6 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { EventEmitter2 } from "@nestjs/event-emitter";
 import { RecentActivityRecord } from "@/common/helpers/recent-activity.helper";
+import type { AuthContext } from "@/core/context/auth-context.interface";
 import { BatchEntity } from "@/core/entities/batch.entity";
 import { DomainEvents } from "@/core/events/domain-events";
 import { OrganizationDeletedEvent } from "@/core/events/organization-deleted.event";
@@ -19,67 +20,92 @@ export class OrganizationsService {
     private readonly eventEmitter: EventEmitter2
   ) {}
 
-  findOneById(id: string): Promise<OrganizationEntity> {
+  findOneById(__ctx: AuthContext, id: string): Promise<OrganizationEntity> {
     return this.repository.crud.findOneById(id);
   }
 
-  findOne({
-    filters,
-  }: {
-    filters?: FilterOrganizationInput;
-  }): Promise<OrganizationEntity> {
+  findOne(
+    _ctx: AuthContext,
+    {
+      filters,
+    }: {
+      filters?: FilterOrganizationInput;
+    }
+  ): Promise<OrganizationEntity> {
     return this.repository.findOneActive({ filters });
   }
 
-  findOneActiveById(id: string): Promise<OrganizationEntity> {
+  findOneActiveById(
+    _ctx: AuthContext,
+    id: string
+  ): Promise<OrganizationEntity> {
     return this.repository.findOneActiveById(id);
   }
 
-  findManyById(ids: string[]): Promise<OrganizationEntity[]> {
+  findManyById(
+    _ctx: AuthContext,
+    ids: string[]
+  ): Promise<OrganizationEntity[]> {
     return this.repository.crud.findManyById(ids);
   }
 
-  findManyActiveById(ids: string[]): Promise<OrganizationEntity[]> {
+  findManyActiveById(
+    _ctx: AuthContext,
+    ids: string[]
+  ): Promise<OrganizationEntity[]> {
     return this.repository.findManyActiveById(ids);
   }
 
-  findMany({
-    filters,
-    sort,
-    skip = 0,
-    limit = 50,
-  }: {
-    filters?: FilterOrganizationInput;
-    sort?: SortOrganizationInput;
-    limit?: number;
-    skip?: number;
-  }): Promise<MultiPaged<OrganizationEntity>> {
+  findMany(
+    _ctx: AuthContext,
+    {
+      filters,
+      sort,
+      skip = 0,
+      limit = 50,
+    }: {
+      filters?: FilterOrganizationInput;
+      sort?: SortOrganizationInput;
+      limit?: number;
+      skip?: number;
+    }
+  ): Promise<MultiPaged<OrganizationEntity>> {
     return this.repository.crud.findMany({ filters, sort, skip, limit });
   }
 
-  findManyActive({
-    filters,
-    sort,
-    skip = 0,
-    limit = 50,
-  }: {
-    filters?: FilterOrganizationInput;
-    sort?: SortOrganizationInput;
-    limit?: number;
-    skip?: number;
-  }): Promise<MultiPaged<OrganizationEntity>> {
+  findManyActive(
+    _ctx: AuthContext,
+    {
+      filters,
+      sort,
+      skip = 0,
+      limit = 50,
+    }: {
+      filters?: FilterOrganizationInput;
+      sort?: SortOrganizationInput;
+      limit?: number;
+      skip?: number;
+    }
+  ): Promise<MultiPaged<OrganizationEntity>> {
     return this.repository.findManyActive({ filters, sort, skip, limit });
   }
 
-  createOne(createInput: CreateOrganizationInput): Promise<OrganizationEntity> {
+  createOne(
+    _ctx: AuthContext,
+    createInput: CreateOrganizationInput
+  ): Promise<OrganizationEntity> {
     return this.repository.crud.createOne(createInput);
   }
 
-  createMany(createInputs: CreateOrganizationInput[]): Promise<BatchEntity> {
+  createMany(
+    _ctx: AuthContext,
+    createInputs: CreateOrganizationInput[]
+  ): Promise<BatchEntity> {
     return this.repository.crud.createMany(createInputs);
   }
 
   updateOne(
+    _ctx: AuthContext,
     id: string,
     updateInput: UpdateOrganizationInput
   ): Promise<OrganizationEntity> {
@@ -87,29 +113,30 @@ export class OrganizationsService {
   }
 
   updateMany(
+    _ctx: AuthContext,
     ids: string[],
     updateInput: UpdateOrganizationInput
   ): Promise<BatchEntity> {
     return this.repository.crud.updateManyById(ids, updateInput);
   }
 
-  disableOne(id: string): Promise<OrganizationEntity> {
+  disableOne(_ctx: AuthContext, id: string): Promise<OrganizationEntity> {
     return this.repository.crud.updateOneById(id, { disabled: true });
   }
 
-  disableMany(ids: string[]): Promise<BatchEntity> {
+  disableMany(_ctx: AuthContext, ids: string[]): Promise<BatchEntity> {
     return this.repository.crud.updateManyById(ids, { disabled: true });
   }
 
-  enableOne(id: string): Promise<OrganizationEntity> {
+  enableOne(_ctx: AuthContext, id: string): Promise<OrganizationEntity> {
     return this.repository.crud.updateOneById(id, { disabled: false });
   }
 
-  enableMany(ids: string[]): Promise<BatchEntity> {
+  enableMany(_ctx: AuthContext, ids: string[]): Promise<BatchEntity> {
     return this.repository.crud.updateManyById(ids, { disabled: false });
   }
 
-  async removeOne(id: string): Promise<OrganizationEntity> {
+  async removeOne(_ctx: AuthContext, id: string): Promise<OrganizationEntity> {
     const organization = await this.repository.crud.findOneById(id);
 
     await this.eventEmitter.emitAsync(
@@ -121,7 +148,7 @@ export class OrganizationsService {
     return organization;
   }
 
-  async removeMany(ids: string[]): Promise<BatchEntity> {
+  async removeMany(_ctx: AuthContext, ids: string[]): Promise<BatchEntity> {
     const organizations = await this.repository.crud.findManyById(ids);
 
     for (const organization of organizations) {
@@ -134,11 +161,14 @@ export class OrganizationsService {
     return this.repository.crud.deleteManyById(ids);
   }
 
-  count(): Promise<number> {
+  count(_ctx: AuthContext): Promise<number> {
     return this.repository.countActive();
   }
 
-  async findRecentActivity(limit: number): Promise<RecentActivityRecord[]> {
+  async findRecentActivity(
+    _ctx: AuthContext,
+    limit: number
+  ): Promise<RecentActivityRecord[]> {
     const rows = await this.repository.findRecentlyUpdatedActive(
       limit,
       "name updatedAt"

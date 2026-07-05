@@ -4,13 +4,13 @@ import {
   IsArray,
   IsEnum,
   IsNotEmpty,
-  IsOptional,
   IsString,
   IsUrl,
   ValidateNested,
 } from "class-validator";
 import { OptionalField } from "@/core/decorators/optional-field.decorator";
 import { RequiredField } from "@/core/decorators/required-field.decorator";
+import { CatalogPartition } from "@/core/enums/catalog-partition.enum";
 import {
   createTranslationInput,
   TranslationInput,
@@ -42,12 +42,10 @@ export class CreateOrganizationInput {
   name: string;
 
   @OptionalField(() => String)
-  @IsOptional()
   @IsUrl()
   website?: string;
 
   @OptionalField(() => String)
-  @IsOptional()
   @IsUrl()
   logo?: string;
 
@@ -60,4 +58,8 @@ export class CreateOrganizationInput {
   @RequiredField(() => OrganizationCategory)
   @IsEnum(OrganizationCategory)
   category: OrganizationCategory;
+
+  @OptionalField(() => CatalogPartition)
+  @IsEnum(CatalogPartition)
+  partition?: CatalogPartition;
 }

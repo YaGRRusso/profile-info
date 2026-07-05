@@ -1,5 +1,6 @@
 import { EventEmitter2 } from "@nestjs/event-emitter";
 import { Test, TestingModule } from "@nestjs/testing";
+import { testSuperAdminContext } from "@test/fixtures/auth-context";
 import { hash } from "bcryptjs";
 import { UserRole } from "@/core/enums/user-role.enum";
 import { DomainEvents } from "@/core/events/domain-events";
@@ -13,6 +14,7 @@ jest.mock("bcryptjs", () => ({
   hash: jest.fn().mockResolvedValue("hashed-password"),
 }));
 
+const ctx = testSuperAdminContext();
 const validId = "507f1f77bcf86cd799439013";
 
 const fakeUser = {
@@ -127,7 +129,9 @@ describe("UsersService", () => {
     it("hashes the password before delegating to crud", async () => {
       crud.createOne.mockResolvedValue(fakeUser);
 
-      await expect(service.createOne(createInput)).resolves.toEqual(fakeUser);
+      await expect(service.createOne(ctx, createInput)).resolves.toEqual(
+        fakeUser
+      );
 
       expect(hash).toHaveBeenCalledWith("plain-pass", 8);
       expect(crud.createOne).toHaveBeenCalledWith({
@@ -144,9 +148,11 @@ describe("UsersService", () => {
       const skillId = "507f1f77bcf86cd799439014";
       crud.createOne.mockResolvedValue(fakeUser);
 
-      await service.createOne({ ...createInput, skillIds: [skillId] });
+      await service.createOne(ctx, { ...createInput, skillIds: [skillId] });
 
-      expect(skillsValidator.assertSkillsExist).toHaveBeenCalledWith([skillId]);
+      expect(skillsValidator.assertSkillsExist).toHaveBeenCalledWith(ctx, [
+        skillId,
+      ]);
       expect(crud.createOne).toHaveBeenCalledWith({
         name: "John",
         nickname: "john",
@@ -179,7 +185,7 @@ describe("UsersService", () => {
     it("hashes each password before delegating to crud", async () => {
       crud.createMany.mockResolvedValue({ succeeded: 2, failed: 0 });
 
-      await expect(service.createMany(createInputs)).resolves.toEqual({
+      await expect(service.createMany(ctx, createInputs)).resolves.toEqual({
         succeeded: 2,
         failed: 0,
       });
@@ -208,7 +214,7 @@ describe("UsersService", () => {
     it("hashes the password when provided", async () => {
       crud.updateOneById.mockResolvedValue(fakeUser);
 
-      await service.updateOne(validId, { password: "new-pass" });
+      await service.updateOne(ctx, validId, { password: "new-pass" });
 
       expect(hash).toHaveBeenCalledWith("new-pass", 8);
       expect(crud.updateOneById).toHaveBeenCalledWith(validId, {
@@ -219,7 +225,7 @@ describe("UsersService", () => {
     it("skips hashing when password is omitted", async () => {
       crud.updateOneById.mockResolvedValue(fakeUser);
 
-      await service.updateOne(validId, { name: "Jane" });
+      await service.updateOne(ctx, validId, { name: "Jane" });
 
       expect(hash).not.toHaveBeenCalled();
       expect(crud.updateOneById).toHaveBeenCalledWith(validId, {

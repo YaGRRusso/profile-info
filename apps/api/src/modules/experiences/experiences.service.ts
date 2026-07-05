@@ -77,7 +77,7 @@ export class ExperiencesService {
     ctx: AuthContext,
     createInput: CreateExperienceInput
   ): Promise<ExperienceEntityRecord> {
-    await this.assertCatalogReferences(createInput);
+    await this.assertCatalogReferences(ctx, createInput);
 
     return this.repository.crud
       .scoped(toTenantScope(ctx))
@@ -88,7 +88,7 @@ export class ExperiencesService {
     ctx: AuthContext,
     createInputs: CreateExperienceInput[]
   ): Promise<BatchEntity> {
-    await this.assertCatalogReferencesMany(createInputs);
+    await this.assertCatalogReferencesMany(ctx, createInputs);
 
     return this.repository.crud
       .scoped(toTenantScope(ctx))
@@ -100,7 +100,7 @@ export class ExperiencesService {
     id: string,
     updateInput: UpdateExperienceInput
   ): Promise<ExperienceEntityRecord> {
-    await this.assertCatalogReferences(updateInput);
+    await this.assertCatalogReferences(ctx, updateInput);
 
     return this.repository.crud
       .scoped(toTenantScope(ctx))
@@ -112,7 +112,7 @@ export class ExperiencesService {
     ids: string[],
     updateInput: UpdateExperienceInput
   ): Promise<BatchEntity> {
-    await this.assertCatalogReferences(updateInput);
+    await this.assertCatalogReferences(ctx, updateInput);
 
     return this.repository.crud
       .scoped(toTenantScope(ctx))
@@ -171,21 +171,24 @@ export class ExperiencesService {
   }
 
   private async assertCatalogReferences(
+    ctx: AuthContext,
     input: ExperienceCatalogRefs
   ): Promise<void> {
     if (input.organizationId) {
       await this.organizationsValidator.assertOrganizationExists(
+        ctx,
         input.organizationId
       );
     }
 
     const skillIds = this.collectSkillIds(input.roles);
     if (skillIds.length > 0) {
-      await this.skillsValidator.assertSkillsExist(skillIds);
+      await this.skillsValidator.assertSkillsExist(ctx, skillIds);
     }
   }
 
   private async assertCatalogReferencesMany(
+    ctx: AuthContext,
     inputs: ExperienceCatalogRefs[]
   ): Promise<void> {
     const organizationIds = [
@@ -201,12 +204,13 @@ export class ExperiencesService {
 
     if (organizationIds.length > 0) {
       await this.organizationsValidator.assertOrganizationsExist(
+        ctx,
         organizationIds
       );
     }
 
     if (skillIds.length > 0) {
-      await this.skillsValidator.assertSkillsExist(skillIds);
+      await this.skillsValidator.assertSkillsExist(ctx, skillIds);
     }
   }
 }

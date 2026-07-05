@@ -1,4 +1,5 @@
 import { INestApplication } from "@nestjs/common";
+import { testSuperAdminContext } from "@test/fixtures/auth-context";
 import { App } from "supertest/types";
 import { UserRole } from "@/core/enums/user-role.enum";
 import { ExperienceCategory } from "@/modules/experiences/enums/category.enum";
@@ -91,7 +92,7 @@ describe("Experiences tenant isolation (e2e)", () => {
     usersService = testApp.module.get(UsersService);
     organizationsService = testApp.module.get(OrganizationsService);
 
-    await usersService.createOne({
+    await usersService.createOne(testSuperAdminContext(), {
       name: "João",
       nickname: "joao",
       email: "joao@profile.info",
@@ -99,7 +100,7 @@ describe("Experiences tenant isolation (e2e)", () => {
       role: UserRole.USER,
     });
 
-    await usersService.createOne({
+    await usersService.createOne(testSuperAdminContext(), {
       name: "Maria",
       nickname: "maria",
       email: "maria@profile.info",
@@ -107,7 +108,7 @@ describe("Experiences tenant isolation (e2e)", () => {
       role: UserRole.USER,
     });
 
-    await usersService.createOne({
+    await usersService.createOne(testSuperAdminContext(), {
       name: "Admin",
       nickname: "admin",
       email: "admin@profile.info",
@@ -115,14 +116,17 @@ describe("Experiences tenant isolation (e2e)", () => {
       role: UserRole.SUPER_ADMIN,
     });
 
-    const organization = await organizationsService.createOne({
-      slug: "experience-org",
-      name: "Experience Org",
-      website: "https://experience.example",
-      logo: "https://experience.example/logo.png",
-      category: OrganizationCategory.COMPANY,
-      i18n: [{ locale: "en", messages: { description: "Org" } }],
-    });
+    const organization = await organizationsService.createOne(
+      testSuperAdminContext(),
+      {
+        slug: "experience-org",
+        name: "Experience Org",
+        website: "https://experience.example",
+        logo: "https://experience.example/logo.png",
+        category: OrganizationCategory.COMPANY,
+        i18n: [{ locale: "en", messages: { description: "Org" } }],
+      }
+    );
     organizationId = organization.id;
 
     const signIn = async (email: string, password: string) => {

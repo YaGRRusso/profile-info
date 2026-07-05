@@ -1,3 +1,4 @@
+import { CatalogPartition } from "@/core/enums/catalog-partition.enum";
 import type { SkillModel } from "../schemas/skill.schema";
 import { SkillMapper } from "./skill.mapper";
 
@@ -13,6 +14,7 @@ describe("SkillMapper", () => {
       i18n: [{ locale: "en", messages: { title: "TypeScript" } }],
       category: "Programming",
       disabled: false,
+      partition: CatalogPartition.GLOBAL,
     } as SkillModel;
 
     expect(mapper.toDomain(model)).toEqual({
@@ -23,6 +25,8 @@ describe("SkillMapper", () => {
       i18n: [{ locale: "en", messages: { title: "TypeScript" } }],
       category: "Programming",
       disabled: false,
+      partition: CatalogPartition.GLOBAL,
+      ownerId: undefined,
     });
   });
 

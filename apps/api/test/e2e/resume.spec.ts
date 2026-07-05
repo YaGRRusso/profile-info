@@ -1,4 +1,5 @@
 import { INestApplication } from "@nestjs/common";
+import { testSuperAdminContext } from "@test/fixtures/auth-context";
 import request from "supertest";
 import { App } from "supertest/types";
 import { UserRole } from "@/core/enums/user-role.enum";
@@ -22,7 +23,7 @@ describe("ResumeController (e2e)", () => {
     const usersService = testApp.module.get(UsersService);
     const skillsService = testApp.module.get(SkillsService);
 
-    const profileUser = await usersService.createOne({
+    const profileUser = await usersService.createOne(testSuperAdminContext(), {
       name: "Admin User",
       nickname: "admin",
       email: "admin@profile.info",
@@ -40,7 +41,7 @@ describe("ResumeController (e2e)", () => {
     });
     profileUserId = profileUser.id;
 
-    await skillsService.createOne({
+    await skillsService.createOne(testSuperAdminContext(), {
       slug: "typescript",
       i18n: skillI18n("TypeScript"),
       category: "Programming",

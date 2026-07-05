@@ -1,5 +1,8 @@
 import { INestApplication } from "@nestjs/common";
-import { testAuthContext } from "@test/fixtures/auth-context";
+import {
+  testAuthContext,
+  testSuperAdminContext,
+} from "@test/fixtures/auth-context";
 import { App } from "supertest/types";
 import { UserRole } from "@/core/enums/user-role.enum";
 import { ExperienceCategory } from "@/modules/experiences/enums/category.enum";
@@ -32,7 +35,7 @@ describe("GraphQL (e2e)", () => {
     experiencesService = testApp.module.get(ExperiencesService);
     skillsService = testApp.module.get(SkillsService);
 
-    await usersService.createOne({
+    await usersService.createOne(testSuperAdminContext(), {
       name: "Admin",
       nickname: "admin",
       email: "admin@profile.info",
@@ -40,7 +43,7 @@ describe("GraphQL (e2e)", () => {
       role: UserRole.SUPER_ADMIN,
     });
 
-    const user = await usersService.createOne({
+    const user = await usersService.createOne(testSuperAdminContext(), {
       name: "User",
       nickname: "user",
       email: "user@profile.info",
@@ -163,7 +166,7 @@ describe("GraphQL (e2e)", () => {
   });
 
   it("should allow authenticated users to set profile skillIds via updateMe", async () => {
-    const skill = await skillsService.createOne({
+    const skill = await skillsService.createOne(testSuperAdminContext(), {
       slug: "profile-skill",
       i18n: skillI18n("Profile Skill"),
       category: "Programming",
@@ -228,19 +231,22 @@ describe("GraphQL (e2e)", () => {
   });
 
   it("should resolve nested organization via DataLoader on authenticated read", async () => {
-    const organization = await organizationsService.createOne({
-      slug: "nested-org",
-      name: "Nested Org",
-      website: "https://nested.example",
-      logo: "https://nested.example/logo.png",
-      category: OrganizationCategory.COMPANY,
-      i18n: [
-        {
-          locale: "en",
-          messages: { description: "Nested organization" },
-        },
-      ],
-    });
+    const organization = await organizationsService.createOne(
+      testSuperAdminContext(),
+      {
+        slug: "nested-org",
+        name: "Nested Org",
+        website: "https://nested.example",
+        logo: "https://nested.example/logo.png",
+        category: OrganizationCategory.COMPANY,
+        i18n: [
+          {
+            locale: "en",
+            messages: { description: "Nested organization" },
+          },
+        ],
+      }
+    );
 
     const portfolioCtx = testAuthContext({ id: portfolioUserId });
 
@@ -263,7 +269,7 @@ describe("GraphQL (e2e)", () => {
       ],
     });
 
-    await skillsService.createOne({
+    await skillsService.createOne(testSuperAdminContext(), {
       slug: "loader-skill",
       i18n: skillI18n("Loader Skill"),
       category: "Programming",

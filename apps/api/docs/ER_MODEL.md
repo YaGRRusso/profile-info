@@ -9,7 +9,7 @@
 - **ORM / layer:** Mongoose (`@nestjs/mongoose`)
 - **Top-level entities:** User, Skill, Organization, Experience, Education, Course, Project, ApiToken
 - **Schema sources:** `apps/api/src/modules/*/schemas/`, `apps/api/src/core/schemas/`
-- **Tenancy:** A tenant is a `User`. Private entities (`Experience`, `Education`, `Course`, `Project`) require `ownerId` → `User`. Catalog entities (`Skill`, `Organization`) use `scope` (`GLOBAL` | `LOCAL`): global rows have no `ownerId`; local rows require `ownerId` → `User`.
+- **Tenancy:** A tenant is a `User`. Private entities (`Experience`, `Education`, `Course`, `Project`) require `ownerId` → `User`. Catalog entities (`Skill`, `Organization`) use `partition` (`GLOBAL` | `LOCAL`; enum `CatalogPartition`): global rows have no `ownerId`; local rows require `ownerId` → `User`.
 - **FK naming (Mongo):** every stored reference uses an explicit `*Id` / `*Ids` suffix (`ownerId`, `organizationId`, `skillIds`). GraphQL output resolves related entities (`owner`, `organization`, `skills`) via `@ResolveField` + DataLoaders — FK scalars are not exposed on output types.
 
 ## Diagram
@@ -38,9 +38,9 @@ erDiagram
   }
   Organization {
     ObjectId _id PK
-    string scope "GLOBAL LOCAL"
+    string partition "GLOBAL LOCAL"
     ObjectId ownerId FK "local only"
-    string slug "UK per scope"
+    string slug "UK per partition"
     string name
     string category
     object i18n "embed"
@@ -84,9 +84,9 @@ erDiagram
   }
   Skill {
     ObjectId _id PK
-    string scope "GLOBAL LOCAL"
+    string partition "GLOBAL LOCAL"
     ObjectId ownerId FK "local only"
-    string slug "UK per scope"
+    string slug "UK per partition"
     string name
     string category
   }
@@ -154,9 +154,9 @@ inputs use `organizationId` and `skillIds` (no `ownerId` — injected from conte
 ### Skill (`skills`)
 
 - **Source:** `src/modules/skills/schemas/skill.schema.ts`
-- **Key fields:** `scope` (enum: `GLOBAL`, `LOCAL`; default `GLOBAL`, indexed),
-  `ownerId` (ref → User; required when `scope` is `LOCAL`, absent when `GLOBAL`),
-  `slug` (unique per `{ scope, ownerId }` — disabled rows still occupy the slug; re-enable to reuse),
+- **Key fields:** `partition` (enum: `GLOBAL`, `LOCAL`; default `GLOBAL`, indexed),
+  `ownerId` (ref → User; required when `partition` is `LOCAL`, absent when `GLOBAL`),
+  `slug` (unique per `{ partition, ownerId }` — disabled rows still occupy the slug; re-enable to reuse),
   `category` (optional free string, indexed), `disabled`, `i18n[]` (embed: `locale`, `messages.title`)
 - **Embedded:** `i18n[]` translations
 - **References:** optional `ownerId` → User (local catalog only; referenced by private entities via `skillIds`)
@@ -164,9 +164,9 @@ inputs use `organizationId` and `skillIds` (no `ownerId` — injected from conte
 ### Organization (`organizations`)
 
 - **Source:** `src/modules/organizations/schemas/organization.schema.ts`
-- **Key fields:** `scope` (enum: `GLOBAL`, `LOCAL`; default `GLOBAL`, indexed),
-  `ownerId` (ref → User; required when `scope` is `LOCAL`, absent when `GLOBAL`),
-  `slug` (unique per `{ scope, ownerId }` — disabled rows still occupy the slug; re-enable to reuse),
+- **Key fields:** `partition` (enum: `GLOBAL`, `LOCAL`; default `GLOBAL`, indexed),
+  `ownerId` (ref → User; required when `partition` is `LOCAL`, absent when `GLOBAL`),
+  `slug` (unique per `{ partition, ownerId }` — disabled rows still occupy the slug; re-enable to reuse),
   `name`, `website` (optional), `logo` (optional), `category` (enum, indexed),
   `disabled`, `i18n[]` (embed: `locale`, `messages.description`)
 - **Embedded:** `i18n[]` translations

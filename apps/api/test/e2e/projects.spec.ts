@@ -1,4 +1,5 @@
 import { INestApplication } from "@nestjs/common";
+import { testSuperAdminContext } from "@test/fixtures/auth-context";
 import { App } from "supertest/types";
 import { UserRole } from "@/core/enums/user-role.enum";
 import { UsersService } from "@/modules/users/users.service";
@@ -79,7 +80,7 @@ describe("Projects tenant isolation (e2e)", () => {
 
     usersService = testApp.module.get(UsersService);
 
-    await usersService.createOne({
+    await usersService.createOne(testSuperAdminContext(), {
       name: "João",
       nickname: "joao",
       email: "joao@profile.info",
@@ -87,7 +88,7 @@ describe("Projects tenant isolation (e2e)", () => {
       role: UserRole.USER,
     });
 
-    await usersService.createOne({
+    await usersService.createOne(testSuperAdminContext(), {
       name: "Maria",
       nickname: "maria",
       email: "maria@profile.info",
@@ -95,7 +96,7 @@ describe("Projects tenant isolation (e2e)", () => {
       role: UserRole.USER,
     });
 
-    await usersService.createOne({
+    await usersService.createOne(testSuperAdminContext(), {
       name: "Admin",
       nickname: "admin",
       email: "admin@profile.info",

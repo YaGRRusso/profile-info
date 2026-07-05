@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import mongoose from "mongoose";
-import { CatalogScope } from "@/core/enums/catalog-scope.enum";
+import { CatalogPartition } from "@/core/enums/catalog-partition.enum";
 import { BaseModel } from "@/core/schemas/base.schema";
 import {
   createTranslationModel,
@@ -22,10 +22,10 @@ export class SkillModel extends BaseModel {
   @Prop({
     type: String,
     required: true,
-    enum: CatalogScope,
-    default: CatalogScope.GLOBAL,
+    enum: CatalogPartition,
+    default: CatalogPartition.GLOBAL,
   })
-  scope: CatalogScope;
+  partition: CatalogPartition;
 
   @Prop({
     type: mongoose.Schema.Types.ObjectId,
@@ -36,16 +36,16 @@ export class SkillModel extends BaseModel {
   @Prop({ type: String, required: true })
   slug: string;
 
+  @Prop({ type: String })
+  category?: string;
+
   @Prop({
     type: [createTranslationModel(SkillMessagesModel)],
     required: true,
   })
   i18n: TranslationModel<SkillMessagesModel>[];
-
-  @Prop({ type: String, index: true })
-  category?: string;
 }
 
 export const SkillSchema = SchemaFactory.createForClass(SkillModel);
 
-SkillSchema.index({ scope: 1, ownerId: 1, slug: 1 }, { unique: true });
+SkillSchema.index({ partition: 1, ownerId: 1, slug: 1 }, { unique: true });

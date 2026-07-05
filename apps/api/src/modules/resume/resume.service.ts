@@ -66,7 +66,7 @@ export class ResumeService {
       projectsResult,
     ] = await Promise.all([
       skillIds.length
-        ? this.skillsService.findManyById(skillIds)
+        ? this.skillsService.findManyById(ctx, skillIds)
         : Promise.resolve([]),
       this.experiencesService.findMany(ctx, {
         sort: { relevance: -1 },
@@ -105,7 +105,7 @@ export class ResumeService {
       if (organizationId) organizationIds.add(organizationId);
     }
 
-    const organizations = await this.organizationsService.findManyById([
+    const organizations = await this.organizationsService.findManyById(ctx, [
       ...organizationIds,
     ]);
 

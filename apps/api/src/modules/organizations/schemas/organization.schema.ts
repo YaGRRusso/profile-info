@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import mongoose from "mongoose";
-import { CatalogScope } from "@/core/enums/catalog-scope.enum";
+import { CatalogPartition } from "@/core/enums/catalog-partition.enum";
 import { BaseModel } from "@/core/schemas/base.schema";
 import {
   createTranslationModel,
@@ -22,10 +22,10 @@ export class OrganizationModel extends BaseModel {
   @Prop({
     type: String,
     required: true,
-    enum: CatalogScope,
-    default: CatalogScope.GLOBAL,
+    enum: CatalogPartition,
+    default: CatalogPartition.GLOBAL,
   })
-  scope: CatalogScope;
+  partition: CatalogPartition;
 
   @Prop({
     type: mongoose.Schema.Types.ObjectId,
@@ -63,4 +63,7 @@ export class OrganizationModel extends BaseModel {
 export const OrganizationSchema =
   SchemaFactory.createForClass(OrganizationModel);
 
-OrganizationSchema.index({ scope: 1, ownerId: 1, slug: 1 }, { unique: true });
+OrganizationSchema.index(
+  { partition: 1, ownerId: 1, slug: 1 },
+  { unique: true }
+);
