@@ -131,4 +131,20 @@ describe("OrganizationsService", () => {
       expect(repository.countActive).toHaveBeenCalled();
     });
   });
+
+  describe("createOne", () => {
+    it("delegates to crud", async () => {
+      const createInput = {
+        slug: "acme-corp",
+        name: "Acme Corp",
+        category: "COMPANY" as const,
+        i18n: [{ locale: "en", messages: { description: "Acme" } }],
+      };
+      crud.createOne.mockResolvedValue(fakeEntity);
+
+      await service.createOne(ctx, createInput);
+
+      expect(crud.createOne).toHaveBeenCalledWith(createInput);
+    });
+  });
 });

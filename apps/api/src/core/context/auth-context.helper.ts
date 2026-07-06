@@ -1,7 +1,10 @@
 import { ApiTokenPermission } from "@/core/enums/api-token-permission.enum";
 import { CredentialKind } from "@/core/enums/credential-kind.enum";
 import { UserRole } from "@/core/enums/user-role.enum";
-import type { TenantScope } from "@/core/persistence/types/scope.type";
+import type {
+  CatalogScope,
+  TenantScope,
+} from "@/core/persistence/types/scope.type";
 import type {
   ApiTokenAuthContext,
   AuthContext,
@@ -56,4 +59,8 @@ export function toApiTokenAuthContext(
 
 export function toTenantScope(ctx: AuthContext): TenantScope {
   return { userId: ctx.id, crossTenant: isSuperAdmin(ctx) };
+}
+
+export function toCatalogScope(ctx: AuthContext): CatalogScope {
+  return { userId: ctx.id, crossCatalog: isSuperAdmin(ctx) };
 }

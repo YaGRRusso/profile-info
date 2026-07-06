@@ -4,9 +4,9 @@ Deferred API and admin work, ordered by criticality, then value, then effort.
 
 ## Current focus
 
-Finish **ADR 001 — Local catalog** (`apps/api/docs/adr/001-local-catalog.md`): API surface,
-visibility/auth on queries, consumer updates, then admin UI and e2e. Everything else below
-waits until catalog scope is end-to-end.
+Finish **ADR 001 — Local catalog** (`apps/api/docs/adr/001-local-catalog.md`): visibility/auth
+on queries (step 2), consumer scoping, then admin UI and e2e (steps 3–4). API surface and
+partition invariants on create/update are done.
 
 ## High Priority
 

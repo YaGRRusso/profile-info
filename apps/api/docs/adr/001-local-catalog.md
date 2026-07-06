@@ -1,6 +1,6 @@
 # ADR 001 — Local catalog (skills & organizations)
 
-**Status:** Accepted (in progress — persistence layer done)  
+**Status:** Accepted (in progress — API surface done; visibility pending)  
 **Date:** 2026-07-01
 
 ## Context
@@ -11,7 +11,7 @@ entries (local) without duplicating the global list.
 ## Decision
 
 - Add `partition`: `GLOBAL` | `LOCAL` (default `GLOBAL`; enum `CatalogPartition`).
-- `ownerId` → `User` only when `partition` is `LOCAL`; global rows have no owner.
+- `ownerId` → `User` (creator on every row). `partition` drives visibility and slug uniqueness, not whether `ownerId` is stored.
 - Unique key: `{ partition, ownerId, slug }`. Disabled rows keep the slug — re-enable to reuse.
 - Invariants (`LOCAL` requires `ownerId`, etc.) live in **services**, not Mongoose hooks.
 - Visibility rule: a user sees **all global** + **own local** entries (active for refs/validators). A super admin sees **all global** + **all users' local** entries.
@@ -23,12 +23,12 @@ entries (local) without duplicating the global list.
 | Persistence | `partition`, `ownerId`, unique `{ partition, ownerId, slug }` on Skill and Organization |
 | Shared types | `CatalogPartition` enum (Mongoose + GraphQL); `CatalogScope` type for caller visibility (`scope.type.ts`) |
 | Docs | `ER_MODEL.md` reflects catalog partition fields |
+| API surface | `partition` / `ownerId` on GraphQL entities, mappers, filters; optional `partition` on create; `AuthContext` on catalog services, resolvers, loaders, validators; `toCatalogScope(ctx)` in `auth-context.helper.ts`; `withCatalogScope` / `withCatalogScopeForAggregate` / `withCatalogScopeForMutate` in `catalog-scope.helper.ts` (not wired in services yet). |
 
 ## Remaining work
 
 | # | What | Notes |
 |---|------|-------|
-| 1 | **API surface** | Expose `partition` / `ownerId` on entities, mappers, inputs, and filters. `create` with `LOCAL` sets `ownerId` from `ctx`. One entity at a time: skills → organizations. |
 | 2 | **Queries & auth** | `findMany` / validators / loaders filter by visibility + `disabled`. `USER` mutates only own `LOCAL`; `SUPER_ADMIN` manages `GLOBAL`. |
 | 3 | **Consumers** | Resume, dashboard, and private-entity refs accept global or caller's local IDs. |
 | 4 | **Admin + tests** | UI for local create/list; seed examples; e2e for slug uniqueness across partitions. |
