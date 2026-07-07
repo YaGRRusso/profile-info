@@ -1,7 +1,7 @@
 import { Test, TestingModule } from "@nestjs/testing";
 import { testAuthContext } from "@test/fixtures/auth-context";
+import { expectCrudScopedToTenant } from "@test/support/expect-crud-scoped";
 import { hash } from "bcryptjs";
-import { toTenantScope } from "@/core/context/auth-context.helper";
 import { ApiTokenPermission } from "@/core/enums/api-token-permission.enum";
 import { createMockCrud } from "@/core/persistence/repositories/testing/service-spec.mock";
 import { ApiTokensRepository } from "./api-tokens.repository";
@@ -71,7 +71,7 @@ describe("ApiTokensService", () => {
       await expect(service.findOneById(ctx, validId)).resolves.toEqual(
         fakeEntity
       );
-      expect(crud.scoped).toHaveBeenCalledWith(toTenantScope(ctx));
+      expectCrudScopedToTenant(crud.scoped, ctx);
       expect(crud.findOneById).toHaveBeenCalledWith(validId);
     });
   });
@@ -91,7 +91,7 @@ describe("ApiTokensService", () => {
       });
 
       expect(hash).toHaveBeenCalledWith("secret-value", 8);
-      expect(crud.scoped).toHaveBeenCalledWith(toTenantScope(ctx));
+      expectCrudScopedToTenant(crud.scoped, ctx);
       expect(crud.createOne).toHaveBeenCalledWith({
         name: "dev-token",
         permissions: [ApiTokenPermission.QUERY],
@@ -108,7 +108,7 @@ describe("ApiTokensService", () => {
       await expect(service.removeOne(ctx, validId)).resolves.toEqual(
         fakeEntity
       );
-      expect(crud.scoped).toHaveBeenCalledWith(toTenantScope(ctx));
+      expectCrudScopedToTenant(crud.scoped, ctx);
       expect(crud.deleteOneById).toHaveBeenCalledWith(validId);
     });
   });

@@ -6,7 +6,7 @@ import {
   toQueryForMutate as catalogToQueryForMutate,
   toQueryForRead as catalogToQueryForRead,
 } from "./catalog-scope.helper";
-import { noopScope, resolvePersistenceScope } from "./persistence-scope.helper";
+import { noopScope } from "./persistence-scope.helper";
 import {
   tenantScope,
   toQueryForAggregate as tenantToQueryForAggregate,
@@ -141,23 +141,5 @@ describe("catalogScope", () => {
         $set: { slug: "renamed", partition: CatalogPartition.GLOBAL },
       })
     ).toEqual({ $set: { slug: "renamed" } });
-  });
-});
-
-describe("resolvePersistenceScope", () => {
-  const userId = new mongoose.Types.ObjectId().toHexString();
-
-  it("should return PersistenceScope as-is", () => {
-    const persistenceScope = noopScope();
-    expect(resolvePersistenceScope(persistenceScope)).toBe(persistenceScope);
-  });
-
-  it("should wrap TenantScope with tenantScope", () => {
-    const tenant = { userId, crossTenant: false };
-    const resolved = resolvePersistenceScope(tenant);
-
-    expect(resolved.query.forRead({})).toEqual(
-      tenantToQueryForRead(tenant, {})
-    );
   });
 });

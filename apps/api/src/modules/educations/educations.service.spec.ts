@@ -1,6 +1,6 @@
 import { Test, TestingModule } from "@nestjs/testing";
 import { testAuthContext } from "@test/fixtures/auth-context";
-import { toTenantScope } from "@/core/context/auth-context.helper";
+import { expectCrudScopedToTenant } from "@test/support/expect-crud-scoped";
 import {
   createMockCrud,
   createMockStats,
@@ -79,7 +79,7 @@ describe("EducationsService", () => {
       await expect(service.findOneById(ctx, validId)).resolves.toEqual(
         fakeEntity
       );
-      expect(crud.scoped).toHaveBeenCalledWith(toTenantScope(ctx));
+      expectCrudScopedToTenant(crud.scoped, ctx);
       expect(crud.findOneById).toHaveBeenCalledWith(validId);
     });
   });
@@ -107,7 +107,7 @@ describe("EducationsService", () => {
       await expect(service.createOne(ctx, createInput)).resolves.toEqual(
         fakeEntity
       );
-      expect(crud.scoped).toHaveBeenCalledWith(toTenantScope(ctx));
+      expectCrudScopedToTenant(crud.scoped, ctx);
       expect(crud.createOne).toHaveBeenCalledWith(createInput);
     });
   });
@@ -119,7 +119,7 @@ describe("EducationsService", () => {
       await expect(service.updateOne(ctx, validId, {})).resolves.toEqual(
         fakeEntity
       );
-      expect(crud.scoped).toHaveBeenCalledWith(toTenantScope(ctx));
+      expectCrudScopedToTenant(crud.scoped, ctx);
       expect(crud.updateOneById).toHaveBeenCalledWith(validId, {});
     });
   });
@@ -131,7 +131,7 @@ describe("EducationsService", () => {
       await expect(service.removeOne(ctx, validId)).resolves.toEqual(
         fakeEntity
       );
-      expect(crud.scoped).toHaveBeenCalledWith(toTenantScope(ctx));
+      expectCrudScopedToTenant(crud.scoped, ctx);
       expect(crud.deleteOneById).toHaveBeenCalledWith(validId);
     });
   });
@@ -144,7 +144,7 @@ describe("EducationsService", () => {
         succeeded: 1,
         failed: 0,
       });
-      expect(crud.scoped).toHaveBeenCalledWith(toTenantScope(ctx));
+      expectCrudScopedToTenant(crud.scoped, ctx);
       expect(crud.deleteManyById).toHaveBeenCalledWith([validId]);
     });
   });
