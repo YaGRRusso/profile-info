@@ -160,6 +160,10 @@ inputs use `organizationId` and `skillIds` (no `ownerId` — injected from conte
   `category` (optional free string, indexed), `disabled`, `i18n[]` (embed: `locale`, `messages.title`)
 - **Embedded:** `i18n[]` translations
 - **References:** `ownerId` → User (creator); referenced by private entities via `skillIds`
+- **Disable (not delete):** `disabled: true` keeps the row and slug. Existing `skillIds`
+  refs on private entities **remain valid for reads**; create/update validators reject
+  new refs to disabled skills. See ADR 001 § *Disabled catalog entries*
+  (`apps/api/docs/adr/001-local-catalog.md`).
 
 ### Organization (`organizations`)
 
@@ -171,6 +175,8 @@ inputs use `organizationId` and `skillIds` (no `ownerId` — injected from conte
   `disabled`, `i18n[]` (embed: `locale`, `messages.description`)
 - **Embedded:** `i18n[]` translations
 - **References:** `ownerId` → User (creator); referenced by Experience, Education, Course
+- **Disable (not delete):** same as Skill — existing `organizationId` refs remain valid
+  for reads; create/update rejects disabled orgs. ADR 001 § *Disabled catalog entries*.
 
 ### Experience (`experiences`)
 
@@ -242,6 +248,8 @@ inputs use `organizationId` and `skillIds` (no `ownerId` — injected from conte
 
 ## Delete and lifecycle notes
 
+- **`disable*` / `enable*`** on Skill and Organization set `disabled` only — no domain
+  events, no cascade. Disabled rows stay referenced until hard delete or manual ref edit.
 - `skill.deleted` event: consumers `$pull` skill refs from Project, Course, Education,
   User (`skillIds`), and nested Experience role arrays (`detachSkill`).
 - `organization.deleted` event: hard `deleteMany` on Course, Education, Experience tied

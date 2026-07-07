@@ -4,7 +4,7 @@ Deferred API and admin work, ordered by criticality, then value, then effort.
 
 ## Current focus
 
-1. **ADR 001 — Local catalog** (`apps/api/docs/adr/001-local-catalog.md`): visibility, consumers, admin, e2e.
+1. **ADR 001 — Local catalog** (`apps/api/docs/adr/001-local-catalog.md`): implement in phases — **phase 1 (disabled read vs write) first**, then partition scope, consumers, admin. Canonical rules for disabled entries are in the ADR § *Disabled catalog entries*.
 
 ## High Priority
 
