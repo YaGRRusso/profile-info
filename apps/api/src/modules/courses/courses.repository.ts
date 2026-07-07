@@ -1,6 +1,8 @@
 import { Injectable } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import { Model } from "mongoose";
+import { tenantPersistenceScope } from "@/core/context/auth-context.helper";
+import type { AuthContext } from "@/core/context/auth-context.interface";
 import { CrudRepository } from "@/core/persistence/repositories/crud/crud.repository";
 import { StatsRepository } from "@/core/persistence/repositories/stats/stats.repository";
 import { CreateCourseInput } from "./dto/create-course.input";
@@ -28,6 +30,14 @@ export class CoursesRepository {
     this.model = model;
     this.crud = new CrudRepository(model, new CourseMapper());
     this.stats = new StatsRepository(model);
+  }
+
+  tenantCrud(ctx: AuthContext) {
+    return this.crud.scoped(tenantPersistenceScope(ctx));
+  }
+
+  tenantStats(ctx: AuthContext) {
+    return this.stats.scoped(tenantPersistenceScope(ctx));
   }
 
   async detachSkill(skillId: string): Promise<void> {

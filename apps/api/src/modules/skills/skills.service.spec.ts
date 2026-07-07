@@ -1,7 +1,6 @@
 import { EventEmitter2 } from "@nestjs/event-emitter";
 import { Test, type TestingModule } from "@nestjs/testing";
 import { testAuthContext } from "@test/fixtures/auth-context";
-import { expectCrudScopedToCatalog } from "@test/support/expect-crud-scoped";
 import { CatalogPartition } from "@/core/enums/catalog-partition.enum";
 import { DomainEvents } from "@/core/events/domain-events";
 import { SkillDeletedEvent } from "@/core/events/skill-deleted.event";
@@ -29,6 +28,7 @@ describe("SkillsService", () => {
   let crud: ReturnType<typeof createMockCrud>;
   let repository: {
     crud: ReturnType<typeof createMockCrud>;
+    catalogCrud: jest.Mock;
     countActive: jest.Mock;
     findRecentlyUpdatedActive: jest.Mock;
     stats: ReturnType<typeof createMockStats>;
@@ -40,6 +40,7 @@ describe("SkillsService", () => {
     crud = createMockCrud();
     repository = {
       crud,
+      catalogCrud: jest.fn().mockReturnValue(crud),
       countActive: jest.fn().mockResolvedValue(2),
       findRecentlyUpdatedActive: jest.fn(),
       stats: createMockStats(),
@@ -109,7 +110,7 @@ describe("SkillsService", () => {
       await expect(service.findOneById(ctx, validId)).resolves.toEqual(
         fakeEntity
       );
-      expectCrudScopedToCatalog(crud.scoped, ctx);
+      expect(repository.catalogCrud).toHaveBeenCalledWith(ctx);
       expect(crud.findOneById).toHaveBeenCalledWith(validId);
     });
   });

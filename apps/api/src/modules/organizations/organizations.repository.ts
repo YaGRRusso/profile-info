@@ -1,13 +1,10 @@
-import { Injectable, NotFoundException } from "@nestjs/common";
+import { Injectable } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import { Model } from "mongoose";
-import { PERSISTENCE_NOT_FOUND } from "@/core/persistence/persistence.messages";
+import { catalogPersistenceScope } from "@/core/context/auth-context.helper";
+import type { AuthContext } from "@/core/context/auth-context.interface";
 import { CrudRepository } from "@/core/persistence/repositories/crud/crud.repository";
 import { StatsRepository } from "@/core/persistence/repositories/stats/stats.repository";
-import type {
-  FindManyQuery,
-  FindOneQuery,
-} from "@/core/persistence/types/input.type";
 import { CreateOrganizationInput } from "./dto/create-organization.input";
 import { FilterOrganizationInput } from "./dto/filter-organization.input";
 import { SortOrganizationInput } from "./dto/sort-organization.input";
@@ -37,45 +34,12 @@ export class OrganizationsRepository {
     this.stats = new StatsRepository(model);
   }
 
-  findOneActive({ filters, ...query }: FindOneQuery<FilterOrganizationInput>) {
-    return this.crud.findOne({
-      ...query,
-      filters: { ...filters, disabled: filters?.disabled ?? false },
-    });
+  catalogCrud(ctx: AuthContext) {
+    return this.crud.scoped(catalogPersistenceScope(ctx));
   }
 
-  async findOneActiveById(id: string): Promise<OrganizationEntity> {
-    const organization = await this.crud.findOneById(id);
-
-    const isDisabled = organization.disabled;
-    if (isDisabled) {
-      throw new NotFoundException(PERSISTENCE_NOT_FOUND);
-    }
-
-    return organization;
-  }
-
-  findManyActive({
-    filters,
-    ...query
-  }: FindManyQuery<FilterOrganizationInput, SortOrganizationInput>) {
-    return this.crud.findMany({
-      ...query,
-      filters: { ...filters, disabled: filters?.disabled ?? false },
-    });
-  }
-
-  async findManyActiveById(ids: string[]): Promise<OrganizationEntity[]> {
-    const organizations = await this.crud.findManyById(ids);
-
-    const isDisabled = organizations.some(
-      (organization) => organization.disabled
-    );
-    if (isDisabled) {
-      throw new NotFoundException(PERSISTENCE_NOT_FOUND);
-    }
-
-    return organizations;
+  catalogStats(ctx: AuthContext) {
+    return this.stats.scoped(catalogPersistenceScope(ctx));
   }
 
   countActive(): Promise<number> {

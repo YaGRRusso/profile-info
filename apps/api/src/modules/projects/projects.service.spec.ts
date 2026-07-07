@@ -1,6 +1,5 @@
 import { Test, TestingModule } from "@nestjs/testing";
 import { testAuthContext } from "@test/fixtures/auth-context";
-import { expectCrudScopedToTenant } from "@test/support/expect-crud-scoped";
 import {
   createMockCrud,
   createMockStats,
@@ -22,9 +21,10 @@ const fakeEntity = {
 describe("ProjectsService", () => {
   let service: ProjectsService;
   let crud: ReturnType<typeof createMockCrud>;
+  let stats: ReturnType<typeof createMockStats>;
   let repository: {
-    crud: ReturnType<typeof createMockCrud>;
-    stats: ReturnType<typeof createMockStats>;
+    tenantCrud: jest.Mock;
+    tenantStats: jest.Mock;
     detachSkill: jest.Mock;
     purgeByOwner: jest.Mock;
   };
@@ -32,9 +32,10 @@ describe("ProjectsService", () => {
   beforeEach(async () => {
     jest.clearAllMocks();
     crud = createMockCrud();
+    stats = createMockStats();
     repository = {
-      crud,
-      stats: createMockStats(),
+      tenantCrud: jest.fn().mockReturnValue(crud),
+      tenantStats: jest.fn().mockReturnValue(stats),
       detachSkill: jest.fn(),
       purgeByOwner: jest.fn(),
     };
@@ -66,7 +67,7 @@ describe("ProjectsService", () => {
       await expect(service.findOneById(ctx, validId)).resolves.toEqual(
         fakeEntity
       );
-      expectCrudScopedToTenant(crud.scoped, ctx);
+      expect(repository.tenantCrud).toHaveBeenCalledWith(ctx);
       expect(crud.findOneById).toHaveBeenCalledWith(validId);
     });
   });
@@ -91,7 +92,7 @@ describe("ProjectsService", () => {
       await expect(service.createOne(ctx, createInput)).resolves.toEqual(
         fakeEntity
       );
-      expectCrudScopedToTenant(crud.scoped, ctx);
+      expect(repository.tenantCrud).toHaveBeenCalledWith(ctx);
       expect(crud.createOne).toHaveBeenCalledWith(createInput);
     });
   });
@@ -103,7 +104,7 @@ describe("ProjectsService", () => {
       await expect(service.updateOne(ctx, validId, {})).resolves.toEqual(
         fakeEntity
       );
-      expectCrudScopedToTenant(crud.scoped, ctx);
+      expect(repository.tenantCrud).toHaveBeenCalledWith(ctx);
       expect(crud.updateOneById).toHaveBeenCalledWith(validId, {});
     });
   });
@@ -115,7 +116,7 @@ describe("ProjectsService", () => {
       await expect(service.removeOne(ctx, validId)).resolves.toEqual(
         fakeEntity
       );
-      expectCrudScopedToTenant(crud.scoped, ctx);
+      expect(repository.tenantCrud).toHaveBeenCalledWith(ctx);
       expect(crud.deleteOneById).toHaveBeenCalledWith(validId);
     });
   });
@@ -128,7 +129,7 @@ describe("ProjectsService", () => {
         succeeded: 1,
         failed: 0,
       });
-      expectCrudScopedToTenant(crud.scoped, ctx);
+      expect(repository.tenantCrud).toHaveBeenCalledWith(ctx);
       expect(crud.deleteManyById).toHaveBeenCalledWith([validId]);
     });
   });

@@ -4,7 +4,6 @@ import {
   labelFromI18nTitle,
   type RecentActivityRecord,
 } from "@/common/helpers/recent-activity.helper";
-import { catalogPersistenceScope } from "@/core/context/auth-context.helper";
 import type { AuthContext } from "@/core/context/auth-context.interface";
 import { BatchEntity } from "@/core/entities/batch.entity";
 import { DomainEvents } from "@/core/events/domain-events";
@@ -29,26 +28,26 @@ export class SkillsService {
   ) {}
 
   findOneById(ctx: AuthContext, id: string): Promise<SkillEntity> {
-    return this.repository.crud
-      .scoped(catalogPersistenceScope(ctx))
-      .findOneById(id);
+    return this.repository.catalogCrud(ctx).findOneById(id);
   }
 
   findOne(
     _ctx: AuthContext,
     { filters }: { filters?: FilterSkillInput }
   ): Promise<SkillEntity> {
-    return this.repository.findOneActive({ filters });
+    return this.repository.crud.findOne({
+      filters: this.withActiveFilter(filters),
+    });
   }
 
-  findOneActiveById(_ctx: AuthContext, id: string): Promise<SkillEntity> {
-    return this.repository.findOneActiveById(id);
+  async findOneActiveById(ctx: AuthContext, id: string): Promise<SkillEntity> {
+    const skill = await this.repository.catalogCrud(ctx).findOneById(id);
+    this.assertActive(skill);
+    return skill;
   }
 
   findManyById(ctx: AuthContext, ids: string[]): Promise<SkillEntity[]> {
-    return this.repository.crud
-      .scoped(catalogPersistenceScope(ctx))
-      .findManyById(ids);
+    return this.repository.catalogCrud(ctx).findManyById(ids);
   }
 
   async findManyActiveById(
@@ -56,11 +55,7 @@ export class SkillsService {
     ids: string[]
   ): Promise<SkillEntity[]> {
     const skills = await this.findManyById(ctx, ids);
-
-    if (skills.some((skill) => skill.disabled)) {
-      throw new NotFoundException(PERSISTENCE_NOT_FOUND);
-    }
-
+    this.assertAllActive(skills);
     return skills;
   }
 
@@ -95,7 +90,12 @@ export class SkillsService {
       skip?: number;
     }
   ): Promise<MultiPaged<SkillEntity>> {
-    return this.repository.findManyActive({ filters, sort, skip, limit });
+    return this.repository.crud.findMany({
+      filters: this.withActiveFilter(filters),
+      sort,
+      skip,
+      limit,
+    });
   }
 
   createOne(
@@ -192,5 +192,21 @@ export class SkillsService {
       ),
       updatedAt: row.updatedAt,
     }));
+  }
+
+  private withActiveFilter(filters?: FilterSkillInput): FilterSkillInput {
+    return { ...filters, disabled: filters?.disabled ?? false };
+  }
+
+  private assertActive(entry: { disabled: boolean }): void {
+    if (entry.disabled) {
+      throw new NotFoundException(PERSISTENCE_NOT_FOUND);
+    }
+  }
+
+  private assertAllActive(entries: Array<{ disabled: boolean }>): void {
+    if (entries.some((entry) => entry.disabled)) {
+      throw new NotFoundException(PERSISTENCE_NOT_FOUND);
+    }
   }
 }

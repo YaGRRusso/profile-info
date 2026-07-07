@@ -4,8 +4,7 @@ Deferred API and admin work, ordered by criticality, then value, then effort.
 
 ## Current focus
 
-1. **ADR 002 — Persistence scope** (`apps/api/docs/adr/002-persistence-scope.md`): steps 1–4 (PersistenceScope → Crud → Stats → call sites). No catalog changes.
-2. **ADR 001 — Local catalog** (`apps/api/docs/adr/001-local-catalog.md`): visibility, consumers, admin, e2e — after ADR 002 if catalog needs `scoped()` (add `catalogScope` factory then).
+1. **ADR 001 — Local catalog** (`apps/api/docs/adr/001-local-catalog.md`): visibility, consumers, admin, e2e.
 
 ## High Priority
 

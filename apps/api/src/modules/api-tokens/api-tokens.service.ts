@@ -2,10 +2,8 @@ import { randomBytes } from "node:crypto";
 import { Injectable } from "@nestjs/common";
 import { hash } from "bcryptjs";
 import mongoose from "mongoose";
-import { toTenantScope } from "@/core/context/auth-context.helper";
 import type { AuthContext } from "@/core/context/auth-context.interface";
 import { BatchEntity } from "@/core/entities/batch.entity";
-import { tenantScope } from "@/core/persistence/helpers/tenant-scope.helper";
 import type { MultiPaged } from "@/core/persistence/types/output.type";
 import { ApiTokensRepository } from "./api-tokens.repository";
 import {
@@ -29,24 +27,18 @@ export class ApiTokensService {
   }
 
   findOneById(ctx: AuthContext, id: string): Promise<ApiTokenEntity> {
-    return this.repository.crud
-      .scoped(tenantScope(toTenantScope(ctx)))
-      .findOneById(id);
+    return this.repository.tenantCrud(ctx).findOneById(id);
   }
 
   findManyById(ctx: AuthContext, ids: string[]): Promise<ApiTokenEntity[]> {
-    return this.repository.crud
-      .scoped(tenantScope(toTenantScope(ctx)))
-      .findManyById(ids);
+    return this.repository.tenantCrud(ctx).findManyById(ids);
   }
 
   findOne(
     ctx: AuthContext,
     { filters }: { filters?: FilterApiTokenInput } = {}
   ): Promise<ApiTokenEntity> {
-    return this.repository.crud
-      .scoped(tenantScope(toTenantScope(ctx)))
-      .findOne({ filters });
+    return this.repository.tenantCrud(ctx).findOne({ filters });
   }
 
   findMany(
@@ -63,14 +55,12 @@ export class ApiTokensService {
       limit?: number;
     } = {}
   ): Promise<MultiPaged<ApiTokenEntity>> {
-    return this.repository.crud
-      .scoped(tenantScope(toTenantScope(ctx)))
-      .findMany({
-        filters,
-        sort,
-        skip,
-        limit,
-      });
+    return this.repository.tenantCrud(ctx).findMany({
+      filters,
+      sort,
+      skip,
+      limit,
+    });
   }
 
   async createOne(
@@ -85,8 +75,8 @@ export class ApiTokensService {
       hashedSecret: await hash(secret, 8),
     };
 
-    const apiToken = await this.repository.crud
-      .scoped(tenantScope(toTenantScope(ctx)))
+    const apiToken = await this.repository
+      .tenantCrud(ctx)
       .createOne(createInput);
 
     return { token: plaintext, apiToken };
@@ -97,9 +87,7 @@ export class ApiTokensService {
     id: string,
     updateInput: UpdateApiTokenInput
   ): Promise<ApiTokenEntity> {
-    return this.repository.crud
-      .scoped(tenantScope(toTenantScope(ctx)))
-      .updateOneById(id, updateInput);
+    return this.repository.tenantCrud(ctx).updateOneById(id, updateInput);
   }
 
   updateMany(
@@ -107,21 +95,15 @@ export class ApiTokensService {
     ids: string[],
     updateInput: UpdateApiTokenInput
   ): Promise<BatchEntity> {
-    return this.repository.crud
-      .scoped(tenantScope(toTenantScope(ctx)))
-      .updateManyById(ids, updateInput);
+    return this.repository.tenantCrud(ctx).updateManyById(ids, updateInput);
   }
 
   removeOne(ctx: AuthContext, id: string): Promise<ApiTokenEntity> {
-    return this.repository.crud
-      .scoped(tenantScope(toTenantScope(ctx)))
-      .deleteOneById(id);
+    return this.repository.tenantCrud(ctx).deleteOneById(id);
   }
 
   removeMany(ctx: AuthContext, ids: string[]): Promise<BatchEntity> {
-    return this.repository.crud
-      .scoped(tenantScope(toTenantScope(ctx)))
-      .deleteManyById(ids);
+    return this.repository.tenantCrud(ctx).deleteManyById(ids);
   }
 
   async purgeByOwner(ownerId: string): Promise<void> {

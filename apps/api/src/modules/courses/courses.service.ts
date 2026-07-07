@@ -3,10 +3,8 @@ import {
   labelFromI18nTitle,
   RecentActivityRecord,
 } from "@/common/helpers/recent-activity.helper";
-import { toTenantScope } from "@/core/context/auth-context.helper";
 import type { AuthContext } from "@/core/context/auth-context.interface";
 import { BatchEntity } from "@/core/entities/batch.entity";
-import { tenantScope } from "@/core/persistence/helpers/tenant-scope.helper";
 import { FieldCount, MultiPaged } from "@/core/persistence/types/output.type";
 import { OrganizationsValidatorService } from "@/modules/organizations/organizations-validator.service";
 import { SkillsValidatorService } from "@/modules/skills/skills-validator.service";
@@ -31,9 +29,7 @@ export class CoursesService {
   ) {}
 
   findOneById(ctx: AuthContext, id: string): Promise<CourseEntityRecord> {
-    return this.repository.crud
-      .scoped(tenantScope(toTenantScope(ctx)))
-      .findOneById(id);
+    return this.repository.tenantCrud(ctx).findOneById(id);
   }
 
   findOne(
@@ -44,15 +40,11 @@ export class CoursesService {
       filters?: FilterCourseInput;
     }
   ): Promise<CourseEntityRecord> {
-    return this.repository.crud
-      .scoped(tenantScope(toTenantScope(ctx)))
-      .findOne({ filters });
+    return this.repository.tenantCrud(ctx).findOne({ filters });
   }
 
   findManyById(ctx: AuthContext, ids: string[]): Promise<CourseEntityRecord[]> {
-    return this.repository.crud
-      .scoped(tenantScope(toTenantScope(ctx)))
-      .findManyById(ids);
+    return this.repository.tenantCrud(ctx).findManyById(ids);
   }
 
   findMany(
@@ -69,14 +61,12 @@ export class CoursesService {
       skip?: number;
     }
   ): Promise<MultiPaged<CourseEntityRecord>> {
-    return this.repository.crud
-      .scoped(tenantScope(toTenantScope(ctx)))
-      .findMany({
-        filters,
-        sort,
-        skip,
-        limit,
-      });
+    return this.repository.tenantCrud(ctx).findMany({
+      filters,
+      sort,
+      skip,
+      limit,
+    });
   }
 
   async createOne(
@@ -85,9 +75,7 @@ export class CoursesService {
   ): Promise<CourseEntityRecord> {
     await this.assertCatalogReferences(ctx, createInput);
 
-    return await this.repository.crud
-      .scoped(tenantScope(toTenantScope(ctx)))
-      .createOne(createInput);
+    return await this.repository.tenantCrud(ctx).createOne(createInput);
   }
 
   async createMany(
@@ -96,9 +84,7 @@ export class CoursesService {
   ): Promise<BatchEntity> {
     await this.assertCatalogReferencesMany(ctx, createInputs);
 
-    return await this.repository.crud
-      .scoped(tenantScope(toTenantScope(ctx)))
-      .createMany(createInputs);
+    return await this.repository.tenantCrud(ctx).createMany(createInputs);
   }
 
   async updateOne(
@@ -108,9 +94,7 @@ export class CoursesService {
   ): Promise<CourseEntityRecord> {
     await this.assertCatalogReferences(ctx, updateInput);
 
-    return this.repository.crud
-      .scoped(tenantScope(toTenantScope(ctx)))
-      .updateOneById(id, updateInput);
+    return this.repository.tenantCrud(ctx).updateOneById(id, updateInput);
   }
 
   async updateMany(
@@ -120,41 +104,33 @@ export class CoursesService {
   ): Promise<BatchEntity> {
     await this.assertCatalogReferences(ctx, updateInput);
 
-    return await this.repository.crud
-      .scoped(tenantScope(toTenantScope(ctx)))
+    return await this.repository
+      .tenantCrud(ctx)
       .updateManyById(ids, updateInput);
   }
 
   removeOne(ctx: AuthContext, id: string): Promise<CourseEntityRecord> {
-    return this.repository.crud
-      .scoped(tenantScope(toTenantScope(ctx)))
-      .deleteOneById(id);
+    return this.repository.tenantCrud(ctx).deleteOneById(id);
   }
 
   async removeMany(ctx: AuthContext, ids: string[]): Promise<BatchEntity> {
-    return await this.repository.crud
-      .scoped(tenantScope(toTenantScope(ctx)))
-      .deleteManyById(ids);
+    return await this.repository.tenantCrud(ctx).deleteManyById(ids);
   }
 
   count(ctx: AuthContext): Promise<number> {
-    return this.repository.stats
-      .scoped(tenantScope(toTenantScope(ctx)))
-      .count();
+    return this.repository.tenantStats(ctx).count();
   }
 
   countByField(ctx: AuthContext, field: string): Promise<FieldCount[]> {
-    return this.repository.stats
-      .scoped(tenantScope(toTenantScope(ctx)))
-      .countByField(field);
+    return this.repository.tenantStats(ctx).countByField(field);
   }
 
   async findRecentActivity(
     ctx: AuthContext,
     limit: number
   ): Promise<RecentActivityRecord[]> {
-    const rows = await this.repository.stats
-      .scoped(tenantScope(toTenantScope(ctx)))
+    const rows = await this.repository
+      .tenantStats(ctx)
       .findRecentlyUpdated(limit, "slug i18n updatedAt");
     return rows.map((row) => ({
       label: labelFromI18nTitle(

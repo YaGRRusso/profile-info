@@ -2,6 +2,8 @@ import { Injectable, NotFoundException } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import { isNil } from "lodash";
 import { Model } from "mongoose";
+import { tenantPersistenceScope } from "@/core/context/auth-context.helper";
+import type { AuthContext } from "@/core/context/auth-context.interface";
 import { PERSISTENCE_NOT_FOUND } from "@/core/persistence/persistence.messages";
 import { CrudRepository } from "@/core/persistence/repositories/crud/crud.repository";
 import { FilterApiTokenInput } from "./dto/filter-api-token.input";
@@ -32,6 +34,10 @@ export class ApiTokensRepository {
     private readonly model: Model<ApiTokenModel>
   ) {
     this.crud = new CrudRepository(model, this.mapper);
+  }
+
+  tenantCrud(ctx: AuthContext) {
+    return this.crud.scoped(tenantPersistenceScope(ctx));
   }
 
   async findOneByIdWithHashedSecret(

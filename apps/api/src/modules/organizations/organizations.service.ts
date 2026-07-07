@@ -1,7 +1,6 @@
 import { Injectable, NotFoundException } from "@nestjs/common";
 import { EventEmitter2 } from "@nestjs/event-emitter";
 import { RecentActivityRecord } from "@/common/helpers/recent-activity.helper";
-import { catalogPersistenceScope } from "@/core/context/auth-context.helper";
 import type { AuthContext } from "@/core/context/auth-context.interface";
 import { BatchEntity } from "@/core/entities/batch.entity";
 import { DomainEvents } from "@/core/events/domain-events";
@@ -23,9 +22,7 @@ export class OrganizationsService {
   ) {}
 
   findOneById(ctx: AuthContext, id: string): Promise<OrganizationEntity> {
-    return this.repository.crud
-      .scoped(catalogPersistenceScope(ctx))
-      .findOneById(id);
+    return this.repository.catalogCrud(ctx).findOneById(id);
   }
 
   findOne(
@@ -36,20 +33,22 @@ export class OrganizationsService {
       filters?: FilterOrganizationInput;
     }
   ): Promise<OrganizationEntity> {
-    return this.repository.findOneActive({ filters });
+    return this.repository.crud.findOne({
+      filters: this.withActiveFilter(filters),
+    });
   }
 
-  findOneActiveById(
-    _ctx: AuthContext,
+  async findOneActiveById(
+    ctx: AuthContext,
     id: string
   ): Promise<OrganizationEntity> {
-    return this.repository.findOneActiveById(id);
+    const organization = await this.repository.catalogCrud(ctx).findOneById(id);
+    this.assertActive(organization);
+    return organization;
   }
 
   findManyById(ctx: AuthContext, ids: string[]): Promise<OrganizationEntity[]> {
-    return this.repository.crud
-      .scoped(catalogPersistenceScope(ctx))
-      .findManyById(ids);
+    return this.repository.catalogCrud(ctx).findManyById(ids);
   }
 
   async findManyActiveById(
@@ -57,11 +56,7 @@ export class OrganizationsService {
     ids: string[]
   ): Promise<OrganizationEntity[]> {
     const organizations = await this.findManyById(ctx, ids);
-
-    if (organizations.some((organization) => organization.disabled)) {
-      throw new NotFoundException(PERSISTENCE_NOT_FOUND);
-    }
-
+    this.assertAllActive(organizations);
     return organizations;
   }
 
@@ -96,7 +91,12 @@ export class OrganizationsService {
       skip?: number;
     }
   ): Promise<MultiPaged<OrganizationEntity>> {
-    return this.repository.findManyActive({ filters, sort, skip, limit });
+    return this.repository.crud.findMany({
+      filters: this.withActiveFilter(filters),
+      sort,
+      skip,
+      limit,
+    });
   }
 
   createOne(
@@ -186,5 +186,23 @@ export class OrganizationsService {
       label: row.name as string,
       updatedAt: row.updatedAt,
     }));
+  }
+
+  private withActiveFilter(
+    filters?: FilterOrganizationInput
+  ): FilterOrganizationInput {
+    return { ...filters, disabled: filters?.disabled ?? false };
+  }
+
+  private assertActive(entry: { disabled: boolean }): void {
+    if (entry.disabled) {
+      throw new NotFoundException(PERSISTENCE_NOT_FOUND);
+    }
+  }
+
+  private assertAllActive(entries: Array<{ disabled: boolean }>): void {
+    if (entries.some((entry) => entry.disabled)) {
+      throw new NotFoundException(PERSISTENCE_NOT_FOUND);
+    }
   }
 }

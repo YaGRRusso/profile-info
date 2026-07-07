@@ -1,6 +1,5 @@
 import { Test, TestingModule } from "@nestjs/testing";
 import { testAuthContext } from "@test/fixtures/auth-context";
-import { expectCrudScopedToTenant } from "@test/support/expect-crud-scoped";
 import { hash } from "bcryptjs";
 import { ApiTokenPermission } from "@/core/enums/api-token-permission.enum";
 import { createMockCrud } from "@/core/persistence/repositories/testing/service-spec.mock";
@@ -26,11 +25,13 @@ const fakeEntity = {
 describe("ApiTokensService", () => {
   let service: ApiTokensService;
   let crud: ReturnType<typeof createMockCrud>;
+  let tenantCrud: jest.Mock;
   let purgeByOwner: jest.Mock;
 
   beforeEach(async () => {
     jest.clearAllMocks();
     crud = createMockCrud();
+    tenantCrud = jest.fn().mockReturnValue(crud);
     jest
       .spyOn(
         ApiTokensService.prototype as unknown as {
@@ -53,7 +54,10 @@ describe("ApiTokensService", () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         ApiTokensService,
-        { provide: ApiTokensRepository, useValue: { crud, purgeByOwner } },
+        {
+          provide: ApiTokensRepository,
+          useValue: { tenantCrud, purgeByOwner },
+        },
       ],
     }).compile();
 
@@ -71,7 +75,7 @@ describe("ApiTokensService", () => {
       await expect(service.findOneById(ctx, validId)).resolves.toEqual(
         fakeEntity
       );
-      expectCrudScopedToTenant(crud.scoped, ctx);
+      expect(tenantCrud).toHaveBeenCalledWith(ctx);
       expect(crud.findOneById).toHaveBeenCalledWith(validId);
     });
   });
@@ -91,7 +95,7 @@ describe("ApiTokensService", () => {
       });
 
       expect(hash).toHaveBeenCalledWith("secret-value", 8);
-      expectCrudScopedToTenant(crud.scoped, ctx);
+      expect(tenantCrud).toHaveBeenCalledWith(ctx);
       expect(crud.createOne).toHaveBeenCalledWith({
         name: "dev-token",
         permissions: [ApiTokenPermission.QUERY],
@@ -108,7 +112,7 @@ describe("ApiTokensService", () => {
       await expect(service.removeOne(ctx, validId)).resolves.toEqual(
         fakeEntity
       );
-      expectCrudScopedToTenant(crud.scoped, ctx);
+      expect(tenantCrud).toHaveBeenCalledWith(ctx);
       expect(crud.deleteOneById).toHaveBeenCalledWith(validId);
     });
   });
