@@ -160,10 +160,7 @@ inputs use `organizationId` and `skillIds` (no `ownerId` — injected from conte
   `category` (optional free string, indexed), `disabled`, `i18n[]` (embed: `locale`, `messages.title`)
 - **Embedded:** `i18n[]` translations
 - **References:** `ownerId` → User (creator); referenced by private entities via `skillIds`
-- **Disable (not delete):** `disabled: true` keeps the row and slug. Existing `skillIds`
-  refs on private entities **remain valid for reads**; create/update validators reject
-  new refs to disabled skills. See ADR 001 § *Disabled catalog entries*
-  (`apps/api/docs/adr/001-local-catalog.md`).
+- **Disable (not delete):** see ADR 001 § *Disabled catalog entries* and § *three catalog access modes*.
 
 ### Organization (`organizations`)
 
@@ -175,8 +172,7 @@ inputs use `organizationId` and `skillIds` (no `ownerId` — injected from conte
   `disabled`, `i18n[]` (embed: `locale`, `messages.description`)
 - **Embedded:** `i18n[]` translations
 - **References:** `ownerId` → User (creator); referenced by Experience, Education, Course
-- **Disable (not delete):** same as Skill — existing `organizationId` refs remain valid
-  for reads; create/update rejects disabled orgs. ADR 001 § *Disabled catalog entries*.
+- **Disable (not delete):** same as Skill — ADR 001 § *Disabled catalog entries* and § *three catalog access modes*.
 
 ### Experience (`experiences`)
 
