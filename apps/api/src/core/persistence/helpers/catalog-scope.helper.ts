@@ -1,26 +1,27 @@
-import mongoose, {
-  type AnyKeys,
-  type QueryFilter,
-  type UpdateQuery,
-} from "mongoose";
+import { assign, isPlainObject, omit } from "lodash";
+import type { AnyKeys, QueryFilter, UpdateQuery } from "mongoose";
+import { assertValidObjectId } from "@/common/helpers/object-id.helper";
 import { CatalogPartition } from "@/core/enums/catalog-partition.enum";
+import { toObjectId } from "@/core/mappers/base.mapper";
 import type { CatalogScope, PersistenceScope } from "../types/scope.type";
+
+const immutableCatalogFields = ["partition", "ownerId"] as const;
 
 export function toQueryForRead<T>(
   scope: CatalogScope,
   filter?: QueryFilter<T>
 ): QueryFilter<T> {
   if (scope.crossCatalog) {
-    return (filter ?? {}) as QueryFilter<T>;
+    return filter ?? {};
   }
 
-  return {
-    ...(filter ?? {}),
+  assertValidObjectId(scope.userId);
+  return assign({}, filter ?? {}, {
     $or: [
       { partition: CatalogPartition.GLOBAL },
       { partition: CatalogPartition.LOCAL, ownerId: scope.userId },
     ],
-  } as QueryFilter<T>;
+  });
 }
 
 export function toQueryForMutate<T>(
@@ -28,17 +29,14 @@ export function toQueryForMutate<T>(
   filter?: QueryFilter<T>
 ): QueryFilter<T> {
   if (scope.crossCatalog) {
-    return {
-      ...(filter ?? {}),
-      partition: CatalogPartition.GLOBAL,
-    } as QueryFilter<T>;
+    return assign({}, filter ?? {}, { partition: CatalogPartition.GLOBAL });
   }
 
-  return {
-    ...(filter ?? {}),
+  assertValidObjectId(scope.userId);
+  return assign({}, filter ?? {}, {
     partition: CatalogPartition.LOCAL,
     ownerId: scope.userId,
-  } as QueryFilter<T>;
+  });
 }
 
 export function toQueryForAggregate<T>(
@@ -46,72 +44,52 @@ export function toQueryForAggregate<T>(
   filter?: QueryFilter<T>
 ): QueryFilter<T> {
   if (scope.crossCatalog) {
-    return (filter ?? {}) as QueryFilter<T>;
+    return filter ?? {};
   }
 
-  return {
-    ...(filter ?? {}),
+  return assign({}, filter ?? {}, {
     $or: [
       { partition: CatalogPartition.GLOBAL },
       {
         partition: CatalogPartition.LOCAL,
-        ownerId: new mongoose.Types.ObjectId(scope.userId),
+        ownerId: toObjectId(scope.userId),
       },
     ],
-  } as QueryFilter<T>;
+  });
 }
 
-export function toDocumentForCreate<T extends object>(
+export function toDocumentForCreate<T>(
   scope: CatalogScope,
-  input: T
-): Omit<T, "partition" | "ownerId"> & {
-  partition: CatalogPartition;
-  ownerId: string;
-} {
-  const {
-    partition: _,
-    ownerId: __,
-    ...rest
-  } = input as T & {
-    partition?: CatalogPartition;
-    ownerId?: string;
-  };
-
-  return {
-    ...rest,
+  payload: AnyKeys<T> & { ownerId?: string; partition?: CatalogPartition }
+): AnyKeys<T> {
+  assertValidObjectId(scope.userId);
+  return assign(omit(payload, immutableCatalogFields), {
     partition: scope.crossCatalog
       ? CatalogPartition.GLOBAL
       : CatalogPartition.LOCAL,
     ownerId: scope.userId,
-  };
+  });
 }
-
-const immutableUpdateFields = ["partition", "ownerId"] as const;
 
 export function toDocumentForUpdate<T>(
   _scope: CatalogScope,
   payload: UpdateQuery<T>
 ): UpdateQuery<T> {
-  if (!payload || typeof payload !== "object") return payload;
-
-  const strip = (value: Record<string, unknown>) => {
-    const next = { ...value };
-    for (const field of immutableUpdateFields) delete next[field];
-    return next;
-  };
-
-  const result = { ...payload } as Record<string, unknown>;
-  const set = result.$set;
-
-  if (set && typeof set === "object" && !Array.isArray(set)) {
-    result.$set = strip(set as Record<string, unknown>);
+  if (!isPlainObject(payload)) {
+    return payload;
   }
 
-  for (const field of immutableUpdateFields) {
-    delete result[field];
+  const withoutTopLevel = omit(payload, immutableCatalogFields);
+  const set = withoutTopLevel.$set;
+
+  if (!isPlainObject(set)) {
+    return withoutTopLevel as UpdateQuery<T>;
   }
 
-  return result as UpdateQuery<T>;
+  return {
+    ...withoutTopLevel,
+    $set: omit(set, immutableCatalogFields),
+  } as UpdateQuery<T>;
 }
 
 export function catalogScope(scope: CatalogScope): PersistenceScope {
@@ -122,8 +100,7 @@ export function catalogScope(scope: CatalogScope): PersistenceScope {
       forAggregate: (filter) => toQueryForAggregate(scope, filter),
     },
     document: {
-      forCreate: (payload) =>
-        toDocumentForCreate(scope, payload as AnyKeys<unknown>),
+      forCreate: (payload) => toDocumentForCreate(scope, payload),
       forUpdate: (payload) => toDocumentForUpdate(scope, payload),
     },
   };

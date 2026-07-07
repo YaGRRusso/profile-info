@@ -1,5 +1,7 @@
+import { BadRequestException } from "@nestjs/common";
 import mongoose from "mongoose";
 import { CatalogPartition } from "@/core/enums/catalog-partition.enum";
+import { toObjectId } from "@/core/mappers/base.mapper";
 import {
   toDocumentForCreate,
   toDocumentForUpdate,
@@ -74,7 +76,7 @@ describe("toQueryForAggregate", () => {
         { partition: CatalogPartition.GLOBAL },
         {
           partition: CatalogPartition.LOCAL,
-          ownerId: new mongoose.Types.ObjectId(userId),
+          ownerId: toObjectId(userId),
         },
       ],
     });
@@ -87,7 +89,7 @@ describe("toQueryForAggregate", () => {
         { partition: CatalogPartition.GLOBAL },
         {
           partition: CatalogPartition.LOCAL,
-          ownerId: new mongoose.Types.ObjectId(userId),
+          ownerId: toObjectId(userId),
         },
       ],
     });
@@ -97,6 +99,12 @@ describe("toQueryForAggregate", () => {
     expect(
       toQueryForAggregate({ userId, crossCatalog: true }, { slug: "x" })
     ).toEqual({ slug: "x" });
+  });
+
+  it("should reject invalid userId", () => {
+    expect(() =>
+      toQueryForAggregate({ userId: "invalid", crossCatalog: false })
+    ).toThrow(BadRequestException);
   });
 });
 

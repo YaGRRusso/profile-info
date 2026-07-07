@@ -16,6 +16,11 @@ export type AtsSummarizeInput = {
   type: ResourceType;
 };
 
+export enum CatalogPartition {
+  Global = 'GLOBAL',
+  Local = 'LOCAL'
+}
+
 export enum ChatFinishReason {
   ContentFilter = 'CONTENT_FILTER',
   Error = 'ERROR',
@@ -118,6 +123,7 @@ export type CreateOrganizationInput = {
   i18n: Array<CreateOrganizationMessagesInputTranslationInput>;
   logo?: string | null | undefined;
   name: string;
+  partition?: CatalogPartition | null | undefined;
   slug: string;
   website?: string | null | undefined;
 };
@@ -153,6 +159,7 @@ export type CreateProjectMessagesInputTranslationInput = {
 export type CreateSkillInput = {
   category?: string | null | undefined;
   i18n: Array<CreateSkillMessagesInputTranslationInput>;
+  partition?: CatalogPartition | null | undefined;
   slug: string;
 };
 
@@ -261,6 +268,8 @@ export type FilterOrganizationInput = {
   i18n?: Array<CreateOrganizationMessagesInputTranslationInput> | null | undefined;
   logo?: string | null | undefined;
   name?: string | null | undefined;
+  ownerId?: string | null | undefined;
+  partition?: CatalogPartition | null | undefined;
   slug?: string | null | undefined;
   website?: string | null | undefined;
 };
@@ -277,6 +286,8 @@ export type FilterProjectInput = {
 export type FilterSkillInput = {
   category?: string | null | undefined;
   disabled?: boolean | null | undefined;
+  ownerId?: string | null | undefined;
+  partition?: CatalogPartition | null | undefined;
   slug?: string | null | undefined;
 };
 
@@ -424,6 +435,7 @@ export type UpdateOrganizationInput = {
   i18n?: Array<CreateOrganizationMessagesInputTranslationInput> | null | undefined;
   logo?: string | null | undefined;
   name?: string | null | undefined;
+  partition?: CatalogPartition | null | undefined;
   slug?: string | null | undefined;
   website?: string | null | undefined;
 };
@@ -441,6 +453,7 @@ export type UpdateSkillInput = {
   category?: string | null | undefined;
   disabled?: boolean | null | undefined;
   i18n?: Array<CreateSkillMessagesInputTranslationInput> | null | undefined;
+  partition?: CatalogPartition | null | undefined;
   slug?: string | null | undefined;
 };
 

@@ -1,8 +1,7 @@
-import mongoose, {
-  type AnyKeys,
-  type QueryFilter,
-  type UpdateQuery,
-} from "mongoose";
+import { assign, omit } from "lodash";
+import type { AnyKeys, QueryFilter, UpdateQuery } from "mongoose";
+import { assertValidObjectId } from "@/common/helpers/object-id.helper";
+import { toObjectId } from "@/core/mappers/base.mapper";
 import type { PersistenceScope, TenantScope } from "../types/scope.type";
 
 export function toQueryForRead<T>(
@@ -10,13 +9,11 @@ export function toQueryForRead<T>(
   filter?: QueryFilter<T>
 ): QueryFilter<T> {
   if (scope.crossTenant) {
-    return (filter ?? {}) as QueryFilter<T>;
+    return filter ?? {};
   }
 
-  return {
-    ...(filter ?? {}),
-    ownerId: scope.userId,
-  } as QueryFilter<T>;
+  assertValidObjectId(scope.userId);
+  return assign({}, filter ?? {}, { ownerId: scope.userId });
 }
 
 export function toQueryForMutate<T>(
@@ -31,21 +28,18 @@ export function toQueryForAggregate<T>(
   filter?: QueryFilter<T>
 ): QueryFilter<T> {
   if (scope.crossTenant) {
-    return (filter ?? {}) as QueryFilter<T>;
+    return filter ?? {};
   }
 
-  return {
-    ...(filter ?? {}),
-    ownerId: new mongoose.Types.ObjectId(scope.userId),
-  } as QueryFilter<T>;
+  return assign({}, filter ?? {}, { ownerId: toObjectId(scope.userId) });
 }
 
 export function toDocumentForCreate<T>(
   scope: TenantScope,
-  payload: AnyKeys<T>
+  payload: AnyKeys<T> & { ownerId?: string }
 ): AnyKeys<T> {
-  const { ownerId: _, ...rest } = payload as AnyKeys<T> & { ownerId?: string };
-  return { ...rest, ownerId: scope.userId } as AnyKeys<T>;
+  assertValidObjectId(scope.userId);
+  return assign(omit(payload, ["ownerId"]), { ownerId: scope.userId });
 }
 
 export function toDocumentForUpdate<T>(

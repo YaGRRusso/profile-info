@@ -1,4 +1,6 @@
+import { BadRequestException } from "@nestjs/common";
 import mongoose from "mongoose";
+import { toObjectId } from "@/core/mappers/base.mapper";
 import {
   toDocumentForCreate,
   toDocumentForUpdate,
@@ -51,14 +53,14 @@ describe("toQueryForAggregate", () => {
 
   it("should add ObjectId ownerId for tenant users", () => {
     expect(toQueryForAggregate(tenant)).toEqual({
-      ownerId: new mongoose.Types.ObjectId(userId),
+      ownerId: toObjectId(userId),
     });
   });
 
   it("should merge extra filters for tenant users", () => {
     expect(toQueryForAggregate(tenant, { status: "COMPLETE" })).toEqual({
       status: "COMPLETE",
-      ownerId: new mongoose.Types.ObjectId(userId),
+      ownerId: toObjectId(userId),
     });
   });
 
@@ -66,6 +68,12 @@ describe("toQueryForAggregate", () => {
     expect(
       toQueryForAggregate({ userId, crossTenant: true }, { slug: "x" })
     ).toEqual({ slug: "x" });
+  });
+
+  it("should reject invalid userId", () => {
+    expect(() =>
+      toQueryForAggregate({ userId: "invalid", crossTenant: false })
+    ).toThrow(BadRequestException);
   });
 });
 
@@ -80,6 +88,15 @@ describe("toDocumentForCreate", () => {
       name: "Test",
       ownerId: userId,
     });
+  });
+
+  it("should reject invalid userId", () => {
+    expect(() =>
+      toDocumentForCreate(
+        { userId: "invalid", crossTenant: false },
+        { name: "Test" }
+      )
+    ).toThrow(BadRequestException);
   });
 });
 

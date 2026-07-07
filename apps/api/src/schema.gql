@@ -34,6 +34,11 @@ type BatchEntity {
   succeeded: Int!
 }
 
+enum CatalogPartition {
+  GLOBAL
+  LOCAL
+}
+
 enum ChatFinishReason {
   CONTENT_FILTER
   ERROR
@@ -170,6 +175,7 @@ input CreateOrganizationInput {
   i18n: [CreateOrganizationMessagesInputTranslationInput!]!
   logo: String
   name: String!
+  partition: CatalogPartition
   slug: String!
   website: String
 }
@@ -205,6 +211,7 @@ input CreateProjectMessagesInputTranslationInput {
 input CreateSkillInput {
   category: String
   i18n: [CreateSkillMessagesInputTranslationInput!]!
+  partition: CatalogPartition
   slug: String!
 }
 
@@ -427,6 +434,8 @@ input FilterOrganizationInput {
   i18n: [CreateOrganizationMessagesInputTranslationInput!]
   logo: String
   name: String
+  ownerId: String
+  partition: CatalogPartition
   slug: String
   website: String
 }
@@ -443,6 +452,8 @@ input FilterProjectInput {
 input FilterSkillInput {
   category: String
   disabled: Boolean
+  ownerId: String
+  partition: CatalogPartition
   slug: String
 }
 
@@ -548,6 +559,8 @@ type OrganizationEntity {
   id: ID!
   logo: String
   name: String!
+  ownerId: String
+  partition: CatalogPartition!
   slug: String!
   updatedAt: DateTime!
   website: String
@@ -691,6 +704,8 @@ type SkillEntity {
   disabled: Boolean!
   i18n: [SkillTranslationLocale!]!
   id: ID!
+  ownerId: String
+  partition: CatalogPartition!
   slug: String!
   updatedAt: DateTime!
 }
@@ -829,6 +844,7 @@ input UpdateOrganizationInput {
   i18n: [CreateOrganizationMessagesInputTranslationInput!]
   logo: String
   name: String
+  partition: CatalogPartition
   slug: String
   website: String
 }
@@ -846,6 +862,7 @@ input UpdateSkillInput {
   category: String
   disabled: Boolean
   i18n: [CreateSkillMessagesInputTranslationInput!]
+  partition: CatalogPartition
   slug: String
 }
 
