@@ -1,6 +1,6 @@
 import type { QueryFilter } from "mongoose";
 import type { FieldCount, RecentUpdateRow } from "../../types/output.type";
-import type { PersistenceScope, TenantScope } from "../../types/scope.type";
+import type { PersistenceScope } from "../../types/scope.type";
 
 export interface StatsRepositoryInterface<TModel> {
   count(filters?: QueryFilter<TModel>): Promise<number>;
@@ -15,7 +15,5 @@ export interface StatsRepositoryInterface<TModel> {
   ): Promise<RecentUpdateRow[]>;
 
   global(): StatsRepositoryInterface<TModel>;
-  scoped(
-    scope: PersistenceScope | TenantScope
-  ): StatsRepositoryInterface<TModel>;
+  scoped(scope: PersistenceScope): StatsRepositoryInterface<TModel>;
 }

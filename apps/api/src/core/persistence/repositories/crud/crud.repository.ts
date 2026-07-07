@@ -15,10 +15,7 @@ import {
 } from "@/common/helpers/object-id.helper";
 import { DEFAULT_PAGE_SIZE, MAX_PAGE_SIZE } from "../../consts/limits.const";
 import { assertBatchSucceeded } from "../../helpers/batch.helper";
-import {
-  noopScope,
-  resolvePersistenceScope,
-} from "../../helpers/persistence-scope.helper";
+import { noopScope } from "../../helpers/persistence-scope.helper";
 import {
   PERSISTENCE_NOT_CREATED,
   PERSISTENCE_NOT_FOUND,
@@ -26,7 +23,7 @@ import {
   PERSISTENCE_NOT_UPDATED,
 } from "../../persistence.messages";
 import type { FindManyQuery, FindOneQuery } from "../../types/input.type";
-import type { PersistenceScope, TenantScope } from "../../types/scope.type";
+import type { PersistenceScope } from "../../types/scope.type";
 import type {
   CrudMapperInterface,
   CrudRepositoryInterface,
@@ -55,12 +52,8 @@ export class CrudRepository<
     protected readonly currentScope?: PersistenceScope
   ) {}
 
-  scoped(scope: PersistenceScope | TenantScope) {
-    return new CrudRepository(
-      this.model,
-      this.mapper,
-      resolvePersistenceScope(scope)
-    );
+  scoped(scope: PersistenceScope) {
+    return new CrudRepository(this.model, this.mapper, scope);
   }
 
   global() {

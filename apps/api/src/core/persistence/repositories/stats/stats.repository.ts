@@ -1,11 +1,8 @@
 import type { Model, PipelineStage, QueryFilter, SortOrder } from "mongoose";
 import { clearObject } from "@/common/helpers/object.helper";
-import {
-  noopScope,
-  resolvePersistenceScope,
-} from "../../helpers/persistence-scope.helper";
+import { noopScope } from "../../helpers/persistence-scope.helper";
 import type { RecentUpdateRow } from "../../types/output.type";
-import type { PersistenceScope, TenantScope } from "../../types/scope.type";
+import type { PersistenceScope } from "../../types/scope.type";
 import type { StatsRepositoryInterface } from "./stats.interface";
 
 export class StatsRepository<TModel>
@@ -16,8 +13,8 @@ export class StatsRepository<TModel>
     protected readonly currentScope?: PersistenceScope
   ) {}
 
-  scoped(scope: PersistenceScope | TenantScope) {
-    return new StatsRepository(this.model, resolvePersistenceScope(scope));
+  scoped(scope: PersistenceScope) {
+    return new StatsRepository(this.model, scope);
   }
 
   global() {

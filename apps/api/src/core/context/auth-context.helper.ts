@@ -1,8 +1,11 @@
 import { ApiTokenPermission } from "@/core/enums/api-token-permission.enum";
 import { CredentialKind } from "@/core/enums/credential-kind.enum";
 import { UserRole } from "@/core/enums/user-role.enum";
+import { catalogScope } from "@/core/persistence/helpers/catalog-scope.helper";
+import { tenantScope } from "@/core/persistence/helpers/tenant-scope.helper";
 import type {
   CatalogScope,
+  PersistenceScope,
   TenantScope,
 } from "@/core/persistence/types/scope.type";
 import type {
@@ -63,4 +66,12 @@ export function toTenantScope(ctx: AuthContext): TenantScope {
 
 export function toCatalogScope(ctx: AuthContext): CatalogScope {
   return { userId: ctx.id, crossCatalog: isSuperAdmin(ctx) };
+}
+
+export function tenantPersistenceScope(ctx: AuthContext): PersistenceScope {
+  return tenantScope(toTenantScope(ctx));
+}
+
+export function catalogPersistenceScope(ctx: AuthContext): PersistenceScope {
+  return catalogScope(toCatalogScope(ctx));
 }

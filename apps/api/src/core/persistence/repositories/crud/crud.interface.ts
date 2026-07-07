@@ -1,7 +1,7 @@
 import type { AnyKeys, QueryFilter, SortOrder, UpdateQuery } from "mongoose";
 import type { FindManyQuery, FindOneQuery } from "../../types/input.type";
 import type { BatchCount, MultiPaged } from "../../types/output.type";
-import type { PersistenceScope, TenantScope } from "../../types/scope.type";
+import type { PersistenceScope } from "../../types/scope.type";
 
 export interface CrudMapperInterface<
   TEntity,
@@ -48,7 +48,7 @@ export interface CrudRepositoryInterface<
     TSort
   >;
   scoped(
-    scope: PersistenceScope | TenantScope
+    scope: PersistenceScope
   ): CrudRepositoryInterface<TModel, TEntity, TCreate, TUpdate, TFilter, TSort>;
 
   updateMany(
