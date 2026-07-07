@@ -11,10 +11,11 @@ export class LoadersService {
     private readonly usersLoaderService: UsersLoaderService
   ) {}
 
-  createLoaders(ctx?: AuthContext): AppLoaders {
+  createLoaders(resolveCtx: () => AuthContext | undefined): AppLoaders {
     return {
-      batchSkills: this.skillsLoaderService.createLoader(ctx),
-      batchOrganizations: this.organizationsLoaderService.createLoader(ctx),
+      batchSkills: this.skillsLoaderService.createLoader(resolveCtx),
+      batchOrganizations:
+        this.organizationsLoaderService.createLoader(resolveCtx),
       batchUsers: this.usersLoaderService.createLoader(),
     };
   }

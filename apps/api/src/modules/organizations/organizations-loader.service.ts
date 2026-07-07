@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable, UnauthorizedException } from "@nestjs/common";
 import DataLoader from "dataloader";
 import { keyBy } from "lodash";
 import type { AuthContext } from "@/core/context/auth-context.interface";
@@ -9,17 +9,15 @@ import { OrganizationsService } from "./organizations.service";
 export class OrganizationsLoaderService {
   constructor(private readonly organizationsService: OrganizationsService) {}
 
-  createLoader(ctx?: AuthContext) {
-    if (!ctx) {
-      return new DataLoader<string, OrganizationEntity | null>(
-        async (ids) => ids.map(() => null),
-        { name: "batchOrganizations", maxBatchSize: 100 }
-      );
-    }
-
+  createLoader(resolveCtx: () => AuthContext | undefined) {
     return new DataLoader<string, OrganizationEntity | null>(
       async (ids) => {
-        const list = await this.organizationsService.findManyById(ctx, [
+        const ctx = resolveCtx();
+        if (!ctx) {
+          throw new UnauthorizedException();
+        }
+
+        const list = await this.organizationsService.findManyActiveById(ctx, [
           ...ids,
         ]);
         const map = keyBy(list, (item) => item.id);

@@ -2,15 +2,18 @@ import { Args, Mutation, Query, Resolver } from "@nestjs/graphql";
 import type { AuthContext } from "@/core/context/auth-context.interface";
 import { Public } from "@/core/decorators/public.decorator";
 import { Auth } from "@/modules/auth/decorators/auth-context.decorator";
-import { CurrentUser } from "@/modules/auth/decorators/current-user.decorator";
 import { UserEntity } from "@/modules/users/entities/user.entity";
+import { UsersService } from "@/modules/users/users.service";
 import { AuthService } from "./auth.service";
 import { SignInInput } from "./dto/sign-in.input";
 import { UpdateMeInput } from "./dto/update-me.input";
 
 @Resolver(() => UserEntity)
 export class AuthResolver {
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private readonly usersService: UsersService
+  ) {}
 
   @Public()
   @Mutation(() => String)
@@ -19,8 +22,8 @@ export class AuthResolver {
   }
 
   @Query(() => UserEntity)
-  getMe(@CurrentUser() user: UserEntity) {
-    return user;
+  getMe(@Auth() ctx: AuthContext) {
+    return this.usersService.findOneById(ctx.id);
   }
 
   @Mutation(() => UserEntity)

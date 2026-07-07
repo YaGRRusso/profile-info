@@ -1,10 +1,12 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable, NotFoundException } from "@nestjs/common";
 import { EventEmitter2 } from "@nestjs/event-emitter";
 import { RecentActivityRecord } from "@/common/helpers/recent-activity.helper";
+import { catalogPersistenceScope } from "@/core/context/auth-context.helper";
 import type { AuthContext } from "@/core/context/auth-context.interface";
 import { BatchEntity } from "@/core/entities/batch.entity";
 import { DomainEvents } from "@/core/events/domain-events";
 import { OrganizationDeletedEvent } from "@/core/events/organization-deleted.event";
+import { PERSISTENCE_NOT_FOUND } from "@/core/persistence/persistence.messages";
 import type { MultiPaged } from "@/core/persistence/types/output.type";
 import { CreateOrganizationInput } from "./dto/create-organization.input";
 import { FilterOrganizationInput } from "./dto/filter-organization.input";
@@ -20,8 +22,10 @@ export class OrganizationsService {
     private readonly eventEmitter: EventEmitter2
   ) {}
 
-  findOneById(__ctx: AuthContext, id: string): Promise<OrganizationEntity> {
-    return this.repository.crud.findOneById(id);
+  findOneById(ctx: AuthContext, id: string): Promise<OrganizationEntity> {
+    return this.repository.crud
+      .scoped(catalogPersistenceScope(ctx))
+      .findOneById(id);
   }
 
   findOne(
@@ -42,18 +46,23 @@ export class OrganizationsService {
     return this.repository.findOneActiveById(id);
   }
 
-  findManyById(
-    _ctx: AuthContext,
-    ids: string[]
-  ): Promise<OrganizationEntity[]> {
-    return this.repository.crud.findManyById(ids);
+  findManyById(ctx: AuthContext, ids: string[]): Promise<OrganizationEntity[]> {
+    return this.repository.crud
+      .scoped(catalogPersistenceScope(ctx))
+      .findManyById(ids);
   }
 
-  findManyActiveById(
-    _ctx: AuthContext,
+  async findManyActiveById(
+    ctx: AuthContext,
     ids: string[]
   ): Promise<OrganizationEntity[]> {
-    return this.repository.findManyActiveById(ids);
+    const organizations = await this.findManyById(ctx, ids);
+
+    if (organizations.some((organization) => organization.disabled)) {
+      throw new NotFoundException(PERSISTENCE_NOT_FOUND);
+    }
+
+    return organizations;
   }
 
   findMany(

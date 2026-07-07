@@ -52,8 +52,15 @@ export function pickProfileSkillIds(
 ): string[] {
   if (count <= 0) return [];
 
-  const uncategorized = allSkillIds.filter((_, index) => index % 4 === 0);
-  const categorized = allSkillIds.filter((_, index) => index % 4 !== 0);
+  const eligible = allSkillIds
+    .map((id, index) => ({ id, index }))
+    .filter(({ index }) => index % 17 !== 0);
+  const uncategorized = eligible
+    .filter(({ index }) => index % 4 === 0)
+    .map(({ id }) => id);
+  const categorized = eligible
+    .filter(({ index }) => index % 4 !== 0)
+    .map(({ id }) => id);
   const picked = [
     ...uncategorized.slice(0, Math.ceil(count / 3)),
     ...categorized.slice(0, count),

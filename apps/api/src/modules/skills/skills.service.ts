@@ -1,13 +1,15 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable, NotFoundException } from "@nestjs/common";
 import { EventEmitter2 } from "@nestjs/event-emitter";
 import {
   labelFromI18nTitle,
   type RecentActivityRecord,
 } from "@/common/helpers/recent-activity.helper";
+import { catalogPersistenceScope } from "@/core/context/auth-context.helper";
 import type { AuthContext } from "@/core/context/auth-context.interface";
 import { BatchEntity } from "@/core/entities/batch.entity";
 import { DomainEvents } from "@/core/events/domain-events";
 import { SkillDeletedEvent } from "@/core/events/skill-deleted.event";
+import { PERSISTENCE_NOT_FOUND } from "@/core/persistence/persistence.messages";
 import type {
   FieldCount,
   MultiPaged,
@@ -26,8 +28,10 @@ export class SkillsService {
     private readonly eventEmitter: EventEmitter2
   ) {}
 
-  findOneById(_ctx: AuthContext, id: string): Promise<SkillEntity> {
-    return this.repository.crud.findOneById(id);
+  findOneById(ctx: AuthContext, id: string): Promise<SkillEntity> {
+    return this.repository.crud
+      .scoped(catalogPersistenceScope(ctx))
+      .findOneById(id);
   }
 
   findOne(
@@ -41,12 +45,23 @@ export class SkillsService {
     return this.repository.findOneActiveById(id);
   }
 
-  findManyById(_ctx: AuthContext, ids: string[]): Promise<SkillEntity[]> {
-    return this.repository.crud.findManyById(ids);
+  findManyById(ctx: AuthContext, ids: string[]): Promise<SkillEntity[]> {
+    return this.repository.crud
+      .scoped(catalogPersistenceScope(ctx))
+      .findManyById(ids);
   }
 
-  findManyActiveById(_ctx: AuthContext, ids: string[]): Promise<SkillEntity[]> {
-    return this.repository.findManyActiveById(ids);
+  async findManyActiveById(
+    ctx: AuthContext,
+    ids: string[]
+  ): Promise<SkillEntity[]> {
+    const skills = await this.findManyById(ctx, ids);
+
+    if (skills.some((skill) => skill.disabled)) {
+      throw new NotFoundException(PERSISTENCE_NOT_FOUND);
+    }
+
+    return skills;
   }
 
   findMany(

@@ -165,6 +165,54 @@ describe("GraphQL (e2e)", () => {
     expect(response.data?.updateMe.phone).toBe("+5511999999999");
   });
 
+  it("should resolve profile skills on getMe", async () => {
+    const skill = await skillsService.createOne(testSuperAdminContext(), {
+      slug: "get-me-skill",
+      i18n: skillI18n("Get Me Skill"),
+      category: "Programming",
+    });
+
+    await graphqlRequest(app, {
+      query: `
+        mutation UpdateMe($updateMeInput: UpdateMeInput!) {
+          updateMe(updateMeInput: $updateMeInput) {
+            id
+          }
+        }
+      `,
+      variables: {
+        updateMeInput: { skillIds: [skill.id] },
+      },
+      token: userToken,
+    });
+
+    const response = await graphqlRequest<{
+      getMe: {
+        skillIds: string[];
+        skills: Array<{ id: string; slug: string }>;
+      };
+    }>(app, {
+      query: `
+        query GetMe {
+          getMe {
+            skillIds
+            skills {
+              id
+              slug
+            }
+          }
+        }
+      `,
+      token: userToken,
+    });
+
+    expect(response.errors).toBeUndefined();
+    expect(response.data?.getMe.skillIds).toEqual([skill.id]);
+    expect(response.data?.getMe.skills).toEqual([
+      { id: skill.id, slug: "get-me-skill" },
+    ]);
+  });
+
   it("should allow authenticated users to set profile skillIds via updateMe", async () => {
     const skill = await skillsService.createOne(testSuperAdminContext(), {
       slug: "profile-skill",

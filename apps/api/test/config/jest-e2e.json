@@ -26,5 +26,6 @@
       }
     ]
   },
+  "transformIgnorePatterns": ["node_modules/(?!(p-limit|yocto-queue)/)"],
   "globalTeardown": "<rootDir>/test/config/global-teardown.ts"
 }

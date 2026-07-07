@@ -1,6 +1,7 @@
 import { EventEmitter2 } from "@nestjs/event-emitter";
 import { Test, type TestingModule } from "@nestjs/testing";
 import { testAuthContext } from "@test/fixtures/auth-context";
+import { expectCrudScopedToCatalog } from "@test/support/expect-crud-scoped";
 import { CatalogPartition } from "@/core/enums/catalog-partition.enum";
 import { DomainEvents } from "@/core/events/domain-events";
 import { SkillDeletedEvent } from "@/core/events/skill-deleted.event";
@@ -102,12 +103,13 @@ describe("SkillsService", () => {
   });
 
   describe("findOneById", () => {
-    it("delegates to crud", async () => {
+    it("delegates to scoped crud", async () => {
       crud.findOneById.mockResolvedValue(fakeEntity);
 
       await expect(service.findOneById(ctx, validId)).resolves.toEqual(
         fakeEntity
       );
+      expectCrudScopedToCatalog(crud.scoped, ctx);
       expect(crud.findOneById).toHaveBeenCalledWith(validId);
     });
   });
