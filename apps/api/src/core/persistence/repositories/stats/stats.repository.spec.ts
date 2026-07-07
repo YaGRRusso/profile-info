@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import { tenantScope } from "@/core/persistence/helpers/tenant-scope.helper";
 import { StatsRepository } from "@/core/persistence/repositories/stats/stats.repository";
 import { BaseModel } from "@/core/schemas/base.schema";
 
@@ -35,7 +36,7 @@ describe("StatsRepository", () => {
   };
 
   const ownerId = new mongoose.Types.ObjectId().toHexString();
-  const tenantScope = { userId: ownerId, crossTenant: false };
+  const tenant = { userId: ownerId, crossTenant: false };
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -130,7 +131,7 @@ describe("StatsRepository", () => {
     let scoped: StatsRepository<TestModel>;
 
     beforeEach(() => {
-      scoped = repository.scoped(tenantScope);
+      scoped = repository.scoped(tenantScope(tenant));
     });
 
     it("should return a new repository instance", () => {
@@ -161,9 +162,11 @@ describe("StatsRepository", () => {
         model.countDocuments.mockReturnValue(mockQueryChain(5));
 
         await expect(
-          repository.scoped({ userId: ownerId, crossTenant: true }).count({
-            name: "TypeScript",
-          })
+          repository
+            .scoped(tenantScope({ userId: ownerId, crossTenant: true }))
+            .count({
+              name: "TypeScript",
+            })
         ).resolves.toBe(5);
 
         expect(model.countDocuments).toHaveBeenCalledWith({
@@ -209,7 +212,7 @@ describe("StatsRepository", () => {
 
         await expect(
           repository
-            .scoped({ userId: ownerId, crossTenant: true })
+            .scoped(tenantScope({ userId: ownerId, crossTenant: true }))
             .countByField("category")
         ).resolves.toEqual([{ label: "FULL_TIME", value: 2 }]);
 

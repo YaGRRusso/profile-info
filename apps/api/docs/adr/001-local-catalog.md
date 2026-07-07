@@ -23,13 +23,13 @@ entries (local) without duplicating the global list.
 | Persistence | `partition`, `ownerId`, unique `{ partition, ownerId, slug }` on Skill and Organization |
 | Shared types | `CatalogPartition` enum (Mongoose + GraphQL); `CatalogScope` type for caller visibility (`scope.type.ts`) |
 | Docs | `ER_MODEL.md` reflects catalog partition fields |
-| API surface | `partition` / `ownerId` on GraphQL entities, mappers, filters; optional `partition` on create; `AuthContext` on catalog services, resolvers, loaders, validators; `toCatalogScope(ctx)` in `auth-context.helper.ts`; `withCatalogScope` / `withCatalogScopeForAggregate` / `withCatalogScopeForMutate` in `catalog-scope.helper.ts` (not wired in services yet). |
+| API surface | `partition` / `ownerId` on GraphQL entities, mappers, filters; optional `partition` on create; `AuthContext` on catalog services, resolvers, loaders, validators; `toCatalogScope(ctx)` in `auth-context.helper.ts`; catalog helpers + **`catalogScope()` factory** in `catalog-scope.helper.ts` (ready — not wired in services yet). |
 
 ## Remaining work
 
 | # | What | Notes |
 |---|------|-------|
-| 2 | **Queries & auth** | `findMany` / validators / loaders filter by visibility + `disabled`. `USER` mutates only own `LOCAL`; `SUPER_ADMIN` manages `GLOBAL`. |
+| 2 | **Queries & auth** | `findMany` / validators / loaders filter by visibility + `disabled`. Wire `repository.crud.scoped(catalogScope(toCatalogScope(ctx)))` on skills/organizations (factory ready). `USER` mutates only own `LOCAL`; `SUPER_ADMIN` manages `GLOBAL`. |
 | 3 | **Consumers** | Resume, dashboard, and private-entity refs accept global or caller's local IDs. |
 | 4 | **Admin + tests** | UI for local create/list; seed examples; e2e for slug uniqueness across partitions. |
 

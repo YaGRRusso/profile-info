@@ -4,6 +4,7 @@ import {
   DEFAULT_PAGE_SIZE,
   MAX_PAGE_SIZE,
 } from "@/core/persistence/consts/limits.const";
+import { tenantScope } from "@/core/persistence/helpers/tenant-scope.helper";
 import {
   PERSISTENCE_NOT_CREATED,
   PERSISTENCE_NOT_FOUND,
@@ -80,7 +81,7 @@ describe("CrudRepository", () => {
   const otherOwnerId = new mongoose.Types.ObjectId().toHexString();
   const docId = new mongoose.Types.ObjectId().toHexString();
   const fakeDoc = { _id: docId, ownerId, name: "Test" } as unknown as TestModel;
-  const tenantScope = { userId: ownerId, crossTenant: false };
+  const tenant = { userId: ownerId, crossTenant: false };
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -380,7 +381,7 @@ describe("CrudRepository", () => {
 
   describe("scoped", () => {
     it("should return a new repository instance", () => {
-      const scoped = repository.scoped(tenantScope);
+      const scoped = repository.scoped(tenantScope(tenant));
       expect(scoped).not.toBe(repository);
       expect(scoped).toBeInstanceOf(CrudRepository);
     });
@@ -390,7 +391,7 @@ describe("CrudRepository", () => {
         model.findOne.mockReturnValue(mockQueryChain(fakeDoc));
 
         await repository
-          .scoped(tenantScope)
+          .scoped(tenantScope(tenant))
           .findOne({ filters: { name: "Test" } });
 
         expect(model.findOne).toHaveBeenCalledWith({
@@ -404,7 +405,7 @@ describe("CrudRepository", () => {
       it("should scope by ownerId for tenant users", async () => {
         model.findOne.mockReturnValue(mockQueryChain(fakeDoc));
 
-        await repository.scoped(tenantScope).findOneById(docId);
+        await repository.scoped(tenantScope(tenant)).findOneById(docId);
 
         expect(model.findOne).toHaveBeenCalledWith(
           expect.objectContaining({ _id: docId, ownerId })
@@ -415,7 +416,7 @@ describe("CrudRepository", () => {
         model.findOne.mockReturnValue(mockQueryChain(fakeDoc));
 
         await repository
-          .scoped({ userId: ownerId, crossTenant: true })
+          .scoped(tenantScope({ userId: ownerId, crossTenant: true }))
           .findOneById(docId);
 
         expect(model.findOne).toHaveBeenCalledWith({ _id: docId });
@@ -426,7 +427,7 @@ describe("CrudRepository", () => {
 
         await expect(
           repository
-            .scoped({ userId: otherOwnerId, crossTenant: false })
+            .scoped(tenantScope({ userId: otherOwnerId, crossTenant: false }))
             .findOneById(docId)
         ).rejects.toThrow(new NotFoundException(PERSISTENCE_NOT_FOUND));
       });
@@ -438,7 +439,7 @@ describe("CrudRepository", () => {
         model.countDocuments.mockReturnValue(mockQueryChain(1));
 
         await repository
-          .scoped(tenantScope)
+          .scoped(tenantScope(tenant))
           .findMany({ filters: { name: "Test" } });
 
         expect(model.find).toHaveBeenCalledWith({ name: "Test", ownerId });
@@ -454,7 +455,7 @@ describe("CrudRepository", () => {
         model.create.mockResolvedValue(fakeDoc);
 
         await repository
-          .scoped(tenantScope)
+          .scoped(tenantScope(tenant))
           .createOne({ name: "Test" } as never);
 
         expect(model.create).toHaveBeenCalledWith(
@@ -465,7 +466,7 @@ describe("CrudRepository", () => {
       it("should ignore ownerId in create input and use scope userId", async () => {
         model.create.mockResolvedValue(fakeDoc);
 
-        await repository.scoped(tenantScope).createOne({
+        await repository.scoped(tenantScope(tenant)).createOne({
           name: "Test",
           ownerId: otherOwnerId,
         } as never);
@@ -479,7 +480,7 @@ describe("CrudRepository", () => {
         model.create.mockResolvedValue(fakeDoc);
 
         await repository
-          .scoped({ userId: ownerId, crossTenant: true })
+          .scoped(tenantScope({ userId: ownerId, crossTenant: true }))
           .createOne({ name: "Test", ownerId: otherOwnerId } as never);
 
         expect(model.create).toHaveBeenCalledWith(
@@ -494,7 +495,7 @@ describe("CrudRepository", () => {
 
         const otherId = new mongoose.Types.ObjectId().toHexString();
         const result = await repository
-          .scoped(tenantScope)
+          .scoped(tenantScope(tenant))
           .updateManyById([docId, otherId], { name: "Updated" });
 
         expect(model.updateMany).toHaveBeenCalledWith(
@@ -512,7 +513,7 @@ describe("CrudRepository", () => {
 
         const otherId = new mongoose.Types.ObjectId().toHexString();
         const result = await repository
-          .scoped(tenantScope)
+          .scoped(tenantScope(tenant))
           .deleteManyById([docId, otherId]);
 
         expect(model.deleteMany).toHaveBeenCalledWith(

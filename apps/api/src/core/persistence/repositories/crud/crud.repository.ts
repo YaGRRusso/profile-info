@@ -5,6 +5,7 @@ import {
   type Model,
   type QueryFilter,
   type SortOrder,
+  type UpdateQuery,
 } from "mongoose";
 import { mapPage } from "@/common/helpers/map-page.helper";
 import { clearObject } from "@/common/helpers/object.helper";
@@ -14,7 +15,10 @@ import {
 } from "@/common/helpers/object-id.helper";
 import { DEFAULT_PAGE_SIZE, MAX_PAGE_SIZE } from "../../consts/limits.const";
 import { assertBatchSucceeded } from "../../helpers/batch.helper";
-import { withTenantScope } from "../../helpers/tenant-scope.helper";
+import {
+  noopScope,
+  resolvePersistenceScope,
+} from "../../helpers/persistence-scope.helper";
 import {
   PERSISTENCE_NOT_CREATED,
   PERSISTENCE_NOT_FOUND,
@@ -22,7 +26,7 @@ import {
   PERSISTENCE_NOT_UPDATED,
 } from "../../persistence.messages";
 import type { FindManyQuery, FindOneQuery } from "../../types/input.type";
-import type { TenantScope } from "../../types/scope.type";
+import type { PersistenceScope, TenantScope } from "../../types/scope.type";
 import type {
   CrudMapperInterface,
   CrudRepositoryInterface,
@@ -48,32 +52,47 @@ export class CrudRepository<
       TFilter,
       TSort
     >,
-    protected readonly currentScope?: TenantScope
+    protected readonly currentScope?: PersistenceScope
   ) {}
 
-  scoped(scope: TenantScope) {
-    return new CrudRepository(this.model, this.mapper, scope);
+  scoped(scope: PersistenceScope | TenantScope) {
+    return new CrudRepository(
+      this.model,
+      this.mapper,
+      resolvePersistenceScope(scope)
+    );
   }
 
   global() {
-    return new CrudRepository(this.model, this.mapper, undefined);
+    return new CrudRepository(this.model, this.mapper, noopScope());
   }
 
   // --- scope ---
 
-  private applyScope(filters?: QueryFilter<TModel>): QueryFilter<TModel> {
-    const cleanFilters = clearObject(filters) as QueryFilter<TModel>;
-    if (!this.currentScope || this.currentScope.crossTenant)
-      return cleanFilters;
-    return withTenantScope<TModel>(this.currentScope, cleanFilters);
+  private cleanFilter(filters?: QueryFilter<TModel>): QueryFilter<TModel> {
+    return clearObject(filters) as QueryFilter<TModel>;
   }
 
-  private injectOwner(payload: AnyKeys<TModel>): AnyKeys<TModel> {
-    if (!this.currentScope) return payload;
-    const { ownerId: _, ...rest } = payload as AnyKeys<TModel> & {
-      ownerId?: string;
-    };
-    return { ...rest, ownerId: this.currentScope.userId } as AnyKeys<TModel>;
+  private applyReadFilter(filters?: QueryFilter<TModel>): QueryFilter<TModel> {
+    const clean = this.cleanFilter(filters);
+    return this.currentScope?.query.forRead(clean) ?? clean;
+  }
+
+  private applyMutateFilter(
+    filters?: QueryFilter<TModel>
+  ): QueryFilter<TModel> {
+    const clean = this.cleanFilter(filters);
+    return this.currentScope?.query.forMutate(clean) ?? clean;
+  }
+
+  private applyCreatePayload(payload: AnyKeys<TModel>): AnyKeys<TModel> {
+    return this.currentScope?.document.forCreate(payload) ?? payload;
+  }
+
+  private applyUpdatePayload(
+    payload: UpdateQuery<TModel>
+  ): UpdateQuery<TModel> {
+    return this.currentScope?.document.forUpdate(payload) ?? payload;
   }
 
   private resolveLimit(limit?: number): number {
@@ -101,7 +120,7 @@ export class CrudRepository<
   async findOne(query: FindOneQuery<TFilter>) {
     const { filters } = query;
     const resolvedFilter = this.resolveFilter(filters);
-    const scopedFilter = this.applyScope(resolvedFilter);
+    const scopedFilter = this.applyReadFilter(resolvedFilter);
 
     const document = await this.model.findOne(scopedFilter).exec();
     if (isNil(document)) throw new NotFoundException(PERSISTENCE_NOT_FOUND);
@@ -111,14 +130,14 @@ export class CrudRepository<
   async findMany(query: FindManyQuery<TFilter, TSort>) {
     const { filters, sort, skip = 0, limit = DEFAULT_PAGE_SIZE } = query;
     const resolvedFilter = this.resolveFilter(filters);
-    const scopedFilter = this.applyScope(resolvedFilter);
+    const scopedFilter = this.applyReadFilter(resolvedFilter);
     const resolvedSort = this.resolveSort(sort);
     const resolvedLimit = this.resolveLimit(limit);
 
     const [documents, found] = await Promise.all([
       this.model
         .find(scopedFilter)
-        .sort(resolvedSort ?? ({} as Record<keyof TModel, SortOrder>))
+        .sort(resolvedSort)
         .skip(skip)
         .limit(resolvedLimit)
         .exec(),
@@ -133,7 +152,7 @@ export class CrudRepository<
   async findOneById(id: string) {
     assertValidObjectId(id);
     const resolvedFilter = { _id: id } as QueryFilter<TModel>;
-    const scopedFilter = this.applyScope(resolvedFilter);
+    const scopedFilter = this.applyReadFilter(resolvedFilter);
 
     const document = await this.model.findOne(scopedFilter).exec();
     if (isNil(document)) throw new NotFoundException(PERSISTENCE_NOT_FOUND);
@@ -145,7 +164,7 @@ export class CrudRepository<
     if (ids.length === 0) return [];
 
     const resolvedFilter = { _id: { $in: ids } } as QueryFilter<TModel>;
-    const scopedFilter = this.applyScope(resolvedFilter);
+    const scopedFilter = this.applyReadFilter(resolvedFilter);
 
     const documents = await this.model
       .find(scopedFilter)
@@ -160,9 +179,8 @@ export class CrudRepository<
   // --- create ---
 
   async createOne(createInput: TCreate) {
-    const payload = this.injectOwner(
-      this.mapper.toPersistenceForCreate(createInput)
-    );
+    const mapped = this.mapper.toPersistenceForCreate(createInput);
+    const payload = this.applyCreatePayload(mapped);
     const document = await this.model.create(payload);
     if (isNil(document)) throw new BadRequestException(PERSISTENCE_NOT_CREATED);
     return await this.mapper.toDomain(document);
@@ -171,9 +189,10 @@ export class CrudRepository<
   async createMany(createInputs: TCreate[]) {
     if (createInputs.length === 0) return { succeeded: 0, failed: 0 };
 
-    const payloads = createInputs.map((input) =>
-      this.injectOwner(this.mapper.toPersistenceForCreate(input))
-    );
+    const payloads = createInputs.map((input) => {
+      const mapped = this.mapper.toPersistenceForCreate(input);
+      return this.applyCreatePayload(mapped);
+    });
     const documents = await this.model.create(payloads);
     if (isNil(documents))
       throw new BadRequestException(PERSISTENCE_NOT_CREATED);
@@ -192,17 +211,16 @@ export class CrudRepository<
   async updateOne(query: FindOneQuery<TFilter>, updateInput: TUpdate) {
     const { filters } = query;
     const resolvedFilter = this.resolveFilter(filters);
-    const scopedFilter = this.applyScope(resolvedFilter);
+    const scopedFilter = this.applyMutateFilter(resolvedFilter);
+
+    const mapped = this.mapper.toPersistenceForUpdate(updateInput);
+    const payload = this.applyUpdatePayload(mapped);
 
     const document = await this.model
-      .findOneAndUpdate(
-        scopedFilter,
-        this.mapper.toPersistenceForUpdate(updateInput),
-        {
-          returnDocument: "after",
-          runValidators: true,
-        }
-      )
+      .findOneAndUpdate(scopedFilter, payload, {
+        returnDocument: "after",
+        runValidators: true,
+      })
       .exec();
 
     if (isNil(document)) throw new NotFoundException(PERSISTENCE_NOT_UPDATED);
@@ -215,17 +233,16 @@ export class CrudRepository<
     options?: { arrayFilters?: Record<string, unknown>[] }
   ) {
     const resolvedFilter = this.resolveFilter(filter);
-    const scopedFilter = this.applyScope(resolvedFilter);
+    const scopedFilter = this.applyMutateFilter(resolvedFilter);
+
+    const mapped = this.mapper.toPersistenceForUpdate(updateInput);
+    const payload = this.applyUpdatePayload(mapped);
 
     const result = await this.model
-      .updateMany(
-        scopedFilter,
-        this.mapper.toPersistenceForUpdate(updateInput),
-        {
-          ...options,
-          runValidators: true,
-        }
-      )
+      .updateMany(scopedFilter, payload, {
+        ...options,
+        runValidators: true,
+      })
       .exec();
 
     return assertBatchSucceeded(
@@ -237,17 +254,16 @@ export class CrudRepository<
   async updateOneById(id: string, updateInput: TUpdate) {
     assertValidObjectId(id);
     const resolvedFilter = { _id: id } as QueryFilter<TModel>;
-    const scopedFilter = this.applyScope(resolvedFilter);
+    const scopedFilter = this.applyMutateFilter(resolvedFilter);
+
+    const mapped = this.mapper.toPersistenceForUpdate(updateInput);
+    const payload = this.applyUpdatePayload(mapped);
 
     const document = await this.model
-      .findOneAndUpdate(
-        scopedFilter,
-        this.mapper.toPersistenceForUpdate(updateInput),
-        {
-          returnDocument: "after",
-          runValidators: true,
-        }
-      )
+      .findOneAndUpdate(scopedFilter, payload, {
+        returnDocument: "after",
+        runValidators: true,
+      })
       .exec();
 
     if (isNil(document)) throw new NotFoundException(PERSISTENCE_NOT_UPDATED);
@@ -259,16 +275,15 @@ export class CrudRepository<
     if (ids.length === 0) return { succeeded: 0, failed: 0 };
 
     const resolvedFilter = { _id: { $in: ids } } as QueryFilter<TModel>;
-    const scopedFilter = this.applyScope(resolvedFilter);
+    const scopedFilter = this.applyMutateFilter(resolvedFilter);
+
+    const mapped = this.mapper.toPersistenceForUpdate(updateInput);
+    const payload = this.applyUpdatePayload(mapped);
 
     const result = await this.model
-      .updateMany(
-        scopedFilter,
-        this.mapper.toPersistenceForUpdate(updateInput),
-        {
-          runValidators: true,
-        }
-      )
+      .updateMany(scopedFilter, payload, {
+        runValidators: true,
+      })
       .exec();
 
     const batch = assertBatchSucceeded(
@@ -286,7 +301,7 @@ export class CrudRepository<
   async deleteOne(query: FindOneQuery<TFilter>) {
     const { filters } = query;
     const resolvedFilter = this.resolveFilter(filters);
-    const scopedFilter = this.applyScope(resolvedFilter);
+    const scopedFilter = this.applyMutateFilter(resolvedFilter);
 
     const document = await this.model.findOneAndDelete(scopedFilter).exec();
     if (isNil(document)) throw new NotFoundException(PERSISTENCE_NOT_REMOVED);
@@ -295,7 +310,7 @@ export class CrudRepository<
 
   async deleteMany(filter: TFilter) {
     const resolvedFilter = this.resolveFilter(filter);
-    const scopedFilter = this.applyScope(resolvedFilter);
+    const scopedFilter = this.applyMutateFilter(resolvedFilter);
 
     const result = await this.model.deleteMany(scopedFilter).exec();
     return assertBatchSucceeded(
@@ -307,7 +322,7 @@ export class CrudRepository<
   async deleteOneById(id: string) {
     assertValidObjectId(id);
     const resolvedFilter = { _id: id } as QueryFilter<TModel>;
-    const scopedFilter = this.applyScope(resolvedFilter);
+    const scopedFilter = this.applyMutateFilter(resolvedFilter);
 
     const document = await this.model.findOneAndDelete(scopedFilter).exec();
     if (isNil(document)) throw new NotFoundException(PERSISTENCE_NOT_REMOVED);
@@ -319,7 +334,7 @@ export class CrudRepository<
     if (ids.length === 0) return { succeeded: 0, failed: 0 };
 
     const resolvedFilter = { _id: { $in: ids } } as QueryFilter<TModel>;
-    const scopedFilter = this.applyScope(resolvedFilter);
+    const scopedFilter = this.applyMutateFilter(resolvedFilter);
 
     const result = await this.model.deleteMany(scopedFilter).exec();
 
