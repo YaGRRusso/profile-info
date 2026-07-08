@@ -87,12 +87,12 @@ these filters.
 7. ~~E2e: `findManyActiveSkills` exclui disabled no escopo do caller~~
 8. ~~E2e: `assertSkillsEnabled` bloqueia attach de skill disabled~~
 9. ~~E2e: `FilterSkillInput` com `ownerId`/`partition` de outro user não vaza LOCAL~~
-10. Unit: `withActiveFilter` força `disabled: false` mesmo com filtro `disabled: true` (já existe — manter)
-11. Unit/integration: `toQueryForRead` vs `toQueryForAggregate` (string vs ObjectId em `ownerId`)
-12. Testar batch (`updateMany`, `disableMany`, `removeMany`) com mix de IDs no escopo e fora
-13. Testar `removeOne`/`removeMany` em LOCAL próprio e cascade (`skill.deleted` / `organization.deleted`)
-14. Testar dashboard `count` e `findRecentActivity` — USER vs SUPER_ADMIN, só active
-15. Testar loader: ids fora do escopo retornam `null`; ids disabled resolvem em browse/resolve
+10. ~~Unit: `withActiveFilter` força `disabled: false` mesmo com filtro `disabled: true` (já existe — manter)~~
+11. ~~Unit: `toQueryForRead` vs `toQueryForAggregate` (string vs ObjectId em `ownerId`)~~
+12. ~~E2e: batch (`updateMany`, `disableMany`, `removeMany`) com mix de IDs no escopo e fora~~
+13. ~~Integration: `removeOne` em LOCAL próprio e cascade (`skill.deleted` / `organization.deleted`)~~
+14. ~~E2e: dashboard `count` catálogo — USER vs SUPER_ADMIN, só active~~
+15. ~~E2e: loader/resolve — ids fora do escopo vazios; ids disabled resolvem em browse~~
 16. ~~ADR: SUPER_ADMIN lê LOCAL mas não muta LOCAL — regra permanente~~
 17. ~~ADR: delete (`remove*`) — API only; admin UI disable/enable only~~
 18. ~~ADR: `Filter*Input.partition` / `ownerId` — disponível no GraphQL; escopo de leitura limita efeito~~
@@ -105,14 +105,20 @@ these filters.
 25. ~~Admin: SUPER_ADMIN não vê ações de mutate em linhas LOCAL~~
 26. ~~Admin: coluna Owner visível só para SUPER_ADMIN~~
 27. ADR: quando implementar resolve owner-scoped nos loaders
-28. ADR: API token com role USER — mesmo escopo de catálogo que sessão JWT
-29. Verificar resume/portfolio com refs LOCAL via GraphQL público (hoje PDF usa ctx do dono)
-30. Verificar slug duplicado: mesmo slug em GLOBAL e LOCAL do mesmo user (`{ partition, ownerId, slug }`)
-31. Melhoria: batch mutations falham explicitamente se algum ID ficou fora do escopo
-32. Smoke manual: páginas Skills e Organizations como USER e SUPER_ADMIN
+28. ~~E2e: API token com role USER — mesmo escopo de catálogo que sessão JWT~~
+29. ~~E2e: resume com refs LOCAL no PDF público (ctx do dono)~~
+30. ~~E2e: slug duplicado GLOBAL + LOCAL do mesmo user~~
+31. Melhoria: batch mutations falham explicitamente se algum ID ficou fora do escopo (hoje: partial `succeeded`/`failed`)
 
 E2e catalog scope (skills + organizations): `test/e2e/skills-catalog-scope.spec.ts`,
 `test/e2e/organizations-catalog-scope.spec.ts`.
+
+E2e catalog batch, loaders, dashboard, API token: `test/e2e/catalog-batch-edge.spec.ts`,
+`test/e2e/catalog-loaders-dashboard.spec.ts`.
+
+Integration LOCAL delete cascade: `test/integration/catalog-local-delete-cascade.spec.ts`.
+
+Resume LOCAL refs: `test/e2e/resume.spec.ts`.
 
 ## Out of scope here
 

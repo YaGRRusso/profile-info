@@ -1,5 +1,8 @@
 import { INestApplication } from "@nestjs/common";
-import { testSuperAdminContext } from "@test/fixtures/auth-context";
+import {
+  testAuthContext,
+  testSuperAdminContext,
+} from "@test/fixtures/auth-context";
 import request from "supertest";
 import { App } from "supertest/types";
 import { UserRole } from "@/core/enums/user-role.enum";
@@ -98,5 +101,48 @@ describe("ResumeController (e2e)", () => {
       .get(`/resume.pdf?userId=${profileUserId}&locale=invalid`)
       .expect(200)
       .expect("Content-Type", PDF_CONTENT_TYPE);
+  });
+
+  it("/resume.pdf (GET) includes LOCAL catalog skills on the owner profile", async () => {
+    const usersService = app!.get(UsersService);
+    const skillsService = app!.get(SkillsService);
+
+    const owner = await usersService.createOne(testSuperAdminContext(), {
+      name: "Resume Local Owner",
+      nickname: "resume-local",
+      email: "resume-local@profile.info",
+      password: "owner.123",
+      role: UserRole.USER,
+      i18n: [
+        {
+          locale: "en",
+          messages: {
+            title: "Engineer",
+            description: "Uses local catalog skills",
+          },
+        },
+      ],
+    });
+
+    const localSkill = await skillsService.createOne(
+      testAuthContext({ id: owner.id }),
+      {
+        slug: "resume-local-skill",
+        i18n: skillI18n("Resume Local Skill"),
+        category: "Programming",
+      }
+    );
+
+    await usersService.updateOne(testSuperAdminContext(), owner.id, {
+      skillIds: [localSkill.id],
+    });
+
+    const response = await request(app!.getHttpServer())
+      .get(`/resume.pdf?userId=${owner.id}`)
+      .expect(200)
+      .expect("Content-Type", PDF_CONTENT_TYPE)
+      .expect("Content-Disposition", 'attachment; filename="resume.pdf"');
+
+    expect(response.body.subarray(0, 4).toString()).toBe("%PDF");
   });
 });

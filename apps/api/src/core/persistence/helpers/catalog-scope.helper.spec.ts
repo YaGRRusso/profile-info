@@ -23,6 +23,18 @@ describe("toQueryForRead", () => {
     });
   });
 
+  it("should use string ownerId on read and ObjectId ownerId on aggregate for USER scope", () => {
+    const read = toQueryForRead(catalog);
+    const aggregate = toQueryForAggregate(catalog);
+
+    const localReadBranch = read.$or?.[1] as { ownerId: unknown };
+    const localAggregateBranch = aggregate.$or?.[1] as { ownerId: unknown };
+
+    expect(localReadBranch.ownerId).toBe(userId);
+    expect(localAggregateBranch.ownerId).toEqual(toObjectId(userId));
+    expect(localReadBranch.ownerId).not.toEqual(localAggregateBranch.ownerId);
+  });
+
   it("should merge extra filters for regular users", () => {
     expect(toQueryForRead(catalog, { slug: "typescript" })).toEqual({
       slug: "typescript",

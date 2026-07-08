@@ -1,0 +1,366 @@
+import { INestApplication } from "@nestjs/common";
+import { getModelToken } from "@nestjs/mongoose";
+import {
+  testAuthContext,
+  testSuperAdminContext,
+} from "@test/fixtures/auth-context";
+import { hash } from "bcryptjs";
+import { Model } from "mongoose";
+import { App } from "supertest/types";
+import { ApiTokenPermission } from "@/core/enums/api-token-permission.enum";
+import { CatalogPartition } from "@/core/enums/catalog-partition.enum";
+import { UserRole } from "@/core/enums/user-role.enum";
+import { API_TOKEN_PREFIX } from "@/modules/api-tokens/constants/api-token.constants";
+import { ApiTokenModel } from "@/modules/api-tokens/schemas/api-token.schema";
+import { SkillsService } from "@/modules/skills/skills.service";
+import { UsersService } from "@/modules/users/users.service";
+import { clearTestDatabase } from "../support/clear-test-database";
+import { createTestApp } from "../support/create-test-app";
+import { graphqlRequest } from "../support/graphql-request";
+import { skillI18n } from "../support/skill-i18n";
+
+const MUTATION_BLOCKED_MESSAGE = /Not (Found|Updated|Removed)/;
+
+async function signIn(
+  app: INestApplication<App>,
+  email: string,
+  password: string
+): Promise<string> {
+  const response = await graphqlRequest<{ signIn: string }>(app, {
+    query: `
+      mutation SignIn($signInInput: SignInInput!) {
+        signIn(signInInput: $signInInput)
+      }
+    `,
+    variables: { signInInput: { email, password } },
+  });
+
+  return response.data?.signIn ?? "";
+}
+
+describe("Catalog batch and edge cases (e2e)", () => {
+  let app: INestApplication<App>;
+  let skillsService: SkillsService;
+  let userAToken: string;
+  let userAId: string;
+  let userBId: string;
+  let globalSkillId: string;
+  let userALocalSkillId: string;
+  let userBLocalSkillId: string;
+  let queryApiToken: string;
+
+  beforeAll(async () => {
+    const testApp = await createTestApp();
+    app = testApp.app;
+    await clearTestDatabase(testApp.module);
+
+    const usersService = testApp.module.get(UsersService);
+    skillsService = testApp.module.get(SkillsService);
+    const apiTokenModel = testApp.module.get<Model<ApiTokenModel>>(
+      getModelToken(ApiTokenModel.name)
+    );
+
+    await usersService.createOne(testSuperAdminContext(), {
+      name: "Admin",
+      nickname: "admin",
+      email: "admin@profile.info",
+      password: "123123",
+      role: UserRole.SUPER_ADMIN,
+    });
+
+    const userA = await usersService.createOne(testSuperAdminContext(), {
+      name: "User A",
+      nickname: "user-a",
+      email: "user-a@profile.info",
+      password: "user-a.123",
+      role: UserRole.USER,
+    });
+    userAId = userA.id;
+
+    const userB = await usersService.createOne(testSuperAdminContext(), {
+      name: "User B",
+      nickname: "user-b",
+      email: "user-b@profile.info",
+      password: "user-b.123",
+      role: UserRole.USER,
+    });
+    userBId = userB.id;
+
+    userAToken = await signIn(app, "user-a@profile.info", "user-a.123");
+
+    const globalSkill = await skillsService.createOne(testSuperAdminContext(), {
+      slug: "batch-global-skill",
+      i18n: skillI18n("Batch Global"),
+      category: "Programming",
+    });
+    globalSkillId = globalSkill.id;
+
+    const userALocalSkill = await skillsService.createOne(
+      testAuthContext({ id: userAId }),
+      {
+        slug: "batch-user-a-local",
+        i18n: skillI18n("User A Local Batch"),
+        category: "Programming",
+      }
+    );
+    userALocalSkillId = userALocalSkill.id;
+
+    const userBLocalSkill = await skillsService.createOne(
+      testAuthContext({ id: userBId }),
+      {
+        slug: "batch-user-b-local",
+        i18n: skillI18n("User B Local Batch"),
+        category: "Programming",
+      }
+    );
+    userBLocalSkillId = userBLocalSkill.id;
+
+    const queryTokenId = "674a00000000000000000011";
+    const queryTokenSecret = "batch-query-token-secret-32chars!!";
+
+    await apiTokenModel.create({
+      _id: queryTokenId,
+      ownerId: userAId,
+      name: "User A query",
+      hashedSecret: await hash(queryTokenSecret, 8),
+      permissions: [ApiTokenPermission.QUERY],
+    });
+
+    queryApiToken = `${API_TOKEN_PREFIX}${queryTokenId}_${queryTokenSecret}`;
+  });
+
+  afterAll(async () => {
+    if (app) await app.close();
+  });
+
+  describe("batch mutations", () => {
+    it("disableMany reports partial success when mixing in-scope and out-of-scope IDs", async () => {
+      const response = await graphqlRequest<{
+        disableManySkills: { succeeded: number; failed: number };
+      }>(app, {
+        query: `
+          mutation DisableManySkills($skillIds: [ID!]!) {
+            disableManySkills(skillIds: $skillIds) {
+              succeeded
+              failed
+            }
+          }
+        `,
+        variables: {
+          skillIds: [userALocalSkillId, globalSkillId],
+        },
+        token: userAToken,
+      });
+
+      expect(response.errors).toBeUndefined();
+      expect(response.data?.disableManySkills).toEqual({
+        succeeded: 1,
+        failed: 1,
+      });
+
+      await skillsService.enableOne(
+        testAuthContext({ id: userAId }),
+        userALocalSkillId
+      );
+    });
+
+    it("disableMany fails when every ID is out of mutate scope", async () => {
+      const response = await graphqlRequest(app, {
+        query: `
+          mutation DisableManySkills($skillIds: [ID!]!) {
+            disableManySkills(skillIds: $skillIds) {
+              succeeded
+              failed
+            }
+          }
+        `,
+        variables: { skillIds: [globalSkillId] },
+        token: userAToken,
+      });
+
+      expect(response.errors?.[0]?.message).toMatch(MUTATION_BLOCKED_MESSAGE);
+    });
+
+    it("updateMany reports partial success when mixing in-scope and out-of-scope IDs", async () => {
+      const response = await graphqlRequest<{
+        updateManySkills: { succeeded: number; failed: number };
+      }>(app, {
+        query: `
+          mutation UpdateManySkills(
+            $skillIds: [ID!]!
+            $updateSkillInput: UpdateSkillInput!
+          ) {
+            updateManySkills(
+              skillIds: $skillIds
+              updateSkillInput: $updateSkillInput
+            ) {
+              succeeded
+              failed
+            }
+          }
+        `,
+        variables: {
+          skillIds: [userALocalSkillId, globalSkillId],
+          updateSkillInput: { category: "Batch Updated" },
+        },
+        token: userAToken,
+      });
+
+      expect(response.errors).toBeUndefined();
+      expect(response.data?.updateManySkills).toEqual({
+        succeeded: 1,
+        failed: 1,
+      });
+
+      const localSkill = await skillsService.findOneById(
+        testAuthContext({ id: userAId }),
+        userALocalSkillId
+      );
+      expect(localSkill.category).toBe("Batch Updated");
+    });
+
+    it("removeMany fails when every ID is out of mutate scope", async () => {
+      const response = await graphqlRequest(app, {
+        query: `
+          mutation RemoveManySkills($skillIds: [ID!]!) {
+            removeManySkills(skillIds: $skillIds) {
+              succeeded
+              failed
+            }
+          }
+        `,
+        variables: { skillIds: [globalSkillId, userBLocalSkillId] },
+        token: userAToken,
+      });
+
+      expect(response.errors?.[0]?.message).toMatch(MUTATION_BLOCKED_MESSAGE);
+    });
+  });
+
+  describe("slug uniqueness per partition", () => {
+    it("allows the same slug on GLOBAL and LOCAL for the same user", async () => {
+      const sharedSlug = "shared-partition-slug";
+
+      const globalResponse = await graphqlRequest<{
+        createOneSkill: { slug: string; partition: CatalogPartition };
+      }>(app, {
+        query: `
+          mutation CreateOneSkill($createSkillInput: CreateSkillInput!) {
+            createOneSkill(createSkillInput: $createSkillInput) {
+              slug
+              partition
+            }
+          }
+        `,
+        variables: {
+          createSkillInput: {
+            slug: sharedSlug,
+            i18n: skillI18n("Shared Slug Global"),
+            category: "Programming",
+          },
+        },
+        token: await signIn(app, "admin@profile.info", "123123"),
+      });
+
+      expect(globalResponse.errors).toBeUndefined();
+      expect(globalResponse.data?.createOneSkill.partition).toBe(
+        CatalogPartition.GLOBAL
+      );
+
+      const localResponse = await graphqlRequest<{
+        createOneSkill: { slug: string; partition: CatalogPartition };
+      }>(app, {
+        query: `
+          mutation CreateOneSkill($createSkillInput: CreateSkillInput!) {
+            createOneSkill(createSkillInput: $createSkillInput) {
+              slug
+              partition
+            }
+          }
+        `,
+        variables: {
+          createSkillInput: {
+            slug: sharedSlug,
+            i18n: skillI18n("Shared Slug Local"),
+            category: "Programming",
+          },
+        },
+        token: userAToken,
+      });
+
+      expect(localResponse.errors).toBeUndefined();
+      expect(localResponse.data?.createOneSkill.slug).toBe(sharedSlug);
+      expect(localResponse.data?.createOneSkill.partition).toBe(
+        CatalogPartition.LOCAL
+      );
+    });
+
+    it("rejects duplicate LOCAL slug for the same user", async () => {
+      const response = await graphqlRequest(app, {
+        query: `
+          mutation CreateOneSkill($createSkillInput: CreateSkillInput!) {
+            createOneSkill(createSkillInput: $createSkillInput) {
+              id
+            }
+          }
+        `,
+        variables: {
+          createSkillInput: {
+            slug: "batch-user-a-local",
+            i18n: skillI18n("Duplicate Local"),
+            category: "Programming",
+          },
+        },
+        token: userAToken,
+      });
+
+      expect(response.errors?.[0]?.message).toBeDefined();
+    });
+  });
+
+  describe("API token catalog scope", () => {
+    it("QUERY token reads GLOBAL and own LOCAL skills", async () => {
+      const response = await graphqlRequest<{
+        findManySkills: {
+          found: number;
+          nodes: Array<{ slug: string; partition: CatalogPartition }>;
+        };
+      }>(app, {
+        query: `
+          query FindManySkills {
+            findManySkills {
+              found
+              nodes { slug partition }
+            }
+          }
+        `,
+        apiKey: queryApiToken,
+      });
+
+      expect(response.errors).toBeUndefined();
+      const slugs = response.data?.findManySkills.nodes.map(
+        (node) => node.slug
+      );
+      expect(slugs).toContain("batch-global-skill");
+      expect(slugs).toContain("batch-user-a-local");
+      expect(slugs).not.toContain("batch-user-b-local");
+    });
+
+    it("QUERY token cannot read another users LOCAL skill via findManySkillById", async () => {
+      const response = await graphqlRequest<{
+        findManySkillById: Array<{ id: string }>;
+      }>(app, {
+        query: `
+          query FindManySkillById($skillIds: [ID!]!) {
+            findManySkillById(skillIds: $skillIds) { id }
+          }
+        `,
+        variables: { skillIds: [userBLocalSkillId] },
+        apiKey: queryApiToken,
+      });
+
+      expect(response.errors).toBeUndefined();
+      expect(response.data?.findManySkillById).toEqual([]);
+    });
+  });
+});
