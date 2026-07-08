@@ -690,6 +690,20 @@ export type EnableManyOrganizationsMutationVariables = Exact<{
 
 export type EnableManyOrganizationsMutation = { enableManyOrganizations: { succeeded: number, failed: number } };
 
+export type RemoveOneOrganizationMutationVariables = Exact<{
+  organizationId: string | number;
+}>;
+
+
+export type RemoveOneOrganizationMutation = { removeOneOrganization: { id: string, slug: string } };
+
+export type RemoveManyOrganizationsMutationVariables = Exact<{
+  organizationIds: Array<string | number> | string | number;
+}>;
+
+
+export type RemoveManyOrganizationsMutation = { removeManyOrganizations: { succeeded: number, failed: number } };
+
 export type CreateOneProjectMutationVariables = Exact<{
   createProjectInput: CreateProjectInput;
 }>;
@@ -777,6 +791,20 @@ export type EnableManySkillsMutationVariables = Exact<{
 
 
 export type EnableManySkillsMutation = { enableManySkills: { succeeded: number, failed: number } };
+
+export type RemoveOneSkillMutationVariables = Exact<{
+  skillId: string | number;
+}>;
+
+
+export type RemoveOneSkillMutation = { removeOneSkill: { id: string, slug: string } };
+
+export type RemoveManySkillsMutationVariables = Exact<{
+  skillIds: Array<string | number> | string | number;
+}>;
+
+
+export type RemoveManySkillsMutation = { removeManySkills: { succeeded: number, failed: number } };
 
 export type UpdateMeMutationVariables = Exact<{
   updateMeInput: UpdateMeInput;
@@ -1220,6 +1248,22 @@ export const EnableManyOrganizationsDocument = new TypedDocumentString(`
   }
 }
     `) as unknown as TypedDocumentString<EnableManyOrganizationsMutation, EnableManyOrganizationsMutationVariables>;
+export const RemoveOneOrganizationDocument = new TypedDocumentString(`
+    mutation RemoveOneOrganization($organizationId: ID!) {
+  removeOneOrganization(organizationId: $organizationId) {
+    id
+    slug
+  }
+}
+    `) as unknown as TypedDocumentString<RemoveOneOrganizationMutation, RemoveOneOrganizationMutationVariables>;
+export const RemoveManyOrganizationsDocument = new TypedDocumentString(`
+    mutation RemoveManyOrganizations($organizationIds: [ID!]!) {
+  removeManyOrganizations(organizationIds: $organizationIds) {
+    succeeded
+    failed
+  }
+}
+    `) as unknown as TypedDocumentString<RemoveManyOrganizationsMutation, RemoveManyOrganizationsMutationVariables>;
 export const CreateOneProjectDocument = new TypedDocumentString(`
     mutation CreateOneProject($createProjectInput: CreateProjectInput!) {
   createOneProject(createProjectInput: $createProjectInput) {
@@ -1337,6 +1381,22 @@ export const EnableManySkillsDocument = new TypedDocumentString(`
   }
 }
     `) as unknown as TypedDocumentString<EnableManySkillsMutation, EnableManySkillsMutationVariables>;
+export const RemoveOneSkillDocument = new TypedDocumentString(`
+    mutation RemoveOneSkill($skillId: ID!) {
+  removeOneSkill(skillId: $skillId) {
+    id
+    slug
+  }
+}
+    `) as unknown as TypedDocumentString<RemoveOneSkillMutation, RemoveOneSkillMutationVariables>;
+export const RemoveManySkillsDocument = new TypedDocumentString(`
+    mutation RemoveManySkills($skillIds: [ID!]!) {
+  removeManySkills(skillIds: $skillIds) {
+    succeeded
+    failed
+  }
+}
+    `) as unknown as TypedDocumentString<RemoveManySkillsMutation, RemoveManySkillsMutationVariables>;
 export const UpdateMeDocument = new TypedDocumentString(`
     mutation UpdateMe($updateMeInput: UpdateMeInput!) {
   updateMe(updateMeInput: $updateMeInput) {

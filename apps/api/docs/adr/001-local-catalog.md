@@ -33,8 +33,7 @@ repositories. Avoid unscoped `repository.crud` on catalog paths.
 `disable*` / `enable*` toggle `disabled` only — **no** delete events.
 
 `remove*` hard-deletes and emits cascade events (`skill.deleted`, `organization.deleted`).
-**Admin UI uses disable/enable only** — `remove*` stays on the GraphQL API for scripts or
-emergency use, not exposed in the admin panel.
+**Admin UI:** `GLOBAL` catalog → disable/enable (SUPER_ADMIN). `LOCAL` catalog → remove (owner USER). Both use existing `remove*` cascade on hard delete.
 
 | Intent | Include disabled? |
 |--------|-------------------|

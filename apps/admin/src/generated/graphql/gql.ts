@@ -46,6 +46,8 @@ type Documents = {
     "\n  mutation DisableManyOrganizations($organizationIds: [ID!]!) {\n    disableManyOrganizations(organizationIds: $organizationIds) {\n      succeeded\n      failed\n    }\n  }\n": typeof types.DisableManyOrganizationsDocument,
     "\n  mutation EnableOneOrganization($organizationId: ID!) {\n    enableOneOrganization(organizationId: $organizationId) {\n      id\n      slug\n    }\n  }\n": typeof types.EnableOneOrganizationDocument,
     "\n  mutation EnableManyOrganizations($organizationIds: [ID!]!) {\n    enableManyOrganizations(organizationIds: $organizationIds) {\n      succeeded\n      failed\n    }\n  }\n": typeof types.EnableManyOrganizationsDocument,
+    "\n  mutation RemoveOneOrganization($organizationId: ID!) {\n    removeOneOrganization(organizationId: $organizationId) {\n      id\n      slug\n    }\n  }\n": typeof types.RemoveOneOrganizationDocument,
+    "\n  mutation RemoveManyOrganizations($organizationIds: [ID!]!) {\n    removeManyOrganizations(organizationIds: $organizationIds) {\n      succeeded\n      failed\n    }\n  }\n": typeof types.RemoveManyOrganizationsDocument,
     "\n  mutation CreateOneProject($createProjectInput: CreateProjectInput!) {\n    createOneProject(createProjectInput: $createProjectInput) {\n      id\n      slug\n    }\n  }\n": typeof types.CreateOneProjectDocument,
     "\n  mutation UpdateOneProject(\n    $projectId: ID!\n    $updateProjectInput: UpdateProjectInput!\n  ) {\n    updateOneProject(\n      projectId: $projectId\n      updateProjectInput: $updateProjectInput\n    ) {\n      id\n      slug\n    }\n  }\n": typeof types.UpdateOneProjectDocument,
     "\n  mutation UpdateManyProjects(\n    $projectIds: [ID!]!\n    $updateProjectInput: UpdateProjectInput!\n  ) {\n    updateManyProjects(\n      projectIds: $projectIds\n      updateProjectInput: $updateProjectInput\n    ) {\n      succeeded\n      failed\n    }\n  }\n": typeof types.UpdateManyProjectsDocument,
@@ -58,6 +60,8 @@ type Documents = {
     "\n  mutation DisableManySkills($skillIds: [ID!]!) {\n    disableManySkills(skillIds: $skillIds) {\n      succeeded\n      failed\n    }\n  }\n": typeof types.DisableManySkillsDocument,
     "\n  mutation EnableOneSkill($skillId: ID!) {\n    enableOneSkill(skillId: $skillId) {\n      id\n      slug\n    }\n  }\n": typeof types.EnableOneSkillDocument,
     "\n  mutation EnableManySkills($skillIds: [ID!]!) {\n    enableManySkills(skillIds: $skillIds) {\n      succeeded\n      failed\n    }\n  }\n": typeof types.EnableManySkillsDocument,
+    "\n  mutation RemoveOneSkill($skillId: ID!) {\n    removeOneSkill(skillId: $skillId) {\n      id\n      slug\n    }\n  }\n": typeof types.RemoveOneSkillDocument,
+    "\n  mutation RemoveManySkills($skillIds: [ID!]!) {\n    removeManySkills(skillIds: $skillIds) {\n      succeeded\n      failed\n    }\n  }\n": typeof types.RemoveManySkillsDocument,
     "\n  mutation UpdateMe($updateMeInput: UpdateMeInput!) {\n    updateMe(updateMeInput: $updateMeInput) {\n      id\n      email\n      name\n      nickname\n      role\n      avatar\n      phone\n      birth\n      address\n      i18n {\n        locale\n        messages {\n          title\n          description\n        }\n      }\n      urls {\n        title\n        value\n      }\n    }\n  }\n": typeof types.UpdateMeDocument,
     "\n  query FindManyApiTokens(\n    $apiTokenFilters: FilterApiTokenInput\n    $apiTokenPagination: PaginationInput\n    $apiTokenSort: SortApiTokenInput\n  ) {\n    findManyApiTokens(\n      apiTokenFilters: $apiTokenFilters\n      apiTokenPagination: $apiTokenPagination\n      apiTokenSort: $apiTokenSort\n    ) {\n      found\n      nodes {\n        id\n        ownerId\n        name\n        permissions\n        expiresAt\n        createdAt\n        updatedAt\n      }\n    }\n  }\n": typeof types.FindManyApiTokensDocument,
     "\n  query GetMe {\n    getMe {\n      id\n      email\n      name\n      nickname\n      role\n      avatar\n      phone\n      birth\n      address\n      i18n {\n        locale\n        messages {\n          title\n          description\n        }\n      }\n      urls {\n        title\n        value\n      }\n      skillIds\n      skills {\n        id\n        slug\n        i18n {\n          locale\n          messages {\n            title\n          }\n        }\n      }\n    }\n  }\n": typeof types.GetMeDocument,
@@ -103,6 +107,8 @@ const documents: Documents = {
     "\n  mutation DisableManyOrganizations($organizationIds: [ID!]!) {\n    disableManyOrganizations(organizationIds: $organizationIds) {\n      succeeded\n      failed\n    }\n  }\n": types.DisableManyOrganizationsDocument,
     "\n  mutation EnableOneOrganization($organizationId: ID!) {\n    enableOneOrganization(organizationId: $organizationId) {\n      id\n      slug\n    }\n  }\n": types.EnableOneOrganizationDocument,
     "\n  mutation EnableManyOrganizations($organizationIds: [ID!]!) {\n    enableManyOrganizations(organizationIds: $organizationIds) {\n      succeeded\n      failed\n    }\n  }\n": types.EnableManyOrganizationsDocument,
+    "\n  mutation RemoveOneOrganization($organizationId: ID!) {\n    removeOneOrganization(organizationId: $organizationId) {\n      id\n      slug\n    }\n  }\n": types.RemoveOneOrganizationDocument,
+    "\n  mutation RemoveManyOrganizations($organizationIds: [ID!]!) {\n    removeManyOrganizations(organizationIds: $organizationIds) {\n      succeeded\n      failed\n    }\n  }\n": types.RemoveManyOrganizationsDocument,
     "\n  mutation CreateOneProject($createProjectInput: CreateProjectInput!) {\n    createOneProject(createProjectInput: $createProjectInput) {\n      id\n      slug\n    }\n  }\n": types.CreateOneProjectDocument,
     "\n  mutation UpdateOneProject(\n    $projectId: ID!\n    $updateProjectInput: UpdateProjectInput!\n  ) {\n    updateOneProject(\n      projectId: $projectId\n      updateProjectInput: $updateProjectInput\n    ) {\n      id\n      slug\n    }\n  }\n": types.UpdateOneProjectDocument,
     "\n  mutation UpdateManyProjects(\n    $projectIds: [ID!]!\n    $updateProjectInput: UpdateProjectInput!\n  ) {\n    updateManyProjects(\n      projectIds: $projectIds\n      updateProjectInput: $updateProjectInput\n    ) {\n      succeeded\n      failed\n    }\n  }\n": types.UpdateManyProjectsDocument,
@@ -115,6 +121,8 @@ const documents: Documents = {
     "\n  mutation DisableManySkills($skillIds: [ID!]!) {\n    disableManySkills(skillIds: $skillIds) {\n      succeeded\n      failed\n    }\n  }\n": types.DisableManySkillsDocument,
     "\n  mutation EnableOneSkill($skillId: ID!) {\n    enableOneSkill(skillId: $skillId) {\n      id\n      slug\n    }\n  }\n": types.EnableOneSkillDocument,
     "\n  mutation EnableManySkills($skillIds: [ID!]!) {\n    enableManySkills(skillIds: $skillIds) {\n      succeeded\n      failed\n    }\n  }\n": types.EnableManySkillsDocument,
+    "\n  mutation RemoveOneSkill($skillId: ID!) {\n    removeOneSkill(skillId: $skillId) {\n      id\n      slug\n    }\n  }\n": types.RemoveOneSkillDocument,
+    "\n  mutation RemoveManySkills($skillIds: [ID!]!) {\n    removeManySkills(skillIds: $skillIds) {\n      succeeded\n      failed\n    }\n  }\n": types.RemoveManySkillsDocument,
     "\n  mutation UpdateMe($updateMeInput: UpdateMeInput!) {\n    updateMe(updateMeInput: $updateMeInput) {\n      id\n      email\n      name\n      nickname\n      role\n      avatar\n      phone\n      birth\n      address\n      i18n {\n        locale\n        messages {\n          title\n          description\n        }\n      }\n      urls {\n        title\n        value\n      }\n    }\n  }\n": types.UpdateMeDocument,
     "\n  query FindManyApiTokens(\n    $apiTokenFilters: FilterApiTokenInput\n    $apiTokenPagination: PaginationInput\n    $apiTokenSort: SortApiTokenInput\n  ) {\n    findManyApiTokens(\n      apiTokenFilters: $apiTokenFilters\n      apiTokenPagination: $apiTokenPagination\n      apiTokenSort: $apiTokenSort\n    ) {\n      found\n      nodes {\n        id\n        ownerId\n        name\n        permissions\n        expiresAt\n        createdAt\n        updatedAt\n      }\n    }\n  }\n": types.FindManyApiTokensDocument,
     "\n  query GetMe {\n    getMe {\n      id\n      email\n      name\n      nickname\n      role\n      avatar\n      phone\n      birth\n      address\n      i18n {\n        locale\n        messages {\n          title\n          description\n        }\n      }\n      urls {\n        title\n        value\n      }\n      skillIds\n      skills {\n        id\n        slug\n        i18n {\n          locale\n          messages {\n            title\n          }\n        }\n      }\n    }\n  }\n": types.GetMeDocument,
@@ -256,6 +264,14 @@ export function graphql(source: "\n  mutation EnableManyOrganizations($organizat
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
+export function graphql(source: "\n  mutation RemoveOneOrganization($organizationId: ID!) {\n    removeOneOrganization(organizationId: $organizationId) {\n      id\n      slug\n    }\n  }\n"): typeof import('./graphql').RemoveOneOrganizationDocument;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation RemoveManyOrganizations($organizationIds: [ID!]!) {\n    removeManyOrganizations(organizationIds: $organizationIds) {\n      succeeded\n      failed\n    }\n  }\n"): typeof import('./graphql').RemoveManyOrganizationsDocument;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
 export function graphql(source: "\n  mutation CreateOneProject($createProjectInput: CreateProjectInput!) {\n    createOneProject(createProjectInput: $createProjectInput) {\n      id\n      slug\n    }\n  }\n"): typeof import('./graphql').CreateOneProjectDocument;
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
@@ -301,6 +317,14 @@ export function graphql(source: "\n  mutation EnableOneSkill($skillId: ID!) {\n 
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function graphql(source: "\n  mutation EnableManySkills($skillIds: [ID!]!) {\n    enableManySkills(skillIds: $skillIds) {\n      succeeded\n      failed\n    }\n  }\n"): typeof import('./graphql').EnableManySkillsDocument;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation RemoveOneSkill($skillId: ID!) {\n    removeOneSkill(skillId: $skillId) {\n      id\n      slug\n    }\n  }\n"): typeof import('./graphql').RemoveOneSkillDocument;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation RemoveManySkills($skillIds: [ID!]!) {\n    removeManySkills(skillIds: $skillIds) {\n      succeeded\n      failed\n    }\n  }\n"): typeof import('./graphql').RemoveManySkillsDocument;
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

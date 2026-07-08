@@ -94,6 +94,24 @@ const enableManySkills = graphql(`
   }
 `);
 
+const removeOneSkill = graphql(`
+  mutation RemoveOneSkill($skillId: ID!) {
+    removeOneSkill(skillId: $skillId) {
+      id
+      slug
+    }
+  }
+`);
+
+const removeManySkills = graphql(`
+  mutation RemoveManySkills($skillIds: [ID!]!) {
+    removeManySkills(skillIds: $skillIds) {
+      succeeded
+      failed
+    }
+  }
+`);
+
 function invalidateSkillQueries(queryClient: QueryClient) {
   queryClient.invalidateQueries({ queryKey: ["findManySkills"] });
   queryClient.invalidateQueries({ queryKey: ["findManyActiveSkills"] });
@@ -179,6 +197,26 @@ export function useEnableManySkills() {
   return useMutation({
     mutationKey: ["enableManySkills"],
     mutationFn: (skillIds: string[]) => execute(enableManySkills, { skillIds }),
+    onSuccess: () => invalidateSkillQueries(queryClient),
+  });
+}
+
+export function useRemoveOneSkill() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationKey: ["removeOneSkill"],
+    mutationFn: (skillId: string) => execute(removeOneSkill, { skillId }),
+    onSuccess: () => invalidateSkillQueries(queryClient),
+  });
+}
+
+export function useRemoveManySkills() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationKey: ["removeManySkills"],
+    mutationFn: (skillIds: string[]) => execute(removeManySkills, { skillIds }),
     onSuccess: () => invalidateSkillQueries(queryClient),
   });
 }

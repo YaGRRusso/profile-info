@@ -87,6 +87,24 @@ const enableManyOrganizations = graphql(`
   }
 `);
 
+const removeOneOrganization = graphql(`
+  mutation RemoveOneOrganization($organizationId: ID!) {
+    removeOneOrganization(organizationId: $organizationId) {
+      id
+      slug
+    }
+  }
+`);
+
+const removeManyOrganizations = graphql(`
+  mutation RemoveManyOrganizations($organizationIds: [ID!]!) {
+    removeManyOrganizations(organizationIds: $organizationIds) {
+      succeeded
+      failed
+    }
+  }
+`);
+
 function invalidateOrganizationQueries(queryClient: QueryClient) {
   queryClient.invalidateQueries({ queryKey: ["findManyOrganizations"] });
   queryClient.invalidateQueries({ queryKey: ["findManyActiveOrganizations"] });
@@ -183,6 +201,28 @@ export function useEnableManyOrganizations() {
     mutationKey: ["enableManyOrganizations"],
     mutationFn: (organizationIds: string[]) =>
       execute(enableManyOrganizations, { organizationIds }),
+    onSuccess: () => invalidateOrganizationQueries(queryClient),
+  });
+}
+
+export function useRemoveOneOrganization() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationKey: ["removeOneOrganization"],
+    mutationFn: (organizationId: string) =>
+      execute(removeOneOrganization, { organizationId }),
+    onSuccess: () => invalidateOrganizationQueries(queryClient),
+  });
+}
+
+export function useRemoveManyOrganizations() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationKey: ["removeManyOrganizations"],
+    mutationFn: (organizationIds: string[]) =>
+      execute(removeManyOrganizations, { organizationIds }),
     onSuccess: () => invalidateOrganizationQueries(queryClient),
   });
 }

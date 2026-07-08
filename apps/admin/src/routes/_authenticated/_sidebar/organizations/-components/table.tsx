@@ -8,6 +8,7 @@ import {
   MagnifyingGlassIcon,
   PencilIcon,
   SlidersHorizontalIcon,
+  TrashSimpleIcon,
   XCircleIcon,
   XIcon,
 } from "@phosphor-icons/react";
@@ -28,7 +29,7 @@ import {
   type VisibilityState,
 } from "@tanstack/react-table";
 import { useQueryState } from "nuqs";
-import { useMemo, useState } from "react";
+import { type ReactNode, useMemo, useState } from "react";
 import { z } from "zod";
 import { EmptyValue } from "@/components/display/empty-value";
 import { Link } from "@/components/display/link";
@@ -108,6 +109,7 @@ const getColumns = (
   onEdit: (organization: OrganizationRow) => void,
   onDisable: (organization: OrganizationRow) => void,
   onEnable: (organization: OrganizationRow) => void,
+  onRemove: (organization: OrganizationRow) => void,
   onView: (organization: OrganizationRow) => void,
   opts: { isSuperAdmin: boolean }
 ) => [
@@ -244,48 +246,76 @@ const getColumns = (
     id: "actions",
     enableHiding: false,
     cell: ({ row }) => {
+      const isGlobal = row.original.partition === CatalogPartition.Global;
       const readOnly = isCatalogRowMutationReadOnly(
         row.original.partition,
         opts.isSuperAdmin
       );
 
-      return (
-        <div className="flex items-center justify-end gap-1">
-          <button
-            className="btn btn-sm btn-square btn-ghost"
-            disabled={readOnly}
-            onClick={() => onEdit(row.original)}
-            type="button"
-          >
-            <PencilIcon />
-          </button>
-          <button
-            className="btn btn-sm btn-square btn-ghost"
-            onClick={() => onView(row.original)}
-            type="button"
-          >
-            <EyeIcon />
-          </button>
-          {row.original.disabled ? (
+      const actions: ReactNode[] = [
+        <button
+          className="btn btn-sm btn-square btn-ghost"
+          disabled={readOnly}
+          key="edit"
+          onClick={() => onEdit(row.original)}
+          type="button"
+        >
+          <PencilIcon />
+        </button>,
+        <button
+          className="btn btn-sm btn-square btn-ghost"
+          key="view"
+          onClick={() => onView(row.original)}
+          type="button"
+        >
+          <EyeIcon />
+        </button>,
+      ];
+
+      if (isGlobal) {
+        if (row.original.disabled) {
+          actions.push(
             <button
               className="btn btn-sm btn-square btn-ghost btn-success"
               disabled={readOnly}
+              key="enable"
               onClick={() => onEnable(row.original)}
               type="button"
             >
               <CheckCircleIcon />
             </button>
-          ) : (
+          );
+        }
+        if (!row.original.disabled) {
+          actions.push(
             <button
               className="btn btn-sm btn-square btn-ghost btn-error"
               disabled={readOnly}
+              key="disable"
               onClick={() => onDisable(row.original)}
               type="button"
             >
               <XCircleIcon />
             </button>
-          )}
-        </div>
+          );
+        }
+      }
+      if (!isGlobal) {
+        actions.push(
+          <button
+            className="btn btn-sm btn-square btn-ghost btn-error"
+            disabled={readOnly}
+            key="remove"
+            onClick={() => onRemove(row.original)}
+            type="button"
+          >
+            <TrashSimpleIcon />
+          </button>
+        );
+      }
+
+      return (
+        <div className="flex items-center justify-end gap-1">{actions}</div>
       );
     },
   }),
@@ -299,7 +329,9 @@ interface OrganizationsTableProps {
   onMultiDisable: (organizations: OrganizationRow[]) => void;
   onMultiEdit: (organizations: OrganizationRow[]) => void;
   onMultiEnable: (organizations: OrganizationRow[]) => void;
+  onMultiRemove: (organizations: OrganizationRow[]) => void;
   onMultiView: (organizations: OrganizationRow[]) => void;
+  onRemove: (organization: OrganizationRow) => void;
   onView: (organization: OrganizationRow) => void;
 }
 
@@ -308,11 +340,13 @@ export function OrganizationsTable({
   onEdit,
   onDisable,
   onEnable,
+  onRemove,
   onView,
   onMultiEdit,
   onMultiView,
   onMultiDisable,
   onMultiEnable,
+  onMultiRemove,
 }: OrganizationsTableProps) {
   const userRole = useAuthStore((state) => state.user?.role);
   const isSuperAdmin = userRole === "SUPER_ADMIN";
@@ -373,7 +407,7 @@ export function OrganizationsTable({
 
   const table = useReactTable({
     data,
-    columns: getColumns(onEdit, onDisable, onEnable, onView, {
+    columns: getColumns(onEdit, onDisable, onEnable, onRemove, onView, {
       isSuperAdmin,
     }),
     getCoreRowModel: getCoreRowModel(),
@@ -437,23 +471,36 @@ export function OrganizationsTable({
             <EyeIcon />
             <span>View Selected ({selected.length})</span>
           </button>
-          <button
-            className="btn btn-ghost btn-sm btn-success"
-            disabled={!selected?.length || selectedHasReadOnlyRows}
-            onClick={() => onMultiEnable(selected)}
-            type="button"
-          >
-            <CheckCircleIcon />
-            <span>Enable Selected ({selected.length})</span>
-          </button>
+          {isSuperAdmin && (
+            <>
+              <button
+                className="btn btn-ghost btn-sm btn-success"
+                disabled={!selected?.length || selectedHasReadOnlyRows}
+                onClick={() => onMultiEnable(selected)}
+                type="button"
+              >
+                <CheckCircleIcon />
+                <span>Enable Selected ({selected.length})</span>
+              </button>
+              <button
+                className="btn btn-ghost btn-sm btn-error"
+                disabled={!selected?.length || selectedHasReadOnlyRows}
+                onClick={() => onMultiDisable(selected)}
+                type="button"
+              >
+                <XCircleIcon />
+                <span>Disable Selected ({selected.length})</span>
+              </button>
+            </>
+          )}
           <button
             className="btn btn-ghost btn-sm btn-error"
             disabled={!selected?.length || selectedHasReadOnlyRows}
-            onClick={() => onMultiDisable(selected)}
+            onClick={() => onMultiRemove(selected)}
             type="button"
           >
-            <XCircleIcon />
-            <span>Disable Selected ({selected.length})</span>
+            <TrashSimpleIcon />
+            <span>Remove Selected ({selected.length})</span>
           </button>
         </div>
       </div>

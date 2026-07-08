@@ -26,6 +26,8 @@ import {
   useDisableOneSkill,
   useEnableManySkills,
   useEnableOneSkill,
+  useRemoveManySkills,
+  useRemoveOneSkill,
   useUpdateManySkills,
   useUpdateOneSkill,
 } from "@/hooks/mutations/skills";
@@ -52,6 +54,8 @@ function RouteComponent() {
   const disableManySkills = useDisableManySkills();
   const enableOneSkill = useEnableOneSkill();
   const enableManySkills = useEnableManySkills();
+  const removeOneSkill = useRemoveOneSkill();
+  const removeManySkills = useRemoveManySkills();
 
   const closeForm = useCallback(() => {
     setFormValues(undefined);
@@ -163,6 +167,37 @@ function RouteComponent() {
     selectedSkillIds,
     closeForm,
     enableManySkills,
+  ]);
+
+  const handleDelete = useCallback(() => {
+    switch (formValues?.state) {
+      case "DELETING":
+        removeOneSkill.mutate(selectedSkillIds[0], {
+          onSuccess: () => {
+            closeForm();
+            toast.success("Skill deleted successfully");
+          },
+        });
+        break;
+      case "MULTI_DELETING":
+        removeManySkills.mutate(selectedSkillIds, {
+          onSuccess: (data) => {
+            closeForm();
+            toast.success(
+              `${data.removeManySkills.succeeded} skills deleted successfully`
+            );
+          },
+        });
+        break;
+      default:
+        break;
+    }
+  }, [
+    formValues?.state,
+    removeOneSkill,
+    selectedSkillIds,
+    closeForm,
+    removeManySkills,
   ]);
 
   return (
@@ -318,6 +353,37 @@ function RouteComponent() {
         </ul>
       </Modal>
 
+      <Modal
+        actions={[
+          {
+            label: "Cancel",
+            className: "btn-ghost",
+            onClick: () => setFormValues(undefined),
+          },
+          {
+            label: "Confirm",
+            className: "btn-soft btn-error",
+            disabled: removeOneSkill.isPending || removeManySkills.isPending,
+            onClick: () => handleDelete(),
+          },
+        ]}
+        description="Are you sure you want to delete the following skills?"
+        isOpen={
+          formValues?.state === "MULTI_DELETING" ||
+          formValues?.state === "DELETING"
+        }
+        onClose={() => setFormValues(undefined)}
+        title="Delete skills?"
+      >
+        <ul className="flex flex-wrap items-center gap-1">
+          {formValues?.customValues?.map((skill) => (
+            <li className="badge badge-sm badge-soft" key={skill?.id}>
+              {skill ? i18nLabel(skill) : null}
+            </li>
+          ))}
+        </ul>
+      </Modal>
+
       <DataState
         isEmpty={findManySkills.data?.nodes.length === 0}
         isFetching={findManySkills.isFetching}
@@ -375,10 +441,22 @@ function RouteComponent() {
                 customValues: skills,
               })
             }
+            onMultiRemove={(skills) =>
+              setFormValues({
+                state: "MULTI_DELETING",
+                customValues: skills,
+              })
+            }
             onMultiView={(skills) =>
               setFormValues({
                 state: "MULTI_READING",
                 customValues: skills,
+              })
+            }
+            onRemove={(skill) =>
+              setFormValues({
+                state: "DELETING",
+                customValues: [skill],
               })
             }
             onView={(skill) =>

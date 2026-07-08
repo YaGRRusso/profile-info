@@ -26,6 +26,8 @@ import {
   useDisableOneOrganization,
   useEnableManyOrganizations,
   useEnableOneOrganization,
+  useRemoveManyOrganizations,
+  useRemoveOneOrganization,
   useUpdateManyOrganizations,
   useUpdateOneOrganization,
 } from "@/hooks/mutations/organizations";
@@ -56,6 +58,8 @@ function RouteComponent() {
   const disableManyOrganizations = useDisableManyOrganizations();
   const enableOneOrganization = useEnableOneOrganization();
   const enableManyOrganizations = useEnableManyOrganizations();
+  const removeOneOrganization = useRemoveOneOrganization();
+  const removeManyOrganizations = useRemoveManyOrganizations();
 
   const closeForm = useCallback(() => {
     setFormValues(undefined);
@@ -169,6 +173,37 @@ function RouteComponent() {
     selectedOrganizationIds,
     closeForm,
     enableManyOrganizations,
+  ]);
+
+  const handleDelete = useCallback(() => {
+    switch (formValues?.state) {
+      case "DELETING":
+        removeOneOrganization.mutate(selectedOrganizationIds[0], {
+          onSuccess: () => {
+            closeForm();
+            toast.success("Organization deleted successfully");
+          },
+        });
+        break;
+      case "MULTI_DELETING":
+        removeManyOrganizations.mutate(selectedOrganizationIds, {
+          onSuccess: (data) => {
+            closeForm();
+            toast.success(
+              `${data.removeManyOrganizations.succeeded} organizations deleted successfully`
+            );
+          },
+        });
+        break;
+      default:
+        break;
+    }
+  }, [
+    formValues?.state,
+    removeOneOrganization,
+    selectedOrganizationIds,
+    closeForm,
+    removeManyOrganizations,
   ]);
 
   return (
@@ -337,6 +372,39 @@ function RouteComponent() {
         </ul>
       </Modal>
 
+      <Modal
+        actions={[
+          {
+            label: "Cancel",
+            className: "btn-ghost",
+            onClick: () => setFormValues(undefined),
+          },
+          {
+            label: "Confirm",
+            className: "btn-soft btn-error",
+            disabled:
+              removeOneOrganization.isPending ||
+              removeManyOrganizations.isPending,
+            onClick: () => handleDelete(),
+          },
+        ]}
+        description="Are you sure you want to delete the following organizations?"
+        isOpen={
+          formValues?.state === "MULTI_DELETING" ||
+          formValues?.state === "DELETING"
+        }
+        onClose={() => setFormValues(undefined)}
+        title="Delete organizations?"
+      >
+        <ul className="flex flex-wrap items-center gap-1">
+          {formValues?.customValues?.map((organization) => (
+            <li className="badge badge-sm badge-soft" key={organization?.id}>
+              {organization?.name}
+            </li>
+          ))}
+        </ul>
+      </Modal>
+
       <DataState
         isEmpty={findManyOrganizations.data?.nodes.length === 0}
         isFetching={findManyOrganizations.isFetching}
@@ -394,10 +462,22 @@ function RouteComponent() {
                 customValues: organizations,
               })
             }
+            onMultiRemove={(organizations) =>
+              setFormValues({
+                state: "MULTI_DELETING",
+                customValues: organizations,
+              })
+            }
             onMultiView={(organizations) =>
               setFormValues({
                 state: "MULTI_READING",
                 customValues: organizations,
+              })
+            }
+            onRemove={(organization) =>
+              setFormValues({
+                state: "DELETING",
+                customValues: [organization],
               })
             }
             onView={(organization) =>
