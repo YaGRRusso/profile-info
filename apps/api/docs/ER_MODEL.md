@@ -261,8 +261,10 @@ inputs use `organizationId` and `skillIds` (no `ownerId` — injected from conte
 ## GraphQL filter inputs
 
 Filter `*Input` types use `PartialType(PickType(Create*Input, [...]))` — an explicit
-whitelist of filterable fields. **`ownerId` is never filterable** (tenant scope comes
-from `AuthContext`, not client filters). `FilterUserInput` excludes `password`.
+whitelist of filterable fields. **Private (tenant-scoped) entities:** `ownerId` is not
+filterable — tenant scope comes from `AuthContext`. **Catalog** (`FilterSkillInput`,
+`FilterOrganizationInput`): optional `partition` and `ownerId` are filterable; read scope
+still applies (see ADR 001). `FilterUserInput` excludes `password`.
 
 ## Maintaining this file
 

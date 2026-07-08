@@ -838,7 +838,7 @@ export type FindManyOrganizationsQueryVariables = Exact<{
 }>;
 
 
-export type FindManyOrganizationsQuery = { findManyOrganizations: { found: number, nodes: Array<{ id: string, name: string, slug: string, category: OrganizationCategory, logo: string | null, website: string | null, disabled: boolean, partition: CatalogPartition, createdAt: string, updatedAt: string, i18n: Array<{ locale: string, messages: { description: string } }> }> } };
+export type FindManyOrganizationsQuery = { findManyOrganizations: { found: number, nodes: Array<{ id: string, name: string, slug: string, category: OrganizationCategory, logo: string | null, website: string | null, disabled: boolean, partition: CatalogPartition, createdAt: string, updatedAt: string, owner: { id: string, nickname: string, name: string, role: UserRole, email: string, phone: string | null, avatar: string | null }, i18n: Array<{ locale: string, messages: { description: string } }> }> } };
 
 export type FindManyActiveOrganizationsQueryVariables = Exact<{
   organizationFilters?: FilterOrganizationInput | null | undefined;
@@ -847,7 +847,7 @@ export type FindManyActiveOrganizationsQueryVariables = Exact<{
 }>;
 
 
-export type FindManyActiveOrganizationsQuery = { findManyActiveOrganizations: { found: number, nodes: Array<{ id: string, name: string, slug: string, category: OrganizationCategory, logo: string | null, website: string | null, disabled: boolean, partition: CatalogPartition, createdAt: string, updatedAt: string, i18n: Array<{ locale: string, messages: { description: string } }> }> } };
+export type FindManyActiveOrganizationsQuery = { findManyActiveOrganizations: { found: number, nodes: Array<{ id: string, name: string, slug: string, category: OrganizationCategory, logo: string | null, website: string | null, disabled: boolean, partition: CatalogPartition, createdAt: string, updatedAt: string, owner: { id: string, nickname: string, name: string, role: UserRole, email: string, phone: string | null, avatar: string | null }, i18n: Array<{ locale: string, messages: { description: string } }> }> } };
 
 export type FindManyProjectsQueryVariables = Exact<{
   projectFilters?: FilterProjectInput | null | undefined;
@@ -1630,13 +1630,21 @@ export const FindManyOrganizationsDocument = new TypedDocumentString(`
       website
       disabled
       partition
+      owner {
+        id
+        nickname
+        name
+        role
+        email
+        phone
+        avatar
+      }
       i18n {
         locale
         messages {
           description
         }
       }
-      disabled
       createdAt
       updatedAt
     }
@@ -1660,13 +1668,21 @@ export const FindManyActiveOrganizationsDocument = new TypedDocumentString(`
       website
       disabled
       partition
+      owner {
+        id
+        nickname
+        name
+        role
+        email
+        phone
+        avatar
+      }
       i18n {
         locale
         messages {
           description
         }
       }
-      disabled
       createdAt
       updatedAt
     }

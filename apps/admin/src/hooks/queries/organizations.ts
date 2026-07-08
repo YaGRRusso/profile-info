@@ -39,13 +39,21 @@ const findManyOrganizations = graphql(`
         website
         disabled
         partition
+        owner {
+          id
+          nickname
+          name
+          role
+          email
+          phone
+          avatar
+        }
         i18n {
           locale
           messages {
             description
           }
         }
-        disabled
         createdAt
         updatedAt
       }
@@ -74,13 +82,21 @@ const findManyActiveOrganizations = graphql(`
         website
         disabled
         partition
+        owner {
+          id
+          nickname
+          name
+          role
+          email
+          phone
+          avatar
+        }
         i18n {
           locale
           messages {
             description
           }
         }
-        disabled
         createdAt
         updatedAt
       }

@@ -33,14 +33,23 @@ import { z } from "zod";
 import { BadgeList } from "@/components/display/badge-list";
 import { EmptyValue } from "@/components/display/empty-value";
 import { PLACEHOLDERS } from "@/consts/placeholders";
-import { CatalogPartition } from "@/generated/graphql/graphql";
+import { CatalogPartition, UserRole } from "@/generated/graphql/graphql";
 import { useActiveFilters } from "@/hooks/custom/use-active-filters";
 import { usePersistedState } from "@/hooks/custom/use-persisted-state";
 import type { SkillRow } from "@/hooks/queries/skills";
+import {
+  isCatalogRowMutationReadOnly,
+  selectionHasReadOnlyCatalogRows,
+} from "@/lib/catalog-mutation-access";
 import { cn } from "@/lib/cn";
-import { EMPTY_MARKER } from "@/lib/empty-value";
+import { EMPTY_MARKER, isEmptyValue } from "@/lib/empty-value";
 import { getUniqueFacets } from "@/lib/facets";
 import { parseAsShape } from "@/lib/parsers";
+import {
+  canSeeColumn,
+  getRestrictedVisibility,
+  type RestrictedColumns,
+} from "@/lib/table-columns";
 import { dateRangeFilter } from "@/lib/table-filters";
 import { useAuthStore } from "@/stores/auth";
 
@@ -73,6 +82,10 @@ const PARTITION_LABELS: Array<{ value: CatalogPartition; label: string }> = [
   { value: CatalogPartition.Local, label: "Local" },
 ];
 
+const RESTRICTED_COLUMNS: RestrictedColumns = {
+  [UserRole.SuperAdmin]: ["owner"],
+};
+
 const columnHelper = createColumnHelper<SkillRow>();
 
 function SortIcon({ sorted }: { sorted: false | "asc" | "desc" }) {
@@ -86,7 +99,7 @@ const getColumns = (
   onDisable: (skill: SkillRow) => void,
   onEnable: (skill: SkillRow) => void,
   onView: (skill: SkillRow) => void,
-  opts: { canMutateGlobal: boolean }
+  opts: { isSuperAdmin: boolean }
 ) => [
   columnHelper.display({
     id: "select",
@@ -151,6 +164,17 @@ const getColumns = (
       </span>
     ),
   }),
+  columnHelper.accessor((row) => row.owner?.nickname ?? "", {
+    id: "owner",
+    header: "Owner",
+    enableGlobalFilter: false,
+    enableSorting: false,
+    cell: (data) => {
+      const value = data.getValue();
+      if (isEmptyValue(value)) return <EmptyValue />;
+      return <span className="badge badge-soft badge-sm">{value}</span>;
+    },
+  }),
   columnHelper.accessor((row) => row.i18n.map((entry) => entry.locale), {
     id: "languages",
     header: "Languages",
@@ -193,9 +217,10 @@ const getColumns = (
     id: "actions",
     enableHiding: false,
     cell: ({ row }) => {
-      const readOnly =
-        row.original.partition === CatalogPartition.Global &&
-        !opts.canMutateGlobal;
+      const readOnly = isCatalogRowMutationReadOnly(
+        row.original.partition,
+        opts.isSuperAdmin
+      );
 
       return (
         <div className="flex items-center justify-end gap-1">
@@ -330,7 +355,7 @@ export function SkillsTable({
   const table = useReactTable({
     data,
     columns: getColumns(onEdit, onDisable, onEnable, onView, {
-      canMutateGlobal: isSuperAdmin,
+      isSuperAdmin,
     }),
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
@@ -344,7 +369,11 @@ export function SkillsTable({
       sorting: sort,
       columnFilters,
       rowSelection,
-      columnVisibility,
+      columnVisibility: getRestrictedVisibility(
+        columnVisibility,
+        RESTRICTED_COLUMNS,
+        userRole
+      ),
     },
     onSortingChange: handleSortingChange,
     onRowSelectionChange: setRowSelection,
@@ -352,9 +381,10 @@ export function SkillsTable({
   });
 
   const selected = data.filter((skill) => rowSelection[skill.id]);
-  const selectedHasGlobal =
-    !isSuperAdmin &&
-    selected.some((row) => row.partition === CatalogPartition.Global);
+  const selectedHasReadOnlyRows = selectionHasReadOnlyCatalogRows(
+    selected,
+    isSuperAdmin
+  );
 
   const categoryFacets = getUniqueFacets(
     table.getColumn("category")!.getFacetedUniqueValues()
@@ -371,7 +401,7 @@ export function SkillsTable({
         <div className="scrollbar-thin flex items-center gap-2 overflow-x-auto">
           <button
             className="btn btn-ghost btn-sm"
-            disabled={!selected?.length || selectedHasGlobal}
+            disabled={!selected?.length || selectedHasReadOnlyRows}
             onClick={() => onMultiEdit(selected)}
             type="button"
           >
@@ -389,7 +419,7 @@ export function SkillsTable({
           </button>
           <button
             className="btn btn-ghost btn-sm btn-success"
-            disabled={!selected?.length || selectedHasGlobal}
+            disabled={!selected?.length || selectedHasReadOnlyRows}
             onClick={() => onMultiEnable(selected)}
             type="button"
           >
@@ -398,7 +428,7 @@ export function SkillsTable({
           </button>
           <button
             className="btn btn-ghost btn-sm btn-error"
-            disabled={!selected?.length || selectedHasGlobal}
+            disabled={!selected?.length || selectedHasReadOnlyRows}
             onClick={() => onMultiDisable(selected)}
             type="button"
           >
@@ -510,6 +540,9 @@ export function SkillsTable({
                 {table
                   .getAllColumns()
                   .filter((col) => col.getCanHide())
+                  .filter((col) =>
+                    canSeeColumn(RESTRICTED_COLUMNS, col.id, userRole)
+                  )
                   .map((col) => (
                     <label
                       className="flex items-center gap-2 text-sm"

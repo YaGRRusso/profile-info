@@ -22,12 +22,19 @@ Applies to **skills** and **organizations** (same rules).
 | `USER` | all `GLOBAL` + own `LOCAL` | own `LOCAL` only |
 | `SUPER_ADMIN` | all `GLOBAL` + all `LOCAL` | `GLOBAL` only |
 
+**Permanent rule:** `SUPER_ADMIN` reads all `LOCAL` rows but **never mutates** another
+user's `LOCAL` catalog (no future moderation path planned in this ADR).
+
 Implementation: `catalogScope()` → `catalogCrud(ctx)` / `catalogStats(ctx)` on
 repositories. Avoid unscoped `repository.crud` on catalog paths.
 
-## Disabled entries
+## Disabled entries and delete
 
 `disable*` / `enable*` toggle `disabled` only — **no** delete events.
+
+`remove*` hard-deletes and emits cascade events (`skill.deleted`, `organization.deleted`).
+**Admin UI uses disable/enable only** — `remove*` stays on the GraphQL API for scripts or
+emergency use, not exposed in the admin panel.
 
 | Intent | Include disabled? |
 |--------|-------------------|
@@ -46,18 +53,28 @@ Name methods however fits the module; keep the **intent** clear in code and test
 | **Resolve** | entity owner (when LOCAL matters) | include | `skillIds` / `organizationId` on saved entities |
 | **Validate** | caller `ctx` | exclude | mutations via `*ValidatorService` |
 
-**Resolve:** loading refs on someone else's entity should use the **parent owner's**
-catalog scope, not the caller's — especially once `LOCAL` rows exist. Today most data is
-`GLOBAL`; implement stricter resolve (e.g. owner-scoped loaders) when LOCAL is in use.
+**Resolve (debt):** GraphQL loaders today use **caller** `ctx`, not `parent.ownerId`.
+Resume PDF builds owner-scoped `ctx` directly and does not use loaders. Implement
+owner-scoped loaders when cross-user GraphQL reads need LOCAL refs (public portfolio, etc.).
 
 **Validate:** `SkillsValidatorService` / `OrganizationsValidatorService` — active refs
 only before writes.
+
+## Filter inputs (`partition`, `ownerId`)
+
+`FilterSkillInput` and `FilterOrganizationInput` expose optional `partition` and
+`ownerId`. Any authenticated caller may pass them; **read scope** (`toQueryForRead`) still
+applies, so `USER` cannot leak another user's `LOCAL` rows (e2e tests 9). `SUPER_ADMIN`
+(`crossCatalog`) may combine filters for debugging via GraphQL. Admin UI does not expose
+these filters.
 
 ## Where to look in code
 
 - Scope: `core/persistence/helpers/catalog-scope.helper.ts`
 - Skills / orgs services, loaders, validators: `modules/skills/`, `modules/organizations/`
 - Admin: `findMany*` for tables, `findManyActive*` for form pickers
+- Admin mutate UX: `lib/catalog-mutation-access.ts` — USER blocked on `GLOBAL`, SUPER_ADMIN
+  blocked on `LOCAL`
 
 ## Verification checklist
 
@@ -73,31 +90,29 @@ only before writes.
 10. Unit: `withActiveFilter` força `disabled: false` mesmo com filtro `disabled: true` (já existe — manter)
 11. Unit/integration: `toQueryForRead` vs `toQueryForAggregate` (string vs ObjectId em `ownerId`)
 12. Testar batch (`updateMany`, `disableMany`, `removeMany`) com mix de IDs no escopo e fora
-13. Testar `removeOne`/`removeMany` em LOCAL próprio e cascade (`skill.deleted`)
+13. Testar `removeOne`/`removeMany` em LOCAL próprio e cascade (`skill.deleted` / `organization.deleted`)
 14. Testar dashboard `count` e `findRecentActivity` — USER vs SUPER_ADMIN, só active
 15. Testar loader: ids fora do escopo retornam `null`; ids disabled resolvem em browse/resolve
-16. ADR: documentar intent resolve — loader hoje usa caller `ctx`, não `parent.ownerId`
-17. ADR: quando implementar resolve owner-scoped (LOCAL real, perfis públicos, multi-owner batch)
-18. ADR: SUPER_ADMIN lê LOCAL mas não muta LOCAL — confirmar como regra permanente ou moderação futura
-19. ADR: delete (`remove*`) faz parte do gerenciamento ou só disable?
-20. ADR: `count` do dashboard = active only, não total com disabled
-21. ADR: `FilterSkillInput.partition` / `ownerId` — quem pode usar e com qual semântica
-22. ADR: API token com role USER — mesmo escopo de catálogo que sessão JWT
-23. Admin: query traz `partition` e `ownerId`
-24. Admin: USER não vê ações de mutate em linhas GLOBAL
-25. Admin: SUPER_ADMIN distingue GLOBAL vs LOCAL na tabela/filtros
-26. Admin: alinhar se delete entra na UI ou fica só disable
-27. Melhoria: rejeitar/ignorar `ownerId` e `partition` no filter para `!crossCatalog`
-28. Melhoria: batch mutations falham explicitamente se algum ID ficou fora do escopo
-29. Melhoria: renomear ou documentar `count` → `countActive` no service
-30. Melhoria: atualizar `agents/api.md` (dashboard catalog scoped, não global count)
-31. ~~Melhoria: e2e de isolamento LOCAL em arquivo dedicado (`skills-catalog-scope.spec.ts`)~~
-32. Port organizations para o padrão skills (`catalogCrud`, sem `@Roles` blanket, browse/active, validator)
-33. Verificar resume/portfolio com refs LOCAL — viewer fora do escopo vê null ou erro
-34. Verificar slug duplicado: mesmo slug em GLOBAL e LOCAL do mesmo user é permitido (`{ partition, ownerId, slug }`)
-35. Smoke manual: página Skills como USER e como SUPER_ADMIN após mudanças de UI
+16. ~~ADR: SUPER_ADMIN lê LOCAL mas não muta LOCAL — regra permanente~~
+17. ~~ADR: delete (`remove*`) — API only; admin UI disable/enable only~~
+18. ~~ADR: `Filter*Input.partition` / `ownerId` — disponível no GraphQL; escopo de leitura limita efeito~~
+19. ~~ADR: dashboard `count` = active only (`countActive` no repository)~~
+20. ~~E2e skills: `test/e2e/skills-catalog-scope.spec.ts` (itens 1–9)~~
+21. ~~E2e organizations: `test/e2e/organizations-catalog-scope.spec.ts` (itens 1–9)~~
+22. ~~Port organizations para o padrão skills (`catalogCrud`, sem `@Roles` blanket, browse/active, validator)~~
+23. ~~Admin: queries trazem `partition` e `owner`~~
+24. ~~Admin: USER não vê ações de mutate em linhas GLOBAL~~
+25. ~~Admin: SUPER_ADMIN não vê ações de mutate em linhas LOCAL~~
+26. ~~Admin: coluna Owner visível só para SUPER_ADMIN~~
+27. ADR: quando implementar resolve owner-scoped nos loaders
+28. ADR: API token com role USER — mesmo escopo de catálogo que sessão JWT
+29. Verificar resume/portfolio com refs LOCAL via GraphQL público (hoje PDF usa ctx do dono)
+30. Verificar slug duplicado: mesmo slug em GLOBAL e LOCAL do mesmo user (`{ partition, ownerId, slug }`)
+31. Melhoria: batch mutations falham explicitamente se algum ID ficou fora do escopo
+32. Smoke manual: páginas Skills e Organizations como USER e SUPER_ADMIN
 
-E2e items 1–9: `test/e2e/skills-catalog-scope.spec.ts`.
+E2e catalog scope (skills + organizations): `test/e2e/skills-catalog-scope.spec.ts`,
+`test/e2e/organizations-catalog-scope.spec.ts`.
 
 ## Out of scope here
 

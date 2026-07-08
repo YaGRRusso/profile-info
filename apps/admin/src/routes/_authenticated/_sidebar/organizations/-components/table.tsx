@@ -36,13 +36,24 @@ import { PLACEHOLDERS } from "@/consts/placeholders";
 import {
   CatalogPartition,
   OrganizationCategory,
+  UserRole,
 } from "@/generated/graphql/graphql";
 import { useActiveFilters } from "@/hooks/custom/use-active-filters";
 import { usePersistedState } from "@/hooks/custom/use-persisted-state";
 import type { OrganizationRow } from "@/hooks/queries/organizations";
+import {
+  isCatalogRowMutationReadOnly,
+  selectionHasReadOnlyCatalogRows,
+} from "@/lib/catalog-mutation-access";
 import { cn } from "@/lib/cn";
+import { isEmptyValue } from "@/lib/empty-value";
 import { getUniqueFacets } from "@/lib/facets";
 import { parseAsShape } from "@/lib/parsers";
+import {
+  canSeeColumn,
+  getRestrictedVisibility,
+  type RestrictedColumns,
+} from "@/lib/table-columns";
 import { dateRangeFilter } from "@/lib/table-filters";
 import { useAuthStore } from "@/stores/auth";
 
@@ -81,6 +92,10 @@ const DATE_OPTIONS = [
   { value: "month", label: "This month" },
 ];
 
+const RESTRICTED_COLUMNS: RestrictedColumns = {
+  [UserRole.SuperAdmin]: ["owner"],
+};
+
 const columnHelper = createColumnHelper<OrganizationRow>();
 
 function SortIcon({ sorted }: { sorted: false | "asc" | "desc" }) {
@@ -94,7 +109,7 @@ const getColumns = (
   onDisable: (organization: OrganizationRow) => void,
   onEnable: (organization: OrganizationRow) => void,
   onView: (organization: OrganizationRow) => void,
-  opts: { canMutateGlobal: boolean }
+  opts: { isSuperAdmin: boolean }
 ) => [
   columnHelper.display({
     id: "select",
@@ -160,6 +175,17 @@ const getColumns = (
       </span>
     ),
   }),
+  columnHelper.accessor((row) => row.owner?.nickname ?? "", {
+    id: "owner",
+    header: "Owner",
+    enableGlobalFilter: false,
+    enableSorting: false,
+    cell: (data) => {
+      const value = data.getValue();
+      if (isEmptyValue(value)) return <EmptyValue />;
+      return <span className="badge badge-soft badge-sm">{value}</span>;
+    },
+  }),
   columnHelper.accessor("logo", {
     header: "Logo",
     enableGlobalFilter: false,
@@ -218,9 +244,10 @@ const getColumns = (
     id: "actions",
     enableHiding: false,
     cell: ({ row }) => {
-      const readOnly =
-        row.original.partition === CatalogPartition.Global &&
-        !opts.canMutateGlobal;
+      const readOnly = isCatalogRowMutationReadOnly(
+        row.original.partition,
+        opts.isSuperAdmin
+      );
 
       return (
         <div className="flex items-center justify-end gap-1">
@@ -347,7 +374,7 @@ export function OrganizationsTable({
   const table = useReactTable({
     data,
     columns: getColumns(onEdit, onDisable, onEnable, onView, {
-      canMutateGlobal: isSuperAdmin,
+      isSuperAdmin,
     }),
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
@@ -361,7 +388,11 @@ export function OrganizationsTable({
       sorting: sort,
       columnFilters,
       rowSelection,
-      columnVisibility,
+      columnVisibility: getRestrictedVisibility(
+        columnVisibility,
+        RESTRICTED_COLUMNS,
+        userRole
+      ),
     },
     onSortingChange: handleSortingChange,
     onRowSelectionChange: setRowSelection,
@@ -369,9 +400,10 @@ export function OrganizationsTable({
   });
 
   const selected = data.filter((organization) => rowSelection[organization.id]);
-  const selectedHasGlobal =
-    !isSuperAdmin &&
-    selected.some((row) => row.partition === CatalogPartition.Global);
+  const selectedHasReadOnlyRows = selectionHasReadOnlyCatalogRows(
+    selected,
+    isSuperAdmin
+  );
 
   const categoryFacets = getUniqueFacets(
     table.getColumn("category")!.getFacetedUniqueValues(),
@@ -389,7 +421,7 @@ export function OrganizationsTable({
         <div className="scrollbar-thin flex items-center gap-2 overflow-x-auto">
           <button
             className="btn btn-ghost btn-sm"
-            disabled={!selected?.length || selectedHasGlobal}
+            disabled={!selected?.length || selectedHasReadOnlyRows}
             onClick={() => onMultiEdit(selected)}
             type="button"
           >
@@ -407,7 +439,7 @@ export function OrganizationsTable({
           </button>
           <button
             className="btn btn-ghost btn-sm btn-success"
-            disabled={!selected?.length || selectedHasGlobal}
+            disabled={!selected?.length || selectedHasReadOnlyRows}
             onClick={() => onMultiEnable(selected)}
             type="button"
           >
@@ -416,7 +448,7 @@ export function OrganizationsTable({
           </button>
           <button
             className="btn btn-ghost btn-sm btn-error"
-            disabled={!selected?.length || selectedHasGlobal}
+            disabled={!selected?.length || selectedHasReadOnlyRows}
             onClick={() => onMultiDisable(selected)}
             type="button"
           >
@@ -528,6 +560,9 @@ export function OrganizationsTable({
                 {table
                   .getAllColumns()
                   .filter((col) => col.getCanHide())
+                  .filter((col) =>
+                    canSeeColumn(RESTRICTED_COLUMNS, col.id, userRole)
+                  )
                   .map((col) => (
                     <label
                       className="flex items-center gap-2 text-sm"
