@@ -1,5 +1,5 @@
 import { DeepKeys, DeepValue, useForm } from "@tanstack/react-form";
-import { useCallback } from "react";
+import { useCallback, useMemo } from "react";
 import { toast } from "react-toastify";
 import z from "zod";
 import { DateRangeInput } from "@/components/inputs/date-range";
@@ -22,8 +22,8 @@ import {
 import { useQueryAllPages } from "@/hooks/custom/use-query-all-pages";
 import { useAtsSummarize, useTranslate } from "@/hooks/mutations/ai";
 import type { ExperienceRow } from "@/hooks/queries/experiences";
-import { useFindManyActiveOrganizations } from "@/hooks/queries/organizations";
-import { useFindManyActiveSkills } from "@/hooks/queries/skills";
+import { useFindManyOrganizations } from "@/hooks/queries/organizations";
+import { useFindManySkills } from "@/hooks/queries/skills";
 import { toDateInput, toIsoDate } from "@/lib/date";
 import { fieldError } from "@/lib/field-error";
 import {
@@ -150,23 +150,34 @@ export function ExperienceForm({
   isLoading,
   state,
 }: ExperienceFormProps) {
-  const findManyOrganizations = useFindManyActiveOrganizations();
+  const findManyOrganizations = useFindManyOrganizations();
   useQueryAllPages(findManyOrganizations);
 
-  const findManySkills = useFindManyActiveSkills();
+  const findManySkills = useFindManySkills();
   useQueryAllPages(findManySkills);
+
+  const skillOptions = useMemo(
+    () =>
+      (findManySkills.data?.nodes ?? []).map((skill) => ({
+        label: i18nLabel(skill),
+        value: skill.id,
+        disabled: skill.disabled,
+      })),
+    [findManySkills.data?.nodes]
+  );
+
+  const organizationOptions = useMemo(
+    () =>
+      (findManyOrganizations.data?.nodes ?? []).map((organization) => ({
+        label: organization.name,
+        value: organization.id,
+        disabled: organization.disabled,
+      })),
+    [findManyOrganizations.data?.nodes]
+  );
 
   const atsSummarize = useAtsSummarize();
   const translate = useTranslate();
-
-  const organizationOptions = (findManyOrganizations.data?.nodes ?? []).map(
-    (organization) => ({ label: organization.name, value: organization.id })
-  );
-
-  const skillOptions = (findManySkills.data?.nodes ?? []).map((skill) => ({
-    label: i18nLabel(skill),
-    value: skill.id,
-  }));
 
   const form = useForm({
     defaultValues: {

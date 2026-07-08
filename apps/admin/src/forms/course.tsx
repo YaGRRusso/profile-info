@@ -1,5 +1,5 @@
 import { DeepKeys, DeepValue, useForm } from "@tanstack/react-form";
-import { useCallback } from "react";
+import { useCallback, useMemo } from "react";
 import { toast } from "react-toastify";
 import z from "zod";
 import { FieldArray } from "@/components/inputs/field-array";
@@ -22,8 +22,8 @@ import {
 import { useQueryAllPages } from "@/hooks/custom/use-query-all-pages";
 import { useAtsSummarize, useTranslate } from "@/hooks/mutations/ai";
 import type { CourseRow } from "@/hooks/queries/courses";
-import { useFindManyActiveOrganizations } from "@/hooks/queries/organizations";
-import { useFindManyActiveSkills } from "@/hooks/queries/skills";
+import { useFindManyOrganizations } from "@/hooks/queries/organizations";
+import { useFindManySkills } from "@/hooks/queries/skills";
 import { fieldError } from "@/lib/field-error";
 import {
   createEmptyI18n,
@@ -122,23 +122,34 @@ export function CourseForm({
   isLoading,
   state,
 }: CourseFormProps) {
-  const findManyOrganizations = useFindManyActiveOrganizations();
+  const findManyOrganizations = useFindManyOrganizations();
   useQueryAllPages(findManyOrganizations);
 
-  const findManySkills = useFindManyActiveSkills();
+  const findManySkills = useFindManySkills();
   useQueryAllPages(findManySkills);
+
+  const skillOptions = useMemo(
+    () =>
+      (findManySkills.data?.nodes ?? []).map((skill) => ({
+        label: i18nLabel(skill),
+        value: skill.id,
+        disabled: skill.disabled,
+      })),
+    [findManySkills.data?.nodes]
+  );
+
+  const organizationOptions = useMemo(
+    () =>
+      (findManyOrganizations.data?.nodes ?? []).map((organization) => ({
+        label: organization.name,
+        value: organization.id,
+        disabled: organization.disabled,
+      })),
+    [findManyOrganizations.data?.nodes]
+  );
 
   const atsSummarize = useAtsSummarize();
   const translate = useTranslate();
-
-  const organizationOptions = (findManyOrganizations.data?.nodes ?? []).map(
-    (organization) => ({ label: organization.name, value: organization.id })
-  );
-
-  const skillOptions = (findManySkills.data?.nodes ?? []).map((skill) => ({
-    label: i18nLabel(skill),
-    value: skill.id,
-  }));
 
   const form = useForm({
     defaultValues: {
@@ -472,7 +483,13 @@ export function CourseForm({
             Cancel
           </button>
         )}
-        <Subscribe>
+        <Subscribe
+          selector={(formState) => ({
+            canSubmit: formState.canSubmit,
+            isSubmitting: formState.isSubmitting,
+            isTouched: formState.isTouched,
+          })}
+        >
           {({ canSubmit, isSubmitting, isTouched }) => (
             <button
               className="btn btn-soft btn-primary flex-1"

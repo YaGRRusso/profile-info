@@ -40,8 +40,8 @@ emergency use, not exposed in the admin panel.
 |--------|-------------------|
 | Admin lists (`findMany*`) | Yes — show all rows |
 | Stored refs already saved (resolve fields, resume, portfolio reads) | Yes — must not break legacy data |
-| Pickers and new attachments (`findManyActive*`, `findOneActive*`) | No |
-| Create/update validation (`assert*Enabled` on consumers) | No — active only |
+| Pickers (`findMany*` in admin forms) | Yes — visible, `text-error`, not selectable for new attach |
+| New-attach validation (`findManyActive*`, `findOneActive*`, `assert*Enabled`) | No — active only |
 
 ## Three access intents
 
@@ -72,7 +72,7 @@ these filters.
 
 - Scope: `core/persistence/helpers/catalog-scope.helper.ts`
 - Skills / orgs services, loaders, validators: `modules/skills/`, `modules/organizations/`
-- Admin: `findMany*` for tables, `findManyActive*` for form pickers
+- Admin: `findMany*` for tables and form pickers (disabled rows shown, not attachable)
 - Admin mutate UX: `lib/catalog-mutation-access.ts` — USER blocked on `GLOBAL`, SUPER_ADMIN
   blocked on `LOCAL`
 

@@ -7,12 +7,13 @@ import { cn } from "@/lib/cn";
 export interface DraggableListProps
   extends Omit<ComponentProps<"ul">, "onChange" | "value"> {
   onChange?: (value: string[]) => void;
-  options: { label: string; value: string }[];
+  options: { disabled?: boolean; label: string; value: string }[];
   showRemove?: boolean;
   value?: string[];
 }
 
 interface DraggableListItemProps {
+  disabled?: boolean;
   index: number;
   label: string;
   onRemove?: () => void;
@@ -20,6 +21,7 @@ interface DraggableListItemProps {
 }
 
 function DraggableListItem({
+  disabled,
   index,
   label,
   onRemove,
@@ -49,7 +51,9 @@ function DraggableListItem({
       <div className="font-thin tabular-nums opacity-30">
         {(index + 1).toString().padStart(2, "0")}
       </div>
-      <div className="list-col-grow">{label}</div>
+      <div className={cn("list-col-grow", disabled && "text-error")}>
+        {label}
+      </div>
       {onRemove && (
         <button
           className="btn btn-xs btn-ghost btn-error btn-square"
@@ -98,6 +102,7 @@ export function DraggableList({
       <ul className={cn("list", className)} {...props}>
         {orderedOptions.map((option, index) => (
           <DraggableListItem
+            disabled={option.disabled}
             index={index}
             key={option.value}
             label={option.label}

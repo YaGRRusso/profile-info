@@ -46,7 +46,6 @@ const findManyExperiences = graphql(`
           id
           name
           slug
-          disabled
         }
         roles {
           i18n {
@@ -63,7 +62,6 @@ const findManyExperiences = graphql(`
           skills {
             id
             slug
-            disabled
             i18n {
               locale
               messages {

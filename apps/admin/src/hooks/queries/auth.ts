@@ -31,7 +31,6 @@ const getMe = graphql(`
       skills {
         id
         slug
-        disabled
         i18n {
           locale
           messages {

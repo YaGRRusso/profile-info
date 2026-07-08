@@ -1,5 +1,5 @@
 import { DeepKeys, DeepValue, useForm } from "@tanstack/react-form";
-import { useCallback } from "react";
+import { useCallback, useMemo } from "react";
 import { toast } from "react-toastify";
 import z from "zod";
 import { FieldArray } from "@/components/inputs/field-array";
@@ -20,7 +20,7 @@ import {
 import { useQueryAllPages } from "@/hooks/custom/use-query-all-pages";
 import { useAtsSummarize, useTranslate } from "@/hooks/mutations/ai";
 import type { ProjectRow } from "@/hooks/queries/projects";
-import { useFindManyActiveSkills } from "@/hooks/queries/skills";
+import { useFindManySkills } from "@/hooks/queries/skills";
 import { fieldError } from "@/lib/field-error";
 import { createEmptyI18n, i18nLabel, i18nLabelsByIds } from "@/lib/i18n";
 import { isSlugTaken } from "@/lib/slug";
@@ -108,16 +108,21 @@ export function ProjectForm({
   isLoading,
   state,
 }: ProjectFormProps) {
-  const findManySkills = useFindManyActiveSkills();
+  const findManySkills = useFindManySkills();
   useQueryAllPages(findManySkills);
+
+  const skillOptions = useMemo(
+    () =>
+      (findManySkills.data?.nodes ?? []).map((skill) => ({
+        label: i18nLabel(skill),
+        value: skill.id,
+        disabled: skill.disabled,
+      })),
+    [findManySkills.data?.nodes]
+  );
 
   const atsSummarize = useAtsSummarize();
   const translate = useTranslate();
-
-  const skillOptions = (findManySkills.data?.nodes ?? []).map((skill) => ({
-    label: i18nLabel(skill),
-    value: skill.id,
-  }));
 
   const form = useForm({
     defaultValues: {
@@ -426,7 +431,13 @@ export function ProjectForm({
             Cancel
           </button>
         )}
-        <Subscribe>
+        <Subscribe
+          selector={(formState) => ({
+            canSubmit: formState.canSubmit,
+            isSubmitting: formState.isSubmitting,
+            isTouched: formState.isTouched,
+          })}
+        >
           {({ canSubmit, isSubmitting, isTouched }) => (
             <button
               className="btn btn-soft btn-primary flex-1"
