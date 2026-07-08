@@ -1,17 +1,21 @@
 import { ExecutionContext, Injectable } from "@nestjs/common";
 import { ThrottlerGuard } from "@nestjs/throttler";
 import { getGraphqlContext } from "@/core/context/graphql-context.helper";
+import {
+  AppRequest,
+  AppResponse,
+} from "@/core/context/graphql-context.interface";
 
 @Injectable()
 export class GqlThrottlerGuard extends ThrottlerGuard {
   getRequestResponse(context: ExecutionContext): {
-    req: Record<string, unknown>;
-    res: Record<string, unknown>;
+    req: AppRequest;
+    res: AppResponse;
   } {
     const ctx = getGraphqlContext(context);
     return {
-      req: ctx.req as unknown as Record<string, unknown>,
-      res: ctx.res as Record<string, unknown>,
+      req: ctx.req,
+      res: ctx.res,
     };
   }
 }

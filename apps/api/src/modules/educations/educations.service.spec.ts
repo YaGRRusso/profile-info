@@ -53,14 +53,14 @@ describe("EducationsService", () => {
         {
           provide: OrganizationsValidatorService,
           useValue: {
-            assertOrganizationExists: jest.fn().mockResolvedValue(undefined),
-            assertOrganizationsExist: jest.fn().mockResolvedValue(undefined),
+            assertOrganizationEnabled: jest.fn().mockResolvedValue(undefined),
+            assertOrganizationsEnabled: jest.fn().mockResolvedValue(undefined),
           },
         },
         {
           provide: SkillsValidatorService,
           useValue: {
-            assertSkillsExist: jest.fn().mockResolvedValue(undefined),
+            assertSkillsEnabled: jest.fn().mockResolvedValue(undefined),
           },
         },
       ],

@@ -170,6 +170,6 @@ export class UsersService {
     skillIds?: string[]
   ): Promise<void> {
     if (skillIds === undefined) return Promise.resolve();
-    return this.skillsValidator.assertSkillsExist(ctx, skillIds);
+    return this.skillsValidator.assertSkillsEnabled(ctx, skillIds);
   }
 }

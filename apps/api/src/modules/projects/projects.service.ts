@@ -148,7 +148,7 @@ export class ProjectsService {
     input: ProjectCatalogRefs
   ): Promise<void> {
     if (input.skillIds?.length) {
-      await this.skillsValidator.assertSkillsExist(ctx, input.skillIds);
+      await this.skillsValidator.assertSkillsEnabled(ctx, input.skillIds);
     }
   }
 
@@ -161,7 +161,7 @@ export class ProjectsService {
     ];
 
     if (skillIds.length > 0) {
-      await this.skillsValidator.assertSkillsExist(ctx, skillIds);
+      await this.skillsValidator.assertSkillsEnabled(ctx, skillIds);
     }
   }
 }

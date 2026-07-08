@@ -158,14 +158,14 @@ export class CoursesService {
     input: CourseCatalogRefs
   ): Promise<void> {
     if (input.organizationId) {
-      await this.organizationsValidator.assertOrganizationExists(
+      await this.organizationsValidator.assertOrganizationEnabled(
         ctx,
         input.organizationId
       );
     }
 
     if (input.skillIds?.length) {
-      await this.skillsValidator.assertSkillsExist(ctx, input.skillIds);
+      await this.skillsValidator.assertSkillsEnabled(ctx, input.skillIds);
     }
   }
 
@@ -185,14 +185,14 @@ export class CoursesService {
     ];
 
     if (organizationIds.length > 0) {
-      await this.organizationsValidator.assertOrganizationsExist(
+      await this.organizationsValidator.assertOrganizationsEnabled(
         ctx,
         organizationIds
       );
     }
 
     if (skillIds.length > 0) {
-      await this.skillsValidator.assertSkillsExist(ctx, skillIds);
+      await this.skillsValidator.assertSkillsEnabled(ctx, skillIds);
     }
   }
 }

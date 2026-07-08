@@ -37,7 +37,7 @@ describe("UsersService", () => {
   let crud: ReturnType<typeof createMockCrud>;
   let eventEmitter: jest.Mocked<Pick<EventEmitter2, "emitAsync">>;
   let skillsValidator: jest.Mocked<
-    Pick<SkillsValidatorService, "assertSkillsExist">
+    Pick<SkillsValidatorService, "assertSkillsEnabled">
   >;
   let repository: {
     crud: ReturnType<typeof createMockCrud>;
@@ -65,7 +65,7 @@ describe("UsersService", () => {
         {
           provide: SkillsValidatorService,
           useValue: {
-            assertSkillsExist: jest.fn().mockResolvedValue(undefined),
+            assertSkillsEnabled: jest.fn().mockResolvedValue(undefined),
           },
         },
       ],
@@ -141,7 +141,7 @@ describe("UsersService", () => {
         role: UserRole.USER,
         password: "hashed-password",
       });
-      expect(skillsValidator.assertSkillsExist).not.toHaveBeenCalled();
+      expect(skillsValidator.assertSkillsEnabled).not.toHaveBeenCalled();
     });
 
     it("validates skillIds when provided", async () => {
@@ -150,7 +150,7 @@ describe("UsersService", () => {
 
       await service.createOne(ctx, { ...createInput, skillIds: [skillId] });
 
-      expect(skillsValidator.assertSkillsExist).toHaveBeenCalledWith(ctx, [
+      expect(skillsValidator.assertSkillsEnabled).toHaveBeenCalledWith(ctx, [
         skillId,
       ]);
       expect(crud.createOne).toHaveBeenCalledWith({

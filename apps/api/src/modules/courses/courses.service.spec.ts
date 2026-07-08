@@ -27,10 +27,10 @@ describe("CoursesService", () => {
   let service: CoursesService;
   let crud: ReturnType<typeof createMockCrud>;
   let organizationsValidator: {
-    assertOrganizationExists: jest.Mock;
-    assertOrganizationsExist: jest.Mock;
+    assertOrganizationEnabled: jest.Mock;
+    assertOrganizationsEnabled: jest.Mock;
   };
-  let skillsValidator: { assertSkillsExist: jest.Mock };
+  let skillsValidator: { assertSkillsEnabled: jest.Mock };
   let stats: ReturnType<typeof createMockStats>;
   let repository: {
     tenantCrud: jest.Mock;
@@ -52,11 +52,11 @@ describe("CoursesService", () => {
       purgeByOwner: jest.fn(),
     };
     organizationsValidator = {
-      assertOrganizationExists: jest.fn().mockResolvedValue(undefined),
-      assertOrganizationsExist: jest.fn().mockResolvedValue(undefined),
+      assertOrganizationEnabled: jest.fn().mockResolvedValue(undefined),
+      assertOrganizationsEnabled: jest.fn().mockResolvedValue(undefined),
     };
     skillsValidator = {
-      assertSkillsExist: jest.fn().mockResolvedValue(undefined),
+      assertSkillsEnabled: jest.fn().mockResolvedValue(undefined),
     };
 
     const module: TestingModule = await Test.createTestingModule({
@@ -113,14 +113,14 @@ describe("CoursesService", () => {
         fakeEntity
       );
       expect(
-        organizationsValidator.assertOrganizationExists
+        organizationsValidator.assertOrganizationEnabled
       ).toHaveBeenCalledWith(ctx, organizationId);
       expect(repository.tenantCrud).toHaveBeenCalledWith(ctx);
       expect(crud.createOne).toHaveBeenCalledWith(createInput);
     });
 
     it("rejects missing organization reference", async () => {
-      organizationsValidator.assertOrganizationExists.mockRejectedValue(
+      organizationsValidator.assertOrganizationEnabled.mockRejectedValue(
         new BadRequestException(REFERENCES_NOT_FOUND)
       );
 

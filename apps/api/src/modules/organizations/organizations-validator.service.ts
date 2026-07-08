@@ -7,14 +7,14 @@ import { OrganizationsService } from "./organizations.service";
 export class OrganizationsValidatorService {
   constructor(private readonly organizationsService: OrganizationsService) {}
 
-  assertOrganizationExists(
+  assertOrganizationEnabled(
     ctx: AuthContext,
     organizationId: string
   ): Promise<void> {
-    return this.assertOrganizationsExist(ctx, [organizationId]);
+    return this.assertOrganizationsEnabled(ctx, [organizationId]);
   }
 
-  assertOrganizationsExist(
+  assertOrganizationsEnabled(
     ctx: AuthContext,
     organizationIds: string[]
   ): Promise<void> {

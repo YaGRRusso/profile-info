@@ -47,7 +47,7 @@ describe("ProjectsService", () => {
         {
           provide: SkillsValidatorService,
           useValue: {
-            assertSkillsExist: jest.fn().mockResolvedValue(undefined),
+            assertSkillsEnabled: jest.fn().mockResolvedValue(undefined),
           },
         },
       ],

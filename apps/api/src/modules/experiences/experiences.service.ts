@@ -166,7 +166,7 @@ export class ExperiencesService {
     input: ExperienceCatalogRefs
   ): Promise<void> {
     if (input.organizationId) {
-      await this.organizationsValidator.assertOrganizationExists(
+      await this.organizationsValidator.assertOrganizationEnabled(
         ctx,
         input.organizationId
       );
@@ -174,7 +174,7 @@ export class ExperiencesService {
 
     const skillIds = this.collectSkillIds(input.roles);
     if (skillIds.length > 0) {
-      await this.skillsValidator.assertSkillsExist(ctx, skillIds);
+      await this.skillsValidator.assertSkillsEnabled(ctx, skillIds);
     }
   }
 
@@ -194,14 +194,14 @@ export class ExperiencesService {
     ];
 
     if (organizationIds.length > 0) {
-      await this.organizationsValidator.assertOrganizationsExist(
+      await this.organizationsValidator.assertOrganizationsEnabled(
         ctx,
         organizationIds
       );
     }
 
     if (skillIds.length > 0) {
-      await this.skillsValidator.assertSkillsExist(ctx, skillIds);
+      await this.skillsValidator.assertSkillsEnabled(ctx, skillIds);
     }
   }
 }

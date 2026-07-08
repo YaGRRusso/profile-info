@@ -31,9 +31,9 @@ describe("OrganizationsValidatorService", () => {
     validator = module.get(OrganizationsValidatorService);
   });
 
-  describe("assertOrganizationExists", () => {
-    it("delegates to assertOrganizationsExist", async () => {
-      await validator.assertOrganizationExists(ctx, organizationId);
+  describe("assertOrganizationEnabled", () => {
+    it("delegates to assertOrganizationsEnabled", async () => {
+      await validator.assertOrganizationEnabled(ctx, organizationId);
 
       expect(organizationsService.findManyActiveById).toHaveBeenCalledWith(
         ctx,
@@ -42,10 +42,10 @@ describe("OrganizationsValidatorService", () => {
     });
   });
 
-  describe("assertOrganizationsExist", () => {
-    it("accepts when every organization exists", async () => {
+  describe("assertOrganizationsEnabled", () => {
+    it("accepts when every organization is enabled", async () => {
       await expect(
-        validator.assertOrganizationsExist(ctx, [organizationId])
+        validator.assertOrganizationsEnabled(ctx, [organizationId])
       ).resolves.toBeUndefined();
     });
 
@@ -53,7 +53,7 @@ describe("OrganizationsValidatorService", () => {
       organizationsService.findManyActiveById.mockResolvedValue([]);
 
       await expect(
-        validator.assertOrganizationsExist(ctx, [missingId])
+        validator.assertOrganizationsEnabled(ctx, [missingId])
       ).rejects.toThrow(new BadRequestException(REFERENCES_NOT_FOUND));
     });
 
@@ -63,7 +63,7 @@ describe("OrganizationsValidatorService", () => {
       );
 
       await expect(
-        validator.assertOrganizationsExist(ctx, [organizationId])
+        validator.assertOrganizationsEnabled(ctx, [organizationId])
       ).rejects.toThrow(new NotFoundException(PERSISTENCE_NOT_FOUND));
     });
   });

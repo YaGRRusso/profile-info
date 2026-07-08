@@ -31,9 +31,9 @@ describe("SkillsValidatorService", () => {
     validator = module.get(SkillsValidatorService);
   });
 
-  describe("assertSkillExists", () => {
-    it("delegates to assertSkillsExist", async () => {
-      await validator.assertSkillExists(ctx, skillId);
+  describe("assertSkillEnabled", () => {
+    it("delegates to assertSkillsEnabled", async () => {
+      await validator.assertSkillEnabled(ctx, skillId);
 
       expect(skillsService.findManyActiveById).toHaveBeenCalledWith(ctx, [
         skillId,
@@ -41,10 +41,10 @@ describe("SkillsValidatorService", () => {
     });
   });
 
-  describe("assertSkillsExist", () => {
-    it("accepts when every skill exists", async () => {
+  describe("assertSkillsEnabled", () => {
+    it("accepts when every skill is enabled", async () => {
       await expect(
-        validator.assertSkillsExist(ctx, [skillId])
+        validator.assertSkillsEnabled(ctx, [skillId])
       ).resolves.toBeUndefined();
     });
 
@@ -52,7 +52,7 @@ describe("SkillsValidatorService", () => {
       skillsService.findManyActiveById.mockResolvedValue([]);
 
       await expect(
-        validator.assertSkillsExist(ctx, [missingId])
+        validator.assertSkillsEnabled(ctx, [missingId])
       ).rejects.toThrow(new BadRequestException(REFERENCES_NOT_FOUND));
     });
 
@@ -61,9 +61,9 @@ describe("SkillsValidatorService", () => {
         new NotFoundException(PERSISTENCE_NOT_FOUND)
       );
 
-      await expect(validator.assertSkillsExist(ctx, [skillId])).rejects.toThrow(
-        new NotFoundException(PERSISTENCE_NOT_FOUND)
-      );
+      await expect(
+        validator.assertSkillsEnabled(ctx, [skillId])
+      ).rejects.toThrow(new NotFoundException(PERSISTENCE_NOT_FOUND));
     });
   });
 });

@@ -7,11 +7,11 @@ import { SkillsService } from "./skills.service";
 export class SkillsValidatorService {
   constructor(private readonly skillsService: SkillsService) {}
 
-  assertSkillExists(ctx: AuthContext, skillId: string): Promise<void> {
-    return this.assertSkillsExist(ctx, [skillId]);
+  assertSkillEnabled(ctx: AuthContext, skillId: string): Promise<void> {
+    return this.assertSkillsEnabled(ctx, [skillId]);
   }
 
-  assertSkillsExist(ctx: AuthContext, skillIds: string[]): Promise<void> {
+  assertSkillsEnabled(ctx: AuthContext, skillIds: string[]): Promise<void> {
     return assertReferencesResolved(skillIds, (ids) =>
       this.skillsService.findManyActiveById(ctx, ids)
     );
