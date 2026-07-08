@@ -211,7 +211,6 @@ input CreateProjectMessagesInputTranslationInput {
 input CreateSkillInput {
   category: String
   i18n: [CreateSkillMessagesInputTranslationInput!]!
-  partition: CatalogPartition
   slug: String!
 }
 
@@ -863,7 +862,6 @@ input UpdateSkillInput {
   category: String
   disabled: Boolean
   i18n: [CreateSkillMessagesInputTranslationInput!]
-  partition: CatalogPartition
   slug: String
 }
 

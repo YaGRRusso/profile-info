@@ -191,7 +191,7 @@ export class SkillsService {
   }
 
   countByField(ctx: AuthContext, field: string): Promise<FieldCount[]> {
-    return this.repository.catalogStats(ctx).countByField(field);
+    return this.repository.countByField(ctx, field);
   }
 
   async findRecentActivity(
@@ -213,7 +213,7 @@ export class SkillsService {
   }
 
   private withActiveFilter(filters?: FilterSkillInput): FilterSkillInput {
-    return { ...filters, disabled: filters?.disabled ?? false };
+    return { ...filters, disabled: false };
   }
 
   private assertActive(entry: { disabled: boolean }): void {

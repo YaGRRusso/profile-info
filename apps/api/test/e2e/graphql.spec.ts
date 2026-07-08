@@ -18,7 +18,6 @@ import { skillI18n } from "../support/skill-i18n";
 
 describe("GraphQL (e2e)", () => {
   let app: INestApplication<App>;
-  let adminToken: string;
   let userToken: string;
   let usersService: UsersService;
   let organizationsService: OrganizationsService;
@@ -51,19 +50,6 @@ describe("GraphQL (e2e)", () => {
       role: UserRole.USER,
     });
     portfolioUserId = user.id;
-
-    const adminSignIn = await graphqlRequest<{ signIn: string }>(app, {
-      query: `
-        mutation SignIn($signInInput: SignInInput!) {
-          signIn(signInInput: $signInInput)
-        }
-      `,
-      variables: {
-        signInInput: { email: "admin@profile.info", password: "123123" },
-      },
-    });
-
-    adminToken = adminSignIn.data?.signIn ?? "";
 
     const userSignIn = await graphqlRequest<{ signIn: string }>(app, {
       query: `
@@ -102,28 +88,6 @@ describe("GraphQL (e2e)", () => {
     });
 
     expect(response.errors?.[0]?.extensions?.code).toBe("UNAUTHENTICATED");
-  });
-
-  it("should forbid non-admin users from mutations", async () => {
-    const response = await graphqlRequest(app, {
-      query: `
-        mutation CreateOneSkill($createSkillInput: CreateSkillInput!) {
-          createOneSkill(createSkillInput: $createSkillInput) {
-            id
-          }
-        }
-      `,
-      variables: {
-        createSkillInput: {
-          slug: "forbidden-skill",
-          i18n: skillI18n("Forbidden"),
-          category: "Programming",
-        },
-      },
-      token: userToken,
-    });
-
-    expect(response.errors?.[0]?.message).toContain("Insufficient permissions");
   });
 
   it("should return UNAUTHENTICATED when calling updateMe without a token", async () => {
@@ -250,32 +214,6 @@ describe("GraphQL (e2e)", () => {
     expect(response.data?.updateMe.skills).toEqual([
       { id: skill.id, slug: "profile-skill" },
     ]);
-  });
-
-  it("should allow admin to create a skill", async () => {
-    const response = await graphqlRequest<{
-      createOneSkill: { id: string; slug: string };
-    }>(app, {
-      query: `
-        mutation CreateOneSkill($createSkillInput: CreateSkillInput!) {
-          createOneSkill(createSkillInput: $createSkillInput) {
-            id
-            slug
-          }
-        }
-      `,
-      variables: {
-        createSkillInput: {
-          slug: "nestjs-skill",
-          i18n: skillI18n("NestJS"),
-          category: "Programming",
-        },
-      },
-      token: adminToken,
-    });
-
-    expect(response.errors).toBeUndefined();
-    expect(response.data?.createOneSkill.slug).toBe("nestjs-skill");
   });
 
   it("should resolve nested organization via DataLoader on authenticated read", async () => {

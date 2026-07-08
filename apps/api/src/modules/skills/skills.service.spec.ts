@@ -33,6 +33,7 @@ describe("SkillsService", () => {
     catalogCrud: jest.Mock;
     catalogStats: jest.Mock;
     countActive: jest.Mock;
+    countByField: jest.Mock;
     findRecentlyUpdatedActive: jest.Mock;
   };
   let eventEmitter: jest.Mocked<Pick<EventEmitter2, "emitAsync">>;
@@ -45,6 +46,7 @@ describe("SkillsService", () => {
       catalogCrud: jest.fn().mockReturnValue(crud),
       catalogStats: jest.fn().mockReturnValue(stats),
       countActive: jest.fn().mockResolvedValue(2),
+      countByField: jest.fn().mockResolvedValue([]),
       findRecentlyUpdatedActive: jest.fn(),
     };
 
@@ -138,6 +140,18 @@ describe("SkillsService", () => {
       await expect(
         service.findOneActive(ctx, { filters: { slug: "typescript" } })
       ).resolves.toEqual(fakeEntity);
+      expect(crud.findOne).toHaveBeenCalledWith({
+        filters: { slug: "typescript", disabled: false },
+      });
+    });
+
+    it("forces disabled false even when client sends disabled true", async () => {
+      crud.findOne.mockResolvedValue(fakeEntity);
+
+      await service.findOneActive(ctx, {
+        filters: { slug: "typescript", disabled: true },
+      });
+
       expect(crud.findOne).toHaveBeenCalledWith({
         filters: { slug: "typescript", disabled: false },
       });

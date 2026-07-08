@@ -159,7 +159,6 @@ export type CreateProjectMessagesInputTranslationInput = {
 export type CreateSkillInput = {
   category?: string | null | undefined;
   i18n: Array<CreateSkillMessagesInputTranslationInput>;
-  partition?: CatalogPartition | null | undefined;
   slug: string;
 };
 
@@ -453,7 +452,6 @@ export type UpdateSkillInput = {
   category?: string | null | undefined;
   disabled?: boolean | null | undefined;
   i18n?: Array<CreateSkillMessagesInputTranslationInput> | null | undefined;
-  partition?: CatalogPartition | null | undefined;
   slug?: string | null | undefined;
 };
 

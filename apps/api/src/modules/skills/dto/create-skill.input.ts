@@ -1,15 +1,8 @@
 import { InputType } from "@nestjs/graphql";
 import { Type } from "class-transformer";
-import {
-  IsArray,
-  IsEnum,
-  IsNotEmpty,
-  IsString,
-  ValidateNested,
-} from "class-validator";
+import { IsArray, IsNotEmpty, IsString, ValidateNested } from "class-validator";
 import { OptionalField } from "@/core/decorators/optional-field.decorator";
 import { RequiredField } from "@/core/decorators/required-field.decorator";
-import { CatalogPartition } from "@/core/enums/catalog-partition.enum";
 import {
   createTranslationInput,
   TranslationInput,
@@ -41,8 +34,4 @@ export class CreateSkillInput {
   @OptionalField(() => String)
   @IsString()
   category?: string;
-
-  @OptionalField(() => CatalogPartition)
-  @IsEnum(CatalogPartition)
-  partition?: CatalogPartition;
 }

@@ -5,6 +5,7 @@ import { catalogPersistenceScope } from "@/core/context/auth-context.helper";
 import type { AuthContext } from "@/core/context/auth-context.interface";
 import { CrudRepository } from "@/core/persistence/repositories/crud/crud.repository";
 import { StatsRepository } from "@/core/persistence/repositories/stats/stats.repository";
+import type { FieldCount } from "@/core/persistence/types/output.type";
 import { CreateSkillInput } from "./dto/create-skill.input";
 import { FilterSkillInput } from "./dto/filter-skill.input";
 import { SortSkillInput } from "./dto/sort-skill.input";
@@ -17,7 +18,7 @@ const NOT_DISABLED = { disabled: { $ne: true } } as const;
 
 @Injectable()
 export class SkillsRepository {
-  readonly crud: CrudRepository<
+  private readonly crud: CrudRepository<
     SkillModel,
     SkillEntity,
     CreateSkillInput,
@@ -25,7 +26,7 @@ export class SkillsRepository {
     FilterSkillInput,
     SortSkillInput
   >;
-  readonly stats: StatsRepository<SkillModel>;
+  private readonly stats: StatsRepository<SkillModel>;
 
   constructor(@InjectModel(SkillModel.name) model: Model<SkillModel>) {
     this.crud = new CrudRepository(model, new SkillMapper());
@@ -42,6 +43,10 @@ export class SkillsRepository {
 
   countActive(ctx: AuthContext): Promise<number> {
     return this.catalogStats(ctx).count(NOT_DISABLED);
+  }
+
+  countByField(ctx: AuthContext, field: string): Promise<FieldCount[]> {
+    return this.catalogStats(ctx).countByField(field, NOT_DISABLED);
   }
 
   findRecentlyUpdatedActive(
