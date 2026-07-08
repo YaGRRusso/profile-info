@@ -1,3 +1,3 @@
-import type { UserEntity } from "./user.entity";
+import type { UserEntityRecord } from "./user.entity";
 
-export type UserWithPasswordEntity = UserEntity & { password: string };
+export type UserWithPasswordEntity = UserEntityRecord & { password: string };

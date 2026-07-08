@@ -13,14 +13,14 @@ import { CreateOrganizationInput } from "../dto/create-organization.input";
 import { FilterOrganizationInput } from "../dto/filter-organization.input";
 import { SortOrganizationInput } from "../dto/sort-organization.input";
 import { UpdateOrganizationInput } from "../dto/update-organization.input";
-import type { OrganizationEntity } from "../entities/organization.entity";
+import type { OrganizationEntityRecord } from "../entities/organization.entity";
 import type { OrganizationCategory } from "../enums/category.enum";
 import type { OrganizationModel } from "../schemas/organization.schema";
 
 export class OrganizationMapper
   implements
     CrudMapperInterface<
-      OrganizationEntity,
+      OrganizationEntityRecord,
       OrganizationModel,
       CreateOrganizationInput,
       UpdateOrganizationInput,
@@ -28,7 +28,7 @@ export class OrganizationMapper
       SortOrganizationInput
     >
 {
-  toDomain(model: OrganizationModel): OrganizationEntity {
+  toDomain(model: OrganizationModel): OrganizationEntityRecord {
     return {
       ...toBaseEntityFields(model),
       slug: model.slug,
@@ -43,7 +43,7 @@ export class OrganizationMapper
       category: model.category as OrganizationCategory,
       disabled: model.disabled,
       partition: model.partition,
-      ownerId: toIdString(model.ownerId),
+      ownerId: toIdString(model.ownerId) ?? "",
     };
   }
 

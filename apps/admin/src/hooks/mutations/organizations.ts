@@ -1,4 +1,8 @@
-import { useMutation } from "@tanstack/react-query";
+import {
+  type QueryClient,
+  useMutation,
+  useQueryClient,
+} from "@tanstack/react-query";
 import { graphql } from "@/generated/graphql";
 import type {
   CreateOrganizationInput,
@@ -83,15 +87,25 @@ const enableManyOrganizations = graphql(`
   }
 `);
 
+function invalidateOrganizationQueries(queryClient: QueryClient) {
+  queryClient.invalidateQueries({ queryKey: ["findManyOrganizations"] });
+  queryClient.invalidateQueries({ queryKey: ["findManyActiveOrganizations"] });
+}
+
 export function useCreateOneOrganization() {
+  const queryClient = useQueryClient();
+
   return useMutation({
     mutationKey: ["createOneOrganization"],
     mutationFn: (createOrganizationInput: CreateOrganizationInput) =>
       execute(createOneOrganization, { createOrganizationInput }),
+    onSuccess: () => invalidateOrganizationQueries(queryClient),
   });
 }
 
 export function useUpdateOneOrganization() {
+  const queryClient = useQueryClient();
+
   return useMutation({
     mutationKey: ["updateOneOrganization"],
     mutationFn: ({
@@ -105,10 +119,13 @@ export function useUpdateOneOrganization() {
         organizationId,
         updateOrganizationInput,
       }),
+    onSuccess: () => invalidateOrganizationQueries(queryClient),
   });
 }
 
 export function useUpdateManyOrganizations() {
+  const queryClient = useQueryClient();
+
   return useMutation({
     mutationKey: ["updateManyOrganizations"],
     mutationFn: ({
@@ -122,37 +139,50 @@ export function useUpdateManyOrganizations() {
         organizationIds,
         updateOrganizationInput,
       }),
+    onSuccess: () => invalidateOrganizationQueries(queryClient),
   });
 }
 
 export function useDisableOneOrganization() {
+  const queryClient = useQueryClient();
+
   return useMutation({
     mutationKey: ["disableOneOrganization"],
     mutationFn: (organizationId: string) =>
       execute(disableOneOrganization, { organizationId }),
+    onSuccess: () => invalidateOrganizationQueries(queryClient),
   });
 }
 
 export function useDisableManyOrganizations() {
+  const queryClient = useQueryClient();
+
   return useMutation({
     mutationKey: ["disableManyOrganizations"],
     mutationFn: (organizationIds: string[]) =>
       execute(disableManyOrganizations, { organizationIds }),
+    onSuccess: () => invalidateOrganizationQueries(queryClient),
   });
 }
 
 export function useEnableOneOrganization() {
+  const queryClient = useQueryClient();
+
   return useMutation({
     mutationKey: ["enableOneOrganization"],
     mutationFn: (organizationId: string) =>
       execute(enableOneOrganization, { organizationId }),
+    onSuccess: () => invalidateOrganizationQueries(queryClient),
   });
 }
 
 export function useEnableManyOrganizations() {
+  const queryClient = useQueryClient();
+
   return useMutation({
     mutationKey: ["enableManyOrganizations"],
     mutationFn: (organizationIds: string[]) =>
       execute(enableManyOrganizations, { organizationIds }),
+    onSuccess: () => invalidateOrganizationQueries(queryClient),
   });
 }

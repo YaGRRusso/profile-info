@@ -17,7 +17,7 @@ import { CreateSkillInput } from "./dto/create-skill.input";
 import { FilterSkillInput } from "./dto/filter-skill.input";
 import { SortSkillInput } from "./dto/sort-skill.input";
 import { UpdateSkillInput } from "./dto/update-skill.input";
-import { SkillEntity } from "./entities/skill.entity";
+import { SkillEntityRecord } from "./entities/skill.entity";
 import { SkillsRepository } from "./skills.repository";
 
 @Injectable()
@@ -27,40 +27,43 @@ export class SkillsService {
     private readonly eventEmitter: EventEmitter2
   ) {}
 
-  findOneById(ctx: AuthContext, id: string): Promise<SkillEntity> {
+  findOneById(ctx: AuthContext, id: string): Promise<SkillEntityRecord> {
     return this.repository.catalogCrud(ctx).findOneById(id);
   }
 
   findOne(
     ctx: AuthContext,
     { filters }: { filters?: FilterSkillInput }
-  ): Promise<SkillEntity> {
+  ): Promise<SkillEntityRecord> {
     return this.repository.catalogCrud(ctx).findOne({ filters });
   }
 
   findOneActive(
     ctx: AuthContext,
     { filters }: { filters?: FilterSkillInput }
-  ): Promise<SkillEntity> {
+  ): Promise<SkillEntityRecord> {
     return this.repository.catalogCrud(ctx).findOne({
       filters: this.withActiveFilter(filters),
     });
   }
 
-  async findOneActiveById(ctx: AuthContext, id: string): Promise<SkillEntity> {
+  async findOneActiveById(
+    ctx: AuthContext,
+    id: string
+  ): Promise<SkillEntityRecord> {
     const skill = await this.repository.catalogCrud(ctx).findOneById(id);
     this.assertActive(skill);
     return skill;
   }
 
-  findManyById(ctx: AuthContext, ids: string[]): Promise<SkillEntity[]> {
+  findManyById(ctx: AuthContext, ids: string[]): Promise<SkillEntityRecord[]> {
     return this.repository.catalogCrud(ctx).findManyById(ids);
   }
 
   async findManyActiveById(
     ctx: AuthContext,
     ids: string[]
-  ): Promise<SkillEntity[]> {
+  ): Promise<SkillEntityRecord[]> {
     const skills = await this.findManyById(ctx, ids);
     this.assertAllActive(skills);
     return skills;
@@ -79,7 +82,7 @@ export class SkillsService {
       limit?: number;
       skip?: number;
     }
-  ): Promise<MultiPaged<SkillEntity>> {
+  ): Promise<MultiPaged<SkillEntityRecord>> {
     return this.repository
       .catalogCrud(ctx)
       .findMany({ filters, sort, skip, limit });
@@ -98,7 +101,7 @@ export class SkillsService {
       limit?: number;
       skip?: number;
     }
-  ): Promise<MultiPaged<SkillEntity>> {
+  ): Promise<MultiPaged<SkillEntityRecord>> {
     return this.repository.catalogCrud(ctx).findMany({
       filters: this.withActiveFilter(filters),
       sort,
@@ -110,7 +113,7 @@ export class SkillsService {
   createOne(
     ctx: AuthContext,
     createInput: CreateSkillInput
-  ): Promise<SkillEntity> {
+  ): Promise<SkillEntityRecord> {
     return this.repository.catalogCrud(ctx).createOne(createInput);
   }
 
@@ -125,7 +128,7 @@ export class SkillsService {
     ctx: AuthContext,
     id: string,
     updateInput: UpdateSkillInput
-  ): Promise<SkillEntity> {
+  ): Promise<SkillEntityRecord> {
     return this.repository.catalogCrud(ctx).updateOneById(id, updateInput);
   }
 
@@ -137,7 +140,7 @@ export class SkillsService {
     return this.repository.catalogCrud(ctx).updateManyById(ids, updateInput);
   }
 
-  disableOne(ctx: AuthContext, id: string): Promise<SkillEntity> {
+  disableOne(ctx: AuthContext, id: string): Promise<SkillEntityRecord> {
     return this.repository
       .catalogCrud(ctx)
       .updateOneById(id, { disabled: true });
@@ -149,7 +152,7 @@ export class SkillsService {
       .updateManyById(ids, { disabled: true });
   }
 
-  enableOne(ctx: AuthContext, id: string): Promise<SkillEntity> {
+  enableOne(ctx: AuthContext, id: string): Promise<SkillEntityRecord> {
     return this.repository
       .catalogCrud(ctx)
       .updateOneById(id, { disabled: false });
@@ -161,7 +164,7 @@ export class SkillsService {
       .updateManyById(ids, { disabled: false });
   }
 
-  async removeOne(ctx: AuthContext, id: string): Promise<SkillEntity> {
+  async removeOne(ctx: AuthContext, id: string): Promise<SkillEntityRecord> {
     const skill = await this.repository.catalogCrud(ctx).findOneById(id);
 
     await this.eventEmitter.emitAsync(

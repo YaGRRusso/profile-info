@@ -33,6 +33,7 @@ import { z } from "zod";
 import { BadgeList } from "@/components/display/badge-list";
 import { EmptyValue } from "@/components/display/empty-value";
 import { PLACEHOLDERS } from "@/consts/placeholders";
+import { CatalogPartition } from "@/generated/graphql/graphql";
 import { useActiveFilters } from "@/hooks/custom/use-active-filters";
 import { usePersistedState } from "@/hooks/custom/use-persisted-state";
 import type { SkillRow } from "@/hooks/queries/skills";
@@ -41,6 +42,7 @@ import { EMPTY_MARKER } from "@/lib/empty-value";
 import { getUniqueFacets } from "@/lib/facets";
 import { parseAsShape } from "@/lib/parsers";
 import { dateRangeFilter } from "@/lib/table-filters";
+import { useAuthStore } from "@/stores/auth";
 
 const debouncedUrlUpdates = { method: "debounce" as const, timeMs: 500 };
 const persistentOptions = { clearOnDefault: true, history: "push" as const };
@@ -56,6 +58,7 @@ const sortParser = parseAsShape(
   .withOptions(persistentOptions);
 
 const categoryParser = parseAsShape(z.string()).withOptions(persistentOptions);
+const partitionParser = parseAsShape(z.string()).withOptions(persistentOptions);
 const createdAtParser = parseAsShape(z.string()).withOptions(persistentOptions);
 const updatedAtParser = parseAsShape(z.string()).withOptions(persistentOptions);
 
@@ -63,6 +66,11 @@ const DATE_OPTIONS = [
   { value: "", label: "Any date" },
   { value: "week", label: "Last 7 days" },
   { value: "month", label: "This month" },
+];
+
+const PARTITION_LABELS: Array<{ value: CatalogPartition; label: string }> = [
+  { value: CatalogPartition.Global, label: "Global" },
+  { value: CatalogPartition.Local, label: "Local" },
 ];
 
 const columnHelper = createColumnHelper<SkillRow>();
@@ -77,7 +85,8 @@ const getColumns = (
   onEdit: (skill: SkillRow) => void,
   onDisable: (skill: SkillRow) => void,
   onEnable: (skill: SkillRow) => void,
-  onView: (skill: SkillRow) => void
+  onView: (skill: SkillRow) => void,
+  opts: { canMutateGlobal: boolean }
 ) => [
   columnHelper.display({
     id: "select",
@@ -123,6 +132,25 @@ const getColumns = (
       return <BadgeList values={[value]} />;
     },
   }),
+  columnHelper.accessor("partition", {
+    header: "Partition",
+    enableColumnFilter: true,
+    enableSorting: false,
+    enableGlobalFilter: false,
+    filterFn: "equals",
+    cell: (data) => (
+      <span
+        className={cn(
+          "badge badge-sm badge-soft",
+          data.getValue() === CatalogPartition.Global
+            ? "badge-info"
+            : "badge-warning"
+        )}
+      >
+        {data.getValue() === CatalogPartition.Global ? "Global" : "Local"}
+      </span>
+    ),
+  }),
   columnHelper.accessor((row) => row.i18n.map((entry) => entry.locale), {
     id: "languages",
     header: "Languages",
@@ -164,41 +192,50 @@ const getColumns = (
   columnHelper.display({
     id: "actions",
     enableHiding: false,
-    cell: ({ row }) => (
-      <div className="flex items-center justify-end gap-1">
-        <button
-          className="btn btn-sm btn-square btn-ghost"
-          onClick={() => onEdit(row.original)}
-          type="button"
-        >
-          <PencilIcon />
-        </button>
-        <button
-          className="btn btn-sm btn-square btn-ghost"
-          onClick={() => onView(row.original)}
-          type="button"
-        >
-          <EyeIcon />
-        </button>
-        {row.original.disabled ? (
+    cell: ({ row }) => {
+      const readOnly =
+        row.original.partition === CatalogPartition.Global &&
+        !opts.canMutateGlobal;
+
+      return (
+        <div className="flex items-center justify-end gap-1">
           <button
-            className="btn btn-sm btn-square btn-ghost btn-success"
-            onClick={() => onEnable(row.original)}
+            className="btn btn-sm btn-square btn-ghost"
+            disabled={readOnly}
+            onClick={() => onEdit(row.original)}
             type="button"
           >
-            <CheckCircleIcon />
+            <PencilIcon />
           </button>
-        ) : (
           <button
-            className="btn btn-sm btn-square btn-ghost btn-error"
-            onClick={() => onDisable(row.original)}
+            className="btn btn-sm btn-square btn-ghost"
+            onClick={() => onView(row.original)}
             type="button"
           >
-            <XCircleIcon />
+            <EyeIcon />
           </button>
-        )}
-      </div>
-    ),
+          {row.original.disabled ? (
+            <button
+              className="btn btn-sm btn-square btn-ghost btn-success"
+              disabled={readOnly}
+              onClick={() => onEnable(row.original)}
+              type="button"
+            >
+              <CheckCircleIcon />
+            </button>
+          ) : (
+            <button
+              className="btn btn-sm btn-square btn-ghost btn-error"
+              disabled={readOnly}
+              onClick={() => onDisable(row.original)}
+              type="button"
+            >
+              <XCircleIcon />
+            </button>
+          )}
+        </div>
+      );
+    },
   }),
 ];
 
@@ -225,9 +262,13 @@ export function SkillsTable({
   onMultiDisable,
   onMultiEnable,
 }: SkillsTableProps) {
+  const userRole = useAuthStore((state) => state.user?.role);
+  const isSuperAdmin = userRole === "SUPER_ADMIN";
+
   const [searchQuery, setSearchQuery] = useQueryState("query", queryParser);
   const [sort, setSort] = useQueryState("sort", sortParser);
   const [category, setCategory] = useQueryState("category", categoryParser);
+  const [partition, setPartition] = useQueryState("partition", partitionParser);
   const [createdAt, setCreatedAt] = useQueryState("createdAt", createdAtParser);
   const [updatedAt, setUpdatedAt] = useQueryState("updatedAt", updatedAtParser);
 
@@ -238,10 +279,11 @@ export function SkillsTable({
   const columnFilters = useMemo<ColumnFiltersState>(() => {
     const activeFilters: ColumnFiltersState = [];
     if (category) activeFilters.push({ id: "category", value: category });
+    if (partition) activeFilters.push({ id: "partition", value: partition });
     if (createdAt) activeFilters.push({ id: "createdAt", value: createdAt });
     if (updatedAt) activeFilters.push({ id: "updatedAt", value: updatedAt });
     return activeFilters;
-  }, [category, createdAt, updatedAt]);
+  }, [category, partition, createdAt, updatedAt]);
 
   const { filters: activeFilters, clearAll: clearAllFilters } =
     useActiveFilters([
@@ -250,6 +292,12 @@ export function SkillsTable({
         label: "Category",
         state: category,
         setState: setCategory,
+      },
+      {
+        id: "partition",
+        label: "Partition",
+        state: partition,
+        setState: setPartition,
       },
       {
         id: "createdAt",
@@ -281,7 +329,9 @@ export function SkillsTable({
 
   const table = useReactTable({
     data,
-    columns: getColumns(onEdit, onDisable, onEnable, onView),
+    columns: getColumns(onEdit, onDisable, onEnable, onView, {
+      canMutateGlobal: isSuperAdmin,
+    }),
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     getSortedRowModel: getSortedRowModel(),
@@ -302,10 +352,18 @@ export function SkillsTable({
   });
 
   const selected = data.filter((skill) => rowSelection[skill.id]);
+  const selectedHasGlobal =
+    !isSuperAdmin &&
+    selected.some((row) => row.partition === CatalogPartition.Global);
 
   const categoryFacets = getUniqueFacets(
     table.getColumn("category")!.getFacetedUniqueValues()
   ).filter(({ value }) => value != null && value !== "");
+
+  const partitionFacets = getUniqueFacets(
+    table.getColumn("partition")!.getFacetedUniqueValues(),
+    PARTITION_LABELS
+  );
 
   return (
     <div className="flex flex-col gap-4">
@@ -313,7 +371,7 @@ export function SkillsTable({
         <div className="scrollbar-thin flex items-center gap-2 overflow-x-auto">
           <button
             className="btn btn-ghost btn-sm"
-            disabled={!selected?.length}
+            disabled={!selected?.length || selectedHasGlobal}
             onClick={() => onMultiEdit(selected)}
             type="button"
           >
@@ -331,7 +389,7 @@ export function SkillsTable({
           </button>
           <button
             className="btn btn-ghost btn-sm btn-success"
-            disabled={!selected?.length}
+            disabled={!selected?.length || selectedHasGlobal}
             onClick={() => onMultiEnable(selected)}
             type="button"
           >
@@ -340,7 +398,7 @@ export function SkillsTable({
           </button>
           <button
             className="btn btn-ghost btn-sm btn-error"
-            disabled={!selected?.length}
+            disabled={!selected?.length || selectedHasGlobal}
             onClick={() => onMultiDisable(selected)}
             type="button"
           >
@@ -363,6 +421,20 @@ export function SkillsTable({
         </div>
 
         <div className="flex min-w-64 flex-1 items-center gap-2">
+          <select
+            className="select flex-1 bg-base-200"
+            disabled={!partitionFacets.length}
+            onChange={(event) => setPartition(event.target.value || null)}
+            value={partition ?? ""}
+          >
+            <option value="">All partitions</option>
+            {partitionFacets.map(({ value, label, count }) => (
+              <option key={value} value={value}>
+                {label} ({count})
+              </option>
+            ))}
+          </select>
+
           <select
             className="select flex-1 bg-base-200"
             disabled={!categoryFacets.length}

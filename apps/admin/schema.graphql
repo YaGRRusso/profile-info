@@ -176,7 +176,6 @@ input CreateOrganizationInput {
   i18n: [CreateOrganizationMessagesInputTranslationInput!]!
   logo: String
   name: String!
-  partition: CatalogPartition
   slug: String!
   website: String
 }
@@ -559,7 +558,8 @@ type OrganizationEntity {
   id: ID!
   logo: String
   name: String!
-  ownerId: String
+  owner: UserEntity!
+  ownerId: ID!
   partition: CatalogPartition!
   slug: String!
   updatedAt: DateTime!
@@ -665,6 +665,7 @@ type Query {
   findManySkills(skillFilters: FilterSkillInput, skillPagination: PaginationInput, skillSort: SortSkillInput): PaginatedSkillEntity!
   findManyUserById(userIds: [ID!]!): [UserEntity!]!
   findManyUsers(userFilters: FilterUserInput, userPagination: PaginationInput, userSort: SortUserInput): PaginatedUserEntity!
+  findOneActiveOrganization(organizationFilters: FilterOrganizationInput): OrganizationEntity!
   findOneActiveSkill(skillFilters: FilterSkillInput): SkillEntity!
   findOneApiToken(apiTokenFilters: FilterApiTokenInput): ApiTokenEntity!
   findOneApiTokenById(apiTokenId: ID!): ApiTokenEntity!
@@ -705,7 +706,8 @@ type SkillEntity {
   disabled: Boolean!
   i18n: [SkillTranslationLocale!]!
   id: ID!
-  ownerId: String
+  owner: UserEntity!
+  ownerId: ID!
   partition: CatalogPartition!
   slug: String!
   updatedAt: DateTime!
@@ -845,7 +847,6 @@ input UpdateOrganizationInput {
   i18n: [CreateOrganizationMessagesInputTranslationInput!]
   logo: String
   name: String
-  partition: CatalogPartition
   slug: String
   website: String
 }

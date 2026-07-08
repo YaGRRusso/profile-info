@@ -1,13 +1,28 @@
-import { Args, ID, Mutation, Query, Resolver } from "@nestjs/graphql";
+import {
+  Args,
+  Context,
+  ID,
+  Mutation,
+  Parent,
+  Query,
+  ResolveField,
+  Resolver,
+} from "@nestjs/graphql";
 import type { AuthContext } from "@/core/context/auth-context.interface";
+import type { GraphqlContext } from "@/core/context/graphql-context.interface";
 import { BatchEntity } from "@/core/entities/batch.entity";
 import { PaginationInput } from "@/core/inputs/pagination.input";
 import { Auth } from "@/modules/auth/decorators/auth-context.decorator";
+import { UserEntity } from "../users/entities/user.entity";
 import { CreateSkillInput } from "./dto/create-skill.input";
 import { FilterSkillInput } from "./dto/filter-skill.input";
 import { SortSkillInput } from "./dto/sort-skill.input";
 import { UpdateSkillInput } from "./dto/update-skill.input";
-import { PaginatedSkillEntity, SkillEntity } from "./entities/skill.entity";
+import {
+  PaginatedSkillEntity,
+  SkillEntity,
+  type SkillEntityRecord,
+} from "./entities/skill.entity";
 import { SkillsService } from "./skills.service";
 
 @Resolver(() => SkillEntity)
@@ -196,5 +211,11 @@ export class SkillsResolver {
     @Args("skillIds", { type: () => [ID] }) skillIds: string[]
   ) {
     return this.skillsService.enableMany(ctx, skillIds);
+  }
+
+  @ResolveField(() => UserEntity)
+  owner(@Parent() skill: SkillEntityRecord, @Context() ctx: GraphqlContext) {
+    if (!skill?.ownerId) return null;
+    return ctx.loaders.batchUsers.load(skill.ownerId);
   }
 }

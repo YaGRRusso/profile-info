@@ -6,7 +6,7 @@ import { PERSISTENCE_NOT_FOUND } from "@/core/persistence/persistence.messages";
 import { CrudRepository } from "@/core/persistence/repositories/crud/crud.repository";
 import { FilterUserInput } from "./dto/filter-user.input";
 import { SortUserInput } from "./dto/sort-user.input";
-import type { UserEntity } from "./entities/user.entity";
+import type { UserEntityRecord } from "./entities/user.entity";
 import type { UserWithPasswordEntity } from "./entities/user-with-password.entity";
 import {
   type UserCreateRecord,
@@ -20,7 +20,7 @@ export class UsersRepository {
   private readonly mapper = new UserMapper();
   readonly crud: CrudRepository<
     UserModel,
-    UserEntity,
+    UserEntityRecord,
     UserCreateRecord,
     UserUpdateRecord,
     FilterUserInput,

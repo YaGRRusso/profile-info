@@ -9,10 +9,16 @@ export interface PersonaEntityCounts {
   projects: number;
 }
 
+export interface PersonaLocalCatalogCounts {
+  organizations: number;
+  skills: number;
+}
+
 export interface PersonaDefinition {
   email: string;
   entities: PersonaEntityCounts;
   key: PersonaKey;
+  localCatalog: PersonaLocalCatalogCounts;
   name: string;
   nickname: string;
   /** Ordered profile skill count (0 = omit skillIds). */
@@ -28,6 +34,7 @@ export const PERSONAS: Record<PersonaKey, PersonaDefinition> = {
     nickname: "empty",
     role: UserRole.USER,
     entities: { courses: 0, educations: 0, experiences: 0, projects: 0 },
+    localCatalog: { skills: 0, organizations: 0 },
     profileSkillCount: 0,
   },
   lite: {
@@ -37,6 +44,7 @@ export const PERSONAS: Record<PersonaKey, PersonaDefinition> = {
     nickname: "lite",
     role: UserRole.USER,
     entities: { courses: 1, educations: 1, experiences: 1, projects: 1 },
+    localCatalog: { skills: 2, organizations: 1 },
     profileSkillCount: 4,
   },
   joao: {
@@ -46,6 +54,7 @@ export const PERSONAS: Record<PersonaKey, PersonaDefinition> = {
     nickname: "joao",
     role: UserRole.USER,
     entities: { courses: 4, educations: 2, experiences: 2, projects: 3 },
+    localCatalog: { skills: 4, organizations: 2 },
     profileSkillCount: 10,
   },
   maria: {
@@ -55,6 +64,7 @@ export const PERSONAS: Record<PersonaKey, PersonaDefinition> = {
     nickname: "maria",
     role: UserRole.USER,
     entities: { courses: 4, educations: 2, experiences: 2, projects: 3 },
+    localCatalog: { skills: 4, organizations: 2 },
     profileSkillCount: 10,
   },
   full: {
@@ -64,6 +74,7 @@ export const PERSONAS: Record<PersonaKey, PersonaDefinition> = {
     nickname: "full",
     role: UserRole.USER,
     entities: { courses: 20, educations: 5, experiences: 5, projects: 10 },
+    localCatalog: { skills: 8, organizations: 4 },
     profileSkillCount: 24,
   },
   admin: {
@@ -73,6 +84,7 @@ export const PERSONAS: Record<PersonaKey, PersonaDefinition> = {
     nickname: "admin",
     role: UserRole.SUPER_ADMIN,
     entities: { courses: 0, educations: 0, experiences: 0, projects: 0 },
+    localCatalog: { skills: 0, organizations: 0 },
     profileSkillCount: 0,
   },
 };

@@ -23,19 +23,30 @@ function skillTitle(index: number): string {
   return `${faker.person.jobArea()} ${faker.lorem.words({ min: 4, max: 8 })}`;
 }
 
-export function buildCatalogSkills(): Pick<
+type SkillSeed = Pick<
   SkillModel,
-  "slug" | "category" | "i18n" | "partition" | "disabled"
->[] {
-  return Array.from({ length: CATALOG_SKILL_COUNT }, (_, index) => {
-    const title = skillTitle(index);
-    const slug = slugFor(title, index);
+  "slug" | "category" | "i18n" | "partition" | "disabled" | "ownerId"
+>;
+
+function buildSkills(
+  ownerId: string,
+  count: number,
+  partition: CatalogPartition,
+  seedOffset: number
+): SkillSeed[] {
+  return Array.from({ length: count }, (_, index) => {
+    const globalIndex = seedOffset + index;
+    const title = skillTitle(globalIndex);
+    const slug = slugFor(title, globalIndex);
     const category =
-      index % 4 === 0 ? undefined : CATEGORY_POOL[index % CATEGORY_POOL.length];
+      globalIndex % 4 === 0
+        ? undefined
+        : CATEGORY_POOL[globalIndex % CATEGORY_POOL.length];
 
     return {
-      partition: CatalogPartition.GLOBAL,
-      disabled: index % 17 === 0,
+      partition,
+      ownerId,
+      disabled: globalIndex % 17 === 0,
       slug,
       category,
       i18n: SEED_LOCALES.map((locale) => ({
@@ -44,6 +55,20 @@ export function buildCatalogSkills(): Pick<
       })),
     };
   });
+}
+
+export function buildCatalogSkills(ownerId: string): SkillSeed[] {
+  return buildSkills(ownerId, CATALOG_SKILL_COUNT, CatalogPartition.GLOBAL, 0);
+}
+
+export function buildLocalSkillsForPersona(
+  ownerId: string,
+  count: number,
+  seedOffset: number
+): SkillSeed[] {
+  if (count <= 0) return [];
+
+  return buildSkills(ownerId, count, CatalogPartition.LOCAL, seedOffset);
 }
 
 export function pickProfileSkillIds(

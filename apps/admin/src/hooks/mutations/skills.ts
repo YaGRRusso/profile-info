@@ -1,4 +1,8 @@
-import { useMutation } from "@tanstack/react-query";
+import {
+  type QueryClient,
+  useMutation,
+  useQueryClient,
+} from "@tanstack/react-query";
 import { graphql } from "@/generated/graphql";
 import type {
   CreateSkillInput,
@@ -90,15 +94,25 @@ const enableManySkills = graphql(`
   }
 `);
 
+function invalidateSkillQueries(queryClient: QueryClient) {
+  queryClient.invalidateQueries({ queryKey: ["findManySkills"] });
+  queryClient.invalidateQueries({ queryKey: ["findManyActiveSkills"] });
+}
+
 export function useCreateOneSkill() {
+  const queryClient = useQueryClient();
+
   return useMutation({
     mutationKey: ["createOneSkill"],
     mutationFn: (createSkillInput: CreateSkillInput) =>
       execute(createOneSkill, { createSkillInput }),
+    onSuccess: () => invalidateSkillQueries(queryClient),
   });
 }
 
 export function useUpdateOneSkill() {
+  const queryClient = useQueryClient();
+
   return useMutation({
     mutationKey: ["updateOneSkill"],
     mutationFn: ({
@@ -108,10 +122,13 @@ export function useUpdateOneSkill() {
       skillId: string;
       updateSkillInput: UpdateSkillInput;
     }) => execute(updateOneSkill, { skillId, updateSkillInput }),
+    onSuccess: () => invalidateSkillQueries(queryClient),
   });
 }
 
 export function useUpdateManySkills() {
+  const queryClient = useQueryClient();
+
   return useMutation({
     mutationKey: ["updateManySkills"],
     mutationFn: ({
@@ -121,34 +138,47 @@ export function useUpdateManySkills() {
       skillIds: string[];
       updateSkillInput: UpdateSkillInput;
     }) => execute(updateManySkills, { skillIds, updateSkillInput }),
+    onSuccess: () => invalidateSkillQueries(queryClient),
   });
 }
 
 export function useDisableOneSkill() {
+  const queryClient = useQueryClient();
+
   return useMutation({
     mutationKey: ["disableOneSkill"],
     mutationFn: (skillId: string) => execute(disableOneSkill, { skillId }),
+    onSuccess: () => invalidateSkillQueries(queryClient),
   });
 }
 
 export function useDisableManySkills() {
+  const queryClient = useQueryClient();
+
   return useMutation({
     mutationKey: ["disableManySkills"],
     mutationFn: (skillIds: string[]) =>
       execute(disableManySkills, { skillIds }),
+    onSuccess: () => invalidateSkillQueries(queryClient),
   });
 }
 
 export function useEnableOneSkill() {
+  const queryClient = useQueryClient();
+
   return useMutation({
     mutationKey: ["enableOneSkill"],
     mutationFn: (skillId: string) => execute(enableOneSkill, { skillId }),
+    onSuccess: () => invalidateSkillQueries(queryClient),
   });
 }
 
 export function useEnableManySkills() {
+  const queryClient = useQueryClient();
+
   return useMutation({
     mutationKey: ["enableManySkills"],
     mutationFn: (skillIds: string[]) => execute(enableManySkills, { skillIds }),
+    onSuccess: () => invalidateSkillQueries(queryClient),
   });
 }

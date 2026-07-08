@@ -38,6 +38,16 @@ export const EXPERIENCE_CATEGORIES = [
 export const CATALOG_SKILL_COUNT = 96;
 export const CATALOG_ORGANIZATION_COUNT = 32;
 
+/** Stable faker offsets so local catalog slugs do not collide across personas. */
+export const PERSONA_CATALOG_SEED_OFFSETS = {
+  empty: 0,
+  lite: 1000,
+  joao: 2000,
+  maria: 3000,
+  full: 4000,
+  admin: 5000,
+} as const;
+
 export const SEED_API_TOKENS = [
   {
     id: "674a00000000000000000001",

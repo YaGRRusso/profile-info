@@ -6,12 +6,15 @@ import { BatchEntity } from "@/core/entities/batch.entity";
 import { DomainEvents } from "@/core/events/domain-events";
 import { OrganizationDeletedEvent } from "@/core/events/organization-deleted.event";
 import { PERSISTENCE_NOT_FOUND } from "@/core/persistence/persistence.messages";
-import type { MultiPaged } from "@/core/persistence/types/output.type";
+import type {
+  FieldCount,
+  MultiPaged,
+} from "@/core/persistence/types/output.type";
 import { CreateOrganizationInput } from "./dto/create-organization.input";
 import { FilterOrganizationInput } from "./dto/filter-organization.input";
 import { SortOrganizationInput } from "./dto/sort-organization.input";
 import { UpdateOrganizationInput } from "./dto/update-organization.input";
-import { OrganizationEntity } from "./entities/organization.entity";
+import type { OrganizationEntityRecord } from "./entities/organization.entity";
 import { OrganizationsRepository } from "./organizations.repository";
 
 @Injectable()
@@ -21,19 +24,22 @@ export class OrganizationsService {
     private readonly eventEmitter: EventEmitter2
   ) {}
 
-  findOneById(ctx: AuthContext, id: string): Promise<OrganizationEntity> {
+  findOneById(ctx: AuthContext, id: string): Promise<OrganizationEntityRecord> {
     return this.repository.catalogCrud(ctx).findOneById(id);
   }
 
   findOne(
-    _ctx: AuthContext,
-    {
-      filters,
-    }: {
-      filters?: FilterOrganizationInput;
-    }
-  ): Promise<OrganizationEntity> {
-    return this.repository.crud.findOne({
+    ctx: AuthContext,
+    { filters }: { filters?: FilterOrganizationInput }
+  ): Promise<OrganizationEntityRecord> {
+    return this.repository.catalogCrud(ctx).findOne({ filters });
+  }
+
+  findOneActive(
+    ctx: AuthContext,
+    { filters }: { filters?: FilterOrganizationInput }
+  ): Promise<OrganizationEntityRecord> {
+    return this.repository.catalogCrud(ctx).findOne({
       filters: this.withActiveFilter(filters),
     });
   }
@@ -41,27 +47,30 @@ export class OrganizationsService {
   async findOneActiveById(
     ctx: AuthContext,
     id: string
-  ): Promise<OrganizationEntity> {
+  ): Promise<OrganizationEntityRecord> {
     const organization = await this.repository.catalogCrud(ctx).findOneById(id);
     this.assertActive(organization);
     return organization;
   }
 
-  findManyById(ctx: AuthContext, ids: string[]): Promise<OrganizationEntity[]> {
+  findManyById(
+    ctx: AuthContext,
+    ids: string[]
+  ): Promise<OrganizationEntityRecord[]> {
     return this.repository.catalogCrud(ctx).findManyById(ids);
   }
 
   async findManyActiveById(
     ctx: AuthContext,
     ids: string[]
-  ): Promise<OrganizationEntity[]> {
+  ): Promise<OrganizationEntityRecord[]> {
     const organizations = await this.findManyById(ctx, ids);
     this.assertAllActive(organizations);
     return organizations;
   }
 
   findMany(
-    _ctx: AuthContext,
+    ctx: AuthContext,
     {
       filters,
       sort,
@@ -73,12 +82,14 @@ export class OrganizationsService {
       limit?: number;
       skip?: number;
     }
-  ): Promise<MultiPaged<OrganizationEntity>> {
-    return this.repository.crud.findMany({ filters, sort, skip, limit });
+  ): Promise<MultiPaged<OrganizationEntityRecord>> {
+    return this.repository
+      .catalogCrud(ctx)
+      .findMany({ filters, sort, skip, limit });
   }
 
   findManyActive(
-    _ctx: AuthContext,
+    ctx: AuthContext,
     {
       filters,
       sort,
@@ -90,8 +101,8 @@ export class OrganizationsService {
       limit?: number;
       skip?: number;
     }
-  ): Promise<MultiPaged<OrganizationEntity>> {
-    return this.repository.crud.findMany({
+  ): Promise<MultiPaged<OrganizationEntityRecord>> {
+    return this.repository.catalogCrud(ctx).findMany({
       filters: this.withActiveFilter(filters),
       sort,
       skip,
@@ -100,65 +111,78 @@ export class OrganizationsService {
   }
 
   createOne(
-    _ctx: AuthContext,
+    ctx: AuthContext,
     createInput: CreateOrganizationInput
-  ): Promise<OrganizationEntity> {
-    return this.repository.crud.createOne(createInput);
+  ): Promise<OrganizationEntityRecord> {
+    return this.repository.catalogCrud(ctx).createOne(createInput);
   }
 
   createMany(
-    _ctx: AuthContext,
+    ctx: AuthContext,
     createInputs: CreateOrganizationInput[]
   ): Promise<BatchEntity> {
-    return this.repository.crud.createMany(createInputs);
+    return this.repository.catalogCrud(ctx).createMany(createInputs);
   }
 
   updateOne(
-    _ctx: AuthContext,
+    ctx: AuthContext,
     id: string,
     updateInput: UpdateOrganizationInput
-  ): Promise<OrganizationEntity> {
-    return this.repository.crud.updateOneById(id, updateInput);
+  ): Promise<OrganizationEntityRecord> {
+    return this.repository.catalogCrud(ctx).updateOneById(id, updateInput);
   }
 
   updateMany(
-    _ctx: AuthContext,
+    ctx: AuthContext,
     ids: string[],
     updateInput: UpdateOrganizationInput
   ): Promise<BatchEntity> {
-    return this.repository.crud.updateManyById(ids, updateInput);
+    return this.repository.catalogCrud(ctx).updateManyById(ids, updateInput);
   }
 
-  disableOne(_ctx: AuthContext, id: string): Promise<OrganizationEntity> {
-    return this.repository.crud.updateOneById(id, { disabled: true });
+  disableOne(ctx: AuthContext, id: string): Promise<OrganizationEntityRecord> {
+    return this.repository
+      .catalogCrud(ctx)
+      .updateOneById(id, { disabled: true });
   }
 
-  disableMany(_ctx: AuthContext, ids: string[]): Promise<BatchEntity> {
-    return this.repository.crud.updateManyById(ids, { disabled: true });
+  disableMany(ctx: AuthContext, ids: string[]): Promise<BatchEntity> {
+    return this.repository
+      .catalogCrud(ctx)
+      .updateManyById(ids, { disabled: true });
   }
 
-  enableOne(_ctx: AuthContext, id: string): Promise<OrganizationEntity> {
-    return this.repository.crud.updateOneById(id, { disabled: false });
+  enableOne(ctx: AuthContext, id: string): Promise<OrganizationEntityRecord> {
+    return this.repository
+      .catalogCrud(ctx)
+      .updateOneById(id, { disabled: false });
   }
 
-  enableMany(_ctx: AuthContext, ids: string[]): Promise<BatchEntity> {
-    return this.repository.crud.updateManyById(ids, { disabled: false });
+  enableMany(ctx: AuthContext, ids: string[]): Promise<BatchEntity> {
+    return this.repository
+      .catalogCrud(ctx)
+      .updateManyById(ids, { disabled: false });
   }
 
-  async removeOne(_ctx: AuthContext, id: string): Promise<OrganizationEntity> {
-    const organization = await this.repository.crud.findOneById(id);
+  async removeOne(
+    ctx: AuthContext,
+    id: string
+  ): Promise<OrganizationEntityRecord> {
+    const organization = await this.repository.catalogCrud(ctx).findOneById(id);
 
     await this.eventEmitter.emitAsync(
       DomainEvents.organization.deleted,
       new OrganizationDeletedEvent(organization.id)
     );
 
-    await this.repository.crud.deleteOneById(id);
+    await this.repository.catalogCrud(ctx).deleteOneById(id);
     return organization;
   }
 
-  async removeMany(_ctx: AuthContext, ids: string[]): Promise<BatchEntity> {
-    const organizations = await this.repository.crud.findManyById(ids);
+  async removeMany(ctx: AuthContext, ids: string[]): Promise<BatchEntity> {
+    const organizations = await this.repository
+      .catalogCrud(ctx)
+      .findManyById(ids);
 
     for (const organization of organizations) {
       await this.eventEmitter.emitAsync(
@@ -167,18 +191,23 @@ export class OrganizationsService {
       );
     }
 
-    return this.repository.crud.deleteManyById(ids);
+    return this.repository.catalogCrud(ctx).deleteManyById(ids);
   }
 
-  count(_ctx: AuthContext): Promise<number> {
-    return this.repository.countActive();
+  count(ctx: AuthContext): Promise<number> {
+    return this.repository.countActive(ctx);
+  }
+
+  countByField(ctx: AuthContext, field: string): Promise<FieldCount[]> {
+    return this.repository.countByField(ctx, field);
   }
 
   async findRecentActivity(
-    _ctx: AuthContext,
+    ctx: AuthContext,
     limit: number
   ): Promise<RecentActivityRecord[]> {
     const rows = await this.repository.findRecentlyUpdatedActive(
+      ctx,
       limit,
       "name updatedAt"
     );
@@ -191,7 +220,7 @@ export class OrganizationsService {
   private withActiveFilter(
     filters?: FilterOrganizationInput
   ): FilterOrganizationInput {
-    return { ...filters, disabled: filters?.disabled ?? false };
+    return { ...filters, disabled: false };
   }
 
   private assertActive(entry: { disabled: boolean }): void {

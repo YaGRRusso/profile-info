@@ -45,6 +45,7 @@ describe("OrganizationMapper", () => {
       logo: "https://example.com/logo.png",
       disabled: false,
       partition: CatalogPartition.GLOBAL,
+      ownerId: "",
       i18n: [
         {
           locale: "en",

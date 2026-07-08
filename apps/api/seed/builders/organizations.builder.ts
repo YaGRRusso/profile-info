@@ -10,7 +10,7 @@ import {
 import { loremSentences, slugFor } from "../helpers/faker-seed.helper";
 import { optionalForIndex, pickTextSize } from "../helpers/variation.helper";
 
-export function buildCatalogOrganizations(): Pick<
+type OrganizationSeed = Pick<
   OrganizationModel,
   | "name"
   | "slug"
@@ -20,29 +20,65 @@ export function buildCatalogOrganizations(): Pick<
   | "i18n"
   | "partition"
   | "disabled"
->[] {
-  return Array.from({ length: CATALOG_ORGANIZATION_COUNT }, (_, index) => {
-    const name =
-      pickTextSize(index) === "large"
-        ? `${faker.company.name()} ${faker.company.catchPhrase()}`
-        : pickTextSize(index) === "small"
-          ? (faker.company.name().split(" ")[0] ?? faker.company.name())
-          : faker.company.name();
+  | "ownerId"
+>;
+
+function organizationName(index: number): string {
+  const size = pickTextSize(index);
+
+  if (size === "large") {
+    return `${faker.company.name()} ${faker.company.catchPhrase()}`;
+  }
+  if (size === "small") {
+    return faker.company.name().split(" ")[0] ?? faker.company.name();
+  }
+  return faker.company.name();
+}
+
+function buildOrganizations(
+  ownerId: string,
+  count: number,
+  partition: CatalogPartition,
+  seedOffset: number
+): OrganizationSeed[] {
+  return Array.from({ length: count }, (_, index) => {
+    const globalIndex = seedOffset + index;
+    const name = organizationName(globalIndex);
 
     return {
-      partition: CatalogPartition.GLOBAL,
-      disabled: index % 19 === 0,
+      partition,
+      ownerId,
+      disabled: globalIndex % 19 === 0,
       name,
-      slug: slugFor(name, index),
+      slug: slugFor(name, globalIndex),
       category: faker.helpers.arrayElement(ORGANIZATION_CATEGORIES),
-      website: optionalForIndex(index, () => faker.internet.url()),
-      logo: optionalForIndex(index + 1, () =>
+      website: optionalForIndex(globalIndex, () => faker.internet.url()),
+      logo: optionalForIndex(globalIndex + 1, () =>
         faker.image.urlPicsumPhotos({ width: 96, height: 96 })
       ),
       i18n: SEED_LOCALES.map((locale) => ({
         locale,
-        messages: { description: loremSentences(pickTextSize(index)) },
+        messages: { description: loremSentences(pickTextSize(globalIndex)) },
       })),
     };
   });
+}
+
+export function buildCatalogOrganizations(ownerId: string): OrganizationSeed[] {
+  return buildOrganizations(
+    ownerId,
+    CATALOG_ORGANIZATION_COUNT,
+    CatalogPartition.GLOBAL,
+    0
+  );
+}
+
+export function buildLocalOrganizationsForPersona(
+  ownerId: string,
+  count: number,
+  seedOffset: number
+): OrganizationSeed[] {
+  if (count <= 0) return [];
+
+  return buildOrganizations(ownerId, count, CatalogPartition.LOCAL, seedOffset);
 }

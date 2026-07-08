@@ -12,7 +12,7 @@ import { CreateUserInput } from "./dto/create-user.input";
 import { FilterUserInput } from "./dto/filter-user.input";
 import { SortUserInput } from "./dto/sort-user.input";
 import { UpdateUserInput } from "./dto/update-user.input";
-import { UserEntity } from "./entities/user.entity";
+import type { UserEntityRecord } from "./entities/user.entity";
 import type { UserWithPasswordEntity } from "./entities/user-with-password.entity";
 import type { UserCreateRecord, UserUpdateRecord } from "./mappers/user.mapper";
 import { UsersRepository } from "./users.repository";
@@ -25,11 +25,15 @@ export class UsersService {
     private readonly skillsValidator: SkillsValidatorService
   ) {}
 
-  findOneById(id: string): Promise<UserEntity> {
+  findOneById(id: string): Promise<UserEntityRecord> {
     return this.repository.crud.findOneById(id);
   }
 
-  findOne({ filters }: { filters?: FilterUserInput }): Promise<UserEntity> {
+  findOne({
+    filters,
+  }: {
+    filters?: FilterUserInput;
+  }): Promise<UserEntityRecord> {
     return this.repository.crud.findOne({ filters });
   }
 
@@ -37,7 +41,7 @@ export class UsersService {
     return this.repository.findOneByEmailWithPassword(email);
   }
 
-  findManyById(ids: string[]): Promise<UserEntity[]> {
+  findManyById(ids: string[]): Promise<UserEntityRecord[]> {
     return this.repository.crud.findManyById(ids);
   }
 
@@ -51,14 +55,14 @@ export class UsersService {
     sort?: SortUserInput;
     limit?: number;
     skip?: number;
-  }): Promise<MultiPaged<UserEntity>> {
+  }): Promise<MultiPaged<UserEntityRecord>> {
     return this.repository.crud.findMany({ filters, sort, skip, limit });
   }
 
   async createOne(
     ctx: AuthContext,
     { password, ...createUserInput }: CreateUserInput
-  ): Promise<UserEntity> {
+  ): Promise<UserEntityRecord> {
     await this.assertSkillsExist(ctx, createUserInput.skillIds);
 
     return this.repository.crud.createOne({
@@ -90,7 +94,7 @@ export class UsersService {
     ctx: AuthContext,
     id: string,
     updateInput: UpdateUserInput
-  ): Promise<UserEntity> {
+  ): Promise<UserEntityRecord> {
     const { password, ...rest } = updateInput;
     await this.assertSkillsExist(ctx, rest.skillIds);
 
@@ -124,7 +128,7 @@ export class UsersService {
     return this.repository.crud.updateManyById(ids, update);
   }
 
-  async removeOne(id: string): Promise<UserEntity> {
+  async removeOne(id: string): Promise<UserEntityRecord> {
     const user = await this.repository.crud.findOneById(id);
 
     this.assertDeletable(user);
@@ -159,7 +163,7 @@ export class UsersService {
     await this.repository.detachSkill(skillId);
   }
 
-  private assertDeletable(user: UserEntity): void {
+  private assertDeletable(user: UserEntityRecord): void {
     if (user.role === UserRole.SUPER_ADMIN) {
       throw new ForbiddenException("SUPER_ADMIN users cannot be deleted");
     }

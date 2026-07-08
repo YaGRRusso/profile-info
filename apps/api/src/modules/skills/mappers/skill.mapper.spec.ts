@@ -26,7 +26,7 @@ describe("SkillMapper", () => {
       category: "Programming",
       disabled: false,
       partition: CatalogPartition.GLOBAL,
-      ownerId: undefined,
+      ownerId: "",
     });
   });
 

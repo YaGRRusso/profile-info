@@ -2,7 +2,7 @@ import { Injectable, UnauthorizedException } from "@nestjs/common";
 import DataLoader from "dataloader";
 import { keyBy } from "lodash";
 import type { AppRequest } from "@/core/context/graphql-context.interface";
-import type { SkillEntity } from "./entities/skill.entity";
+import type { SkillEntityRecord } from "./entities/skill.entity";
 import { SkillsService } from "./skills.service";
 
 @Injectable()
@@ -10,7 +10,7 @@ export class SkillsLoaderService {
   constructor(private readonly skillsService: SkillsService) {}
 
   createLoader(req: AppRequest) {
-    return new DataLoader<string, SkillEntity | null>(
+    return new DataLoader<string, SkillEntityRecord | null>(
       async (ids) => {
         const ctx = req.user;
         if (!ctx) {

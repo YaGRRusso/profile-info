@@ -1,7 +1,8 @@
-import { Field, ObjectType } from "@nestjs/graphql";
+import { Field, ID, ObjectType } from "@nestjs/graphql";
 import { BaseEntity } from "@/core/entities/base.entity";
 import { CatalogPartition } from "@/core/enums/catalog-partition.enum";
 import { createPaginatedModel } from "@/core/schemas/paginated.schema";
+import { UserEntity } from "@/modules/users/entities/user.entity";
 import { OrganizationCategory } from "../enums/category.enum";
 
 @ObjectType()
@@ -45,9 +46,14 @@ export class OrganizationEntity extends BaseEntity {
   @Field(() => CatalogPartition)
   partition: CatalogPartition;
 
-  @Field(() => String, { nullable: true })
-  ownerId?: string;
+  @Field(() => ID)
+  ownerId: string;
+
+  @Field(() => UserEntity)
+  owner: UserEntity;
 }
 
 export const PaginatedOrganizationEntity =
   createPaginatedModel(OrganizationEntity);
+
+export type OrganizationEntityRecord = Omit<OrganizationEntity, "owner">;

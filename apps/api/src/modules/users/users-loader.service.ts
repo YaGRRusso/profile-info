@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import DataLoader from "dataloader";
 import { keyBy } from "lodash";
-import { UserEntity } from "./entities/user.entity";
+import type { UserEntityRecord } from "./entities/user.entity";
 import { UsersService } from "./users.service";
 
 @Injectable()
@@ -9,7 +9,7 @@ export class UsersLoaderService {
   constructor(private readonly usersService: UsersService) {}
 
   createLoader() {
-    return new DataLoader<string, UserEntity | null>(
+    return new DataLoader<string, UserEntityRecord | null>(
       async (ids) => {
         const list = await this.usersService.findManyById([...ids]);
         const map = keyBy(list, (item) => item.id);

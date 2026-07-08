@@ -57,10 +57,9 @@ function RouteComponent() {
   const enableOneOrganization = useEnableOneOrganization();
   const enableManyOrganizations = useEnableManyOrganizations();
 
-  const closeAndRefetch = useCallback(async () => {
+  const closeForm = useCallback(() => {
     setFormValues(undefined);
-    await findManyOrganizations.refetch();
-  }, [findManyOrganizations.refetch]);
+  }, []);
 
   const selectedOrganizationIds = useMemo(
     () =>
@@ -78,7 +77,7 @@ function RouteComponent() {
         case "CREATING":
           createOneOrganization.mutate(organizationToInput(data), {
             onSuccess: () => {
-              closeAndRefetch();
+              closeForm();
               toast.success("Organization created successfully");
             },
           });
@@ -91,7 +90,7 @@ function RouteComponent() {
             },
             {
               onSuccess: () => {
-                closeAndRefetch();
+                closeForm();
                 toast.success("Organization updated successfully");
               },
             }
@@ -103,7 +102,7 @@ function RouteComponent() {
     },
     [
       createOneOrganization.mutate,
-      closeAndRefetch,
+      closeForm,
       formValues?.state,
       updateOneOrganization.mutate,
       selectedOrganizationIds,
@@ -115,7 +114,7 @@ function RouteComponent() {
       case "DISABLING":
         disableOneOrganization.mutate(selectedOrganizationIds[0], {
           onSuccess: () => {
-            closeAndRefetch();
+            closeForm();
             toast.success("Organization disabled successfully");
           },
         });
@@ -123,7 +122,7 @@ function RouteComponent() {
       case "MULTI_DISABLING":
         disableManyOrganizations.mutate(selectedOrganizationIds, {
           onSuccess: (data) => {
-            closeAndRefetch();
+            closeForm();
             toast.success(
               `${data.disableManyOrganizations.succeeded} organizations disabled successfully`
             );
@@ -137,7 +136,7 @@ function RouteComponent() {
     formValues?.state,
     disableOneOrganization,
     selectedOrganizationIds,
-    closeAndRefetch,
+    closeForm,
     disableManyOrganizations,
   ]);
 
@@ -146,7 +145,7 @@ function RouteComponent() {
       case "ENABLING":
         enableOneOrganization.mutate(selectedOrganizationIds[0], {
           onSuccess: () => {
-            closeAndRefetch();
+            closeForm();
             toast.success("Organization enabled successfully");
           },
         });
@@ -154,7 +153,7 @@ function RouteComponent() {
       case "MULTI_ENABLING":
         enableManyOrganizations.mutate(selectedOrganizationIds, {
           onSuccess: (data) => {
-            closeAndRefetch();
+            closeForm();
             toast.success(
               `${data.enableManyOrganizations.succeeded} organizations enabled successfully`
             );
@@ -168,7 +167,7 @@ function RouteComponent() {
     formValues?.state,
     enableOneOrganization,
     selectedOrganizationIds,
-    closeAndRefetch,
+    closeForm,
     enableManyOrganizations,
   ]);
 
@@ -239,7 +238,7 @@ function RouteComponent() {
               },
               {
                 onSuccess: (data) => {
-                  closeAndRefetch();
+                  closeForm();
                   toast.success(
                     `${data.updateManyOrganizations.succeeded} organizations updated successfully`
                   );

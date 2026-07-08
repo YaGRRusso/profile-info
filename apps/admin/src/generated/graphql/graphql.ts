@@ -123,7 +123,6 @@ export type CreateOrganizationInput = {
   i18n: Array<CreateOrganizationMessagesInputTranslationInput>;
   logo?: string | null | undefined;
   name: string;
-  partition?: CatalogPartition | null | undefined;
   slug: string;
   website?: string | null | undefined;
 };
@@ -434,7 +433,6 @@ export type UpdateOrganizationInput = {
   i18n?: Array<CreateOrganizationMessagesInputTranslationInput> | null | undefined;
   logo?: string | null | undefined;
   name?: string | null | undefined;
-  partition?: CatalogPartition | null | undefined;
   slug?: string | null | undefined;
   website?: string | null | undefined;
 };
@@ -840,7 +838,7 @@ export type FindManyOrganizationsQueryVariables = Exact<{
 }>;
 
 
-export type FindManyOrganizationsQuery = { findManyOrganizations: { found: number, nodes: Array<{ id: string, name: string, slug: string, category: OrganizationCategory, logo: string | null, website: string | null, disabled: boolean, createdAt: string, updatedAt: string, i18n: Array<{ locale: string, messages: { description: string } }> }> } };
+export type FindManyOrganizationsQuery = { findManyOrganizations: { found: number, nodes: Array<{ id: string, name: string, slug: string, category: OrganizationCategory, logo: string | null, website: string | null, disabled: boolean, partition: CatalogPartition, createdAt: string, updatedAt: string, i18n: Array<{ locale: string, messages: { description: string } }> }> } };
 
 export type FindManyActiveOrganizationsQueryVariables = Exact<{
   organizationFilters?: FilterOrganizationInput | null | undefined;
@@ -849,7 +847,7 @@ export type FindManyActiveOrganizationsQueryVariables = Exact<{
 }>;
 
 
-export type FindManyActiveOrganizationsQuery = { findManyActiveOrganizations: { found: number, nodes: Array<{ id: string, name: string, slug: string, category: OrganizationCategory, logo: string | null, website: string | null, disabled: boolean, createdAt: string, updatedAt: string, i18n: Array<{ locale: string, messages: { description: string } }> }> } };
+export type FindManyActiveOrganizationsQuery = { findManyActiveOrganizations: { found: number, nodes: Array<{ id: string, name: string, slug: string, category: OrganizationCategory, logo: string | null, website: string | null, disabled: boolean, partition: CatalogPartition, createdAt: string, updatedAt: string, i18n: Array<{ locale: string, messages: { description: string } }> }> } };
 
 export type FindManyProjectsQueryVariables = Exact<{
   projectFilters?: FilterProjectInput | null | undefined;
@@ -867,7 +865,7 @@ export type FindManySkillsQueryVariables = Exact<{
 }>;
 
 
-export type FindManySkillsQuery = { findManySkills: { found: number, nodes: Array<{ id: string, slug: string, category: string | null, disabled: boolean, createdAt: string, updatedAt: string, i18n: Array<{ locale: string, messages: { title: string } }> }> } };
+export type FindManySkillsQuery = { findManySkills: { found: number, nodes: Array<{ id: string, slug: string, category: string | null, disabled: boolean, partition: CatalogPartition, createdAt: string, updatedAt: string, owner: { id: string, nickname: string, name: string, role: UserRole, email: string, phone: string | null, avatar: string | null }, i18n: Array<{ locale: string, messages: { title: string } }> }> } };
 
 export type FindManyActiveSkillsQueryVariables = Exact<{
   skillFilters?: FilterSkillInput | null | undefined;
@@ -876,7 +874,7 @@ export type FindManyActiveSkillsQueryVariables = Exact<{
 }>;
 
 
-export type FindManyActiveSkillsQuery = { findManyActiveSkills: { found: number, nodes: Array<{ id: string, slug: string, category: string | null, disabled: boolean, createdAt: string, updatedAt: string, i18n: Array<{ locale: string, messages: { title: string } }> }> } };
+export type FindManyActiveSkillsQuery = { findManyActiveSkills: { found: number, nodes: Array<{ id: string, slug: string, category: string | null, disabled: boolean, partition: CatalogPartition, createdAt: string, updatedAt: string, owner: { id: string, nickname: string, name: string, role: UserRole, email: string, phone: string | null, avatar: string | null }, i18n: Array<{ locale: string, messages: { title: string } }> }> } };
 
 export class TypedDocumentString<TResult, TVariables>
   extends String
@@ -1631,6 +1629,7 @@ export const FindManyOrganizationsDocument = new TypedDocumentString(`
       logo
       website
       disabled
+      partition
       i18n {
         locale
         messages {
@@ -1660,6 +1659,7 @@ export const FindManyActiveOrganizationsDocument = new TypedDocumentString(`
       logo
       website
       disabled
+      partition
       i18n {
         locale
         messages {
@@ -1735,6 +1735,16 @@ export const FindManySkillsDocument = new TypedDocumentString(`
       slug
       category
       disabled
+      partition
+      owner {
+        id
+        nickname
+        name
+        role
+        email
+        phone
+        avatar
+      }
       i18n {
         locale
         messages {
@@ -1760,6 +1770,16 @@ export const FindManyActiveSkillsDocument = new TypedDocumentString(`
       slug
       category
       disabled
+      partition
+      owner {
+        id
+        nickname
+        name
+        role
+        email
+        phone
+        avatar
+      }
       i18n {
         locale
         messages {

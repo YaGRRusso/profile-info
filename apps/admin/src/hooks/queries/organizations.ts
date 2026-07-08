@@ -38,6 +38,7 @@ const findManyOrganizations = graphql(`
         logo
         website
         disabled
+        partition
         i18n {
           locale
           messages {
@@ -72,6 +73,7 @@ const findManyActiveOrganizations = graphql(`
         logo
         website
         disabled
+        partition
         i18n {
           locale
           messages {

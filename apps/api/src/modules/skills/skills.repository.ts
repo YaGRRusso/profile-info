@@ -10,7 +10,7 @@ import { CreateSkillInput } from "./dto/create-skill.input";
 import { FilterSkillInput } from "./dto/filter-skill.input";
 import { SortSkillInput } from "./dto/sort-skill.input";
 import { UpdateSkillInput } from "./dto/update-skill.input";
-import type { SkillEntity } from "./entities/skill.entity";
+import type { SkillEntityRecord } from "./entities/skill.entity";
 import { SkillMapper } from "./mappers/skill.mapper";
 import { SkillModel } from "./schemas/skill.schema";
 
@@ -20,7 +20,7 @@ const NOT_DISABLED = { disabled: { $ne: true } } as const;
 export class SkillsRepository {
   private readonly crud: CrudRepository<
     SkillModel,
-    SkillEntity,
+    SkillEntityRecord,
     CreateSkillInput,
     UpdateSkillInput,
     FilterSkillInput,

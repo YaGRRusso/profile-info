@@ -2,7 +2,7 @@ import { Injectable, UnauthorizedException } from "@nestjs/common";
 import DataLoader from "dataloader";
 import { keyBy } from "lodash";
 import type { AppRequest } from "@/core/context/graphql-context.interface";
-import type { OrganizationEntity } from "./entities/organization.entity";
+import type { OrganizationEntityRecord } from "./entities/organization.entity";
 import { OrganizationsService } from "./organizations.service";
 
 @Injectable()
@@ -10,7 +10,7 @@ export class OrganizationsLoaderService {
   constructor(private readonly organizationsService: OrganizationsService) {}
 
   createLoader(req: AppRequest) {
-    return new DataLoader<string, OrganizationEntity | null>(
+    return new DataLoader<string, OrganizationEntityRecord | null>(
       async (ids) => {
         const ctx = req.user;
         if (!ctx) {

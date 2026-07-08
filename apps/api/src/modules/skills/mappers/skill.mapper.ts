@@ -13,13 +13,13 @@ import { CreateSkillInput } from "../dto/create-skill.input";
 import { FilterSkillInput } from "../dto/filter-skill.input";
 import { SortSkillInput } from "../dto/sort-skill.input";
 import { UpdateSkillInput } from "../dto/update-skill.input";
-import type { SkillEntity } from "../entities/skill.entity";
+import type { SkillEntityRecord } from "../entities/skill.entity";
 import type { SkillModel } from "../schemas/skill.schema";
 
 export class SkillMapper
   implements
     CrudMapperInterface<
-      SkillEntity,
+      SkillEntityRecord,
       SkillModel,
       CreateSkillInput,
       UpdateSkillInput,
@@ -27,7 +27,7 @@ export class SkillMapper
       SortSkillInput
     >
 {
-  toDomain(model: SkillModel): SkillEntity {
+  toDomain(model: SkillModel): SkillEntityRecord {
     return {
       ...toBaseEntityFields(model),
       slug: model.slug,
@@ -39,7 +39,7 @@ export class SkillMapper
       category: model.category,
       disabled: model.disabled,
       partition: model.partition,
-      ownerId: toIdString(model.ownerId),
+      ownerId: toIdString(model.ownerId) ?? "",
     };
   }
 

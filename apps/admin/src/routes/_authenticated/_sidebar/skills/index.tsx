@@ -53,10 +53,9 @@ function RouteComponent() {
   const enableOneSkill = useEnableOneSkill();
   const enableManySkills = useEnableManySkills();
 
-  const closeAndRefetch = useCallback(async () => {
+  const closeForm = useCallback(() => {
     setFormValues(undefined);
-    await findManySkills.refetch();
-  }, [findManySkills.refetch]);
+  }, []);
 
   const selectedSkillIds = useMemo(
     () =>
@@ -72,7 +71,7 @@ function RouteComponent() {
         case "CREATING":
           createOneSkill.mutate(skillToInput(data), {
             onSuccess: () => {
-              closeAndRefetch();
+              closeForm();
               toast.success("Skill created successfully");
             },
           });
@@ -85,7 +84,7 @@ function RouteComponent() {
             },
             {
               onSuccess: () => {
-                closeAndRefetch();
+                closeForm();
                 toast.success("Skill updated successfully");
               },
             }
@@ -97,7 +96,7 @@ function RouteComponent() {
     },
     [
       createOneSkill.mutate,
-      closeAndRefetch,
+      closeForm,
       formValues?.state,
       updateOneSkill.mutate,
       selectedSkillIds,
@@ -109,7 +108,7 @@ function RouteComponent() {
       case "DISABLING":
         disableOneSkill.mutate(selectedSkillIds[0], {
           onSuccess: () => {
-            closeAndRefetch();
+            closeForm();
             toast.success("Skill disabled successfully");
           },
         });
@@ -117,7 +116,7 @@ function RouteComponent() {
       case "MULTI_DISABLING":
         disableManySkills.mutate(selectedSkillIds, {
           onSuccess: (data) => {
-            closeAndRefetch();
+            closeForm();
             toast.success(
               `${data.disableManySkills.succeeded} skills disabled successfully`
             );
@@ -131,7 +130,7 @@ function RouteComponent() {
     formValues?.state,
     disableOneSkill,
     selectedSkillIds,
-    closeAndRefetch,
+    closeForm,
     disableManySkills,
   ]);
 
@@ -140,7 +139,7 @@ function RouteComponent() {
       case "ENABLING":
         enableOneSkill.mutate(selectedSkillIds[0], {
           onSuccess: () => {
-            closeAndRefetch();
+            closeForm();
             toast.success("Skill enabled successfully");
           },
         });
@@ -148,7 +147,7 @@ function RouteComponent() {
       case "MULTI_ENABLING":
         enableManySkills.mutate(selectedSkillIds, {
           onSuccess: (data) => {
-            closeAndRefetch();
+            closeForm();
             toast.success(
               `${data.enableManySkills.succeeded} skills enabled successfully`
             );
@@ -162,7 +161,7 @@ function RouteComponent() {
     formValues?.state,
     enableOneSkill,
     selectedSkillIds,
-    closeAndRefetch,
+    closeForm,
     enableManySkills,
   ]);
 
@@ -224,7 +223,7 @@ function RouteComponent() {
               { skillIds: selectedSkillIds, updateSkillInput },
               {
                 onSuccess: (data) => {
-                  closeAndRefetch();
+                  closeForm();
                   toast.success(
                     `${data.updateManySkills.succeeded} skills updated successfully`
                   );

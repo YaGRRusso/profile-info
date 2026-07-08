@@ -1,8 +1,9 @@
-import { Field, ObjectType } from "@nestjs/graphql";
+import { Field, ID, ObjectType } from "@nestjs/graphql";
 import { OptionalField } from "@/core/decorators/optional-field.decorator";
 import { BaseEntity } from "@/core/entities/base.entity";
 import { CatalogPartition } from "@/core/enums/catalog-partition.enum";
 import { createPaginatedModel } from "@/core/schemas/paginated.schema";
+import { UserEntity } from "@/modules/users/entities/user.entity";
 
 @ObjectType()
 export class SkillMessages {
@@ -36,8 +37,13 @@ export class SkillEntity extends BaseEntity {
   @Field(() => CatalogPartition)
   partition: CatalogPartition;
 
-  @Field(() => String, { nullable: true })
-  ownerId?: string;
+  @Field(() => ID)
+  ownerId: string;
+
+  @Field(() => UserEntity)
+  owner: UserEntity;
 }
 
 export const PaginatedSkillEntity = createPaginatedModel(SkillEntity);
+
+export type SkillEntityRecord = Omit<SkillEntity, "owner">;

@@ -36,7 +36,8 @@
     "test:e2e": "npm run test:e2e --workspaces --if-present",
     "typecheck": "npm run typecheck --workspaces --if-present",
     "lint": "npm run lint --workspaces --if-present",
-    "format": "npm run format --workspaces --if-present"
+    "format": "npm run format --workspaces --if-present",
+    "simulate": "clear && npm run build && npm run test && npm run test:e2e && npm run seed && echo 'All Passed'"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.5.2",

@@ -15,6 +15,7 @@ import { SkillModel } from "@/modules/skills/schemas/skill.schema";
 import { UserModel } from "@/modules/users/schemas/user.schema";
 import {
   buildCatalogSkills,
+  buildLocalSkillsForPersona,
   pickProfileSkillIds,
 } from "./builders/catalog.builder";
 import {
@@ -23,9 +24,17 @@ import {
   buildExperiencesForPersona,
   buildProjectsForPersona,
 } from "./builders/entities.builder";
-import { buildCatalogOrganizations } from "./builders/organizations.builder";
+import {
+  buildCatalogOrganizations,
+  buildLocalOrganizationsForPersona,
+} from "./builders/organizations.builder";
 import { createPersonaUser } from "./builders/users.builder";
-import { DEV_PASSWORD, FAKER_SEED, SEED_API_TOKENS } from "./constants";
+import {
+  DEV_PASSWORD,
+  FAKER_SEED,
+  PERSONA_CATALOG_SEED_OFFSETS,
+  SEED_API_TOKENS,
+} from "./constants";
 import { PERSONA_KEYS, PERSONAS, type PersonaKey } from "./personas";
 
 export async function runSeed(): Promise<void> {
@@ -58,27 +67,85 @@ export async function runSeed(): Promise<void> {
     users.deleteMany({}),
   ]);
 
-  const skillDocs = await skills.create(buildCatalogSkills());
-  const skillIds = skillDocs.map((doc) => String(doc._id));
+  const adminPersona = PERSONAS.admin;
+  const adminUser = await createPersonaUser(users, adminPersona, []);
+  const globalOwnerId = String(adminUser._id);
 
-  const organizationDocs = await organizations.create(
-    buildCatalogOrganizations()
+  const globalSkillDocs = await skills.create(
+    buildCatalogSkills(globalOwnerId)
   );
-  const organizationIds = organizationDocs.map((doc) => String(doc._id));
+  const globalSkillIds = globalSkillDocs.map((doc) => String(doc._id));
 
-  const userDocs: Record<
+  const globalOrganizationDocs = await organizations.create(
+    buildCatalogOrganizations(globalOwnerId)
+  );
+  const globalOrganizationIds = globalOrganizationDocs.map((doc) =>
+    String(doc._id)
+  );
+
+  const userDocs = {} as Record<
     PersonaKey,
     Awaited<ReturnType<typeof createPersonaUser>>
-  > = {} as never;
+  >;
+  userDocs.admin = adminUser;
+
+  const skillIdsByPersona: Record<PersonaKey, string[]> = {
+    admin: [...globalSkillIds],
+    empty: [...globalSkillIds],
+    lite: [...globalSkillIds],
+    joao: [...globalSkillIds],
+    maria: [...globalSkillIds],
+    full: [...globalSkillIds],
+  };
+
+  const organizationIdsByPersona: Record<PersonaKey, string[]> = {
+    admin: [...globalOrganizationIds],
+    empty: [...globalOrganizationIds],
+    lite: [...globalOrganizationIds],
+    joao: [...globalOrganizationIds],
+    maria: [...globalOrganizationIds],
+    full: [...globalOrganizationIds],
+  };
 
   for (const key of PERSONA_KEYS) {
+    if (key === "admin") continue;
+
     const persona = PERSONAS[key];
     const profileSkillIds = pickProfileSkillIds(
-      skillIds,
+      globalSkillIds,
       persona.profileSkillCount
     );
 
     userDocs[key] = await createPersonaUser(users, persona, profileSkillIds);
+
+    const ownerId = String(userDocs[key]._id);
+    const catalogSeedOffset = PERSONA_CATALOG_SEED_OFFSETS[key];
+
+    if (persona.localCatalog.skills > 0) {
+      const localSkillDocs = await skills.create(
+        buildLocalSkillsForPersona(
+          ownerId,
+          persona.localCatalog.skills,
+          catalogSeedOffset
+        )
+      );
+      skillIdsByPersona[key].push(
+        ...localSkillDocs.map((doc) => String(doc._id))
+      );
+    }
+
+    if (persona.localCatalog.organizations > 0) {
+      const localOrganizationDocs = await organizations.create(
+        buildLocalOrganizationsForPersona(
+          ownerId,
+          persona.localCatalog.organizations,
+          catalogSeedOffset
+        )
+      );
+      organizationIdsByPersona[key].push(
+        ...localOrganizationDocs.map((doc) => String(doc._id))
+      );
+    }
   }
 
   let entityOffset = 0;
@@ -86,6 +153,8 @@ export async function runSeed(): Promise<void> {
   for (const key of PERSONA_KEYS) {
     const persona = PERSONAS[key];
     const ownerId = String(userDocs[key]._id);
+    const skillIds = skillIdsByPersona[key];
+    const organizationIds = organizationIdsByPersona[key];
 
     if (persona.entities.courses > 0) {
       await courses.create(

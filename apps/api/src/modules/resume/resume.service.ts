@@ -10,7 +10,7 @@ import { CourseStatus } from "@/modules/courses/enums/status.enum";
 import { EducationsService } from "@/modules/educations/educations.service";
 import { EducationStatus } from "@/modules/educations/enums/status.enum";
 import { ExperiencesService } from "@/modules/experiences/experiences.service";
-import { OrganizationEntity } from "@/modules/organizations/entities/organization.entity";
+import type { OrganizationEntityRecord } from "@/modules/organizations/entities/organization.entity";
 import { OrganizationsService } from "@/modules/organizations/organizations.service";
 import { ProjectsService } from "@/modules/projects/projects.service";
 import { SkillsService } from "@/modules/skills/skills.service";
@@ -158,7 +158,7 @@ export class ResumeService {
 
   private buildExperiences(
     experiences: Awaited<ReturnType<ExperiencesService["findMany"]>>["nodes"],
-    organizationMap: Map<string, OrganizationEntity>,
+    organizationMap: Map<string, OrganizationEntityRecord>,
     locale: LocaleCode
   ): ResumeExperience[] {
     return experiences.map((experience) => {
@@ -190,7 +190,7 @@ export class ResumeService {
 
   private buildEducations(
     educations: Awaited<ReturnType<EducationsService["findMany"]>>["nodes"],
-    organizationMap: Map<string, OrganizationEntity>,
+    organizationMap: Map<string, OrganizationEntityRecord>,
     locale: LocaleCode
   ): ResumeEducation[] {
     return educations.flatMap((education): ResumeEducation[] => {
@@ -216,7 +216,7 @@ export class ResumeService {
 
   private buildCertifications(
     courses: Awaited<ReturnType<CoursesService["findMany"]>>["nodes"],
-    organizationMap: Map<string, OrganizationEntity>,
+    organizationMap: Map<string, OrganizationEntityRecord>,
     locale: LocaleCode
   ): ResumeCertification[] {
     return courses.flatMap((course): ResumeCertification[] => {

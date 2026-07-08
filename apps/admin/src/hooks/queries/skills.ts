@@ -34,6 +34,16 @@ const findManySkills = graphql(`
         slug
         category
         disabled
+        partition
+        owner {
+          id
+          nickname
+          name
+          role
+          email
+          phone
+          avatar
+        }
         i18n {
           locale
           messages {
@@ -64,6 +74,16 @@ const findManyActiveSkills = graphql(`
         slug
         category
         disabled
+        partition
+        owner {
+          id
+          nickname
+          name
+          role
+          email
+          phone
+          avatar
+        }
         i18n {
           locale
           messages {

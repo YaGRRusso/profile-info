@@ -18,7 +18,7 @@ import { CreateUserInput } from "../dto/create-user.input";
 import { FilterUserInput } from "../dto/filter-user.input";
 import { SortUserInput } from "../dto/sort-user.input";
 import { UpdateUserInput } from "../dto/update-user.input";
-import type { UserEntity } from "../entities/user.entity";
+import type { UserEntityRecord } from "../entities/user.entity";
 import type { UserModel } from "../schemas/user.schema";
 
 export type UserCreateRecord = Omit<CreateUserInput, "password"> & {
@@ -32,7 +32,7 @@ export type UserUpdateRecord = Omit<UpdateUserInput, "password"> & {
 export class UserMapper
   implements
     CrudMapperInterface<
-      UserEntity,
+      UserEntityRecord,
       UserModel,
       UserCreateRecord,
       UserUpdateRecord,
@@ -40,7 +40,7 @@ export class UserMapper
       SortUserInput
     >
 {
-  toDomain(model: UserModel): UserEntity {
+  toDomain(model: UserModel): UserEntityRecord {
     return {
       ...toBaseEntityFields(model),
       avatar: model.avatar,
