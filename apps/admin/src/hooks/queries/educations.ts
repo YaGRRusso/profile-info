@@ -49,6 +49,7 @@ const findManyEducations = graphql(`
           id
           name
           slug
+          disabled
         }
         i18n {
           locale
@@ -60,6 +61,7 @@ const findManyEducations = graphql(`
         skills {
           id
           slug
+          disabled
           i18n {
             locale
             messages {

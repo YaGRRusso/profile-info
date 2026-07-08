@@ -797,7 +797,7 @@ export type FindManyApiTokensQuery = { findManyApiTokens: { found: number, nodes
 export type GetMeQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetMeQuery = { getMe: { id: string, email: string, name: string, nickname: string, role: UserRole, avatar: string | null, phone: string | null, birth: string | null, address: string | null, skillIds: Array<string> | null, i18n: Array<{ locale: string, messages: { title: string | null, description: string | null } }> | null, urls: Array<{ title: string, value: string }> | null, skills: Array<{ id: string, slug: string, i18n: Array<{ locale: string, messages: { title: string } }> }> | null } };
+export type GetMeQuery = { getMe: { id: string, email: string, name: string, nickname: string, role: UserRole, avatar: string | null, phone: string | null, birth: string | null, address: string | null, skillIds: Array<string> | null, i18n: Array<{ locale: string, messages: { title: string | null, description: string | null } }> | null, urls: Array<{ title: string, value: string }> | null, skills: Array<{ id: string, slug: string, disabled: boolean, i18n: Array<{ locale: string, messages: { title: string } }> }> | null } };
 
 export type FindManyCoursesQueryVariables = Exact<{
   courseFilters?: FilterCourseInput | null | undefined;
@@ -806,7 +806,7 @@ export type FindManyCoursesQueryVariables = Exact<{
 }>;
 
 
-export type FindManyCoursesQuery = { findManyCourses: { found: number, nodes: Array<{ id: string, slug: string, status: CourseStatus, relevance: number, url: string | null, image: string | null, hours: number | null, createdAt: string, updatedAt: string, owner: { id: string, nickname: string, name: string, role: UserRole, email: string, phone: string | null, avatar: string | null }, organization: { id: string, name: string, slug: string } | null, i18n: Array<{ locale: string, messages: { title: string, description: string } }>, skills: Array<{ id: string, slug: string, i18n: Array<{ locale: string, messages: { title: string } }> }> | null }> } };
+export type FindManyCoursesQuery = { findManyCourses: { found: number, nodes: Array<{ id: string, slug: string, status: CourseStatus, relevance: number, url: string | null, image: string | null, hours: number | null, createdAt: string, updatedAt: string, owner: { id: string, nickname: string, name: string, role: UserRole, email: string, phone: string | null, avatar: string | null }, organization: { id: string, name: string, slug: string, disabled: boolean } | null, i18n: Array<{ locale: string, messages: { title: string, description: string } }>, skills: Array<{ id: string, slug: string, disabled: boolean, i18n: Array<{ locale: string, messages: { title: string } }> }> | null }> } };
 
 export type DashboardQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -820,7 +820,7 @@ export type FindManyEducationsQueryVariables = Exact<{
 }>;
 
 
-export type FindManyEducationsQuery = { findManyEducations: { found: number, nodes: Array<{ id: string, slug: string, level: EducationLevel, status: EducationStatus, relevance: number, url: string | null, image: string | null, createdAt: string, updatedAt: string, owner: { id: string, nickname: string, name: string, role: UserRole, email: string, phone: string | null, avatar: string | null }, organization: { id: string, name: string, slug: string } | null, i18n: Array<{ locale: string, messages: { title: string, description: string } }>, skills: Array<{ id: string, slug: string, i18n: Array<{ locale: string, messages: { title: string } }> }> | null, period: { from: string | null, to: string | null } | null }> } };
+export type FindManyEducationsQuery = { findManyEducations: { found: number, nodes: Array<{ id: string, slug: string, level: EducationLevel, status: EducationStatus, relevance: number, url: string | null, image: string | null, createdAt: string, updatedAt: string, owner: { id: string, nickname: string, name: string, role: UserRole, email: string, phone: string | null, avatar: string | null }, organization: { id: string, name: string, slug: string, disabled: boolean } | null, i18n: Array<{ locale: string, messages: { title: string, description: string } }>, skills: Array<{ id: string, slug: string, disabled: boolean, i18n: Array<{ locale: string, messages: { title: string } }> }> | null, period: { from: string | null, to: string | null } | null }> } };
 
 export type FindManyExperiencesQueryVariables = Exact<{
   experienceFilters?: FilterExperienceInput | null | undefined;
@@ -829,7 +829,7 @@ export type FindManyExperiencesQueryVariables = Exact<{
 }>;
 
 
-export type FindManyExperiencesQuery = { findManyExperiences: { found: number, nodes: Array<{ id: string, slug: string, category: ExperienceCategory, relevance: number, createdAt: string, updatedAt: string, owner: { id: string, nickname: string, name: string, role: UserRole, email: string, phone: string | null, avatar: string | null }, organization: { id: string, name: string, slug: string } | null, roles: Array<{ i18n: Array<{ locale: string, messages: { title: string, description: string } }>, period: { from: string | null, to: string | null } | null, skills: Array<{ id: string, slug: string, i18n: Array<{ locale: string, messages: { title: string } }> }> | null }> }> } };
+export type FindManyExperiencesQuery = { findManyExperiences: { found: number, nodes: Array<{ id: string, slug: string, category: ExperienceCategory, relevance: number, createdAt: string, updatedAt: string, owner: { id: string, nickname: string, name: string, role: UserRole, email: string, phone: string | null, avatar: string | null }, organization: { id: string, name: string, slug: string, disabled: boolean } | null, roles: Array<{ i18n: Array<{ locale: string, messages: { title: string, description: string } }>, period: { from: string | null, to: string | null } | null, skills: Array<{ id: string, slug: string, disabled: boolean, i18n: Array<{ locale: string, messages: { title: string } }> }> | null }> }> } };
 
 export type FindManyOrganizationsQueryVariables = Exact<{
   organizationFilters?: FilterOrganizationInput | null | undefined;
@@ -856,7 +856,7 @@ export type FindManyProjectsQueryVariables = Exact<{
 }>;
 
 
-export type FindManyProjectsQuery = { findManyProjects: { found: number, nodes: Array<{ id: string, slug: string, relevance: number, images: Array<string> | null, createdAt: string, updatedAt: string, owner: { id: string, nickname: string, name: string, role: UserRole, email: string, phone: string | null, avatar: string | null }, urls: Array<{ title: string, value: string }> | null, i18n: Array<{ locale: string, messages: { title: string, description: string } }>, skills: Array<{ id: string, slug: string, i18n: Array<{ locale: string, messages: { title: string } }> }> | null }> } };
+export type FindManyProjectsQuery = { findManyProjects: { found: number, nodes: Array<{ id: string, slug: string, relevance: number, images: Array<string> | null, createdAt: string, updatedAt: string, owner: { id: string, nickname: string, name: string, role: UserRole, email: string, phone: string | null, avatar: string | null }, urls: Array<{ title: string, value: string }> | null, i18n: Array<{ locale: string, messages: { title: string, description: string } }>, skills: Array<{ id: string, slug: string, disabled: boolean, i18n: Array<{ locale: string, messages: { title: string } }> }> | null }> } };
 
 export type FindManySkillsQueryVariables = Exact<{
   skillFilters?: FilterSkillInput | null | undefined;
@@ -1410,6 +1410,7 @@ export const GetMeDocument = new TypedDocumentString(`
     skills {
       id
       slug
+      disabled
       i18n {
         locale
         messages {
@@ -1449,6 +1450,7 @@ export const FindManyCoursesDocument = new TypedDocumentString(`
         id
         name
         slug
+        disabled
       }
       i18n {
         locale
@@ -1460,6 +1462,7 @@ export const FindManyCoursesDocument = new TypedDocumentString(`
       skills {
         id
         slug
+        disabled
         i18n {
           locale
           messages {
@@ -1529,6 +1532,7 @@ export const FindManyEducationsDocument = new TypedDocumentString(`
         id
         name
         slug
+        disabled
       }
       i18n {
         locale
@@ -1540,6 +1544,7 @@ export const FindManyEducationsDocument = new TypedDocumentString(`
       skills {
         id
         slug
+        disabled
         i18n {
           locale
           messages {
@@ -1583,6 +1588,7 @@ export const FindManyExperiencesDocument = new TypedDocumentString(`
         id
         name
         slug
+        disabled
       }
       roles {
         i18n {
@@ -1599,6 +1605,7 @@ export const FindManyExperiencesDocument = new TypedDocumentString(`
         skills {
           id
           slug
+          disabled
           i18n {
             locale
             messages {
@@ -1725,6 +1732,7 @@ export const FindManyProjectsDocument = new TypedDocumentString(`
       skills {
         id
         slug
+        disabled
         i18n {
           locale
           messages {

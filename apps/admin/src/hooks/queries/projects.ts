@@ -56,6 +56,7 @@ const findManyProjects = graphql(`
         skills {
           id
           slug
+          disabled
           i18n {
             locale
             messages {
