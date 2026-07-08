@@ -1,9 +1,11 @@
+import { NotFoundException } from "@nestjs/common";
 import { EventEmitter2 } from "@nestjs/event-emitter";
 import { Test, type TestingModule } from "@nestjs/testing";
 import { testAuthContext } from "@test/fixtures/auth-context";
 import { CatalogPartition } from "@/core/enums/catalog-partition.enum";
 import { DomainEvents } from "@/core/events/domain-events";
 import { SkillDeletedEvent } from "@/core/events/skill-deleted.event";
+import { PERSISTENCE_NOT_FOUND } from "@/core/persistence/persistence.messages";
 import {
   createMockCrud,
   createMockStats,
@@ -112,6 +114,29 @@ describe("SkillsService", () => {
       );
       expect(repository.catalogCrud).toHaveBeenCalledWith(ctx);
       expect(crud.findOneById).toHaveBeenCalledWith(validId);
+    });
+  });
+
+  describe("findManyById", () => {
+    it("returns disabled skills for legacy query resolution", async () => {
+      const disabledSkill = { ...fakeEntity, disabled: true };
+      crud.findManyById.mockResolvedValue([disabledSkill]);
+
+      await expect(service.findManyById(ctx, [validId])).resolves.toEqual([
+        disabledSkill,
+      ]);
+      expect(repository.catalogCrud).toHaveBeenCalledWith(ctx);
+      expect(crud.findManyById).toHaveBeenCalledWith([validId]);
+    });
+  });
+
+  describe("findManyActiveById", () => {
+    it("rejects when any skill is disabled", async () => {
+      crud.findManyById.mockResolvedValue([{ ...fakeEntity, disabled: true }]);
+
+      await expect(service.findManyActiveById(ctx, [validId])).rejects.toThrow(
+        new NotFoundException(PERSISTENCE_NOT_FOUND)
+      );
     });
   });
 

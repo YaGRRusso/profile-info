@@ -1,7 +1,7 @@
 import { Injectable, UnauthorizedException } from "@nestjs/common";
 import DataLoader from "dataloader";
 import { keyBy } from "lodash";
-import type { AuthContext } from "@/core/context/auth-context.interface";
+import type { AppRequest } from "@/core/context/graphql-context.interface";
 import type { OrganizationEntity } from "./entities/organization.entity";
 import { OrganizationsService } from "./organizations.service";
 
@@ -9,15 +9,15 @@ import { OrganizationsService } from "./organizations.service";
 export class OrganizationsLoaderService {
   constructor(private readonly organizationsService: OrganizationsService) {}
 
-  createLoader(resolveCtx: () => AuthContext | undefined) {
+  createLoader(req: AppRequest) {
     return new DataLoader<string, OrganizationEntity | null>(
       async (ids) => {
-        const ctx = resolveCtx();
+        const ctx = req.user;
         if (!ctx) {
           throw new UnauthorizedException();
         }
 
-        const list = await this.organizationsService.findManyActiveById(ctx, [
+        const list = await this.organizationsService.findManyById(ctx, [
           ...ids,
         ]);
         const map = keyBy(list, (item) => item.id);

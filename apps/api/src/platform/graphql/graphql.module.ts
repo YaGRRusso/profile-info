@@ -60,7 +60,7 @@ import "./loaders.registry";
               skillsLoaderService,
               organizationsLoaderService,
               usersLoaderService
-            ).createLoaders(() => req.user),
+            ).createLoaders(req),
             req,
             res,
           }),

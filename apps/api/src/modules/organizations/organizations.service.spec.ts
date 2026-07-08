@@ -1,9 +1,11 @@
+import { NotFoundException } from "@nestjs/common";
 import { EventEmitter2 } from "@nestjs/event-emitter";
 import { Test, TestingModule } from "@nestjs/testing";
 import { testAuthContext } from "@test/fixtures/auth-context";
 import { CatalogPartition } from "@/core/enums/catalog-partition.enum";
 import { DomainEvents } from "@/core/events/domain-events";
 import { OrganizationDeletedEvent } from "@/core/events/organization-deleted.event";
+import { PERSISTENCE_NOT_FOUND } from "@/core/persistence/persistence.messages";
 import { createMockCrud } from "@/core/persistence/repositories/testing/service-spec.mock";
 import { OrganizationsRepository } from "./organizations.repository";
 import { OrganizationsService } from "./organizations.service";
@@ -26,6 +28,7 @@ describe("OrganizationsService", () => {
   let crud: ReturnType<typeof createMockCrud>;
   let repository: {
     crud: ReturnType<typeof createMockCrud>;
+    catalogCrud: jest.Mock;
     countActive: jest.Mock;
     findRecentlyUpdatedActive: jest.Mock;
   };
@@ -36,6 +39,7 @@ describe("OrganizationsService", () => {
     crud = createMockCrud();
     repository = {
       crud,
+      catalogCrud: jest.fn().mockReturnValue(crud),
       countActive: jest.fn().mockResolvedValue(2),
       findRecentlyUpdatedActive: jest.fn(),
     };
@@ -129,6 +133,29 @@ describe("OrganizationsService", () => {
     it("delegates to repository.countActive", async () => {
       await expect(service.count(ctx)).resolves.toBe(2);
       expect(repository.countActive).toHaveBeenCalled();
+    });
+  });
+
+  describe("findManyById", () => {
+    it("returns disabled organizations for legacy query resolution", async () => {
+      const disabledOrganization = { ...fakeEntity, disabled: true };
+      crud.findManyById.mockResolvedValue([disabledOrganization]);
+
+      await expect(service.findManyById(ctx, [validId])).resolves.toEqual([
+        disabledOrganization,
+      ]);
+      expect(repository.catalogCrud).toHaveBeenCalledWith(ctx);
+      expect(crud.findManyById).toHaveBeenCalledWith([validId]);
+    });
+  });
+
+  describe("findManyActiveById", () => {
+    it("rejects when any organization is disabled", async () => {
+      crud.findManyById.mockResolvedValue([{ ...fakeEntity, disabled: true }]);
+
+      await expect(service.findManyActiveById(ctx, [validId])).rejects.toThrow(
+        new NotFoundException(PERSISTENCE_NOT_FOUND)
+      );
     });
   });
 
