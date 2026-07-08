@@ -2,6 +2,13 @@ import { UserRole } from "@/core/enums/user-role.enum";
 
 export type PersonaKey = "empty" | "lite" | "joao" | "maria" | "full" | "admin";
 
+/**
+ * Dev personas for manual QA and e2e fixtures (`@test/fixtures/sign-in-persona`).
+ *
+ * Catalog: GLOBAL pool is owned by `admin`; each USER persona may add LOCAL skills/orgs.
+ * The first LOCAL skill and org per persona is always `disabled: true` for picker UX.
+ * `empty` / `admin` have no LOCAL catalog rows.
+ */
 export interface PersonaEntityCounts {
   courses: number;
   educations: number;

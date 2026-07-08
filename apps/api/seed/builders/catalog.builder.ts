@@ -68,7 +68,9 @@ export function buildLocalSkillsForPersona(
 ): SkillSeed[] {
   if (count <= 0) return [];
 
-  return buildSkills(ownerId, count, CatalogPartition.LOCAL, seedOffset);
+  return buildSkills(ownerId, count, CatalogPartition.LOCAL, seedOffset).map(
+    (skill, index) => (index === 0 ? { ...skill, disabled: true } : skill)
+  );
 }
 
 export function pickProfileSkillIds(

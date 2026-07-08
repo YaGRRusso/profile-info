@@ -27,4 +27,17 @@ describe("seed personas", () => {
       projects: 10,
     });
   });
+
+  it("assigns local catalog counts for multi-tenant personas", () => {
+    expect(PERSONAS.empty.localCatalog).toEqual({
+      skills: 0,
+      organizations: 0,
+    });
+    expect(PERSONAS.lite.localCatalog).toEqual({ skills: 2, organizations: 1 });
+    expect(PERSONAS.joao.localCatalog).toEqual({ skills: 4, organizations: 2 });
+    expect(PERSONAS.admin.localCatalog).toEqual({
+      skills: 0,
+      organizations: 0,
+    });
+  });
 });

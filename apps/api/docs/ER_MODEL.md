@@ -39,7 +39,7 @@ erDiagram
   Organization {
     ObjectId _id PK
     string partition "GLOBAL LOCAL"
-    ObjectId ownerId FK "local only"
+    ObjectId ownerId FK "creator every row"
     string slug "UK per partition"
     string name
     string category
@@ -85,7 +85,7 @@ erDiagram
   Skill {
     ObjectId _id PK
     string partition "GLOBAL LOCAL"
-    ObjectId ownerId FK "local only"
+    ObjectId ownerId FK "creator every row"
     string slug "UK per partition"
     string name
     string category
@@ -105,8 +105,8 @@ erDiagram
   User ||--o{ Project : ownerId
   User ||--o{ ApiToken : ownerId
   User ||--o{ Skill : skillIds
-  User ||--o{ Skill : "ownerId local"
-  User ||--o{ Organization : "ownerId local"
+  User ||--o{ Skill : "ownerId creator"
+  User ||--o{ Organization : "ownerId creator"
   Project ||--o{ UrlEmbed : urls
   Organization ||--o{ Experience : organizationId
   Organization ||--o{ Education : organizationId
@@ -150,6 +150,7 @@ inputs use `organizationId` and `skillIds` (no `ownerId` — injected from conte
 - **References:** `skillIds[]` → Skill (ordered; CV display priority)
 - **Delete:** `SUPER_ADMIN` accounts cannot be deleted. Deleting a `USER` emits
   `user.deleted`, which hard-deletes all private entities and API tokens for that `ownerId`.
+  LOCAL catalog rows for that user are **not** purged today (see `BACKLOG.md`).
 
 ### Skill (`skills`)
 

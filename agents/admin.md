@@ -85,7 +85,7 @@ Keep `components/`, `hooks/custom/`, and `lib/` domain-agnostic.
 - Codegen reads `../api/src/schema.gql` from disk; keep it up to date after API changes.
 - GraphQL Codegen `client` preset (v6+) defaults `enumType` to `string-literal` (union types) and leaves unmapped scalars as `unknown`. This admin relies on runtime enum values (`ExperienceCategory.FullTime`, `Object.values`, `z.enum`) — keep `codegen.ts` on `enumType: "enum"` and map `DateTime` → `string`.
 - Batch mutations (`createMany*`, `updateMany*`, `removeMany*`, `disableMany*`, `enableMany*`) return `BatchEntity { succeeded, failed }` — not `count` or entity arrays.
-- Catalog admin tables and form pickers: `useFindManyOrganizations` / `useFindManySkills`. Mutate actions: USER blocked on `GLOBAL` rows; SUPER_ADMIN blocked on `LOCAL` rows (`catalog-mutation-access.ts`). Row actions: `GLOBAL` + SUPER_ADMIN → disable/enable; otherwise → remove (`disabled={readOnly}`). Batch: remove always; enable/disable batch only for SUPER_ADMIN.
+- Catalog admin tables and form pickers: `useFindManyOrganizations` / `useFindManySkills`. Mutate actions: USER read-only on `GLOBAL` rows; SUPER_ADMIN read-only on `LOCAL` rows (`catalog-mutation-access.ts`, `disabled={readOnly}`). Row lifecycle: `GLOBAL` → enable/disable (always visible); `LOCAL` → remove. Batch: remove always; enable/disable batch only for `SUPER_ADMIN`.
 - `src/generated/graphql/` and `routeTree.gen.ts` are generated.
 - Do not add ad-hoc 401 handling in hooks.
 - `dev` backgrounds codegen; first start may race — run `build` once if types missing.

@@ -80,5 +80,12 @@ export function buildLocalOrganizationsForPersona(
 ): OrganizationSeed[] {
   if (count <= 0) return [];
 
-  return buildOrganizations(ownerId, count, CatalogPartition.LOCAL, seedOffset);
+  return buildOrganizations(
+    ownerId,
+    count,
+    CatalogPartition.LOCAL,
+    seedOffset
+  ).map((organization, index) =>
+    index === 0 ? { ...organization, disabled: true } : organization
+  );
 }

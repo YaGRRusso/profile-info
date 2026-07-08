@@ -33,7 +33,9 @@ repositories. Avoid unscoped `repository.crud` on catalog paths.
 `disable*` / `enable*` toggle `disabled` only — **no** delete events.
 
 `remove*` hard-deletes and emits cascade events (`skill.deleted`, `organization.deleted`).
-**Admin UI:** `GLOBAL` catalog → disable/enable (SUPER_ADMIN). `LOCAL` catalog → remove (owner USER). Both use existing `remove*` cascade on hard delete.
+**Admin UI:** `GLOBAL` rows always show enable/disable lifecycle buttons
+(`disabled={readOnly}` for `USER`). `LOCAL` rows show remove (trash). Both partitions use
+`remove*` cascade on hard delete when remove is allowed.
 
 | Intent | Include disabled? |
 |--------|-------------------|
@@ -72,8 +74,8 @@ these filters.
 - Scope: `core/persistence/helpers/catalog-scope.helper.ts`
 - Skills / orgs services, loaders, validators: `modules/skills/`, `modules/organizations/`
 - Admin: `findMany*` for tables and form pickers (disabled rows shown, not attachable)
-- Admin mutate UX: `lib/catalog-mutation-access.ts` — USER blocked on `GLOBAL`, SUPER_ADMIN
-  blocked on `LOCAL`
+- Admin mutate UX: `lib/catalog-mutation-access.ts` — USER read-only on `GLOBAL`, SUPER_ADMIN
+  read-only on `LOCAL`; buttons stay visible, `disabled={readOnly}`
 
 ## Verification checklist
 
@@ -93,21 +95,23 @@ these filters.
 14. ~~E2e: dashboard `count` catálogo — USER vs SUPER_ADMIN, só active~~
 15. ~~E2e: loader/resolve — ids fora do escopo vazios; ids disabled resolvem em browse~~
 16. ~~ADR: SUPER_ADMIN lê LOCAL mas não muta LOCAL — regra permanente~~
-17. ~~ADR: delete (`remove*`) — API only; admin UI disable/enable only~~
+17. ~~ADR: admin UI — GLOBAL enable/disable; LOCAL remove; API `remove*` for hard delete~~
 18. ~~ADR: `Filter*Input.partition` / `ownerId` — disponível no GraphQL; escopo de leitura limita efeito~~
 19. ~~ADR: dashboard `count` = active only (`countActive` no repository)~~
 20. ~~E2e skills: `test/e2e/skills-catalog-scope.spec.ts` (itens 1–9)~~
 21. ~~E2e organizations: `test/e2e/organizations-catalog-scope.spec.ts` (itens 1–9)~~
 22. ~~Port organizations para o padrão skills (`catalogCrud`, sem `@Roles` blanket, browse/active, validator)~~
 23. ~~Admin: queries trazem `partition` e `owner`~~
-24. ~~Admin: USER não vê ações de mutate em linhas GLOBAL~~
-25. ~~Admin: SUPER_ADMIN não vê ações de mutate em linhas LOCAL~~
+24. ~~Admin: USER sees GLOBAL lifecycle buttons disabled (`readOnly`)~~
+25. ~~Admin: SUPER_ADMIN sees LOCAL remove disabled (`readOnly`)~~
 26. ~~Admin: coluna Owner visível só para SUPER_ADMIN~~
-27. ADR: quando implementar resolve owner-scoped nos loaders
+27. Melhoria: owner-scoped loaders para resolve (ver **Resolve (debt)** acima)
 28. ~~E2e: API token com role USER — mesmo escopo de catálogo que sessão JWT~~
 29. ~~E2e: resume com refs LOCAL no PDF público (ctx do dono)~~
 30. ~~E2e: slug duplicado GLOBAL + LOCAL do mesmo user~~
 31. Melhoria: batch mutations falham explicitamente se algum ID ficou fora do escopo (hoje: partial `succeeded`/`failed`)
+
+Melhorias acima (27, 31) estão no `BACKLOG.md` — não bloqueiam o escopo entregue.
 
 E2e catalog scope (skills + organizations): `test/e2e/skills-catalog-scope.spec.ts`,
 `test/e2e/organizations-catalog-scope.spec.ts`.
