@@ -160,7 +160,7 @@ inputs use `organizationId` and `skillIds` (no `ownerId` — injected from conte
   `category` (optional free string, indexed), `disabled`, `i18n[]` (embed: `locale`, `messages.title`)
 - **Embedded:** `i18n[]` translations
 - **References:** `ownerId` → User (creator); referenced by private entities via `skillIds`
-- **Disable (not delete):** see ADR 001 § *Disabled catalog entries* and § *three catalog access modes*.
+- **Disable (not delete):** see ADR 001 (*Disabled entries*, *Three access intents*).
 
 ### Organization (`organizations`)
 
@@ -172,7 +172,7 @@ inputs use `organizationId` and `skillIds` (no `ownerId` — injected from conte
   `disabled`, `i18n[]` (embed: `locale`, `messages.description`)
 - **Embedded:** `i18n[]` translations
 - **References:** `ownerId` → User (creator); referenced by Experience, Education, Course
-- **Disable (not delete):** same as Skill — ADR 001 § *Disabled catalog entries* and § *three catalog access modes*.
+- **Disable (not delete):** same as Skill — ADR 001 (*Disabled entries*, *Three access intents*).
 
 ### Experience (`experiences`)
 

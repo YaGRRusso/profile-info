@@ -4,7 +4,7 @@ Deferred API and admin work, ordered by criticality, then value, then effort.
 
 ## Current focus
 
-1. **ADR 001 — Local catalog** (`apps/api/docs/adr/001-local-catalog.md`): rewrite accepted — implement phases 1→6 in order (access model → resolve → browse → mutations → consumers → admin). Do not ship parallel fix APIs.
+1. **Local catalog** (`apps/api/docs/adr/001-local-catalog.md`): finish scoped catalog reads/writes and disabled semantics in skills/orgs; LOCAL partition UI and owner-scoped resolve when needed — follow the ADR principles, not a fixed phase list.
 
 ## High Priority
 

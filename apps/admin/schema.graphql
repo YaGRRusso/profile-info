@@ -666,6 +666,7 @@ type Query {
   findManySkills(skillFilters: FilterSkillInput, skillPagination: PaginationInput, skillSort: SortSkillInput): PaginatedSkillEntity!
   findManyUserById(userIds: [ID!]!): [UserEntity!]!
   findManyUsers(userFilters: FilterUserInput, userPagination: PaginationInput, userSort: SortUserInput): PaginatedUserEntity!
+  findOneActiveSkill(skillFilters: FilterSkillInput): SkillEntity!
   findOneApiToken(apiTokenFilters: FilterApiTokenInput): ApiTokenEntity!
   findOneApiTokenById(apiTokenId: ID!): ApiTokenEntity!
   findOneCourse(courseFilters: FilterCourseInput): CourseEntity!

@@ -1,68 +1,66 @@
 # ADR 001 — Local catalog (skills & organizations)
 
-**Status:** Accepted (not implemented)  
+**Status:** Accepted (living document)  
 **Date:** 2026-07-01
 
-## Decision
+This ADR is a **starting point**, not a step-by-step spec. When it disagrees with the
+codebase, **the code and tests win** — update this file after deliberate changes, do not
+force legacy wording onto new work.
 
-**Partition:** `GLOBAL` | `LOCAL`; `ownerId` on every row; unique `{ partition, ownerId, slug }`.
-Create assigns partition from role in `toDocumentForCreate` — client never sends `partition`.
+Applies to **skills** and **organizations** (same rules).
 
-| Role | Browse | Mutate |
-|------|--------|--------|
-| `USER` | all `GLOBAL` + own `LOCAL` | own `LOCAL` |
-| `SUPER_ADMIN` | all `GLOBAL` + all `LOCAL` | `GLOBAL` |
+## Data model
 
-Scope: `catalogScope()` in `catalog-scope.helper.ts`.
+- `partition`: `GLOBAL` | `LOCAL`
+- `ownerId` on every row (creator; server-assigned on create)
+- Unique `{ partition, ownerId, slug }`
+- Partition on create comes from role via `toDocumentForCreate` in
+  `catalog-scope.helper.ts` — prefer server assignment over client input
 
-**Disabled** (skills & orgs — same rules):
+| Role | Read scope | Write scope |
+|------|------------|-------------|
+| `USER` | all `GLOBAL` + own `LOCAL` | own `LOCAL` only |
+| `SUPER_ADMIN` | all `GLOBAL` + all `LOCAL` | `GLOBAL` only |
 
-| Where | Disabled |
-|-------|----------|
-| Admin tables (`findManySkills` / `findManyOrganizations`) | show |
-| Stored refs on entities (`@ResolveField`, resume) | show — must not break |
-| Create/update, pickers (`findManyActive*`) | reject |
-| `disable*` / `enable*` | toggle only, no events |
+Implementation: `catalogScope()` → `catalogCrud(ctx)` / `catalogStats(ctx)` on
+repositories. Avoid unscoped `repository.crud` on catalog paths.
 
-## Catalog access — three modes only
+## Disabled entries
 
-Do not add parallel methods or resolver filters. One path per intent.
+`disable*` / `enable*` toggle `disabled` only — **no** delete events.
 
-| Mode | Scope | Disabled | Used for |
-|------|-------|----------|----------|
-| **Browse** | caller `ctx` | all in `findMany*`; excluded in `findManyActive*` | admin tables, pickers, GraphQL list queries |
-| **Resolve** | **entity `ownerId`** | include | `skillIds` / `organizationId` already saved on course, experience, etc. |
-| **Validate** | caller `ctx` | exclude (active only) | create/update via validators |
+| Intent | Include disabled? |
+|--------|-------------------|
+| Admin lists (`findMany*`) | Yes — show all rows |
+| Stored refs already saved (resolve fields, resume, portfolio reads) | Yes — must not break legacy data |
+| Pickers and new attachments (`findManyActive*`, `findOneActive*`) | No |
+| Create/update validation (`assert*Enabled` on consumers) | No — active only |
 
-**Resolve rule:** `@ResolveField` skills/org **never** uses caller ctx. Use
-`catalogCrud({ userId: parent.ownerId, crossCatalog: false }).findManyById(ids)`.
+## Three access intents
 
-Service names (skills & orgs): `browse`, `browseActive`, `resolveRefs(ownerId, ids)`.
-Validators = validate mode. GraphQL query names stay; they delegate to browse/browseActive.
+Name methods however fits the module; keep the **intent** clear in code and tests.
 
-**Loaders:** batch `resolveRefs` only; key `{ ownerId, id }`. Experience roles: `ownerId`
-on `ExperienceRoleRecord` (resolver-only, not GraphQL field).
+| Intent | Who scopes the query | Disabled | Typical use |
+|--------|----------------------|----------|-------------|
+| **Browse** | caller `ctx` | all in `findMany*` / `findOne*`; excluded in `*Active*` | admin tables, catalog CRUD |
+| **Resolve** | entity owner (when LOCAL matters) | include | `skillIds` / `organizationId` on saved entities |
+| **Validate** | caller `ctx` | exclude | mutations via `*ValidatorService` |
 
-**Forbidden:** `findManyByIdForRefs`, string composite loader keys, `compactLoadMany`,
-loaders on `findManyActiveById`, filtering nulls in resolvers, unscoped `repository.crud`
-on catalog, seed tricks to hide broken resolve.
+**Resolve:** loading refs on someone else's entity should use the **parent owner's**
+catalog scope, not the caller's — especially once `LOCAL` rows exist. Today most data is
+`GLOBAL`; implement stricter resolve (e.g. owner-scoped loaders) when LOCAL is in use.
 
-## In repo today
+**Validate:** `SkillsValidatorService` / `OrganizationsValidatorService` — active refs
+only before writes.
 
-Schema + `catalogScope()` + `catalogCrud()` on repositories. Services/loaders/resolvers
-are legacy — replace per phases below.
+## Where to look in code
 
-## Phases (in order)
+- Scope: `core/persistence/helpers/catalog-scope.helper.ts`
+- Skills / orgs services, loaders, validators: `modules/skills/`, `modules/organizations/`
+- Admin: `findMany*` for tables, `findManyActive*` for form pickers
 
-| # | Ship | Test |
-|---|------|------|
-| 1 | `browse` / `browseActive` / `resolveRefs` + validators | unit |
-| 2 | Loaders + all `@ResolveField` use resolve | `catalog-disabled-refs.spec.ts` |
-| 3 | All catalog reads via browse + `catalogCrud(ctx)` | `catalog-visibility.spec.ts` |
-| 4 | All catalog mutations scoped; create input without `partition` | `catalog-mutations.spec.ts`, `catalog-consumer-refs.spec.ts` |
-| 5 | Resume, dashboard | consumer tests |
-| 6 | Admin partition UI, seed LOCAL, slug rules | `catalog-slug-uniqueness.spec.ts` |
+## Out of scope here
 
-**Done:** phases 1–6 green; disabled refs render on read; writes reject disabled; no unscoped catalog crud.
-
-**Out of scope:** collaborative catalog (`BACKLOG.md`).
+- Collaborative / moderated catalog — see `BACKLOG.md`
+- Exact GraphQL names, loader key shapes, e2e file names — follow existing module
+  conventions unless a real bug forces a change

@@ -40,11 +40,19 @@ export class SkillsRepository {
     return this.stats.scoped(catalogPersistenceScope(ctx));
   }
 
-  countActive(): Promise<number> {
-    return this.stats.count(NOT_DISABLED);
+  countActive(ctx: AuthContext): Promise<number> {
+    return this.catalogStats(ctx).count(NOT_DISABLED);
   }
 
-  findRecentlyUpdatedActive(limit: number, projection: string) {
-    return this.stats.findRecentlyUpdated(limit, projection, NOT_DISABLED);
+  findRecentlyUpdatedActive(
+    ctx: AuthContext,
+    limit: number,
+    projection: string
+  ) {
+    return this.catalogStats(ctx).findRecentlyUpdated(
+      limit,
+      projection,
+      NOT_DISABLED
+    );
   }
 }

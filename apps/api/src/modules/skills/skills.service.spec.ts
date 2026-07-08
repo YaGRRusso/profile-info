@@ -28,24 +28,24 @@ const fakeEntity = {
 describe("SkillsService", () => {
   let service: SkillsService;
   let crud: ReturnType<typeof createMockCrud>;
+  let stats: ReturnType<typeof createMockStats>;
   let repository: {
-    crud: ReturnType<typeof createMockCrud>;
     catalogCrud: jest.Mock;
+    catalogStats: jest.Mock;
     countActive: jest.Mock;
     findRecentlyUpdatedActive: jest.Mock;
-    stats: ReturnType<typeof createMockStats>;
   };
   let eventEmitter: jest.Mocked<Pick<EventEmitter2, "emitAsync">>;
 
   beforeEach(async () => {
     jest.clearAllMocks();
     crud = createMockCrud();
+    stats = createMockStats();
     repository = {
-      crud,
       catalogCrud: jest.fn().mockReturnValue(crud),
+      catalogStats: jest.fn().mockReturnValue(stats),
       countActive: jest.fn().mockResolvedValue(2),
       findRecentlyUpdatedActive: jest.fn(),
-      stats: createMockStats(),
     };
 
     const module: TestingModule = await Test.createTestingModule({
@@ -101,7 +101,7 @@ describe("SkillsService", () => {
   describe("count", () => {
     it("delegates to repository.countActive", async () => {
       await expect(service.count(ctx)).resolves.toBe(2);
-      expect(repository.countActive).toHaveBeenCalled();
+      expect(repository.countActive).toHaveBeenCalledWith(ctx);
     });
   });
 
@@ -114,6 +114,33 @@ describe("SkillsService", () => {
       );
       expect(repository.catalogCrud).toHaveBeenCalledWith(ctx);
       expect(crud.findOneById).toHaveBeenCalledWith(validId);
+    });
+  });
+
+  describe("findOne", () => {
+    it("delegates to scoped crud without forcing active filter", async () => {
+      const disabledSkill = { ...fakeEntity, disabled: true };
+      crud.findOne.mockResolvedValue(disabledSkill);
+
+      await expect(
+        service.findOne(ctx, { filters: { slug: "typescript" } })
+      ).resolves.toEqual(disabledSkill);
+      expect(crud.findOne).toHaveBeenCalledWith({
+        filters: { slug: "typescript" },
+      });
+    });
+  });
+
+  describe("findOneActive", () => {
+    it("delegates to scoped crud with active filter", async () => {
+      crud.findOne.mockResolvedValue(fakeEntity);
+
+      await expect(
+        service.findOneActive(ctx, { filters: { slug: "typescript" } })
+      ).resolves.toEqual(fakeEntity);
+      expect(crud.findOne).toHaveBeenCalledWith({
+        filters: { slug: "typescript", disabled: false },
+      });
     });
   });
 

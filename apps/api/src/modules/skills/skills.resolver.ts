@@ -1,8 +1,6 @@
 import { Args, ID, Mutation, Query, Resolver } from "@nestjs/graphql";
 import type { AuthContext } from "@/core/context/auth-context.interface";
-import { Roles } from "@/core/decorators/roles.decorator";
 import { BatchEntity } from "@/core/entities/batch.entity";
-import { UserRole } from "@/core/enums/user-role.enum";
 import { PaginationInput } from "@/core/inputs/pagination.input";
 import { Auth } from "@/modules/auth/decorators/auth-context.decorator";
 import { CreateSkillInput } from "./dto/create-skill.input";
@@ -36,6 +34,18 @@ export class SkillsResolver {
     skillFilters?: FilterSkillInput
   ) {
     return this.skillsService.findOne(ctx, { filters: skillFilters });
+  }
+
+  @Query(() => SkillEntity)
+  findOneActiveSkill(
+    @Auth() ctx: AuthContext,
+    @Args("skillFilters", {
+      type: () => FilterSkillInput,
+      nullable: true,
+    })
+    skillFilters?: FilterSkillInput
+  ) {
+    return this.skillsService.findOneActive(ctx, { filters: skillFilters });
   }
 
   @Query(() => [SkillEntity])
@@ -102,7 +112,6 @@ export class SkillsResolver {
 
   // MUTATIONS
 
-  @Roles(UserRole.SUPER_ADMIN)
   @Mutation(() => SkillEntity)
   createOneSkill(
     @Auth() ctx: AuthContext,
@@ -112,7 +121,6 @@ export class SkillsResolver {
     return this.skillsService.createOne(ctx, createSkillInput);
   }
 
-  @Roles(UserRole.SUPER_ADMIN)
   @Mutation(() => BatchEntity)
   createManySkills(
     @Auth() ctx: AuthContext,
@@ -122,7 +130,6 @@ export class SkillsResolver {
     return this.skillsService.createMany(ctx, createSkillInputs);
   }
 
-  @Roles(UserRole.SUPER_ADMIN)
   @Mutation(() => SkillEntity)
   updateOneSkill(
     @Auth() ctx: AuthContext,
@@ -133,7 +140,6 @@ export class SkillsResolver {
     return this.skillsService.updateOne(ctx, skillId, updateSkillInput);
   }
 
-  @Roles(UserRole.SUPER_ADMIN)
   @Mutation(() => BatchEntity)
   updateManySkills(
     @Auth() ctx: AuthContext,
@@ -144,7 +150,6 @@ export class SkillsResolver {
     return this.skillsService.updateMany(ctx, skillIds, updateSkillInput);
   }
 
-  @Roles(UserRole.SUPER_ADMIN)
   @Mutation(() => SkillEntity)
   removeOneSkill(
     @Auth() ctx: AuthContext,
@@ -153,7 +158,6 @@ export class SkillsResolver {
     return this.skillsService.removeOne(ctx, skillId);
   }
 
-  @Roles(UserRole.SUPER_ADMIN)
   @Mutation(() => BatchEntity)
   removeManySkills(
     @Auth() ctx: AuthContext,
@@ -162,7 +166,6 @@ export class SkillsResolver {
     return this.skillsService.removeMany(ctx, skillIds);
   }
 
-  @Roles(UserRole.SUPER_ADMIN)
   @Mutation(() => SkillEntity)
   disableOneSkill(
     @Auth() ctx: AuthContext,
@@ -171,7 +174,6 @@ export class SkillsResolver {
     return this.skillsService.disableOne(ctx, skillId);
   }
 
-  @Roles(UserRole.SUPER_ADMIN)
   @Mutation(() => BatchEntity)
   disableManySkills(
     @Auth() ctx: AuthContext,
@@ -180,7 +182,6 @@ export class SkillsResolver {
     return this.skillsService.disableMany(ctx, skillIds);
   }
 
-  @Roles(UserRole.SUPER_ADMIN)
   @Mutation(() => SkillEntity)
   enableOneSkill(
     @Auth() ctx: AuthContext,
@@ -189,7 +190,6 @@ export class SkillsResolver {
     return this.skillsService.enableOne(ctx, skillId);
   }
 
-  @Roles(UserRole.SUPER_ADMIN)
   @Mutation(() => BatchEntity)
   enableManySkills(
     @Auth() ctx: AuthContext,
