@@ -10,6 +10,7 @@ import ReactDOM from "react-dom/client";
 import { ToastContainer, toast } from "react-toastify";
 import { GqlClientError } from "@/lib/gql";
 import { useAuthStore } from "@/stores/auth";
+import { useSystemMessagesStore } from "@/stores/system-messages";
 import { routeTree } from "./routeTree.gen";
 
 import "./styles/globals.css";
@@ -50,6 +51,10 @@ const router = createRouter({
   basepath: import.meta.env.BASE_URL,
   scrollRestoration: true,
   context: { queryClient },
+});
+
+router.subscribe("onResolved", () => {
+  useSystemMessagesStore.getState().clearAllMessages();
 });
 
 declare module "@tanstack/react-router" {

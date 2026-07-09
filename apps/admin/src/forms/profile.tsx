@@ -1,5 +1,5 @@
 import { DeepKeys, DeepValue, useForm } from "@tanstack/react-form";
-import { useCallback, useEffect, useMemo } from "react";
+import { useCallback, useMemo } from "react";
 import { toast } from "react-toastify";
 import z from "zod";
 import { DraggableList } from "@/components/inputs/draggable-list";
@@ -167,32 +167,22 @@ export function ProfileForm({
     },
     onSubmit: ({ value }) => onSubmit?.(value),
     validators: { onChange: profileSchema },
+    listeners: {
+      onChange: ({ formApi }) => {
+        const { setMessage, clearMessage } = useSystemMessagesStore.getState();
+
+        if (formApi.state.isDirty) {
+          setMessage({
+            id: PROFILE_UNSAVED_MESSAGE_ID,
+            title: "You have unsaved changes",
+            variant: "warning",
+          });
+        } else {
+          clearMessage(PROFILE_UNSAVED_MESSAGE_ID);
+        }
+      },
+    },
   });
-
-  useEffect(() => {
-    const { setMessage, clearMessage } = useSystemMessagesStore.getState();
-
-    const sync = () => {
-      if (form.store.state.isDirty) {
-        setMessage({
-          id: PROFILE_UNSAVED_MESSAGE_ID,
-          title: "You have unsaved changes",
-          variant: "warning",
-        });
-        return;
-      }
-
-      clearMessage(PROFILE_UNSAVED_MESSAGE_ID);
-    };
-
-    sync();
-    const subscription = form.store.subscribe(sync);
-
-    return () => {
-      subscription.unsubscribe();
-      clearMessage(PROFILE_UNSAVED_MESSAGE_ID);
-    };
-  }, [form]);
 
   const handleAtsOptimize = useCallback(
     async <Field extends DeepKeys<ProfileSchema>>(
@@ -558,7 +548,12 @@ export function ProfileForm({
         <button
           className="btn btn-ghost btn-block"
           disabled={isDisabled || isLoading}
-          onClick={() => form.reset()}
+          onClick={() => {
+            form.reset();
+            useSystemMessagesStore
+              .getState()
+              .clearMessage(PROFILE_UNSAVED_MESSAGE_ID);
+          }}
           type="button"
         >
           Reset

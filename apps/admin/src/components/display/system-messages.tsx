@@ -6,10 +6,10 @@ import {
 } from "@/stores/system-messages";
 
 const ALERT_VARIANT_CLASS: Record<SystemMessageVariant, string> = {
-  error: "alert-error",
-  info: "alert-info",
-  success: "alert-success",
-  warning: "alert-warning",
+  error: "alert-error border-error/10",
+  info: "alert-info border-info/10",
+  success: "alert-success border-success/10",
+  warning: "alert-warning border-warning/10",
 };
 
 const BUTTON_VARIANT_CLASS: Record<SystemMessageVariant, string> = {
@@ -30,7 +30,7 @@ export function SystemMessages() {
       {items.map((message) => (
         <div
           className={cn(
-            "alert alert-soft h-12 flex-1 animate-system-message gap-2",
+            "alert alert-soft flex-1 animate-system-message gap-2 border p-1.5 text-xs",
             ALERT_VARIANT_CLASS[message.variant ?? "info"]
           )}
           key={message.id}

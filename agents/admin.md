@@ -30,7 +30,7 @@ Routing:
 - `_authenticated/_sidebar/`: CRUD pages per entity with `-components/table.tsx`.
 - `settings/index.tsx`: inline profile form via `useGetMe()` + `useUpdateMe()` (`updateMe` mutation); syncs auth store after save.
 
-Rich forms map flat Zod schemas to nested GraphQL shapes (`i18n`, `organizationId`, `skillIds`, `period`, experience `roles`). GraphQL output still exposes resolved `organization` and `skills` objects. Profile settings uses `forms/profile.tsx` (`profileToForm` / `profileToInput`) with `skillIds` via `MultiSelectInput` + `DraggableList` for display order. ATS on profile description uses the form's skill list (`i18nLabelsByIds`), not the global catalog.
+Rich forms map flat Zod schemas to nested GraphQL shapes (`i18n`, `organizationId`, `skillIds`, `period`, experience `roles`). GraphQL output still exposes resolved `organization` and `skills` objects. Profile settings uses `forms/profile.tsx` (`profileToForm` / `profileToInput`) with `skillIds` via `MultiSelectInput` + `DraggableList` for display order. ATS on profile description uses the form's skill list (`i18nLabelsByIds`), not the global catalog. Unsaved header alert: TanStack Form `listeners.onChange` → `system-messages` store (do not use `useStore` + `useEffect([isDirty])` on the form — it re-renders during input and steals focus). `form.reset()` does not fire `onChange` — clear the message in the Reset button handler.
 
 ## Core technologies
 
@@ -39,7 +39,7 @@ Rich forms map flat Zod schemas to nested GraphQL shapes (`i18n`, `organizationI
 - **TanStack Query**: hooks in `src/hooks/`.
 - **GraphQL Codegen**: `codegen.ts` → `src/generated/graphql/` from `../api/src/schema.gql`.
 - **GraphQL client**: `src/lib/execute.ts` (GraphQL POST). **REST client**: `src/lib/api.ts` (`getApiOrigin`, `apiRequest`). Binary saves use `src/lib/download-blob.ts` (`downloadBlob`).
-- **Zustand**: `stores/auth.ts`, `stores/theme.ts` (persisted); `stores/system-messages.ts` (ephemeral header alerts via `setMessage` / `clearMessage`).
+- **Zustand**: `stores/auth.ts`, `stores/theme.ts` (persisted); `stores/system-messages.ts` (ephemeral header alerts via `setMessage` / `clearMessage` / `clearAllMessages` on every navigation — `router.subscribe('onResolved')` in `main.tsx`).
 - **TanStack Form + Zod**: `src/forms/`.
 - **Tailwind v4 + DaisyUI**: `src/styles/globals.css`.
 - **dayjs**: configured in `src/lib/dayjs.ts` (relative time, etc.).

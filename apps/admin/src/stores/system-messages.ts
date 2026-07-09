@@ -10,14 +10,14 @@ export interface SystemMessage {
 }
 
 interface SystemMessagesStore {
-  clearAll: () => void;
+  clearAllMessages: () => void;
   clearMessage: (id: string) => void;
   messages: Record<string, SystemMessage>;
   setMessage: (message: SystemMessage) => void;
 }
 
 export const useSystemMessagesStore = create<SystemMessagesStore>((set) => ({
-  clearAll: () => set({ messages: {} }),
+  clearAllMessages: () => set({ messages: {} }),
   messages: {},
   setMessage: (message) =>
     set((state) => {
