@@ -1,5 +1,5 @@
-import { DeepKeys, DeepValue, useForm } from "@tanstack/react-form";
-import { useCallback, useMemo } from "react";
+import { DeepKeys, DeepValue, useForm, useStore } from "@tanstack/react-form";
+import { useCallback, useEffect, useMemo } from "react";
 import { toast } from "react-toastify";
 import z from "zod";
 import { DraggableList } from "@/components/inputs/draggable-list";
@@ -24,6 +24,7 @@ import { useFindManySkills } from "@/hooks/queries/skills";
 import { toDateInput, toIsoDate } from "@/lib/date";
 import { fieldError } from "@/lib/field-error";
 import { createEmptyI18n, i18nLabel, i18nLabelsByIds } from "@/lib/i18n";
+import { useSystemMessagesStore } from "@/stores/system-messages";
 import { CommonFormProps } from "./common";
 
 const urlSchema = z.object({
@@ -64,6 +65,7 @@ const profileSchema = z.object({
 
 export type ProfileSchema = z.infer<typeof profileSchema>;
 
+const PROFILE_UNSAVED_MESSAGE_ID = "profile-unsaved-changes";
 export const PROFILE_SETTINGS_FORM_ID = "profile-settings-form";
 
 export interface ProfileFormProps extends CommonFormProps<ProfileSchema> {}
@@ -166,6 +168,22 @@ export function ProfileForm({
     onSubmit: ({ value }) => onSubmit?.(value),
     validators: { onChange: profileSchema },
   });
+
+  const isDirty = useStore(form.store, (state) => state.isDirty);
+  useEffect(() => {
+    const { setMessage, clearMessage } = useSystemMessagesStore.getState();
+
+    if (isDirty) {
+      setMessage({
+        id: PROFILE_UNSAVED_MESSAGE_ID,
+        title: "You have unsaved changes",
+        variant: "warning",
+      });
+      return () => clearMessage(PROFILE_UNSAVED_MESSAGE_ID);
+    }
+
+    clearMessage(PROFILE_UNSAVED_MESSAGE_ID);
+  }, [isDirty]);
 
   const handleAtsOptimize = useCallback(
     async <Field extends DeepKeys<ProfileSchema>>(
@@ -540,15 +558,15 @@ export function ProfileForm({
           selector={(state) => ({
             canSubmit: state.canSubmit,
             isSubmitting: state.isSubmitting,
-            isTouched: state.isTouched,
+            isDirty: state.isDirty,
           })}
         >
-          {({ canSubmit, isSubmitting, isTouched }) => (
+          {({ canSubmit, isSubmitting, isDirty }) => (
             <button
               className="btn btn-soft btn-primary flex-1 lg:hidden"
               disabled={
                 !canSubmit ||
-                !isTouched ||
+                !isDirty ||
                 isSubmitting ||
                 isDisabled ||
                 isLoading

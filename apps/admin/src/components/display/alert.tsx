@@ -15,11 +15,7 @@ export function Alert({
   ...props
 }: AlertProps) {
   return (
-    <div
-      className={cn("alert max-sm:alert-vertical gap-y-2", className)}
-      role="alert"
-      {...props}
-    >
+    <div className={cn("alert", className)} role="alert" {...props}>
       {icon}
       <div className="flex flex-col">
         <span>{title}</span>

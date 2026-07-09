@@ -118,6 +118,7 @@
 
 @theme {
   --animate-blink: blink 300ms ease-in;
+  --animate-system-message: system-message 200ms ease-out;
 
   @keyframes blink {
     0% {
@@ -125,6 +126,17 @@
     }
     100% {
       opacity: 1;
+    }
+  }
+
+  @keyframes system-message {
+    from {
+      opacity: 0;
+      transform: translateY(-0.5rem);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
     }
   }
 }

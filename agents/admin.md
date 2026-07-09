@@ -39,7 +39,7 @@ Rich forms map flat Zod schemas to nested GraphQL shapes (`i18n`, `organizationI
 - **TanStack Query**: hooks in `src/hooks/`.
 - **GraphQL Codegen**: `codegen.ts` → `src/generated/graphql/` from `../api/src/schema.gql`.
 - **GraphQL client**: `src/lib/execute.ts` (GraphQL POST). **REST client**: `src/lib/api.ts` (`getApiOrigin`, `apiRequest`). Binary saves use `src/lib/download-blob.ts` (`downloadBlob`).
-- **Zustand**: `stores/auth.ts`, `stores/theme.ts` (persisted).
+- **Zustand**: `stores/auth.ts`, `stores/theme.ts` (persisted); `stores/system-messages.ts` (ephemeral header alerts via `setMessage` / `clearMessage`).
 - **TanStack Form + Zod**: `src/forms/`.
 - **Tailwind v4 + DaisyUI**: `src/styles/globals.css`.
 - **dayjs**: configured in `src/lib/dayjs.ts` (relative time, etc.).

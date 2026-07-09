@@ -14,6 +14,7 @@ import {
 import { createFileRoute, Outlet } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { Avatar } from "@/components/display/avatar";
+import { SystemMessages } from "@/components/display/system-messages";
 import { useDebounce } from "@/hooks/custom/use-debounce";
 import { useMediaQuery } from "@/hooks/custom/use-media-query";
 import { useAuthStore } from "@/stores/auth";
@@ -128,14 +129,15 @@ function RouteComponent() {
         type="checkbox"
       />
       <div className="drawer-content">
-        <nav className="navbar sticky top-0 z-30 w-full gap-2 bg-base bg-base-100">
+        <nav className="navbar sticky top-0 z-30 w-full gap-2 bg-base-100">
           <label
             aria-label="open sidebar"
-            className="btn btn-square btn-ghost group"
+            className="btn btn-square btn-ghost group shrink-0"
             htmlFor="drawer"
           >
             <ListIcon size={24} weight="bold" />
           </label>
+          <SystemMessages />
         </nav>
         <main className="container">
           <Outlet />
