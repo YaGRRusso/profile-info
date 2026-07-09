@@ -55,7 +55,7 @@ These items were deferred; scope and security behave as documented and tested.
 
 ### Deferred polish (from shipped ADRs)
 
-- **Admin i18n (ADR 002)** — Form field labels/placeholders/validation; table headers, filters, toolbar; dashboard copy (stats, greeting); sidebar nav, login, toasts; locale `es` in switcher + JSON. See `apps/admin/docs/adr/002-admin-i18n.md`.
+- **Admin i18n (ADR 002)** — Form field labels/placeholders/validation; table headers, filters, toolbar; dashboard copy (stats, greeting); login, toasts; locale `es` in switcher + JSON. See `apps/admin/docs/adr/002-admin-i18n.md`.
 - **Resume label** — "Certifications" section label vs `Course` entity naming.
 - **Skill form AI** — Translate/AI on skill descriptions (organization form already has it).
 - **Skill category i18n** — `category` is a free string today; translate per locale if needed.

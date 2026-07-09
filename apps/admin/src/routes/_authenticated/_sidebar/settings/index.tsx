@@ -1,10 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { toast } from "react-toastify";
 import { DataState } from "@/components/display/data-state";
 import { PageTitle } from "@/components/display/page-title";
 import { ProfileForm, profileToForm, profileToInput } from "@/forms/profile";
-import { useSettingsPageCopy } from "@/hooks/custom/use-page-copy";
 import { usePageHelp } from "@/hooks/custom/use-page-help";
 import { useUpdateMe } from "@/hooks/mutations/users";
 import { useGetMe } from "@/hooks/queries/auth";
@@ -17,7 +17,7 @@ export const Route = createFileRoute("/_authenticated/_sidebar/settings/")({
 });
 
 function RouteComponent() {
-  const page = useSettingsPageCopy();
+  const { t } = useTranslation("pages");
   const help = usePageHelp("settings");
   const setUser = useAuthStore((state) => state.setUser);
   const getMe = useGetMe();
@@ -31,9 +31,9 @@ function RouteComponent() {
     <div className="flex flex-col gap-4">
       <div className="flex flex-wrap items-start justify-between gap-4">
         <PageTitle
-          description={page.description}
+          description={t("settings.description")}
           help={help}
-          title={page.title}
+          title={t("settings.title")}
         />
         <DownloadCvControl />
       </div>

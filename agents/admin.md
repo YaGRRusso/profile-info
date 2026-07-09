@@ -43,7 +43,7 @@ Rich forms map flat Zod schemas to nested GraphQL shapes (`i18n`, `organizationI
 - **TanStack Form + Zod**: `src/forms/`.
 - **Tailwind v4 + DaisyUI**: `src/styles/globals.css`.
 - **dayjs**: `src/lib/dayjs.ts` — relative time; locale synced from `useLocaleStore` (`syncDayjsLocale`).
-- **i18next**: `src/i18n/index.ts` (imported from `main.tsx`); namespaces `help`, `pages` in `src/locales/<locale>/`.
+- **i18next**: `src/i18n/index.ts` (imported from `main.tsx`); namespaces `help`, `nav`, `pages` in `src/locales/<locale>/`.
 - **Recharts**: shared chart styling in `src/lib/chart-theme.ts` (theme colors, tooltips, axis props).
 - **nuqs**: URL state via `NuqsAdapter` in `__root.tsx`.
 
@@ -83,7 +83,7 @@ Keep `components/`, `hooks/custom/`, and `lib/` domain-agnostic.
 
 ## Gotchas & notes
 
-- **i18n (ADR 002):** `stores/locale.ts` (`useLocaleStore`) is the single locale source — drives `react-i18next`, `i18nLabel` (default via `useLocaleStore.getState().locale`), skill pickers, and `dayjs` relative time. UI copy (`help`, `pages`) covers page help and titles/descriptions. Form field labels, table chrome, dashboard copy, nav, and toasts stay English (backlog). See `apps/admin/docs/adr/002-admin-i18n.md`.
+- **i18n (ADR 002):** `stores/locale.ts` (`useLocaleStore`) is the single locale source — drives `react-i18next` (`help`, `nav`, `pages`), `i18nLabel` (default via `useLocaleStore.getState().locale`), skill pickers, and `dayjs` relative time. UI copy covers sidebar nav, page help, and titles/descriptions. Form field labels, table chrome, dashboard copy, login, and toasts stay English (backlog). See `apps/admin/docs/adr/002-admin-i18n.md`.
 - Codegen reads `../api/src/schema.gql` from disk; keep it up to date after API changes.
 - GraphQL Codegen `client` preset (v6+) defaults `enumType` to `string-literal` (union types) and leaves unmapped scalars as `unknown`. This admin relies on runtime enum values (`ExperienceCategory.FullTime`, `Object.values`, `z.enum`) — keep `codegen.ts` on `enumType: "enum"` and map `DateTime` → `string`.
 - Batch mutations (`createMany*`, `updateMany*`, `removeMany*`, `disableMany*`, `enableMany*`) return `BatchEntity { succeeded, failed }` — not `count` or entity arrays.

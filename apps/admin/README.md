@@ -92,4 +92,4 @@ The **Settings** page (`/settings`) loads the authenticated user via `useGetMe()
 
 ### Locale / i18n
 
-Sidebar **locale switcher** (`useLocaleStore` in `stores/locale.ts`) is the single source of truth for UI language and entity display locale. It drives `react-i18next` (`help`, `pages` namespaces), `i18nLabel` in tables/pickers, and `dayjs` relative time. Phase 1 scope and backlog: `docs/adr/002-admin-i18n.md`. Agent context: `agents/admin.md` (gotcha **i18n**).
+Sidebar **locale switcher** (`useLocaleStore` in `stores/locale.ts`) is the single source of truth for UI language and entity display locale. It drives `react-i18next` (`help`, `nav`, `pages` namespaces), `i18nLabel` in tables/pickers, and `dayjs` relative time. Phase 1 scope and backlog: `docs/adr/002-admin-i18n.md`. Agent context: `agents/admin.md` (gotcha **i18n**).

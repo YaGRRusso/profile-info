@@ -18,6 +18,10 @@
     "title": "Configurações",
     "description": "Gerencie os dados da sua conta."
   },
+  "home": {
+    "title": "Olá, {{name}}!",
+    "description": "Painel principal do seu perfil."
+  },
   "courses": {
     "manageTitle": "Gerenciar cursos",
     "manageDescription": "Crie, atualize ou exclua cursos, bootcamps e certificados do seu perfil.",

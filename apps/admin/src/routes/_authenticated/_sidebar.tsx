@@ -12,7 +12,8 @@ import {
   SignOutIcon,
 } from "@phosphor-icons/react";
 import { createFileRoute, Outlet } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Avatar } from "@/components/display/avatar";
 import { SystemMessages } from "@/components/display/system-messages";
 import { useDebounce } from "@/hooks/custom/use-debounce";
@@ -23,77 +24,98 @@ import { MenuAction, type MenuActionProps } from "./-components/menu-action";
 import { MenuLink, type MenuLinkProps } from "./-components/menu-link";
 import { ThemeSwitch } from "./-components/theme-switch";
 
+type NavKey =
+  | "home"
+  | "skills"
+  | "courses"
+  | "educations"
+  | "organizations"
+  | "projects"
+  | "experiences"
+  | "apiTokens"
+  | "settings"
+  | "signOut";
+
+type MenuLinkItem = Omit<MenuLinkProps, "label"> & {
+  id: NavKey;
+  type: "link";
+};
+
+type MenuActionItem = Omit<MenuActionProps, "label"> & {
+  id: NavKey;
+  type: "action";
+};
+
+type MenuItem = MenuLinkItem | MenuActionItem;
+
 interface MenuSection {
-  items: (MenuLinkProps | MenuActionProps)[];
-  label?: string;
+  items: MenuItem[];
 }
 
 const MENU_SECTIONS: MenuSection[] = [
   {
-    label: "Navigation",
     items: [
       {
+        id: "home",
         icon: <HouseIcon size={24} weight="duotone" />,
-        label: "Home",
         to: "/",
         type: "link",
       },
       {
+        id: "skills",
         icon: <PackageIcon size={24} weight="duotone" />,
-        label: "Skills",
         to: "/skills",
         type: "link",
       },
       {
+        id: "courses",
         icon: <CertificateIcon size={24} weight="duotone" />,
-        label: "Courses",
         to: "/courses",
         type: "link",
       },
       {
+        id: "educations",
         icon: <GraduationCapIcon size={24} weight="duotone" />,
-        label: "Educations",
         to: "/educations",
         type: "link",
       },
       {
+        id: "organizations",
         icon: <BuildingsIcon size={24} weight="duotone" />,
-        label: "Organizations",
         to: "/organizations",
         type: "link",
       },
       {
+        id: "projects",
         icon: <RocketLaunchIcon size={24} weight="duotone" />,
-        label: "Projects",
         to: "/projects",
         type: "link",
       },
       {
+        id: "experiences",
         icon: <BriefcaseIcon size={24} weight="duotone" />,
-        label: "Experiences",
         to: "/experiences",
         type: "link",
       },
     ],
   },
   {
-    label: "Actions",
     items: [
       {
+        id: "apiTokens",
         icon: <KeyIcon size={24} weight="duotone" />,
-        label: "Tokens",
         to: "/api-tokens",
         type: "link",
       },
       {
+        id: "settings",
         icon: <GearIcon size={24} />,
-        label: "Settings",
         to: "/settings",
         type: "link",
       },
       {
+        id: "signOut",
         icon: <SignOutIcon size={24} />,
-        label: "Sign Out",
         onClick: () => useAuthStore.getState().clearAuth(),
         type: "action",
       },
@@ -109,10 +131,22 @@ const LG_MEDIA_QUERY = "(min-width: 1024px)";
 const DRAWER_SYNC_DEBOUNCE_MS = 100;
 
 function RouteComponent() {
+  const { t } = useTranslation("nav");
   const { user } = useAuthStore();
   const isLg = useMediaQuery(LG_MEDIA_QUERY);
   const isLgDebounced = useDebounce(isLg, DRAWER_SYNC_DEBOUNCE_MS);
   const [drawerExpanded, setDrawerExpanded] = useState(isLg);
+
+  const menuSections = useMemo(
+    () =>
+      MENU_SECTIONS.map((section) => ({
+        items: section.items.map((item) => ({
+          ...item,
+          label: t(item.id),
+        })),
+      })),
+    [t]
+  );
 
   useEffect(() => {
     setDrawerExpanded((current) =>
@@ -168,10 +202,10 @@ function RouteComponent() {
             <LocaleSwitch />
           </div>
           <div className="flex w-full flex-1 flex-col justify-between gap-2">
-            {MENU_SECTIONS.map((section, i) => (
-              <ul className="menu w-full gap-2" key={section.label ?? i}>
+            {menuSections.map((section, i) => (
+              <ul className="menu w-full gap-2" key={i}>
                 {section.items.map((item) => (
-                  <li key={item.label}>
+                  <li key={item.id}>
                     {item.type === "link" && <MenuLink {...item} />}
                     {item.type === "action" && <MenuAction {...item} />}
                   </li>

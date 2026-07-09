@@ -33,14 +33,15 @@ time (`lib/dayjs.ts` → `syncDayjsLocale`).
 ### UI strings (react-i18next)
 
 - `i18next` + `react-i18next`; init in `src/i18n/index.ts`, imported from `main.tsx`.
-- Namespaces (v1): `help`, `pages`.
+- Namespaces (v1): `help`, `nav`, `pages`.
 
 **In scope (shipped in phase 1):**
 
 | Area | Approach |
 |------|----------|
 | Page help | `help.json`; `usePageHelp(key)` |
-| Page / modal titles & descriptions | `pages.json`; `usePageCopy(key)` on CRUD + settings routes |
+| Page / modal titles & descriptions | `pages.json`; `usePageCopy(key)` on CRUD routes; `useTranslation("pages")` for home/settings titles |
+| Sidebar nav | `nav.json`; `useTranslation("nav")` in `_sidebar.tsx` |
 | Entity i18n labels | `i18nLabel(item)` defaults to `useLocaleStore.getState().locale`; tables may pass locale explicitly |
 | Skill pickers in forms | `i18nLabel(skill, locale)` in options; `useLocaleStore` selector in `useMemo` deps |
 | Relative timestamps | `formatRelativeTime` via `dayjs` synced to display locale |
@@ -49,8 +50,8 @@ time (`lib/dayjs.ts` → `syncDayjsLocale`).
 
 - Form chrome: field labels, placeholders, validation messages (non-picker)
 - Tables: column headers, filters, toolbar, enum labels in cells
-- Dashboard copy (stats, charts, greeting) — relative time only is localized
-- Buttons, selects, sidebar nav, login, toasts, alerts actions
+- Dashboard widgets (stats, charts, greeting inside cards) — page title/description localized; relative time only elsewhere
+- Buttons, selects, login, toasts, alerts actions
 - Locale `es` in switcher / JSON (enum exists; not enabled in UI yet)
 - API / backend error messages and toasts (belong on API layer)
 - API recent-activity entity labels (`i18n[0]`) — optional API follow-up
@@ -71,6 +72,7 @@ time (`lib/dayjs.ts` → `syncDayjsLocale`).
 | Display locale | `src/stores/locale.ts` (`useLocaleStore`) |
 | Relative time | `src/lib/dayjs.ts` (`syncDayjsLocale`) |
 | i18next init | `src/i18n/index.ts` |
+| Sidebar nav | `src/locales/<locale>/nav.json` |
 | Help keys | `src/consts/page-help.ts` (`PageHelpKey` only) |
 | Page copy hook | `src/hooks/custom/use-page-copy.ts` |
 
@@ -80,10 +82,11 @@ time (`lib/dayjs.ts` → `syncDayjsLocale`).
 2. Skill labels in entity tables and pickers change when locale changes (no refetch).
 3. Page help modal shows `pt` text when locale is `pt`.
 4. CRUD page `PageTitle` and modal titles/descriptions show `pt` when locale is `pt`.
-5. Dashboard `fromNow` strings follow display locale (e.g. `há 2 dias` in `pt`).
-6. Table headers / filters / form field labels stay English.
-7. `lib/i18n.ts` stays free of UI string keys.
-8. No duplicate locale state on auth store.
+5. Sidebar nav labels show `pt` when locale is `pt`.
+6. Dashboard `fromNow` strings follow display locale (e.g. `há 2 dias` in `pt`).
+7. Table headers / filters / form field labels stay English.
+8. `lib/i18n.ts` stays free of UI string keys.
+9. No duplicate locale state on auth store.
 
 ## Related
 

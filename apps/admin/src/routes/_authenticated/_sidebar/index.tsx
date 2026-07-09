@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useTranslation } from "react-i18next";
 import { DataState } from "@/components/display/data-state";
 import { PageTitle } from "@/components/display/page-title";
 import { usePageHelp } from "@/hooks/custom/use-page-help";
@@ -15,6 +16,7 @@ export const Route = createFileRoute("/_authenticated/_sidebar/")({
 });
 
 function RouteComponent() {
+  const { t } = useTranslation("pages");
   const help = usePageHelp("home");
   const getMe = useGetMe();
   const dashboard = useDashboard();
@@ -25,9 +27,9 @@ function RouteComponent() {
     <div className="flex flex-col gap-4">
       <div className="flex flex-wrap items-start justify-between gap-4">
         <PageTitle
-          description="Main dashboard for your profile."
+          description={t("home.description")}
           help={help}
-          title={`Hello, ${user?.name}!`}
+          title={t("home.title", { name: user?.name ?? "" })}
         />
         <ProfileCompleteness user={user} />
       </div>

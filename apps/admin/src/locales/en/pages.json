@@ -18,6 +18,10 @@
     "title": "Settings",
     "description": "Manage your account details."
   },
+  "home": {
+    "title": "Hello, {{name}}!",
+    "description": "Main dashboard for your profile."
+  },
   "courses": {
     "manageTitle": "Manage Courses",
     "manageDescription": "Create, update or delete courses, bootcamps and certificates of your profile.",

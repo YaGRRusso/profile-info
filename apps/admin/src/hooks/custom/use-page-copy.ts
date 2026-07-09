@@ -38,11 +38,3 @@ export function usePageCopy(key: PageCopyKey) {
     emptyDescription: t("shared.emptyDescription", { entity }),
   };
 }
-
-export function useSettingsPageCopy() {
-  const { t } = useTranslation("pages");
-  return {
-    title: t("settings.title"),
-    description: t("settings.description"),
-  };
-}
