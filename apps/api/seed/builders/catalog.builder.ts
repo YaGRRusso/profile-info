@@ -1,8 +1,8 @@
-import { faker } from "@faker-js/faker";
+import type { LocaleCode } from "@/common/i18n/locales";
 import { CatalogPartition } from "@/core/enums/catalog-partition.enum";
 import type { SkillModel } from "@/modules/skills/schemas/skill.schema";
 import { CATALOG_SKILL_COUNT, SEED_LOCALES } from "../constants";
-import { slugFor } from "../helpers/faker-seed.helper";
+import { faker, fakerForLocale, slugFor } from "../helpers/faker-seed.helper";
 import { optionalForIndex, pickTextSize } from "../helpers/variation.helper";
 
 const CATEGORY_POOL = buildCategoryPool();
@@ -13,14 +13,15 @@ function buildCategoryPool(): string[] {
   );
 }
 
-function skillTitle(index: number): string {
+function skillTitle(index: number, locale: LocaleCode): string {
+  const localeFaker = fakerForLocale(locale);
   const size = pickTextSize(index);
 
-  if (size === "small") return faker.person.jobType();
+  if (size === "small") return localeFaker.person.jobType();
   if (size === "medium") {
-    return `${faker.person.jobArea()} ${faker.hacker.noun()}`;
+    return `${localeFaker.person.jobArea()} ${localeFaker.hacker.noun()}`;
   }
-  return `${faker.person.jobArea()} ${faker.lorem.words({ min: 4, max: 8 })}`;
+  return `${localeFaker.person.jobArea()} ${localeFaker.lorem.words({ min: 4, max: 8 })}`;
 }
 
 type SkillSeed = Pick<
@@ -36,8 +37,6 @@ function buildSkills(
 ): SkillSeed[] {
   return Array.from({ length: count }, (_, index) => {
     const globalIndex = seedOffset + index;
-    const title = skillTitle(globalIndex);
-    const slug = slugFor(title, globalIndex);
     const category =
       globalIndex % 4 === 0
         ? undefined
@@ -47,11 +46,11 @@ function buildSkills(
       partition,
       ownerId,
       disabled: globalIndex % 17 === 0,
-      slug,
+      slug: slugFor(skillTitle(globalIndex, SEED_LOCALES[0]), globalIndex),
       category,
       i18n: SEED_LOCALES.map((locale) => ({
         locale,
-        messages: { title },
+        messages: { title: skillTitle(globalIndex, locale) },
       })),
     };
   });

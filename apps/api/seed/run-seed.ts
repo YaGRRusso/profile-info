@@ -1,4 +1,3 @@
-import { faker } from "@faker-js/faker";
 import { NestFactory } from "@nestjs/core";
 import { getModelToken } from "@nestjs/mongoose";
 import { hash } from "bcryptjs";
@@ -35,10 +34,11 @@ import {
   PERSONA_CATALOG_SEED_OFFSETS,
   SEED_API_TOKENS,
 } from "./constants";
+import { initSeedFakers } from "./helpers/faker-seed.helper";
 import { PERSONA_KEYS, PERSONAS, type PersonaKey } from "./personas";
 
 export async function runSeed(): Promise<void> {
-  faker.seed(FAKER_SEED);
+  initSeedFakers();
 
   const app = await NestFactory.createApplicationContext(AppModule, {
     logger: ["error", "warn"],

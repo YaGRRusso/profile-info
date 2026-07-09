@@ -58,7 +58,9 @@ function buildOrganizations(
       ),
       i18n: SEED_LOCALES.map((locale) => ({
         locale,
-        messages: { description: loremSentences(pickTextSize(globalIndex)) },
+        messages: {
+          description: loremSentences(pickTextSize(globalIndex), locale),
+        },
       })),
     };
   });

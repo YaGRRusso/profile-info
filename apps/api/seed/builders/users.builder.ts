@@ -37,8 +37,8 @@ export async function createPersonaUser(
       SEED_LOCALES.map((locale) => ({
         locale,
         messages: {
-          title: loremSentences(pickTextSize(profileIndex)),
-          description: loremSentences(pickTextSize(profileIndex + 1)),
+          title: loremSentences(pickTextSize(profileIndex), locale),
+          description: loremSentences(pickTextSize(profileIndex + 1), locale),
         },
       }))
     ),

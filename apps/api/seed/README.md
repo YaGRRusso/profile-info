@@ -26,6 +26,8 @@ Password for all personas: `123123` (`DEV_PASSWORD` in `constants.ts`).
   **first LOCAL skill and first LOCAL org** is forced `disabled: true` for admin picker QA.
 - **Profile skills:** `pickProfileSkillIds` skips disabled GLOBAL skills; entities may still
   reference disabled LOCAL refs via `pickSkillIds`.
+- **i18n:** `en` and `pt` use separate faker streams (`faker` + `pt_BR`); titles and
+  descriptions differ per locale (skills use locale-specific job titles).
 
 ## API tokens
 
