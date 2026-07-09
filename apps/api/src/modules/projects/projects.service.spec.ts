@@ -1,56 +1,59 @@
-import { BadRequestException, NotFoundException } from "@nestjs/common";
-import { getModelToken } from "@nestjs/mongoose";
 import { Test, TestingModule } from "@nestjs/testing";
-import mongoose, { Model } from "mongoose";
-import { ProjectModel } from "@/modules/projects/schemas/project.schema";
+import { testAuthContext } from "@test/fixtures/auth-context";
+import {
+  createMockCrud,
+  createMockStats,
+} from "@/core/persistence/repositories/testing/service-spec.mock";
+import { SkillsValidatorService } from "@/modules/skills/skills-validator.service";
 import { ProjectsRepository } from "./projects.repository";
 import { ProjectsService } from "./projects.service";
 
-const validId = new mongoose.Types.ObjectId().toHexString();
-const invalidId = "not-an-object-id";
-const fakeDoc = {
-  _id: validId,
-  title: "My Project",
-} as unknown as ProjectModel;
+const ownerId = "507f1f77bcf86cd799439011";
+const validId = "507f1f77bcf86cd799439013";
+const ctx = testAuthContext({ id: ownerId });
 
-function makeExec(returnValue: unknown) {
-  return {
-    sort: jest.fn().mockReturnThis(),
-    skip: jest.fn().mockReturnThis(),
-    limit: jest.fn().mockReturnThis(),
-    exec: jest.fn().mockResolvedValue(returnValue),
-  };
-}
+const fakeEntity = {
+  id: validId,
+  ownerId,
+  slug: "portfolio-app",
+};
 
 describe("ProjectsService", () => {
   let service: ProjectsService;
-  let model: jest.Mocked<Model<ProjectModel>>;
+  let crud: ReturnType<typeof createMockCrud>;
+  let stats: ReturnType<typeof createMockStats>;
+  let repository: {
+    tenantCrud: jest.Mock;
+    tenantStats: jest.Mock;
+    detachSkill: jest.Mock;
+    purgeByOwner: jest.Mock;
+  };
 
   beforeEach(async () => {
     jest.clearAllMocks();
+    crud = createMockCrud();
+    stats = createMockStats();
+    repository = {
+      tenantCrud: jest.fn().mockReturnValue(crud),
+      tenantStats: jest.fn().mockReturnValue(stats),
+      detachSkill: jest.fn(),
+      purgeByOwner: jest.fn(),
+    };
 
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         ProjectsService,
-        ProjectsRepository,
+        { provide: ProjectsRepository, useValue: repository },
         {
-          provide: getModelToken(ProjectModel.name),
+          provide: SkillsValidatorService,
           useValue: {
-            findById: jest.fn(),
-            findOne: jest.fn(),
-            find: jest.fn(),
-            create: jest.fn(),
-            findByIdAndUpdate: jest.fn(),
-            updateMany: jest.fn(),
-            findByIdAndDelete: jest.fn(),
-            deleteMany: jest.fn(),
+            assertSkillsEnabled: jest.fn().mockResolvedValue(undefined),
           },
         },
       ],
     }).compile();
 
-    service = module.get<ProjectsService>(ProjectsService);
-    model = module.get(getModelToken(ProjectModel.name));
+    service = module.get(ProjectsService);
   });
 
   it("should be defined", () => {
@@ -58,65 +61,90 @@ describe("ProjectsService", () => {
   });
 
   describe("findOneById", () => {
-    it("should return the project document", async () => {
-      (model.findById as jest.Mock).mockReturnValue(makeExec(fakeDoc));
-      expect(await service.findOneById(validId)).toBe(fakeDoc);
-    });
+    it("delegates to scoped crud", async () => {
+      crud.findOneById.mockResolvedValue(fakeEntity);
 
-    it("should throw BadRequestException for invalid ID", async () => {
-      await expect(service.findOneById(invalidId)).rejects.toThrow(
-        BadRequestException
+      await expect(service.findOneById(ctx, validId)).resolves.toEqual(
+        fakeEntity
       );
-    });
-
-    it("should throw NotFoundException when not found", async () => {
-      (model.findById as jest.Mock).mockReturnValue(makeExec(null));
-      await expect(service.findOneById(validId)).rejects.toThrow(
-        NotFoundException
-      );
+      expect(repository.tenantCrud).toHaveBeenCalledWith(ctx);
+      expect(crud.findOneById).toHaveBeenCalledWith(validId);
     });
   });
 
   describe("createOne", () => {
-    it("should return the created document", async () => {
-      (model.create as jest.Mock).mockResolvedValue(fakeDoc);
-      const result = await service.createOne({ title: "My Project" } as any);
-      expect(result).toBe(fakeDoc);
+    const createInput = {
+      slug: "portfolio-app",
+      i18n: [
+        {
+          locale: "en",
+          messages: {
+            title: "Portfolio",
+            description: "My portfolio app",
+          },
+        },
+      ],
+    };
+
+    it("delegates to scoped crud", async () => {
+      crud.createOne.mockResolvedValue(fakeEntity);
+
+      await expect(service.createOne(ctx, createInput)).resolves.toEqual(
+        fakeEntity
+      );
+      expect(repository.tenantCrud).toHaveBeenCalledWith(ctx);
+      expect(crud.createOne).toHaveBeenCalledWith(createInput);
     });
   });
 
   describe("updateOne", () => {
-    it("should return the updated document", async () => {
-      (model.findByIdAndUpdate as jest.Mock).mockReturnValue(makeExec(fakeDoc));
-      expect(await service.updateOne(validId, {})).toBe(fakeDoc);
-    });
+    it("delegates to scoped crud", async () => {
+      crud.updateOneById.mockResolvedValue(fakeEntity);
 
-    it("should throw BadRequestException for invalid ID", async () => {
-      await expect(service.updateOne(invalidId, {})).rejects.toThrow(
-        BadRequestException
+      await expect(service.updateOne(ctx, validId, {})).resolves.toEqual(
+        fakeEntity
       );
+      expect(repository.tenantCrud).toHaveBeenCalledWith(ctx);
+      expect(crud.updateOneById).toHaveBeenCalledWith(validId, {});
     });
   });
 
   describe("removeOne", () => {
-    it("should return the removed document", async () => {
-      (model.findByIdAndDelete as jest.Mock).mockReturnValue(makeExec(fakeDoc));
-      expect(await service.removeOne(validId)).toBe(fakeDoc);
-    });
+    it("delegates to scoped crud", async () => {
+      crud.deleteOneById.mockResolvedValue(fakeEntity);
 
-    it("should throw BadRequestException for invalid ID", async () => {
-      await expect(service.removeOne(invalidId)).rejects.toThrow(
-        BadRequestException
+      await expect(service.removeOne(ctx, validId)).resolves.toEqual(
+        fakeEntity
       );
+      expect(repository.tenantCrud).toHaveBeenCalledWith(ctx);
+      expect(crud.deleteOneById).toHaveBeenCalledWith(validId);
     });
   });
 
   describe("removeMany", () => {
-    it("should return a BatchEntity count", async () => {
-      (model.deleteMany as jest.Mock).mockReturnValue(
-        makeExec({ deletedCount: 3 })
-      );
-      expect(await service.removeMany([validId])).toEqual({ count: 3 });
+    it("delegates to scoped crud", async () => {
+      crud.deleteManyById.mockResolvedValue({ succeeded: 1, failed: 0 });
+
+      await expect(service.removeMany(ctx, [validId])).resolves.toEqual({
+        succeeded: 1,
+        failed: 0,
+      });
+      expect(repository.tenantCrud).toHaveBeenCalledWith(ctx);
+      expect(crud.deleteManyById).toHaveBeenCalledWith([validId]);
+    });
+  });
+
+  describe("detachSkill", () => {
+    it("delegates to repository helper", async () => {
+      await service.detachSkill(validId);
+      expect(repository.detachSkill).toHaveBeenCalledWith(validId);
+    });
+  });
+
+  describe("purgeByOwner", () => {
+    it("delegates to repository helper", async () => {
+      await service.purgeByOwner(ownerId);
+      expect(repository.purgeByOwner).toHaveBeenCalledWith(ownerId);
     });
   });
 });

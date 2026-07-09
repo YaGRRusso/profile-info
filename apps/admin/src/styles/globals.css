@@ -6,6 +6,33 @@
     dracula --prefersdark;
 }
 
+@layer base {
+  html {
+    @apply scrollbar-thin;
+  }
+
+  @media (max-width: 640px), (pointer: coarse) {
+    :root:has(
+        :is(.modal-open, .modal[open], .modal:target),
+        .drawer-toggle:checked
+      ) {
+      --page-scroll-gutter: unset;
+      scrollbar-gutter: unset !important;
+    }
+  }
+}
+
+@layer utilities {
+  .list {
+    & > :not(:last-child) {
+      &.list-row::after,
+      & .list-row::after {
+        inset-inline: 0;
+      }
+    }
+  }
+}
+
 @utility container {
   max-width: 1280px;
   padding: 2rem 1rem;
@@ -17,33 +44,6 @@
 
   @media (min-width: 769px) {
     padding: 2rem 4rem;
-  }
-}
-
-@utility scrollbar-thin {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
-
-  &::-webkit-scrollbar {
-    display: none;
-  }
-}
-
-@layer base {
-  html {
-    @apply scrollbar-thin;
-  }
-}
-
-@layer base {
-  @media (max-width: 640px), (pointer: coarse) {
-    :root:has(
-        :is(.modal-open, .modal[open], .modal:target),
-        .drawer-toggle:checked
-      ) {
-      --page-scroll-gutter: unset;
-      scrollbar-gutter: unset !important;
-    }
   }
 }
 
@@ -61,6 +61,15 @@
 
 @utility opacity-full {
   opacity: 1;
+}
+
+@utility scrollbar-thin {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
 }
 
 @utility form {

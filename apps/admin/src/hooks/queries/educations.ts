@@ -3,11 +3,15 @@ import { graphql } from "@/generated/graphql";
 import type {
   FilterEducationInput,
   FindManyEducationsQuery,
+  FindManyEducationsQueryVariables,
   SortEducationInput,
 } from "@/generated/graphql/graphql";
+import {
+  paginatedNextPageParam,
+  paginatedSelect,
+  withPagination,
+} from "@/hooks/custom/paginated-query";
 import { execute } from "@/lib/execute";
-
-const PAGE_SIZE = 50;
 
 export type EducationRow =
   FindManyEducationsQuery["findManyEducations"]["nodes"][number];
@@ -32,6 +36,15 @@ const findManyEducations = graphql(`
         relevance
         url
         image
+        owner {
+          id
+          nickname
+          name
+          role
+          email
+          phone
+          avatar
+        }
         organization {
           id
           name
@@ -46,7 +59,13 @@ const findManyEducations = graphql(`
         }
         skills {
           id
-          name
+          slug
+          i18n {
+            locale
+            messages {
+              title
+            }
+          }
         }
         period {
           from
@@ -69,24 +88,18 @@ export function useFindManyEducations(
   return useInfiniteQuery({
     queryKey: ["findManyEducations", variables],
     queryFn: ({ pageParam }) =>
-      execute(findManyEducations, {
-        ...variables,
-        educationPagination: { skip: pageParam, limit: PAGE_SIZE },
-      }),
+      execute(
+        findManyEducations,
+        withPagination<FindManyEducationsQueryVariables>(
+          "educationPagination",
+          pageParam,
+          variables
+        )
+      ),
     initialPageParam: 0,
-    getNextPageParam: (lastPage, allPages) => {
-      const totalFetched = allPages.reduce(
-        (sum, p) => sum + p.findManyEducations.nodes.length,
-        0
-      );
-      return totalFetched < lastPage.findManyEducations.found
-        ? totalFetched
-        : undefined;
-    },
-    select: (data) => ({
-      found: data.pages[0]?.findManyEducations.found ?? 0,
-      nodes: data.pages.flatMap((p) => p.findManyEducations.nodes),
-    }),
+    getNextPageParam:
+      paginatedNextPageParam<FindManyEducationsQuery>("findManyEducations"),
+    select: paginatedSelect<FindManyEducationsQuery>("findManyEducations"),
     ...options,
   });
 }

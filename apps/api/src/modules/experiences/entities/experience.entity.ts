@@ -1,10 +1,11 @@
-import { Field, ObjectType } from "@nestjs/graphql";
+import { Field, ID, ObjectType } from "@nestjs/graphql";
 import { OptionalField } from "@/core/decorators/optional-field.decorator";
 import { BaseEntity } from "@/core/entities/base.entity";
 import { DateRangeEntity } from "@/core/entities/date-range.entity";
 import { createPaginatedModel } from "@/core/schemas/paginated.schema";
 import { OrganizationEntity } from "@/modules/organizations/entities/organization.entity";
 import { SkillEntity } from "@/modules/skills/entities/skill.entity";
+import { UserEntity } from "@/modules/users/entities/user.entity";
 import { ExperienceCategory } from "../enums/category.enum";
 
 @ObjectType()
@@ -33,6 +34,9 @@ export class ExperienceRole {
   @OptionalField(() => DateRangeEntity)
   period?: DateRangeEntity;
 
+  @OptionalField(() => [ID])
+  skillIds?: string[];
+
   @OptionalField(() => [SkillEntity])
   skills?: SkillEntity[];
 }
@@ -45,8 +49,17 @@ export class ExperienceEntity extends BaseEntity {
   @Field(() => String)
   slug: string;
 
-  @Field(() => OrganizationEntity)
-  organization: OrganizationEntity;
+  @Field(() => ID)
+  ownerId: string;
+
+  @Field(() => UserEntity)
+  owner: UserEntity;
+
+  @OptionalField(() => ID)
+  organizationId?: string;
+
+  @OptionalField(() => OrganizationEntity)
+  organization?: OrganizationEntity;
 
   @Field(() => ExperienceCategory)
   category: ExperienceCategory;
@@ -59,3 +72,12 @@ export class ExperienceEntity extends BaseEntity {
 }
 
 export const PaginatedExperienceEntity = createPaginatedModel(ExperienceEntity);
+
+export type ExperienceRoleRecord = Omit<ExperienceRole, "skills">;
+
+export type ExperienceEntityRecord = Omit<
+  ExperienceEntity,
+  "owner" | "organization" | "skills" | "roles"
+> & {
+  roles: ExperienceRoleRecord[];
+};

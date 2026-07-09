@@ -1,100 +1,138 @@
 import { Injectable } from "@nestjs/common";
-import { AnyKeys, QueryFilter, SortOrder, UpdateQuery } from "mongoose";
 import { RecentActivityRecord } from "@/common/helpers/recent-activity.helper";
+import type { AuthContext } from "@/core/context/auth-context.interface";
 import { BatchEntity } from "@/core/entities/batch.entity";
-import { PaginatedModel } from "@/core/schemas/paginated.schema";
-import { ExperienceModel } from "@/modules/experiences/schemas/experience.schema";
+import type {
+  FieldCount,
+  MultiPaged,
+} from "@/core/persistence/types/output.type";
+import { OrganizationsValidatorService } from "@/modules/organizations/organizations-validator.service";
+import { SkillsValidatorService } from "@/modules/skills/skills-validator.service";
 import { CreateExperienceInput } from "./dto/create-experience.input";
+import { FilterExperienceInput } from "./dto/filter-experience.input";
+import { SortExperienceInput } from "./dto/sort-experience.input";
 import { UpdateExperienceInput } from "./dto/update-experience.input";
+import type { ExperienceEntityRecord } from "./entities/experience.entity";
 import { ExperiencesRepository } from "./experiences.repository";
+
+interface ExperienceCatalogRefs {
+  organizationId?: string;
+  roles?: Array<{ skillIds?: string[] }>;
+}
 
 @Injectable()
 export class ExperiencesService {
-  constructor(private readonly repository: ExperiencesRepository) {}
+  constructor(
+    private readonly repository: ExperiencesRepository,
+    private readonly organizationsValidator: OrganizationsValidatorService,
+    private readonly skillsValidator: SkillsValidatorService
+  ) {}
 
-  findOneById(id: string): Promise<ExperienceModel> {
-    return this.repository.findOneById(id);
+  findOneById(ctx: AuthContext, id: string): Promise<ExperienceEntityRecord> {
+    return this.repository.tenantCrud(ctx).findOneById(id);
   }
 
-  findOne({
-    filters,
-  }: {
-    filters?: QueryFilter<ExperienceModel>;
-  }): Promise<ExperienceModel> {
-    return this.repository.findOne({ filters });
+  findOne(
+    ctx: AuthContext,
+    {
+      filters,
+    }: {
+      filters?: FilterExperienceInput;
+    }
+  ): Promise<ExperienceEntityRecord> {
+    return this.repository.tenantCrud(ctx).findOne({ filters });
   }
 
-  findManyById(ids: string[]): Promise<ExperienceModel[]> {
-    return this.repository.findManyById(ids);
+  findManyById(
+    ctx: AuthContext,
+    ids: string[]
+  ): Promise<ExperienceEntityRecord[]> {
+    return this.repository.tenantCrud(ctx).findManyById(ids);
   }
 
-  findMany({
-    filters,
-    sort,
-    skip = 0,
-    limit = 50,
-  }: {
-    filters?: QueryFilter<ExperienceModel>;
-    sort?: Partial<Record<keyof ExperienceModel, SortOrder>>;
-    limit?: number;
-    skip?: number;
-  }): Promise<PaginatedModel<ExperienceModel>> {
-    return this.repository.findMany({ filters, sort, skip, limit });
+  findMany(
+    ctx: AuthContext,
+    {
+      filters,
+      sort,
+      skip = 0,
+      limit = 50,
+    }: {
+      filters?: FilterExperienceInput;
+      sort?: SortExperienceInput;
+      limit?: number;
+      skip?: number;
+    }
+  ): Promise<MultiPaged<ExperienceEntityRecord>> {
+    return this.repository.tenantCrud(ctx).findMany({
+      filters,
+      sort,
+      skip,
+      limit,
+    });
   }
 
-  createOne(createInput: CreateExperienceInput): Promise<ExperienceModel> {
-    return this.repository.createOne(createInput as AnyKeys<ExperienceModel>);
+  async createOne(
+    ctx: AuthContext,
+    createInput: CreateExperienceInput
+  ): Promise<ExperienceEntityRecord> {
+    await this.assertCatalogReferences(ctx, createInput);
+
+    return this.repository.tenantCrud(ctx).createOne(createInput);
   }
 
-  createMany(
+  async createMany(
+    ctx: AuthContext,
     createInputs: CreateExperienceInput[]
-  ): Promise<ExperienceModel[]> {
-    return this.repository.createMany(
-      createInputs as AnyKeys<ExperienceModel>[]
-    );
+  ): Promise<BatchEntity> {
+    await this.assertCatalogReferencesMany(ctx, createInputs);
+
+    return this.repository.tenantCrud(ctx).createMany(createInputs);
   }
 
-  updateOne(
+  async updateOne(
+    ctx: AuthContext,
     id: string,
     updateInput: UpdateExperienceInput
-  ): Promise<ExperienceModel> {
-    return this.repository.updateOne(
-      id,
-      updateInput as object as UpdateQuery<ExperienceModel>
-    );
+  ): Promise<ExperienceEntityRecord> {
+    await this.assertCatalogReferences(ctx, updateInput);
+
+    return this.repository.tenantCrud(ctx).updateOneById(id, updateInput);
   }
 
-  updateMany(
+  async updateMany(
+    ctx: AuthContext,
     ids: string[],
     updateInput: UpdateExperienceInput
   ): Promise<BatchEntity> {
-    return this.repository.updateMany(
-      ids,
-      updateInput as object as UpdateQuery<ExperienceModel>
-    );
+    await this.assertCatalogReferences(ctx, updateInput);
+
+    return this.repository.tenantCrud(ctx).updateManyById(ids, updateInput);
   }
 
-  removeOne(id: string): Promise<ExperienceModel> {
-    return this.repository.deleteOne(id);
+  removeOne(ctx: AuthContext, id: string): Promise<ExperienceEntityRecord> {
+    return this.repository.tenantCrud(ctx).deleteOneById(id);
   }
 
-  removeMany(ids: string[]): Promise<BatchEntity> {
-    return this.repository.deleteMany(ids);
+  removeMany(ctx: AuthContext, ids: string[]): Promise<BatchEntity> {
+    return this.repository.tenantCrud(ctx).deleteManyById(ids);
   }
 
-  count(): Promise<number> {
-    return this.repository.count();
+  count(ctx: AuthContext): Promise<number> {
+    return this.repository.tenantStats(ctx).count();
   }
 
-  countByField(field: string): Promise<{ label: string; value: number }[]> {
-    return this.repository.countByField(field);
+  countByField(ctx: AuthContext, field: string): Promise<FieldCount[]> {
+    return this.repository.tenantStats(ctx).countByField(field);
   }
 
-  async findRecentActivity(limit: number): Promise<RecentActivityRecord[]> {
-    const rows = await this.repository.findRecentlyUpdated(
-      limit,
-      "slug roles updatedAt"
-    );
+  async findRecentActivity(
+    ctx: AuthContext,
+    limit: number
+  ): Promise<RecentActivityRecord[]> {
+    const rows = await this.repository
+      .tenantStats(ctx)
+      .findRecentlyUpdated(limit, "slug roles updatedAt");
     return rows.map((row) => {
       const roles = row.roles as
         | Array<{ i18n?: Array<{ messages?: { title?: string } }> }>
@@ -107,15 +145,63 @@ export class ExperiencesService {
     });
   }
 
-  detachSkill(skillId: string): Promise<void> {
-    return this.repository.updateManyByFilter(
-      { "roles.skills": skillId },
-      { $pull: { "roles.$[roleElem].skills": skillId } },
-      { arrayFilters: [{ "roleElem.skills": skillId }] }
-    );
+  async detachSkill(skillId: string): Promise<void> {
+    await this.repository.detachSkill(skillId);
   }
 
-  purgeByOrganization(organizationId: string): Promise<void> {
-    return this.repository.deleteManyByFilter({ organization: organizationId });
+  async purgeByOrganization(organizationId: string): Promise<void> {
+    await this.repository.purgeByOrganization(organizationId);
+  }
+
+  async purgeByOwner(ownerId: string): Promise<void> {
+    await this.repository.purgeByOwner(ownerId);
+  }
+
+  private collectSkillIds(roles?: Array<{ skillIds?: string[] }>): string[] {
+    return roles?.flatMap((role) => role.skillIds ?? []) ?? [];
+  }
+
+  private async assertCatalogReferences(
+    ctx: AuthContext,
+    input: ExperienceCatalogRefs
+  ): Promise<void> {
+    if (input.organizationId) {
+      await this.organizationsValidator.assertOrganizationEnabled(
+        ctx,
+        input.organizationId
+      );
+    }
+
+    const skillIds = this.collectSkillIds(input.roles);
+    if (skillIds.length > 0) {
+      await this.skillsValidator.assertSkillsEnabled(ctx, skillIds);
+    }
+  }
+
+  private async assertCatalogReferencesMany(
+    ctx: AuthContext,
+    inputs: ExperienceCatalogRefs[]
+  ): Promise<void> {
+    const organizationIds = [
+      ...new Set(
+        inputs
+          .map((item) => item.organizationId)
+          .filter((id): id is string => id !== undefined)
+      ),
+    ];
+    const skillIds = [
+      ...new Set(inputs.flatMap((item) => this.collectSkillIds(item.roles))),
+    ];
+
+    if (organizationIds.length > 0) {
+      await this.organizationsValidator.assertOrganizationsEnabled(
+        ctx,
+        organizationIds
+      );
+    }
+
+    if (skillIds.length > 0) {
+      await this.skillsValidator.assertSkillsEnabled(ctx, skillIds);
+    }
   }
 }

@@ -2,7 +2,6 @@ import { useForm } from "@tanstack/react-form";
 import { useState } from "react";
 import z from "zod";
 import { CheckboxInput } from "@/components/inputs/checkbox";
-import { RangeInput } from "@/components/inputs/range";
 import { SelectInput } from "@/components/inputs/select";
 import { PLACEHOLDERS } from "@/consts/placeholders";
 import {
@@ -14,7 +13,6 @@ import { CommonFormProps } from "./common";
 
 const organizationMultiSchema = z.object({
   category: z.enum(OrganizationCategory),
-  relevance: z.number().min(1, "must be a positive number"),
 });
 
 export type OrganizationMultiSchema = z.infer<typeof organizationMultiSchema>;
@@ -36,18 +34,14 @@ export function OrganizationMultiForm({
   isLoading,
 }: OrganizationMultiFormProps) {
   const [changeCategory, setChangeCategory] = useState(false);
-  const [changeRelevance, setChangeRelevance] = useState(false);
 
   const form = useForm({
     defaultValues: {
       category: OrganizationCategory.Company,
-      relevance: 1,
     },
     onSubmit: ({ value }) => {
-      const updateOrganizationInput: UpdateOrganizationInput = {};
-      if (changeCategory) updateOrganizationInput.category = value.category;
-      if (changeRelevance) updateOrganizationInput.relevance = value.relevance;
-      onSubmit?.(updateOrganizationInput);
+      if (!changeCategory) return;
+      onSubmit?.({ category: value.category });
     },
     validators: { onChange: organizationMultiSchema },
   });
@@ -80,33 +74,7 @@ export function OrganizationMultiForm({
               field.handleChange(value as OrganizationCategory)
             }
             options={CATEGORY_OPTIONS}
-            placeholder={PLACEHOLDERS.chooseCategory}
-            value={field.state.value}
-          />
-        )}
-      </Field>
-
-      <div className="divider" />
-
-      <CheckboxInput
-        checked={changeRelevance}
-        label="Change Relevance"
-        onChange={setChangeRelevance}
-      />
-
-      <Field name="relevance">
-        {(field) => (
-          <RangeInput
-            className="range-xs"
-            disabled={!changeRelevance}
-            error={fieldError(field.state.meta)}
-            label="Relevance"
-            max={5}
-            min={1}
-            name={field.name}
-            onChange={field.handleChange}
-            ruler
-            step={1}
+            placeholder={PLACEHOLDERS.chooseOne}
             value={field.state.value}
           />
         )}
@@ -128,7 +96,7 @@ export function OrganizationMultiForm({
               className="btn btn-soft btn-primary flex-1"
               disabled={
                 !canSubmit ||
-                !(changeCategory || changeRelevance) ||
+                !changeCategory ||
                 isSubmitting ||
                 isDisabled ||
                 isLoading

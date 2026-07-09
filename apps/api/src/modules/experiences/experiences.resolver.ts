@@ -9,18 +9,14 @@ import {
   Resolver,
 } from "@nestjs/graphql";
 import { sortDateRange } from "@/common/helpers/daterange.helper";
-import { Public } from "@/core/decorators/public-route.decorator";
-import { Roles } from "@/core/decorators/roles.decorator";
+import type { AuthContext } from "@/core/context/auth-context.interface";
+import type { GraphqlContext } from "@/core/context/graphql-context.interface";
 import { BatchEntity } from "@/core/entities/batch.entity";
-import { UserRole } from "@/core/enums/user-role.enum";
 import { PaginationInput } from "@/core/inputs/pagination.input";
-import {
-  ExperienceModel,
-  ExperienceRoleModel,
-} from "@/modules/experiences/schemas/experience.schema";
-import type { Ctx } from "@/modules/graphql/context.interface";
+import { Auth } from "@/modules/auth/decorators/auth-context.decorator";
 import { OrganizationEntity } from "@/modules/organizations/entities/organization.entity";
 import { SkillEntity } from "@/modules/skills/entities/skill.entity";
+import { UserEntity } from "@/modules/users/entities/user.entity";
 import { CreateExperienceInput } from "./dto/create-experience.input";
 import { FilterExperienceInput } from "./dto/filter-experience.input";
 import { SortExperienceInput } from "./dto/sort-experience.input";
@@ -38,37 +34,39 @@ export class ExperiencesResolver {
 
   // QUERIES
 
-  @Public()
   @Query(() => ExperienceEntity)
   findOneExperienceById(
+    @Auth() ctx: AuthContext,
     @Args("experienceId", { type: () => ID }) experienceId: string
   ) {
-    return this.experiencesService.findOneById(experienceId);
+    return this.experiencesService.findOneById(ctx, experienceId);
   }
 
-  @Public()
   @Query(() => ExperienceEntity)
   findOneExperience(
+    @Auth() ctx: AuthContext,
     @Args("experienceFilters", {
       type: () => FilterExperienceInput,
       nullable: true,
     })
     experienceFilters?: FilterExperienceInput
   ) {
-    return this.experiencesService.findOne({ filters: experienceFilters });
+    return this.experiencesService.findOne(ctx, {
+      filters: experienceFilters,
+    });
   }
 
-  @Public()
   @Query(() => [ExperienceEntity])
   findManyExperienceById(
+    @Auth() ctx: AuthContext,
     @Args("experienceIds", { type: () => [ID] }) experienceIds: string[]
   ) {
-    return this.experiencesService.findManyById(experienceIds);
+    return this.experiencesService.findManyById(ctx, experienceIds);
   }
 
-  @Public()
   @Query(() => PaginatedExperienceEntity)
   findManyExperiences(
+    @Auth() ctx: AuthContext,
     @Args("experienceFilters", {
       type: () => FilterExperienceInput,
       nullable: true,
@@ -85,7 +83,7 @@ export class ExperiencesResolver {
     })
     experienceSort?: SortExperienceInput
   ) {
-    return this.experiencesService.findMany({
+    return this.experiencesService.findMany(ctx, {
       filters: experienceFilters,
       sort: experienceSort,
       limit: experiencePagination?.limit,
@@ -95,89 +93,104 @@ export class ExperiencesResolver {
 
   // MUTATIONS
 
-  @Roles(UserRole.ADMIN)
   @Mutation(() => ExperienceEntity)
   createOneExperience(
+    @Auth() ctx: AuthContext,
     @Args("createExperienceInput", { type: () => CreateExperienceInput })
     createExperienceInput: CreateExperienceInput
   ) {
-    return this.experiencesService.createOne(createExperienceInput);
+    return this.experiencesService.createOne(ctx, createExperienceInput);
   }
 
-  @Roles(UserRole.ADMIN)
-  @Mutation(() => [ExperienceEntity])
+  @Mutation(() => BatchEntity)
   createManyExperiences(
+    @Auth() ctx: AuthContext,
     @Args("createExperienceInputs", { type: () => [CreateExperienceInput] })
     createExperienceInputs: CreateExperienceInput[]
   ) {
-    return this.experiencesService.createMany(createExperienceInputs);
+    return this.experiencesService.createMany(ctx, createExperienceInputs);
   }
 
-  @Roles(UserRole.ADMIN)
   @Mutation(() => ExperienceEntity)
   updateOneExperience(
+    @Auth() ctx: AuthContext,
     @Args("experienceId", { type: () => ID }) experienceId: string,
     @Args("updateExperienceInput", { type: () => UpdateExperienceInput })
     updateExperienceInput: UpdateExperienceInput
   ) {
     return this.experiencesService.updateOne(
+      ctx,
       experienceId,
       updateExperienceInput
     );
   }
 
-  @Roles(UserRole.ADMIN)
   @Mutation(() => BatchEntity)
   updateManyExperiences(
+    @Auth() ctx: AuthContext,
     @Args("experienceIds", { type: () => [ID] }) experienceIds: string[],
     @Args("updateExperienceInput", { type: () => UpdateExperienceInput })
     updateExperienceInput: UpdateExperienceInput
   ) {
     return this.experiencesService.updateMany(
+      ctx,
       experienceIds,
       updateExperienceInput
     );
   }
 
-  @Roles(UserRole.ADMIN)
   @Mutation(() => ExperienceEntity)
   removeOneExperience(
+    @Auth() ctx: AuthContext,
     @Args("experienceId", { type: () => ID }) experienceId: string
   ) {
-    return this.experiencesService.removeOne(experienceId);
+    return this.experiencesService.removeOne(ctx, experienceId);
   }
 
-  @Roles(UserRole.ADMIN)
   @Mutation(() => BatchEntity)
   removeManyExperiences(
+    @Auth() ctx: AuthContext,
     @Args("experienceIds", { type: () => [ID] }) experienceIds: string[]
   ) {
-    return this.experiencesService.removeMany(experienceIds);
+    return this.experiencesService.removeMany(ctx, experienceIds);
+  }
+
+  @ResolveField(() => UserEntity)
+  owner(
+    @Parent() experience: ExperienceEntity,
+    @Context() ctx: GraphqlContext
+  ) {
+    if (!experience?.ownerId) return null;
+    return ctx.loaders.batchUsers.load(experience.ownerId);
   }
 
   @ResolveField(() => [ExperienceRole])
-  roles(@Parent() experience: ExperienceModel) {
+  roles(@Parent() experience: ExperienceEntity) {
     if (experience.roles) {
       return sortDateRange([...experience.roles]);
     }
   }
 
-  @ResolveField(() => OrganizationEntity)
-  organization(@Parent() experience: ExperienceModel, @Context() ctx: Ctx) {
-    if (!experience?.organization) return null;
-    return ctx.loaders.batchOrganizations.load(
-      experience.organization.toString()
-    );
+  @ResolveField(() => OrganizationEntity, { nullable: true })
+  organization(
+    @Parent() experience: ExperienceEntity,
+    @Context() ctx: GraphqlContext
+  ) {
+    if (!experience?.organizationId) return null;
+    return ctx.loaders.batchOrganizations.load(experience.organizationId);
   }
 
   @ResolveField(() => [SkillEntity])
-  skills(@Parent() experience: ExperienceModel, @Context() ctx: Ctx) {
+  skills(
+    @Parent() experience: ExperienceEntity,
+    @Context() ctx: GraphqlContext
+  ) {
     const ids = new Set<string>();
 
     for (const role of experience.roles) {
-      if (role.skills) {
-        for (const skill of role.skills) {
-          ids.add(skill.toString());
+      if (role.skillIds) {
+        for (const skillId of role.skillIds) {
+          ids.add(skillId);
         }
       }
     }
@@ -189,8 +202,8 @@ export class ExperiencesResolver {
 @Resolver(() => ExperienceRole)
 export class ExperienceRoleResolver {
   @ResolveField(() => [SkillEntity])
-  skills(@Parent() role: ExperienceRoleModel, @Context() ctx: Ctx) {
-    const ids = role.skills?.map((id) => id.toString());
+  skills(@Parent() role: ExperienceRole, @Context() ctx: GraphqlContext) {
+    const ids = role.skillIds;
     if (!ids) return [];
     return ctx.loaders.batchSkills.loadMany(ids);
   }

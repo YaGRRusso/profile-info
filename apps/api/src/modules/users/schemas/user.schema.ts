@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
-import type { HydratedDocument } from "mongoose";
+import mongoose, { type HydratedDocument } from "mongoose";
 import { UserRole } from "@/core/enums/user-role.enum";
 import { BaseModel } from "@/core/schemas/base.schema";
 import {
@@ -51,6 +51,11 @@ export class UserModel extends BaseModel {
 
   @Prop({ type: [{ type: SchemaFactory.createForClass(UrlModel) }] })
   urls?: UrlModel[];
+
+  @Prop({
+    type: [{ type: mongoose.Schema.Types.ObjectId, ref: "SkillModel" }],
+  })
+  skillIds?: (mongoose.Types.ObjectId | string)[];
 }
 
 export type UserDocument = HydratedDocument<UserModel>;

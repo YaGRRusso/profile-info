@@ -46,7 +46,8 @@ export class CreateExperienceRoleInput {
   period?: DateRangeInput;
 
   @OptionalField(() => [String])
-  skills?: string[];
+  @IsMongoId({ each: true })
+  skillIds?: string[];
 }
 
 @InputType()
@@ -61,7 +62,7 @@ export class CreateExperienceInput {
 
   @RequiredField(() => String)
   @IsMongoId()
-  organization: string;
+  organizationId: string;
 
   @RequiredField(() => ExperienceCategory)
   @IsEnum(ExperienceCategory)

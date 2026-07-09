@@ -1,9 +1,10 @@
-import { Field, ObjectType } from "@nestjs/graphql";
+import { Field, ID, ObjectType } from "@nestjs/graphql";
 import { OptionalField } from "@/core/decorators/optional-field.decorator";
 import { BaseEntity } from "@/core/entities/base.entity";
 import { UrlEntity } from "@/core/entities/url.entity";
 import { UserRole } from "@/core/enums/user-role.enum";
 import { createPaginatedModel } from "@/core/schemas/paginated.schema";
+import { SkillEntity } from "@/modules/skills/entities/skill.entity";
 
 @ObjectType()
 export class UserMessages {
@@ -57,6 +58,14 @@ export class UserEntity extends BaseEntity {
 
   @OptionalField(() => [UrlEntity])
   urls?: UrlEntity[];
+
+  @OptionalField(() => [ID])
+  skillIds?: string[];
+
+  @OptionalField(() => [SkillEntity])
+  skills?: SkillEntity[];
 }
 
 export const PaginatedUserEntity = createPaginatedModel(UserEntity);
+
+export type UserEntityRecord = Omit<UserEntity, "skills">;

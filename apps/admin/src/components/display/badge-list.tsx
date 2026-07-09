@@ -1,3 +1,6 @@
+import { EmptyValue } from "@/components/display/empty-value";
+import { isEmptyValue } from "@/lib/empty-value";
+
 export interface BadgeListProps {
   values: string[];
 }
@@ -5,8 +8,8 @@ export interface BadgeListProps {
 export function BadgeList({ values }: BadgeListProps) {
   const unique = [...new Set(values.filter(Boolean))];
 
-  if (!unique.length) {
-    return <span className="opacity-md">–</span>;
+  if (isEmptyValue(unique)) {
+    return <EmptyValue />;
   }
 
   return (

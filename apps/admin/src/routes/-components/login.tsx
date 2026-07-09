@@ -2,6 +2,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { UserForm } from "@/forms/user";
 import { useSignIn } from "@/hooks/mutations/auth";
 import { useAuthStore } from "@/stores/auth";
+import { DevQuickLogin } from "./dev-quick-login";
 
 export function Login() {
   const { setToken } = useAuthStore();
@@ -42,6 +43,7 @@ export function Login() {
               )
             }
           />
+          <DevQuickLogin />
         </div>
       </div>
     </main>

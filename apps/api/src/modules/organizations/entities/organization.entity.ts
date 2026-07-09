@@ -1,6 +1,8 @@
-import { Field, ObjectType } from "@nestjs/graphql";
+import { Field, ID, ObjectType } from "@nestjs/graphql";
 import { BaseEntity } from "@/core/entities/base.entity";
+import { CatalogPartition } from "@/core/enums/catalog-partition.enum";
 import { createPaginatedModel } from "@/core/schemas/paginated.schema";
+import { UserEntity } from "@/modules/users/entities/user.entity";
 import { OrganizationCategory } from "../enums/category.enum";
 
 @ObjectType()
@@ -20,27 +22,38 @@ export class OrganizationTranslationLocale {
 
 @ObjectType()
 export class OrganizationEntity extends BaseEntity {
-  @Field(() => Number)
-  relevance: number;
-
   @Field(() => String)
   slug: string;
 
   @Field(() => String)
   name: string;
 
-  @Field(() => String)
-  website: string;
+  @Field(() => String, { nullable: true })
+  website?: string;
 
-  @Field(() => String)
-  logo: string;
+  @Field(() => String, { nullable: true })
+  logo?: string;
 
   @Field(() => [OrganizationTranslationLocale])
   i18n: OrganizationTranslationLocale[];
 
   @Field(() => OrganizationCategory)
   category: OrganizationCategory;
+
+  @Field(() => Boolean)
+  disabled: boolean;
+
+  @Field(() => CatalogPartition)
+  partition: CatalogPartition;
+
+  @Field(() => ID)
+  ownerId: string;
+
+  @Field(() => UserEntity)
+  owner: UserEntity;
 }
 
 export const PaginatedOrganizationEntity =
   createPaginatedModel(OrganizationEntity);
+
+export type OrganizationEntityRecord = Omit<OrganizationEntity, "owner">;

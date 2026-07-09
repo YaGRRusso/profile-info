@@ -1,16 +1,22 @@
 {
   "rootDir": "../../",
+  "cacheDirectory": "<rootDir>/.cache/jest-e2e",
   "moduleFileExtensions": ["js", "json", "ts"],
   "testEnvironment": "node",
+  "globalSetup": "<rootDir>/test/config/global-setup.ts",
   "setupFiles": ["<rootDir>/test/config/setup-env.ts"],
   "testTimeout": 120000,
   "maxWorkers": 1,
   "testMatch": [
-    "<rootDir>/test/e2e/**/*.e2e-spec.ts",
-    "<rootDir>/test/integration/**/*.integration-spec.ts"
+    "<rootDir>/test/e2e/**/*.spec.ts",
+    "<rootDir>/test/integration/**/*.spec.ts"
   ],
   "moduleNameMapper": {
-    "^@/(.*)$": "<rootDir>/src/$1"
+    "^@/(.*)$": "<rootDir>/src/$1",
+    "^@seed/(.*)$": "<rootDir>/seed/$1",
+    "^@test/(.*)$": "<rootDir>/test/$1",
+    "^@octokit/rest$": "<rootDir>/test/mocks/octokit-rest.mock.ts",
+    "^@openrouter/sdk(.*)$": "<rootDir>/test/mocks/openrouter-sdk.mock.ts"
   },
   "transform": {
     "^.+\\.(t|j)s$": [
@@ -20,5 +26,6 @@
       }
     ]
   },
+  "transformIgnorePatterns": ["node_modules/(?!(p-limit|yocto-queue)/)"],
   "globalTeardown": "<rootDir>/test/config/global-teardown.ts"
 }

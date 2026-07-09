@@ -15,7 +15,11 @@ export interface CommonFormValuesProps<
     | "UPDATING"
     | "MULTI_UPDATING"
     | "DELETING"
-    | "MULTI_DELETING";
+    | "MULTI_DELETING"
+    | "DISABLING"
+    | "MULTI_DISABLING"
+    | "ENABLING"
+    | "MULTI_ENABLING";
 }
 
 export interface CommonFormProps<

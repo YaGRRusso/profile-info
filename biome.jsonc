@@ -13,7 +13,8 @@
       "!!**/*.graphql",
       "!!**/*.gql",
       "!!**/gql",
-      "!!**/out"
+      "!!**/out",
+      "!!**/*.svg"
     ]
   },
   "javascript": {
@@ -52,7 +53,7 @@
   },
   "overrides": [
     {
-      "includes": ["**/*.spec.ts", "**/*.test.ts"],
+      "includes": ["**/*.spec.ts", "**/*.test.ts", "**/*.mock.ts"],
       "javascript": {
         "globals": [
           "jest",

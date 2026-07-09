@@ -8,15 +8,14 @@ import {
   ResolveField,
   Resolver,
 } from "@nestjs/graphql";
-import { Public } from "@/core/decorators/public-route.decorator";
-import { Roles } from "@/core/decorators/roles.decorator";
+import type { AuthContext } from "@/core/context/auth-context.interface";
+import type { GraphqlContext } from "@/core/context/graphql-context.interface";
 import { BatchEntity } from "@/core/entities/batch.entity";
-import { UserRole } from "@/core/enums/user-role.enum";
 import { PaginationInput } from "@/core/inputs/pagination.input";
-import { EducationModel } from "@/modules/educations/schemas/education.schema";
-import type { Ctx } from "@/modules/graphql/context.interface";
+import { Auth } from "@/modules/auth/decorators/auth-context.decorator";
 import { OrganizationEntity } from "@/modules/organizations/entities/organization.entity";
 import { SkillEntity } from "@/modules/skills/entities/skill.entity";
+import { UserEntity } from "@/modules/users/entities/user.entity";
 import { CreateEducationInput } from "./dto/create-education.input";
 import { FilterEducationInput } from "./dto/filter-education.input";
 import { SortEducationInput } from "./dto/sort-education.input";
@@ -33,37 +32,37 @@ export class EducationsResolver {
 
   // QUERIES
 
-  @Public()
   @Query(() => EducationEntity)
   findOneEducationById(
+    @Auth() ctx: AuthContext,
     @Args("educationId", { type: () => ID }) educationId: string
   ) {
-    return this.educationsService.findOneById(educationId);
+    return this.educationsService.findOneById(ctx, educationId);
   }
 
-  @Public()
   @Query(() => EducationEntity)
   findOneEducation(
+    @Auth() ctx: AuthContext,
     @Args("educationFilters", {
       type: () => FilterEducationInput,
       nullable: true,
     })
     educationFilters?: FilterEducationInput
   ) {
-    return this.educationsService.findOne({ filters: educationFilters });
+    return this.educationsService.findOne(ctx, { filters: educationFilters });
   }
 
-  @Public()
   @Query(() => [EducationEntity])
   findManyEducationById(
+    @Auth() ctx: AuthContext,
     @Args("educationIds", { type: () => [ID] }) educationIds: string[]
   ) {
-    return this.educationsService.findManyById(educationIds);
+    return this.educationsService.findManyById(ctx, educationIds);
   }
 
-  @Public()
   @Query(() => PaginatedEducationEntity)
   findManyEducations(
+    @Auth() ctx: AuthContext,
     @Args("educationFilters", {
       type: () => FilterEducationInput,
       nullable: true,
@@ -80,7 +79,7 @@ export class EducationsResolver {
     })
     educationSort?: SortEducationInput
   ) {
-    return this.educationsService.findMany({
+    return this.educationsService.findMany(ctx, {
       filters: educationFilters,
       sort: educationSort,
       limit: educationPagination?.limit,
@@ -90,74 +89,86 @@ export class EducationsResolver {
 
   // MUTATIONS
 
-  @Roles(UserRole.ADMIN)
   @Mutation(() => EducationEntity)
   createOneEducation(
+    @Auth() ctx: AuthContext,
     @Args("createEducationInput", { type: () => CreateEducationInput })
     createEducationInput: CreateEducationInput
   ) {
-    return this.educationsService.createOne(createEducationInput);
+    return this.educationsService.createOne(ctx, createEducationInput);
   }
 
-  @Roles(UserRole.ADMIN)
-  @Mutation(() => [EducationEntity])
+  @Mutation(() => BatchEntity)
   createManyEducations(
+    @Auth() ctx: AuthContext,
     @Args("createEducationInputs", { type: () => [CreateEducationInput] })
     createEducationInputs: CreateEducationInput[]
   ) {
-    return this.educationsService.createMany(createEducationInputs);
+    return this.educationsService.createMany(ctx, createEducationInputs);
   }
 
-  @Roles(UserRole.ADMIN)
   @Mutation(() => EducationEntity)
   updateOneEducation(
+    @Auth() ctx: AuthContext,
     @Args("educationId", { type: () => ID }) educationId: string,
     @Args("updateEducationInput", { type: () => UpdateEducationInput })
     updateEducationInput: UpdateEducationInput
   ) {
-    return this.educationsService.updateOne(educationId, updateEducationInput);
+    return this.educationsService.updateOne(
+      ctx,
+      educationId,
+      updateEducationInput
+    );
   }
 
-  @Roles(UserRole.ADMIN)
   @Mutation(() => BatchEntity)
   updateManyEducations(
+    @Auth() ctx: AuthContext,
     @Args("educationIds", { type: () => [ID] }) educationIds: string[],
     @Args("updateEducationInput", { type: () => UpdateEducationInput })
     updateEducationInput: UpdateEducationInput
   ) {
     return this.educationsService.updateMany(
+      ctx,
       educationIds,
       updateEducationInput
     );
   }
 
-  @Roles(UserRole.ADMIN)
   @Mutation(() => EducationEntity)
   removeOneEducation(
+    @Auth() ctx: AuthContext,
     @Args("educationId", { type: () => ID }) educationId: string
   ) {
-    return this.educationsService.removeOne(educationId);
+    return this.educationsService.removeOne(ctx, educationId);
   }
 
-  @Roles(UserRole.ADMIN)
   @Mutation(() => BatchEntity)
   removeManyEducations(
+    @Auth() ctx: AuthContext,
     @Args("educationIds", { type: () => [ID] }) educationIds: string[]
   ) {
-    return this.educationsService.removeMany(educationIds);
+    return this.educationsService.removeMany(ctx, educationIds);
   }
 
-  @ResolveField(() => OrganizationEntity)
-  organization(@Parent() education: EducationModel, @Context() ctx: Ctx) {
-    if (!education?.organization) return null;
-    return ctx.loaders.batchOrganizations.load(
-      education.organization.toString()
-    );
+  @ResolveField(() => UserEntity)
+  owner(@Parent() education: EducationEntity, @Context() ctx: GraphqlContext) {
+    if (!education?.ownerId) return null;
+    return ctx.loaders.batchUsers.load(education.ownerId);
+  }
+
+  @ResolveField(() => OrganizationEntity, { nullable: true })
+  organization(
+    @Parent() education: EducationEntity,
+    @Context() ctx: GraphqlContext
+  ) {
+    if (!education?.organizationId) return null;
+    return ctx.loaders.batchOrganizations.load(education.organizationId);
   }
 
   @ResolveField(() => [SkillEntity])
-  skills(@Parent() education: EducationModel, @Context() ctx: Ctx) {
-    const ids = education.skills?.map((id) => id.toString());
+  skills(@Parent() education: EducationEntity, @Context() ctx: GraphqlContext) {
+    const ids = education.skillIds;
     if (!ids) return [];
     return ctx.loaders.batchSkills.loadMany(ids);
   }

@@ -1,15 +1,26 @@
-import { Args, ID, Mutation, Query, Resolver } from "@nestjs/graphql";
-import { Public } from "@/core/decorators/public-route.decorator";
-import { Roles } from "@/core/decorators/roles.decorator";
+import {
+  Args,
+  Context,
+  ID,
+  Mutation,
+  Parent,
+  Query,
+  ResolveField,
+  Resolver,
+} from "@nestjs/graphql";
+import type { AuthContext } from "@/core/context/auth-context.interface";
+import type { GraphqlContext } from "@/core/context/graphql-context.interface";
 import { BatchEntity } from "@/core/entities/batch.entity";
-import { UserRole } from "@/core/enums/user-role.enum";
 import { PaginationInput } from "@/core/inputs/pagination.input";
+import { Auth } from "@/modules/auth/decorators/auth-context.decorator";
+import { UserEntity } from "../users/entities/user.entity";
 import { CreateOrganizationInput } from "./dto/create-organization.input";
 import { FilterOrganizationInput } from "./dto/filter-organization.input";
 import { SortOrganizationInput } from "./dto/sort-organization.input";
 import { UpdateOrganizationInput } from "./dto/update-organization.input";
 import {
   OrganizationEntity,
+  type OrganizationEntityRecord,
   PaginatedOrganizationEntity,
 } from "./entities/organization.entity";
 import { OrganizationsService } from "./organizations.service";
@@ -20,37 +31,53 @@ export class OrganizationsResolver {
 
   // QUERIES
 
-  @Public()
   @Query(() => OrganizationEntity)
   findOneOrganizationById(
+    @Auth() ctx: AuthContext,
     @Args("organizationId", { type: () => ID }) organizationId: string
   ) {
-    return this.organizationsService.findOneById(organizationId);
+    return this.organizationsService.findOneById(ctx, organizationId);
   }
 
-  @Public()
   @Query(() => OrganizationEntity)
   findOneOrganization(
+    @Auth() ctx: AuthContext,
     @Args("organizationFilters", {
       type: () => FilterOrganizationInput,
       nullable: true,
     })
     organizationFilters?: FilterOrganizationInput
   ) {
-    return this.organizationsService.findOne({ filters: organizationFilters });
+    return this.organizationsService.findOne(ctx, {
+      filters: organizationFilters,
+    });
   }
 
-  @Public()
+  @Query(() => OrganizationEntity)
+  findOneActiveOrganization(
+    @Auth() ctx: AuthContext,
+    @Args("organizationFilters", {
+      type: () => FilterOrganizationInput,
+      nullable: true,
+    })
+    organizationFilters?: FilterOrganizationInput
+  ) {
+    return this.organizationsService.findOneActive(ctx, {
+      filters: organizationFilters,
+    });
+  }
+
   @Query(() => [OrganizationEntity])
   findManyOrganizationById(
+    @Auth() ctx: AuthContext,
     @Args("organizationIds", { type: () => [ID] }) organizationIds: string[]
   ) {
-    return this.organizationsService.findManyById(organizationIds);
+    return this.organizationsService.findManyById(ctx, organizationIds);
   }
 
-  @Public()
   @Query(() => PaginatedOrganizationEntity)
   findManyOrganizations(
+    @Auth() ctx: AuthContext,
     @Args("organizationFilters", {
       type: () => FilterOrganizationInput,
       nullable: true,
@@ -67,7 +94,34 @@ export class OrganizationsResolver {
     })
     organizationSort?: SortOrganizationInput
   ) {
-    return this.organizationsService.findMany({
+    return this.organizationsService.findMany(ctx, {
+      filters: organizationFilters,
+      sort: organizationSort,
+      limit: organizationPagination?.limit,
+      skip: organizationPagination?.skip,
+    });
+  }
+
+  @Query(() => PaginatedOrganizationEntity)
+  findManyActiveOrganizations(
+    @Auth() ctx: AuthContext,
+    @Args("organizationFilters", {
+      type: () => FilterOrganizationInput,
+      nullable: true,
+    })
+    organizationFilters?: FilterOrganizationInput,
+    @Args("organizationPagination", {
+      type: () => PaginationInput,
+      nullable: true,
+    })
+    organizationPagination?: PaginationInput,
+    @Args("organizationSort", {
+      type: () => SortOrganizationInput,
+      nullable: true,
+    })
+    organizationSort?: SortOrganizationInput
+  ) {
+    return this.organizationsService.findManyActive(ctx, {
       filters: organizationFilters,
       sort: organizationSort,
       limit: organizationPagination?.limit,
@@ -77,63 +131,106 @@ export class OrganizationsResolver {
 
   // MUTATIONS
 
-  @Roles(UserRole.ADMIN)
   @Mutation(() => OrganizationEntity)
   createOneOrganization(
+    @Auth() ctx: AuthContext,
     @Args("createOrganizationInput", { type: () => CreateOrganizationInput })
     createOrganizationInput: CreateOrganizationInput
   ) {
-    return this.organizationsService.createOne(createOrganizationInput);
+    return this.organizationsService.createOne(ctx, createOrganizationInput);
   }
 
-  @Roles(UserRole.ADMIN)
-  @Mutation(() => [OrganizationEntity])
+  @Mutation(() => BatchEntity)
   createManyOrganizations(
+    @Auth() ctx: AuthContext,
     @Args("createOrganizationInputs", { type: () => [CreateOrganizationInput] })
     createOrganizationInputs: CreateOrganizationInput[]
   ) {
-    return this.organizationsService.createMany(createOrganizationInputs);
+    return this.organizationsService.createMany(ctx, createOrganizationInputs);
   }
 
-  @Roles(UserRole.ADMIN)
   @Mutation(() => OrganizationEntity)
   updateOneOrganization(
+    @Auth() ctx: AuthContext,
     @Args("organizationId", { type: () => ID }) organizationId: string,
     @Args("updateOrganizationInput", { type: () => UpdateOrganizationInput })
     updateOrganizationInput: UpdateOrganizationInput
   ) {
     return this.organizationsService.updateOne(
+      ctx,
       organizationId,
       updateOrganizationInput
     );
   }
 
-  @Roles(UserRole.ADMIN)
   @Mutation(() => BatchEntity)
   updateManyOrganizations(
+    @Auth() ctx: AuthContext,
     @Args("organizationIds", { type: () => [ID] }) organizationIds: string[],
     @Args("updateOrganizationInput", { type: () => UpdateOrganizationInput })
     updateOrganizationInput: UpdateOrganizationInput
   ) {
     return this.organizationsService.updateMany(
+      ctx,
       organizationIds,
       updateOrganizationInput
     );
   }
 
-  @Roles(UserRole.ADMIN)
   @Mutation(() => OrganizationEntity)
   removeOneOrganization(
+    @Auth() ctx: AuthContext,
     @Args("organizationId", { type: () => ID }) organizationId: string
   ) {
-    return this.organizationsService.removeOne(organizationId);
+    return this.organizationsService.removeOne(ctx, organizationId);
   }
 
-  @Roles(UserRole.ADMIN)
   @Mutation(() => BatchEntity)
   removeManyOrganizations(
+    @Auth() ctx: AuthContext,
     @Args("organizationIds", { type: () => [ID] }) organizationIds: string[]
   ) {
-    return this.organizationsService.removeMany(organizationIds);
+    return this.organizationsService.removeMany(ctx, organizationIds);
+  }
+
+  @Mutation(() => OrganizationEntity)
+  disableOneOrganization(
+    @Auth() ctx: AuthContext,
+    @Args("organizationId", { type: () => ID }) organizationId: string
+  ) {
+    return this.organizationsService.disableOne(ctx, organizationId);
+  }
+
+  @Mutation(() => BatchEntity)
+  disableManyOrganizations(
+    @Auth() ctx: AuthContext,
+    @Args("organizationIds", { type: () => [ID] }) organizationIds: string[]
+  ) {
+    return this.organizationsService.disableMany(ctx, organizationIds);
+  }
+
+  @Mutation(() => OrganizationEntity)
+  enableOneOrganization(
+    @Auth() ctx: AuthContext,
+    @Args("organizationId", { type: () => ID }) organizationId: string
+  ) {
+    return this.organizationsService.enableOne(ctx, organizationId);
+  }
+
+  @Mutation(() => BatchEntity)
+  enableManyOrganizations(
+    @Auth() ctx: AuthContext,
+    @Args("organizationIds", { type: () => [ID] }) organizationIds: string[]
+  ) {
+    return this.organizationsService.enableMany(ctx, organizationIds);
+  }
+
+  @ResolveField(() => UserEntity)
+  owner(
+    @Parent() organization: OrganizationEntityRecord,
+    @Context() ctx: GraphqlContext
+  ) {
+    if (!organization?.ownerId) return null;
+    return ctx.loaders.batchUsers.load(organization.ownerId);
   }
 }

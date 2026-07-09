@@ -1,5 +1,6 @@
-import { stopTestMongo } from "../support/mongo-memory";
+import { cleanTestCache } from "../support/clean-test-cache";
 
 export default async function globalTeardown() {
-  await stopTestMongo();
+  await globalThis.__MONGOD__?.stop();
+  cleanTestCache();
 }

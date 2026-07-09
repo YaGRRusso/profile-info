@@ -1,5 +1,5 @@
 import { DeepKeys, DeepValue, useForm } from "@tanstack/react-form";
-import { useCallback } from "react";
+import { useCallback, useMemo } from "react";
 import { toast } from "react-toastify";
 import z from "zod";
 import { FieldArray } from "@/components/inputs/field-array";
@@ -22,8 +22,7 @@ import { useAtsSummarize, useTranslate } from "@/hooks/mutations/ai";
 import type { ProjectRow } from "@/hooks/queries/projects";
 import { useFindManySkills } from "@/hooks/queries/skills";
 import { fieldError } from "@/lib/field-error";
-import { createEmptyI18n } from "@/lib/i18n";
-import { findLabelsByIds } from "@/lib/mappers";
+import { createEmptyI18n, i18nLabel, i18nLabelsByIds } from "@/lib/i18n";
 import { isSlugTaken } from "@/lib/slug";
 import { CommonFormProps } from "./common";
 
@@ -33,7 +32,7 @@ const projectSchema = z.object({
     .min(1, "required field")
     .regex(SLUG_REGEX, "invalid field format"),
   relevance: z.number().min(1, "must be a positive number"),
-  skills: z.array(z.string()),
+  skillIds: z.array(z.string()),
   images: z.array(z.url()),
   urls: z.array(
     z.object({
@@ -69,7 +68,7 @@ export function projectToInput(data: ProjectSchema): CreateProjectInput {
   return {
     slug: data.slug,
     relevance: data.relevance,
-    skills: data.skills.length ? data.skills : undefined,
+    skillIds: data.skillIds.length ? data.skillIds : undefined,
     images: data.images.length ? data.images : undefined,
     urls: data.urls.length ? data.urls : undefined,
     i18n: data.i18n.map((translation) => ({
@@ -86,7 +85,7 @@ export function projectToForm(project: ProjectRow): Partial<ProjectSchema> {
   return {
     slug: project.slug,
     relevance: project.relevance,
-    skills: (project.skills ?? []).map((skill) => skill.id),
+    skillIds: (project.skills ?? []).map((skill) => skill.id),
     images: project.images ?? [],
     urls: (project.urls ?? []).map((url) => ({
       title: url.title,
@@ -112,19 +111,24 @@ export function ProjectForm({
   const findManySkills = useFindManySkills();
   useQueryAllPages(findManySkills);
 
+  const skillOptions = useMemo(
+    () =>
+      (findManySkills.data?.nodes ?? []).map((skill) => ({
+        label: i18nLabel(skill),
+        value: skill.id,
+        disabled: skill.disabled,
+      })),
+    [findManySkills.data?.nodes]
+  );
+
   const atsSummarize = useAtsSummarize();
   const translate = useTranslate();
-
-  const skillOptions = (findManySkills.data?.nodes ?? []).map((skill) => ({
-    label: skill.name,
-    value: skill.id,
-  }));
 
   const form = useForm({
     defaultValues: {
       slug: "",
       relevance: 1,
-      skills: [] as string[],
+      skillIds: [] as string[],
       images: [] as string[],
       urls: [] as { title: string; value: string }[],
       i18n: createEmptyI18n({ title: "", description: "" }),
@@ -148,12 +152,10 @@ export function ProjectForm({
       if (raw.trim().length <= RawSizeEnum.XSMALL)
         return toast.error("Description must be at least 32 characters long");
 
-      const skills = findLabelsByIds({
-        items: findManySkills.data?.nodes,
-        lookupKey: "id",
-        labelKey: "name",
-        targetValues: form.getFieldValue("skills"),
-      });
+      const skills = i18nLabelsByIds(
+        findManySkills.data?.nodes,
+        form.getFieldValue("skillIds")
+      );
       if (!skills.length) return toast.error("At least one skill is required");
 
       const title = fieldGroup.title;
@@ -264,14 +266,14 @@ export function ProjectForm({
           />
         )}
       </Field>
-      <Field name="skills">
+      <Field name="skillIds">
         {(field) => (
           <MultiSelectInput
             error={fieldError(field.state.meta)}
             label="Skills"
             onChange={field.handleChange}
             options={skillOptions}
-            placeholder={PLACEHOLDERS.searchSkills}
+            placeholder={PLACEHOLDERS.search}
             value={field.state.value}
           />
         )}
@@ -295,7 +297,7 @@ export function ProjectForm({
                     error={fieldError(field.state.meta)}
                     name={field.name}
                     onChange={field.handleChange}
-                    placeholder={PLACEHOLDERS.imageUrl}
+                    placeholder={PLACEHOLDERS.url}
                     value={field.state.value}
                   />
                 )}
@@ -335,7 +337,7 @@ export function ProjectForm({
                       error={fieldError(field.state.meta)}
                       name={field.name}
                       onChange={field.handleChange}
-                      placeholder={PLACEHOLDERS.linkUrl}
+                      placeholder={PLACEHOLDERS.url}
                       value={field.state.value}
                     />
                   )}
@@ -369,7 +371,7 @@ export function ProjectForm({
                       name={field.name}
                       onChange={field.handleChange}
                       options={LOCALES}
-                      placeholder={PLACEHOLDERS.chooseLanguage}
+                      placeholder={PLACEHOLDERS.chooseOne}
                       value={field.state.value}
                     />
                   )}
@@ -408,7 +410,7 @@ export function ProjectForm({
                           field.state.value
                         )
                       }
-                      placeholder={PLACEHOLDERS.projectDescription}
+                      placeholder={PLACEHOLDERS.description}
                       value={field.state.value}
                     />
                   )}
@@ -429,7 +431,13 @@ export function ProjectForm({
             Cancel
           </button>
         )}
-        <Subscribe>
+        <Subscribe
+          selector={(formState) => ({
+            canSubmit: formState.canSubmit,
+            isSubmitting: formState.isSubmitting,
+            isTouched: formState.isTouched,
+          })}
+        >
           {({ canSubmit, isSubmitting, isTouched }) => (
             <button
               className="btn btn-soft btn-primary flex-1"

@@ -39,7 +39,8 @@ const updateManyExperiences = graphql(`
       experienceIds: $experienceIds
       updateExperienceInput: $updateExperienceInput
     ) {
-      count
+      succeeded
+      failed
     }
   }
 `);
@@ -56,7 +57,8 @@ const removeOneExperience = graphql(`
 const removeManyExperiences = graphql(`
   mutation RemoveManyExperiences($experienceIds: [ID!]!) {
     removeManyExperiences(experienceIds: $experienceIds) {
-      count
+      succeeded
+      failed
     }
   }
 `);

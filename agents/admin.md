@@ -24,13 +24,13 @@ Data flow: GraphQL hooks call `execute()` from `src/lib/execute.ts` (POST to `VI
 
 Routing:
 
-- `_authenticated.tsx`: protected layout; `useGetMe()` when token exists; login page when unauthenticated.
+- `_authenticated.tsx`: protected layout; waits for auth store hydration, then `useGetMe()` when a token exists. Child routes mount only after session is valid — queries do not gate auth themselves. Login when unauthenticated. Dev-only quick login buttons (`DevQuickLogin` on login screen, `import.meta.env.DEV`) sign in as seed personas with password `123123`.
 - `index.tsx`: dashboard via `useDashboard()` (stats + recharts).
 - `_authenticated/_sidebar/settings/`: profile form + `DownloadCvControl` in page header.
 - `_authenticated/_sidebar/`: CRUD pages per entity with `-components/table.tsx`.
 - `settings/index.tsx`: inline profile form via `useGetMe()` + `useUpdateMe()` (`updateMe` mutation); syncs auth store after save.
 
-Rich forms map flat Zod schemas to nested GraphQL shapes (`i18n`, `organization`, `skills`, `period`, experience `roles`). Profile settings uses `forms/profile.tsx` (`profileToForm` / `profileToInput`).
+Rich forms map flat Zod schemas to nested GraphQL shapes (`i18n`, `organizationId`, `skillIds`, `period`, experience `roles`). GraphQL output still exposes resolved `organization` and `skills` objects. Profile settings uses `forms/profile.tsx` (`profileToForm` / `profileToInput`) with `skillIds` via `MultiSelectInput` + `DraggableList` for display order. ATS on profile description uses the form's skill list (`i18nLabelsByIds`), not the global catalog.
 
 ## Core technologies
 
@@ -49,7 +49,7 @@ Rich forms map flat Zod schemas to nested GraphQL shapes (`i18n`, `organization`
 ## Module / directory breakdown
 
 - `src/lib/execute.ts`: GraphQL transport. `src/lib/api.ts`: REST transport (`getApiOrigin`, `apiRequest`). Other helpers: `gql.ts`, `tc.ts`, `cn.ts`, `parsers.ts`, `field-error.ts`, `chart-theme.ts`, `dayjs.ts`, `greeting.ts`, etc.
-- `src/hooks/queries/` and `mutations/`: one file per entity; `graphql` tag must use static string literals (no interpolated fragments).
+- `src/hooks/queries/` and `mutations/`: one file per entity; `graphql` tag must use static string literals (no interpolated fragments). Paginated list hooks use `hooks/custom/paginated-query.ts` helpers inside `useInfiniteQuery` — each helper receives an explicit key (`withPagination`: variables pagination key; `paginatedNextPageParam` / `paginatedSelect`: response field name).
 - `src/generated/graphql/`: codegen output — regenerate, do not edit.
 - `src/forms/`: entity forms + `*ToInput`/`*ToForm` mappers co-located.
 - `src/components/`: generic `display/` and `inputs/` (domain-agnostic).
@@ -63,7 +63,7 @@ Adding a GraphQL operation:
 2. Regenerate via `npm run dev` (watch) or `npm run build`; once: `npx graphql-codegen --config codegen.ts`.
 3. Wrap in `useQuery` / `useInfiniteQuery` / `useMutation` calling `execute`. Follow `useFindManySkills` for infinite pagination.
 
-REST reads (e.g. resume PDF): `hooks/queries/resume.ts` — `fetchResumePdf` via `apiRequest`, user-triggered download via `useDownloadResume` (`useMutation`).
+REST reads (e.g. resume PDF): `hooks/mutations/resume.ts` — `fetchResumePdf(locale, userId)` via `apiRequest`, user-triggered download via `useDownloadResume` (`useMutation`; `userId` from auth store).
 
 Adding a form: copy `src/forms/skill.tsx` (Zod + TanStack Form + generic inputs).
 
@@ -83,6 +83,9 @@ Keep `components/`, `hooks/custom/`, and `lib/` domain-agnostic.
 ## Gotchas & notes
 
 - Codegen reads `../api/src/schema.gql` from disk; keep it up to date after API changes.
+- GraphQL Codegen `client` preset (v6+) defaults `enumType` to `string-literal` (union types) and leaves unmapped scalars as `unknown`. This admin relies on runtime enum values (`ExperienceCategory.FullTime`, `Object.values`, `z.enum`) — keep `codegen.ts` on `enumType: "enum"` and map `DateTime` → `string`.
+- Batch mutations (`createMany*`, `updateMany*`, `removeMany*`, `disableMany*`, `enableMany*`) return `BatchEntity { succeeded, failed }` — not `count` or entity arrays.
+- Catalog admin tables and form pickers: `useFindManyOrganizations` / `useFindManySkills`. Mutate actions: USER read-only on `GLOBAL` rows; SUPER_ADMIN read-only on `LOCAL` rows (`catalog-mutation-access.ts`, `disabled={readOnly}`). Row lifecycle: `GLOBAL` → enable/disable (always visible); `LOCAL` → remove. Batch: remove always; enable/disable batch only for `SUPER_ADMIN`.
 - `src/generated/graphql/` and `routeTree.gen.ts` are generated.
 - Do not add ad-hoc 401 handling in hooks.
 - `dev` backgrounds codegen; first start may race — run `build` once if types missing.

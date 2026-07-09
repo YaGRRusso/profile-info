@@ -1,96 +1,137 @@
 import { Injectable } from "@nestjs/common";
-import { AnyKeys, QueryFilter, SortOrder, UpdateQuery } from "mongoose";
 import {
   labelFromI18nTitle,
   RecentActivityRecord,
 } from "@/common/helpers/recent-activity.helper";
+import type { AuthContext } from "@/core/context/auth-context.interface";
 import { BatchEntity } from "@/core/entities/batch.entity";
-import { PaginatedModel } from "@/core/schemas/paginated.schema";
-import { CourseModel } from "@/modules/courses/schemas/course.schema";
+import { FieldCount, MultiPaged } from "@/core/persistence/types/output.type";
+import { OrganizationsValidatorService } from "@/modules/organizations/organizations-validator.service";
+import { SkillsValidatorService } from "@/modules/skills/skills-validator.service";
 import { CoursesRepository } from "./courses.repository";
 import { CreateCourseInput } from "./dto/create-course.input";
+import { FilterCourseInput } from "./dto/filter-course.input";
+import { SortCourseInput } from "./dto/sort-course.input";
 import { UpdateCourseInput } from "./dto/update-course.input";
+import { CourseEntityRecord } from "./entities/course.entity";
+
+interface CourseCatalogRefs {
+  organizationId?: string;
+  skillIds?: string[];
+}
 
 @Injectable()
 export class CoursesService {
-  constructor(private readonly repository: CoursesRepository) {}
+  constructor(
+    private readonly repository: CoursesRepository,
+    private readonly organizationsValidator: OrganizationsValidatorService,
+    private readonly skillsValidator: SkillsValidatorService
+  ) {}
 
-  findOneById(id: string): Promise<CourseModel> {
-    return this.repository.findOneById(id);
+  findOneById(ctx: AuthContext, id: string): Promise<CourseEntityRecord> {
+    return this.repository.tenantCrud(ctx).findOneById(id);
   }
 
-  findOne({
-    filters,
-  }: {
-    filters?: QueryFilter<CourseModel>;
-  }): Promise<CourseModel> {
-    return this.repository.findOne({ filters });
+  findOne(
+    ctx: AuthContext,
+    {
+      filters,
+    }: {
+      filters?: FilterCourseInput;
+    }
+  ): Promise<CourseEntityRecord> {
+    return this.repository.tenantCrud(ctx).findOne({ filters });
   }
 
-  findManyById(ids: string[]): Promise<CourseModel[]> {
-    return this.repository.findManyById(ids);
+  findManyById(ctx: AuthContext, ids: string[]): Promise<CourseEntityRecord[]> {
+    return this.repository.tenantCrud(ctx).findManyById(ids);
   }
 
-  findMany({
-    filters,
-    sort,
-    skip = 0,
-    limit = 50,
-  }: {
-    filters?: QueryFilter<CourseModel>;
-    sort?: Partial<Record<keyof CourseModel, SortOrder>>;
-    limit?: number;
-    skip?: number;
-  }): Promise<PaginatedModel<CourseModel>> {
-    return this.repository.findMany({ filters, sort, skip, limit });
+  findMany(
+    ctx: AuthContext,
+    {
+      filters,
+      sort,
+      skip = 0,
+      limit = 50,
+    }: {
+      filters?: FilterCourseInput;
+      sort?: SortCourseInput;
+      limit?: number;
+      skip?: number;
+    }
+  ): Promise<MultiPaged<CourseEntityRecord>> {
+    return this.repository.tenantCrud(ctx).findMany({
+      filters,
+      sort,
+      skip,
+      limit,
+    });
   }
 
-  createOne(createInput: CreateCourseInput): Promise<CourseModel> {
-    return this.repository.createOne(createInput as AnyKeys<CourseModel>);
+  async createOne(
+    ctx: AuthContext,
+    createInput: CreateCourseInput
+  ): Promise<CourseEntityRecord> {
+    await this.assertCatalogReferences(ctx, createInput);
+
+    return await this.repository.tenantCrud(ctx).createOne(createInput);
   }
 
-  createMany(createInputs: CreateCourseInput[]): Promise<CourseModel[]> {
-    return this.repository.createMany(createInputs as AnyKeys<CourseModel>[]);
+  async createMany(
+    ctx: AuthContext,
+    createInputs: CreateCourseInput[]
+  ): Promise<BatchEntity> {
+    await this.assertCatalogReferencesMany(ctx, createInputs);
+
+    return await this.repository.tenantCrud(ctx).createMany(createInputs);
   }
 
-  updateOne(id: string, updateInput: UpdateCourseInput): Promise<CourseModel> {
-    return this.repository.updateOne(
-      id,
-      updateInput as object as UpdateQuery<CourseModel>
-    );
+  async updateOne(
+    ctx: AuthContext,
+    id: string,
+    updateInput: UpdateCourseInput
+  ): Promise<CourseEntityRecord> {
+    await this.assertCatalogReferences(ctx, updateInput);
+
+    return this.repository.tenantCrud(ctx).updateOneById(id, updateInput);
   }
 
-  updateMany(
+  async updateMany(
+    ctx: AuthContext,
     ids: string[],
     updateInput: UpdateCourseInput
   ): Promise<BatchEntity> {
-    return this.repository.updateMany(
-      ids,
-      updateInput as object as UpdateQuery<CourseModel>
-    );
+    await this.assertCatalogReferences(ctx, updateInput);
+
+    return await this.repository
+      .tenantCrud(ctx)
+      .updateManyById(ids, updateInput);
   }
 
-  removeOne(id: string): Promise<CourseModel> {
-    return this.repository.deleteOne(id);
+  removeOne(ctx: AuthContext, id: string): Promise<CourseEntityRecord> {
+    return this.repository.tenantCrud(ctx).deleteOneById(id);
   }
 
-  removeMany(ids: string[]): Promise<BatchEntity> {
-    return this.repository.deleteMany(ids);
+  async removeMany(ctx: AuthContext, ids: string[]): Promise<BatchEntity> {
+    return await this.repository.tenantCrud(ctx).deleteManyById(ids);
   }
 
-  count(): Promise<number> {
-    return this.repository.count();
+  count(ctx: AuthContext): Promise<number> {
+    return this.repository.tenantStats(ctx).count();
   }
 
-  countByField(field: string): Promise<{ label: string; value: number }[]> {
-    return this.repository.countByField(field);
+  countByField(ctx: AuthContext, field: string): Promise<FieldCount[]> {
+    return this.repository.tenantStats(ctx).countByField(field);
   }
 
-  async findRecentActivity(limit: number): Promise<RecentActivityRecord[]> {
-    const rows = await this.repository.findRecentlyUpdated(
-      limit,
-      "slug i18n updatedAt"
-    );
+  async findRecentActivity(
+    ctx: AuthContext,
+    limit: number
+  ): Promise<RecentActivityRecord[]> {
+    const rows = await this.repository
+      .tenantStats(ctx)
+      .findRecentlyUpdated(limit, "slug i18n updatedAt");
     return rows.map((row) => ({
       label: labelFromI18nTitle(
         row.slug as string,
@@ -100,14 +141,58 @@ export class CoursesService {
     }));
   }
 
-  detachSkill(skillId: string): Promise<void> {
-    return this.repository.updateManyByFilter(
-      { skills: skillId },
-      { $pull: { skills: skillId } }
-    );
+  async detachSkill(skillId: string): Promise<void> {
+    await this.repository.detachSkill(skillId);
   }
 
-  purgeByOrganization(organizationId: string): Promise<void> {
-    return this.repository.deleteManyByFilter({ organization: organizationId });
+  async purgeByOrganization(organizationId: string): Promise<void> {
+    await this.repository.purgeByOrganization(organizationId);
+  }
+
+  async purgeByOwner(ownerId: string): Promise<void> {
+    await this.repository.purgeByOwner(ownerId);
+  }
+
+  private async assertCatalogReferences(
+    ctx: AuthContext,
+    input: CourseCatalogRefs
+  ): Promise<void> {
+    if (input.organizationId) {
+      await this.organizationsValidator.assertOrganizationEnabled(
+        ctx,
+        input.organizationId
+      );
+    }
+
+    if (input.skillIds?.length) {
+      await this.skillsValidator.assertSkillsEnabled(ctx, input.skillIds);
+    }
+  }
+
+  private async assertCatalogReferencesMany(
+    ctx: AuthContext,
+    inputs: CourseCatalogRefs[]
+  ): Promise<void> {
+    const organizationIds = [
+      ...new Set(
+        inputs
+          .map((item) => item.organizationId)
+          .filter((id): id is string => id !== undefined)
+      ),
+    ];
+    const skillIds = [
+      ...new Set(inputs.flatMap((item) => item.skillIds ?? [])),
+    ];
+
+    if (organizationIds.length > 0) {
+      await this.organizationsValidator.assertOrganizationsEnabled(
+        ctx,
+        organizationIds
+      );
+    }
+
+    if (skillIds.length > 0) {
+      await this.skillsValidator.assertSkillsEnabled(ctx, skillIds);
+    }
   }
 }

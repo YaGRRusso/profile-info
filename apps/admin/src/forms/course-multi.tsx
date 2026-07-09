@@ -76,7 +76,7 @@ export function CourseMultiForm({
             name={field.name}
             onChange={(value) => field.handleChange(value as CourseStatus)}
             options={STATUS_OPTIONS}
-            placeholder={PLACEHOLDERS.chooseStatus}
+            placeholder={PLACEHOLDERS.chooseOne}
             value={field.state.value}
           />
         )}

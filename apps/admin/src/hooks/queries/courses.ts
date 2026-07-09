@@ -3,11 +3,15 @@ import { graphql } from "@/generated/graphql";
 import type {
   FilterCourseInput,
   FindManyCoursesQuery,
+  FindManyCoursesQueryVariables,
   SortCourseInput,
 } from "@/generated/graphql/graphql";
+import {
+  paginatedNextPageParam,
+  paginatedSelect,
+  withPagination,
+} from "@/hooks/custom/paginated-query";
 import { execute } from "@/lib/execute";
-
-const PAGE_SIZE = 50;
 
 export type CourseRow =
   FindManyCoursesQuery["findManyCourses"]["nodes"][number];
@@ -32,6 +36,15 @@ const findManyCourses = graphql(`
         url
         image
         hours
+        owner {
+          id
+          nickname
+          name
+          role
+          email
+          phone
+          avatar
+        }
         organization {
           id
           name
@@ -46,7 +59,13 @@ const findManyCourses = graphql(`
         }
         skills {
           id
-          name
+          slug
+          i18n {
+            locale
+            messages {
+              title
+            }
+          }
         }
         createdAt
         updatedAt
@@ -65,24 +84,18 @@ export function useFindManyCourses(
   return useInfiniteQuery({
     queryKey: ["findManyCourses", variables],
     queryFn: ({ pageParam }) =>
-      execute(findManyCourses, {
-        ...variables,
-        coursePagination: { skip: pageParam, limit: PAGE_SIZE },
-      }),
+      execute(
+        findManyCourses,
+        withPagination<FindManyCoursesQueryVariables>(
+          "coursePagination",
+          pageParam,
+          variables
+        )
+      ),
     initialPageParam: 0,
-    getNextPageParam: (lastPage, allPages) => {
-      const totalFetched = allPages.reduce(
-        (sum, p) => sum + p.findManyCourses.nodes.length,
-        0
-      );
-      return totalFetched < lastPage.findManyCourses.found
-        ? totalFetched
-        : undefined;
-    },
-    select: (data) => ({
-      found: data.pages[0]?.findManyCourses.found ?? 0,
-      nodes: data.pages.flatMap((p) => p.findManyCourses.nodes),
-    }),
+    getNextPageParam:
+      paginatedNextPageParam<FindManyCoursesQuery>("findManyCourses"),
+    select: paginatedSelect<FindManyCoursesQuery>("findManyCourses"),
     ...options,
   });
 }

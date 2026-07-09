@@ -1,19 +1,22 @@
-import { Injectable, NotFoundException } from "@nestjs/common";
+import { Injectable } from "@nestjs/common";
 import { sortDateRange } from "@/common/helpers/daterange.helper";
 import { formatPeriod } from "@/common/helpers/format-period.helper";
 import { pickTranslation } from "@/common/helpers/pick-translation.helper";
-import { truncateText } from "@/common/helpers/truncate-text.helper";
 import { DEFAULT_LOCALE, type LocaleCode } from "@/common/i18n/locales";
+import { toSessionAuthContext } from "@/core/context/auth-context.helper";
 import { UserRole } from "@/core/enums/user-role.enum";
 import { CoursesService } from "@/modules/courses/courses.service";
+import { CourseStatus } from "@/modules/courses/enums/status.enum";
 import { EducationsService } from "@/modules/educations/educations.service";
+import { EducationStatus } from "@/modules/educations/enums/status.enum";
 import { ExperiencesService } from "@/modules/experiences/experiences.service";
+import type { OrganizationEntityRecord } from "@/modules/organizations/entities/organization.entity";
 import { OrganizationsService } from "@/modules/organizations/organizations.service";
-import { OrganizationModel } from "@/modules/organizations/schemas/organization.schema";
 import { ProjectsService } from "@/modules/projects/projects.service";
 import { SkillsService } from "@/modules/skills/skills.service";
 import { UsersService } from "@/modules/users/users.service";
 import { RESUME_LIMITS } from "./const/resume-limits.const";
+import { orderSkillsByIds } from "./helpers/order-skills.helper";
 import { selectResumeSkillGroups } from "./helpers/select-skill-groups.helper";
 import type {
   ResumeCertification,
@@ -43,41 +46,43 @@ export class ResumeService {
   ) {}
 
   async buildResume(
+    userId: string,
     locale: LocaleCode = DEFAULT_LOCALE
   ): Promise<ResumeDocumentData> {
-    const { nodes: users } = await this.usersService.findMany({
-      filters: { role: UserRole.ADMIN },
-      limit: 1,
+    const user = await this.usersService.findOneById(userId);
+
+    const ctx = toSessionAuthContext({
+      id: user.id,
+      role: UserRole.USER,
     });
 
-    const user = users[0];
-    if (!user) throw new NotFoundException("Profile user not found");
+    const skillIds = user.skillIds ?? [];
 
     const [
-      skillsResult,
+      profileSkills,
       experiencesResult,
       educationsResult,
       coursesResult,
       projectsResult,
     ] = await Promise.all([
-      this.skillsService.findMany({
-        sort: { relevance: -1 },
-      }),
-      this.experiencesService.findMany({
+      skillIds.length
+        ? this.skillsService.findManyById(ctx, skillIds)
+        : Promise.resolve([]),
+      this.experiencesService.findMany(ctx, {
         sort: { relevance: -1 },
         limit: RESUME_LIMITS.experiences,
       }),
-      this.educationsService.findMany({
-        filters: { status: "COMPLETE" },
+      this.educationsService.findMany(ctx, {
+        filters: { status: EducationStatus.COMPLETE },
         sort: { relevance: -1 },
         limit: RESUME_LIMITS.educations,
       }),
-      this.coursesService.findMany({
-        filters: { status: "COMPLETE" },
+      this.coursesService.findMany(ctx, {
+        filters: { status: CourseStatus.COMPLETE },
         sort: { relevance: -1 },
         limit: RESUME_LIMITS.certifications,
       }),
-      this.projectsService.findMany({
+      this.projectsService.findMany(ctx, {
         sort: { relevance: -1 },
         limit: RESUME_LIMITS.projects,
       }),
@@ -86,29 +91,26 @@ export class ResumeService {
     const organizationIds = new Set<string>();
 
     for (const experience of experiencesResult.nodes) {
-      const organizationId = toIdString(experience.organization);
+      const organizationId = toIdString(experience.organizationId);
       if (organizationId) organizationIds.add(organizationId);
     }
 
     for (const education of educationsResult.nodes) {
-      const organizationId = toIdString(education.organization);
+      const organizationId = toIdString(education.organizationId);
       if (organizationId) organizationIds.add(organizationId);
     }
 
     for (const course of coursesResult.nodes) {
-      const organizationId = toIdString(course.organization);
+      const organizationId = toIdString(course.organizationId);
       if (organizationId) organizationIds.add(organizationId);
     }
 
-    const organizations = await this.organizationsService.findManyById([
+    const organizations = await this.organizationsService.findManyById(ctx, [
       ...organizationIds,
     ]);
 
     const organizationMap = new Map(
-      organizations.map((organization) => [
-        String(organization._id),
-        organization,
-      ])
+      organizations.map((organization) => [organization.id, organization])
     );
 
     const userTranslation = pickTranslation(user.i18n, locale);
@@ -118,16 +120,14 @@ export class ResumeService {
       title: userTranslation?.messages.title,
       email: user.email,
       phone: user.phone,
-      description: userTranslation?.messages.description
-        ? truncateText(
-            userTranslation.messages.description,
-            RESUME_LIMITS.descriptionMaxLength
-          )
-        : undefined,
+      description: userTranslation?.messages.description || undefined,
       urls: (user.urls ?? []).map(({ title, value }) => ({ title, value })),
     };
 
-    const skills = selectResumeSkillGroups(skillsResult.nodes);
+    const skills = selectResumeSkillGroups(
+      orderSkillsByIds(skillIds, profileSkills),
+      locale
+    );
     const experiences = this.buildExperiences(
       experiencesResult.nodes,
       organizationMap,
@@ -158,12 +158,12 @@ export class ResumeService {
 
   private buildExperiences(
     experiences: Awaited<ReturnType<ExperiencesService["findMany"]>>["nodes"],
-    organizationMap: Map<string, OrganizationModel>,
+    organizationMap: Map<string, OrganizationEntityRecord>,
     locale: LocaleCode
   ): ResumeExperience[] {
     return experiences.map((experience) => {
       const organization = organizationMap.get(
-        String(experience.organization ?? "")
+        String(experience.organizationId ?? "")
       );
 
       const roles = sortDateRange(experience.roles ?? [])
@@ -175,10 +175,7 @@ export class ResumeService {
           return [
             {
               title: translation.messages.title,
-              description: truncateText(
-                translation.messages.description,
-                RESUME_LIMITS.descriptionMaxLength
-              ),
+              description: translation.messages.description,
               period: formatPeriod(role.period, locale),
             },
           ];
@@ -193,7 +190,7 @@ export class ResumeService {
 
   private buildEducations(
     educations: Awaited<ReturnType<EducationsService["findMany"]>>["nodes"],
-    organizationMap: Map<string, OrganizationModel>,
+    organizationMap: Map<string, OrganizationEntityRecord>,
     locale: LocaleCode
   ): ResumeEducation[] {
     return educations.flatMap((education): ResumeEducation[] => {
@@ -201,13 +198,10 @@ export class ResumeService {
       if (!translation) return [];
 
       const organization = organizationMap.get(
-        String(education.organization ?? "")
+        String(education.organizationId ?? "")
       );
 
-      const description = truncateText(
-        translation.messages.description,
-        RESUME_LIMITS.descriptionMaxLength
-      );
+      const description = translation.messages.description;
 
       return [
         {
@@ -222,7 +216,7 @@ export class ResumeService {
 
   private buildCertifications(
     courses: Awaited<ReturnType<CoursesService["findMany"]>>["nodes"],
-    organizationMap: Map<string, OrganizationModel>,
+    organizationMap: Map<string, OrganizationEntityRecord>,
     locale: LocaleCode
   ): ResumeCertification[] {
     return courses.flatMap((course): ResumeCertification[] => {
@@ -230,14 +224,17 @@ export class ResumeService {
       if (!translation) return [];
 
       const organization = organizationMap.get(
-        String(course.organization ?? "")
+        String(course.organizationId ?? "")
       );
+
+      const description = translation.messages.description;
 
       return [
         {
           title: translation.messages.title,
           organization: organization?.name ?? "Unknown organization",
           hours: course.hours,
+          description: description || undefined,
         },
       ];
     });
@@ -254,10 +251,7 @@ export class ResumeService {
       return [
         {
           title: translation.messages.title,
-          description: truncateText(
-            translation.messages.description,
-            RESUME_LIMITS.descriptionMaxLength
-          ),
+          description: translation.messages.description,
           url: project.urls?.[0]?.value,
         },
       ];

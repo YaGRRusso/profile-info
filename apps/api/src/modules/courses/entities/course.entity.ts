@@ -1,9 +1,10 @@
-import { Field, Int, ObjectType } from "@nestjs/graphql";
+import { Field, ID, Int, ObjectType } from "@nestjs/graphql";
 import { OptionalField } from "@/core/decorators/optional-field.decorator";
 import { BaseEntity } from "@/core/entities/base.entity";
 import { createPaginatedModel } from "@/core/schemas/paginated.schema";
 import { OrganizationEntity } from "@/modules/organizations/entities/organization.entity";
 import { SkillEntity } from "@/modules/skills/entities/skill.entity";
+import { UserEntity } from "@/modules/users/entities/user.entity";
 import { CourseStatus } from "../enums/status.enum";
 
 @ObjectType()
@@ -32,8 +33,17 @@ export class CourseEntity extends BaseEntity {
   @Field(() => String)
   slug: string;
 
-  @Field(() => OrganizationEntity)
-  organization: OrganizationEntity;
+  @Field(() => ID)
+  ownerId: string;
+
+  @Field(() => UserEntity)
+  owner: UserEntity;
+
+  @OptionalField(() => ID)
+  organizationId?: string;
+
+  @OptionalField(() => OrganizationEntity)
+  organization?: OrganizationEntity;
 
   @Field(() => CourseStatus)
   status: CourseStatus;
@@ -50,8 +60,16 @@ export class CourseEntity extends BaseEntity {
   @Field(() => [CourseTranslationLocale])
   i18n: CourseTranslationLocale[];
 
+  @OptionalField(() => [ID])
+  skillIds?: string[];
+
   @OptionalField(() => [SkillEntity])
   skills?: SkillEntity[];
 }
 
 export const PaginatedCourseEntity = createPaginatedModel(CourseEntity);
+
+export type CourseEntityRecord = Omit<
+  CourseEntity,
+  "owner" | "organization" | "skills"
+>;

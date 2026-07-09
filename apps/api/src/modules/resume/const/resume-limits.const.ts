@@ -5,5 +5,4 @@ export const RESUME_LIMITS = {
   educations: 3,
   certifications: 6,
   projects: 3,
-  descriptionMaxLength: 800,
 } as const;

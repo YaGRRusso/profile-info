@@ -1,10 +1,11 @@
-import { Field, ObjectType } from "@nestjs/graphql";
+import { Field, ID, ObjectType } from "@nestjs/graphql";
 import { OptionalField } from "@/core/decorators/optional-field.decorator";
 import { BaseEntity } from "@/core/entities/base.entity";
 import { DateRangeEntity } from "@/core/entities/date-range.entity";
 import { createPaginatedModel } from "@/core/schemas/paginated.schema";
 import { OrganizationEntity } from "@/modules/organizations/entities/organization.entity";
 import { SkillEntity } from "@/modules/skills/entities/skill.entity";
+import { UserEntity } from "@/modules/users/entities/user.entity";
 import { EducationLevel } from "../enums/level.enum";
 import { EducationStatus } from "../enums/status.enum";
 
@@ -34,8 +35,17 @@ export class EducationEntity extends BaseEntity {
   @Field(() => String)
   slug: string;
 
-  @Field(() => OrganizationEntity)
-  organization: OrganizationEntity;
+  @Field(() => ID)
+  ownerId: string;
+
+  @Field(() => UserEntity)
+  owner: UserEntity;
+
+  @OptionalField(() => ID)
+  organizationId?: string;
+
+  @OptionalField(() => OrganizationEntity)
+  organization?: OrganizationEntity;
 
   @Field(() => EducationLevel)
   level: EducationLevel;
@@ -52,6 +62,9 @@ export class EducationEntity extends BaseEntity {
   @Field(() => [EducationTranslationLocale])
   i18n: EducationTranslationLocale[];
 
+  @OptionalField(() => [ID])
+  skillIds?: string[];
+
   @OptionalField(() => [SkillEntity])
   skills?: SkillEntity[];
 
@@ -60,3 +73,8 @@ export class EducationEntity extends BaseEntity {
 }
 
 export const PaginatedEducationEntity = createPaginatedModel(EducationEntity);
+
+export type EducationEntityRecord = Omit<
+  EducationEntity,
+  "owner" | "organization" | "skills"
+>;

@@ -8,15 +8,14 @@ import {
   ResolveField,
   Resolver,
 } from "@nestjs/graphql";
-import { Public } from "@/core/decorators/public-route.decorator";
-import { Roles } from "@/core/decorators/roles.decorator";
+import type { AuthContext } from "@/core/context/auth-context.interface";
+import type { GraphqlContext } from "@/core/context/graphql-context.interface";
 import { BatchEntity } from "@/core/entities/batch.entity";
-import { UserRole } from "@/core/enums/user-role.enum";
 import { PaginationInput } from "@/core/inputs/pagination.input";
-import { CourseModel } from "@/modules/courses/schemas/course.schema";
-import type { Ctx } from "@/modules/graphql/context.interface";
+import { Auth } from "@/modules/auth/decorators/auth-context.decorator";
 import { OrganizationEntity } from "@/modules/organizations/entities/organization.entity";
 import { SkillEntity } from "@/modules/skills/entities/skill.entity";
+import { UserEntity } from "@/modules/users/entities/user.entity";
 import { CoursesService } from "./courses.service";
 import { CreateCourseInput } from "./dto/create-course.input";
 import { FilterCourseInput } from "./dto/filter-course.input";
@@ -30,35 +29,37 @@ export class CoursesResolver {
 
   // QUERIES
 
-  @Public()
   @Query(() => CourseEntity)
-  findOneCourseById(@Args("courseId", { type: () => ID }) courseId: string) {
-    return this.coursesService.findOneById(courseId);
+  findOneCourseById(
+    @Auth() ctx: AuthContext,
+    @Args("courseId", { type: () => ID }) courseId: string
+  ) {
+    return this.coursesService.findOneById(ctx, courseId);
   }
 
-  @Public()
   @Query(() => CourseEntity)
   findOneCourse(
+    @Auth() ctx: AuthContext,
     @Args("courseFilters", {
       type: () => FilterCourseInput,
       nullable: true,
     })
     courseFilters?: FilterCourseInput
   ) {
-    return this.coursesService.findOne({ filters: courseFilters });
+    return this.coursesService.findOne(ctx, { filters: courseFilters });
   }
 
-  @Public()
   @Query(() => [CourseEntity])
   findManyCourseById(
+    @Auth() ctx: AuthContext,
     @Args("courseIds", { type: () => [ID] }) courseIds: string[]
   ) {
-    return this.coursesService.findManyById(courseIds);
+    return this.coursesService.findManyById(ctx, courseIds);
   }
 
-  @Public()
   @Query(() => PaginatedCourseEntity)
   findManyCourses(
+    @Auth() ctx: AuthContext,
     @Args("courseFilters", {
       type: () => FilterCourseInput,
       nullable: true,
@@ -75,7 +76,7 @@ export class CoursesResolver {
     })
     courseSort?: SortCourseInput
   ) {
-    return this.coursesService.findMany({
+    return this.coursesService.findMany(ctx, {
       filters: courseFilters,
       sort: courseSort,
       limit: coursePagination?.limit,
@@ -85,67 +86,75 @@ export class CoursesResolver {
 
   // MUTATIONS
 
-  @Roles(UserRole.ADMIN)
   @Mutation(() => CourseEntity)
   createOneCourse(
+    @Auth() ctx: AuthContext,
     @Args("createCourseInput", { type: () => CreateCourseInput })
     createCourseInput: CreateCourseInput
   ) {
-    return this.coursesService.createOne(createCourseInput);
+    return this.coursesService.createOne(ctx, createCourseInput);
   }
 
-  @Roles(UserRole.ADMIN)
-  @Mutation(() => [CourseEntity])
+  @Mutation(() => BatchEntity)
   createManyCourses(
+    @Auth() ctx: AuthContext,
     @Args("createCourseInputs", { type: () => [CreateCourseInput] })
     createCourseInputs: CreateCourseInput[]
   ) {
-    return this.coursesService.createMany(createCourseInputs);
+    return this.coursesService.createMany(ctx, createCourseInputs);
   }
 
-  @Roles(UserRole.ADMIN)
   @Mutation(() => CourseEntity)
   updateOneCourse(
+    @Auth() ctx: AuthContext,
     @Args("courseId", { type: () => ID }) courseId: string,
     @Args("updateCourseInput", { type: () => UpdateCourseInput })
     updateCourseInput: UpdateCourseInput
   ) {
-    return this.coursesService.updateOne(courseId, updateCourseInput);
+    return this.coursesService.updateOne(ctx, courseId, updateCourseInput);
   }
 
-  @Roles(UserRole.ADMIN)
   @Mutation(() => BatchEntity)
   updateManyCourses(
+    @Auth() ctx: AuthContext,
     @Args("courseIds", { type: () => [ID] }) courseIds: string[],
     @Args("updateCourseInput", { type: () => UpdateCourseInput })
     updateCourseInput: UpdateCourseInput
   ) {
-    return this.coursesService.updateMany(courseIds, updateCourseInput);
+    return this.coursesService.updateMany(ctx, courseIds, updateCourseInput);
   }
 
-  @Roles(UserRole.ADMIN)
   @Mutation(() => CourseEntity)
-  removeOneCourse(@Args("courseId", { type: () => ID }) courseId: string) {
-    return this.coursesService.removeOne(courseId);
+  removeOneCourse(
+    @Auth() ctx: AuthContext,
+    @Args("courseId", { type: () => ID }) courseId: string
+  ) {
+    return this.coursesService.removeOne(ctx, courseId);
   }
 
-  @Roles(UserRole.ADMIN)
   @Mutation(() => BatchEntity)
   removeManyCourses(
+    @Auth() ctx: AuthContext,
     @Args("courseIds", { type: () => [ID] }) courseIds: string[]
   ) {
-    return this.coursesService.removeMany(courseIds);
+    return this.coursesService.removeMany(ctx, courseIds);
   }
 
-  @ResolveField(() => OrganizationEntity)
-  organization(@Parent() course: CourseModel, @Context() ctx: Ctx) {
-    if (!course?.organization) return null;
-    return ctx.loaders.batchOrganizations.load(course.organization.toString());
+  @ResolveField(() => UserEntity)
+  owner(@Parent() course: CourseEntity, @Context() ctx: GraphqlContext) {
+    if (!course?.ownerId) return null;
+    return ctx.loaders.batchUsers.load(course.ownerId);
+  }
+
+  @ResolveField(() => OrganizationEntity, { nullable: true })
+  organization(@Parent() course: CourseEntity, @Context() ctx: GraphqlContext) {
+    if (!course?.organizationId) return null;
+    return ctx.loaders.batchOrganizations.load(course.organizationId);
   }
 
   @ResolveField(() => [SkillEntity])
-  skills(@Parent() course: CourseModel, @Context() ctx: Ctx) {
-    const ids = course.skills?.map((id) => id.toString());
+  skills(@Parent() course: CourseEntity, @Context() ctx: GraphqlContext) {
+    const ids = course.skillIds;
     if (!ids) return [];
     return ctx.loaders.batchSkills.loadMany(ids);
   }

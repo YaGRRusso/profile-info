@@ -30,9 +30,6 @@ const OrganizationTranslationInput = createTranslationInput(
 
 @InputType()
 export class CreateOrganizationInput {
-  @OptionalField(() => Number)
-  relevance?: number;
-
   @RequiredField(() => String)
   @IsString()
   @IsNotEmpty()
@@ -43,13 +40,13 @@ export class CreateOrganizationInput {
   @IsNotEmpty()
   name: string;
 
-  @RequiredField(() => String)
+  @OptionalField(() => String)
   @IsUrl()
-  website: string;
+  website?: string;
 
-  @RequiredField(() => String)
+  @OptionalField(() => String)
   @IsUrl()
-  logo: string;
+  logo?: string;
 
   @RequiredField(() => [OrganizationTranslationInput])
   @IsArray()

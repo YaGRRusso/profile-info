@@ -1,5 +1,5 @@
 import { DeepKeys, DeepValue, useForm } from "@tanstack/react-form";
-import { useCallback } from "react";
+import { useCallback, useMemo } from "react";
 import { toast } from "react-toastify";
 import z from "zod";
 import { FieldArray } from "@/components/inputs/field-array";
@@ -25,8 +25,12 @@ import type { CourseRow } from "@/hooks/queries/courses";
 import { useFindManyOrganizations } from "@/hooks/queries/organizations";
 import { useFindManySkills } from "@/hooks/queries/skills";
 import { fieldError } from "@/lib/field-error";
-import { createEmptyI18n, pickTranslation } from "@/lib/i18n";
-import { findLabelsByIds } from "@/lib/mappers";
+import {
+  createEmptyI18n,
+  i18nLabel,
+  i18nLabelsByIds,
+  pickTranslation,
+} from "@/lib/i18n";
 import { isSlugTaken } from "@/lib/slug";
 import { CommonFormProps } from "./common";
 
@@ -35,13 +39,13 @@ const courseSchema = z.object({
     .string()
     .min(1, "required field")
     .regex(SLUG_REGEX, "invalid field format"),
-  organization: z.string().min(1, "required field"),
+  organizationId: z.string().min(1, "required field"),
   status: z.enum(CourseStatus, "required field"),
   relevance: z.number().min(1, "must be a positive number"),
   url: z.url().or(z.literal("")),
   image: z.url().or(z.literal("")),
   hours: z.number(),
-  skills: z.array(z.string()),
+  skillIds: z.array(z.string()),
   i18n: z
     .array(
       z.object({
@@ -69,13 +73,13 @@ export interface CourseFormProps extends CommonFormProps<CourseSchema> {
 export function courseToInput(data: CourseSchema): CreateCourseInput {
   return {
     slug: data.slug,
-    organization: data.organization,
+    organizationId: data.organizationId,
     status: data.status,
     relevance: data.relevance,
     url: data.url || undefined,
     image: data.image || undefined,
     hours: data.hours || undefined,
-    skills: data.skills.length ? data.skills : undefined,
+    skillIds: data.skillIds.length ? data.skillIds : undefined,
     i18n: data.i18n.map((translation) => ({
       locale: translation.locale,
       messages: {
@@ -89,13 +93,13 @@ export function courseToInput(data: CourseSchema): CreateCourseInput {
 export function courseToForm(course: CourseRow): Partial<CourseSchema> {
   return {
     slug: course.slug,
-    organization: course.organization?.id ?? "",
+    organizationId: course.organization?.id ?? "",
     status: course.status,
     relevance: course.relevance,
     url: course.url ?? "",
     image: course.image ?? "",
     hours: course.hours ?? 0,
-    skills: (course.skills ?? []).map((skill) => skill.id),
+    skillIds: (course.skills ?? []).map((skill) => skill.id),
     i18n: course.i18n.map((translation) => ({
       locale: translation.locale,
       title: translation.messages.title,
@@ -124,28 +128,39 @@ export function CourseForm({
   const findManySkills = useFindManySkills();
   useQueryAllPages(findManySkills);
 
-  const atsSummarize = useAtsSummarize();
-  const translate = useTranslate();
-
-  const organizationOptions = (findManyOrganizations.data?.nodes ?? []).map(
-    (organization) => ({ label: organization.name, value: organization.id })
+  const skillOptions = useMemo(
+    () =>
+      (findManySkills.data?.nodes ?? []).map((skill) => ({
+        label: i18nLabel(skill),
+        value: skill.id,
+        disabled: skill.disabled,
+      })),
+    [findManySkills.data?.nodes]
   );
 
-  const skillOptions = (findManySkills.data?.nodes ?? []).map((skill) => ({
-    label: skill.name,
-    value: skill.id,
-  }));
+  const organizationOptions = useMemo(
+    () =>
+      (findManyOrganizations.data?.nodes ?? []).map((organization) => ({
+        label: organization.name,
+        value: organization.id,
+        disabled: organization.disabled,
+      })),
+    [findManyOrganizations.data?.nodes]
+  );
+
+  const atsSummarize = useAtsSummarize();
+  const translate = useTranslate();
 
   const form = useForm({
     defaultValues: {
       slug: "",
-      organization: "",
+      organizationId: "",
       status: CourseStatus.Complete,
       relevance: 1,
       url: "",
       image: "",
       hours: 0,
-      skills: [] as string[],
+      skillIds: [] as string[],
       i18n: createEmptyI18n({ title: "", description: "" }),
       ...defaultValues,
     },
@@ -167,12 +182,10 @@ export function CourseForm({
       if (raw.trim().length <= RawSizeEnum.XSMALL)
         return toast.error("Description must be at least 64 characters long");
 
-      const skills = findLabelsByIds({
-        items: findManySkills.data?.nodes,
-        lookupKey: "id",
-        labelKey: "name",
-        targetValues: form.getFieldValue("skills"),
-      });
+      const skills = i18nLabelsByIds(
+        findManySkills.data?.nodes,
+        form.getFieldValue("skillIds")
+      );
       if (!skills.length) return toast.error("At least one skill is required");
 
       const title = fieldGroup.title;
@@ -188,7 +201,7 @@ export function CourseForm({
       details.push({ key: "Status", value: [status] });
 
       const organization = findManyOrganizations.data?.nodes.find(
-        (org) => org.id === form.getFieldValue("organization")
+        (org) => org.id === form.getFieldValue("organizationId")
       );
       if (!organization) return toast.error("Organization is required");
 
@@ -294,7 +307,7 @@ export function CourseForm({
           />
         )}
       </Field>
-      <Field name="organization">
+      <Field name="organizationId">
         {(field) => (
           <SelectInput
             disabled={!organizationOptions.length}
@@ -303,7 +316,7 @@ export function CourseForm({
             name={field.name}
             onChange={field.handleChange}
             options={organizationOptions}
-            placeholder={PLACEHOLDERS.chooseOrganization}
+            placeholder={PLACEHOLDERS.chooseOne}
             value={field.state.value}
           />
         )}
@@ -316,7 +329,7 @@ export function CourseForm({
             name={field.name}
             onChange={(value) => field.handleChange(value as CourseStatus)}
             options={STATUS_OPTIONS}
-            placeholder={PLACEHOLDERS.chooseStatus}
+            placeholder={PLACEHOLDERS.chooseOne}
             value={field.state.value}
           />
         )}
@@ -328,7 +341,7 @@ export function CourseForm({
             label="URL"
             name={field.name}
             onChange={field.handleChange}
-            placeholder={PLACEHOLDERS.certificateUrl}
+            placeholder={PLACEHOLDERS.url}
             value={field.state.value}
           />
         )}
@@ -340,7 +353,7 @@ export function CourseForm({
             label="Image"
             name={field.name}
             onChange={field.handleChange}
-            placeholder={PLACEHOLDERS.imageUrl}
+            placeholder={PLACEHOLDERS.url}
             value={field.state.value}
           />
         )}
@@ -374,14 +387,14 @@ export function CourseForm({
           />
         )}
       </Field>
-      <Field name="skills">
+      <Field name="skillIds">
         {(field) => (
           <MultiSelectInput
             error={fieldError(field.state.meta)}
             label="Skills"
             onChange={field.handleChange}
             options={skillOptions}
-            placeholder={PLACEHOLDERS.searchSkills}
+            placeholder={PLACEHOLDERS.search}
             value={field.state.value}
           />
         )}
@@ -410,7 +423,7 @@ export function CourseForm({
                       name={field.name}
                       onChange={field.handleChange}
                       options={LOCALES}
-                      placeholder={PLACEHOLDERS.chooseLanguage}
+                      placeholder={PLACEHOLDERS.chooseOne}
                       value={field.state.value}
                     />
                   )}
@@ -449,7 +462,7 @@ export function CourseForm({
                           field.state.value
                         )
                       }
-                      placeholder={PLACEHOLDERS.courseDescription}
+                      placeholder={PLACEHOLDERS.description}
                       value={field.state.value}
                     />
                   )}
@@ -470,7 +483,13 @@ export function CourseForm({
             Cancel
           </button>
         )}
-        <Subscribe>
+        <Subscribe
+          selector={(formState) => ({
+            canSubmit: formState.canSubmit,
+            isSubmitting: formState.isSubmitting,
+            isTouched: formState.isTouched,
+          })}
+        >
           {({ canSubmit, isSubmitting, isTouched }) => (
             <button
               className="btn btn-soft btn-primary flex-1"

@@ -6,7 +6,7 @@ export interface SelectInputProps
   error?: string;
   label?: string;
   onChange?: (value: string) => void;
-  options: { label: string; value: string }[];
+  options: { disabled?: boolean; label: string; value: string }[];
   placeholder?: string;
   value?: string;
 }
@@ -21,11 +21,18 @@ export function SelectInput({
   value,
   ...props
 }: SelectInputProps) {
+  const selectedOption = options.find((option) => option.value === value);
+
   return (
     <fieldset className="fieldset">
       {label && <legend className="fieldset-legend">{label}</legend>}
       <select
-        className={cn("select w-full", error && "select-error", className)}
+        className={cn(
+          "select w-full",
+          error && "select-error",
+          selectedOption?.disabled && "select-error",
+          className
+        )}
         onChange={(event) => onChange?.(event.target.value)}
         value={value ?? ""}
         {...props}
@@ -36,7 +43,14 @@ export function SelectInput({
           </option>
         )}
         {options.map((option) => (
-          <option key={option.value} value={option.value}>
+          <option
+            className={cn(
+              option.disabled && option.value === value && "text-error"
+            )}
+            disabled={option.disabled}
+            key={option.value}
+            value={option.value}
+          >
             {option.label}
           </option>
         ))}

@@ -7,9 +7,11 @@ export interface MultiSelectInputProps {
   disabled?: boolean;
   error?: string;
   label?: string;
+  maxSelected?: number;
   onChange?: (value: string[]) => void;
-  options: { label: string; value: string }[];
+  options: { disabled?: boolean; label: string; value: string }[];
   placeholder?: string;
+  showSelected?: boolean;
   value?: string[];
 }
 
@@ -22,6 +24,8 @@ export function MultiSelectInput({
   options,
   placeholder,
   value = [],
+  maxSelected = 50,
+  showSelected = true,
 }: MultiSelectInputProps) {
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -49,6 +53,9 @@ export function MultiSelectInput({
   );
 
   function toggle(optionValue: string) {
+    const option = options.find((candidate) => candidate.value === optionValue);
+    if (option?.disabled && !value.includes(optionValue)) return;
+
     onChange?.(
       value.includes(optionValue)
         ? value.filter((item) => item !== optionValue)
@@ -79,14 +86,35 @@ export function MultiSelectInput({
             <ul className="flex flex-col">
               {filteredOptions.map((option) => (
                 <li key={option.value}>
-                  <label className="flex cursor-pointer items-center gap-2 rounded p-2 text-sm hover:bg-base-300">
+                  <label
+                    className={cn(
+                      "flex items-center gap-2 rounded p-2 text-sm hover:bg-base-300",
+                      option.disabled && !value.includes(option.value)
+                        ? "cursor-not-allowed opacity-60"
+                        : "cursor-pointer"
+                    )}
+                  >
                     <input
                       checked={value.includes(option.value)}
                       className="checkbox checkbox-xs"
+                      disabled={
+                        (option.disabled && !value.includes(option.value)) ||
+                        (maxSelected !== undefined &&
+                          value.length >= maxSelected &&
+                          !value.includes(option.value))
+                      }
                       onChange={() => toggle(option.value)}
                       type="checkbox"
                     />
-                    <span>{option.label}</span>
+                    <span
+                      className={cn(
+                        option.disabled &&
+                          value.includes(option.value) &&
+                          "text-error"
+                      )}
+                    >
+                      {option.label}
+                    </span>
                   </label>
                 </li>
               ))}
@@ -97,11 +125,14 @@ export function MultiSelectInput({
           </div>
         )}
       </div>
-      {selectedOptions.length > 0 && (
+      {showSelected && selectedOptions.length > 0 && (
         <div className="flex flex-wrap items-center gap-1">
           {selectedOptions.map((option) => (
             <button
-              className="btn btn-xs btn-soft"
+              className={cn(
+                "btn btn-xs btn-soft",
+                option.disabled && "text-error"
+              )}
               key={option.value}
               onClick={() => toggle(option.value)}
               type="button"

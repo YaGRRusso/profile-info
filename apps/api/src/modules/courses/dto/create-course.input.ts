@@ -11,7 +11,6 @@ import {
 } from "class-validator";
 import { OptionalField } from "@/core/decorators/optional-field.decorator";
 import { RequiredField } from "@/core/decorators/required-field.decorator";
-import { DateRangeInput } from "@/core/inputs/date-range.input";
 import {
   createTranslationInput,
   TranslationInput,
@@ -47,7 +46,7 @@ export class CreateCourseInput {
 
   @RequiredField(() => String)
   @IsMongoId()
-  organization: string;
+  organizationId: string;
 
   @RequiredField(() => CourseStatus)
   @IsEnum(CourseStatus)
@@ -70,9 +69,7 @@ export class CreateCourseInput {
   @Type(() => CourseTranslationInput)
   i18n: TranslationInput<CreateCourseMessagesInput>[];
 
-  @OptionalField(() => DateRangeInput)
-  period?: DateRangeInput;
-
   @OptionalField(() => [String])
-  skills?: string[];
+  @IsMongoId({ each: true })
+  skillIds?: string[];
 }

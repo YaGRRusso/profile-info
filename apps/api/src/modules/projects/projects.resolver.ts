@@ -8,14 +8,13 @@ import {
   ResolveField,
   Resolver,
 } from "@nestjs/graphql";
-import { Public } from "@/core/decorators/public-route.decorator";
-import { Roles } from "@/core/decorators/roles.decorator";
+import type { AuthContext } from "@/core/context/auth-context.interface";
+import type { GraphqlContext } from "@/core/context/graphql-context.interface";
 import { BatchEntity } from "@/core/entities/batch.entity";
-import { UserRole } from "@/core/enums/user-role.enum";
 import { PaginationInput } from "@/core/inputs/pagination.input";
-import type { Ctx } from "@/modules/graphql/context.interface";
-import type { ProjectModel } from "@/modules/projects/schemas/project.schema";
+import { Auth } from "@/modules/auth/decorators/auth-context.decorator";
 import { SkillEntity } from "@/modules/skills/entities/skill.entity";
+import { UserEntity } from "@/modules/users/entities/user.entity";
 import { CreateProjectInput } from "./dto/create-project.input";
 import { FilterProjectInput } from "./dto/filter-project.input";
 import { SortProjectInput } from "./dto/sort-project.input";
@@ -32,35 +31,37 @@ export class ProjectsResolver {
 
   // QUERIES
 
-  @Public()
   @Query(() => ProjectEntity)
-  findOneProjectById(@Args("projectId", { type: () => ID }) projectId: string) {
-    return this.projectsService.findOneById(projectId);
+  findOneProjectById(
+    @Auth() ctx: AuthContext,
+    @Args("projectId", { type: () => ID }) projectId: string
+  ) {
+    return this.projectsService.findOneById(ctx, projectId);
   }
 
-  @Public()
   @Query(() => ProjectEntity)
   findOneProject(
+    @Auth() ctx: AuthContext,
     @Args("projectFilters", {
       type: () => FilterProjectInput,
       nullable: true,
     })
     projectFilters?: FilterProjectInput
   ) {
-    return this.projectsService.findOne({ filters: projectFilters });
+    return this.projectsService.findOne(ctx, { filters: projectFilters });
   }
 
-  @Public()
   @Query(() => [ProjectEntity])
   findManyProjectById(
+    @Auth() ctx: AuthContext,
     @Args("projectIds", { type: () => [ID] }) projectIds: string[]
   ) {
-    return this.projectsService.findManyById(projectIds);
+    return this.projectsService.findManyById(ctx, projectIds);
   }
 
-  @Public()
   @Query(() => PaginatedProjectEntity)
   findManyProjects(
+    @Auth() ctx: AuthContext,
     @Args("projectFilters", {
       type: () => FilterProjectInput,
       nullable: true,
@@ -77,7 +78,7 @@ export class ProjectsResolver {
     })
     projectSort?: SortProjectInput
   ) {
-    return this.projectsService.findMany({
+    return this.projectsService.findMany(ctx, {
       filters: projectFilters,
       sort: projectSort,
       limit: projectPagination?.limit,
@@ -87,61 +88,69 @@ export class ProjectsResolver {
 
   // MUTATIONS
 
-  @Roles(UserRole.ADMIN)
   @Mutation(() => ProjectEntity)
   createOneProject(
+    @Auth() ctx: AuthContext,
     @Args("createProjectInput", { type: () => CreateProjectInput })
     createProjectInput: CreateProjectInput
   ) {
-    return this.projectsService.createOne(createProjectInput);
+    return this.projectsService.createOne(ctx, createProjectInput);
   }
 
-  @Roles(UserRole.ADMIN)
-  @Mutation(() => [ProjectEntity])
+  @Mutation(() => BatchEntity)
   createManyProjects(
+    @Auth() ctx: AuthContext,
     @Args("createProjectInputs", { type: () => [CreateProjectInput] })
     createProjectInputs: CreateProjectInput[]
   ) {
-    return this.projectsService.createMany(createProjectInputs);
+    return this.projectsService.createMany(ctx, createProjectInputs);
   }
 
-  @Roles(UserRole.ADMIN)
   @Mutation(() => ProjectEntity)
   updateOneProject(
+    @Auth() ctx: AuthContext,
     @Args("projectId", { type: () => ID }) projectId: string,
     @Args("updateProjectInput", { type: () => UpdateProjectInput })
     updateProjectInput: UpdateProjectInput
   ) {
-    return this.projectsService.updateOne(projectId, updateProjectInput);
+    return this.projectsService.updateOne(ctx, projectId, updateProjectInput);
   }
 
-  @Roles(UserRole.ADMIN)
   @Mutation(() => BatchEntity)
   updateManyProjects(
+    @Auth() ctx: AuthContext,
     @Args("projectIds", { type: () => [ID] }) projectIds: string[],
     @Args("updateProjectInput", { type: () => UpdateProjectInput })
     updateProjectInput: UpdateProjectInput
   ) {
-    return this.projectsService.updateMany(projectIds, updateProjectInput);
+    return this.projectsService.updateMany(ctx, projectIds, updateProjectInput);
   }
 
-  @Roles(UserRole.ADMIN)
   @Mutation(() => ProjectEntity)
-  removeOneProject(@Args("projectId", { type: () => ID }) projectId: string) {
-    return this.projectsService.removeOne(projectId);
+  removeOneProject(
+    @Auth() ctx: AuthContext,
+    @Args("projectId", { type: () => ID }) projectId: string
+  ) {
+    return this.projectsService.removeOne(ctx, projectId);
   }
 
-  @Roles(UserRole.ADMIN)
   @Mutation(() => BatchEntity)
   removeManyProjects(
+    @Auth() ctx: AuthContext,
     @Args("projectIds", { type: () => [ID] }) projectIds: string[]
   ) {
-    return this.projectsService.removeMany(projectIds);
+    return this.projectsService.removeMany(ctx, projectIds);
+  }
+
+  @ResolveField(() => UserEntity)
+  owner(@Parent() project: ProjectEntity, @Context() ctx: GraphqlContext) {
+    if (!project?.ownerId) return null;
+    return ctx.loaders.batchUsers.load(project.ownerId);
   }
 
   @ResolveField(() => [SkillEntity])
-  skills(@Parent() project: ProjectModel, @Context() ctx: Ctx) {
-    const ids = project.skills?.map((id) => id.toString());
+  skills(@Parent() project: ProjectEntity, @Context() ctx: GraphqlContext) {
+    const ids = project.skillIds;
     if (!ids) return [];
     return ctx.loaders.batchSkills.loadMany(ids);
   }

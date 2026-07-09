@@ -73,6 +73,31 @@ The auth handshake: admin calls the `signIn(signInInput: SignInInput!): String!`
 - Adding a screen or operation to the admin: write the `.graphql`-tagged operation inside a hook in `apps/admin/src/hooks/queries/` or `hooks/mutations/`, run codegen, then consume the generated typed document. See `agents/admin.md`.
 - Keep reusable admin components and hooks domain-agnostic: iterate over the data shape rather than referencing specific entity fields.
 
+## Engineering principles (non-negotiable)
+
+### Long-term over short-term
+
+**Never optimize for the smallest diff today at the cost of clarity or correctness tomorrow.**
+
+Applies to naming, APIs, types, migrations, and refactors across the whole repo (API, admin, docs, agent context):
+
+- Choose names and shapes that still make sense when the next auth mode, tenant rule, or entity lands — not aliases you plan to rename later.
+- Avoid transitional cruft (`CurrentX`, `*Legacy`, `*V2`, “minimal rename now, proper rename later”) unless there is an explicit, time-boxed migration window.
+- When the right fix touches types, decorators, services, tests, and docs together, **do it once** — do not ship a shortcut knowing a fuller change is imminent.
+- Prefer semantic precision over convention copied from elsewhere (e.g. `@Auth()` + `AuthContext` for the authenticated caller, distinct from GraphQL `@Context()` for loaders).
+
+Agents and humans: if a proposal has a “quick” and a “right” option, default to **right** and document the choice in `agents/*.md` when it affects future work.
+
+### Debug before refactor
+
+When **one** endpoint or module fails but siblings with the same pattern work, treat it as an **environment or stale-runtime** hypothesis first — not a missing abstraction.
+
+1. Restart the affected dev process (API `nr dev`, not only admin HMR).
+2. Reproduce on a clean process; compare with a working sibling (e.g. courses vs educations).
+3. Change code only if the failure survives that.
+
+See **NestJS GraphQL resolver hot-reload** in `agents/api.md` for a concrete example (`toTenantScope` / `userId` null on a single `findMany*`).
+
 ## Conventions & standards
 
 - Formatting and linting: Biome configured through `ultracite` presets in `biome.jsonc` (`ultracite/biome/core`, `.../nestjs`, `.../jest`). Run `npm run lint` and `npm run format`. Generated GraphQL artifacts are excluded from Biome.
@@ -80,8 +105,9 @@ The auth handshake: admin calls the `signIn(signInInput: SignInInput!): String!`
   Configured in root `package.json` `lint-staged`.
 - Types: `tsconfig.base.json` sets `strictNullChecks: true` (not full `strict`). The API package loosens `noImplicitAny` and `strictBindCallApply` to `false`.
 - Naming: files and folders are kebab-case; suffixes signal role (`*.resolver.ts`, `*.service.ts`, `*.schema.ts`, `*.entity.ts`, `*.input.ts`).
+- **No barrel files:** do not add `index.ts` (or similar) modules that re-export siblings (`export * from`, `export { … } from`). Import from the concrete file path instead — barrels widen the module graph and pull in unused code. Exceptions: framework entry points (e.g. `seed/index.ts` CLI), and generated output (e.g. GraphQL codegen).
 - Code artifacts (names, comments, files) are written in English even though project discussion may be in Portuguese.
-- Testing: API uses Jest (`*.spec.ts` unit, `*.e2e-spec.ts` e2e). The admin has no test setup yet.
+- Testing: API uses Jest — unit tests in `src/**/*.spec.ts`; e2e/integration in `test/**/*.spec.ts` (`npm run test` vs `npm run test:e2e`). The admin has no test setup yet.
 
 ## Environment variables
 
@@ -101,7 +127,7 @@ Root scripts (run from the repo root):
 - `npm run prod`: runs both apps in their `prod` mode.
 - `npm run docker:up` / `npm run docker:down`: start / stop MongoDB via Compose (uses `sudo docker compose`).
 - `npm run api:dev` / `npm run admin:dev`: run a single app in watch mode.
-- `npm run api:seed`: wipe and repopulate MongoDB with a coherent dev dataset (admin `admin@profile.info` / `admin123`). See `apps/api/src/seed.ts`.
+- `npm run api:seed`: wipe and repopulate MongoDB with dev personas (`empty`, `lite`, `joao`, `maria`, `full`, `admin` @ `profile.info`, password `123123`). See `apps/api/seed/README.md`.
 - CI (`.github/workflows/deploy.yml`): builds the admin and deploys to GitHub Pages on push to `main`.
 - `npm run api:build` / `npm run admin:build`: build a single app.
 - `npm run api:start` / `npm run admin:start`: start a single app.

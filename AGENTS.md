@@ -7,6 +7,11 @@
 Backend and admin panel for managing a personal professional profile. An npm
 workspaces monorepo with a NestJS GraphQL API and a React admin dashboard.
 
+## Principles
+
+**Long-term over short-term** — see **Engineering principles** in `agents/overview.md`.
+Never ship naming or API shortcuts that will need a second pass; prefer the semantically correct design now.
+
 ## Where to find context
 
 - **Repo-wide:** `agents/overview.md` (start here)

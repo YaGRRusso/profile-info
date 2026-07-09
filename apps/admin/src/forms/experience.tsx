@@ -1,5 +1,5 @@
 import { DeepKeys, DeepValue, useForm } from "@tanstack/react-form";
-import { useCallback } from "react";
+import { useCallback, useMemo } from "react";
 import { toast } from "react-toastify";
 import z from "zod";
 import { DateRangeInput } from "@/components/inputs/date-range";
@@ -26,8 +26,12 @@ import { useFindManyOrganizations } from "@/hooks/queries/organizations";
 import { useFindManySkills } from "@/hooks/queries/skills";
 import { toDateInput, toIsoDate } from "@/lib/date";
 import { fieldError } from "@/lib/field-error";
-import { createEmptyI18n, pickTranslation } from "@/lib/i18n";
-import { findLabelsByIds } from "@/lib/mappers";
+import {
+  createEmptyI18n,
+  i18nLabel,
+  i18nLabelsByIds,
+  pickTranslation,
+} from "@/lib/i18n";
 import { isSlugTaken } from "@/lib/slug";
 import { CommonFormProps } from "./common";
 
@@ -36,7 +40,7 @@ const experienceSchema = z.object({
     .string()
     .min(1, "required field")
     .regex(SLUG_REGEX, "invalid field format"),
-  organization: z.string().min(1, "required field"),
+  organizationId: z.string().min(1, "required field"),
   category: z.enum(ExperienceCategory, "required field"),
   relevance: z.number().min(1, "must be a positive number"),
   roles: z
@@ -64,7 +68,7 @@ const experienceSchema = z.object({
             (range) => !(range.from && range.to) || range.from <= range.to,
             { message: "end date must be after start date" }
           ),
-        skills: z.array(z.string()),
+        skillIds: z.array(z.string()),
       })
     )
     .min(1, "required group"),
@@ -81,7 +85,7 @@ export function experienceToInput(
 ): CreateExperienceInput {
   return {
     slug: data.slug,
-    organization: data.organization,
+    organizationId: data.organizationId,
     category: data.category,
     relevance: data.relevance,
     roles: data.roles.map((role) => ({
@@ -96,7 +100,7 @@ export function experienceToInput(
         role.period.from || role.period.to
           ? { from: toIsoDate(role.period.from), to: toIsoDate(role.period.to) }
           : undefined,
-      skills: role.skills.length ? role.skills : undefined,
+      skillIds: role.skillIds.length ? role.skillIds : undefined,
     })),
   };
 }
@@ -106,7 +110,7 @@ export function experienceToForm(
 ): Partial<ExperienceSchema> {
   return {
     slug: experience.slug,
-    organization: experience.organization?.id ?? "",
+    organizationId: experience.organization?.id ?? "",
     category: experience.category,
     relevance: experience.relevance,
     roles: (experience.roles ?? []).map((role) => ({
@@ -119,7 +123,7 @@ export function experienceToForm(
         from: toDateInput(role.period?.from),
         to: toDateInput(role.period?.to),
       },
-      skills: (role.skills ?? []).map((skill) => skill.id),
+      skillIds: (role.skills ?? []).map((skill) => skill.id),
     })),
   };
 }
@@ -133,7 +137,7 @@ function emptyRole() {
   return {
     i18n: createEmptyI18n({ title: "", description: "" }),
     period: { from: "", to: "" },
-    skills: [] as string[],
+    skillIds: [] as string[],
   };
 }
 
@@ -152,22 +156,33 @@ export function ExperienceForm({
   const findManySkills = useFindManySkills();
   useQueryAllPages(findManySkills);
 
-  const atsSummarize = useAtsSummarize();
-  const translate = useTranslate();
-
-  const organizationOptions = (findManyOrganizations.data?.nodes ?? []).map(
-    (organization) => ({ label: organization.name, value: organization.id })
+  const skillOptions = useMemo(
+    () =>
+      (findManySkills.data?.nodes ?? []).map((skill) => ({
+        label: i18nLabel(skill),
+        value: skill.id,
+        disabled: skill.disabled,
+      })),
+    [findManySkills.data?.nodes]
   );
 
-  const skillOptions = (findManySkills.data?.nodes ?? []).map((skill) => ({
-    label: skill.name,
-    value: skill.id,
-  }));
+  const organizationOptions = useMemo(
+    () =>
+      (findManyOrganizations.data?.nodes ?? []).map((organization) => ({
+        label: organization.name,
+        value: organization.id,
+        disabled: organization.disabled,
+      })),
+    [findManyOrganizations.data?.nodes]
+  );
+
+  const atsSummarize = useAtsSummarize();
+  const translate = useTranslate();
 
   const form = useForm({
     defaultValues: {
       slug: "",
-      organization: "",
+      organizationId: "",
       category: ExperienceCategory.FullTime,
       relevance: 1,
       roles: [emptyRole()],
@@ -192,12 +207,10 @@ export function ExperienceForm({
       if (raw.trim().length <= RawSizeEnum.XSMALL)
         return toast.error("Description must be at least 32 characters long");
 
-      const skills = findLabelsByIds({
-        items: findManySkills.data?.nodes,
-        lookupKey: "id",
-        labelKey: "name",
-        targetValues: fieldParent.skills,
-      });
+      const skills = i18nLabelsByIds(
+        findManySkills.data?.nodes,
+        fieldParent.skillIds
+      );
       if (!skills.length) return toast.error("At least one skill is required");
 
       const title = fieldGroup.title;
@@ -219,7 +232,7 @@ export function ExperienceForm({
       details.push({ key: "Category", value: [category] });
 
       const organization = findManyOrganizations.data?.nodes.find(
-        (org) => org.id === form.getFieldValue("organization")
+        (org) => org.id === form.getFieldValue("organizationId")
       );
       if (!organization) return toast.error("Organization is required");
 
@@ -322,7 +335,7 @@ export function ExperienceForm({
           />
         )}
       </Field>
-      <Field name="organization">
+      <Field name="organizationId">
         {(field) => (
           <SelectInput
             disabled={!organizationOptions.length}
@@ -331,7 +344,7 @@ export function ExperienceForm({
             name={field.name}
             onChange={field.handleChange}
             options={organizationOptions}
-            placeholder={PLACEHOLDERS.chooseOrganization}
+            placeholder={PLACEHOLDERS.chooseOne}
             value={field.state.value}
           />
         )}
@@ -346,7 +359,7 @@ export function ExperienceForm({
               field.handleChange(value as ExperienceCategory)
             }
             options={CATEGORY_OPTIONS}
-            placeholder={PLACEHOLDERS.chooseCategory}
+            placeholder={PLACEHOLDERS.chooseOne}
             value={field.state.value}
           />
         )}
@@ -394,14 +407,14 @@ export function ExperienceForm({
                   )}
                 </Field>
 
-                <Field name={`roles[${roleIndex}].skills`}>
+                <Field name={`roles[${roleIndex}].skillIds`}>
                   {(field) => (
                     <MultiSelectInput
                       error={fieldError(field.state.meta)}
                       label="Skills"
                       onChange={field.handleChange}
                       options={skillOptions}
-                      placeholder={PLACEHOLDERS.searchSkills}
+                      placeholder={PLACEHOLDERS.search}
                       value={field.state.value}
                     />
                   )}
@@ -437,7 +450,7 @@ export function ExperienceForm({
                                 name={field.name}
                                 onChange={field.handleChange}
                                 options={LOCALES}
-                                placeholder={PLACEHOLDERS.chooseLanguage}
+                                placeholder={PLACEHOLDERS.chooseOne}
                                 value={field.state.value}
                               />
                             )}
@@ -451,7 +464,7 @@ export function ExperienceForm({
                                 label="Title"
                                 name={field.name}
                                 onChange={field.handleChange}
-                                placeholder={PLACEHOLDERS.experienceRoleTitle}
+                                placeholder={PLACEHOLDERS.experienceTitle}
                                 value={field.state.value}
                               />
                             )}
@@ -485,7 +498,7 @@ export function ExperienceForm({
                                     field.state.value
                                   )
                                 }
-                                placeholder={PLACEHOLDERS.experienceDescription}
+                                placeholder={PLACEHOLDERS.description}
                                 value={field.state.value}
                               />
                             )}

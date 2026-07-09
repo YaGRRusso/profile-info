@@ -1,56 +1,77 @@
-import { BadRequestException, NotFoundException } from "@nestjs/common";
-import { getModelToken } from "@nestjs/mongoose";
+import { BadRequestException } from "@nestjs/common";
 import { Test, TestingModule } from "@nestjs/testing";
-import mongoose, { Model } from "mongoose";
-import { CourseModel } from "@/modules/courses/schemas/course.schema";
+import { testAuthContext } from "@test/fixtures/auth-context";
+import { REFERENCES_NOT_FOUND } from "@/common/helpers/assert.helper";
+import {
+  createMockCrud,
+  createMockStats,
+} from "@/core/persistence/repositories/testing/service-spec.mock";
+import { CourseStatus } from "@/modules/courses/enums/status.enum";
+import { OrganizationsValidatorService } from "@/modules/organizations/organizations-validator.service";
+import { SkillsValidatorService } from "@/modules/skills/skills-validator.service";
 import { CoursesRepository } from "./courses.repository";
 import { CoursesService } from "./courses.service";
 
-const validId = new mongoose.Types.ObjectId().toHexString();
-const invalidId = "not-an-object-id";
-const fakeDoc = {
-  _id: validId,
-  title: "Full-Stack Bootcamp",
-} as unknown as CourseModel;
+const ownerId = "507f1f77bcf86cd799439011";
+const organizationId = "507f1f77bcf86cd799439012";
+const validId = "507f1f77bcf86cd799439013";
+const ctx = testAuthContext({ id: ownerId });
 
-function makeExec(returnValue: unknown) {
-  return {
-    sort: jest.fn().mockReturnThis(),
-    skip: jest.fn().mockReturnThis(),
-    limit: jest.fn().mockReturnThis(),
-    exec: jest.fn().mockResolvedValue(returnValue),
-  };
-}
+const fakeEntity = {
+  id: validId,
+  ownerId,
+  slug: "bootcamp",
+};
 
 describe("CoursesService", () => {
   let service: CoursesService;
-  let model: jest.Mocked<Model<CourseModel>>;
+  let crud: ReturnType<typeof createMockCrud>;
+  let organizationsValidator: {
+    assertOrganizationEnabled: jest.Mock;
+    assertOrganizationsEnabled: jest.Mock;
+  };
+  let skillsValidator: { assertSkillsEnabled: jest.Mock };
+  let stats: ReturnType<typeof createMockStats>;
+  let repository: {
+    tenantCrud: jest.Mock;
+    tenantStats: jest.Mock;
+    detachSkill: jest.Mock;
+    purgeByOrganization: jest.Mock;
+    purgeByOwner: jest.Mock;
+  };
 
   beforeEach(async () => {
     jest.clearAllMocks();
+    crud = createMockCrud();
+    stats = createMockStats();
+    repository = {
+      tenantCrud: jest.fn().mockReturnValue(crud),
+      tenantStats: jest.fn().mockReturnValue(stats),
+      detachSkill: jest.fn(),
+      purgeByOrganization: jest.fn(),
+      purgeByOwner: jest.fn(),
+    };
+    organizationsValidator = {
+      assertOrganizationEnabled: jest.fn().mockResolvedValue(undefined),
+      assertOrganizationsEnabled: jest.fn().mockResolvedValue(undefined),
+    };
+    skillsValidator = {
+      assertSkillsEnabled: jest.fn().mockResolvedValue(undefined),
+    };
 
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         CoursesService,
-        CoursesRepository,
+        { provide: CoursesRepository, useValue: repository },
         {
-          provide: getModelToken(CourseModel.name),
-          useValue: {
-            findById: jest.fn(),
-            findOne: jest.fn(),
-            find: jest.fn(),
-            create: jest.fn(),
-            findByIdAndUpdate: jest.fn(),
-            updateMany: jest.fn(),
-            findByIdAndDelete: jest.fn(),
-            deleteMany: jest.fn(),
-          },
+          provide: OrganizationsValidatorService,
+          useValue: organizationsValidator,
         },
+        { provide: SkillsValidatorService, useValue: skillsValidator },
       ],
     }).compile();
 
-    service = module.get<CoursesService>(CoursesService);
-    model = module.get(getModelToken(CourseModel.name));
+    service = module.get(CoursesService);
   });
 
   it("should be defined", () => {
@@ -58,67 +79,115 @@ describe("CoursesService", () => {
   });
 
   describe("findOneById", () => {
-    it("should return the course document", async () => {
-      (model.findById as jest.Mock).mockReturnValue(makeExec(fakeDoc));
-      expect(await service.findOneById(validId)).toBe(fakeDoc);
-    });
+    it("delegates to scoped crud", async () => {
+      crud.findOneById.mockResolvedValue(fakeEntity);
 
-    it("should throw BadRequestException for invalid ID", async () => {
-      await expect(service.findOneById(invalidId)).rejects.toThrow(
-        BadRequestException
+      await expect(service.findOneById(ctx, validId)).resolves.toEqual(
+        fakeEntity
       );
-    });
-
-    it("should throw NotFoundException when not found", async () => {
-      (model.findById as jest.Mock).mockReturnValue(makeExec(null));
-      await expect(service.findOneById(validId)).rejects.toThrow(
-        NotFoundException
-      );
+      expect(repository.tenantCrud).toHaveBeenCalledWith(ctx);
+      expect(crud.findOneById).toHaveBeenCalledWith(validId);
     });
   });
 
   describe("createOne", () => {
-    it("should return the created document", async () => {
-      (model.create as jest.Mock).mockResolvedValue(fakeDoc);
-      const result = await service.createOne({
-        title: "Full-Stack Bootcamp",
-      } as any);
-      expect(result).toBe(fakeDoc);
+    const createInput = {
+      slug: "bootcamp",
+      organizationId,
+      status: CourseStatus.COMPLETE,
+      i18n: [
+        {
+          locale: "en",
+          messages: {
+            title: "Bootcamp",
+            description: "Intensive course",
+          },
+        },
+      ],
+    };
+
+    it("delegates to scoped crud", async () => {
+      crud.createOne.mockResolvedValue(fakeEntity);
+
+      await expect(service.createOne(ctx, createInput)).resolves.toEqual(
+        fakeEntity
+      );
+      expect(
+        organizationsValidator.assertOrganizationEnabled
+      ).toHaveBeenCalledWith(ctx, organizationId);
+      expect(repository.tenantCrud).toHaveBeenCalledWith(ctx);
+      expect(crud.createOne).toHaveBeenCalledWith(createInput);
+    });
+
+    it("rejects missing organization reference", async () => {
+      organizationsValidator.assertOrganizationEnabled.mockRejectedValue(
+        new BadRequestException(REFERENCES_NOT_FOUND)
+      );
+
+      await expect(service.createOne(ctx, createInput)).rejects.toThrow(
+        new BadRequestException(REFERENCES_NOT_FOUND)
+      );
+      expect(crud.createOne).not.toHaveBeenCalled();
     });
   });
 
   describe("updateOne", () => {
-    it("should return the updated document", async () => {
-      (model.findByIdAndUpdate as jest.Mock).mockReturnValue(makeExec(fakeDoc));
-      expect(await service.updateOne(validId, {})).toBe(fakeDoc);
-    });
+    it("delegates to scoped crud", async () => {
+      crud.updateOneById.mockResolvedValue(fakeEntity);
 
-    it("should throw BadRequestException for invalid ID", async () => {
-      await expect(service.updateOne(invalidId, {})).rejects.toThrow(
-        BadRequestException
+      await expect(service.updateOne(ctx, validId, {})).resolves.toEqual(
+        fakeEntity
       );
+      expect(repository.tenantCrud).toHaveBeenCalledWith(ctx);
+      expect(crud.updateOneById).toHaveBeenCalledWith(validId, {});
     });
   });
 
   describe("removeOne", () => {
-    it("should return the removed document", async () => {
-      (model.findByIdAndDelete as jest.Mock).mockReturnValue(makeExec(fakeDoc));
-      expect(await service.removeOne(validId)).toBe(fakeDoc);
-    });
+    it("delegates to scoped crud", async () => {
+      crud.deleteOneById.mockResolvedValue(fakeEntity);
 
-    it("should throw BadRequestException for invalid ID", async () => {
-      await expect(service.removeOne(invalidId)).rejects.toThrow(
-        BadRequestException
+      await expect(service.removeOne(ctx, validId)).resolves.toEqual(
+        fakeEntity
       );
+      expect(repository.tenantCrud).toHaveBeenCalledWith(ctx);
+      expect(crud.deleteOneById).toHaveBeenCalledWith(validId);
     });
   });
 
   describe("removeMany", () => {
-    it("should return a BatchEntity count", async () => {
-      (model.deleteMany as jest.Mock).mockReturnValue(
-        makeExec({ deletedCount: 2 })
+    it("delegates to scoped crud", async () => {
+      crud.deleteManyById.mockResolvedValue({ succeeded: 1, failed: 0 });
+
+      await expect(service.removeMany(ctx, [validId])).resolves.toEqual({
+        succeeded: 1,
+        failed: 0,
+      });
+      expect(repository.tenantCrud).toHaveBeenCalledWith(ctx);
+      expect(crud.deleteManyById).toHaveBeenCalledWith([validId]);
+    });
+  });
+
+  describe("detachSkill", () => {
+    it("delegates to repository helper", async () => {
+      await service.detachSkill(validId);
+      expect(repository.detachSkill).toHaveBeenCalledWith(validId);
+    });
+  });
+
+  describe("purgeByOrganization", () => {
+    it("delegates to repository helper", async () => {
+      await service.purgeByOrganization(organizationId);
+      expect(repository.purgeByOrganization).toHaveBeenCalledWith(
+        organizationId
       );
-      expect(await service.removeMany([validId])).toEqual({ count: 2 });
+    });
+  });
+
+  describe("purgeByOwner", () => {
+    it("delegates to repository helper", async () => {
+      await service.purgeByOwner(ownerId);
+      expect(repository.purgeByOwner).toHaveBeenCalledWith(ownerId);
     });
   });
 });

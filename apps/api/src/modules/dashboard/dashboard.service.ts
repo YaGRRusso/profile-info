@@ -1,5 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { RecentActivityRecord } from "@/common/helpers/recent-activity.helper";
+import type { AuthContext } from "@/core/context/auth-context.interface";
 import { CoursesService } from "@/modules/courses/courses.service";
 import { EducationsService } from "@/modules/educations/educations.service";
 import { ExperiencesService } from "@/modules/experiences/experiences.service";
@@ -23,7 +24,7 @@ export class DashboardService {
     private readonly experiencesService: ExperiencesService
   ) {}
 
-  async getDashboard(): Promise<DashboardEntity> {
+  async getDashboard(ctx: AuthContext): Promise<DashboardEntity> {
     const [
       skills,
       courses,
@@ -31,7 +32,6 @@ export class DashboardService {
       organizations,
       projects,
       experiences,
-      skillsByCategory,
       experiencesByCategory,
       coursesByStatus,
       skillActivity,
@@ -41,21 +41,29 @@ export class DashboardService {
       projectActivity,
       experienceActivity,
     ] = await Promise.all([
-      this.skillsService.count(),
-      this.coursesService.count(),
-      this.educationsService.count(),
-      this.organizationsService.count(),
-      this.projectsService.count(),
-      this.experiencesService.count(),
-      this.skillsService.countByField("category"),
-      this.experiencesService.countByField("category"),
-      this.coursesService.countByField("status"),
-      this.skillsService.findRecentActivity(RECENT_ACTIVITY_PER_ENTITY),
-      this.coursesService.findRecentActivity(RECENT_ACTIVITY_PER_ENTITY),
-      this.educationsService.findRecentActivity(RECENT_ACTIVITY_PER_ENTITY),
-      this.organizationsService.findRecentActivity(RECENT_ACTIVITY_PER_ENTITY),
-      this.projectsService.findRecentActivity(RECENT_ACTIVITY_PER_ENTITY),
-      this.experiencesService.findRecentActivity(RECENT_ACTIVITY_PER_ENTITY),
+      this.skillsService.count(ctx),
+      this.coursesService.count(ctx),
+      this.educationsService.count(ctx),
+      this.organizationsService.count(ctx),
+      this.projectsService.count(ctx),
+      this.experiencesService.count(ctx),
+      this.experiencesService.countByField(ctx, "category"),
+      this.coursesService.countByField(ctx, "status"),
+      this.skillsService.findRecentActivity(ctx, RECENT_ACTIVITY_PER_ENTITY),
+      this.coursesService.findRecentActivity(ctx, RECENT_ACTIVITY_PER_ENTITY),
+      this.educationsService.findRecentActivity(
+        ctx,
+        RECENT_ACTIVITY_PER_ENTITY
+      ),
+      this.organizationsService.findRecentActivity(
+        ctx,
+        RECENT_ACTIVITY_PER_ENTITY
+      ),
+      this.projectsService.findRecentActivity(ctx, RECENT_ACTIVITY_PER_ENTITY),
+      this.experiencesService.findRecentActivity(
+        ctx,
+        RECENT_ACTIVITY_PER_ENTITY
+      ),
     ]);
 
     return {
@@ -67,7 +75,6 @@ export class DashboardService {
         projects,
         experiences,
       },
-      skillsByCategory,
       experiencesByCategory,
       coursesByStatus,
       recentActivity: this.mergeRecentActivity([

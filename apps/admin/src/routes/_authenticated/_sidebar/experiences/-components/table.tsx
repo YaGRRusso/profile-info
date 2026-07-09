@@ -30,15 +30,25 @@ import { useQueryState } from "nuqs";
 import { useMemo, useState } from "react";
 import { z } from "zod";
 import { BadgeList } from "@/components/display/badge-list";
-import { ExperienceCategory } from "@/generated/graphql/graphql";
+import { EmptyValue } from "@/components/display/empty-value";
+import { PLACEHOLDERS } from "@/consts/placeholders";
+import { ExperienceCategory, UserRole } from "@/generated/graphql/graphql";
 import { useActiveFilters } from "@/hooks/custom/use-active-filters";
 import { usePersistedState } from "@/hooks/custom/use-persisted-state";
 import { useStableValue } from "@/hooks/custom/use-stable-value";
 import type { ExperienceRow } from "@/hooks/queries/experiences";
 import { cn } from "@/lib/cn";
+import { isEmptyValue } from "@/lib/empty-value";
 import { getMinMaxFacets, getUniqueFacets } from "@/lib/facets";
+import { i18nLabel } from "@/lib/i18n";
 import { parseAsShape } from "@/lib/parsers";
+import {
+  canSeeColumn,
+  getRestrictedVisibility,
+  RestrictedColumns,
+} from "@/lib/table-columns";
 import { dateRangeFilter, numberRangeFilter } from "@/lib/table-filters";
+import { useAuthStore } from "@/stores/auth";
 
 const debouncedUrlUpdates = { method: "debounce" as const, timeMs: 500 };
 const persistentOptions = { clearOnDefault: true, history: "push" as const };
@@ -79,6 +89,10 @@ const DATE_OPTIONS = [
   { value: "week", label: "Last 7 days" },
   { value: "month", label: "This month" },
 ];
+
+const RESTRICTED_COLUMNS: RestrictedColumns = {
+  [UserRole.SuperAdmin]: ["owner"],
+};
 
 const columnHelper = createColumnHelper<ExperienceRow>();
 
@@ -125,6 +139,17 @@ const getColumns = (
   columnHelper.accessor("slug", {
     header: "Slug",
   }),
+  columnHelper.accessor((row) => row.owner?.nickname ?? "", {
+    id: "owner",
+    header: "Owner",
+    enableGlobalFilter: false,
+    enableSorting: false,
+    cell: (data) => {
+      const value = data.getValue();
+      if (isEmptyValue(value)) return <EmptyValue />;
+      return <span className="badge badge-soft badge-sm">{value}</span>;
+    },
+  }),
   columnHelper.accessor((row) => row.organization?.name ?? "", {
     id: "organization",
     header: "Organization",
@@ -159,7 +184,9 @@ const getColumns = (
   }),
   columnHelper.accessor(
     (row) =>
-      row.roles?.flatMap((role) => role.skills?.map((s) => s.name) ?? []) ?? [],
+      row.roles?.flatMap(
+        (role) => role.skills?.map((s) => i18nLabel(s)) ?? []
+      ) ?? [],
     {
       id: "skills",
       header: "Skills",
@@ -244,6 +271,7 @@ export function ExperiencesTable({
   onMultiView,
   onMultiDelete,
 }: ExperiencesTableProps) {
+  const userRole = useAuthStore((state) => state.user?.role);
   const [searchQuery, setSearchQuery] = useQueryState("query", queryParser);
   const [sort, setSort] = useQueryState("sort", sortParser);
   const [category, setCategory] = useQueryState("category", categoryParser);
@@ -322,7 +350,11 @@ export function ExperiencesTable({
       sorting: sort,
       columnFilters,
       rowSelection,
-      columnVisibility,
+      columnVisibility: getRestrictedVisibility(
+        columnVisibility,
+        RESTRICTED_COLUMNS,
+        userRole
+      ),
     },
     onSortingChange: handleSortingChange,
     onRowSelectionChange: setRowSelection,
@@ -390,7 +422,7 @@ export function ExperiencesTable({
             <MagnifyingGlassIcon className="opacity-md" />
             <input
               onChange={(event) => setSearchQuery(event.target.value)}
-              placeholder="Search by name or slug..."
+              placeholder={PLACEHOLDERS.search}
               type="search"
               value={searchQuery}
             />
@@ -497,6 +529,9 @@ export function ExperiencesTable({
                 {table
                   .getAllColumns()
                   .filter((col) => col.getCanHide())
+                  .filter((col) =>
+                    canSeeColumn(RESTRICTED_COLUMNS, col.id, userRole)
+                  )
                   .map((col) => (
                     <label
                       className="flex items-center gap-2 text-sm"

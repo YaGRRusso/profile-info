@@ -1,14 +1,23 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable, NotFoundException } from "@nestjs/common";
 import { EventEmitter2 } from "@nestjs/event-emitter";
-import { AnyKeys, QueryFilter, SortOrder, UpdateQuery } from "mongoose";
-import { RecentActivityRecord } from "@/common/helpers/recent-activity.helper";
+import {
+  labelFromI18nTitle,
+  type RecentActivityRecord,
+} from "@/common/helpers/recent-activity.helper";
+import type { AuthContext } from "@/core/context/auth-context.interface";
 import { BatchEntity } from "@/core/entities/batch.entity";
 import { DomainEvents } from "@/core/events/domain-events";
 import { SkillDeletedEvent } from "@/core/events/skill-deleted.event";
-import { PaginatedModel } from "@/core/schemas/paginated.schema";
-import { SkillModel } from "@/modules/skills/schemas/skill.schema";
+import { PERSISTENCE_NOT_FOUND } from "@/core/persistence/persistence.messages";
+import type {
+  FieldCount,
+  MultiPaged,
+} from "@/core/persistence/types/output.type";
 import { CreateSkillInput } from "./dto/create-skill.input";
+import { FilterSkillInput } from "./dto/filter-skill.input";
+import { SortSkillInput } from "./dto/sort-skill.input";
 import { UpdateSkillInput } from "./dto/update-skill.input";
+import { SkillEntityRecord } from "./entities/skill.entity";
 import { SkillsRepository } from "./skills.repository";
 
 @Injectable()
@@ -18,102 +27,207 @@ export class SkillsService {
     private readonly eventEmitter: EventEmitter2
   ) {}
 
-  findOneById(id: string): Promise<SkillModel> {
-    return this.repository.findOneById(id);
+  findOneById(ctx: AuthContext, id: string): Promise<SkillEntityRecord> {
+    return this.repository.catalogCrud(ctx).findOneById(id);
   }
 
-  findOne({
-    filters,
-  }: {
-    filters?: QueryFilter<SkillModel>;
-  }): Promise<SkillModel> {
-    return this.repository.findOne({ filters });
+  findOne(
+    ctx: AuthContext,
+    { filters }: { filters?: FilterSkillInput }
+  ): Promise<SkillEntityRecord> {
+    return this.repository.catalogCrud(ctx).findOne({ filters });
   }
 
-  findManyById(ids: string[]): Promise<SkillModel[]> {
-    return this.repository.findManyById(ids);
+  findOneActive(
+    ctx: AuthContext,
+    { filters }: { filters?: FilterSkillInput }
+  ): Promise<SkillEntityRecord> {
+    return this.repository.catalogCrud(ctx).findOne({
+      filters: this.withActiveFilter(filters),
+    });
   }
 
-  findMany({
-    filters,
-    sort,
-    skip = 0,
-    limit = 50,
-  }: {
-    filters?: QueryFilter<SkillModel>;
-    sort?: Partial<Record<keyof SkillModel, SortOrder>>;
-    limit?: number;
-    skip?: number;
-  }): Promise<PaginatedModel<SkillModel>> {
-    return this.repository.findMany({ filters, sort, skip, limit });
-  }
-
-  createOne(createInput: CreateSkillInput): Promise<SkillModel> {
-    return this.repository.createOne(createInput as AnyKeys<SkillModel>);
-  }
-
-  createMany(createInputs: CreateSkillInput[]): Promise<SkillModel[]> {
-    return this.repository.createMany(createInputs as AnyKeys<SkillModel>[]);
-  }
-
-  updateOne(id: string, updateInput: UpdateSkillInput): Promise<SkillModel> {
-    return this.repository.updateOne(
-      id,
-      updateInput as object as UpdateQuery<SkillModel>
-    );
-  }
-
-  updateMany(
-    ids: string[],
-    updateInput: UpdateSkillInput
-  ): Promise<BatchEntity> {
-    return this.repository.updateMany(
-      ids,
-      updateInput as object as UpdateQuery<SkillModel>
-    );
-  }
-
-  async removeOne(id: string): Promise<SkillModel> {
-    const skill = await this.repository.findOneById(id);
-
-    await this.eventEmitter.emitAsync(
-      DomainEvents.skill.deleted,
-      new SkillDeletedEvent(skill._id.toString())
-    );
-
-    await this.repository.deleteOne(id);
+  async findOneActiveById(
+    ctx: AuthContext,
+    id: string
+  ): Promise<SkillEntityRecord> {
+    const skill = await this.repository.catalogCrud(ctx).findOneById(id);
+    this.assertActive(skill);
     return skill;
   }
 
-  async removeMany(ids: string[]): Promise<BatchEntity> {
-    const skills = await this.repository.findManyById(ids);
+  findManyById(ctx: AuthContext, ids: string[]): Promise<SkillEntityRecord[]> {
+    return this.repository.catalogCrud(ctx).findManyById(ids);
+  }
+
+  async findManyActiveById(
+    ctx: AuthContext,
+    ids: string[]
+  ): Promise<SkillEntityRecord[]> {
+    const skills = await this.findManyById(ctx, ids);
+    this.assertAllActive(skills);
+    return skills;
+  }
+
+  findMany(
+    ctx: AuthContext,
+    {
+      filters,
+      sort,
+      skip = 0,
+      limit = 50,
+    }: {
+      filters?: FilterSkillInput;
+      sort?: SortSkillInput;
+      limit?: number;
+      skip?: number;
+    }
+  ): Promise<MultiPaged<SkillEntityRecord>> {
+    return this.repository
+      .catalogCrud(ctx)
+      .findMany({ filters, sort, skip, limit });
+  }
+
+  findManyActive(
+    ctx: AuthContext,
+    {
+      filters,
+      sort,
+      skip = 0,
+      limit = 50,
+    }: {
+      filters?: FilterSkillInput;
+      sort?: SortSkillInput;
+      limit?: number;
+      skip?: number;
+    }
+  ): Promise<MultiPaged<SkillEntityRecord>> {
+    return this.repository.catalogCrud(ctx).findMany({
+      filters: this.withActiveFilter(filters),
+      sort,
+      skip,
+      limit,
+    });
+  }
+
+  createOne(
+    ctx: AuthContext,
+    createInput: CreateSkillInput
+  ): Promise<SkillEntityRecord> {
+    return this.repository.catalogCrud(ctx).createOne(createInput);
+  }
+
+  createMany(
+    ctx: AuthContext,
+    createInputs: CreateSkillInput[]
+  ): Promise<BatchEntity> {
+    return this.repository.catalogCrud(ctx).createMany(createInputs);
+  }
+
+  updateOne(
+    ctx: AuthContext,
+    id: string,
+    updateInput: UpdateSkillInput
+  ): Promise<SkillEntityRecord> {
+    return this.repository.catalogCrud(ctx).updateOneById(id, updateInput);
+  }
+
+  updateMany(
+    ctx: AuthContext,
+    ids: string[],
+    updateInput: UpdateSkillInput
+  ): Promise<BatchEntity> {
+    return this.repository.catalogCrud(ctx).updateManyById(ids, updateInput);
+  }
+
+  disableOne(ctx: AuthContext, id: string): Promise<SkillEntityRecord> {
+    return this.repository
+      .catalogCrud(ctx)
+      .updateOneById(id, { disabled: true });
+  }
+
+  disableMany(ctx: AuthContext, ids: string[]): Promise<BatchEntity> {
+    return this.repository
+      .catalogCrud(ctx)
+      .updateManyById(ids, { disabled: true });
+  }
+
+  enableOne(ctx: AuthContext, id: string): Promise<SkillEntityRecord> {
+    return this.repository
+      .catalogCrud(ctx)
+      .updateOneById(id, { disabled: false });
+  }
+
+  enableMany(ctx: AuthContext, ids: string[]): Promise<BatchEntity> {
+    return this.repository
+      .catalogCrud(ctx)
+      .updateManyById(ids, { disabled: false });
+  }
+
+  async removeOne(ctx: AuthContext, id: string): Promise<SkillEntityRecord> {
+    const skill = await this.repository.catalogCrud(ctx).findOneById(id);
+
+    await this.eventEmitter.emitAsync(
+      DomainEvents.skill.deleted,
+      new SkillDeletedEvent(skill.id)
+    );
+
+    await this.repository.catalogCrud(ctx).deleteOneById(id);
+    return skill;
+  }
+
+  async removeMany(ctx: AuthContext, ids: string[]): Promise<BatchEntity> {
+    const skills = await this.repository.catalogCrud(ctx).findManyById(ids);
 
     for (const skill of skills) {
       await this.eventEmitter.emitAsync(
         DomainEvents.skill.deleted,
-        new SkillDeletedEvent(skill._id.toString())
+        new SkillDeletedEvent(skill.id)
       );
     }
 
-    return this.repository.deleteMany(ids);
+    return this.repository.catalogCrud(ctx).deleteManyById(ids);
   }
 
-  count(): Promise<number> {
-    return this.repository.count();
+  count(ctx: AuthContext): Promise<number> {
+    return this.repository.countActive(ctx);
   }
 
-  countByField(field: string): Promise<{ label: string; value: number }[]> {
-    return this.repository.countByField(field);
+  countByField(ctx: AuthContext, field: string): Promise<FieldCount[]> {
+    return this.repository.countByField(ctx, field);
   }
 
-  async findRecentActivity(limit: number): Promise<RecentActivityRecord[]> {
-    const rows = await this.repository.findRecentlyUpdated(
+  async findRecentActivity(
+    ctx: AuthContext,
+    limit: number
+  ): Promise<RecentActivityRecord[]> {
+    const rows = await this.repository.findRecentlyUpdatedActive(
+      ctx,
       limit,
-      "name updatedAt"
+      "slug i18n updatedAt"
     );
     return rows.map((row) => ({
-      label: row.name as string,
+      label: labelFromI18nTitle(
+        row.slug as string,
+        row.i18n as Parameters<typeof labelFromI18nTitle>[1]
+      ),
       updatedAt: row.updatedAt,
     }));
+  }
+
+  private withActiveFilter(filters?: FilterSkillInput): FilterSkillInput {
+    return { ...filters, disabled: false };
+  }
+
+  private assertActive(entry: { disabled: boolean }): void {
+    if (entry.disabled) {
+      throw new NotFoundException(PERSISTENCE_NOT_FOUND);
+    }
+  }
+
+  private assertAllActive(entries: Array<{ disabled: boolean }>): void {
+    if (entries.some((entry) => entry.disabled)) {
+      throw new NotFoundException(PERSISTENCE_NOT_FOUND);
+    }
   }
 }

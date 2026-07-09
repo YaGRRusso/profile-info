@@ -1,8 +1,10 @@
 import { DeepKeys, DeepValue, useForm } from "@tanstack/react-form";
-import { useCallback } from "react";
+import { useCallback, useMemo } from "react";
 import { toast } from "react-toastify";
 import z from "zod";
+import { DraggableList } from "@/components/inputs/draggable-list";
 import { FieldArray } from "@/components/inputs/field-array";
+import { MultiSelectInput } from "@/components/inputs/multi-select";
 import { PasswordInput } from "@/components/inputs/password";
 import { SelectInput } from "@/components/inputs/select";
 import { TextInput } from "@/components/inputs/text";
@@ -21,7 +23,7 @@ import { useAtsSummarize, useTranslate } from "@/hooks/mutations/ai";
 import { useFindManySkills } from "@/hooks/queries/skills";
 import { toDateInput, toIsoDate } from "@/lib/date";
 import { fieldError } from "@/lib/field-error";
-import { createEmptyI18n } from "@/lib/i18n";
+import { createEmptyI18n, i18nLabel, i18nLabelsByIds } from "@/lib/i18n";
 import { CommonFormProps } from "./common";
 
 const urlSchema = z.object({
@@ -53,6 +55,7 @@ const profileSchema = z.object({
       { message: "locales must be unique" }
     ),
   urls: z.array(urlSchema),
+  skillIds: z.array(z.string()),
   password: z.union([
     z.literal(""),
     z.string().min(8, "must be at least 8 characters"),
@@ -87,6 +90,9 @@ export function profileToForm(user: GetMeUser): Partial<ProfileSchema> {
       title: url.title,
       value: url.value,
     })),
+    skillIds: user.skillIds?.length
+      ? [...user.skillIds]
+      : (user.skills ?? []).map((skill) => skill.id),
     password: "",
   };
 }
@@ -115,6 +121,7 @@ export function profileToInput(data: ProfileSchema): UpdateMeInput {
     address: data.address || undefined,
     i18n: i18n.length ? i18n : undefined,
     urls: data.urls.length ? data.urls : undefined,
+    skillIds: data.skillIds.length ? data.skillIds : undefined,
     password: data.password || undefined,
   };
 }
@@ -131,6 +138,16 @@ export function ProfileForm({
   const atsSummarize = useAtsSummarize();
   const translate = useTranslate();
 
+  const skillOptions = useMemo(
+    () =>
+      (findManySkills.data?.nodes ?? []).map((skill) => ({
+        label: i18nLabel(skill),
+        value: skill.id,
+        disabled: skill.disabled,
+      })),
+    [findManySkills.data?.nodes]
+  );
+
   const form = useForm({
     defaultValues: {
       name: "",
@@ -142,6 +159,7 @@ export function ProfileForm({
       address: "",
       i18n: createEmptyI18n({ title: "", description: "" }),
       urls: [] as ProfileSchema["urls"],
+      skillIds: [] as string[],
       password: "",
       ...defaultValues,
     },
@@ -163,11 +181,13 @@ export function ProfileForm({
       if (raw.trim().length <= RawSizeEnum.XSMALL)
         return toast.error("Description must be at least 64 characters long");
 
-      const skills = [...(findManySkills.data?.nodes ?? [])]
-        .sort((a, b) => b.relevance - a.relevance)
-        .slice(0, 32)
-        .map((skill) => skill.name);
-      if (!skills.length) return toast.error("At least one skill is required");
+      const skills = i18nLabelsByIds(
+        findManySkills.data?.nodes,
+        form.getFieldValue("skillIds")
+      );
+      if (!skills.length) {
+        return toast.error("At least one skill is required");
+      }
 
       const name = form.getFieldValue("name");
       if (name) details.push({ key: "Name", value: [name] });
@@ -250,7 +270,7 @@ export function ProfileForm({
                 label="Name"
                 name={field.name}
                 onChange={field.handleChange}
-                placeholder={PLACEHOLDERS.name}
+                placeholder={PLACEHOLDERS.profileName}
                 value={field.state.value}
               />
             )}
@@ -276,7 +296,7 @@ export function ProfileForm({
                 label="Birth date"
                 name={field.name}
                 onChange={field.handleChange}
-                placeholder="YYYY-MM-DD"
+                placeholder={PLACEHOLDERS.date}
                 type="date"
                 value={field.state.value}
               />
@@ -290,7 +310,7 @@ export function ProfileForm({
                 label="Avatar URL"
                 name={field.name}
                 onChange={field.handleChange}
-                placeholder={PLACEHOLDERS.avatarUrl}
+                placeholder={PLACEHOLDERS.url}
                 value={field.state.value}
               />
             )}
@@ -324,7 +344,7 @@ export function ProfileForm({
                           name={field.name}
                           onChange={field.handleChange}
                           options={LOCALES}
-                          placeholder={PLACEHOLDERS.chooseLanguage}
+                          placeholder={PLACEHOLDERS.chooseOne}
                           value={field.state.value}
                         />
                       )}
@@ -336,7 +356,7 @@ export function ProfileForm({
                           label="Title"
                           name={field.name}
                           onChange={field.handleChange}
-                          placeholder={PLACEHOLDERS.title}
+                          placeholder={PLACEHOLDERS.profileTitle}
                           value={field.state.value}
                         />
                       )}
@@ -365,7 +385,7 @@ export function ProfileForm({
                               field.state.value
                             )
                           }
-                          placeholder={PLACEHOLDERS.profileDescription}
+                          placeholder={PLACEHOLDERS.description}
                           value={field.state.value}
                         />
                       )}
@@ -433,9 +453,33 @@ export function ProfileForm({
               label="New password"
               name={field.name}
               onChange={field.handleChange}
-              placeholder={PLACEHOLDERS.newPassword}
+              placeholder={PLACEHOLDERS.password}
               value={field.state.value}
             />
+          )}
+        </Field>
+      </section>
+
+      <section className="rounded-box bg-base-200 p-4 sm:p-6">
+        <h2 className="mb-4 font-semibold text-lg">Main Skills</h2>
+        <Field name="skillIds">
+          {(field) => (
+            <>
+              <MultiSelectInput
+                error={fieldError(field.state.meta)}
+                label="Skills"
+                onChange={field.handleChange}
+                options={skillOptions}
+                placeholder={PLACEHOLDERS.search}
+                showSelected={false}
+                value={field.state.value}
+              />
+              <DraggableList
+                onChange={field.handleChange}
+                options={skillOptions}
+                value={field.state.value}
+              />
+            </>
           )}
         </Field>
       </section>
@@ -471,7 +515,7 @@ export function ProfileForm({
                         error={fieldError(field.state.meta)}
                         name={field.name}
                         onChange={field.handleChange}
-                        placeholder={PLACEHOLDERS.linkUrl}
+                        placeholder={PLACEHOLDERS.url}
                         value={field.state.value}
                       />
                     )}
@@ -492,7 +536,13 @@ export function ProfileForm({
         >
           Reset
         </button>
-        <Subscribe>
+        <Subscribe
+          selector={(state) => ({
+            canSubmit: state.canSubmit,
+            isSubmitting: state.isSubmitting,
+            isTouched: state.isTouched,
+          })}
+        >
           {({ canSubmit, isSubmitting, isTouched }) => (
             <button
               className="btn btn-soft btn-primary flex-1 lg:hidden"

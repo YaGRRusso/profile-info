@@ -1,25 +1,37 @@
 import { InputType } from "@nestjs/graphql";
-import { IsEnum, IsNotEmpty, IsString } from "class-validator";
+import { Type } from "class-transformer";
+import { IsArray, IsNotEmpty, IsString, ValidateNested } from "class-validator";
 import { OptionalField } from "@/core/decorators/optional-field.decorator";
 import { RequiredField } from "@/core/decorators/required-field.decorator";
-import { SkillCategory } from "../enums/category.enum";
+import {
+  createTranslationInput,
+  TranslationInput,
+} from "@/core/inputs/translation.input";
+
+@InputType()
+export class CreateSkillMessagesInput {
+  @RequiredField(() => String)
+  @IsString()
+  @IsNotEmpty()
+  title: string;
+}
+
+const SkillTranslationInput = createTranslationInput(CreateSkillMessagesInput);
 
 @InputType()
 export class CreateSkillInput {
-  @OptionalField(() => Number)
-  relevance?: number;
-
   @RequiredField(() => String)
   @IsString()
   @IsNotEmpty()
   slug: string;
 
-  @RequiredField(() => String)
-  @IsString()
-  @IsNotEmpty()
-  name: string;
+  @RequiredField(() => [SkillTranslationInput])
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => SkillTranslationInput)
+  i18n: TranslationInput<CreateSkillMessagesInput>[];
 
-  @RequiredField(() => SkillCategory)
-  @IsEnum(SkillCategory)
-  category: SkillCategory;
+  @OptionalField(() => String)
+  @IsString()
+  category?: string;
 }

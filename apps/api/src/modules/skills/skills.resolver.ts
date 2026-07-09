@@ -1,14 +1,28 @@
-import { Args, ID, Mutation, Query, Resolver } from "@nestjs/graphql";
-import { Public } from "@/core/decorators/public-route.decorator";
-import { Roles } from "@/core/decorators/roles.decorator";
+import {
+  Args,
+  Context,
+  ID,
+  Mutation,
+  Parent,
+  Query,
+  ResolveField,
+  Resolver,
+} from "@nestjs/graphql";
+import type { AuthContext } from "@/core/context/auth-context.interface";
+import type { GraphqlContext } from "@/core/context/graphql-context.interface";
 import { BatchEntity } from "@/core/entities/batch.entity";
-import { UserRole } from "@/core/enums/user-role.enum";
 import { PaginationInput } from "@/core/inputs/pagination.input";
+import { Auth } from "@/modules/auth/decorators/auth-context.decorator";
+import { UserEntity } from "../users/entities/user.entity";
 import { CreateSkillInput } from "./dto/create-skill.input";
 import { FilterSkillInput } from "./dto/filter-skill.input";
 import { SortSkillInput } from "./dto/sort-skill.input";
 import { UpdateSkillInput } from "./dto/update-skill.input";
-import { PaginatedSkillEntity, SkillEntity } from "./entities/skill.entity";
+import {
+  PaginatedSkillEntity,
+  SkillEntity,
+  type SkillEntityRecord,
+} from "./entities/skill.entity";
 import { SkillsService } from "./skills.service";
 
 @Resolver(() => SkillEntity)
@@ -17,35 +31,49 @@ export class SkillsResolver {
 
   // QUERIES
 
-  @Public()
   @Query(() => SkillEntity)
-  findOneSkillById(@Args("skillId", { type: () => ID }) skillId: string) {
-    return this.skillsService.findOneById(skillId);
+  findOneSkillById(
+    @Auth() ctx: AuthContext,
+    @Args("skillId", { type: () => ID }) skillId: string
+  ) {
+    return this.skillsService.findOneById(ctx, skillId);
   }
 
-  @Public()
   @Query(() => SkillEntity)
   findOneSkill(
+    @Auth() ctx: AuthContext,
     @Args("skillFilters", {
       type: () => FilterSkillInput,
       nullable: true,
     })
     skillFilters?: FilterSkillInput
   ) {
-    return this.skillsService.findOne({ filters: skillFilters });
+    return this.skillsService.findOne(ctx, { filters: skillFilters });
   }
 
-  @Public()
+  @Query(() => SkillEntity)
+  findOneActiveSkill(
+    @Auth() ctx: AuthContext,
+    @Args("skillFilters", {
+      type: () => FilterSkillInput,
+      nullable: true,
+    })
+    skillFilters?: FilterSkillInput
+  ) {
+    return this.skillsService.findOneActive(ctx, { filters: skillFilters });
+  }
+
   @Query(() => [SkillEntity])
   findManySkillById(
+    @Auth() ctx: AuthContext,
     @Args("skillIds", { type: () => [ID] }) skillIds: string[]
   ) {
-    return this.skillsService.findManyById(skillIds);
+    return this.skillsService.findManyById(ctx, skillIds);
   }
 
-  @Public()
   @Query(() => PaginatedSkillEntity)
   findManySkills(
+    @Auth() ctx: AuthContext,
     @Args("skillFilters", {
       type: () => FilterSkillInput,
       nullable: true,
@@ -62,7 +90,34 @@ export class SkillsResolver {
     })
     skillSort?: SortSkillInput
   ) {
-    return this.skillsService.findMany({
+    return this.skillsService.findMany(ctx, {
+      filters: skillFilters,
+      sort: skillSort,
+      limit: skillPagination?.limit,
+      skip: skillPagination?.skip,
+    });
+  }
+
+  @Query(() => PaginatedSkillEntity)
+  findManyActiveSkills(
+    @Auth() ctx: AuthContext,
+    @Args("skillFilters", {
+      type: () => FilterSkillInput,
+      nullable: true,
+    })
+    skillFilters?: FilterSkillInput,
+    @Args("skillPagination", {
+      type: () => PaginationInput,
+      nullable: true,
+    })
+    skillPagination?: PaginationInput,
+    @Args("skillSort", {
+      type: () => SortSkillInput,
+      nullable: true,
+    })
+    skillSort?: SortSkillInput
+  ) {
+    return this.skillsService.findManyActive(ctx, {
       filters: skillFilters,
       sort: skillSort,
       limit: skillPagination?.limit,
@@ -72,53 +127,95 @@ export class SkillsResolver {
 
   // MUTATIONS
 
-  @Roles(UserRole.ADMIN)
   @Mutation(() => SkillEntity)
   createOneSkill(
+    @Auth() ctx: AuthContext,
     @Args("createSkillInput", { type: () => CreateSkillInput })
     createSkillInput: CreateSkillInput
   ) {
-    return this.skillsService.createOne(createSkillInput);
+    return this.skillsService.createOne(ctx, createSkillInput);
   }
 
-  @Roles(UserRole.ADMIN)
-  @Mutation(() => [SkillEntity])
+  @Mutation(() => BatchEntity)
   createManySkills(
+    @Auth() ctx: AuthContext,
     @Args("createSkillInputs", { type: () => [CreateSkillInput] })
     createSkillInputs: CreateSkillInput[]
   ) {
-    return this.skillsService.createMany(createSkillInputs);
+    return this.skillsService.createMany(ctx, createSkillInputs);
   }
 
-  @Roles(UserRole.ADMIN)
   @Mutation(() => SkillEntity)
   updateOneSkill(
+    @Auth() ctx: AuthContext,
     @Args("skillId", { type: () => ID }) skillId: string,
     @Args("updateSkillInput", { type: () => UpdateSkillInput })
     updateSkillInput: UpdateSkillInput
   ) {
-    return this.skillsService.updateOne(skillId, updateSkillInput);
+    return this.skillsService.updateOne(ctx, skillId, updateSkillInput);
   }
 
-  @Roles(UserRole.ADMIN)
   @Mutation(() => BatchEntity)
   updateManySkills(
+    @Auth() ctx: AuthContext,
     @Args("skillIds", { type: () => [ID] }) skillIds: string[],
     @Args("updateSkillInput", { type: () => UpdateSkillInput })
     updateSkillInput: UpdateSkillInput
   ) {
-    return this.skillsService.updateMany(skillIds, updateSkillInput);
+    return this.skillsService.updateMany(ctx, skillIds, updateSkillInput);
   }
 
-  @Roles(UserRole.ADMIN)
   @Mutation(() => SkillEntity)
-  removeOneSkill(@Args("skillId", { type: () => ID }) skillId: string) {
-    return this.skillsService.removeOne(skillId);
+  removeOneSkill(
+    @Auth() ctx: AuthContext,
+    @Args("skillId", { type: () => ID }) skillId: string
+  ) {
+    return this.skillsService.removeOne(ctx, skillId);
   }
 
-  @Roles(UserRole.ADMIN)
   @Mutation(() => BatchEntity)
-  removeManySkills(@Args("skillIds", { type: () => [ID] }) skillIds: string[]) {
-    return this.skillsService.removeMany(skillIds);
+  removeManySkills(
+    @Auth() ctx: AuthContext,
+    @Args("skillIds", { type: () => [ID] }) skillIds: string[]
+  ) {
+    return this.skillsService.removeMany(ctx, skillIds);
+  }
+
+  @Mutation(() => SkillEntity)
+  disableOneSkill(
+    @Auth() ctx: AuthContext,
+    @Args("skillId", { type: () => ID }) skillId: string
+  ) {
+    return this.skillsService.disableOne(ctx, skillId);
+  }
+
+  @Mutation(() => BatchEntity)
+  disableManySkills(
+    @Auth() ctx: AuthContext,
+    @Args("skillIds", { type: () => [ID] }) skillIds: string[]
+  ) {
+    return this.skillsService.disableMany(ctx, skillIds);
+  }
+
+  @Mutation(() => SkillEntity)
+  enableOneSkill(
+    @Auth() ctx: AuthContext,
+    @Args("skillId", { type: () => ID }) skillId: string
+  ) {
+    return this.skillsService.enableOne(ctx, skillId);
+  }
+
+  @Mutation(() => BatchEntity)
+  enableManySkills(
+    @Auth() ctx: AuthContext,
+    @Args("skillIds", { type: () => [ID] }) skillIds: string[]
+  ) {
+    return this.skillsService.enableMany(ctx, skillIds);
+  }
+
+  @ResolveField(() => UserEntity)
+  owner(@Parent() skill: SkillEntityRecord, @Context() ctx: GraphqlContext) {
+    if (!skill?.ownerId) return null;
+    return ctx.loaders.batchUsers.load(skill.ownerId);
   }
 }

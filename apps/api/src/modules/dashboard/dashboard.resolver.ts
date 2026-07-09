@@ -1,6 +1,7 @@
 import { Query, Resolver } from "@nestjs/graphql";
-import { Roles } from "@/core/decorators/roles.decorator";
-import { UserRole } from "@/core/enums/user-role.enum";
+import type { AuthContext } from "@/core/context/auth-context.interface";
+import { SessionOnly } from "@/core/decorators/session-only.decorator";
+import { Auth } from "@/modules/auth/decorators/auth-context.decorator";
 import { DashboardService } from "./dashboard.service";
 import { DashboardEntity } from "./entities/dashboard.entity";
 
@@ -8,9 +9,9 @@ import { DashboardEntity } from "./entities/dashboard.entity";
 export class DashboardResolver {
   constructor(readonly dashboardService: DashboardService) {}
 
-  @Roles(UserRole.ADMIN)
+  @SessionOnly()
   @Query(() => DashboardEntity)
-  dashboard() {
-    return this.dashboardService.getDashboard();
+  dashboard(@Auth() ctx: AuthContext) {
+    return this.dashboardService.getDashboard(ctx);
   }
 }

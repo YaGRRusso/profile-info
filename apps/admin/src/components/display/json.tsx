@@ -9,7 +9,7 @@ export interface JsonProps
 }
 
 export function Json({ data, ...props }: JsonProps) {
-  const [levelToExpand, setLevelToExpand] = useState(1);
+  const [levelToExpand, setLevelToExpand] = useState(5);
 
   return (
     <div className="relative">

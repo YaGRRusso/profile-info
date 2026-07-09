@@ -36,16 +36,17 @@
     "test:e2e": "npm run test:e2e --workspaces --if-present",
     "typecheck": "npm run typecheck --workspaces --if-present",
     "lint": "npm run lint --workspaces --if-present",
-    "format": "npm run format --workspaces --if-present"
+    "format": "npm run format --workspaces --if-present",
+    "simulate": "clear && npm run build && npm run test && npm run test:e2e && npm run seed && echo 'All Passed'"
   },
   "devDependencies": {
-    "@biomejs/biome": "^2.5.0",
-    "concurrently": "^9.2.1",
+    "@biomejs/biome": "^2.5.2",
+    "concurrently": "^10.0.3",
     "husky": "^9.1.7",
-    "lint-staged": "^16.4.0",
-    "prettier": "^3.8.4",
-    "typescript": "^5.9.3",
-    "ultracite": "^7.8.3"
+    "lint-staged": "^17.0.8",
+    "prettier": "^3.9.4",
+    "typescript": "^6.0.3",
+    "ultracite": "^7.8.4"
   },
   "lint-staged": {
     "*.{js,jsx,ts,tsx,json,jsonc,css,scss,md,mdx}": [

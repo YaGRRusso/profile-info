@@ -19,6 +19,7 @@ import { Route as AuthenticatedSidebarOrganizationsIndexRouteImport } from './ro
 import { Route as AuthenticatedSidebarExperiencesIndexRouteImport } from './routes/_authenticated/_sidebar/experiences/index'
 import { Route as AuthenticatedSidebarEducationsIndexRouteImport } from './routes/_authenticated/_sidebar/educations/index'
 import { Route as AuthenticatedSidebarCoursesIndexRouteImport } from './routes/_authenticated/_sidebar/courses/index'
+import { Route as AuthenticatedSidebarApiTokensIndexRouteImport } from './routes/_authenticated/_sidebar/api-tokens/index'
 
 const AuthenticatedRoute = AuthenticatedRouteImport.update({
   id: '/_authenticated',
@@ -76,9 +77,16 @@ const AuthenticatedSidebarCoursesIndexRoute =
     path: '/courses/',
     getParentRoute: () => AuthenticatedSidebarRoute,
   } as any)
+const AuthenticatedSidebarApiTokensIndexRoute =
+  AuthenticatedSidebarApiTokensIndexRouteImport.update({
+    id: '/api-tokens/',
+    path: '/api-tokens/',
+    getParentRoute: () => AuthenticatedSidebarRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof AuthenticatedSidebarIndexRoute
+  '/api-tokens/': typeof AuthenticatedSidebarApiTokensIndexRoute
   '/courses/': typeof AuthenticatedSidebarCoursesIndexRoute
   '/educations/': typeof AuthenticatedSidebarEducationsIndexRoute
   '/experiences/': typeof AuthenticatedSidebarExperiencesIndexRoute
@@ -89,6 +97,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof AuthenticatedSidebarIndexRoute
+  '/api-tokens': typeof AuthenticatedSidebarApiTokensIndexRoute
   '/courses': typeof AuthenticatedSidebarCoursesIndexRoute
   '/educations': typeof AuthenticatedSidebarEducationsIndexRoute
   '/experiences': typeof AuthenticatedSidebarExperiencesIndexRoute
@@ -102,6 +111,7 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteWithChildren
   '/_authenticated/_sidebar': typeof AuthenticatedSidebarRouteWithChildren
   '/_authenticated/_sidebar/': typeof AuthenticatedSidebarIndexRoute
+  '/_authenticated/_sidebar/api-tokens/': typeof AuthenticatedSidebarApiTokensIndexRoute
   '/_authenticated/_sidebar/courses/': typeof AuthenticatedSidebarCoursesIndexRoute
   '/_authenticated/_sidebar/educations/': typeof AuthenticatedSidebarEducationsIndexRoute
   '/_authenticated/_sidebar/experiences/': typeof AuthenticatedSidebarExperiencesIndexRoute
@@ -114,6 +124,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/api-tokens/'
     | '/courses/'
     | '/educations/'
     | '/experiences/'
@@ -124,6 +135,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/api-tokens'
     | '/courses'
     | '/educations'
     | '/experiences'
@@ -136,6 +148,7 @@ export interface FileRouteTypes {
     | '/_authenticated'
     | '/_authenticated/_sidebar'
     | '/_authenticated/_sidebar/'
+    | '/_authenticated/_sidebar/api-tokens/'
     | '/_authenticated/_sidebar/courses/'
     | '/_authenticated/_sidebar/educations/'
     | '/_authenticated/_sidebar/experiences/'
@@ -221,11 +234,19 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedSidebarCoursesIndexRouteImport
       parentRoute: typeof AuthenticatedSidebarRoute
     }
+    '/_authenticated/_sidebar/api-tokens/': {
+      id: '/_authenticated/_sidebar/api-tokens/'
+      path: '/api-tokens'
+      fullPath: '/api-tokens/'
+      preLoaderRoute: typeof AuthenticatedSidebarApiTokensIndexRouteImport
+      parentRoute: typeof AuthenticatedSidebarRoute
+    }
   }
 }
 
 interface AuthenticatedSidebarRouteChildren {
   AuthenticatedSidebarIndexRoute: typeof AuthenticatedSidebarIndexRoute
+  AuthenticatedSidebarApiTokensIndexRoute: typeof AuthenticatedSidebarApiTokensIndexRoute
   AuthenticatedSidebarCoursesIndexRoute: typeof AuthenticatedSidebarCoursesIndexRoute
   AuthenticatedSidebarEducationsIndexRoute: typeof AuthenticatedSidebarEducationsIndexRoute
   AuthenticatedSidebarExperiencesIndexRoute: typeof AuthenticatedSidebarExperiencesIndexRoute
@@ -237,6 +258,8 @@ interface AuthenticatedSidebarRouteChildren {
 
 const AuthenticatedSidebarRouteChildren: AuthenticatedSidebarRouteChildren = {
   AuthenticatedSidebarIndexRoute: AuthenticatedSidebarIndexRoute,
+  AuthenticatedSidebarApiTokensIndexRoute:
+    AuthenticatedSidebarApiTokensIndexRoute,
   AuthenticatedSidebarCoursesIndexRoute: AuthenticatedSidebarCoursesIndexRoute,
   AuthenticatedSidebarEducationsIndexRoute:
     AuthenticatedSidebarEducationsIndexRoute,

@@ -1,4 +1,5 @@
 import { ComponentProps } from "react";
+import { EmptyValue } from "@/components/display/empty-value";
 import { cn } from "@/lib/cn";
 
 export interface LinkProps extends Omit<ComponentProps<"a">, "href"> {
@@ -17,6 +18,6 @@ export function Link({ href, className, ...props }: LinkProps) {
       {href}
     </a>
   ) : (
-    <span className={cn("text-sm opacity-sm", className)}>empty</span>
+    <EmptyValue />
   );
 }

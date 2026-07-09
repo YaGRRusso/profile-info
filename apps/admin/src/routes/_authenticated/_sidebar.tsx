@@ -5,6 +5,7 @@ import {
   GearIcon,
   GraduationCapIcon,
   HouseIcon,
+  KeyIcon,
   ListIcon,
   PackageIcon,
   RocketLaunchIcon,
@@ -77,6 +78,12 @@ const MENU_SECTIONS: MenuSection[] = [
     label: "Actions",
     items: [
       {
+        icon: <KeyIcon size={24} weight="duotone" />,
+        label: "Tokens",
+        to: "/api-tokens",
+        type: "link",
+      },
+      {
         icon: <GearIcon size={24} />,
         label: "Settings",
         to: "/settings",
@@ -145,10 +152,10 @@ function RouteComponent() {
           <div className="flex w-full items-center gap-2 p-4 pb-2">
             <Avatar
               avatar={user?.avatar}
-              className="is-drawer-close:size-8 is-drawer-open:size-10"
+              className="size-8"
               name={user?.name}
             />
-            <div className="flex is-drawer-close:hidden flex-col">
+            <div className="flex is-drawer-close:hidden flex-1 flex-col">
               <strong className="line-clamp-1 text-sm">{user?.name}</strong>
               <p className="line-clamp-1 text-xs opacity-md">{user?.role}</p>
             </div>

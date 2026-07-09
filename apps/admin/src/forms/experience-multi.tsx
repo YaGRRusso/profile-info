@@ -78,7 +78,7 @@ export function ExperienceMultiForm({
               field.handleChange(value as ExperienceCategory)
             }
             options={CATEGORY_OPTIONS}
-            placeholder={PLACEHOLDERS.chooseCategory}
+            placeholder={PLACEHOLDERS.chooseOne}
             value={field.state.value}
           />
         )}

@@ -2,12 +2,14 @@ import {
   ArrowDownIcon,
   ArrowsDownUpIcon,
   ArrowUpIcon,
+  CheckCircleIcon,
   EyeIcon,
   GearIcon,
   MagnifyingGlassIcon,
   PencilIcon,
   SlidersHorizontalIcon,
   TrashSimpleIcon,
+  XCircleIcon,
   XIcon,
 } from "@phosphor-icons/react";
 import {
@@ -27,18 +29,34 @@ import {
   type VisibilityState,
 } from "@tanstack/react-table";
 import { useQueryState } from "nuqs";
-import { useMemo, useState } from "react";
+import { type ReactNode, useMemo, useState } from "react";
 import { z } from "zod";
+import { EmptyValue } from "@/components/display/empty-value";
 import { Link } from "@/components/display/link";
-import { OrganizationCategory } from "@/generated/graphql/graphql";
+import { PLACEHOLDERS } from "@/consts/placeholders";
+import {
+  CatalogPartition,
+  OrganizationCategory,
+  UserRole,
+} from "@/generated/graphql/graphql";
 import { useActiveFilters } from "@/hooks/custom/use-active-filters";
 import { usePersistedState } from "@/hooks/custom/use-persisted-state";
-import { useStableValue } from "@/hooks/custom/use-stable-value";
 import type { OrganizationRow } from "@/hooks/queries/organizations";
+import {
+  isCatalogRowMutationReadOnly,
+  selectionHasReadOnlyCatalogRows,
+} from "@/lib/catalog-mutation-access";
 import { cn } from "@/lib/cn";
-import { getMinMaxFacets, getUniqueFacets } from "@/lib/facets";
+import { isEmptyValue } from "@/lib/empty-value";
+import { getUniqueFacets } from "@/lib/facets";
 import { parseAsShape } from "@/lib/parsers";
-import { dateRangeFilter, numberRangeFilter } from "@/lib/table-filters";
+import {
+  canSeeColumn,
+  getRestrictedVisibility,
+  type RestrictedColumns,
+} from "@/lib/table-columns";
+import { dateRangeFilter } from "@/lib/table-filters";
+import { useAuthStore } from "@/stores/auth";
 
 const debouncedUrlUpdates = { method: "debounce" as const, timeMs: 500 };
 const persistentOptions = { clearOnDefault: true, history: "push" as const };
@@ -54,18 +72,9 @@ const sortParser = parseAsShape(
   .withOptions(persistentOptions);
 
 const categoryParser = parseAsShape(z.string()).withOptions(persistentOptions);
+const partitionParser = parseAsShape(z.string()).withOptions(persistentOptions);
 const createdAtParser = parseAsShape(z.string()).withOptions(persistentOptions);
 const updatedAtParser = parseAsShape(z.string()).withOptions(persistentOptions);
-
-const relevanceParser = parseAsShape(
-  z.object({
-    min: z.number().optional(),
-    max: z.number().optional(),
-  })
-).withOptions({
-  ...persistentOptions,
-  limitUrlUpdates: debouncedUrlUpdates,
-});
 
 const CATEGORY_LABELS: Array<{ value: OrganizationCategory; label: string }> = [
   { value: OrganizationCategory.Company, label: "Company" },
@@ -73,11 +82,20 @@ const CATEGORY_LABELS: Array<{ value: OrganizationCategory; label: string }> = [
   { value: OrganizationCategory.Other, label: "Other" },
 ];
 
+const PARTITION_LABELS: Array<{ value: CatalogPartition; label: string }> = [
+  { value: CatalogPartition.Global, label: "Global" },
+  { value: CatalogPartition.Local, label: "Local" },
+];
+
 const DATE_OPTIONS = [
   { value: "", label: "Any date" },
   { value: "week", label: "Last 7 days" },
   { value: "month", label: "This month" },
 ];
+
+const RESTRICTED_COLUMNS: RestrictedColumns = {
+  [UserRole.SuperAdmin]: ["owner"],
+};
 
 const columnHelper = createColumnHelper<OrganizationRow>();
 
@@ -89,8 +107,11 @@ function SortIcon({ sorted }: { sorted: false | "asc" | "desc" }) {
 
 const getColumns = (
   onEdit: (organization: OrganizationRow) => void,
-  onDelete: (organization: OrganizationRow) => void,
-  onView: (organization: OrganizationRow) => void
+  onDisable: (organization: OrganizationRow) => void,
+  onEnable: (organization: OrganizationRow) => void,
+  onRemove: (organization: OrganizationRow) => void,
+  onView: (organization: OrganizationRow) => void,
+  opts: { isSuperAdmin: boolean }
 ) => [
   columnHelper.display({
     id: "select",
@@ -137,36 +158,72 @@ const getColumns = (
       <span className="badge badge-soft badge-sm">{data.getValue()}</span>
     ),
   }),
+  columnHelper.accessor("partition", {
+    header: "Partition",
+    enableColumnFilter: true,
+    enableSorting: false,
+    enableGlobalFilter: false,
+    filterFn: "equals",
+    cell: (data) => (
+      <span
+        className={cn(
+          "badge badge-sm badge-soft",
+          data.getValue() === CatalogPartition.Global
+            ? "badge-info"
+            : "badge-warning"
+        )}
+      >
+        {data.getValue() === CatalogPartition.Global ? "Global" : "Local"}
+      </span>
+    ),
+  }),
+  columnHelper.accessor((row) => row.owner?.nickname ?? "", {
+    id: "owner",
+    header: "Owner",
+    enableGlobalFilter: false,
+    enableSorting: false,
+    cell: (data) => {
+      const value = data.getValue();
+      if (isEmptyValue(value)) return <EmptyValue />;
+      return <span className="badge badge-soft badge-sm">{value}</span>;
+    },
+  }),
   columnHelper.accessor("logo", {
     header: "Logo",
     enableGlobalFilter: false,
     enableSorting: false,
     cell: (data) => {
       const url = data.getValue();
+      if (!url) return <EmptyValue />;
       return <Link href={url} />;
     },
   }),
   columnHelper.accessor("website", {
     header: "Website",
     enableGlobalFilter: false,
-    cell: (data) => (
-      <a
-        className="link"
-        href={data.getValue()}
-        rel="noreferrer"
-        target="_blank"
-      >
-        {data.getValue()}
-      </a>
-    ),
+    cell: (data) => {
+      const url = data.getValue();
+      if (!url) return <EmptyValue />;
+      return (
+        <a className="link" href={url} rel="noreferrer" target="_blank">
+          {url}
+        </a>
+      );
+    },
   }),
-  columnHelper.accessor("relevance", {
-    header: "Relevance",
-    enableColumnFilter: true,
+  columnHelper.accessor("disabled", {
+    header: "Status",
     enableGlobalFilter: false,
-    filterFn: numberRangeFilter,
+    enableSorting: false,
     cell: (data) => (
-      <span className="badge badge-soft badge-sm">{data.getValue()}</span>
+      <span
+        className={cn(
+          "badge badge-sm badge-soft",
+          data.getValue() ? "badge-error" : "badge-success"
+        )}
+      >
+        {data.getValue() ? "Disabled" : "Active"}
+      </span>
     ),
   }),
   columnHelper.accessor("createdAt", {
@@ -188,81 +245,131 @@ const getColumns = (
   columnHelper.display({
     id: "actions",
     enableHiding: false,
-    cell: ({ row }) => (
-      <div className="flex items-center justify-end gap-1">
+    cell: ({ row }) => {
+      const isGlobal = row.original.partition === CatalogPartition.Global;
+      const readOnly = isCatalogRowMutationReadOnly(
+        row.original.partition,
+        opts.isSuperAdmin
+      );
+
+      const actions: ReactNode[] = [
         <button
           className="btn btn-sm btn-square btn-ghost"
+          disabled={readOnly}
+          key="edit"
           onClick={() => onEdit(row.original)}
           type="button"
         >
           <PencilIcon />
-        </button>
+        </button>,
         <button
           className="btn btn-sm btn-square btn-ghost"
+          key="view"
           onClick={() => onView(row.original)}
           type="button"
         >
           <EyeIcon />
-        </button>
-        <button
-          className="btn btn-sm btn-square btn-ghost btn-error"
-          onClick={() => onDelete(row.original)}
-          type="button"
-        >
-          <TrashSimpleIcon />
-        </button>
-      </div>
-    ),
+        </button>,
+      ];
+
+      if (isGlobal) {
+        if (row.original.disabled) {
+          actions.push(
+            <button
+              className="btn btn-sm btn-square btn-ghost btn-success"
+              disabled={readOnly}
+              key="enable"
+              onClick={() => onEnable(row.original)}
+              type="button"
+            >
+              <CheckCircleIcon />
+            </button>
+          );
+        }
+        if (!row.original.disabled) {
+          actions.push(
+            <button
+              className="btn btn-sm btn-square btn-ghost btn-error"
+              disabled={readOnly}
+              key="disable"
+              onClick={() => onDisable(row.original)}
+              type="button"
+            >
+              <XCircleIcon />
+            </button>
+          );
+        }
+      }
+      if (!isGlobal) {
+        actions.push(
+          <button
+            className="btn btn-sm btn-square btn-ghost btn-error"
+            disabled={readOnly}
+            key="remove"
+            onClick={() => onRemove(row.original)}
+            type="button"
+          >
+            <TrashSimpleIcon />
+          </button>
+        );
+      }
+
+      return (
+        <div className="flex items-center justify-end gap-1">{actions}</div>
+      );
+    },
   }),
 ];
 
 interface OrganizationsTableProps {
   data: OrganizationRow[];
-  onDelete: (organization: OrganizationRow) => void;
+  onDisable: (organization: OrganizationRow) => void;
   onEdit: (organization: OrganizationRow) => void;
-  onMultiDelete: (organizations: OrganizationRow[]) => void;
+  onEnable: (organization: OrganizationRow) => void;
+  onMultiDisable: (organizations: OrganizationRow[]) => void;
   onMultiEdit: (organizations: OrganizationRow[]) => void;
+  onMultiEnable: (organizations: OrganizationRow[]) => void;
+  onMultiRemove: (organizations: OrganizationRow[]) => void;
   onMultiView: (organizations: OrganizationRow[]) => void;
+  onRemove: (organization: OrganizationRow) => void;
   onView: (organization: OrganizationRow) => void;
 }
 
 export function OrganizationsTable({
   data,
   onEdit,
-  onDelete,
+  onDisable,
+  onEnable,
+  onRemove,
   onView,
   onMultiEdit,
   onMultiView,
-  onMultiDelete,
+  onMultiDisable,
+  onMultiEnable,
+  onMultiRemove,
 }: OrganizationsTableProps) {
+  const userRole = useAuthStore((state) => state.user?.role);
+  const isSuperAdmin = userRole === "SUPER_ADMIN";
+
   const [searchQuery, setSearchQuery] = useQueryState("query", queryParser);
   const [sort, setSort] = useQueryState("sort", sortParser);
   const [category, setCategory] = useQueryState("category", categoryParser);
+  const [partition, setPartition] = useQueryState("partition", partitionParser);
   const [createdAt, setCreatedAt] = useQueryState("createdAt", createdAtParser);
   const [updatedAt, setUpdatedAt] = useQueryState("updatedAt", updatedAtParser);
-  const [relevance, setRelevance] = useQueryState("relevance", relevanceParser);
 
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
   const [columnVisibility, setColumnVisibility] =
     usePersistedState<VisibilityState>("organizations-table-columns", {});
 
-  const stableRelevance = useStableValue(relevance);
   const columnFilters = useMemo<ColumnFiltersState>(() => {
     const activeFilters: ColumnFiltersState = [];
     if (category) activeFilters.push({ id: "category", value: category });
+    if (partition) activeFilters.push({ id: "partition", value: partition });
     if (createdAt) activeFilters.push({ id: "createdAt", value: createdAt });
     if (updatedAt) activeFilters.push({ id: "updatedAt", value: updatedAt });
-    if (stableRelevance) {
-      activeFilters.push({
-        id: "relevance",
-        value: [stableRelevance.min, stableRelevance.max] as [
-          number | undefined,
-          number | undefined,
-        ],
-      });
-    }
     return activeFilters;
-  }, [category, createdAt, updatedAt, stableRelevance]);
+  }, [category, partition, createdAt, updatedAt]);
 
   const { filters: activeFilters, clearAll: clearAllFilters } =
     useActiveFilters([
@@ -271,6 +378,12 @@ export function OrganizationsTable({
         label: "Category",
         state: category,
         setState: setCategory,
+      },
+      {
+        id: "partition",
+        label: "Partition",
+        state: partition,
+        setState: setPartition,
       },
       {
         id: "createdAt",
@@ -284,12 +397,6 @@ export function OrganizationsTable({
         state: updatedAt,
         setState: setUpdatedAt,
       },
-      {
-        id: "relevance",
-        label: "Relevance",
-        state: stableRelevance,
-        setState: setRelevance,
-      },
     ]);
 
   const handleSortingChange: OnChangeFn<SortingState> = (updater) => {
@@ -300,7 +407,9 @@ export function OrganizationsTable({
 
   const table = useReactTable({
     data,
-    columns: getColumns(onEdit, onDelete, onView),
+    columns: getColumns(onEdit, onDisable, onEnable, onRemove, onView, {
+      isSuperAdmin,
+    }),
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     getSortedRowModel: getSortedRowModel(),
@@ -313,33 +422,31 @@ export function OrganizationsTable({
       sorting: sort,
       columnFilters,
       rowSelection,
-      columnVisibility,
+      columnVisibility: getRestrictedVisibility(
+        columnVisibility,
+        RESTRICTED_COLUMNS,
+        userRole
+      ),
     },
     onSortingChange: handleSortingChange,
     onRowSelectionChange: setRowSelection,
     onColumnVisibilityChange: setColumnVisibility,
   });
 
-  function setRelevanceFilter(inputIndex: 0 | 1, rawValue: string) {
-    const parsedValue = rawValue === "" ? undefined : Number(rawValue);
-    const nextRange: [number | undefined, number | undefined] = [
-      relevance?.min,
-      relevance?.max,
-    ];
-    nextRange[inputIndex] = parsedValue;
-    const [nextMin, nextMax] = nextRange;
-    const hasAnyValue = nextMin !== undefined || nextMax !== undefined;
-    setRelevance(hasAnyValue ? { min: nextMin, max: nextMax } : null);
-  }
-
   const selected = data.filter((organization) => rowSelection[organization.id]);
+  const selectedHasReadOnlyRows = selectionHasReadOnlyCatalogRows(
+    selected,
+    isSuperAdmin
+  );
 
   const categoryFacets = getUniqueFacets(
     table.getColumn("category")!.getFacetedUniqueValues(),
     CATEGORY_LABELS
   );
-  const relevanceFacets = getMinMaxFacets(
-    table.getColumn("relevance")?.getFacetedMinMaxValues()
+
+  const partitionFacets = getUniqueFacets(
+    table.getColumn("partition")!.getFacetedUniqueValues(),
+    PARTITION_LABELS
   );
 
   return (
@@ -348,7 +455,7 @@ export function OrganizationsTable({
         <div className="scrollbar-thin flex items-center gap-2 overflow-x-auto">
           <button
             className="btn btn-ghost btn-sm"
-            disabled={!selected?.length}
+            disabled={!selected?.length || selectedHasReadOnlyRows}
             onClick={() => onMultiEdit(selected)}
             type="button"
           >
@@ -364,10 +471,32 @@ export function OrganizationsTable({
             <EyeIcon />
             <span>View Selected ({selected.length})</span>
           </button>
+          {isSuperAdmin && (
+            <>
+              <button
+                className="btn btn-ghost btn-sm btn-success"
+                disabled={!selected?.length || selectedHasReadOnlyRows}
+                onClick={() => onMultiEnable(selected)}
+                type="button"
+              >
+                <CheckCircleIcon />
+                <span>Enable Selected ({selected.length})</span>
+              </button>
+              <button
+                className="btn btn-ghost btn-sm btn-error"
+                disabled={!selected?.length || selectedHasReadOnlyRows}
+                onClick={() => onMultiDisable(selected)}
+                type="button"
+              >
+                <XCircleIcon />
+                <span>Disable Selected ({selected.length})</span>
+              </button>
+            </>
+          )}
           <button
             className="btn btn-ghost btn-sm btn-error"
-            disabled={!selected?.length}
-            onClick={() => onMultiDelete(selected)}
+            disabled={!selected?.length || selectedHasReadOnlyRows}
+            onClick={() => onMultiRemove(selected)}
             type="button"
           >
             <TrashSimpleIcon />
@@ -381,7 +510,7 @@ export function OrganizationsTable({
             <MagnifyingGlassIcon className="opacity-md" />
             <input
               onChange={(event) => setSearchQuery(event.target.value)}
-              placeholder="Search by name or slug..."
+              placeholder={PLACEHOLDERS.search}
               type="search"
               value={searchQuery}
             />
@@ -389,6 +518,20 @@ export function OrganizationsTable({
         </div>
 
         <div className="flex min-w-64 flex-1 items-center gap-2">
+          <select
+            className="select flex-1 bg-base-200"
+            disabled={!partitionFacets.length}
+            onChange={(event) => setPartition(event.target.value || null)}
+            value={partition ?? ""}
+          >
+            <option value="">All partitions</option>
+            {partitionFacets.map(({ value, label, count }) => (
+              <option key={value} value={value}>
+                {label} ({count})
+              </option>
+            ))}
+          </select>
+
           <select
             className="select flex-1 bg-base-200"
             disabled={!categoryFacets.length}
@@ -408,30 +551,6 @@ export function OrganizationsTable({
               <SlidersHorizontalIcon />
             </button>
             <div className="dropdown-content z-10 w-52 rounded-box bg-base-200 p-4">
-              <fieldset className="flex flex-col gap-2">
-                <span className="font-semibold">Relevance</span>
-                <div className="flex items-center gap-2">
-                  <input
-                    className="input input-sm w-full"
-                    max={relevanceFacets.max ?? 100}
-                    min={relevanceFacets.min ?? 0}
-                    onChange={(e) => setRelevanceFilter(0, e.target.value)}
-                    placeholder={`Min (${relevanceFacets.min ?? "–"})`}
-                    type="number"
-                    value={relevance?.min ?? ""}
-                  />
-                  <input
-                    className="input input-sm w-full"
-                    max={relevanceFacets.max ?? 100}
-                    min={relevanceFacets.min ?? 0}
-                    onChange={(e) => setRelevanceFilter(1, e.target.value)}
-                    placeholder={`Max (${relevanceFacets.max ?? "–"})`}
-                    type="number"
-                    value={relevance?.max ?? ""}
-                  />
-                </div>
-              </fieldset>
-              <div className="divider mt-2 mb-0" />
               <fieldset className="flex flex-col gap-2">
                 <span className="font-semibold">Created</span>
                 {DATE_OPTIONS.map(({ value, label }) => (
@@ -488,6 +607,9 @@ export function OrganizationsTable({
                 {table
                   .getAllColumns()
                   .filter((col) => col.getCanHide())
+                  .filter((col) =>
+                    canSeeColumn(RESTRICTED_COLUMNS, col.id, userRole)
+                  )
                   .map((col) => (
                     <label
                       className="flex items-center gap-2 text-sm"

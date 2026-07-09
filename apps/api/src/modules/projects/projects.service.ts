@@ -1,95 +1,131 @@
 import { Injectable } from "@nestjs/common";
-import { AnyKeys, QueryFilter, SortOrder, UpdateQuery } from "mongoose";
 import {
   labelFromI18nTitle,
   RecentActivityRecord,
 } from "@/common/helpers/recent-activity.helper";
+import type { AuthContext } from "@/core/context/auth-context.interface";
 import { BatchEntity } from "@/core/entities/batch.entity";
-import { PaginatedModel } from "@/core/schemas/paginated.schema";
-import { ProjectModel } from "@/modules/projects/schemas/project.schema";
+import type { MultiPaged } from "@/core/persistence/types/output.type";
+import { SkillsValidatorService } from "@/modules/skills/skills-validator.service";
 import { CreateProjectInput } from "./dto/create-project.input";
+import { FilterProjectInput } from "./dto/filter-project.input";
+import { SortProjectInput } from "./dto/sort-project.input";
 import { UpdateProjectInput } from "./dto/update-project.input";
+import type { ProjectEntityRecord } from "./entities/project.entity";
 import { ProjectsRepository } from "./projects.repository";
+
+interface ProjectCatalogRefs {
+  skillIds?: string[];
+}
 
 @Injectable()
 export class ProjectsService {
-  constructor(private readonly repository: ProjectsRepository) {}
+  constructor(
+    private readonly repository: ProjectsRepository,
+    private readonly skillsValidator: SkillsValidatorService
+  ) {}
 
-  findOneById(id: string): Promise<ProjectModel> {
-    return this.repository.findOneById(id);
+  findOneById(ctx: AuthContext, id: string): Promise<ProjectEntityRecord> {
+    return this.repository.tenantCrud(ctx).findOneById(id);
   }
 
-  findOne({
-    filters,
-  }: {
-    filters?: QueryFilter<ProjectModel>;
-  }): Promise<ProjectModel> {
-    return this.repository.findOne({ filters });
+  findOne(
+    ctx: AuthContext,
+    {
+      filters,
+    }: {
+      filters?: FilterProjectInput;
+    }
+  ): Promise<ProjectEntityRecord> {
+    return this.repository.tenantCrud(ctx).findOne({ filters });
   }
 
-  findManyById(ids: string[]): Promise<ProjectModel[]> {
-    return this.repository.findManyById(ids);
+  findManyById(
+    ctx: AuthContext,
+    ids: string[]
+  ): Promise<ProjectEntityRecord[]> {
+    return this.repository.tenantCrud(ctx).findManyById(ids);
   }
 
-  findMany({
-    filters,
-    sort,
-    skip = 0,
-    limit = 50,
-  }: {
-    filters?: QueryFilter<ProjectModel>;
-    sort?: Partial<Record<keyof ProjectModel, SortOrder>>;
-    limit?: number;
-    skip?: number;
-  }): Promise<PaginatedModel<ProjectModel>> {
-    return this.repository.findMany({ filters, sort, skip, limit });
+  findMany(
+    ctx: AuthContext,
+    {
+      filters,
+      sort,
+      skip = 0,
+      limit = 50,
+    }: {
+      filters?: FilterProjectInput;
+      sort?: SortProjectInput;
+      limit?: number;
+      skip?: number;
+    }
+  ): Promise<MultiPaged<ProjectEntityRecord>> {
+    return this.repository.tenantCrud(ctx).findMany({
+      filters,
+      sort,
+      skip,
+      limit,
+    });
   }
 
-  createOne(createInput: CreateProjectInput): Promise<ProjectModel> {
-    return this.repository.createOne(createInput as AnyKeys<ProjectModel>);
+  async createOne(
+    ctx: AuthContext,
+    createInput: CreateProjectInput
+  ): Promise<ProjectEntityRecord> {
+    await this.assertCatalogReferences(ctx, createInput);
+
+    return this.repository.tenantCrud(ctx).createOne(createInput);
   }
 
-  createMany(createInputs: CreateProjectInput[]): Promise<ProjectModel[]> {
-    return this.repository.createMany(createInputs as AnyKeys<ProjectModel>[]);
+  async createMany(
+    ctx: AuthContext,
+    createInputs: CreateProjectInput[]
+  ): Promise<BatchEntity> {
+    await this.assertCatalogReferencesMany(ctx, createInputs);
+
+    return this.repository.tenantCrud(ctx).createMany(createInputs);
   }
 
-  updateOne(
+  async updateOne(
+    ctx: AuthContext,
     id: string,
     updateInput: UpdateProjectInput
-  ): Promise<ProjectModel> {
-    return this.repository.updateOne(
-      id,
-      updateInput as object as UpdateQuery<ProjectModel>
-    );
+  ): Promise<ProjectEntityRecord> {
+    await this.assertCatalogReferences(ctx, updateInput);
+
+    return this.repository.tenantCrud(ctx).updateOneById(id, updateInput);
   }
 
-  updateMany(
+  async updateMany(
+    ctx: AuthContext,
     ids: string[],
     updateInput: UpdateProjectInput
   ): Promise<BatchEntity> {
-    return this.repository.updateMany(
-      ids,
-      updateInput as object as UpdateQuery<ProjectModel>
-    );
+    await this.assertCatalogReferences(ctx, updateInput);
+
+    return this.repository.tenantCrud(ctx).updateManyById(ids, updateInput);
   }
 
-  removeOne(id: string): Promise<ProjectModel> {
-    return this.repository.deleteOne(id);
+  removeOne(ctx: AuthContext, id: string): Promise<ProjectEntityRecord> {
+    return this.repository.tenantCrud(ctx).deleteOneById(id);
   }
 
-  removeMany(ids: string[]): Promise<BatchEntity> {
-    return this.repository.deleteMany(ids);
+  removeMany(ctx: AuthContext, ids: string[]): Promise<BatchEntity> {
+    return this.repository.tenantCrud(ctx).deleteManyById(ids);
   }
 
-  count(): Promise<number> {
-    return this.repository.count();
+  count(ctx: AuthContext): Promise<number> {
+    return this.repository.tenantStats(ctx).count();
   }
 
-  async findRecentActivity(limit: number): Promise<RecentActivityRecord[]> {
-    const rows = await this.repository.findRecentlyUpdated(
-      limit,
-      "slug i18n updatedAt"
-    );
+  async findRecentActivity(
+    ctx: AuthContext,
+    limit: number
+  ): Promise<RecentActivityRecord[]> {
+    const rows = await this.repository
+      .tenantStats(ctx)
+      .findRecentlyUpdated(limit, "slug i18n updatedAt");
     return rows.map((row) => ({
       label: labelFromI18nTitle(
         row.slug as string,
@@ -99,10 +135,33 @@ export class ProjectsService {
     }));
   }
 
-  detachSkill(skillId: string): Promise<void> {
-    return this.repository.updateManyByFilter(
-      { skills: skillId },
-      { $pull: { skills: skillId } }
-    );
+  async detachSkill(skillId: string): Promise<void> {
+    await this.repository.detachSkill(skillId);
+  }
+
+  async purgeByOwner(ownerId: string): Promise<void> {
+    await this.repository.purgeByOwner(ownerId);
+  }
+
+  private async assertCatalogReferences(
+    ctx: AuthContext,
+    input: ProjectCatalogRefs
+  ): Promise<void> {
+    if (input.skillIds?.length) {
+      await this.skillsValidator.assertSkillsEnabled(ctx, input.skillIds);
+    }
+  }
+
+  private async assertCatalogReferencesMany(
+    ctx: AuthContext,
+    inputs: ProjectCatalogRefs[]
+  ): Promise<void> {
+    const skillIds = [
+      ...new Set(inputs.flatMap((item) => item.skillIds ?? [])),
+    ];
+
+    if (skillIds.length > 0) {
+      await this.skillsValidator.assertSkillsEnabled(ctx, skillIds);
+    }
   }
 }

@@ -1,14 +1,15 @@
 import { useForm } from "@tanstack/react-form";
-import lodash from "lodash";
-import { useState } from "react";
 import z from "zod";
-import { RangeInput } from "@/components/inputs/range";
+import { FieldArray } from "@/components/inputs/field-array";
 import { SelectInput } from "@/components/inputs/select";
 import { TextInput } from "@/components/inputs/text";
+import { LOCALES } from "@/consts/locales";
 import { PLACEHOLDERS } from "@/consts/placeholders";
 import { SLUG_REGEX } from "@/consts/regex";
-import { SkillCategory } from "@/generated/graphql/graphql";
+import { type CreateSkillInput } from "@/generated/graphql/graphql";
+import type { SkillRow } from "@/hooks/queries/skills";
 import { fieldError } from "@/lib/field-error";
+import { createEmptyI18n } from "@/lib/i18n";
 import { isSlugTaken } from "@/lib/slug";
 import { CommonFormProps } from "./common";
 
@@ -17,9 +18,22 @@ const skillSchema = z.object({
     .string()
     .min(1, "required field")
     .regex(SLUG_REGEX, "invalid field format"),
-  name: z.string().min(1, "required field"),
-  category: z.enum(SkillCategory, "required field"),
-  relevance: z.number().min(1, "must be a positive number"),
+  category: z.string(),
+  i18n: z
+    .array(
+      z.object({
+        locale: z.string().min(1, "required field"),
+        title: z.string().min(1, "required field"),
+      })
+    )
+    .min(1, "required group")
+    .refine(
+      (items) => {
+        const locales = items.map((item) => item.locale);
+        return new Set(locales).size === locales.length;
+      },
+      { message: "locales must be unique" }
+    ),
 });
 
 export type SkillSchema = z.infer<typeof skillSchema>;
@@ -28,10 +42,27 @@ export interface SkillFormProps extends CommonFormProps<SkillSchema> {
   slugsList?: string[];
 }
 
-const CATEGORY_OPTIONS = Object.values(SkillCategory).map((category) => ({
-  label: category,
-  value: category,
-}));
+export function skillToInput(data: SkillSchema): CreateSkillInput {
+  return {
+    slug: data.slug,
+    category: data.category || undefined,
+    i18n: data.i18n.map((translation) => ({
+      locale: translation.locale,
+      messages: { title: translation.title },
+    })),
+  };
+}
+
+export function skillToForm(skill: SkillRow): Partial<SkillSchema> {
+  return {
+    slug: skill.slug,
+    category: skill.category ?? "",
+    i18n: skill.i18n.map((translation) => ({
+      locale: translation.locale,
+      title: translation.messages.title,
+    })),
+  };
+}
 
 export function SkillForm({
   onSubmit,
@@ -42,14 +73,11 @@ export function SkillForm({
   isLoading,
   state,
 }: SkillFormProps) {
-  const [isNameEdited, setIsNameEdited] = useState(!!defaultValues?.name);
-
   const form = useForm({
     defaultValues: {
-      name: "",
       slug: "",
-      category: SkillCategory.Language,
-      relevance: 1,
+      category: "",
+      i18n: createEmptyI18n({ title: "" }),
       ...defaultValues,
     },
     onSubmit: ({ value }) => onSubmit?.(value),
@@ -68,13 +96,6 @@ export function SkillForm({
       }}
     >
       <Field
-        listeners={{
-          onChange: ({ value }) => {
-            if (!isNameEdited) {
-              form.setFieldValue("name", lodash.startCase(value));
-            }
-          },
-        }}
         name="slug"
         validators={{
           onChange: ({ value }) => {
@@ -95,51 +116,64 @@ export function SkillForm({
           />
         )}
       </Field>
-      <Field name="name">
+
+      <Field name="category">
         {(field) => (
           <TextInput
             error={fieldError(field.state.meta)}
-            label="Name"
+            label="Category"
             name={field.name}
-            onChange={(value) => {
-              setIsNameEdited(true);
-              field.handleChange(value);
-            }}
-            placeholder={PLACEHOLDERS.skillName}
-            value={field.state.value}
+            onChange={field.handleChange}
+            placeholder={PLACEHOLDERS.category}
+            value={field.state.value ?? ""}
           />
         )}
       </Field>
 
-      <Field name="category">
-        {(field) => (
-          <SelectInput
-            error={fieldError(field.state.meta)}
-            label="Category"
-            name={field.name}
-            onChange={(value) => field.handleChange(value as SkillCategory)}
-            options={CATEGORY_OPTIONS}
-            placeholder={PLACEHOLDERS.chooseCategory}
-            value={field.state.value}
-          />
+      <div className="divider">Translations</div>
+
+      <Field mode="array" name="i18n">
+        {(arrayField) => (
+          <FieldArray
+            error={fieldError(arrayField.state.meta)}
+            label="Translation"
+            onAdd={() => arrayField.pushValue({ locale: "", title: "" })}
+            onRemove={(index) => arrayField.removeValue(index)}
+            values={arrayField.state.value}
+          >
+            {(index) => (
+              <>
+                <Field name={`i18n[${index}].locale`}>
+                  {(field) => (
+                    <SelectInput
+                      error={fieldError(field.state.meta)}
+                      label="Locale"
+                      name={field.name}
+                      onChange={field.handleChange}
+                      options={LOCALES}
+                      placeholder={PLACEHOLDERS.chooseOne}
+                      value={field.state.value}
+                    />
+                  )}
+                </Field>
+                <Field name={`i18n[${index}].title`}>
+                  {(field) => (
+                    <TextInput
+                      error={fieldError(field.state.meta)}
+                      label="Title"
+                      name={field.name}
+                      onChange={field.handleChange}
+                      placeholder={PLACEHOLDERS.skillTitle}
+                      value={field.state.value}
+                    />
+                  )}
+                </Field>
+              </>
+            )}
+          </FieldArray>
         )}
       </Field>
-      <Field name="relevance">
-        {(field) => (
-          <RangeInput
-            className="range-xs"
-            error={fieldError(field.state.meta)}
-            label="Relevance"
-            max={5}
-            min={1}
-            name={field.name}
-            onChange={field.handleChange}
-            ruler
-            step={1}
-            value={field.state.value}
-          />
-        )}
-      </Field>
+
       <div className="form-footer">
         {onCancel && (
           <button

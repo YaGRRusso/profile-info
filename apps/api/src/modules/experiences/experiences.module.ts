@@ -4,6 +4,8 @@ import {
   ExperienceModel,
   ExperienceSchema,
 } from "@/modules/experiences/schemas/experience.schema";
+import { OrganizationsModule } from "@/modules/organizations/organizations.module";
+import { SkillsModule } from "@/modules/skills/skills.module";
 import { ExperiencesRepository } from "./experiences.repository";
 import {
   ExperienceRoleResolver,
@@ -12,9 +14,12 @@ import {
 import { ExperiencesService } from "./experiences.service";
 import { OnOrganizationDeletedListener } from "./listeners/on-organization-deleted.listener";
 import { OnSkillDeletedListener } from "./listeners/on-skill-deleted.listener";
+import { OnUserDeletedListener } from "./listeners/on-user-deleted.listener";
 
 @Module({
   imports: [
+    OrganizationsModule,
+    SkillsModule,
     MongooseModule.forFeature([
       { name: ExperienceModel.name, schema: ExperienceSchema },
     ]),
@@ -26,6 +31,7 @@ import { OnSkillDeletedListener } from "./listeners/on-skill-deleted.listener";
     ExperiencesService,
     OnSkillDeletedListener,
     OnOrganizationDeletedListener,
+    OnUserDeletedListener,
   ],
   exports: [ExperiencesService],
 })

@@ -1,9 +1,12 @@
-import { BadRequestException, NotFoundException } from "@nestjs/common";
-import { getModelToken } from "@nestjs/mongoose";
+import { EventEmitter2 } from "@nestjs/event-emitter";
 import { Test, TestingModule } from "@nestjs/testing";
+import { testSuperAdminContext } from "@test/fixtures/auth-context";
 import { hash } from "bcryptjs";
-import mongoose, { Model } from "mongoose";
-import { UserModel } from "@/modules/users/schemas/user.schema";
+import { UserRole } from "@/core/enums/user-role.enum";
+import { DomainEvents } from "@/core/events/domain-events";
+import { UserDeletedEvent } from "@/core/events/user-deleted.event";
+import { createMockCrud } from "@/core/persistence/repositories/testing/service-spec.mock";
+import { SkillsValidatorService } from "@/modules/skills/skills-validator.service";
 import { UsersRepository } from "./users.repository";
 import { UsersService } from "./users.service";
 
@@ -11,135 +14,108 @@ jest.mock("bcryptjs", () => ({
   hash: jest.fn().mockResolvedValue("hashed-password"),
 }));
 
-const validId = new mongoose.Types.ObjectId().toHexString();
+const ctx = testSuperAdminContext();
+const validId = "507f1f77bcf86cd799439013";
 
 const fakeUser = {
-  _id: validId,
+  id: validId,
   name: "John",
+  nickname: "john",
   email: "john@example.com",
-  password: "hashed-password",
-  role: "USER",
-} as unknown as UserModel;
+  role: UserRole.USER,
+  i18n: [],
+  urls: [],
+};
 
-function makeExec(returnValue: unknown) {
-  return {
-    select: jest.fn().mockReturnThis(),
-    exec: jest.fn().mockResolvedValue(returnValue),
-  };
-}
+const fakeUserWithPassword = {
+  ...fakeUser,
+  password: "hashed-password",
+};
 
 describe("UsersService", () => {
   let service: UsersService;
-  let model: jest.Mocked<Model<UserModel>>;
+  let crud: ReturnType<typeof createMockCrud>;
+  let eventEmitter: jest.Mocked<Pick<EventEmitter2, "emitAsync">>;
+  let skillsValidator: jest.Mocked<
+    Pick<SkillsValidatorService, "assertSkillsEnabled">
+  >;
+  let repository: {
+    crud: ReturnType<typeof createMockCrud>;
+    findOneByEmailWithPassword: jest.Mock;
+    detachSkill: jest.Mock;
+  };
 
   beforeEach(async () => {
     jest.clearAllMocks();
+    crud = createMockCrud();
+    repository = {
+      crud,
+      findOneByEmailWithPassword: jest.fn(),
+      detachSkill: jest.fn().mockResolvedValue(undefined),
+    };
 
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         UsersService,
-        UsersRepository,
+        { provide: UsersRepository, useValue: repository },
         {
-          provide: getModelToken(UserModel.name),
+          provide: EventEmitter2,
+          useValue: { emitAsync: jest.fn().mockResolvedValue([]) },
+        },
+        {
+          provide: SkillsValidatorService,
           useValue: {
-            findById: jest.fn(),
-            findOne: jest.fn(),
-            create: jest.fn(),
-            // inherited methods (not overridden)
-            find: jest.fn(),
-            findByIdAndUpdate: jest.fn(),
-            updateMany: jest.fn(),
-            findByIdAndDelete: jest.fn(),
-            deleteMany: jest.fn(),
+            assertSkillsEnabled: jest.fn().mockResolvedValue(undefined),
           },
         },
       ],
     }).compile();
 
-    service = module.get<UsersService>(UsersService);
-    model = module.get(getModelToken(UserModel.name));
+    service = module.get(UsersService);
+    eventEmitter = module.get(EventEmitter2);
+    skillsValidator = module.get(SkillsValidatorService);
   });
 
   it("should be defined", () => {
     expect(service).toBeDefined();
   });
 
-  // ------------------------------------------------------------------ //
-  // findOneById
-  // ------------------------------------------------------------------ //
-
   describe("findOneById", () => {
-    it("should return the user without password", async () => {
-      (model.findById as jest.Mock).mockReturnValue(makeExec(fakeUser));
+    it("delegates to crud", async () => {
+      crud.findOneById.mockResolvedValue(fakeUser);
 
-      const result = await service.findOneById(validId);
-      expect(result).toBe(fakeUser);
-      expect(model.findById).toHaveBeenCalledWith(validId);
-    });
-
-    it("should throw BadRequestException for invalid id", async () => {
-      await expect(service.findOneById("invalid")).rejects.toThrow(
-        BadRequestException
-      );
-    });
-
-    it("should throw NotFoundException when user is not found", async () => {
-      (model.findById as jest.Mock).mockReturnValue(makeExec(null));
-
-      await expect(service.findOneById(validId)).rejects.toThrow(
-        NotFoundException
-      );
+      await expect(service.findOneById(validId)).resolves.toEqual(fakeUser);
+      expect(crud.findOneById).toHaveBeenCalledWith(validId);
     });
   });
-
-  // ------------------------------------------------------------------ //
-  // findOne
-  // ------------------------------------------------------------------ //
 
   describe("findOne", () => {
-    it("should return the user matching filters", async () => {
-      (model.findOne as jest.Mock).mockReturnValue(makeExec(fakeUser));
-
-      const result = await service.findOne({
-        filters: { email: "john@example.com" } as any,
-      });
-      expect(result).toBe(fakeUser);
-    });
-
-    it("should throw NotFoundException when no user matches", async () => {
-      (model.findOne as jest.Mock).mockReturnValue(makeExec(null));
-
-      await expect(service.findOne({})).rejects.toThrow(NotFoundException);
-    });
-  });
-
-  // ------------------------------------------------------------------ //
-  // findOneByEmailWithPassword
-  // ------------------------------------------------------------------ //
-
-  describe("findOneByEmailWithPassword", () => {
-    it("should return the user with password selected", async () => {
-      (model.findOne as jest.Mock).mockReturnValue(makeExec(fakeUser));
-
-      const result =
-        await service.findOneByEmailWithPassword("john@example.com");
-
-      expect(result).toBe(fakeUser);
-      expect(model.findOne).toHaveBeenCalledWith({ email: "john@example.com" });
-    });
-
-    it("should throw NotFoundException when user is not found", async () => {
-      (model.findOne as jest.Mock).mockReturnValue(makeExec(null));
+    it("delegates to crud", async () => {
+      crud.findOne.mockResolvedValue(fakeUser);
 
       await expect(
-        service.findOneByEmailWithPassword("missing@example.com")
-      ).rejects.toThrow(NotFoundException);
+        service.findOne({ filters: { email: "john@example.com" } })
+      ).resolves.toEqual(fakeUser);
+      expect(crud.findOne).toHaveBeenCalledWith({
+        filters: { email: "john@example.com" },
+      });
     });
   });
 
-  // ------------------------------------------------------------------ //
-  // createOne (overridden — hashes password)
-  // ------------------------------------------------------------------ //
+  describe("findOneByEmailWithPassword", () => {
+    it("delegates to repository", async () => {
+      repository.findOneByEmailWithPassword.mockResolvedValue(
+        fakeUserWithPassword
+      );
+
+      await expect(
+        service.findOneByEmailWithPassword("john@example.com")
+      ).resolves.toEqual(fakeUserWithPassword);
+      expect(repository.findOneByEmailWithPassword).toHaveBeenCalledWith(
+        "john@example.com"
+      );
+    });
+  });
 
   describe("createOne", () => {
     const createInput = {
@@ -147,33 +123,46 @@ describe("UsersService", () => {
       nickname: "john",
       email: "john@example.com",
       password: "plain-pass",
-      role: "USER" as any,
+      role: UserRole.USER,
     };
 
-    it("should hash the password before creating the user", async () => {
-      (model.create as jest.Mock).mockResolvedValue(fakeUser);
+    it("hashes the password before delegating to crud", async () => {
+      crud.createOne.mockResolvedValue(fakeUser);
 
-      const result = await service.createOne(createInput);
+      await expect(service.createOne(ctx, createInput)).resolves.toEqual(
+        fakeUser
+      );
 
       expect(hash).toHaveBeenCalledWith("plain-pass", 8);
-      expect(model.create).toHaveBeenCalledWith(
-        expect.objectContaining({ password: "hashed-password" })
-      );
-      expect(result).toBe(fakeUser);
+      expect(crud.createOne).toHaveBeenCalledWith({
+        name: "John",
+        nickname: "john",
+        email: "john@example.com",
+        role: UserRole.USER,
+        password: "hashed-password",
+      });
+      expect(skillsValidator.assertSkillsEnabled).not.toHaveBeenCalled();
     });
 
-    it("should throw BadRequestException when create returns null", async () => {
-      (model.create as jest.Mock).mockResolvedValue(null);
+    it("validates skillIds when provided", async () => {
+      const skillId = "507f1f77bcf86cd799439014";
+      crud.createOne.mockResolvedValue(fakeUser);
 
-      await expect(service.createOne(createInput)).rejects.toThrow(
-        BadRequestException
-      );
+      await service.createOne(ctx, { ...createInput, skillIds: [skillId] });
+
+      expect(skillsValidator.assertSkillsEnabled).toHaveBeenCalledWith(ctx, [
+        skillId,
+      ]);
+      expect(crud.createOne).toHaveBeenCalledWith({
+        name: "John",
+        nickname: "john",
+        email: "john@example.com",
+        role: UserRole.USER,
+        password: "hashed-password",
+        skillIds: [skillId],
+      });
     });
   });
-
-  // ------------------------------------------------------------------ //
-  // createMany (overridden — hashes passwords)
-  // ------------------------------------------------------------------ //
 
   describe("createMany", () => {
     const createInputs = [
@@ -182,60 +171,136 @@ describe("UsersService", () => {
         nickname: "alice",
         email: "alice@example.com",
         password: "pass1",
-        role: "USER" as any,
+        role: UserRole.USER,
       },
       {
         name: "Bob",
         nickname: "bob",
         email: "bob@example.com",
         password: "pass2",
-        role: "USER" as any,
+        role: UserRole.USER,
       },
     ];
 
-    it("should hash each password before creating users", async () => {
-      (model.create as jest.Mock).mockResolvedValue([fakeUser]);
+    it("hashes each password before delegating to crud", async () => {
+      crud.createMany.mockResolvedValue({ succeeded: 2, failed: 0 });
 
-      const result = await service.createMany(createInputs);
+      await expect(service.createMany(ctx, createInputs)).resolves.toEqual({
+        succeeded: 2,
+        failed: 0,
+      });
 
       expect(hash).toHaveBeenCalledTimes(2);
-      expect(model.create).toHaveBeenCalledWith(
-        expect.arrayContaining([
-          expect.objectContaining({ password: "hashed-password" }),
-        ])
-      );
-      expect(result).toEqual([fakeUser]);
-    });
-
-    it("should throw BadRequestException when create returns null", async () => {
-      (model.create as jest.Mock).mockResolvedValue(null);
-
-      await expect(service.createMany(createInputs)).rejects.toThrow(
-        BadRequestException
-      );
+      expect(crud.createMany).toHaveBeenCalledWith([
+        {
+          name: "Alice",
+          nickname: "alice",
+          email: "alice@example.com",
+          role: UserRole.USER,
+          password: "hashed-password",
+        },
+        {
+          name: "Bob",
+          nickname: "bob",
+          email: "bob@example.com",
+          role: UserRole.USER,
+          password: "hashed-password",
+        },
+      ]);
     });
   });
 
-  // ------------------------------------------------------------------ //
-  // updateOne (overridden — hashes password when provided)
-  // ------------------------------------------------------------------ //
-
   describe("updateOne", () => {
-    it("should hash the password when updating a user", async () => {
-      (model.findByIdAndUpdate as jest.Mock).mockReturnValue(
-        makeExec(fakeUser)
-      );
+    it("hashes the password when provided", async () => {
+      crud.updateOneById.mockResolvedValue(fakeUser);
 
-      await service.updateOne("507f1f77bcf86cd799439011", {
-        password: "new-pass",
-      });
+      await service.updateOne(ctx, validId, { password: "new-pass" });
 
       expect(hash).toHaveBeenCalledWith("new-pass", 8);
-      expect(model.findByIdAndUpdate).toHaveBeenCalledWith(
-        "507f1f77bcf86cd799439011",
-        expect.objectContaining({ password: "hashed-password" }),
-        { new: true }
+      expect(crud.updateOneById).toHaveBeenCalledWith(validId, {
+        password: "hashed-password",
+      });
+    });
+
+    it("skips hashing when password is omitted", async () => {
+      crud.updateOneById.mockResolvedValue(fakeUser);
+
+      await service.updateOne(ctx, validId, { name: "Jane" });
+
+      expect(hash).not.toHaveBeenCalled();
+      expect(crud.updateOneById).toHaveBeenCalledWith(validId, {
+        name: "Jane",
+      });
+    });
+  });
+
+  describe("removeOne", () => {
+    it("emits user.deleted before deleting", async () => {
+      crud.findOneById.mockResolvedValue(fakeUser);
+      crud.deleteOneById.mockResolvedValue(fakeUser);
+
+      await expect(service.removeOne(validId)).resolves.toEqual(fakeUser);
+
+      expect(eventEmitter.emitAsync).toHaveBeenCalledWith(
+        DomainEvents.user.deleted,
+        new UserDeletedEvent(validId)
       );
+      expect(crud.deleteOneById).toHaveBeenCalledWith(validId);
+    });
+
+    it("rejects SUPER_ADMIN deletion", async () => {
+      crud.findOneById.mockResolvedValue({
+        ...fakeUser,
+        role: UserRole.SUPER_ADMIN,
+      });
+
+      await expect(service.removeOne(validId)).rejects.toThrow(
+        "SUPER_ADMIN users cannot be deleted"
+      );
+      expect(eventEmitter.emitAsync).not.toHaveBeenCalled();
+      expect(crud.deleteOneById).not.toHaveBeenCalled();
+    });
+  });
+
+  describe("removeMany", () => {
+    it("emits user.deleted for each user before deleteManyById", async () => {
+      crud.findManyById.mockResolvedValue([fakeUser]);
+      crud.deleteManyById.mockResolvedValue({ succeeded: 1, failed: 0 });
+
+      await expect(service.removeMany([validId])).resolves.toEqual({
+        succeeded: 1,
+        failed: 0,
+      });
+
+      expect(eventEmitter.emitAsync).toHaveBeenCalledWith(
+        DomainEvents.user.deleted,
+        new UserDeletedEvent(validId)
+      );
+      expect(crud.deleteManyById).toHaveBeenCalledWith([validId]);
+    });
+
+    it("rejects batch when any user is SUPER_ADMIN", async () => {
+      crud.findManyById.mockResolvedValue([
+        fakeUser,
+        {
+          ...fakeUser,
+          id: "507f1f77bcf86cd799439014",
+          role: UserRole.SUPER_ADMIN,
+        },
+      ]);
+
+      await expect(
+        service.removeMany([validId, "507f1f77bcf86cd799439014"])
+      ).rejects.toThrow("SUPER_ADMIN users cannot be deleted");
+      expect(eventEmitter.emitAsync).not.toHaveBeenCalled();
+      expect(crud.deleteManyById).not.toHaveBeenCalled();
+    });
+  });
+
+  describe("detachSkill", () => {
+    it("delegates to repository helper", async () => {
+      await service.detachSkill(validId);
+      expect(repository.detachSkill).toHaveBeenCalledWith(validId);
     });
   });
 });

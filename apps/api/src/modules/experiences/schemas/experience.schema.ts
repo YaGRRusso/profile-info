@@ -8,6 +8,7 @@ import {
 } from "@/core/schemas/translation.schema";
 import { OrganizationModel } from "@/modules/organizations/schemas/organization.schema";
 import { SkillModel } from "@/modules/skills/schemas/skill.schema";
+import { UserModel } from "@/modules/users/schemas/user.schema";
 
 @Schema({ _id: false })
 export class ExperienceMessagesModel {
@@ -34,7 +35,7 @@ export class ExperienceRoleModel {
   @Prop({
     type: [{ type: mongoose.Schema.Types.ObjectId, ref: SkillModel.name }],
   })
-  skills?: (mongoose.Types.ObjectId | string)[];
+  skillIds?: (mongoose.Types.ObjectId | string)[];
 }
 
 @Schema({ timestamps: true })
@@ -42,11 +43,19 @@ export class ExperienceModel extends BaseModel {
   @Prop({ type: Number, required: true, default: 0 })
   relevance: number;
 
-  @Prop({ type: String, required: true, unique: true })
+  @Prop({ type: String, required: true })
   slug: string;
 
+  @Prop({
+    type: mongoose.Schema.Types.ObjectId,
+    ref: UserModel.name,
+    required: true,
+    index: true,
+  })
+  ownerId: mongoose.Types.ObjectId | string;
+
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: OrganizationModel.name })
-  organization?: mongoose.Types.ObjectId | string;
+  organizationId?: mongoose.Types.ObjectId | string;
 
   @Prop({
     type: String,
@@ -65,3 +74,4 @@ export class ExperienceModel extends BaseModel {
 
 export type ExperienceDocument = HydratedDocument<ExperienceModel>;
 export const ExperienceSchema = SchemaFactory.createForClass(ExperienceModel);
+ExperienceSchema.index({ ownerId: 1, slug: 1 }, { unique: true });

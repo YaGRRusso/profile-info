@@ -1,4 +1,4 @@
-import { Field, ObjectType } from "@nestjs/graphql";
+import { Field, ID, ObjectType } from "@nestjs/graphql";
 import { OptionalField } from "@/core/decorators/optional-field.decorator";
 import { BaseEntity } from "@/core/entities/base.entity";
 import {
@@ -8,6 +8,7 @@ import {
 import { UrlEntity } from "@/core/entities/url.entity";
 import { createPaginatedModel } from "@/core/schemas/paginated.schema";
 import { SkillEntity } from "@/modules/skills/entities/skill.entity";
+import { UserEntity } from "@/modules/users/entities/user.entity";
 
 @ObjectType()
 export class ProjectMessages {
@@ -28,8 +29,17 @@ export class ProjectEntity extends BaseEntity {
   @Field(() => String)
   slug: string;
 
+  @Field(() => ID)
+  ownerId: string;
+
+  @Field(() => UserEntity)
+  owner: UserEntity;
+
   @OptionalField(() => [String])
   images?: string[];
+
+  @OptionalField(() => [ID])
+  skillIds?: string[];
 
   @OptionalField(() => [SkillEntity])
   skills?: SkillEntity[];
@@ -42,3 +52,5 @@ export class ProjectEntity extends BaseEntity {
 }
 
 export const PaginatedProjectEntity = createPaginatedModel(ProjectEntity);
+
+export type ProjectEntityRecord = Omit<ProjectEntity, "owner" | "skills">;

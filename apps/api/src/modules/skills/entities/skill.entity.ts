@@ -1,21 +1,49 @@
-import { Field, ObjectType } from "@nestjs/graphql";
+import { Field, ID, ObjectType } from "@nestjs/graphql";
+import { OptionalField } from "@/core/decorators/optional-field.decorator";
 import { BaseEntity } from "@/core/entities/base.entity";
+import { CatalogPartition } from "@/core/enums/catalog-partition.enum";
 import { createPaginatedModel } from "@/core/schemas/paginated.schema";
-import { SkillCategory } from "../enums/category.enum";
+import { UserEntity } from "@/modules/users/entities/user.entity";
+
+@ObjectType()
+export class SkillMessages {
+  @Field(() => String)
+  title: string;
+}
+
+@ObjectType()
+export class SkillTranslationLocale {
+  @Field(() => String)
+  locale: string;
+
+  @Field(() => SkillMessages)
+  messages: SkillMessages;
+}
 
 @ObjectType()
 export class SkillEntity extends BaseEntity {
-  @Field(() => Number)
-  relevance: number;
-
   @Field(() => String)
   slug: string;
 
-  @Field(() => String)
-  name: string;
+  @Field(() => [SkillTranslationLocale])
+  i18n: SkillTranslationLocale[];
 
-  @Field(() => SkillCategory)
-  category: SkillCategory;
+  @OptionalField(() => String)
+  category?: string;
+
+  @Field(() => Boolean)
+  disabled: boolean;
+
+  @Field(() => CatalogPartition)
+  partition: CatalogPartition;
+
+  @Field(() => ID)
+  ownerId: string;
+
+  @Field(() => UserEntity)
+  owner: UserEntity;
 }
 
 export const PaginatedSkillEntity = createPaginatedModel(SkillEntity);
+
+export type SkillEntityRecord = Omit<SkillEntity, "owner">;

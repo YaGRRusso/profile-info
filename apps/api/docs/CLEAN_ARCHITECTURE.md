@@ -34,7 +34,7 @@ src/
 │   ├── enums/          Enums compartilhados (UserRole, SortEnum)
 │   ├── events/         Domain events (payloads + constantes de nomes)
 │   ├── inputs/         Inputs GraphQL genéricos (pagination, sort factory)
-│   ├── persistence/    MongooseCrudRepository<T> — abstração genérica
+│   ├── persistence/    CrudRepository, StatsRepository, CrudMapperInterface, scoped()
 │   └── schemas/        Mongoose sub-schemas reutilizáveis
 │                       Regra: NÃO importa de modules/ nem integrations/.
 │
@@ -65,30 +65,27 @@ integrations → modules (PROIBIDO) (adapters não conhecem domínio)
 
 ## Estrutura de um Módulo (Micro)
 
-Usando `skills/` como exemplo:
+Usando `courses/` como exemplo:
 
 ```
-modules/skills/
-├── skills.module.ts        ← Composição: imports, providers, exports
-├── skills.resolver.ts      ← Camada de APRESENTAÇÃO (GraphQL I/O)
-├── skills.service.ts       ← Camada de APLICAÇÃO (regras de negócio)
-├── skills-loader.service.ts ← DataLoader para nested fields
-├── skills.service.spec.ts  ← Testes unitários do service
-│
+modules/courses/
+├── courses.module.ts
+├── courses.resolver.ts
+├── courses.service.ts
+├── courses.repository.ts
+├── mappers/
+│   └── course.mapper.ts    ← Model ↔ domain record; DTO → persistence
 ├── schemas/
-│   └── skill.schema.ts     ← Camada de PERSISTÊNCIA (Mongoose model)
-│
+│   └── course.schema.ts
 ├── entities/
-│   └── skill.entity.ts     ← GraphQL ObjectType (apresentação de saída)
-│
+│   └── course.entity.ts
 ├── dto/
-│   ├── create-skill.input.ts  ← GraphQL InputType + class-validator
-│   ├── update-skill.input.ts
-│   ├── filter-skill.input.ts
-│   └── sort-skill.input.ts
-│
+│   ├── create-course.input.ts
+│   ├── update-course.input.ts
+│   ├── filter-course.input.ts
+│   └── sort-course.input.ts
 └── enums/
-    └── category.enum.ts    ← Enum registrado no GraphQL
+    └── status.enum.ts
 ```
 
 ### Responsabilidades
@@ -97,7 +94,7 @@ modules/skills/
 |--------|---------|-----------|---------------|
 | Apresentação | `resolver.ts` | Recebe input, valida tipos, chama service, retorna | Lógica de negócio |
 | Aplicação | `service.ts` | Orquestra regras, emite eventos, chama repository | Saber se é GraphQL ou REST |
-| Persistência | `schema.ts` + `MongooseCrudRepository` | CRUD MongoDB, validação de schema | Regras de negócio |
+| Persistência | `schema.ts` + `repository.ts` + `mappers/` | CRUD via `CrudRepository` + mapper; cascade ops on raw `model` | Regras de negócio |
 | Validação de entrada | `dto/*.input.ts` | Valida shape + constraints (class-validator) | Regras de domínio complexas |
 
 ---
@@ -149,11 +146,21 @@ export class OnSkillDeletedListener {
 }
 ```
 
-### Acesso a dados genérico → MongooseCrudRepository (core/)
+### Acesso a dados genérico → `core/persistence/`
 ```typescript
-export class MongooseCrudRepository<T> {
-  // findOneById, findMany, createOne, updateOne, deleteOne...
-  // Validação de ObjectId, paginação, not-found handling
+// CrudRepository + CrudMapperInterface — find/create/update/delete; batch → BatchCount
+// StatsRepository — count, countByField, findRecentlyUpdated
+// scoped(TenantScope) — ownerId filter composition (no separate wrapper class)
+
+@Injectable()
+export class CoursesRepository {
+  readonly crud: CrudRepository<CourseModel, CourseEntityRecord, ...>;
+  readonly stats: StatsRepository<CourseModel>;
+
+  constructor(@InjectModel(CourseModel.name) model: Model<CourseModel>) {
+    this.crud = new CrudRepository(model, new CourseMapper());
+    this.stats = new StatsRepository(model);
+  }
 }
 ```
 
@@ -163,7 +170,8 @@ export class MongooseCrudRepository<T> {
 
 | Pattern | Onde | Por que vale a pena |
 |---------|------|---------------------|
-| **Repository (DI)** | `SkillsRepository extends MongooseCrudRepository<T>` | Tipado, injetável, mockável em testes; se trocar banco, troca só a impl |
+| **Mapper (CrudMapperInterface)** | `mappers/<entity>.mapper.ts` | Model ↔ domain record; DTOs → persistence; `withObjectIdRefs` em filters |
+| **Repository (DI)** | `CoursesRepository` — `crud` + `stats` + mapper | Tipado, injetável, mockável; tenant via `scoped()` |
 | **Domain Events** | `EventEmitter2` + listeners | Desacopla cascatas (skill deletada → projetos atualizam) sem import circular |
 | **Error Handling** | `PersistenceExceptionFilter` (`APP_FILTER`) | Converte erros de Mongo/Mongoose em 4xx/503 globalmente; `assertDuplicate` / `assertReferencesExist` em services só para mensagens específicas |
 | **Port/Adapter** | `integrations/` (abstract class + impl) | Troca OpenRouter por outro LLM sem tocar nos modules |
@@ -179,7 +187,6 @@ export class MongooseCrudRepository<T> {
 |------------------|----------------------|
 | Use Cases separados do Service | O Service do NestJS JÁ É o use case. Separar só se houver múltiplos consumers |
 | Value Objects manuais | class-validator + GraphQL types já validam na fronteira |
-| Mappers Domain↔Persistence | O Mongoose model já é o retorno — as camadas usam o mesmo shape |
 | CQRS | Um banco só, uma interface só — a separação query/command no service basta |
 | Entidade Rica separada | Para CRUD simples, o schema + service cobrem. Se o domínio cresce, aí sim |
 
@@ -209,7 +216,7 @@ export class MongooseCrudRepository<T> {
               │              │              │
     ┌─────────▼──────┐ ┌────▼────┐ ┌──────▼───────┐
     │  Repository    │ │ Events  │ │  DataLoader  │
-    │  (Mongoose)    │ │ (EE2)   │ │  (batching)  │
+    │  crud + mapper │ │ (EE2)   │ │  (batching)  │
     └─────────┬──────┘ └────┬────┘ └──────────────┘
               │              │
     ┌─────────▼──────┐ ┌────▼────────────────┐
@@ -238,7 +245,7 @@ removeOneSkill(id)
       ▼            ▼            ▼              ▼
   Projects     Courses     Educations    Experiences
   $pull skill  $pull skill $pull skill   $pull from
-  from array   from array  from array   roles.skills
+  from array   from array  from array   roles.skillIds
 ```
 
 **Por que eventos e não chamada direta?**
@@ -257,7 +264,7 @@ A pergunta na entrevista: "E se precisar ficar mais complexo?"
 | Mesma lógica consumida por GraphQL + REST + Worker | Extrair Use Cases do Service |
 | Invariantes que precisam valer fora da fronteira de entrada | Criar Value Objects |
 | Modelo de leitura ≠ modelo de escrita | Considerar CQRS leve |
-| Schema do DB diverge do GraphQL response | Introduzir Mapper |
+| Schema do DB diverge do GraphQL response | `CrudMapperInterface` + `*EntityRecord` (implemented) |
 | Trocar MongoDB por PostgreSQL | O Repository em `core/` já isola — criar nova implementação |
 | Módulo cresce demais | Criar sub-módulos ou extrair para microservice |
 

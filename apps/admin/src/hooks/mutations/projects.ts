@@ -39,7 +39,8 @@ const updateManyProjects = graphql(`
       projectIds: $projectIds
       updateProjectInput: $updateProjectInput
     ) {
-      count
+      succeeded
+      failed
     }
   }
 `);
@@ -56,7 +57,8 @@ const removeOneProject = graphql(`
 const removeManyProjects = graphql(`
   mutation RemoveManyProjects($projectIds: [ID!]!) {
     removeManyProjects(projectIds: $projectIds) {
-      count
+      succeeded
+      failed
     }
   }
 `);

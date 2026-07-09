@@ -4,7 +4,6 @@ import { useCallback, useState } from "react";
 import { toast } from "react-toastify";
 import z from "zod";
 import { FieldArray } from "@/components/inputs/field-array";
-import { RangeInput } from "@/components/inputs/range";
 import { SelectInput } from "@/components/inputs/select";
 import { TextInput } from "@/components/inputs/text";
 import { TextareaInput } from "@/components/inputs/textarea";
@@ -32,9 +31,8 @@ const organizationSchema = z.object({
     .regex(SLUG_REGEX, "invalid field format"),
   name: z.string().min(1, "required field"),
   category: z.enum(OrganizationCategory, "required field"),
-  logo: z.url(),
-  website: z.url(),
-  relevance: z.number().min(1, "must be a positive number"),
+  logo: z.union([z.url(), z.literal("")]),
+  website: z.union([z.url(), z.literal("")]),
   i18n: z
     .array(
       z.object({
@@ -68,7 +66,6 @@ export function organizationToInput(
     category: data.category,
     logo: data.logo,
     website: data.website,
-    relevance: data.relevance,
     i18n: data.i18n.map((translation) => ({
       locale: translation.locale,
       messages: {
@@ -85,9 +82,8 @@ export function organizationToForm(
     name: organization.name,
     slug: organization.slug,
     category: organization.category,
-    logo: organization.logo,
-    website: organization.website,
-    relevance: organization.relevance,
+    logo: organization.logo ?? "",
+    website: organization.website ?? "",
     i18n: organization.i18n.map((translation) => ({
       locale: translation.locale,
       description: translation.messages.description,
@@ -123,7 +119,6 @@ export function OrganizationForm({
       category: OrganizationCategory.Company,
       logo: "",
       website: "",
-      relevance: 1,
       i18n: createEmptyI18n({ description: "" }),
       ...defaultValues,
     },
@@ -265,7 +260,7 @@ export function OrganizationForm({
               field.handleChange(value as OrganizationCategory)
             }
             options={CATEGORY_OPTIONS}
-            placeholder={PLACEHOLDERS.chooseCategory}
+            placeholder={PLACEHOLDERS.chooseOne}
             value={field.state.value}
           />
         )}
@@ -277,7 +272,7 @@ export function OrganizationForm({
             label="Logo"
             name={field.name}
             onChange={field.handleChange}
-            placeholder={PLACEHOLDERS.logoUrl}
+            placeholder={PLACEHOLDERS.url}
             value={field.state.value}
           />
         )}
@@ -289,23 +284,7 @@ export function OrganizationForm({
             label="Website"
             name={field.name}
             onChange={field.handleChange}
-            placeholder={PLACEHOLDERS.websiteUrl}
-            value={field.state.value}
-          />
-        )}
-      </Field>
-      <Field name="relevance">
-        {(field) => (
-          <RangeInput
-            className="range-xs"
-            error={fieldError(field.state.meta)}
-            label="Relevance"
-            max={5}
-            min={1}
-            name={field.name}
-            onChange={field.handleChange}
-            ruler
-            step={1}
+            placeholder={PLACEHOLDERS.url}
             value={field.state.value}
           />
         )}
@@ -330,7 +309,7 @@ export function OrganizationForm({
                       name={field.name}
                       onChange={field.handleChange}
                       options={LOCALES}
-                      placeholder={PLACEHOLDERS.chooseLanguage}
+                      placeholder={PLACEHOLDERS.chooseOne}
                       value={field.state.value}
                     />
                   )}
@@ -357,7 +336,7 @@ export function OrganizationForm({
                           field.state.value
                         )
                       }
-                      placeholder={PLACEHOLDERS.organizationDescription}
+                      placeholder={PLACEHOLDERS.description}
                       value={field.state.value}
                     />
                   )}

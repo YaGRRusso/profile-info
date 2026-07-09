@@ -3,11 +3,15 @@ import { graphql } from "@/generated/graphql";
 import type {
   FilterProjectInput,
   FindManyProjectsQuery,
+  FindManyProjectsQueryVariables,
   SortProjectInput,
 } from "@/generated/graphql/graphql";
+import {
+  paginatedNextPageParam,
+  paginatedSelect,
+  withPagination,
+} from "@/hooks/custom/paginated-query";
 import { execute } from "@/lib/execute";
-
-const PAGE_SIZE = 50;
 
 export type ProjectRow =
   FindManyProjectsQuery["findManyProjects"]["nodes"][number];
@@ -28,6 +32,15 @@ const findManyProjects = graphql(`
         id
         slug
         relevance
+        owner {
+          id
+          nickname
+          name
+          role
+          email
+          phone
+          avatar
+        }
         images
         urls {
           title
@@ -42,7 +55,13 @@ const findManyProjects = graphql(`
         }
         skills {
           id
-          name
+          slug
+          i18n {
+            locale
+            messages {
+              title
+            }
+          }
         }
         createdAt
         updatedAt
@@ -61,24 +80,18 @@ export function useFindManyProjects(
   return useInfiniteQuery({
     queryKey: ["findManyProjects", variables],
     queryFn: ({ pageParam }) =>
-      execute(findManyProjects, {
-        ...variables,
-        projectPagination: { skip: pageParam, limit: PAGE_SIZE },
-      }),
+      execute(
+        findManyProjects,
+        withPagination<FindManyProjectsQueryVariables>(
+          "projectPagination",
+          pageParam,
+          variables
+        )
+      ),
     initialPageParam: 0,
-    getNextPageParam: (lastPage, allPages) => {
-      const totalFetched = allPages.reduce(
-        (sum, p) => sum + p.findManyProjects.nodes.length,
-        0
-      );
-      return totalFetched < lastPage.findManyProjects.found
-        ? totalFetched
-        : undefined;
-    },
-    select: (data) => ({
-      found: data.pages[0]?.findManyProjects.found ?? 0,
-      nodes: data.pages.flatMap((p) => p.findManyProjects.nodes),
-    }),
+    getNextPageParam:
+      paginatedNextPageParam<FindManyProjectsQuery>("findManyProjects"),
+    select: paginatedSelect<FindManyProjectsQuery>("findManyProjects"),
     ...options,
   });
 }

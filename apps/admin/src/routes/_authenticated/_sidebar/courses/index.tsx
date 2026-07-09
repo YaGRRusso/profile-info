@@ -114,7 +114,7 @@ function RouteComponent() {
           onSuccess: (data) => {
             closeAndRefetch();
             toast.success(
-              `${data.removeManyCourses.count} courses deleted successfully`
+              `${data.removeManyCourses.succeeded} courses deleted successfully`
             );
           },
         });
@@ -190,7 +190,7 @@ function RouteComponent() {
                 onSuccess: (data) => {
                   closeAndRefetch();
                   toast.success(
-                    `${data.updateManyCourses.count} courses updated successfully`
+                    `${data.updateManyCourses.succeeded} courses updated successfully`
                   );
                 },
               }

@@ -5,6 +5,7 @@ import { SkillsRepository } from "./skills.repository";
 import { SkillsResolver } from "./skills.resolver";
 import { SkillsService } from "./skills.service";
 import { SkillsLoaderService } from "./skills-loader.service";
+import { SkillsValidatorService } from "./skills-validator.service";
 
 @Module({
   imports: [
@@ -15,7 +16,8 @@ import { SkillsLoaderService } from "./skills-loader.service";
     SkillsResolver,
     SkillsService,
     SkillsLoaderService,
+    SkillsValidatorService,
   ],
-  exports: [SkillsService, SkillsLoaderService],
+  exports: [SkillsService, SkillsLoaderService, SkillsValidatorService],
 })
 export class SkillsModule {}
