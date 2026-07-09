@@ -1,4 +1,3 @@
-import { TranslateIcon } from "@phosphor-icons/react";
 import { LOCALES } from "@/consts/locales";
 import { useDisplayLocaleStore } from "@/stores/display-locale";
 
@@ -6,10 +5,10 @@ export function LocaleSwitch() {
   const { locale, setLocale } = useDisplayLocaleStore();
 
   return (
-    <div className="join my-2 is-drawer-close:hidden w-full rounded px-2">
+    <div className="join my-2 is-drawer-close:hidden w-full rounded">
       {LOCALES.map((option) => (
         <label
-          className="btn btn-sm join-item has-checked:btn-neutral flex-1"
+          className="btn btn-xs join-item flex-1 border-base-content/40 text-base-content/80 has-checked:bg-neutral has-checked:text-neutral-content"
           key={option.value}
         >
           <input
@@ -21,7 +20,6 @@ export function LocaleSwitch() {
             type="radio"
             value={option.value}
           />
-          <TranslateIcon />
           <span>{option.label}</span>
         </label>
       ))}

@@ -163,8 +163,10 @@ function RouteComponent() {
               <p className="line-clamp-1 text-xs opacity-md">{user?.role}</p>
             </div>
           </div>
-          <ThemeSwitch />
-          <LocaleSwitch />
+          <div className="flex w-full items-center gap-2 px-3 pt-1">
+            <ThemeSwitch />
+            <LocaleSwitch />
+          </div>
           <div className="flex w-full flex-1 flex-col justify-between gap-2">
             {MENU_SECTIONS.map((section, i) => (
               <ul className="menu w-full gap-2" key={section.label ?? i}>
