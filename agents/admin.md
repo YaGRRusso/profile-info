@@ -82,6 +82,9 @@ Keep `components/`, `hooks/custom/`, and `lib/` domain-agnostic.
 
 ## Gotchas & notes
 
+- **i18n (ADR 002):** UI strings (`react-i18next`) and entity display locale
+  (`lib/i18n.ts`) are separate layers. Persist display locale in its own store; pass it to
+  `i18nLabel` / `pickTranslation`. Principles only — `apps/admin/docs/adr/002-admin-i18n.md`.
 - Codegen reads `../api/src/schema.gql` from disk; keep it up to date after API changes.
 - GraphQL Codegen `client` preset (v6+) defaults `enumType` to `string-literal` (union types) and leaves unmapped scalars as `unknown`. This admin relies on runtime enum values (`ExperienceCategory.FullTime`, `Object.values`, `z.enum`) — keep `codegen.ts` on `enumType: "enum"` and map `DateTime` → `string`.
 - Batch mutations (`createMany*`, `updateMany*`, `removeMany*`, `disableMany*`, `enableMany*`) return `BatchEntity { succeeded, failed }` — not `count` or entity arrays.
