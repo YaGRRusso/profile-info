@@ -13,6 +13,7 @@ import { Json } from "@/components/display/json";
 import { Modal } from "@/components/display/modal";
 import { PageTitle } from "@/components/display/page-title";
 import { TextInput } from "@/components/inputs/text";
+import { PAGE_HELP } from "@/consts/page-help";
 import {
   ApiTokenForm,
   type ApiTokenSchema,
@@ -170,6 +171,7 @@ function RouteComponent() {
           },
         ]}
         description="Create, update or delete API tokens for programmatic access to your data."
+        help={PAGE_HELP.apiTokens}
         title="Manage API Tokens"
       />
 

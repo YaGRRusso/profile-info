@@ -11,6 +11,7 @@ import { DataState } from "@/components/display/data-state";
 import { Json } from "@/components/display/json";
 import { Modal } from "@/components/display/modal";
 import { PageTitle } from "@/components/display/page-title";
+import { PAGE_HELP } from "@/consts/page-help";
 import type { CommonFormValuesProps } from "@/forms/common";
 import {
   SkillForm,
@@ -222,6 +223,7 @@ function RouteComponent() {
           },
         ]}
         description="Create, update, disable or enable skills that can be associated with your profile."
+        help={PAGE_HELP.skills}
         title="Manage Skills"
       />
 

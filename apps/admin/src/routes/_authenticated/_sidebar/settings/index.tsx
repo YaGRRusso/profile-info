@@ -3,6 +3,7 @@ import { useState } from "react";
 import { toast } from "react-toastify";
 import { DataState } from "@/components/display/data-state";
 import { PageTitle } from "@/components/display/page-title";
+import { PAGE_HELP } from "@/consts/page-help";
 import { ProfileForm, profileToForm, profileToInput } from "@/forms/profile";
 import { useUpdateMe } from "@/hooks/mutations/users";
 import { useGetMe } from "@/hooks/queries/auth";
@@ -28,6 +29,7 @@ function RouteComponent() {
       <div className="flex flex-wrap items-start justify-between gap-4">
         <PageTitle
           description="Manage your account details."
+          help={PAGE_HELP.settings}
           title="Settings"
         />
         <DownloadCvControl />

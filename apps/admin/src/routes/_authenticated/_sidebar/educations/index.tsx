@@ -11,6 +11,7 @@ import { DataState } from "@/components/display/data-state";
 import { Json } from "@/components/display/json";
 import { Modal } from "@/components/display/modal";
 import { PageTitle } from "@/components/display/page-title";
+import { PAGE_HELP } from "@/consts/page-help";
 import type { CommonFormValuesProps } from "@/forms/common";
 import {
   EducationForm,
@@ -155,6 +156,7 @@ function RouteComponent() {
           },
         ]}
         description="Create, update or delete academic degrees of your profile."
+        help={PAGE_HELP.educations}
         title="Manage Educations"
       />
 

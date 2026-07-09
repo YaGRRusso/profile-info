@@ -11,6 +11,7 @@ import { DataState } from "@/components/display/data-state";
 import { Json } from "@/components/display/json";
 import { Modal } from "@/components/display/modal";
 import { PageTitle } from "@/components/display/page-title";
+import { PAGE_HELP } from "@/consts/page-help";
 import type { CommonFormValuesProps } from "@/forms/common";
 import {
   OrganizationForm,
@@ -230,6 +231,7 @@ function RouteComponent() {
           },
         ]}
         description="Create, update, disable or enable organizations referenced across your profile."
+        help={PAGE_HELP.organizations}
         title="Manage Organizations"
       />
 

@@ -1,4 +1,6 @@
 import { ComponentProps, ReactNode } from "react";
+import { HelpModal } from "@/components/display/help-modal";
+import { PageHelpContent } from "@/consts/page-help";
 import { cn } from "@/lib/cn";
 
 interface ActionProps extends ComponentProps<"button"> {
@@ -9,12 +11,14 @@ interface ActionProps extends ComponentProps<"button"> {
 export interface PageTitleProps extends ComponentProps<"div"> {
   actions?: ActionProps[];
   description?: string;
+  help?: PageHelpContent;
   title: string;
 }
 
 export function PageTitle({
   title,
   description,
+  help,
   className,
   actions,
   ...props
@@ -28,7 +32,12 @@ export function PageTitle({
       {...props}
     >
       <div className="flex flex-col">
-        <h1 className="font-bold text-4xl">{title}</h1>
+        <div className="flex items-center gap-2">
+          <h1 className="font-bold text-4xl">{title}</h1>
+          {help && (
+            <HelpModal paragraphs={help.paragraphs} title={help.title} />
+          )}
+        </div>
         <p className="opacity-md">{description}</p>
       </div>
       {actions && (

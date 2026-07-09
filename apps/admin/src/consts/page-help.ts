@@ -1,0 +1,79 @@
+export interface PageHelpContent {
+  paragraphs: string[];
+  title: string;
+}
+
+export const PAGE_HELP = {
+  home: {
+    title: "Home",
+    paragraphs: [
+      "Your starting point after sign-in. The dashboard summarizes how much profile data you have and what changed recently.",
+      "Use the stats and charts to spot gaps (for example, no courses or an empty experience section). Profile completeness highlights the main fields still missing on your account.",
+      "Recent activity lists the latest creates and updates across all entities so you can pick up where you left off.",
+    ],
+  },
+  settings: {
+    title: "Settings",
+    paragraphs: [
+      "Edit your public profile: name, contact details, avatar, languages, and the professional summary shown on your CV.",
+      "Skills selected here appear on your profile and CV in the order you arrange them. They come from the Skills catalog (global entries plus any you created locally).",
+      "Download CV exports a PDF built from your profile, ordered experiences, educations, courses, projects, and profile skills.",
+    ],
+  },
+  skills: {
+    title: "Skills",
+    paragraphs: [
+      "Skills are reusable tags for what you know or do. Attach them to your profile, job roles, courses, educations, and projects.",
+      "Global skills are shared by everyone and maintained by an administrator. Local skills are yours only — useful for niche or personal wording.",
+      "Disabled skills stay visible in lists but cannot be linked to new records. On the CV, skills are grouped by category when one is set.",
+    ],
+  },
+  courses: {
+    title: "Courses",
+    paragraphs: [
+      "Courses cover certificates, bootcamps, workshops, and other short-form learning — distinct from formal degrees in Educations.",
+      "Each course links to an Organization (platform or school that issued or hosted it) and can list related skills.",
+      "Set status and relevance so your CV prioritizes completed, meaningful entries. URL and workload hours are optional but useful for verification.",
+    ],
+  },
+  educations: {
+    title: "Educations",
+    paragraphs: [
+      "Educations are formal academic paths: degrees, technical programs, and similar credentials with level and completion status.",
+      "Link each entry to an Organization (university, college, or institute). Skills can reflect subjects or competencies gained.",
+      "Completed educations with higher relevance surface more prominently on your exported CV.",
+    ],
+  },
+  organizations: {
+    title: "Organizations",
+    paragraphs: [
+      "Organizations are schools, employers, and platforms referenced by your experiences, educations, and courses — not standalone profile sections.",
+      "Like skills, they can be global (shared catalog) or local (created by you). Pick the closest match when filling other forms; create a local one if nothing fits.",
+      "Category helps distinguish companies, schools, and other types. Disabled organizations cannot be selected for new links.",
+    ],
+  },
+  projects: {
+    title: "Projects",
+    paragraphs: [
+      "Projects showcase work you did outside or alongside employment: personal builds, freelance deliverables, volunteer efforts, and portfolios.",
+      "Attach skills to describe what each project demonstrates. Relevance controls how strongly it appears on your CV.",
+      "Projects do not require an organization, but you can add a URL or image when you want to link to a demo or repository.",
+    ],
+  },
+  experiences: {
+    title: "Experiences",
+    paragraphs: [
+      "Experiences are jobs and similar engagements over a period. Each has one organization (employer or client) and one or more roles inside it.",
+      "Roles carry their own title, period, description, and skills — useful when you changed position under the same company.",
+      "Category (full-time, part-time, freelance, volunteer) describes the engagement type. Relevance helps the CV keep only the strongest entries.",
+    ],
+  },
+  apiTokens: {
+    title: "API Tokens",
+    paragraphs: [
+      "API tokens let scripts or tools read or update your data without using the web UI. Each token has a name and a permission scope.",
+      "The secret value is shown only once at creation — store it safely. Revoke tokens you no longer use.",
+      "Query tokens are read-only. Mutate tokens can change data. Combined tokens can do both, within the same catalog and tenant rules as your user account.",
+    ],
+  },
+} as const satisfies Record<string, PageHelpContent>;

@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { DataState } from "@/components/display/data-state";
 import { PageTitle } from "@/components/display/page-title";
+import { PAGE_HELP } from "@/consts/page-help";
 import { useGetMe } from "@/hooks/queries/auth";
 import { useDashboard } from "@/hooks/queries/dashboard";
 import { DashboardCharts } from "./-components/dashboard-charts";
@@ -24,6 +25,7 @@ function RouteComponent() {
       <div className="flex flex-wrap items-start justify-between gap-4">
         <PageTitle
           description="Main dashboard for your profile."
+          help={PAGE_HELP.home}
           title={`Hello, ${user?.name}!`}
         />
         <ProfileCompleteness user={user} />
