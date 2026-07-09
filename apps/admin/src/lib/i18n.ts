@@ -36,7 +36,8 @@ interface I18nSource {
 
 export function i18nLabel(item: I18nSource, locale?: string): string {
   return (
-    pickTranslation(item.i18n, locale ?? "en")?.messages.title ?? item.slug
+    pickTranslation(item.i18n, locale ?? LocaleEnum.ENGLISH)?.messages.title ??
+    item.slug
   );
 }
 

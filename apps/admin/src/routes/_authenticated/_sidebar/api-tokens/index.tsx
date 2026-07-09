@@ -13,7 +13,6 @@ import { Json } from "@/components/display/json";
 import { Modal } from "@/components/display/modal";
 import { PageTitle } from "@/components/display/page-title";
 import { TextInput } from "@/components/inputs/text";
-import { PAGE_HELP } from "@/consts/page-help";
 import {
   ApiTokenForm,
   type ApiTokenSchema,
@@ -22,6 +21,8 @@ import {
 } from "@/forms/api-token";
 import { ApiTokenMultiForm } from "@/forms/api-token-multi";
 import type { CommonFormValuesProps } from "@/forms/common";
+import { usePageCopy } from "@/hooks/custom/use-page-copy";
+import { usePageHelp } from "@/hooks/custom/use-page-help";
 import { useQueryAllPages } from "@/hooks/custom/use-query-all-pages";
 import {
   useCreateOneApiToken,
@@ -42,6 +43,8 @@ export const Route = createFileRoute("/_authenticated/_sidebar/api-tokens/")({
 });
 
 function RouteComponent() {
+  const page = usePageCopy("apiTokens");
+  const help = usePageHelp("apiTokens");
   const [formValues, setFormValues] =
     useState<CommonFormValuesProps<ApiTokenSchema, ApiTokenRow[]>>();
   const [createdToken, setCreatedToken] = useState<string>();
@@ -170,18 +173,18 @@ function RouteComponent() {
             onClick: () => setFormValues({ state: "CREATING" }),
           },
         ]}
-        description="Create, update or delete API tokens for programmatic access to your data."
-        help={PAGE_HELP.apiTokens}
-        title="Manage API Tokens"
+        description={page.manageDescription}
+        help={help}
+        title={page.manageTitle}
       />
 
       <Modal
-        description="Fill the details below and submit."
+        description={page.modalFillDetails}
         isOpen={
           formValues?.state === "CREATING" || formValues?.state === "UPDATING"
         }
         onClose={() => setFormValues(undefined)}
-        title="Manage API Token"
+        title={page.modalManage}
       >
         <ApiTokenForm
           customValues={formValues?.customValues}
@@ -207,10 +210,10 @@ function RouteComponent() {
             onClick: () => copyCreatedToken(),
           },
         ]}
-        description="Copy this token now. You will not be able to see it again."
+        description={page.newApiTokenDescription}
         isOpen={Boolean(createdToken)}
         onClose={() => setCreatedToken(undefined)}
-        title="Your new API token"
+        title={page.newApiTokenTitle}
       >
         <TextInput
           className="font-mono text-xs"
@@ -220,10 +223,12 @@ function RouteComponent() {
       </Modal>
 
       <Modal
-        description={`Update the fields below to apply them to all ${formValues?.customValues?.length ?? 0} selected API tokens.`}
+        description={page.batchUpdateDescription(
+          formValues?.customValues?.length ?? 0
+        )}
         isOpen={formValues?.state === "MULTI_UPDATING"}
         onClose={() => setFormValues(undefined)}
-        title="Update API Tokens"
+        title={page.modalBatchUpdate}
       >
         <ApiTokenMultiForm
           isLoading={updateManyApiTokens.isPending}
@@ -253,13 +258,13 @@ function RouteComponent() {
             onClick: () => setFormValues(undefined),
           },
         ]}
-        description="Read only view of the API token."
+        description={page.modalReadDescription}
         isOpen={
           formValues?.state === "READING" ||
           formValues?.state === "MULTI_READING"
         }
         onClose={() => setFormValues(undefined)}
-        title="Read API Token"
+        title={page.modalRead}
       >
         {formValues?.customValues?.map((token) => (
           <Json data={token} key={token?.id} />
@@ -281,13 +286,13 @@ function RouteComponent() {
             onClick: () => handleDelete(),
           },
         ]}
-        description="Are you sure you want to delete the following API tokens?"
+        description={page.deleteDescription}
         isOpen={
           formValues?.state === "MULTI_DELETING" ||
           formValues?.state === "DELETING"
         }
         onClose={() => setFormValues(undefined)}
-        title="Delete API tokens?"
+        title={page.deleteTitle}
       >
         <ul className="flex flex-wrap items-center gap-1">
           {formValues?.customValues?.map((token) => (
@@ -309,9 +314,9 @@ function RouteComponent() {
 
         <DataState.Empty>
           <Alert
-            description="Try refreshing the page or create a new API token."
+            description={page.emptyDescription}
             icon={<WarningIcon weight="bold" />}
-            title="Nothing found!"
+            title={page.emptyTitle}
           />
         </DataState.Empty>
 

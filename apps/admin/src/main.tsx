@@ -13,6 +13,7 @@ import { useAuthStore } from "@/stores/auth";
 import { useSystemMessagesStore } from "@/stores/system-messages";
 import { routeTree } from "./routeTree.gen";
 
+import "./i18n";
 import "./styles/globals.css";
 
 function notifyQueryError(error: Error) {

@@ -1,0 +1,84 @@
+{
+  "shared": {
+    "modalFillDetails": "Preencha os dados abaixo e envie.",
+    "modalBatchUpdateDescription": "Atualize os campos abaixo para aplicar a todos os {{count}} {{entityPlural}} selecionados.",
+    "modalReadDescription": "Visualização somente leitura do {{entity}}.",
+    "deleteTitle": "Excluir {{entityPlural}}?",
+    "deleteDescription": "Tem certeza de que deseja excluir os seguintes {{entityPlural}}?",
+    "disableTitle": "Desativar {{entityPlural}}?",
+    "disableDescription": "Tem certeza de que deseja desativar os seguintes {{entityPlural}}?",
+    "enableTitle": "Ativar {{entityPlural}}?",
+    "enableDescription": "Tem certeza de que deseja ativar os seguintes {{entityPlural}}?",
+    "newApiTokenTitle": "Seu novo token de API",
+    "newApiTokenDescription": "Copie este token agora. Você não poderá vê-lo novamente.",
+    "emptyTitle": "Nada encontrado!",
+    "emptyDescription": "Tente atualizar a página ou criar um novo {{entity}}."
+  },
+  "settings": {
+    "title": "Configurações",
+    "description": "Gerencie os dados da sua conta."
+  },
+  "courses": {
+    "manageTitle": "Gerenciar cursos",
+    "manageDescription": "Crie, atualize ou exclua cursos, bootcamps e certificados do seu perfil.",
+    "entity": "curso",
+    "entityPlural": "cursos",
+    "modalManage": "Gerenciar curso",
+    "modalBatchUpdate": "Atualizar cursos",
+    "modalRead": "Ver curso"
+  },
+  "skills": {
+    "manageTitle": "Gerenciar habilidades",
+    "manageDescription": "Crie, atualize, desative ou ative habilidades associadas ao seu perfil.",
+    "entity": "habilidade",
+    "entityPlural": "habilidades",
+    "modalManage": "Gerenciar habilidade",
+    "modalBatchUpdate": "Atualizar habilidades",
+    "modalRead": "Ver habilidade"
+  },
+  "educations": {
+    "manageTitle": "Gerenciar formações",
+    "manageDescription": "Crie, atualize ou exclua formações acadêmicas do seu perfil.",
+    "entity": "formação",
+    "entityPlural": "formações",
+    "modalManage": "Gerenciar formação",
+    "modalBatchUpdate": "Atualizar formações",
+    "modalRead": "Ver formação"
+  },
+  "organizations": {
+    "manageTitle": "Gerenciar organizações",
+    "manageDescription": "Crie, atualize, desative ou ative organizações referenciadas no seu perfil.",
+    "entity": "organização",
+    "entityPlural": "organizações",
+    "modalManage": "Gerenciar organização",
+    "modalBatchUpdate": "Atualizar organizações",
+    "modalRead": "Ver organização"
+  },
+  "projects": {
+    "manageTitle": "Gerenciar projetos",
+    "manageDescription": "Crie, atualize ou exclua projetos do seu perfil.",
+    "entity": "projeto",
+    "entityPlural": "projetos",
+    "modalManage": "Gerenciar projeto",
+    "modalBatchUpdate": "Atualizar projetos",
+    "modalRead": "Ver projeto"
+  },
+  "experiences": {
+    "manageTitle": "Gerenciar experiências",
+    "manageDescription": "Crie, atualize ou exclua experiências profissionais do seu perfil.",
+    "entity": "experiência",
+    "entityPlural": "experiências",
+    "modalManage": "Gerenciar experiência",
+    "modalBatchUpdate": "Atualizar experiências",
+    "modalRead": "Ver experiência"
+  },
+  "apiTokens": {
+    "manageTitle": "Gerenciar tokens de API",
+    "manageDescription": "Crie, atualize ou exclua tokens de API para acesso programático aos seus dados.",
+    "entity": "token de API",
+    "entityPlural": "tokens de API",
+    "modalManage": "Gerenciar token de API",
+    "modalBatchUpdate": "Atualizar tokens de API",
+    "modalRead": "Ver token de API"
+  }
+}

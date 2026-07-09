@@ -11,7 +11,6 @@ import { DataState } from "@/components/display/data-state";
 import { Json } from "@/components/display/json";
 import { Modal } from "@/components/display/modal";
 import { PageTitle } from "@/components/display/page-title";
-import { PAGE_HELP } from "@/consts/page-help";
 import type { CommonFormValuesProps } from "@/forms/common";
 import {
   ExperienceForm,
@@ -20,6 +19,8 @@ import {
   experienceToInput,
 } from "@/forms/experience";
 import { ExperienceMultiForm } from "@/forms/experience-multi";
+import { usePageCopy } from "@/hooks/custom/use-page-copy";
+import { usePageHelp } from "@/hooks/custom/use-page-help";
 import { useQueryAllPages } from "@/hooks/custom/use-query-all-pages";
 import {
   useCreateOneExperience,
@@ -40,6 +41,8 @@ export const Route = createFileRoute("/_authenticated/_sidebar/experiences/")({
 });
 
 function RouteComponent() {
+  const page = usePageCopy("experiences");
+  const help = usePageHelp("experiences");
   const [formValues, setFormValues] =
     useState<CommonFormValuesProps<ExperienceSchema, ExperienceRow[]>>();
 
@@ -157,18 +160,18 @@ function RouteComponent() {
             onClick: () => setFormValues({ state: "CREATING" }),
           },
         ]}
-        description="Create, update or delete professional experiences of your profile."
-        help={PAGE_HELP.experiences}
-        title="Manage Experiences"
+        description={page.manageDescription}
+        help={help}
+        title={page.manageTitle}
       />
 
       <Modal
-        description="Fill the details below and submit."
+        description={page.modalFillDetails}
         isOpen={
           formValues?.state === "CREATING" || formValues?.state === "UPDATING"
         }
         onClose={() => setFormValues(undefined)}
-        title="Manage Experience"
+        title={page.modalManage}
       >
         <ExperienceForm
           customValues={formValues?.customValues}
@@ -186,10 +189,12 @@ function RouteComponent() {
       </Modal>
 
       <Modal
-        description={`Update the fields below to apply them to all ${formValues?.customValues?.length ?? 0} selected experiences.`}
+        description={page.batchUpdateDescription(
+          formValues?.customValues?.length ?? 0
+        )}
         isOpen={formValues?.state === "MULTI_UPDATING"}
         onClose={() => setFormValues(undefined)}
-        title="Update Experiences"
+        title={page.modalBatchUpdate}
       >
         <ExperienceMultiForm
           isLoading={updateManyExperiences.isPending}
@@ -219,13 +224,13 @@ function RouteComponent() {
             onClick: () => setFormValues(undefined),
           },
         ]}
-        description="Read only view of the experience."
+        description={page.modalReadDescription}
         isOpen={
           formValues?.state === "READING" ||
           formValues?.state === "MULTI_READING"
         }
         onClose={() => setFormValues(undefined)}
-        title="Read Experience"
+        title={page.modalRead}
       >
         {formValues?.customValues?.map((experience) => (
           <Json data={experience} key={experience?.id} />
@@ -247,13 +252,13 @@ function RouteComponent() {
             onClick: () => handleDelete(),
           },
         ]}
-        description="Are you sure you want to delete the following experiences?"
+        description={page.deleteDescription}
         isOpen={
           formValues?.state === "MULTI_DELETING" ||
           formValues?.state === "DELETING"
         }
         onClose={() => setFormValues(undefined)}
-        title="Delete experiences?"
+        title={page.deleteTitle}
       >
         <ul className="flex flex-wrap items-center gap-1">
           {formValues?.customValues?.map((experience) => (
@@ -275,9 +280,9 @@ function RouteComponent() {
 
         <DataState.Empty>
           <Alert
-            description="Try refreshing the page or create a new experience."
+            description={page.emptyDescription}
             icon={<WarningIcon weight="bold" />}
-            title="Nothing found!"
+            title={page.emptyTitle}
           />
         </DataState.Empty>
 

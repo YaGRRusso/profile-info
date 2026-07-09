@@ -18,6 +18,7 @@ import { SystemMessages } from "@/components/display/system-messages";
 import { useDebounce } from "@/hooks/custom/use-debounce";
 import { useMediaQuery } from "@/hooks/custom/use-media-query";
 import { useAuthStore } from "@/stores/auth";
+import { LocaleSwitch } from "./-components/locale-switch";
 import { MenuAction, type MenuActionProps } from "./-components/menu-action";
 import { MenuLink, type MenuLinkProps } from "./-components/menu-link";
 import { ThemeSwitch } from "./-components/theme-switch";
@@ -163,6 +164,7 @@ function RouteComponent() {
             </div>
           </div>
           <ThemeSwitch />
+          <LocaleSwitch />
           <div className="flex w-full flex-1 flex-col justify-between gap-2">
             {MENU_SECTIONS.map((section, i) => (
               <ul className="menu w-full gap-2" key={section.label ?? i}>

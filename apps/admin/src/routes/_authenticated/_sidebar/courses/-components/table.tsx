@@ -35,6 +35,7 @@ import { Link } from "@/components/display/link";
 import { PLACEHOLDERS } from "@/consts/placeholders";
 import { CourseStatus, UserRole } from "@/generated/graphql/graphql";
 import { useActiveFilters } from "@/hooks/custom/use-active-filters";
+import { useDisplayLocale } from "@/hooks/custom/use-display-locale";
 import { usePersistedState } from "@/hooks/custom/use-persisted-state";
 import { useStableValue } from "@/hooks/custom/use-stable-value";
 import type { CourseRow } from "@/hooks/queries/courses";
@@ -103,6 +104,7 @@ function SortIcon({ sorted }: { sorted: false | "asc" | "desc" }) {
 }
 
 const getColumns = (
+  displayLocale: string,
   onEdit: (course: CourseRow) => void,
   onDelete: (course: CourseRow) => void,
   onView: (course: CourseRow) => void
@@ -198,7 +200,7 @@ const getColumns = (
     ),
   }),
   columnHelper.accessor(
-    (row) => row.skills?.map((skill) => i18nLabel(skill)) ?? [],
+    (row) => row.skills?.map((skill) => i18nLabel(skill, displayLocale)) ?? [],
     {
       id: "skills",
       header: "Skills",
@@ -280,6 +282,7 @@ export function CoursesTable({
   onMultiView,
   onMultiDelete,
 }: CoursesTableProps) {
+  const displayLocale = useDisplayLocale();
   const userRole = useAuthStore((state) => state.user?.role);
   const [searchQuery, setSearchQuery] = useQueryState("query", queryParser);
   const [sort, setSort] = useQueryState("sort", sortParser);
@@ -339,9 +342,14 @@ export function CoursesTable({
     );
   };
 
+  const columns = useMemo(
+    () => getColumns(displayLocale, onEdit, onDelete, onView),
+    [displayLocale, onEdit, onDelete, onView]
+  );
+
   const table = useReactTable({
     data,
-    columns: getColumns(onEdit, onDelete, onView),
+    columns,
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     getSortedRowModel: getSortedRowModel(),

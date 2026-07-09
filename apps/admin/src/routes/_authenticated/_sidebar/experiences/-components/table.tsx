@@ -34,6 +34,7 @@ import { EmptyValue } from "@/components/display/empty-value";
 import { PLACEHOLDERS } from "@/consts/placeholders";
 import { ExperienceCategory, UserRole } from "@/generated/graphql/graphql";
 import { useActiveFilters } from "@/hooks/custom/use-active-filters";
+import { useDisplayLocale } from "@/hooks/custom/use-display-locale";
 import { usePersistedState } from "@/hooks/custom/use-persisted-state";
 import { useStableValue } from "@/hooks/custom/use-stable-value";
 import type { ExperienceRow } from "@/hooks/queries/experiences";
@@ -103,6 +104,7 @@ function SortIcon({ sorted }: { sorted: false | "asc" | "desc" }) {
 }
 
 const getColumns = (
+  displayLocale: string,
   onEdit: (experience: ExperienceRow) => void,
   onDelete: (experience: ExperienceRow) => void,
   onView: (experience: ExperienceRow) => void
@@ -185,7 +187,7 @@ const getColumns = (
   columnHelper.accessor(
     (row) =>
       row.roles?.flatMap(
-        (role) => role.skills?.map((s) => i18nLabel(s)) ?? []
+        (role) => role.skills?.map((s) => i18nLabel(s, displayLocale)) ?? []
       ) ?? [],
     {
       id: "skills",
@@ -271,6 +273,7 @@ export function ExperiencesTable({
   onMultiView,
   onMultiDelete,
 }: ExperiencesTableProps) {
+  const displayLocale = useDisplayLocale();
   const userRole = useAuthStore((state) => state.user?.role);
   const [searchQuery, setSearchQuery] = useQueryState("query", queryParser);
   const [sort, setSort] = useQueryState("sort", sortParser);
@@ -335,9 +338,14 @@ export function ExperiencesTable({
     );
   };
 
+  const columns = useMemo(
+    () => getColumns(displayLocale, onEdit, onDelete, onView),
+    [displayLocale, onEdit, onDelete, onView]
+  );
+
   const table = useReactTable({
     data,
-    columns: getColumns(onEdit, onDelete, onView),
+    columns,
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     getSortedRowModel: getSortedRowModel(),

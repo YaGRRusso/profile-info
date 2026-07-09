@@ -11,7 +11,6 @@ import { DataState } from "@/components/display/data-state";
 import { Json } from "@/components/display/json";
 import { Modal } from "@/components/display/modal";
 import { PageTitle } from "@/components/display/page-title";
-import { PAGE_HELP } from "@/consts/page-help";
 import type { CommonFormValuesProps } from "@/forms/common";
 import {
   EducationForm,
@@ -20,6 +19,8 @@ import {
   educationToInput,
 } from "@/forms/education";
 import { EducationMultiForm } from "@/forms/education-multi";
+import { usePageCopy } from "@/hooks/custom/use-page-copy";
+import { usePageHelp } from "@/hooks/custom/use-page-help";
 import { useQueryAllPages } from "@/hooks/custom/use-query-all-pages";
 import {
   useCreateOneEducation,
@@ -40,6 +41,8 @@ export const Route = createFileRoute("/_authenticated/_sidebar/educations/")({
 });
 
 function RouteComponent() {
+  const page = usePageCopy("educations");
+  const help = usePageHelp("educations");
   const [formValues, setFormValues] =
     useState<CommonFormValuesProps<EducationSchema, EducationRow[]>>();
 
@@ -155,18 +158,18 @@ function RouteComponent() {
             onClick: () => setFormValues({ state: "CREATING" }),
           },
         ]}
-        description="Create, update or delete academic degrees of your profile."
-        help={PAGE_HELP.educations}
-        title="Manage Educations"
+        description={page.manageDescription}
+        help={help}
+        title={page.manageTitle}
       />
 
       <Modal
-        description="Fill the details below and submit."
+        description={page.modalFillDetails}
         isOpen={
           formValues?.state === "CREATING" || formValues?.state === "UPDATING"
         }
         onClose={() => setFormValues(undefined)}
-        title="Manage Education"
+        title={page.modalManage}
       >
         <EducationForm
           customValues={formValues?.customValues}
@@ -184,10 +187,12 @@ function RouteComponent() {
       </Modal>
 
       <Modal
-        description={`Update the fields below to apply them to all ${formValues?.customValues?.length ?? 0} selected educations.`}
+        description={page.batchUpdateDescription(
+          formValues?.customValues?.length ?? 0
+        )}
         isOpen={formValues?.state === "MULTI_UPDATING"}
         onClose={() => setFormValues(undefined)}
-        title="Update Educations"
+        title={page.modalBatchUpdate}
       >
         <EducationMultiForm
           isLoading={updateManyEducations.isPending}
@@ -217,13 +222,13 @@ function RouteComponent() {
             onClick: () => setFormValues(undefined),
           },
         ]}
-        description="Read only view of the education."
+        description={page.modalReadDescription}
         isOpen={
           formValues?.state === "READING" ||
           formValues?.state === "MULTI_READING"
         }
         onClose={() => setFormValues(undefined)}
-        title="Read Education"
+        title={page.modalRead}
       >
         {formValues?.customValues?.map((education) => (
           <Json data={education} key={education?.id} />
@@ -245,13 +250,13 @@ function RouteComponent() {
             onClick: () => handleDelete(),
           },
         ]}
-        description="Are you sure you want to delete the following educations?"
+        description={page.deleteDescription}
         isOpen={
           formValues?.state === "MULTI_DELETING" ||
           formValues?.state === "DELETING"
         }
         onClose={() => setFormValues(undefined)}
-        title="Delete educations?"
+        title={page.deleteTitle}
       >
         <ul className="flex flex-wrap items-center gap-1">
           {formValues?.customValues?.map((education) => (
@@ -273,9 +278,9 @@ function RouteComponent() {
 
         <DataState.Empty>
           <Alert
-            description="Try refreshing the page or create a new education."
+            description={page.emptyDescription}
             icon={<WarningIcon weight="bold" />}
-            title="Nothing found!"
+            title={page.emptyTitle}
           />
         </DataState.Empty>
 

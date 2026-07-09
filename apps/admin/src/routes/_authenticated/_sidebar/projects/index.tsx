@@ -11,7 +11,6 @@ import { DataState } from "@/components/display/data-state";
 import { Json } from "@/components/display/json";
 import { Modal } from "@/components/display/modal";
 import { PageTitle } from "@/components/display/page-title";
-import { PAGE_HELP } from "@/consts/page-help";
 import type { CommonFormValuesProps } from "@/forms/common";
 import {
   ProjectForm,
@@ -20,6 +19,8 @@ import {
   projectToInput,
 } from "@/forms/project";
 import { ProjectMultiForm } from "@/forms/project-multi";
+import { usePageCopy } from "@/hooks/custom/use-page-copy";
+import { usePageHelp } from "@/hooks/custom/use-page-help";
 import { useQueryAllPages } from "@/hooks/custom/use-query-all-pages";
 import {
   useCreateOneProject,
@@ -37,6 +38,8 @@ export const Route = createFileRoute("/_authenticated/_sidebar/projects/")({
 });
 
 function RouteComponent() {
+  const page = usePageCopy("projects");
+  const help = usePageHelp("projects");
   const [formValues, setFormValues] =
     useState<CommonFormValuesProps<ProjectSchema, ProjectRow[]>>();
 
@@ -152,18 +155,18 @@ function RouteComponent() {
             onClick: () => setFormValues({ state: "CREATING" }),
           },
         ]}
-        description="Create, update or delete projects of your profile."
-        help={PAGE_HELP.projects}
-        title="Manage Projects"
+        description={page.manageDescription}
+        help={help}
+        title={page.manageTitle}
       />
 
       <Modal
-        description="Fill the details below and submit."
+        description={page.modalFillDetails}
         isOpen={
           formValues?.state === "CREATING" || formValues?.state === "UPDATING"
         }
         onClose={() => setFormValues(undefined)}
-        title="Manage Project"
+        title={page.modalManage}
       >
         <ProjectForm
           customValues={formValues?.customValues}
@@ -179,10 +182,12 @@ function RouteComponent() {
       </Modal>
 
       <Modal
-        description={`Update the fields below to apply them to all ${formValues?.customValues?.length ?? 0} selected projects.`}
+        description={page.batchUpdateDescription(
+          formValues?.customValues?.length ?? 0
+        )}
         isOpen={formValues?.state === "MULTI_UPDATING"}
         onClose={() => setFormValues(undefined)}
-        title="Update Projects"
+        title={page.modalBatchUpdate}
       >
         <ProjectMultiForm
           isLoading={updateManyProjects.isPending}
@@ -212,13 +217,13 @@ function RouteComponent() {
             onClick: () => setFormValues(undefined),
           },
         ]}
-        description="Read only view of the project."
+        description={page.modalReadDescription}
         isOpen={
           formValues?.state === "READING" ||
           formValues?.state === "MULTI_READING"
         }
         onClose={() => setFormValues(undefined)}
-        title="Read Project"
+        title={page.modalRead}
       >
         {formValues?.customValues?.map((project) => (
           <Json data={project} key={project?.id} />
@@ -240,13 +245,13 @@ function RouteComponent() {
             onClick: () => handleDelete(),
           },
         ]}
-        description="Are you sure you want to delete the following projects?"
+        description={page.deleteDescription}
         isOpen={
           formValues?.state === "MULTI_DELETING" ||
           formValues?.state === "DELETING"
         }
         onClose={() => setFormValues(undefined)}
-        title="Delete projects?"
+        title={page.deleteTitle}
       >
         <ul className="flex flex-wrap items-center gap-1">
           {formValues?.customValues?.map((project) => (
@@ -268,9 +273,9 @@ function RouteComponent() {
 
         <DataState.Empty>
           <Alert
-            description="Try refreshing the page or create a new project."
+            description={page.emptyDescription}
             icon={<WarningIcon weight="bold" />}
-            title="Nothing found!"
+            title={page.emptyTitle}
           />
         </DataState.Empty>
 

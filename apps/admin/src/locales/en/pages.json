@@ -1,0 +1,84 @@
+{
+  "shared": {
+    "modalFillDetails": "Fill the details below and submit.",
+    "modalBatchUpdateDescription": "Update the fields below to apply them to all {{count}} selected {{entityPlural}}.",
+    "modalReadDescription": "Read only view of the {{entity}}.",
+    "deleteTitle": "Delete {{entityPlural}}?",
+    "deleteDescription": "Are you sure you want to delete the following {{entityPlural}}?",
+    "disableTitle": "Disable {{entityPlural}}?",
+    "disableDescription": "Are you sure you want to disable the following {{entityPlural}}?",
+    "enableTitle": "Enable {{entityPlural}}?",
+    "enableDescription": "Are you sure you want to enable the following {{entityPlural}}?",
+    "newApiTokenTitle": "Your new API token",
+    "newApiTokenDescription": "Copy this token now. You will not be able to see it again.",
+    "emptyTitle": "Nothing found!",
+    "emptyDescription": "Try refreshing the page or create a new {{entity}}."
+  },
+  "settings": {
+    "title": "Settings",
+    "description": "Manage your account details."
+  },
+  "courses": {
+    "manageTitle": "Manage Courses",
+    "manageDescription": "Create, update or delete courses, bootcamps and certificates of your profile.",
+    "entity": "course",
+    "entityPlural": "courses",
+    "modalManage": "Manage Course",
+    "modalBatchUpdate": "Update Courses",
+    "modalRead": "Read Course"
+  },
+  "skills": {
+    "manageTitle": "Manage Skills",
+    "manageDescription": "Create, update, disable or enable skills that can be associated with your profile.",
+    "entity": "skill",
+    "entityPlural": "skills",
+    "modalManage": "Manage Skill",
+    "modalBatchUpdate": "Update Skills",
+    "modalRead": "Read Skill"
+  },
+  "educations": {
+    "manageTitle": "Manage Educations",
+    "manageDescription": "Create, update or delete academic degrees of your profile.",
+    "entity": "education",
+    "entityPlural": "educations",
+    "modalManage": "Manage Education",
+    "modalBatchUpdate": "Update Educations",
+    "modalRead": "Read Education"
+  },
+  "organizations": {
+    "manageTitle": "Manage Organizations",
+    "manageDescription": "Create, update, disable or enable organizations referenced across your profile.",
+    "entity": "organization",
+    "entityPlural": "organizations",
+    "modalManage": "Manage Organization",
+    "modalBatchUpdate": "Update Organizations",
+    "modalRead": "Read Organization"
+  },
+  "projects": {
+    "manageTitle": "Manage Projects",
+    "manageDescription": "Create, update or delete projects of your profile.",
+    "entity": "project",
+    "entityPlural": "projects",
+    "modalManage": "Manage Project",
+    "modalBatchUpdate": "Update Projects",
+    "modalRead": "Read Project"
+  },
+  "experiences": {
+    "manageTitle": "Manage Experiences",
+    "manageDescription": "Create, update or delete professional experiences of your profile.",
+    "entity": "experience",
+    "entityPlural": "experiences",
+    "modalManage": "Manage Experience",
+    "modalBatchUpdate": "Update Experiences",
+    "modalRead": "Read Experience"
+  },
+  "apiTokens": {
+    "manageTitle": "Manage API Tokens",
+    "manageDescription": "Create, update or delete API tokens for programmatic access to your data.",
+    "entity": "API token",
+    "entityPlural": "API tokens",
+    "modalManage": "Manage API Token",
+    "modalBatchUpdate": "Update API Tokens",
+    "modalRead": "Read API Token"
+  }
+}
