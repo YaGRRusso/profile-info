@@ -9,9 +9,9 @@ import {
 } from "@phosphor-icons/react";
 import { Link } from "@tanstack/react-router";
 import type { ReactNode } from "react";
+import { useTranslation } from "react-i18next";
 import type { DashboardActivityType } from "@/generated/graphql/graphql";
 import { formatRelativeTime } from "@/lib/dayjs";
-import { useLocaleStore } from "@/stores/locale";
 
 interface RecentActivityItem {
   label: string;
@@ -46,7 +46,8 @@ function formatActivityType(type: DashboardActivityType): string {
 }
 
 export function RecentActivity({ items }: RecentActivityProps) {
-  const locale = useLocaleStore((state) => state.locale);
+  const { i18n } = useTranslation();
+  const locale = i18n.language;
   return (
     <section className="flex flex-col gap-4 rounded-box bg-base-200 p-4">
       <div className="flex items-center gap-2">

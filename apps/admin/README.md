@@ -15,7 +15,7 @@ provides CRUD screens for the profile data. It deploys to GitHub Pages.
   and generates typed documents into `src/generated/graphql/`.
 - **TanStack Table**: data tables (the skills table in `src/routes/.../skills/`).
 - **TanStack Form + Zod**: forms in `src/forms/` with schema validation.
-- **Zustand**: persisted auth, theme, and locale stores in `src/stores/`.
+- **Zustand**: persisted auth and theme stores in `src/stores/`.
 - **Tailwind CSS v4 + DaisyUI**: styling via the `@tailwindcss/vite` plugin and
   `src/styles/globals.css`.
 - **nuqs**: URL-synced state for table filters and sorting.
@@ -47,7 +47,7 @@ src/
 │   ├── display/              # Generic display components (modal, alert, data-state).
 │   └── inputs/               # Generic input components (text, password, select, ...).
 ├── lib/                      # execute (GraphQL client), cn, parsers, small helpers.
-├── stores/                   # Zustand: auth, theme, locale (persisted); system-messages.
+├── stores/                   # Zustand: auth, theme (persisted); system-messages.
 └── styles/globals.css        # Tailwind v4 + DaisyUI setup and custom utilities.
 ```
 
@@ -92,4 +92,4 @@ The **Settings** page (`/settings`) loads the authenticated user via `useGetMe()
 
 ### Locale / i18n
 
-Sidebar **locale switcher** (`useLocaleStore` in `stores/locale.ts`) is the single source of truth for UI language and entity display locale. It drives `react-i18next` (`help`, `nav`, `pages` namespaces), `i18nLabel` in tables/pickers, and `dayjs` relative time. Phase 1 scope and backlog: `docs/adr/002-admin-i18n.md`. Agent context: `agents/admin.md` (gotcha **i18n**).
+Sidebar **locale switcher** calls `i18n.changeLanguage`. Locale persists via `i18next-browser-languagedetector` (`localStorage` key `i18nextLng`). Same active locale drives `react-i18next` (`help`, `nav`, `pages`), `i18nLabel` in tables/pickers, and `dayjs` relative time. Phase 1 scope and backlog: `docs/adr/002-admin-i18n.md`.

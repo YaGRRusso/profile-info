@@ -16,23 +16,23 @@ The admin **chrome** is mostly English. Two concerns must stay separate:
 | **Entity display** | Skill title in a table cell or picker | `lib/i18n.ts` (`pickTranslation`, `i18nLabel`) |
 | **UI copy** | Page help, page/modal titles and descriptions | `react-i18next` + JSON under `src/locales/` |
 
-`stores/locale.ts` (`useLocaleStore`) is the **single source of truth** for the active locale. It
-drives `i18nLabel` (default when no locale arg), `react-i18next`, and `dayjs` relative
-time (`lib/dayjs.ts` → `syncDayjsLocale`).
+`i18next` (`src/i18n/index.ts`) is the **single source of truth** for the active locale.
+`i18next-browser-languagedetector` persists the choice in `localStorage` (`i18nextLng`).
+It drives UI strings, `i18nLabel` (via `i18n.language`), and `dayjs` (`languageChanged` →
+`syncDayjsLocale`).
 
 ## Decision
 
-### Display locale (Zustand — not i18next)
+### Active locale (i18next — not a separate Zustand store)
 
-- Persisted store `stores/locale.ts` (`useLocaleStore`, `LocaleEnum` — same as profile content / CV export).
-- Sidebar switcher next to theme.
-- `setLocale` updates the store, `i18n.changeLanguage`, and `syncDayjsLocale`.
+- `i18next` + `i18next-browser-languagedetector` + `react-i18next`; init in `src/i18n/index.ts`, imported from `main.tsx`.
+- Sidebar switcher calls `i18n.changeLanguage`.
+- Detection: `localStorage` only (no browser-language auto-pick); `fallbackLng` = `en`.
 - Drives entity labels via `i18nLabel` / `pickTranslation` (tables, pickers, modals).
 - Does **not** translate table headers, filters, form field labels, or buttons.
 
 ### UI strings (react-i18next)
 
-- `i18next` + `react-i18next`; init in `src/i18n/index.ts`, imported from `main.tsx`.
 - Namespaces (v1): `help`, `nav`, `pages`.
 
 **In scope (shipped in phase 1):**
@@ -40,11 +40,11 @@ time (`lib/dayjs.ts` → `syncDayjsLocale`).
 | Area | Approach |
 |------|----------|
 | Page help | `help.json`; `usePageHelp(key)` |
-| Page / modal titles & descriptions | `pages.json`; `usePageCopy(key)` on CRUD routes; `useTranslation("pages")` for home/settings titles |
 | Sidebar nav | `nav.json`; `useTranslation("nav")` in `_sidebar.tsx` |
-| Entity i18n labels | `i18nLabel(item)` defaults to `useLocaleStore.getState().locale`; tables may pass locale explicitly |
-| Skill pickers in forms | `i18nLabel(skill, locale)` in options; `useLocaleStore` selector in `useMemo` deps |
-| Relative timestamps | `formatRelativeTime` via `dayjs` synced to display locale |
+| Page / modal titles & descriptions | `pages.json`; `usePageCopy(key)` on CRUD routes; `useTranslation("pages")` for home/settings titles |
+| Entity i18n labels | `i18nLabel(item)` defaults to `i18n.language`; tables may pass locale explicitly |
+| Skill pickers in forms | `i18nLabel(skill, locale)` in options; `i18n.language` in `useMemo` deps |
+| Relative timestamps | `formatRelativeTime` via `dayjs` synced on `languageChanged` |
 
 **Explicitly out of scope (backlog — do not add without revisiting this ADR):**
 
@@ -60,25 +60,23 @@ time (`lib/dayjs.ts` → `syncDayjsLocale`).
 
 | Phase | Deliverable | Status |
 |-------|-------------|--------|
-| **1 — Foundation** | i18next setup, display locale store + switcher, `help` + `pages` namespaces (en + pt) | Done |
-| **1 — Wiring** | `usePageHelp` / `usePageCopy` on entity pages + settings; `i18nLabel` + pickers + dayjs on display locale | Done |
-| **Later** | Form chrome, table chrome, dashboard copy, nav, toasts, `es` UI | Backlog |
+| **1 — Foundation** | i18next setup, locale switcher, `help` + `nav` + `pages` namespaces (en + pt) | Done |
+| **1 — Wiring** | Page copy, sidebar nav, `i18nLabel` + pickers + dayjs on active locale | Done |
+| **Later** | Form chrome, table chrome, dashboard widgets, login, toasts, `es` UI | Backlog |
 
 ## Where to look
 
 | Topic | Location |
 |-------|----------|
 | Entity translation pick | `src/lib/i18n.ts` |
-| Display locale | `src/stores/locale.ts` (`useLocaleStore`) |
+| Locale init + persistence | `src/i18n/index.ts` |
 | Relative time | `src/lib/dayjs.ts` (`syncDayjsLocale`) |
-| i18next init | `src/i18n/index.ts` |
-| Sidebar nav | `src/locales/<locale>/nav.json` |
 | Help keys | `src/consts/page-help.ts` (`PageHelpKey` only) |
 | Page copy hook | `src/hooks/custom/use-page-copy.ts` |
 
 ## Verification checklist
 
-1. Display locale persists across refresh.
+1. Display locale persists across refresh (`i18nextLng` in localStorage).
 2. Skill labels in entity tables and pickers change when locale changes (no refetch).
 3. Page help modal shows `pt` text when locale is `pt`.
 4. CRUD page `PageTitle` and modal titles/descriptions show `pt` when locale is `pt`.

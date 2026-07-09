@@ -3,7 +3,6 @@ import "dayjs/locale/es";
 import "dayjs/locale/pt";
 import relativeTime from "dayjs/plugin/relativeTime";
 import { LocaleEnum } from "@/consts/locales";
-import { readPersistedDisplayLocale } from "@/i18n/read-persisted-display-locale";
 
 dayjsLib.extend(relativeTime);
 
@@ -18,8 +17,6 @@ const DAYJS_LOCALE: Record<LocaleEnum, string> = {
 export function syncDayjsLocale(locale: LocaleEnum) {
   dayjsLib.locale(DAYJS_LOCALE[locale] ?? "en");
 }
-
-syncDayjsLocale(readPersistedDisplayLocale());
 
 export function formatRelativeTime(value: string | Date): string {
   return dayjs(value).fromNow();

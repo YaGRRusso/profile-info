@@ -5,6 +5,7 @@ import {
 } from "@phosphor-icons/react";
 import { createFileRoute } from "@tanstack/react-router";
 import { useCallback, useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { toast } from "react-toastify";
 import { Alert } from "@/components/display/alert";
 import { DataState } from "@/components/display/data-state";
@@ -36,7 +37,6 @@ import {
 import { type SkillRow, useFindManySkills } from "@/hooks/queries/skills";
 import { cn } from "@/lib/cn";
 import { i18nLabel } from "@/lib/i18n";
-import { useLocaleStore } from "@/stores/locale";
 import { SkillsTable } from "./-components/table";
 
 export const Route = createFileRoute("/_authenticated/_sidebar/skills/")({
@@ -44,7 +44,8 @@ export const Route = createFileRoute("/_authenticated/_sidebar/skills/")({
 });
 
 function RouteComponent() {
-  const locale = useLocaleStore((state) => state.locale);
+  const { i18n } = useTranslation();
+  const locale = i18n.language;
   const page = usePageCopy("skills");
   const help = usePageHelp("skills");
   const [formValues, setFormValues] =

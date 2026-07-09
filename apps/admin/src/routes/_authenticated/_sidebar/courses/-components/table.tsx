@@ -28,6 +28,7 @@ import {
 } from "@tanstack/react-table";
 import { useQueryState } from "nuqs";
 import { useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { z } from "zod";
 import { BadgeList } from "@/components/display/badge-list";
 import { EmptyValue } from "@/components/display/empty-value";
@@ -50,7 +51,6 @@ import {
 } from "@/lib/table-columns";
 import { dateRangeFilter, numberRangeFilter } from "@/lib/table-filters";
 import { useAuthStore } from "@/stores/auth";
-import { useLocaleStore } from "@/stores/locale";
 
 const debouncedUrlUpdates = { method: "debounce" as const, timeMs: 500 };
 const persistentOptions = { clearOnDefault: true, history: "push" as const };
@@ -282,7 +282,8 @@ export function CoursesTable({
   onMultiView,
   onMultiDelete,
 }: CoursesTableProps) {
-  const locale = useLocaleStore((state) => state.locale);
+  const { i18n } = useTranslation();
+  const locale = i18n.language;
   const userRole = useAuthStore((state) => state.user?.role);
   const [searchQuery, setSearchQuery] = useQueryState("query", queryParser);
   const [sort, setSort] = useQueryState("sort", sortParser);

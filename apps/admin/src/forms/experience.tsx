@@ -1,5 +1,6 @@
 import { DeepKeys, DeepValue, useForm } from "@tanstack/react-form";
 import { useCallback, useMemo } from "react";
+import { useTranslation } from "react-i18next";
 import { toast } from "react-toastify";
 import z from "zod";
 import { DateRangeInput } from "@/components/inputs/date-range";
@@ -33,7 +34,6 @@ import {
   pickTranslation,
 } from "@/lib/i18n";
 import { isSlugTaken } from "@/lib/slug";
-import { useLocaleStore } from "@/stores/locale";
 import { CommonFormProps } from "./common";
 
 const experienceSchema = z.object({
@@ -157,7 +157,8 @@ export function ExperienceForm({
   const findManySkills = useFindManySkills();
   useQueryAllPages(findManySkills);
 
-  const locale = useLocaleStore((state) => state.locale);
+  const { i18n } = useTranslation();
+  const locale = i18n.language;
 
   const skillOptions = useMemo(
     () =>

@@ -1,5 +1,6 @@
 import { DeepKeys, DeepValue, useForm } from "@tanstack/react-form";
 import { useCallback, useMemo } from "react";
+import { useTranslation } from "react-i18next";
 import { toast } from "react-toastify";
 import z from "zod";
 import { DraggableList } from "@/components/inputs/draggable-list";
@@ -24,7 +25,6 @@ import { useFindManySkills } from "@/hooks/queries/skills";
 import { toDateInput, toIsoDate } from "@/lib/date";
 import { fieldError } from "@/lib/field-error";
 import { createEmptyI18n, i18nLabel, i18nLabelsByIds } from "@/lib/i18n";
-import { useLocaleStore } from "@/stores/locale";
 import { useSystemMessagesStore } from "@/stores/system-messages";
 import { CommonFormProps } from "./common";
 
@@ -141,7 +141,8 @@ export function ProfileForm({
   const atsSummarize = useAtsSummarize();
   const translate = useTranslate();
 
-  const locale = useLocaleStore((state) => state.locale);
+  const { i18n } = useTranslation();
+  const locale = i18n.language;
 
   const skillOptions = useMemo(
     () =>

@@ -1,5 +1,6 @@
 import { DeepKeys, DeepValue, useForm } from "@tanstack/react-form";
 import { useCallback, useMemo } from "react";
+import { useTranslation } from "react-i18next";
 import { toast } from "react-toastify";
 import z from "zod";
 import { FieldArray } from "@/components/inputs/field-array";
@@ -32,7 +33,6 @@ import {
   pickTranslation,
 } from "@/lib/i18n";
 import { isSlugTaken } from "@/lib/slug";
-import { useLocaleStore } from "@/stores/locale";
 import { CommonFormProps } from "./common";
 
 const courseSchema = z.object({
@@ -129,7 +129,8 @@ export function CourseForm({
   const findManySkills = useFindManySkills();
   useQueryAllPages(findManySkills);
 
-  const locale = useLocaleStore((state) => state.locale);
+  const { i18n } = useTranslation();
+  const locale = i18n.language;
 
   const skillOptions = useMemo(
     () =>
