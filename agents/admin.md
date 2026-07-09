@@ -42,14 +42,14 @@ Rich forms map flat Zod schemas to nested GraphQL shapes (`i18n`, `organizationI
 - **Zustand**: `stores/auth.ts`, `stores/theme.ts`, `stores/locale.ts` (persisted); `stores/system-messages.ts` (ephemeral header alerts via `setMessage` / `clearMessage` / `clearAllMessages` on every navigation — `router.subscribe('onResolved')` in `main.tsx`).
 - **TanStack Form + Zod**: `src/forms/`.
 - **Tailwind v4 + DaisyUI**: `src/styles/globals.css`.
-- **dayjs**: configured in `src/lib/dayjs.ts` (relative time, etc.).
+- **dayjs**: `src/lib/dayjs.ts` — relative time; locale synced from `useLocaleStore` (`syncDayjsLocale`).
 - **i18next**: `src/i18n/index.ts` (imported from `main.tsx`); namespaces `help`, `pages` in `src/locales/<locale>/`.
 - **Recharts**: shared chart styling in `src/lib/chart-theme.ts` (theme colors, tooltips, axis props).
 - **nuqs**: URL state via `NuqsAdapter` in `__root.tsx`.
 
 ## Module / directory breakdown
 
-- `src/lib/execute.ts`: GraphQL transport. `src/lib/api.ts`: REST transport (`getApiOrigin`, `apiRequest`). Other helpers: `gql.ts`, `tc.ts`, `cn.ts`, `parsers.ts`, `field-error.ts`, `chart-theme.ts`, `dayjs.ts`, `greeting.ts`, etc.
+- `src/lib/execute.ts`: GraphQL transport. `src/lib/api.ts`: REST transport (`getApiOrigin`, `apiRequest`). Other helpers: `gql.ts`, `tc.ts`, `cn.ts`, `parsers.ts`, `field-error.ts`, `chart-theme.ts`, `dayjs.ts`, `i18n.ts` (entity `pickTranslation` / `i18nLabel`), `greeting.ts`, etc.
 - `src/hooks/queries/` and `mutations/`: one file per entity; `graphql` tag must use static string literals (no interpolated fragments). Paginated list hooks use `hooks/custom/paginated-query.ts` helpers inside `useInfiniteQuery` — each helper receives an explicit key (`withPagination`: variables pagination key; `paginatedNextPageParam` / `paginatedSelect`: response field name).
 - `src/generated/graphql/`: codegen output — regenerate, do not edit.
 - `src/forms/`: entity forms + `*ToInput`/`*ToForm` mappers co-located.

@@ -174,7 +174,7 @@ Loaded via `--env-file .env.development` / `.env.production` and `ConfigModule`.
 
 Run from `apps/api/` or via root `api:*` aliases: `dev`, `prod`, `build`, `start`, `seed`, `test`, `test:coverage`, `test:e2e`, `typecheck`, `lint`, `format`.
 
-`npm run seed`: wipes profile collections and inserts faker dev data plus personas (`empty`, `lite`, `joao`, `maria`, `full`, `admin` @ `profile.info`, password `123123`). Deterministic via `faker.seed(20260702)`. Entry: `apps/api/seed/index.ts` (excluded from Nest build). GLOBAL catalog owned by admin; USER personas get LOCAL skills/orgs (first LOCAL row per persona forced `disabled` for picker QA). Logs fixed dev API tokens (`pi_…`) — send as `X-Api-Key` header. Full matrix: `apps/api/seed/README.md`.
+`npm run seed`: wipes profile collections and inserts faker dev data plus personas (`empty`, `lite`, `joao`, `maria`, `full`, `admin` @ `profile.info`, password `123123`). Deterministic via `initSeedFakers()` (`en` + `pt_BR` streams, `FAKER_SEED` in `constants.ts`). Entry: `apps/api/seed/index.ts` (excluded from Nest build). Entity `i18n` differs per locale (skills use locale-specific job titles). GLOBAL catalog owned by admin; USER personas get LOCAL skills/orgs (first LOCAL row per persona forced `disabled` for picker QA). Logs fixed dev API tokens (`pi_…`) — send as `X-Api-Key` header. Full matrix: `apps/api/seed/README.md`.
 
 - `GET /health`: Terminus health check with MongoDB ping.
 - Test layout: `test/fixtures/` (shared builders — import `@test/fixtures/…` from unit specs), `test/config/` (Jest e2e config, setup/teardown), `test/support/` (Nest bootstrap + `TestAppModule`), `test/e2e/`, `test/integration/`. Path aliases: `@/*` → `src/`, `@test/*` → `test/` (Jest + `tsconfig.json`).
