@@ -167,6 +167,7 @@ Loaded via `--env-file .env.development` / `.env.production` and `ConfigModule`.
 - `DATABASE_URL` (required): MongoDB URI.
 - `JWT_SECRET` (required): JWT signing secret.
 - `HOST` (optional, default `0.0.0.0`), `PORT` (optional, default `8080`).
+- `GRAPHQL_INTROSPECTION` (required, `true` | `false`): Apollo Sandbox schema introspection. Set `true` in development; `false` in production unless you explicitly want the public schema explorer.
 - `OPENROUTER_API_KEY`, `OPENROUTER_AI_MODELS`, `GITHUB_API_KEY`, `TAVILY_API_KEY` (required for the `ai-tools` module): read via `ConfigService`. `OPENROUTER_AI_MODELS` is a comma-separated list of model ids, tried in order; when one fails with a retryable error (503, overload, timeout, etc.), `OpenRouterService` tries the next.
 
 ## Scripts / commands
@@ -187,5 +188,5 @@ Run from `apps/api/` or via root `api:*` aliases: `dev`, `prod`, `build`, `start
 - New public GraphQL fields need `@Public()` or they 401.
 - Password is `select: false` and absent from `UserEntity`; never expose it in GraphQL.
 - DataLoaders exist only for skills and organizations today.
-- Startup log says "Playground" but `playground` is disabled; Apollo landing page is at `/graphql`.
+- Startup log says "Playground" but `playground` is disabled; Apollo landing page is at `/graphql`. Introspection follows `GRAPHQL_INTROSPECTION` in env.
 - `app.controller.ts` exposes REST `GET /` for health/e2e smoke test.

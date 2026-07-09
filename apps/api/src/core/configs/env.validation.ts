@@ -9,6 +9,9 @@ export const envSchema = z.object({
   NODE_ENV: z
     .enum(["development", "production", "test"])
     .default("development"),
+  GRAPHQL_INTROSPECTION: z
+    .enum(["true", "false"])
+    .transform((value) => value === "true"),
   OPENROUTER_API_KEY: z.string().min(1),
   OPENROUTER_AI_MODELS: z
     .string()

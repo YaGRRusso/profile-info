@@ -41,7 +41,7 @@ import "./loaders.registry";
           plugins: [ApolloServerPluginLandingPageLocalDefault()],
           autoSchemaFile:
             nodeEnv === "test" ? true : join(process.cwd(), "src/schema.gql"),
-          introspection: nodeEnv !== "production",
+          introspection: config.getOrThrow("GRAPHQL_INTROSPECTION"),
           sortSchema: true,
           playground: false,
           formatError: (
