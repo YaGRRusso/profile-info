@@ -34,6 +34,7 @@ import {
   pickTranslation,
 } from "@/lib/i18n";
 import { isSlugTaken } from "@/lib/slug";
+import { useLocaleStore } from "@/stores/locale";
 import { CommonFormProps } from "./common";
 
 const educationSchema = z.object({
@@ -152,14 +153,16 @@ export function EducationForm({
   const findManySkills = useFindManySkills();
   useQueryAllPages(findManySkills);
 
+  const locale = useLocaleStore((state) => state.locale);
+
   const skillOptions = useMemo(
     () =>
       (findManySkills.data?.nodes ?? []).map((skill) => ({
-        label: i18nLabel(skill),
+        label: i18nLabel(skill, locale),
         value: skill.id,
         disabled: skill.disabled,
       })),
-    [findManySkills.data?.nodes]
+    [locale, findManySkills.data?.nodes]
   );
 
   const organizationOptions = useMemo(

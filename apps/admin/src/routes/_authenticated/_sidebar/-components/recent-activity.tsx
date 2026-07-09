@@ -11,6 +11,7 @@ import { Link } from "@tanstack/react-router";
 import type { ReactNode } from "react";
 import type { DashboardActivityType } from "@/generated/graphql/graphql";
 import { formatRelativeTime } from "@/lib/dayjs";
+import { useLocaleStore } from "@/stores/locale";
 
 interface RecentActivityItem {
   label: string;
@@ -45,6 +46,7 @@ function formatActivityType(type: DashboardActivityType): string {
 }
 
 export function RecentActivity({ items }: RecentActivityProps) {
+  const locale = useLocaleStore((state) => state.locale);
   return (
     <section className="flex flex-col gap-4 rounded-box bg-base-200 p-4">
       <div className="flex items-center gap-2">
@@ -57,7 +59,7 @@ export function RecentActivity({ items }: RecentActivityProps) {
       ) : (
         <ul className="menu w-full rounded-box p-0">
           {items.map((item) => (
-            <li key={`${item.type}-${item.label}-${item.updatedAt}`}>
+            <li key={`${item.type}-${item.label}-${item.updatedAt}-${locale}`}>
               <Link to={ACTIVITY_ROUTES[item.type]}>
                 <div className="flex items-center justify-center rounded bg-primary/10 p-1 text-primary">
                   {ACTIVITY_ICONS[item.type]}

@@ -1,4 +1,5 @@
 import { LocaleEnum } from "@/consts/locales";
+import { useLocaleStore } from "@/stores/locale";
 
 export const DEFAULT_FORM_LOCALES = [
   LocaleEnum.PORTUGUESE,
@@ -36,8 +37,8 @@ interface I18nSource {
 
 export function i18nLabel(item: I18nSource, locale?: string): string {
   return (
-    pickTranslation(item.i18n, locale ?? LocaleEnum.ENGLISH)?.messages.title ??
-    item.slug
+    pickTranslation(item.i18n, locale ?? useLocaleStore.getState().locale)
+      ?.messages.title ?? item.slug
   );
 }
 

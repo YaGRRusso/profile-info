@@ -13,58 +13,63 @@ The admin **chrome** is mostly English. Two concerns must stay separate:
 
 | Concern | Examples | Mechanism |
 |---------|----------|-----------|
-| **Entity display** | Skill title in a table cell | `lib/i18n.ts` (`pickTranslation`, `i18nLabel`) |
+| **Entity display** | Skill title in a table cell or picker | `lib/i18n.ts` (`pickTranslation`, `i18nLabel`) |
 | **UI copy** | Page help, page/modal titles and descriptions | `react-i18next` + JSON under `src/locales/` |
 
-`i18nLabel` defaults to `"en"` when no locale is passed. Tables call it without a locale
-today, so translated skill names always follow English fallback order.
+`stores/locale.ts` (`useLocaleStore`) is the **single source of truth** for the active locale. It
+drives `i18nLabel` (default when no locale arg), `react-i18next`, and `dayjs` relative
+time (`lib/dayjs.ts` → `syncDayjsLocale`).
 
 ## Decision
 
 ### Display locale (Zustand — not i18next)
 
-- Persisted store `stores/display-locale.ts` (`LocaleEnum`, same as profile content / CV export).
+- Persisted store `stores/locale.ts` (`useLocaleStore`, `LocaleEnum` — same as profile content / CV export).
 - Sidebar switcher next to theme.
-- **Only** drives `i18nLabel` / `pickTranslation` where entity data is shown (v1: **tables**).
-- Does **not** translate table headers, filters, or buttons.
+- `setLocale` updates the store, `i18n.changeLanguage`, and `syncDayjsLocale`.
+- Drives entity labels via `i18nLabel` / `pickTranslation` (tables, pickers, modals).
+- Does **not** translate table headers, filters, form field labels, or buttons.
 
 ### UI strings (react-i18next)
 
 - `i18next` + `react-i18next`; init in `src/i18n/index.ts`, imported from `main.tsx`.
 - Namespaces (v1): `help`, `pages`.
-- `stores/display-locale.ts` is the **single source of truth**; `setLocale` also calls
-  `i18n.changeLanguage`.
 
-**In scope (incremental):**
+**In scope (shipped in phase 1):**
 
 | Area | Approach |
 |------|----------|
 | Page help | `help.json`; `usePageHelp(key)` |
 | Page / modal titles & descriptions | `pages.json`; `usePageCopy(key)` on CRUD + settings routes |
-| Entity fields in tables | Pass `displayLocale` into `i18nLabel` |
+| Entity i18n labels | `i18nLabel(item)` defaults to `useLocaleStore.getState().locale`; tables may pass locale explicitly |
+| Skill pickers in forms | `i18nLabel(skill, locale)` in options; `useLocaleStore` selector in `useMemo` deps |
+| Relative timestamps | `formatRelativeTime` via `dayjs` synced to display locale |
 
-**Explicitly out of scope (do not add without revisiting this ADR):**
+**Explicitly out of scope (backlog — do not add without revisiting this ADR):**
 
-- Forms: labels, inputs, placeholders, validation messages
+- Form chrome: field labels, placeholders, validation messages (non-picker)
 - Tables: column headers, filters, toolbar, enum labels in cells
-- Dashboard (stats, charts, recent activity, greeting)
+- Dashboard copy (stats, charts, greeting) — relative time only is localized
 - Buttons, selects, sidebar nav, login, toasts, alerts actions
+- Locale `es` in switcher / JSON (enum exists; not enabled in UI yet)
 - API / backend error messages and toasts (belong on API layer)
+- API recent-activity entity labels (`i18n[0]`) — optional API follow-up
 
 ## Phased delivery
 
-| Phase | Deliverable |
-|-------|-------------|
-| **1 — Foundation** | i18next setup, display locale store + switcher, `help` + `pages` namespaces (en + pt) |
-| **1 — Wiring** | `usePageHelp` / `usePageCopy` on entity pages + settings; `i18nLabel(..., displayLocale)` in tables |
-| **Later** | Forms pickers, dashboard, chrome, toasts — only after phase 1 is stable |
+| Phase | Deliverable | Status |
+|-------|-------------|--------|
+| **1 — Foundation** | i18next setup, display locale store + switcher, `help` + `pages` namespaces (en + pt) | Done |
+| **1 — Wiring** | `usePageHelp` / `usePageCopy` on entity pages + settings; `i18nLabel` + pickers + dayjs on display locale | Done |
+| **Later** | Form chrome, table chrome, dashboard copy, nav, toasts, `es` UI | Backlog |
 
 ## Where to look
 
 | Topic | Location |
 |-------|----------|
 | Entity translation pick | `src/lib/i18n.ts` |
-| Display locale | `src/stores/display-locale.ts` |
+| Display locale | `src/stores/locale.ts` (`useLocaleStore`) |
+| Relative time | `src/lib/dayjs.ts` (`syncDayjsLocale`) |
 | i18next init | `src/i18n/index.ts` |
 | Help keys | `src/consts/page-help.ts` (`PageHelpKey` only) |
 | Page copy hook | `src/hooks/custom/use-page-copy.ts` |
@@ -72,14 +77,15 @@ today, so translated skill names always follow English fallback order.
 ## Verification checklist
 
 1. Display locale persists across refresh.
-2. Skill labels in entity tables change when locale changes (no refetch).
+2. Skill labels in entity tables and pickers change when locale changes (no refetch).
 3. Page help modal shows `pt` text when locale is `pt`.
 4. CRUD page `PageTitle` and modal titles/descriptions show `pt` when locale is `pt`.
-5. Table headers / filters / buttons stay English.
-6. `lib/i18n.ts` stays free of UI string keys.
-7. No duplicate locale state on auth store.
+5. Dashboard `fromNow` strings follow display locale (e.g. `há 2 dias` in `pt`).
+6. Table headers / filters / form field labels stay English.
+7. `lib/i18n.ts` stays free of UI string keys.
+8. No duplicate locale state on auth store.
 
 ## Related
 
 - Content locales: `apps/api/src/common/i18n/locales.ts`
-- API recent-activity labels (`i18n[0]`) — optional follow-up, not admin UI i18n
+- Admin i18n backlog items also listed under **Deferred polish** in `apps/api/docs/BACKLOG.md`

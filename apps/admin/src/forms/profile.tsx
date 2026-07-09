@@ -24,6 +24,7 @@ import { useFindManySkills } from "@/hooks/queries/skills";
 import { toDateInput, toIsoDate } from "@/lib/date";
 import { fieldError } from "@/lib/field-error";
 import { createEmptyI18n, i18nLabel, i18nLabelsByIds } from "@/lib/i18n";
+import { useLocaleStore } from "@/stores/locale";
 import { useSystemMessagesStore } from "@/stores/system-messages";
 import { CommonFormProps } from "./common";
 
@@ -140,14 +141,16 @@ export function ProfileForm({
   const atsSummarize = useAtsSummarize();
   const translate = useTranslate();
 
+  const locale = useLocaleStore((state) => state.locale);
+
   const skillOptions = useMemo(
     () =>
       (findManySkills.data?.nodes ?? []).map((skill) => ({
-        label: i18nLabel(skill),
+        label: i18nLabel(skill, locale),
         value: skill.id,
         disabled: skill.disabled,
       })),
-    [findManySkills.data?.nodes]
+    [locale, findManySkills.data?.nodes]
   );
 
   const form = useForm({

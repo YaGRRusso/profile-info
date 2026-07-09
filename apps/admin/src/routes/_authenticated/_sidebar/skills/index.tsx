@@ -36,6 +36,7 @@ import {
 import { type SkillRow, useFindManySkills } from "@/hooks/queries/skills";
 import { cn } from "@/lib/cn";
 import { i18nLabel } from "@/lib/i18n";
+import { useLocaleStore } from "@/stores/locale";
 import { SkillsTable } from "./-components/table";
 
 export const Route = createFileRoute("/_authenticated/_sidebar/skills/")({
@@ -43,6 +44,7 @@ export const Route = createFileRoute("/_authenticated/_sidebar/skills/")({
 });
 
 function RouteComponent() {
+  const locale = useLocaleStore((state) => state.locale);
   const page = usePageCopy("skills");
   const help = usePageHelp("skills");
   const [formValues, setFormValues] =
@@ -323,7 +325,7 @@ function RouteComponent() {
         <ul className="flex flex-wrap items-center gap-1">
           {formValues?.customValues?.map((skill) => (
             <li className="badge badge-sm badge-soft" key={skill?.id}>
-              {skill ? i18nLabel(skill) : null}
+              {skill ? i18nLabel(skill, locale) : null}
             </li>
           ))}
         </ul>
@@ -354,7 +356,7 @@ function RouteComponent() {
         <ul className="flex flex-wrap items-center gap-1">
           {formValues?.customValues?.map((skill) => (
             <li className="badge badge-sm badge-soft" key={skill?.id}>
-              {skill ? i18nLabel(skill) : null}
+              {skill ? i18nLabel(skill, locale) : null}
             </li>
           ))}
         </ul>
@@ -385,7 +387,7 @@ function RouteComponent() {
         <ul className="flex flex-wrap items-center gap-1">
           {formValues?.customValues?.map((skill) => (
             <li className="badge badge-sm badge-soft" key={skill?.id}>
-              {skill ? i18nLabel(skill) : null}
+              {skill ? i18nLabel(skill, locale) : null}
             </li>
           ))}
         </ul>

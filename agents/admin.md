@@ -39,7 +39,7 @@ Rich forms map flat Zod schemas to nested GraphQL shapes (`i18n`, `organizationI
 - **TanStack Query**: hooks in `src/hooks/`.
 - **GraphQL Codegen**: `codegen.ts` → `src/generated/graphql/` from `../api/src/schema.gql`.
 - **GraphQL client**: `src/lib/execute.ts` (GraphQL POST). **REST client**: `src/lib/api.ts` (`getApiOrigin`, `apiRequest`). Binary saves use `src/lib/download-blob.ts` (`downloadBlob`).
-- **Zustand**: `stores/auth.ts`, `stores/theme.ts`, `stores/display-locale.ts` (persisted); `stores/system-messages.ts` (ephemeral header alerts via `setMessage` / `clearMessage` / `clearAllMessages` on every navigation — `router.subscribe('onResolved')` in `main.tsx`).
+- **Zustand**: `stores/auth.ts`, `stores/theme.ts`, `stores/locale.ts` (persisted); `stores/system-messages.ts` (ephemeral header alerts via `setMessage` / `clearMessage` / `clearAllMessages` on every navigation — `router.subscribe('onResolved')` in `main.tsx`).
 - **TanStack Form + Zod**: `src/forms/`.
 - **Tailwind v4 + DaisyUI**: `src/styles/globals.css`.
 - **dayjs**: configured in `src/lib/dayjs.ts` (relative time, etc.).
@@ -83,7 +83,7 @@ Keep `components/`, `hooks/custom/`, and `lib/` domain-agnostic.
 
 ## Gotchas & notes
 
-- **i18n (ADR 002):** Display locale (`stores/display-locale.ts`) drives `i18nLabel` in tables. UI copy via `react-i18next` (`help`, `pages` namespaces) for page help and titles/descriptions only. Forms, table chrome, dashboard, buttons, and toasts stay English until later phases. See `apps/admin/docs/adr/002-admin-i18n.md`.
+- **i18n (ADR 002):** `stores/locale.ts` (`useLocaleStore`) is the single locale source — drives `react-i18next`, `i18nLabel` (default via `useLocaleStore.getState().locale`), skill pickers, and `dayjs` relative time. UI copy (`help`, `pages`) covers page help and titles/descriptions. Form field labels, table chrome, dashboard copy, nav, and toasts stay English (backlog). See `apps/admin/docs/adr/002-admin-i18n.md`.
 - Codegen reads `../api/src/schema.gql` from disk; keep it up to date after API changes.
 - GraphQL Codegen `client` preset (v6+) defaults `enumType` to `string-literal` (union types) and leaves unmapped scalars as `unknown`. This admin relies on runtime enum values (`ExperienceCategory.FullTime`, `Object.values`, `z.enum`) — keep `codegen.ts` on `enumType: "enum"` and map `DateTime` → `string`.
 - Batch mutations (`createMany*`, `updateMany*`, `removeMany*`, `disableMany*`, `enableMany*`) return `BatchEntity { succeeded, failed }` — not `count` or entity arrays.

@@ -1,8 +1,8 @@
 import { LOCALES } from "@/consts/locales";
-import { useDisplayLocaleStore } from "@/stores/display-locale";
+import { useLocaleStore } from "@/stores/locale";
 
 export function LocaleSwitch() {
-  const { locale, setLocale } = useDisplayLocaleStore();
+  const { locale, setLocale } = useLocaleStore();
 
   return (
     <div className="join my-2 is-drawer-close:hidden w-full rounded">

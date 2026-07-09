@@ -34,7 +34,6 @@ import { EmptyValue } from "@/components/display/empty-value";
 import { PLACEHOLDERS } from "@/consts/placeholders";
 import { UserRole } from "@/generated/graphql/graphql";
 import { useActiveFilters } from "@/hooks/custom/use-active-filters";
-import { useDisplayLocale } from "@/hooks/custom/use-display-locale";
 import { usePersistedState } from "@/hooks/custom/use-persisted-state";
 import { useStableValue } from "@/hooks/custom/use-stable-value";
 import type { ProjectRow } from "@/hooks/queries/projects";
@@ -50,6 +49,7 @@ import {
 } from "@/lib/table-columns";
 import { dateRangeFilter, numberRangeFilter } from "@/lib/table-filters";
 import { useAuthStore } from "@/stores/auth";
+import { useLocaleStore } from "@/stores/locale";
 
 const debouncedUrlUpdates = { method: "debounce" as const, timeMs: 500 };
 const persistentOptions = { clearOnDefault: true, history: "push" as const };
@@ -96,7 +96,7 @@ function SortIcon({ sorted }: { sorted: false | "asc" | "desc" }) {
 }
 
 const getColumns = (
-  displayLocale: string,
+  locale: string,
   onEdit: (project: ProjectRow) => void,
   onDelete: (project: ProjectRow) => void,
   onView: (project: ProjectRow) => void
@@ -154,7 +154,7 @@ const getColumns = (
     ),
   }),
   columnHelper.accessor(
-    (row) => row.skills?.map((skill) => i18nLabel(skill, displayLocale)) ?? [],
+    (row) => row.skills?.map((skill) => i18nLabel(skill, locale)) ?? [],
     {
       id: "skills",
       header: "Skills",
@@ -251,7 +251,7 @@ export function ProjectsTable({
   onMultiView,
   onMultiDelete,
 }: ProjectsTableProps) {
-  const displayLocale = useDisplayLocale();
+  const locale = useLocaleStore((state) => state.locale);
   const userRole = useAuthStore((state) => state.user?.role);
   const [searchQuery, setSearchQuery] = useQueryState("query", queryParser);
   const [sort, setSort] = useQueryState("sort", sortParser);
@@ -309,8 +309,8 @@ export function ProjectsTable({
   };
 
   const columns = useMemo(
-    () => getColumns(displayLocale, onEdit, onDelete, onView),
-    [displayLocale, onEdit, onDelete, onView]
+    () => getColumns(locale, onEdit, onDelete, onView),
+    [locale, onEdit, onDelete, onView]
   );
 
   const table = useReactTable({
