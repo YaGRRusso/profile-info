@@ -1,4 +1,4 @@
-import { DeepKeys, DeepValue, useForm, useStore } from "@tanstack/react-form";
+import { DeepKeys, DeepValue, useForm } from "@tanstack/react-form";
 import { useCallback, useEffect, useMemo } from "react";
 import { toast } from "react-toastify";
 import z from "zod";
@@ -169,21 +169,30 @@ export function ProfileForm({
     validators: { onChange: profileSchema },
   });
 
-  const isDirty = useStore(form.store, (state) => state.isDirty);
   useEffect(() => {
     const { setMessage, clearMessage } = useSystemMessagesStore.getState();
 
-    if (isDirty) {
-      setMessage({
-        id: PROFILE_UNSAVED_MESSAGE_ID,
-        title: "You have unsaved changes",
-        variant: "warning",
-      });
-      return () => clearMessage(PROFILE_UNSAVED_MESSAGE_ID);
-    }
+    const sync = () => {
+      if (form.store.state.isDirty) {
+        setMessage({
+          id: PROFILE_UNSAVED_MESSAGE_ID,
+          title: "You have unsaved changes",
+          variant: "warning",
+        });
+        return;
+      }
 
-    clearMessage(PROFILE_UNSAVED_MESSAGE_ID);
-  }, [isDirty]);
+      clearMessage(PROFILE_UNSAVED_MESSAGE_ID);
+    };
+
+    sync();
+    const subscription = form.store.subscribe(sync);
+
+    return () => {
+      subscription.unsubscribe();
+      clearMessage(PROFILE_UNSAVED_MESSAGE_ID);
+    };
+  }, [form]);
 
   const handleAtsOptimize = useCallback(
     async <Field extends DeepKeys<ProfileSchema>>(

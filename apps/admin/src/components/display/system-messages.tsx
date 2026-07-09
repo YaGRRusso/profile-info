@@ -20,8 +20,7 @@ const BUTTON_VARIANT_CLASS: Record<SystemMessageVariant, string> = {
 };
 
 export function SystemMessages() {
-  const messages = useSystemMessagesStore((state) => state.messages);
-  const clearMessage = useSystemMessagesStore((state) => state.clearMessage);
+  const { messages, clearMessage } = useSystemMessagesStore();
   const items = Object.values(messages);
 
   if (!items.length) return null;
