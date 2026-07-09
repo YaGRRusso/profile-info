@@ -62,7 +62,7 @@ export function RecentActivity({ items }: RecentActivityProps) {
                 <div className="flex items-center justify-center rounded bg-primary/10 p-1 text-primary">
                   {ACTIVITY_ICONS[item.type]}
                 </div>
-                <div className="flex-1">
+                <div className="min-w-0 flex-1">
                   <span className="block truncate">{item.label}</span>
                   <span className="text-xs opacity-md">
                     {formatActivityType(item.type)}

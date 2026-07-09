@@ -139,7 +139,7 @@ function RouteComponent() {
           </label>
           <SystemMessages />
         </nav>
-        <main className="container">
+        <main className="container overflow-x-clip">
           <Outlet />
         </main>
       </div>
