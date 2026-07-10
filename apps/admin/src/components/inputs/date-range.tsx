@@ -1,4 +1,5 @@
 import { cn } from "@/lib/cn";
+import { InputLegend } from "./legend";
 
 export interface DateRangeValue {
   from: string;
@@ -24,7 +25,7 @@ export function DateRangeInput({
 }: DateRangeInputProps) {
   return (
     <fieldset className="fieldset">
-      {label && <legend className="fieldset-legend">{label}</legend>}
+      <InputLegend label={label} />
       <div className="flex flex-wrap items-center gap-2">
         <input
           aria-label="From"

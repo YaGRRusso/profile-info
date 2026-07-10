@@ -1,5 +1,6 @@
 import { type ComponentProps } from "react";
 import { cn } from "@/lib/cn";
+import { InputLegend } from "./legend";
 
 export interface SelectInputProps
   extends Omit<ComponentProps<"select">, "onChange" | "value"> {
@@ -25,7 +26,7 @@ export function SelectInput({
 
   return (
     <fieldset className="fieldset">
-      {label && <legend className="fieldset-legend">{label}</legend>}
+      <InputLegend label={label} />
       <select
         className={cn(
           "select w-full",

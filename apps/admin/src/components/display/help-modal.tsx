@@ -20,7 +20,10 @@ export function HelpModal({
     <>
       <button
         aria-label="help"
-        className={cn("btn btn-circle btn-ghost btn-sm shrink-0", className)}
+        className={cn(
+          "btn btn-circle btn-ghost btn-sm -mb-2 shrink-0",
+          className
+        )}
         onClick={() => setIsOpen(true)}
         type="button"
         {...props}

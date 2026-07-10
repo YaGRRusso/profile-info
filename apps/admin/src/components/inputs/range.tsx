@@ -1,5 +1,6 @@
 import { type ComponentProps, useMemo } from "react";
 import { cn } from "@/lib/cn";
+import { InputLegend } from "./legend";
 
 export interface RangeInputProps
   extends Omit<ComponentProps<"input">, "onChange" | "value"> {
@@ -39,7 +40,7 @@ export function RangeInput({
 
   return (
     <fieldset className="fieldset">
-      {label && <legend className="fieldset-legend">{label}</legend>}
+      <InputLegend label={label} />
       <input
         className={cn("range w-full", error && "range-error", className)}
         max={max}

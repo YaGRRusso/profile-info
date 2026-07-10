@@ -7,6 +7,7 @@ import {
 import { ComponentProps } from "react";
 import { RawSizeEnum } from "@/consts/raw-size";
 import { cn } from "@/lib/cn";
+import { InputLegend } from "./legend";
 
 export interface TextareaInputProps
   extends Omit<ComponentProps<"textarea">, "onChange" | "value"> {
@@ -32,7 +33,7 @@ export function TextareaInput({
 }: TextareaInputProps) {
   return (
     <fieldset className="fieldset">
-      {label && <legend className="fieldset-legend">{label}</legend>}
+      <InputLegend label={label} />
       <label
         className={cn(
           "textarea flex w-full cursor-text flex-col gap-2",

@@ -1,6 +1,7 @@
 import { CaretDownIcon, XIcon } from "@phosphor-icons/react";
 import { useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/cn";
+import { InputLegend } from "./legend";
 
 export interface MultiSelectInputProps {
   className?: string;
@@ -65,7 +66,7 @@ export function MultiSelectInput({
 
   return (
     <fieldset className="fieldset" disabled={disabled}>
-      {label && <legend className="fieldset-legend">{label}</legend>}
+      <InputLegend label={label} />
       <div className="relative w-full" ref={containerRef}>
         <label
           className={cn("input w-full", error && "input-error", className)}

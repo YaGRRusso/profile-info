@@ -1,5 +1,6 @@
 import { type ComponentProps } from "react";
 import { cn } from "@/lib/cn";
+import { InputLegend } from "./legend";
 
 export interface NumberInputProps
   extends Omit<ComponentProps<"input">, "onChange" | "value"> {
@@ -20,7 +21,7 @@ export function NumberInput({
 }: NumberInputProps) {
   return (
     <fieldset className="fieldset">
-      {label && <legend className="fieldset-legend">{label}</legend>}
+      <InputLegend label={label} />
       <input
         className={cn("input w-full", error && "input-error", className)}
         onChange={(event) => onChange?.(event.target.valueAsNumber)}
