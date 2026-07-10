@@ -50,6 +50,7 @@ import { i18nLabel } from "@/lib/i18n";
 import { parseAsShape } from "@/lib/parsers";
 import {
   canSeeColumn,
+  DEFAULT_META_COLUMN_VISIBILITY,
   getRestrictedVisibility,
   RestrictedColumns,
 } from "@/lib/table-columns";
@@ -329,7 +330,10 @@ export function EducationsTable({
 
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
   const [columnVisibility, setColumnVisibility] =
-    usePersistedState<VisibilityState>("educations-table-columns", {});
+    usePersistedState<VisibilityState>(
+      "educations-table-columns",
+      DEFAULT_META_COLUMN_VISIBILITY
+    );
 
   const stableRelevance = useStableValue(relevance);
   const columnFilters = useMemo<ColumnFiltersState>(() => {

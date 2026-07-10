@@ -1,6 +1,13 @@
 import { VisibilityState } from "@tanstack/react-table";
 import { UserRole } from "@/generated/graphql/graphql";
 
+export const DEFAULT_META_COLUMN_VISIBILITY: VisibilityState = {
+  id: false,
+  // slug: false,
+  createdAt: false,
+  updatedAt: false,
+};
+
 export type RestrictedColumns = Partial<Record<UserRole, string[]>>;
 
 export function canSeeColumn(

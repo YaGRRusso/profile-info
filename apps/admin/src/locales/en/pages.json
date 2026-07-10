@@ -15,7 +15,7 @@
     "emptyDescription": "Try refreshing the page or create a new {{entity}}."
   },
   "settings": {
-    "title": "Settings",
+    "title": "Profile",
     "description": "Manage your account details."
   },
   "home": {

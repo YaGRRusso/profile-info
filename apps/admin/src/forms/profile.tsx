@@ -169,7 +169,12 @@ export function ProfileForm({
       password: "",
       ...defaultValues,
     },
-    onSubmit: ({ value }) => onSubmit?.(value),
+    onSubmit: ({ value }) => {
+      onSubmit?.(value);
+      useSystemMessagesStore
+        .getState()
+        .clearMessage(PROFILE_UNSAVED_MESSAGE_ID);
+    },
     validators: { onChange: profileSchema },
     listeners: {
       onChange: ({ formApi }) => {

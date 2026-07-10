@@ -2,7 +2,6 @@ import {
   BriefcaseIcon,
   BuildingsIcon,
   CertificateIcon,
-  GearIcon,
   GraduationCapIcon,
   HouseIcon,
   KeyIcon,
@@ -10,6 +9,7 @@ import {
   PackageIcon,
   RocketLaunchIcon,
   SignOutIcon,
+  UserIcon,
 } from "@phosphor-icons/react";
 import { createFileRoute, Outlet } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
@@ -109,7 +109,7 @@ const MENU_SECTIONS: MenuSection[] = [
       },
       {
         id: "settings",
-        icon: <GearIcon size={24} />,
+        icon: <UserIcon size={24} />,
         to: "/settings",
         type: "link",
       },

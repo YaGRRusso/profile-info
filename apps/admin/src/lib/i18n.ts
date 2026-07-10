@@ -1,22 +1,34 @@
 import { LocaleEnum } from "@/consts/locales";
 import i18n from "@/i18n";
 
-export const DEFAULT_FORM_LOCALES = [
-  LocaleEnum.PORTUGUESE,
-  LocaleEnum.ENGLISH,
-] as const;
+const SUPPORTED_LOCALES = new Set<string>(Object.values(LocaleEnum));
+
+export function resolveActiveLocale(): LocaleEnum {
+  const language = i18n.language;
+  if (SUPPORTED_LOCALES.has(language)) {
+    return language as LocaleEnum;
+  }
+
+  const base = language.split("-")[0];
+  if (SUPPORTED_LOCALES.has(base)) {
+    return base as LocaleEnum;
+  }
+
+  return LocaleEnum.ENGLISH;
+}
 
 export function createEmptyI18n<T extends Record<string, string>>(template: T) {
-  return DEFAULT_FORM_LOCALES.map((locale) => ({
-    locale,
-    ...template,
-  }));
+  return [{ locale: resolveActiveLocale(), ...template }];
 }
 
 export function pickTranslation<T extends { locale: string }>(
   i18n: T[] | undefined,
   locale: string,
-  fallbacks: readonly string[] = DEFAULT_FORM_LOCALES
+  fallbacks: readonly string[] = [
+    LocaleEnum.ENGLISH,
+    LocaleEnum.PORTUGUESE,
+    LocaleEnum.SPANISH,
+  ]
 ): T | undefined {
   if (!i18n?.length) return;
 

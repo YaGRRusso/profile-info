@@ -38,6 +38,7 @@ import type { ApiTokenRow } from "@/hooks/queries/api-tokens";
 import { cn } from "@/lib/cn";
 import { getUniqueFacets } from "@/lib/facets";
 import { parseAsShape } from "@/lib/parsers";
+import { DEFAULT_META_COLUMN_VISIBILITY } from "@/lib/table-columns";
 import { dateRangeFilter } from "@/lib/table-filters";
 
 const debouncedUrlUpdates = { method: "debounce" as const, timeMs: 500 };
@@ -295,7 +296,10 @@ export function ApiTokensTable({
 
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
   const [columnVisibility, setColumnVisibility] =
-    usePersistedState<VisibilityState>("api-tokens-table-columns", {});
+    usePersistedState<VisibilityState>(
+      "api-tokens-table-columns",
+      DEFAULT_META_COLUMN_VISIBILITY
+    );
 
   const columnFilters = useMemo<ColumnFiltersState>(() => {
     const activeFilters: ColumnFiltersState = [];

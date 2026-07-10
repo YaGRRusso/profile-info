@@ -52,6 +52,7 @@ import { getUniqueFacets } from "@/lib/facets";
 import { parseAsShape } from "@/lib/parsers";
 import {
   canSeeColumn,
+  DEFAULT_META_COLUMN_VISIBILITY,
   getRestrictedVisibility,
   type RestrictedColumns,
 } from "@/lib/table-columns";
@@ -360,7 +361,10 @@ export function OrganizationsTable({
 
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
   const [columnVisibility, setColumnVisibility] =
-    usePersistedState<VisibilityState>("organizations-table-columns", {});
+    usePersistedState<VisibilityState>(
+      "organizations-table-columns",
+      DEFAULT_META_COLUMN_VISIBILITY
+    );
 
   const columnFilters = useMemo<ColumnFiltersState>(() => {
     const activeFilters: ColumnFiltersState = [];

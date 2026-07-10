@@ -30,7 +30,7 @@ Routing:
 - `_authenticated/_sidebar/`: CRUD pages per entity with `-components/table.tsx`.
 - `settings/index.tsx`: inline profile form via `useGetMe()` + `useUpdateMe()` (`updateMe` mutation); syncs auth store after save.
 
-Rich forms map flat Zod schemas to nested GraphQL shapes (`i18n`, `organizationId`, `skillIds`, `period`, experience `roles`). GraphQL output still exposes resolved `organization` and `skills` objects. Profile settings uses `forms/profile.tsx` (`profileToForm` / `profileToInput`) with `skillIds` via `MultiSelectInput` + `DraggableList` for display order. ATS on profile description uses the form's skill list (`i18nLabelsByIds`), not the global catalog. Unsaved header alert: TanStack Form `listeners.onChange` → `system-messages` store (do not use `useStore` + `useEffect([isDirty])` on the form — it re-renders during input and steals focus). `form.reset()` does not fire `onChange` — clear the message in the Reset button handler.
+Rich forms map flat Zod schemas to nested GraphQL shapes (`i18n`, `organizationId`, `skillIds`, `period`, experience `roles`). GraphQL output still exposes resolved `organization` and `skills` objects. Profile settings uses `forms/profile.tsx` (`profileToForm` / `profileToInput`) with `skillIds` via `MultiSelectInput` + `DraggableList` for display order. ATS on profile description uses the form's skill list (`i18nLabelsByIds`), not the global catalog. Unsaved header alert: TanStack Form `listeners.onChange` → `system-messages` store (do not use `useStore` + `useEffect([isDirty])` on the form — it re-renders during input and steals focus). `form.reset()` does not fire `onChange` — clear the message in the Reset button handler; clear on successful submit in `onSubmit` as well.
 
 ## Core technologies
 
@@ -83,7 +83,8 @@ Keep `components/`, `hooks/custom/`, and `lib/` domain-agnostic.
 
 ## Gotchas & notes
 
-- **i18n (ADR 002):** `i18next` is the single locale source (`i18n.changeLanguage` / `i18n.language`) — drives UI copy (`help`, `nav`, `pages`), `i18nLabel`, skill pickers, and `dayjs` relative time. Form field labels, table chrome, dashboard widgets, login, and toasts stay English (backlog). See `apps/admin/docs/adr/002-admin-i18n.md`.
+- **i18n (ADR 002):** `i18next` is the single locale source (`i18n.changeLanguage` / `i18n.language`) — drives UI copy (`help`, `nav`, `pages`), `i18nLabel`, skill pickers, and `dayjs` relative time. Create forms initialize `i18n` with one entry via `createEmptyI18n` using the active UI locale (`resolveActiveLocale`), not PT+EN by default. Form field labels, table chrome, dashboard widgets, login, and toasts stay English (backlog). See `apps/admin/docs/adr/002-admin-i18n.md`.
+- Catalog list tables hide meta columns by default (`id`, `slug`, `createdAt`, `updatedAt`) via `DEFAULT_META_COLUMN_VISIBILITY` in `lib/table-columns.ts` + `usePersistedState`; users can toggle visibility in the table gear menu.
 - Codegen reads `../api/src/schema.gql` from disk; keep it up to date after API changes.
 - GraphQL Codegen `client` preset (v6+) defaults `enumType` to `string-literal` (union types) and leaves unmapped scalars as `unknown`. This admin relies on runtime enum values (`ExperienceCategory.FullTime`, `Object.values`, `z.enum`) — keep `codegen.ts` on `enumType: "enum"` and map `DateTime` → `string`.
 - Batch mutations (`createMany*`, `updateMany*`, `removeMany*`, `disableMany*`, `enableMany*`) return `BatchEntity { succeeded, failed }` — not `count` or entity arrays.
