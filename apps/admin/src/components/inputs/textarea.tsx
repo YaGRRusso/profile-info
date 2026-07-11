@@ -16,6 +16,7 @@ export interface TextareaInputProps
   onChange?: (value: string) => void;
   onOptimize?: () => void;
   onTranslate?: () => void;
+  tooltip?: string;
   value?: string;
 }
 
@@ -27,13 +28,14 @@ export function TextareaInput({
   onTranslate,
   placeholder,
   label,
+  tooltip,
   disabled,
   value,
   ...props
 }: TextareaInputProps) {
   return (
     <fieldset className="fieldset">
-      <InputLegend label={label} />
+      <InputLegend label={label} tooltip={tooltip} />
       <label
         className={cn(
           "textarea flex w-full cursor-text flex-col gap-2",

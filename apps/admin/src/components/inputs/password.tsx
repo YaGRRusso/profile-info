@@ -8,6 +8,7 @@ export interface PasswordInputProps
   error?: string;
   label?: string;
   onChange?: (value: string) => void;
+  tooltip?: string;
   value?: string;
 }
 
@@ -17,6 +18,7 @@ export function PasswordInput({
   onChange,
   placeholder,
   label,
+  tooltip,
   value,
   ...props
 }: PasswordInputProps) {
@@ -24,7 +26,7 @@ export function PasswordInput({
 
   return (
     <fieldset className="fieldset">
-      <InputLegend label={label} />
+      <InputLegend label={label} tooltip={tooltip} />
       <label className={cn("input w-full", error && "input-error", className)}>
         <input
           onChange={(event) => onChange?.(event.target.value)}

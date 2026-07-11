@@ -9,6 +9,7 @@ export interface SelectInputProps
   onChange?: (value: string) => void;
   options: { disabled?: boolean; label: string; value: string }[];
   placeholder?: string;
+  tooltip?: string;
   value?: string;
 }
 
@@ -19,6 +20,7 @@ export function SelectInput({
   options,
   label,
   placeholder,
+  tooltip,
   value,
   ...props
 }: SelectInputProps) {
@@ -26,7 +28,7 @@ export function SelectInput({
 
   return (
     <fieldset className="fieldset">
-      <InputLegend label={label} />
+      <InputLegend label={label} tooltip={tooltip} />
       <select
         className={cn(
           "select w-full",

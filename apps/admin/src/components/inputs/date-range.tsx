@@ -12,6 +12,7 @@ export interface DateRangeInputProps {
   error?: string;
   label?: string;
   onChange?: (value: DateRangeValue) => void;
+  tooltip?: string;
   value?: DateRangeValue;
 }
 
@@ -21,11 +22,12 @@ export function DateRangeInput({
   error,
   onChange,
   label,
+  tooltip,
   value,
 }: DateRangeInputProps) {
   return (
     <fieldset className="fieldset">
-      <InputLegend label={label} />
+      <InputLegend label={label} tooltip={tooltip} />
       <div className="flex flex-wrap items-center gap-2">
         <input
           aria-label="From"

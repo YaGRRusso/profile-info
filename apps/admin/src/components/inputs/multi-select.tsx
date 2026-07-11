@@ -13,6 +13,7 @@ export interface MultiSelectInputProps {
   options: { disabled?: boolean; label: string; value: string }[];
   placeholder?: string;
   showSelected?: boolean;
+  tooltip?: string;
   value?: string[];
 }
 
@@ -24,6 +25,7 @@ export function MultiSelectInput({
   onChange,
   options,
   placeholder,
+  tooltip,
   value = [],
   maxSelected = 50,
   showSelected = true,
@@ -66,7 +68,7 @@ export function MultiSelectInput({
 
   return (
     <fieldset className="fieldset" disabled={disabled}>
-      <InputLegend label={label} />
+      <InputLegend label={label} tooltip={tooltip} />
       <div className="relative w-full" ref={containerRef}>
         <label
           className={cn("input w-full", error && "input-error", className)}

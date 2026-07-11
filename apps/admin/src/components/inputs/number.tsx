@@ -7,6 +7,7 @@ export interface NumberInputProps
   error?: string;
   label?: string;
   onChange?: (value: number) => void;
+  tooltip?: string;
   value?: number;
 }
 
@@ -16,12 +17,13 @@ export function NumberInput({
   onChange,
   label,
   placeholder,
+  tooltip,
   value,
   ...props
 }: NumberInputProps) {
   return (
     <fieldset className="fieldset">
-      <InputLegend label={label} />
+      <InputLegend label={label} tooltip={tooltip} />
       <input
         className={cn("input w-full", error && "input-error", className)}
         onChange={(event) => onChange?.(event.target.valueAsNumber)}

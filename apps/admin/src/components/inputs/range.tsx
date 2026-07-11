@@ -8,6 +8,7 @@ export interface RangeInputProps
   label?: string;
   onChange?: (value: number) => void;
   ruler?: boolean;
+  tooltip?: string;
   value?: number;
 }
 
@@ -21,6 +22,7 @@ export function RangeInput({
   placeholder,
   label,
   ruler,
+  tooltip,
   value,
   ...props
 }: RangeInputProps) {
@@ -40,7 +42,7 @@ export function RangeInput({
 
   return (
     <fieldset className="fieldset">
-      <InputLegend label={label} />
+      <InputLegend label={label} tooltip={tooltip} />
       <input
         className={cn("range w-full", error && "range-error", className)}
         max={max}
