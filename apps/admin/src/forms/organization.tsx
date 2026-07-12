@@ -28,10 +28,7 @@ import { isSlugTaken } from "@/lib/slug";
 import { CommonFormProps } from "./common";
 
 const organizationSchema = z.object({
-  slug: z
-    .string()
-    .min(1, FormError.requiredField)
-    .regex(SLUG_REGEX, FormError.invalidFormat),
+  slug: z.string().regex(SLUG_REGEX, FormError.invalidFormat).or(z.literal("")),
   name: z.string().min(1, FormError.requiredField),
   category: z.enum(OrganizationCategory, FormError.requiredField),
   logo: z.union([z.url(FormError.invalidFormat), z.literal("")]),
@@ -59,7 +56,7 @@ export function organizationToInput(
 ): CreateOrganizationInput {
   return {
     name: data.name,
-    slug: data.slug,
+    slug: data.slug || undefined,
     category: data.category,
     logo: data.logo,
     website: data.website,
@@ -77,7 +74,7 @@ export function organizationToForm(
 ): Partial<OrganizationSchema> {
   return {
     name: organization.name,
-    slug: organization.slug,
+    slug: organization.slug ?? "",
     category: organization.category,
     logo: organization.logo ?? "",
     website: organization.website ?? "",

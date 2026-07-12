@@ -44,13 +44,14 @@ export function pickTranslation<T extends { locale: string }>(
 
 interface I18nSource {
   i18n?: Array<{ locale: string; messages: { title: string } }>;
-  slug: string;
+  slug?: string | null;
 }
 
 export function i18nLabel(item: I18nSource, locale?: string): string {
   return (
     pickTranslation(item.i18n, locale ?? i18n.language)?.messages.title ??
-    item.slug
+    item.slug ??
+    ""
   );
 }
 

@@ -50,10 +50,7 @@ const roleI18nSchema = z
   .refine(hasUniqueLocales, { message: FormError.uniqueField });
 
 const experienceSchema = z.object({
-  slug: z
-    .string()
-    .min(1, FormError.requiredField)
-    .regex(SLUG_REGEX, FormError.invalidFormat),
+  slug: z.string().regex(SLUG_REGEX, FormError.invalidFormat).or(z.literal("")),
   organizationId: z.string().min(1, FormError.requiredField),
   category: z.enum(ExperienceCategory, FormError.requiredField),
   relevance: z.number().min(1, FormError.minValue),
@@ -83,7 +80,7 @@ export function experienceToInput(
   data: ExperienceSchema
 ): CreateExperienceInput {
   return {
-    slug: data.slug,
+    slug: data.slug || undefined,
     organizationId: data.organizationId,
     category: data.category,
     relevance: data.relevance,
@@ -108,7 +105,7 @@ export function experienceToForm(
   experience: ExperienceRow
 ): Partial<ExperienceSchema> {
   return {
-    slug: experience.slug,
+    slug: experience.slug ?? "",
     organizationId: experience.organization?.id ?? "",
     category: experience.category,
     relevance: experience.relevance,

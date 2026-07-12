@@ -30,10 +30,7 @@ import { isSlugTaken } from "@/lib/slug";
 import { CommonFormProps } from "./common";
 
 const projectSchema = z.object({
-  slug: z
-    .string()
-    .min(1, FormError.requiredField)
-    .regex(SLUG_REGEX, FormError.invalidFormat),
+  slug: z.string().regex(SLUG_REGEX, FormError.invalidFormat).or(z.literal("")),
   relevance: z.number().min(1, FormError.minValue),
   skillIds: z.array(z.string()),
   images: z.array(z.url(FormError.invalidFormat)),
@@ -63,7 +60,7 @@ export interface ProjectFormProps extends CommonFormProps<ProjectSchema> {
 
 export function projectToInput(data: ProjectSchema): CreateProjectInput {
   return {
-    slug: data.slug,
+    slug: data.slug || undefined,
     relevance: data.relevance,
     skillIds: data.skillIds.length ? data.skillIds : undefined,
     images: data.images.length ? data.images : undefined,
@@ -80,7 +77,7 @@ export function projectToInput(data: ProjectSchema): CreateProjectInput {
 
 export function projectToForm(project: ProjectRow): Partial<ProjectSchema> {
   return {
-    slug: project.slug,
+    slug: project.slug ?? "",
     relevance: project.relevance,
     skillIds: (project.skills ?? []).map((skill) => skill.id),
     images: project.images ?? [],

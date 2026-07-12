@@ -40,10 +40,7 @@ import { isSlugTaken } from "@/lib/slug";
 import { CommonFormProps } from "./common";
 
 const educationSchema = z.object({
-  slug: z
-    .string()
-    .min(1, FormError.requiredField)
-    .regex(SLUG_REGEX, FormError.invalidFormat),
+  slug: z.string().regex(SLUG_REGEX, FormError.invalidFormat).or(z.literal("")),
   organizationId: z.string().min(1, FormError.requiredField),
   level: z.enum(EducationLevel, FormError.requiredField),
   status: z.enum(EducationStatus, FormError.requiredField),
@@ -81,7 +78,7 @@ export function educationToInput(data: EducationSchema): CreateEducationInput {
       : undefined;
 
   return {
-    slug: data.slug,
+    slug: data.slug || undefined,
     organizationId: data.organizationId,
     level: data.level,
     status: data.status,
@@ -104,7 +101,7 @@ export function educationToForm(
   education: EducationRow
 ): Partial<EducationSchema> {
   return {
-    slug: education.slug,
+    slug: education.slug ?? "",
     organizationId: education.organization?.id ?? "",
     level: education.level,
     status: education.status,

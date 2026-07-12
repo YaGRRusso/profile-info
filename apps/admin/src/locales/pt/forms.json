@@ -3,7 +3,7 @@
     "slug": {
       "label": "Slug",
       "placeholder": "ex.: meu-slug",
-      "tooltip": "Identificador único para URLs. Use apenas letras minúsculas, números e hífens."
+      "tooltip": "Identificador opcional para URLs. Use apenas letras minúsculas, números e hífens quando preenchido."
     },
     "email": {
       "label": "E-mail",

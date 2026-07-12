@@ -38,10 +38,7 @@ import { isSlugTaken } from "@/lib/slug";
 import { CommonFormProps } from "./common";
 
 const courseSchema = z.object({
-  slug: z
-    .string()
-    .min(1, FormError.requiredField)
-    .regex(SLUG_REGEX, FormError.invalidFormat),
+  slug: z.string().regex(SLUG_REGEX, FormError.invalidFormat).or(z.literal("")),
   organizationId: z.string().min(1, FormError.requiredField),
   status: z.enum(CourseStatus, FormError.requiredField),
   relevance: z.number().min(1, FormError.minValue),
@@ -69,7 +66,7 @@ export interface CourseFormProps extends CommonFormProps<CourseSchema> {
 
 export function courseToInput(data: CourseSchema): CreateCourseInput {
   return {
-    slug: data.slug,
+    slug: data.slug || undefined,
     organizationId: data.organizationId,
     status: data.status,
     relevance: data.relevance,
@@ -89,7 +86,7 @@ export function courseToInput(data: CourseSchema): CreateCourseInput {
 
 export function courseToForm(course: CourseRow): Partial<CourseSchema> {
   return {
-    slug: course.slug,
+    slug: course.slug ?? "",
     organizationId: course.organization?.id ?? "",
     status: course.status,
     relevance: course.relevance,

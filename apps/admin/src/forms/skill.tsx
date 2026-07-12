@@ -17,10 +17,7 @@ import { isSlugTaken } from "@/lib/slug";
 import { CommonFormProps } from "./common";
 
 const skillSchema = z.object({
-  slug: z
-    .string()
-    .min(1, FormError.requiredField)
-    .regex(SLUG_REGEX, FormError.invalidFormat),
+  slug: z.string().regex(SLUG_REGEX, FormError.invalidFormat).or(z.literal("")),
   category: z.string(),
   i18n: z
     .array(
@@ -41,7 +38,7 @@ export interface SkillFormProps extends CommonFormProps<SkillSchema> {
 
 export function skillToInput(data: SkillSchema): CreateSkillInput {
   return {
-    slug: data.slug,
+    slug: data.slug || undefined,
     category: data.category || undefined,
     i18n: data.i18n.map((translation) => ({
       locale: translation.locale,
@@ -52,7 +49,7 @@ export function skillToInput(data: SkillSchema): CreateSkillInput {
 
 export function skillToForm(skill: SkillRow): Partial<SkillSchema> {
   return {
-    slug: skill.slug,
+    slug: skill.slug ?? "",
     category: skill.category ?? "",
     i18n: skill.i18n.map((translation) => ({
       locale: translation.locale,

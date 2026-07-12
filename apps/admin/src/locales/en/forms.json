@@ -3,7 +3,7 @@
     "slug": {
       "label": "Slug",
       "placeholder": "e.g. my-slug",
-      "tooltip": "Unique URL-friendly identifier. Use lowercase letters, numbers, and hyphens only."
+      "tooltip": "Optional URL-friendly identifier. Use lowercase letters, numbers, and hyphens only when set."
     },
     "email": {
       "label": "Email",
