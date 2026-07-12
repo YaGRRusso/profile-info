@@ -1,5 +1,6 @@
 import { XIcon } from "@phosphor-icons/react";
 import { ComponentProps, ReactNode } from "react";
+import { useTranslation } from "react-i18next";
 import { cn } from "@/lib/cn";
 
 interface ActionProps extends ComponentProps<"button"> {
@@ -25,6 +26,8 @@ export function Modal({
   actions,
   ...props
 }: ModalProps) {
+  const { t: tAction } = useTranslation("actions");
+
   return (
     isOpen && (
       <dialog
@@ -64,7 +67,7 @@ export function Modal({
           </div>
         </div>
         <button className="modal-backdrop" onClick={onClose} type="button">
-          close
+          {tAction("close")}
         </button>
       </dialog>
     )

@@ -29,31 +29,70 @@ It drives UI strings, `i18nLabel` (via `i18n.language`), and `dayjs` (`languageC
 - Sidebar switcher calls `i18n.changeLanguage`.
 - Detection: `localStorage` only (no browser-language auto-pick); `fallbackLng` = `en`.
 - Drives entity labels via `i18nLabel` / `pickTranslation` (tables, pickers, modals).
-- Does **not** translate table headers, filters, form field labels, or buttons.
+- Does **not** translate table column headers, filters, or form field labels.
 
 ### UI strings (react-i18next)
 
-- Namespaces (v1): `help`, `nav`, `pages`.
+- Namespaces: `help`, `nav`, `pages`, `actions`, `alerts`, `dashboard`, `login`.
 
-**In scope (shipped in phase 1):**
+#### `useTranslation` aliases (always prefixed — never bare `t`)
+
+| Context | Hooks (fixed order) | Example call |
+|---------|---------------------|--------------|
+| CRUD route | `tAction`, `tAlert`, `tPage`, `tHelp` | `tPage("courses.manageTitle")` |
+| CRUD route + `i18nLabel` in modals | above, then `i18n` / `locale` | `i18nLabel(skill, locale)` |
+| Settings / home route | `tPage`, `tHelp`, `tAlert` (omit unused) | `tPage("settings.title")` |
+| Table toolbar | `tAction` only | `tAction("clearAll")` |
+| Table + `i18nLabel` in cells | `tAction`, then `i18n` / `locale` | `i18nLabel(skill, locale)` |
+| Actions chrome (modal backdrop, download CV, profile save) | `tAction` | `tAction("close")` |
+| Sidebar nav | `tNav` | `tNav("skills")` |
+| Dashboard widgets | `tDashboard` | `tDashboard("stats.skills")` |
+| Login page | `tLogin` | `tLogin("title")` |
+
+Omit hooks the file does not use. Never build keys dynamically (`t(\`stats.${key}\`)`, `t(item.id)`).
+
+#### Copy in JSX
+
+Literal keys at the call site: `tPage("settings.summary.phone")`, `label={tDashboard("stats.skills")}`. Each item gets its own explicit key — passing the resolved string as a `label`/`title` prop is fine.
+
+**Do not** pass **generic** translation keys through props into shared components (e.g. `countLabel={tDashboard("charts.count")}` on a reusable chart). If a shared component needs generic copy (`charts.count`, `close`, …), it calls `useTranslation` for that key internally.
+
+Never build keys dynamically (`t(\`stats.${key}\`)`, `t(item.id)`). Dynamic lists keyed by enum: `switch` with one explicit `href` / `icon` / `t("literal.key")` per case (same spirit as unrolled `MetricCard`s in `dashboard-stats`).
+
+#### Post-mutation close (CRUD routes)
+
+- `closeForm` — `setFormValues(undefined)` only; use when mutation hooks invalidate list queries (`skills`, `organizations`).
+- `closeAndRefetch` — close + `findMany*.refetch()`; use when mutations do not invalidate yet (`courses`, `experiences`, …). Prefer adding `invalidateQueries` to mutations and converging on `closeForm` when touching that layer.
+
+**In scope (phase 1):**
 
 | Area | Approach |
 |------|----------|
-| Page help | `help.json`; `usePageHelp(key)` |
+| Page help | `help.json`; `useTranslation("help")` directly in routes |
 | Sidebar nav | `nav.json`; `useTranslation("nav")` in `_sidebar.tsx` |
-| Page / modal titles & descriptions | `pages.json`; `usePageCopy(key)` on CRUD routes; `useTranslation("pages")` for home/settings titles |
+| Page / modal titles & descriptions | `pages.json`; `useTranslation("pages")` directly in routes |
 | Entity i18n labels | `i18nLabel(item)` defaults to `i18n.language`; tables may pass locale explicitly |
 | Skill pickers in forms | `i18nLabel(skill, locale)` in options; `i18n.language` in `useMemo` deps |
 | Relative timestamps | `formatRelativeTime` via `dayjs` synced on `languageChanged` |
 
+**In scope (phase 2):**
+
+| Area | Approach |
+|------|----------|
+| Shared actions | `actions.json`; `useTranslation("actions")` — Cancel, Confirm, Close, Copy token, Download CV, Save changes, table toolbar labels |
+| Page / modal buttons | `pages.json` `newButton` per entity; modal actions via `useTranslation("actions")` on CRUD routes |
+| Success toasts (front) | `alerts.json`; `useTranslation("alerts")` + `toast` on route `onSuccess` |
+| Dashboard widgets | `dashboard.json`; stats, charts, profile completeness, recent activity |
+| Login chrome | `login.json` — title/subtitle only (not `UserForm`) |
+| Table toolbar buttons | `useTranslation("actions")` in `*-components/table.tsx` |
+
 **Explicitly out of scope (backlog — do not add without revisiting this ADR):**
 
 - Form chrome: field labels, placeholders, validation messages (non-picker)
-- Tables: column headers, filters, toolbar, enum labels in cells
-- Dashboard widgets (stats, charts, greeting inside cards) — page title/description localized; relative time only elsewhere
-- Buttons, selects, login, toasts, alerts actions
+- System header alerts (e.g. profile unsaved changes)
+- Tables: column headers, filters, facet dropdowns, enum labels in cells
 - Locale `es` in switcher / JSON (enum exists; not enabled in UI yet)
-- API / backend error messages and toasts (belong on API layer)
+- API / backend error messages and toasts (`main.tsx` `toast.error(error.message)`)
 - API recent-activity entity labels (`i18n[0]`) — optional API follow-up
 
 ## Phased delivery
@@ -62,7 +101,8 @@ It drives UI strings, `i18nLabel` (via `i18n.language`), and `dayjs` (`languageC
 |-------|-------------|--------|
 | **1 — Foundation** | i18next setup, locale switcher, `help` + `nav` + `pages` namespaces (en + pt) | Done |
 | **1 — Wiring** | Page copy, sidebar nav, `i18nLabel` + pickers + dayjs on active locale | Done |
-| **Later** | Form chrome, table chrome, dashboard widgets, login, toasts, `es` UI | Backlog |
+| **2 — Chrome (non-form)** | `actions`, `alerts`, `dashboard`, `login`; shared buttons, toasts, table toolbar, dashboard widgets | Done |
+| **Later** | Form chrome, table columns/filters, `es` UI | Backlog |
 
 ## Where to look
 
@@ -71,8 +111,7 @@ It drives UI strings, `i18nLabel` (via `i18n.language`), and `dayjs` (`languageC
 | Entity translation pick | `src/lib/i18n.ts` |
 | Locale init + persistence | `src/i18n/index.ts` |
 | Relative time | `src/lib/dayjs.ts` (`syncDayjsLocale`) |
-| Help keys | `src/consts/page-help.ts` (`PageHelpKey` only) |
-| Page copy hook | `src/hooks/custom/use-page-copy.ts` |
+| Help content type | `src/consts/page-help.ts` (`PageHelpContent` interface) |
 
 ## Verification checklist
 
@@ -82,9 +121,12 @@ It drives UI strings, `i18nLabel` (via `i18n.language`), and `dayjs` (`languageC
 4. CRUD page `PageTitle` and modal titles/descriptions show `pt` when locale is `pt`.
 5. Sidebar nav labels show `pt` when locale is `pt`.
 6. Dashboard `fromNow` strings follow display locale (e.g. `há 2 dias` in `pt`).
-7. Table headers / filters / form field labels stay English.
-8. `lib/i18n.ts` stays free of UI string keys.
-9. No duplicate locale state on auth store.
+7. CRUD page buttons, modal actions, and success toasts show `pt` when locale is `pt`.
+8. Dashboard stats/charts/recent activity and login title show `pt` when locale is `pt`.
+9. Table toolbar buttons (`Update selected`, `clear all`, etc.) show `pt`; column headers and filters stay English.
+10. Table headers / filters / form field labels stay English.
+11. `lib/i18n.ts` stays free of UI string keys.
+12. No duplicate locale state on auth store.
 
 ## Related
 

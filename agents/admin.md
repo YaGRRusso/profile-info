@@ -43,7 +43,7 @@ Rich forms map flat Zod schemas to nested GraphQL shapes (`i18n`, `organizationI
 - **TanStack Form + Zod**: `src/forms/`.
 - **Tailwind v4 + DaisyUI**: `src/styles/globals.css`.
 - **dayjs**: `src/lib/dayjs.ts` — relative time; locale synced from `i18n` (`languageChanged` → `syncDayjsLocale`).
-- **i18next**: `src/i18n/index.ts` (imported from `main.tsx`; `i18next-browser-languagedetector` + `localStorage`); namespaces `help`, `nav`, `pages` in `src/locales/<locale>/`.
+- **i18next**: `src/i18n/index.ts`; namespaces in `src/locales/<locale>/`. Prefixed aliases (`tPage`, `tAction`, `tNav`, …). Explicit literal keys per call site; generic keys (e.g. `charts.count`) live inside the shared component — not passed as props. See ADR 002.
 - **Recharts**: shared chart styling in `src/lib/chart-theme.ts` (theme colors, tooltips, axis props).
 - **nuqs**: URL state via `NuqsAdapter` in `__root.tsx`.
 
@@ -83,7 +83,7 @@ Keep `components/`, `hooks/custom/`, and `lib/` domain-agnostic.
 
 ## Gotchas & notes
 
-- **i18n (ADR 002):** `i18next` is the single locale source (`i18n.changeLanguage` / `i18n.language`) — drives UI copy (`help`, `nav`, `pages`), `i18nLabel`, skill pickers, and `dayjs` relative time. Create forms initialize `i18n` with one entry via `createEmptyI18n` using the active UI locale (`resolveActiveLocale`), not PT+EN by default. Form field labels, table chrome, dashboard widgets, login, and toasts stay English (backlog). See `apps/admin/docs/adr/002-admin-i18n.md`.
+- **i18n (ADR 002):** `i18next` is the single locale source (`i18n.changeLanguage` / `i18n.language`) — drives UI copy (`help`, `nav`, `pages`, `actions`, `alerts`, `dashboard`, `login`), `i18nLabel`, skill pickers, and `dayjs` relative time. Phase 2 covers shared buttons, route toasts, table toolbar, dashboard widgets, and login chrome — **not** form field labels or table columns/filters (backlog). Create forms initialize `i18n` with one entry via `createEmptyI18n` using the active UI locale (`resolveActiveLocale`), not PT+EN by default. See `apps/admin/docs/adr/002-admin-i18n.md`.
 - Catalog list tables hide meta columns by default (`id`, `slug`, `createdAt`, `updatedAt`) via `DEFAULT_META_COLUMN_VISIBILITY` in `lib/table-columns.ts` + `usePersistedState`; users can toggle visibility in the table gear menu.
 - Codegen reads `../api/src/schema.gql` from disk; keep it up to date after API changes.
 - GraphQL Codegen `client` preset (v6+) defaults `enumType` to `string-literal` (union types) and leaves unmapped scalars as `unknown`. This admin relies on runtime enum values (`ExperienceCategory.FullTime`, `Object.values`, `z.enum`) — keep `codegen.ts` on `enumType: "enum"` and map `DateTime` → `string`.

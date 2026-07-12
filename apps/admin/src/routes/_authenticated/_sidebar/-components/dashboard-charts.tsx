@@ -1,4 +1,5 @@
 import { useMemo } from "react";
+import { useTranslation } from "react-i18next";
 import {
   Bar,
   BarChart,
@@ -44,6 +45,7 @@ interface CategoryBarChartProps extends Omit<ChartCardProps, "children"> {
 }
 
 function CategoryBarChart({ data, ...props }: CategoryBarChartProps) {
+  const { t: tDashboard } = useTranslation("dashboard");
   const colors = useMemo(() => getChartColors(data.length || 3), [data.length]);
   const formattedData = useMemo(
     () =>
@@ -69,7 +71,7 @@ function CategoryBarChart({ data, ...props }: CategoryBarChartProps) {
           <YAxis {...CHART_AXIS_PROPS} allowDecimals={false} width={28} />
           <Tooltip
             {...CHART_TOOLTIP_PROPS}
-            formatter={(value) => [value, "Count"]}
+            formatter={(value) => [value, tDashboard("charts.count")]}
             labelFormatter={(_, payload) =>
               payload?.[0]?.payload?.displayLabel ?? ""
             }
@@ -95,13 +97,18 @@ interface DashboardChartsProps {
 }
 
 export function DashboardCharts({ data }: DashboardChartsProps) {
+  const { t: tDashboard } = useTranslation("dashboard");
+
   return (
     <div className="grid gap-4 xl:grid-cols-2">
       <CategoryBarChart
         data={data.experiencesByCategory}
-        title="Experiences by Category"
+        title={tDashboard("charts.experiencesByCategory")}
       />
-      <CategoryBarChart data={data.coursesByStatus} title="Courses by Status" />
+      <CategoryBarChart
+        data={data.coursesByStatus}
+        title={tDashboard("charts.coursesByStatus")}
+      />
     </div>
   );
 }

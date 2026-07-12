@@ -2,7 +2,6 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import { DataState } from "@/components/display/data-state";
 import { PageTitle } from "@/components/display/page-title";
-import { usePageHelp } from "@/hooks/custom/use-page-help";
 import { useGetMe } from "@/hooks/queries/auth";
 import { useDashboard } from "@/hooks/queries/dashboard";
 import { DashboardCharts } from "./-components/dashboard-charts";
@@ -16,8 +15,8 @@ export const Route = createFileRoute("/_authenticated/_sidebar/")({
 });
 
 function RouteComponent() {
-  const { t } = useTranslation("pages");
-  const help = usePageHelp("home");
+  const { t: tPage } = useTranslation("pages");
+  const { t: tHelp } = useTranslation("help");
   const getMe = useGetMe();
   const dashboard = useDashboard();
   const data = dashboard.data?.dashboard;
@@ -27,9 +26,14 @@ function RouteComponent() {
     <div className="flex flex-col gap-4">
       <div className="flex flex-wrap items-start justify-between gap-4">
         <PageTitle
-          description={t("home.description")}
-          help={help}
-          title={t("home.title", { name: user?.name ?? "" })}
+          description={tPage("home.description")}
+          help={{
+            title: tHelp("home.title"),
+            paragraphs: tHelp("home.paragraphs", {
+              returnObjects: true,
+            }) as string[],
+          }}
+          title={tPage("home.title", { name: user?.name ?? "" })}
         />
         <ProfileCompleteness user={user} />
       </div>

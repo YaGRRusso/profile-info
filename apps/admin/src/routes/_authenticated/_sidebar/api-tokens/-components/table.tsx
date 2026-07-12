@@ -28,6 +28,7 @@ import {
 } from "@tanstack/react-table";
 import { useQueryState } from "nuqs";
 import { useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { z } from "zod";
 import { BadgeList } from "@/components/display/badge-list";
 import { PLACEHOLDERS } from "@/consts/placeholders";
@@ -283,6 +284,7 @@ export function ApiTokensTable({
   onMultiView,
   onMultiDelete,
 }: ApiTokensTableProps) {
+  const { t: tAction } = useTranslation("actions");
   const [searchQuery, setSearchQuery] = useQueryState("query", queryParser);
   const [sort, setSort] = useQueryState("sort", sortParser);
   const [permission, setPermission] = useQueryState(
@@ -424,7 +426,7 @@ export function ApiTokensTable({
             type="button"
           >
             <PencilIcon />
-            <span>Update Selected ({selected.length})</span>
+            <span>{tAction("updateSelected", { count: selected.length })}</span>
           </button>
           <button
             className="btn btn-ghost btn-sm"
@@ -433,7 +435,7 @@ export function ApiTokensTable({
             type="button"
           >
             <EyeIcon />
-            <span>View Selected ({selected.length})</span>
+            <span>{tAction("viewSelected", { count: selected.length })}</span>
           </button>
           <button
             className="btn btn-ghost btn-sm btn-error"
@@ -442,7 +444,7 @@ export function ApiTokensTable({
             type="button"
           >
             <TrashSimpleIcon />
-            <span>Remove Selected ({selected.length})</span>
+            <span>{tAction("removeSelected", { count: selected.length })}</span>
           </button>
         </div>
       </div>
@@ -629,7 +631,7 @@ export function ApiTokensTable({
             onClick={clearAllFilters}
             type="button"
           >
-            clear all
+            {tAction("clearAll")}
           </button>
         </div>
       )}

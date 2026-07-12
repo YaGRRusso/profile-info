@@ -30,6 +30,7 @@ import {
 } from "@tanstack/react-table";
 import { useQueryState } from "nuqs";
 import { type ReactNode, useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { z } from "zod";
 import { BadgeList } from "@/components/display/badge-list";
 import { EmptyValue } from "@/components/display/empty-value";
@@ -322,6 +323,7 @@ export function SkillsTable({
   onMultiEnable,
   onMultiRemove,
 }: SkillsTableProps) {
+  const { t: tAction } = useTranslation("actions");
   const userRole = useAuthStore((state) => state.user?.role);
   const isSuperAdmin = userRole === "SUPER_ADMIN";
 
@@ -444,7 +446,7 @@ export function SkillsTable({
             type="button"
           >
             <PencilIcon />
-            <span>Update Selected ({selected.length})</span>
+            <span>{tAction("updateSelected", { count: selected.length })}</span>
           </button>
           <button
             className="btn btn-ghost btn-sm"
@@ -453,7 +455,7 @@ export function SkillsTable({
             type="button"
           >
             <EyeIcon />
-            <span>View Selected ({selected.length})</span>
+            <span>{tAction("viewSelected", { count: selected.length })}</span>
           </button>
           {isSuperAdmin && (
             <>
@@ -464,7 +466,9 @@ export function SkillsTable({
                 type="button"
               >
                 <CheckCircleIcon />
-                <span>Enable Selected ({selected.length})</span>
+                <span>
+                  {tAction("enableSelected", { count: selected.length })}
+                </span>
               </button>
               <button
                 className="btn btn-ghost btn-sm btn-error"
@@ -473,7 +477,9 @@ export function SkillsTable({
                 type="button"
               >
                 <XCircleIcon />
-                <span>Disable Selected ({selected.length})</span>
+                <span>
+                  {tAction("disableSelected", { count: selected.length })}
+                </span>
               </button>
             </>
           )}
@@ -484,7 +490,7 @@ export function SkillsTable({
             type="button"
           >
             <TrashSimpleIcon />
-            <span>Remove Selected ({selected.length})</span>
+            <span>{tAction("removeSelected", { count: selected.length })}</span>
           </button>
         </div>
       </div>
@@ -632,7 +638,7 @@ export function SkillsTable({
             onClick={clearAllFilters}
             type="button"
           >
-            clear all
+            {tAction("clearAll")}
           </button>
         </div>
       )}

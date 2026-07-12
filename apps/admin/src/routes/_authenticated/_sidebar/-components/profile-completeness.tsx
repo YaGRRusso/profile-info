@@ -1,4 +1,5 @@
 import { Link } from "@tanstack/react-router";
+import { useTranslation } from "react-i18next";
 import type { GetMeQuery } from "@/generated/graphql/graphql";
 
 type ProfileUser = GetMeQuery["getMe"];
@@ -67,15 +68,19 @@ function ProgressRing({ value }: { value: number }) {
 }
 
 export function ProfileCompleteness({ user }: ProfileCompletenessProps) {
+  const { t: tDashboard } = useTranslation("dashboard");
   const profileCompleteness = computeProfileCompleteness(user);
 
   return (
     <div className="flex items-center gap-2">
       <ProgressRing value={profileCompleteness} />
       <div className="flex flex-col">
-        <span className="font-semibold text-sm">Profile completeness</span>
+        <span className="font-semibold text-sm">
+          {tDashboard("profileCompleteness.title")}
+        </span>
         <Link className="link link-hover text-xs opacity-md" to="/settings">
-          Fill in your settings{" · "}
+          {tDashboard("profileCompleteness.cta")}
+          {" · "}
           {profileCompleteness}%
         </Link>
       </div>

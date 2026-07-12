@@ -6,6 +6,7 @@ import {
   PackageIcon,
   RocketLaunchIcon,
 } from "@phosphor-icons/react";
+import { useTranslation } from "react-i18next";
 import { MetricCard } from "@/components/display/metric-card";
 
 interface DashboardStatsProps {
@@ -19,57 +20,47 @@ interface DashboardStatsProps {
   };
 }
 
-const STAT_ITEMS = [
-  {
-    href: "/skills" as const,
-    icon: <PackageIcon weight="duotone" />,
-    key: "skills" as const,
-    label: "Skills",
-  },
-  {
-    href: "/courses" as const,
-    icon: <CertificateIcon weight="duotone" />,
-    key: "courses" as const,
-    label: "Courses",
-  },
-  {
-    href: "/educations" as const,
-    icon: <GraduationCapIcon weight="duotone" />,
-    key: "educations" as const,
-    label: "Educations",
-  },
-  {
-    href: "/organizations" as const,
-    icon: <BuildingsIcon weight="duotone" />,
-    key: "organizations" as const,
-    label: "Organizations",
-  },
-  {
-    href: "/projects" as const,
-    icon: <RocketLaunchIcon weight="duotone" />,
-    key: "projects" as const,
-    label: "Projects",
-  },
-  {
-    href: "/experiences" as const,
-    icon: <BriefcaseIcon weight="duotone" />,
-    key: "experiences" as const,
-    label: "Experiences",
-  },
-];
-
 export function DashboardStats({ totals }: DashboardStatsProps) {
+  const { t: tDashboard } = useTranslation("dashboard");
+
   return (
     <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3">
-      {STAT_ITEMS.map((item) => (
-        <MetricCard
-          href={item.href}
-          icon={item.icon}
-          key={item.key}
-          label={item.label}
-          value={totals[item.key]}
-        />
-      ))}
+      <MetricCard
+        href="/skills"
+        icon={<PackageIcon weight="duotone" />}
+        label={tDashboard("stats.skills")}
+        value={totals.skills}
+      />
+      <MetricCard
+        href="/courses"
+        icon={<CertificateIcon weight="duotone" />}
+        label={tDashboard("stats.courses")}
+        value={totals.courses}
+      />
+      <MetricCard
+        href="/educations"
+        icon={<GraduationCapIcon weight="duotone" />}
+        label={tDashboard("stats.educations")}
+        value={totals.educations}
+      />
+      <MetricCard
+        href="/organizations"
+        icon={<BuildingsIcon weight="duotone" />}
+        label={tDashboard("stats.organizations")}
+        value={totals.organizations}
+      />
+      <MetricCard
+        href="/projects"
+        icon={<RocketLaunchIcon weight="duotone" />}
+        label={tDashboard("stats.projects")}
+        value={totals.projects}
+      />
+      <MetricCard
+        href="/experiences"
+        icon={<BriefcaseIcon weight="duotone" />}
+        label={tDashboard("stats.experiences")}
+        value={totals.experiences}
+      />
     </div>
   );
 }

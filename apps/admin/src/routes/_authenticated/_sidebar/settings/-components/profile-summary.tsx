@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { Avatar } from "@/components/display/avatar";
 import { PROFILE_SETTINGS_FORM_ID } from "@/forms/profile";
 import type { GetMeQuery } from "@/generated/graphql/graphql";
@@ -28,13 +29,15 @@ function SummaryItem({
 }
 
 export function ProfileSummary({ isLoading, user }: ProfileSummaryProps) {
+  const { t: tAction } = useTranslation("actions");
+  const { t: tPage } = useTranslation("pages");
   const birth = toDateInput(user.birth);
   const translation = user.i18n?.find(
     (entry) =>
       entry.messages.title?.trim() || entry.messages.description?.trim()
   );
-  const title = translation?.messages.title;
-  const description = translation?.messages.description;
+  const profileTitle = translation?.messages.title;
+  const profileDescription = translation?.messages.description;
 
   return (
     <aside className="flex flex-col gap-4 rounded-box bg-base-200 p-6 lg:sticky lg:top-16 lg:self-start">
@@ -58,12 +61,30 @@ export function ProfileSummary({ isLoading, user }: ProfileSummaryProps) {
       <div className="divider my-0" />
 
       <div className="flex flex-col gap-4">
-        <SummaryItem label="Title" value={title} />
-        <SummaryItem label="Description" value={description} />
-        <SummaryItem label="Email" value={user.email} />
-        <SummaryItem label="Phone" value={user.phone} />
-        <SummaryItem label="Birth date" value={birth || undefined} />
-        <SummaryItem label="Address" value={user.address} />
+        <SummaryItem
+          label={tPage("settings.summary.title")}
+          value={profileTitle}
+        />
+        <SummaryItem
+          label={tPage("settings.summary.description")}
+          value={profileDescription}
+        />
+        <SummaryItem
+          label={tPage("settings.summary.email")}
+          value={user.email}
+        />
+        <SummaryItem
+          label={tPage("settings.summary.phone")}
+          value={user.phone}
+        />
+        <SummaryItem
+          label={tPage("settings.summary.birth")}
+          value={birth || undefined}
+        />
+        <SummaryItem
+          label={tPage("settings.summary.address")}
+          value={user.address}
+        />
       </div>
 
       <button
@@ -72,7 +93,7 @@ export function ProfileSummary({ isLoading, user }: ProfileSummaryProps) {
         form={PROFILE_SETTINGS_FORM_ID}
         type="submit"
       >
-        Save changes
+        {tAction("saveChanges")}
       </button>
     </aside>
   );

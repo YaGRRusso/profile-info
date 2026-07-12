@@ -1,10 +1,12 @@
 import { useQueryClient } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
 import { UserForm } from "@/forms/user";
 import { useSignIn } from "@/hooks/mutations/auth";
 import { useAuthStore } from "@/stores/auth";
 import { DevQuickLogin } from "./dev-quick-login";
 
 export function Login() {
+  const { t: tLogin } = useTranslation("login");
   const { setToken } = useAuthStore();
 
   const queryClient = useQueryClient();
@@ -24,10 +26,10 @@ export function Login() {
         </div>
         <div className="flex flex-1 flex-col justify-center gap-10 p-12 max-sm:p-4">
           <div className="flex flex-col">
-            <h1 className="font-semibold text-5xl max-sm:text-3xl">Welcome</h1>
-            <p className="text-sm opacity-md">
-              Sign in to your account to continue
-            </p>
+            <h1 className="font-semibold text-5xl max-sm:text-3xl">
+              {tLogin("title")}
+            </h1>
+            <p className="text-sm opacity-md">{tLogin("subtitle")}</p>
           </div>
           <UserForm
             isLoading={signIn.isPending}

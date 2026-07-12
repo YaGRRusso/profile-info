@@ -252,6 +252,7 @@ export function ProjectsTable({
   onMultiView,
   onMultiDelete,
 }: ProjectsTableProps) {
+  const { t: tAction } = useTranslation("actions");
   const { i18n } = useTranslation();
   const locale = i18n.language;
   const userRole = useAuthStore((state) => state.user?.role);
@@ -373,7 +374,7 @@ export function ProjectsTable({
             type="button"
           >
             <PencilIcon />
-            <span>Update Selected ({selected.length})</span>
+            <span>{tAction("updateSelected", { count: selected.length })}</span>
           </button>
           <button
             className="btn btn-ghost btn-sm"
@@ -382,7 +383,7 @@ export function ProjectsTable({
             type="button"
           >
             <EyeIcon />
-            <span>View Selected ({selected.length})</span>
+            <span>{tAction("viewSelected", { count: selected.length })}</span>
           </button>
           <button
             className="btn btn-ghost btn-sm btn-error"
@@ -391,7 +392,7 @@ export function ProjectsTable({
             type="button"
           >
             <TrashSimpleIcon />
-            <span>Remove Selected ({selected.length})</span>
+            <span>{tAction("removeSelected", { count: selected.length })}</span>
           </button>
         </div>
       </div>
@@ -533,7 +534,7 @@ export function ProjectsTable({
             onClick={clearAllFilters}
             type="button"
           >
-            clear all
+            {tAction("clearAll")}
           </button>
         </div>
       )}

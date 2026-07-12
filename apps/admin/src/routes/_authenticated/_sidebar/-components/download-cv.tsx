@@ -1,7 +1,9 @@
+import { useTranslation } from "react-i18next";
 import { LOCALES, LocaleEnum } from "@/consts/locales";
 import { useDownloadResume } from "@/hooks/mutations/resume";
 
 export function DownloadCvControl() {
+  const { t: tAction } = useTranslation("actions");
   const downloadResume = useDownloadResume();
 
   return (
@@ -14,7 +16,7 @@ export function DownloadCvControl() {
       value=""
     >
       <option disabled value="">
-        Download CV
+        {tAction("downloadCv")}
       </option>
       {LOCALES.map((locale) => (
         <option key={locale.value} value={locale.value}>
