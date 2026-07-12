@@ -31,7 +31,6 @@ import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { z } from "zod";
 import { BadgeList } from "@/components/display/badge-list";
-import { PLACEHOLDERS } from "@/consts/placeholders";
 import { ApiTokenPermission } from "@/generated/graphql/graphql";
 import { useActiveFilters } from "@/hooks/custom/use-active-filters";
 import { usePersistedState } from "@/hooks/custom/use-persisted-state";
@@ -285,6 +284,7 @@ export function ApiTokensTable({
   onMultiDelete,
 }: ApiTokensTableProps) {
   const { t: tAction } = useTranslation("actions");
+  const { t: tTable } = useTranslation("tables");
   const [searchQuery, setSearchQuery] = useQueryState("query", queryParser);
   const [sort, setSort] = useQueryState("sort", sortParser);
   const [permission, setPermission] = useQueryState(
@@ -455,7 +455,7 @@ export function ApiTokensTable({
             <MagnifyingGlassIcon className="opacity-md" />
             <input
               onChange={(event) => setSearchQuery(event.target.value)}
-              placeholder={PLACEHOLDERS.search}
+              placeholder={tTable("search")}
               type="search"
               value={searchQuery}
             />

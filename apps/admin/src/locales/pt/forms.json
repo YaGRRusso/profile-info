@@ -231,6 +231,10 @@
       "tooltip": "Quando marcado, substitui as permissões em todos os tokens selecionados."
     }
   },
+  "ai": {
+    "translate": "Traduzir com IA",
+    "optimize": "Otimizar com IA"
+  },
   "validation": {
     "required": "Campo obrigatório",
     "invalidEmail": "E-mail inválido",
@@ -242,13 +246,7 @@
     "selectAtLeastOnePermission": "Selecione pelo menos uma permissão",
     "descriptionMin": "A descrição deve ter pelo menos {{value}} caracteres",
     "atLeastOneSkill": "Pelo menos uma habilidade é obrigatória",
-    "titleRequired": "Título é obrigatório",
-    "periodRequired": "Período é obrigatório",
-    "levelRequired": "Nível é obrigatório",
-    "statusRequired": "Status é obrigatório",
-    "hoursRequired": "Horas é obrigatório",
-    "categoryRequired": "Categoria é obrigatória",
-    "organizationRequired": "Organização é obrigatória",
+    "fieldRequired": "{{field}} é obrigatório",
     "positiveNumber": "Deve ser um número positivo",
     "endDateAfterStartDate": "A data final deve ser posterior à data inicial"
   },

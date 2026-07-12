@@ -5,6 +5,7 @@ import {
   TranslateIcon,
 } from "@phosphor-icons/react";
 import { ComponentProps } from "react";
+import { useTranslation } from "react-i18next";
 import { RawSizeEnum } from "@/consts/raw-size";
 import { cn } from "@/lib/cn";
 import { InputLegend } from "./legend";
@@ -33,6 +34,8 @@ export function TextareaInput({
   value,
   ...props
 }: TextareaInputProps) {
+  const { t: tForm } = useTranslation("forms");
+
   return (
     <fieldset className="fieldset">
       <InputLegend label={label} tooltip={tooltip} />
@@ -78,7 +81,7 @@ export function TextareaInput({
             >
               <TranslateIcon className="text-primary group-disabled:text-base-content/20" />
               <span className="bg-linear-to-r from-primary to-secondary bg-clip-text text-transparent group-disabled:from-base-content/20 group-disabled:to-base-content/20">
-                Translate with AI
+                {tForm("ai.translate")}
               </span>
             </button>
           )}
@@ -96,7 +99,7 @@ export function TextareaInput({
             >
               <SparkleIcon className="text-primary group-disabled:text-base-content/20" />
               <span className="bg-linear-to-r from-primary to-secondary bg-clip-text text-transparent group-disabled:from-base-content/20 group-disabled:to-base-content/20">
-                Optimize with AI
+                {tForm("ai.optimize")}
               </span>
             </button>
           )}

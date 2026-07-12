@@ -34,7 +34,6 @@ import { useTranslation } from "react-i18next";
 import { z } from "zod";
 import { EmptyValue } from "@/components/display/empty-value";
 import { Link } from "@/components/display/link";
-import { PLACEHOLDERS } from "@/consts/placeholders";
 import {
   CatalogPartition,
   OrganizationCategory,
@@ -351,6 +350,7 @@ export function OrganizationsTable({
   onMultiRemove,
 }: OrganizationsTableProps) {
   const { t: tAction } = useTranslation("actions");
+  const { t: tTable } = useTranslation("tables");
   const userRole = useAuthStore((state) => state.user?.role);
   const isSuperAdmin = userRole === "SUPER_ADMIN";
 
@@ -520,7 +520,7 @@ export function OrganizationsTable({
             <MagnifyingGlassIcon className="opacity-md" />
             <input
               onChange={(event) => setSearchQuery(event.target.value)}
-              placeholder={PLACEHOLDERS.search}
+              placeholder={tTable("search")}
               type="search"
               value={searchQuery}
             />

@@ -33,7 +33,7 @@ It drives UI strings, `i18nLabel` (via `i18n.language`), and `dayjs` (`languageC
 
 ### UI strings (react-i18next)
 
-- Namespaces: `help`, `nav`, `pages`, `actions`, `alerts`, `dashboard`, `login`, `forms`.
+- Namespaces: `help`, `nav`, `pages`, `actions`, `alerts`, `dashboard`, `login`, `forms`, `tables`.
 
 #### `useTranslation` aliases (always prefixed — never bare `t`)
 
@@ -43,7 +43,8 @@ It drives UI strings, `i18nLabel` (via `i18n.language`), and `dayjs` (`languageC
 | CRUD route + `i18nLabel` in modals | above, then `i18n` / `locale` | `i18nLabel(skill, locale)` |
 | Settings / home route | `tPage`, `tHelp`, `tAlert` (omit unused) | `tPage("settings.title")` |
 | Table toolbar | `tAction` only | `tAction("clearAll")` |
-| Table + `i18nLabel` in cells | `tAction`, then `i18n` / `locale` | `i18nLabel(skill, locale)` |
+| Table search / relevance placeholders | `tTable` | `tTable("search")`, `tTable("relevanceMin", { value })` |
+| Table + `i18nLabel` in cells | `tAction`, `tTable`, then `i18n` / `locale` | `i18nLabel(skill, locale)` |
 | Actions chrome (modal backdrop, download CV, profile save) | `tAction` | `tAction("close")` |
 | Sidebar nav | `tNav` | `tNav("skills")` |
 | Dashboard widgets | `tDashboard` | `tDashboard("stats.skills")` |
@@ -86,6 +87,7 @@ Never build keys dynamically (`t(\`stats.${key}\`)`, `t(item.id)`). Dynamic list
 | Dashboard widgets | `dashboard.json`; stats, charts, profile completeness, recent activity |
 | Login chrome | `login.json` — page title/subtitle; `UserForm` in `forms.json` |
 | Table toolbar buttons | `useTranslation("actions")` in `*-components/table.tsx` |
+| Table search + relevance min/max placeholders | `useTranslation("tables")` as `tTable` in `*-components/table.tsx` |
 
 **`alerts.json` key naming:**
 
@@ -100,7 +102,8 @@ Never build keys dynamically (`t(\`stats.${key}\`)`, `t(item.id)`). Dynamic list
 | Area | Approach |
 |------|----------|
 | Form chrome | `forms.json`; `useTranslation("forms")` as `tForm` — `fields.<key>.label`, `.placeholder`, `.tooltip`; `batch.<key>.label` / `.tooltip`; sections, submit |
-| Form validation (Zod) | Static English messages in schema constants; `hasUniqueLocales` in `lib/form-validation.ts`. Toast/ATS copy uses `tForm("validation.*")` with interpolation when needed (e.g. `descriptionMin`, `{ value: 64 }`) |
+| Form validation (Zod) | Static English messages in schema constants; `hasUniqueLocales` in `lib/form-validation.ts`. Toast/ATS copy uses `tForm("validation.*")` with interpolation when needed (e.g. `descriptionMin`, `{ value: 64 }`; `fieldRequired`, `{ field: tForm("fields.courseTitle.label") }`) |
+| AI textarea buttons | `tForm("ai.translate")`, `tForm("ai.optimize")` inside `textarea.tsx` |
 | Form actions | Cancel via `tAction("cancel")`; profile mobile save via `tAction("saveChanges")` |
 | Field arrays | Generic empty/add copy inside `field-array.tsx`; entity-specific `label` prop passed translated from parent |
 | AI optimize/translate detail keys | English keys sent to API — not UI i18n |
@@ -108,7 +111,7 @@ Never build keys dynamically (`t(\`stats.${key}\`)`, `t(item.id)`). Dynamic list
 **Explicitly out of scope (backlog — do not add without revisiting this ADR):**
 
 - System header alerts (e.g. profile unsaved changes title)
-- Tables: column headers, filters, facet dropdowns, enum labels in cells
+- Tables: column headers, filter facet labels/dropdowns, enum labels in cells (search + relevance min/max placeholders are in scope via `tables`)
 - Locale `es` in switcher / JSON (enum exists; not enabled in UI yet)
 - API / backend error messages and toasts (`main.tsx` `toast.error(error.message)`)
 - API recent-activity entity labels (`i18n[0]`) — optional API follow-up
@@ -120,8 +123,9 @@ Never build keys dynamically (`t(\`stats.${key}\`)`, `t(item.id)`). Dynamic list
 | **1 — Foundation** | i18next setup, locale switcher, `help` + `nav` + `pages` namespaces (en + pt) | Done |
 | **1 — Wiring** | Page copy, sidebar nav, `i18nLabel` + pickers + dayjs on active locale | Done |
 | **2 — Chrome (non-form)** | `actions`, `alerts`, `dashboard`, `login`; shared buttons, toasts, table toolbar, dashboard widgets | Done |
-| **3 — Form chrome** | `forms` namespace; all entity forms, login form, field-array, labels/placeholders/tooltips/submit | Done |
-| **Later** | Table columns/filters, `es` UI | Backlog |
+| **3 — Form chrome** | `forms` namespace; all entity forms, login form, field-array, labels/placeholders/tooltips/submit, AI buttons, `fieldRequired` validation | Done |
+| **3b — Table chrome (partial)** | `tables` search + relevance placeholders; static English `aria-label`s; removed `consts/placeholders.ts` | Done |
+| **Later** | Table columns/filters (remaining), `es` UI | Backlog |
 
 ## Where to look
 
@@ -144,8 +148,8 @@ Never build keys dynamically (`t(\`stats.${key}\`)`, `t(item.id)`). Dynamic list
 6. Dashboard `fromNow` strings follow display locale (e.g. `há 2 dias` in `pt`).
 7. CRUD page buttons, modal actions, and success toasts show `pt` when locale is `pt`.
 8. Dashboard stats/charts/recent activity, login page, and login form show `pt` when locale is `pt`.
-9. Table toolbar buttons (`Update selected`, `clear all`, etc.) show `pt`; column headers and filters stay English.
-10. Entity form labels, placeholders, tooltips, and submit buttons show `pt`; Zod inline validation messages stay English; table column headers and filters stay English.
+9. Table toolbar buttons (`Update selected`, `clear all`, etc.) and search placeholder show `pt`; column headers and filter facet labels stay English.
+10. Entity form labels, placeholders, tooltips, submit buttons, and AI textarea buttons show `pt`; Zod inline validation messages stay English; relevance min/max placeholders show `pt`.
 11. `lib/i18n.ts` stays free of UI string keys.
 12. No duplicate locale state on auth store.
 

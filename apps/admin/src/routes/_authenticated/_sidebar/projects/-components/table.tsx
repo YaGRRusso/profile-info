@@ -32,7 +32,6 @@ import { useTranslation } from "react-i18next";
 import { z } from "zod";
 import { BadgeList } from "@/components/display/badge-list";
 import { EmptyValue } from "@/components/display/empty-value";
-import { PLACEHOLDERS } from "@/consts/placeholders";
 import { UserRole } from "@/generated/graphql/graphql";
 import { useActiveFilters } from "@/hooks/custom/use-active-filters";
 import { usePersistedState } from "@/hooks/custom/use-persisted-state";
@@ -253,6 +252,7 @@ export function ProjectsTable({
   onMultiDelete,
 }: ProjectsTableProps) {
   const { t: tAction } = useTranslation("actions");
+  const { t: tTable } = useTranslation("tables");
   const { i18n } = useTranslation();
   const locale = i18n.language;
   const userRole = useAuthStore((state) => state.user?.role);
@@ -402,7 +402,7 @@ export function ProjectsTable({
             <MagnifyingGlassIcon className="opacity-md" />
             <input
               onChange={(event) => setSearchQuery(event.target.value)}
-              placeholder={PLACEHOLDERS.search}
+              placeholder={tTable("search")}
               type="search"
               value={searchQuery}
             />
@@ -421,7 +421,9 @@ export function ProjectsTable({
                     max={relevanceFacets.max ?? 100}
                     min={relevanceFacets.min ?? 0}
                     onChange={(e) => setRelevanceFilter(0, e.target.value)}
-                    placeholder={`Min (${relevanceFacets.min ?? "–"})`}
+                    placeholder={tTable("relevanceMin", {
+                      value: relevanceFacets.min ?? "–",
+                    })}
                     type="number"
                     value={relevance?.min ?? ""}
                   />
@@ -430,7 +432,9 @@ export function ProjectsTable({
                     max={relevanceFacets.max ?? 100}
                     min={relevanceFacets.min ?? 0}
                     onChange={(e) => setRelevanceFilter(1, e.target.value)}
-                    placeholder={`Max (${relevanceFacets.max ?? "–"})`}
+                    placeholder={tTable("relevanceMax", {
+                      value: relevanceFacets.max ?? "–",
+                    })}
                     type="number"
                     value={relevance?.max ?? ""}
                   />

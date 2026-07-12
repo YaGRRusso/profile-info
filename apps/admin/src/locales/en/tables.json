@@ -1,0 +1,5 @@
+{
+  "search": "Type to search...",
+  "relevanceMin": "Min ({{value}})",
+  "relevanceMax": "Max ({{value}})"
+}

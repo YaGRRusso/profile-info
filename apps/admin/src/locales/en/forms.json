@@ -231,6 +231,10 @@
       "tooltip": "When checked, replaces permissions on all selected tokens."
     }
   },
+  "ai": {
+    "translate": "Translate with AI",
+    "optimize": "Optimize with AI"
+  },
   "validation": {
     "required": "Required field",
     "invalidEmail": "Invalid email",
@@ -242,13 +246,7 @@
     "selectAtLeastOnePermission": "Select at least one permission",
     "descriptionMin": "Description must be at least {{value}} characters long",
     "atLeastOneSkill": "At least one skill is required",
-    "titleRequired": "Title is required",
-    "periodRequired": "Period is required",
-    "levelRequired": "Level is required",
-    "statusRequired": "Status is required",
-    "hoursRequired": "Hours is required",
-    "categoryRequired": "Category is required",
-    "organizationRequired": "Organization is required",
+    "fieldRequired": "{{field}} is required",
     "positiveNumber": "Must be a positive number",
     "endDateAfterStartDate": "End date must be after start date"
   },

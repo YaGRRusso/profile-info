@@ -217,12 +217,21 @@ export function ExperienceForm({
         return toast.error(tForm("validation.atLeastOneSkill"));
 
       const title = fieldGroup.title;
-      if (!title) return toast.error(tForm("validation.titleRequired"));
+      if (!title)
+        return toast.error(
+          tForm("validation.fieldRequired", {
+            field: tForm("fields.experienceTitle.label"),
+          })
+        );
       details.push({ key: "Title", value: [title] });
 
       const period = fieldParent.period;
       if (!period.from && !period.to)
-        return toast.error(tForm("validation.periodRequired"));
+        return toast.error(
+          tForm("validation.fieldRequired", {
+            field: tForm("fields.period.label"),
+          })
+        );
       details.push({
         key: "Period",
         value: [
@@ -232,14 +241,23 @@ export function ExperienceForm({
       });
 
       const category = form.getFieldValue("category");
-      if (!category) return toast.error(tForm("validation.categoryRequired"));
+      if (!category)
+        return toast.error(
+          tForm("validation.fieldRequired", {
+            field: tForm("fields.experienceCategory.label"),
+          })
+        );
       details.push({ key: "Category", value: [category] });
 
       const organization = findManyOrganizations.data?.nodes.find(
         (org) => org.id === form.getFieldValue("organizationId")
       );
       if (!organization)
-        return toast.error(tForm("validation.organizationRequired"));
+        return toast.error(
+          tForm("validation.fieldRequired", {
+            field: tForm("fields.organization.label"),
+          })
+        );
 
       const organizationName = organization.name;
       details.push({ key: "Organization Name", value: [organizationName] });

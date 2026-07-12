@@ -190,22 +190,41 @@ export function CourseForm({
         return toast.error(tForm("validation.atLeastOneSkill"));
 
       const title = fieldGroup.title;
-      if (!title) return toast.error(tForm("validation.titleRequired"));
+      if (!title)
+        return toast.error(
+          tForm("validation.fieldRequired", {
+            field: tForm("fields.courseTitle.label"),
+          })
+        );
       details.push({ key: "Title", value: [title] });
 
       const duration = form.getFieldValue("hours");
-      if (!duration) return toast.error(tForm("validation.hoursRequired"));
+      if (!duration)
+        return toast.error(
+          tForm("validation.fieldRequired", {
+            field: tForm("fields.hours.label"),
+          })
+        );
       details.push({ key: "Hours", value: [`${duration} hours`] });
 
       const status = form.getFieldValue("status");
-      if (!status) return toast.error(tForm("validation.statusRequired"));
+      if (!status)
+        return toast.error(
+          tForm("validation.fieldRequired", {
+            field: tForm("fields.status.label"),
+          })
+        );
       details.push({ key: "Status", value: [status] });
 
       const organization = findManyOrganizations.data?.nodes.find(
         (org) => org.id === form.getFieldValue("organizationId")
       );
       if (!organization)
-        return toast.error(tForm("validation.organizationRequired"));
+        return toast.error(
+          tForm("validation.fieldRequired", {
+            field: tForm("fields.organization.label"),
+          })
+        );
 
       const organizationName = organization.name;
       details.push({ key: "Organization Name", value: [organizationName] });

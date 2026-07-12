@@ -34,7 +34,6 @@ import { useTranslation } from "react-i18next";
 import { z } from "zod";
 import { BadgeList } from "@/components/display/badge-list";
 import { EmptyValue } from "@/components/display/empty-value";
-import { PLACEHOLDERS } from "@/consts/placeholders";
 import { CatalogPartition, UserRole } from "@/generated/graphql/graphql";
 import { useActiveFilters } from "@/hooks/custom/use-active-filters";
 import { usePersistedState } from "@/hooks/custom/use-persisted-state";
@@ -324,6 +323,7 @@ export function SkillsTable({
   onMultiRemove,
 }: SkillsTableProps) {
   const { t: tAction } = useTranslation("actions");
+  const { t: tTable } = useTranslation("tables");
   const userRole = useAuthStore((state) => state.user?.role);
   const isSuperAdmin = userRole === "SUPER_ADMIN";
 
@@ -500,7 +500,7 @@ export function SkillsTable({
             <MagnifyingGlassIcon className="opacity-md" />
             <input
               onChange={(event) => setSearchQuery(event.target.value)}
-              placeholder={PLACEHOLDERS.search}
+              placeholder={tTable("search")}
               type="search"
               value={searchQuery}
             />

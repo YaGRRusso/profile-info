@@ -215,30 +215,53 @@ export function EducationForm({
         return toast.error(tForm("validation.atLeastOneSkill"));
 
       const title = fieldGroup.title;
-      if (!title) return toast.error(tForm("validation.titleRequired"));
+      if (!title)
+        return toast.error(
+          tForm("validation.fieldRequired", {
+            field: tForm("fields.educationTitle.label"),
+          })
+        );
       details.push({ key: "Title", value: [title] });
 
       const period = form.getFieldValue("period");
       if (!period.from && !period.to)
-        return toast.error(tForm("validation.periodRequired"));
+        return toast.error(
+          tForm("validation.fieldRequired", {
+            field: tForm("fields.period.label"),
+          })
+        );
       details.push({
         key: "Period",
         value: [`from ${period.from} to ${period.to}`],
       });
 
       const level = form.getFieldValue("level");
-      if (!level) return toast.error(tForm("validation.levelRequired"));
+      if (!level)
+        return toast.error(
+          tForm("validation.fieldRequired", {
+            field: tForm("fields.level.label"),
+          })
+        );
       details.push({ key: "Level", value: [level] });
 
       const status = form.getFieldValue("status");
-      if (!status) return toast.error(tForm("validation.statusRequired"));
+      if (!status)
+        return toast.error(
+          tForm("validation.fieldRequired", {
+            field: tForm("fields.status.label"),
+          })
+        );
       details.push({ key: "Status", value: [status] });
 
       const organization = findManyOrganizations.data?.nodes.find(
         (org) => org.id === form.getFieldValue("organizationId")
       );
       if (!organization)
-        return toast.error(tForm("validation.organizationRequired"));
+        return toast.error(
+          tForm("validation.fieldRequired", {
+            field: tForm("fields.organization.label"),
+          })
+        );
 
       const organizationName = organization.name;
       details.push({ key: "Organization Name", value: [organizationName] });

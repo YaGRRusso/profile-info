@@ -160,7 +160,12 @@ export function ProjectForm({
         return toast.error(tForm("validation.atLeastOneSkill"));
 
       const title = fieldGroup.title;
-      if (!title) return toast.error(tForm("validation.titleRequired"));
+      if (!title)
+        return toast.error(
+          tForm("validation.fieldRequired", {
+            field: tForm("fields.projectTitle.label"),
+          })
+        );
       details.push({ key: "Title", value: [title] });
 
       const language = fieldGroup.locale;

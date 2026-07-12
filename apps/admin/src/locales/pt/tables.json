@@ -1,0 +1,5 @@
+{
+  "search": "Digite para buscar...",
+  "relevanceMin": "Mín. ({{value}})",
+  "relevanceMax": "Máx. ({{value}})"
+}
