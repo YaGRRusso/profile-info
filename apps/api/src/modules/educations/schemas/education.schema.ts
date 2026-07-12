@@ -24,8 +24,8 @@ export class EducationModel extends BaseModel {
   @Prop({ type: Number, required: true, default: 0 })
   relevance: number;
 
-  @Prop({ type: String, required: true })
-  slug: string;
+  @Prop({ type: String })
+  slug?: string;
 
   @Prop({
     type: mongoose.Schema.Types.ObjectId,
@@ -86,4 +86,4 @@ export class EducationModel extends BaseModel {
 
 export type EducationDocument = HydratedDocument<EducationModel>;
 export const EducationSchema = SchemaFactory.createForClass(EducationModel);
-EducationSchema.index({ ownerId: 1, slug: 1 }, { unique: true });
+EducationSchema.index({ ownerId: 1, slug: 1 }, { unique: true, sparse: true });

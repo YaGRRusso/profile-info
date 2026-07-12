@@ -361,7 +361,7 @@ describe("Cross-tenant DataLoader isolation (e2e)", () => {
       category: "Programming",
     });
     skillId = skill.id;
-    skillSlug = skill.slug;
+    skillSlug = skill.slug!;
 
     const joaoCtx = testAuthContext({ id: joao.id });
     const bobCtx = testAuthContext({ id: bob.id });

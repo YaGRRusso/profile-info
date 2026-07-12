@@ -30,10 +30,9 @@ const OrganizationTranslationInput = createTranslationInput(
 
 @InputType()
 export class CreateOrganizationInput {
-  @RequiredField(() => String)
+  @OptionalField(() => String)
   @IsString()
-  @IsNotEmpty()
-  slug: string;
+  slug?: string;
 
   @RequiredField(() => String)
   @IsString()

@@ -33,8 +33,8 @@ export class OrganizationModel extends BaseModel {
   })
   ownerId?: mongoose.Types.ObjectId | string;
 
-  @Prop({ type: String, required: true })
-  slug: string;
+  @Prop({ type: String })
+  slug?: string;
 
   @Prop({ type: String, required: true })
   name: string;
@@ -65,5 +65,5 @@ export const OrganizationSchema =
 
 OrganizationSchema.index(
   { partition: 1, ownerId: 1, slug: 1 },
-  { unique: true }
+  { unique: true, sparse: true }
 );

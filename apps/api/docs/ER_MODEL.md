@@ -40,7 +40,7 @@ erDiagram
     ObjectId _id PK
     string partition "GLOBAL LOCAL"
     ObjectId ownerId FK "creator every row"
-    string slug "UK per partition"
+    string slug "optional UK per partition"
     string name
     string category
     object i18n "embed"
@@ -48,7 +48,7 @@ erDiagram
   Experience {
     ObjectId _id PK
     ObjectId ownerId FK
-    string slug "UK per owner"
+    string slug "optional UK per owner"
     ObjectId organizationId FK
     object roles "embed"
   }
@@ -60,7 +60,7 @@ erDiagram
   Education {
     ObjectId _id PK
     ObjectId ownerId FK
-    string slug "UK per owner"
+    string slug "optional UK per owner"
     ObjectId organizationId FK
     ObjectId skillIds FK "array"
     string level
@@ -69,7 +69,7 @@ erDiagram
   Course {
     ObjectId _id PK
     ObjectId ownerId FK
-    string slug "UK per owner"
+    string slug "optional UK per owner"
     ObjectId organizationId FK
     ObjectId skillIds FK "array"
     string status
@@ -78,7 +78,7 @@ erDiagram
   Project {
     ObjectId _id PK
     ObjectId ownerId FK
-    string slug "UK per owner"
+    string slug "optional UK per owner"
     ObjectId skillIds FK "array"
     string images "array"
   }
@@ -86,7 +86,7 @@ erDiagram
     ObjectId _id PK
     string partition "GLOBAL LOCAL"
     ObjectId ownerId FK "creator every row"
-    string slug "UK per partition"
+    string slug "optional UK per partition"
     string name
     string category
   }
@@ -157,7 +157,7 @@ inputs use `organizationId` and `skillIds` (no `ownerId` — injected from conte
 - **Source:** `src/modules/skills/schemas/skill.schema.ts`
 - **Key fields:** `partition` (enum: `GLOBAL`, `LOCAL`; default `GLOBAL`, indexed),
   `ownerId` (ref → User; creator, set on every row),
-  `slug` (unique per `{ partition, ownerId }` — disabled rows still occupy the slug; re-enable to reuse),
+  `slug` (optional; unique per `{ partition, ownerId }` when set — sparse index; disabled rows still occupy the slug; re-enable to reuse),
   `category` (optional free string, indexed), `disabled`, `i18n[]` (embed: `locale`, `messages.title`)
 - **Embedded:** `i18n[]` translations
 - **References:** `ownerId` → User (creator); referenced by private entities via `skillIds`
@@ -168,7 +168,7 @@ inputs use `organizationId` and `skillIds` (no `ownerId` — injected from conte
 - **Source:** `src/modules/organizations/schemas/organization.schema.ts`
 - **Key fields:** `partition` (enum: `GLOBAL`, `LOCAL`; default `GLOBAL`, indexed),
   `ownerId` (ref → User; creator, set on every row),
-  `slug` (unique per `{ partition, ownerId }` — disabled rows still occupy the slug; re-enable to reuse),
+  `slug` (optional; unique per `{ partition, ownerId }` when set — sparse index; disabled rows still occupy the slug; re-enable to reuse),
   `name`, `website` (optional), `logo` (optional), `category` (enum, indexed),
   `disabled`, `i18n[]` (embed: `locale`, `messages.description`)
 - **Embedded:** `i18n[]` translations
@@ -178,15 +178,15 @@ inputs use `organizationId` and `skillIds` (no `ownerId` — injected from conte
 ### Experience (`experiences`)
 
 - **Source:** `src/modules/experiences/schemas/experience.schema.ts`
-- **Key fields:** `ownerId` (required, ref → User), `slug` (unique per owner via
-  `{ ownerId, slug }` index), `category` (enum, indexed), `relevance`
+- **Key fields:** `ownerId` (required, ref → User), `slug` (optional; unique per owner when set via
+  sparse `{ ownerId, slug }` index), `category` (enum, indexed), `relevance`
 - **Embedded:** `roles[]` (`ExperienceRole`: `i18n[]`, `period`, `skillIds[]`)
 - **References:** `ownerId` → User; `organizationId` → Organization (optional ObjectId)
 
 ### Education (`educations`)
 
 - **Source:** `src/modules/educations/schemas/education.schema.ts`
-- **Key fields:** `ownerId` (required), `slug` (unique per owner), `level` (enum,
+- **Key fields:** `ownerId` (required), `slug` (optional; unique per owner when set), `level` (enum,
   indexed), `status` (enum, indexed), `url`, `image`, `relevance`, `period`, `i18n[]`
 - **Embedded:** `i18n[]` translations, `period` (`DateRange`: `from`, `to`)
 - **References:** `ownerId` → User; `organizationId` → Organization; `skillIds[]` → Skill
@@ -194,7 +194,7 @@ inputs use `organizationId` and `skillIds` (no `ownerId` — injected from conte
 ### Course (`courses`)
 
 - **Source:** `src/modules/courses/schemas/course.schema.ts`
-- **Key fields:** `ownerId` (required), `slug` (unique per owner), `status` (enum,
+- **Key fields:** `ownerId` (required), `slug` (optional; unique per owner when set), `status` (enum,
   indexed), `url`, `image`, `hours`, `relevance`, `i18n[]`
 - **Embedded:** `i18n[]` translations
 - **References:** `ownerId` → User; `organizationId` → Organization; `skillIds[]` → Skill
@@ -202,7 +202,7 @@ inputs use `organizationId` and `skillIds` (no `ownerId` — injected from conte
 ### Project (`projects`)
 
 - **Source:** `src/modules/projects/schemas/project.schema.ts`
-- **Key fields:** `ownerId` (required), `slug` (unique per owner), `relevance`,
+- **Key fields:** `ownerId` (required), `slug` (optional; unique per owner when set), `relevance`,
   `images[]`, `i18n[]`
 - **Embedded:** `i18n[]` translations, `urls[]` (`UrlEmbed`)
 - **References:** `ownerId` → User; `skillIds[]` → Skill

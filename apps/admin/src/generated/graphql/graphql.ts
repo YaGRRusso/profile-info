@@ -56,7 +56,7 @@ export type CreateCourseInput = {
   organizationId: string;
   relevance?: number | null | undefined;
   skillIds?: Array<string> | null | undefined;
-  slug: string;
+  slug?: string | null | undefined;
   status: CourseStatus;
   url?: string | null | undefined;
 };
@@ -79,7 +79,7 @@ export type CreateEducationInput = {
   period?: DateRangeInput | null | undefined;
   relevance?: number | null | undefined;
   skillIds?: Array<string> | null | undefined;
-  slug: string;
+  slug?: string | null | undefined;
   status: EducationStatus;
   url?: string | null | undefined;
 };
@@ -99,7 +99,7 @@ export type CreateExperienceInput = {
   organizationId: string;
   relevance?: number | null | undefined;
   roles: Array<CreateExperienceRoleInput>;
-  slug: string;
+  slug?: string | null | undefined;
 };
 
 export type CreateExperienceMessagesInput = {
@@ -123,7 +123,7 @@ export type CreateOrganizationInput = {
   i18n: Array<CreateOrganizationMessagesInputTranslationInput>;
   logo?: string | null | undefined;
   name: string;
-  slug: string;
+  slug?: string | null | undefined;
   website?: string | null | undefined;
 };
 
@@ -141,7 +141,7 @@ export type CreateProjectInput = {
   images?: Array<string> | null | undefined;
   relevance?: number | null | undefined;
   skillIds?: Array<string> | null | undefined;
-  slug: string;
+  slug?: string | null | undefined;
   urls?: Array<UrlInput> | null | undefined;
 };
 
@@ -158,7 +158,7 @@ export type CreateProjectMessagesInputTranslationInput = {
 export type CreateSkillInput = {
   category?: string | null | undefined;
   i18n: Array<CreateSkillMessagesInputTranslationInput>;
-  slug: string;
+  slug?: string | null | undefined;
 };
 
 export type CreateSkillMessagesInput = {
@@ -533,7 +533,7 @@ export type CreateOneCourseMutationVariables = Exact<{
 }>;
 
 
-export type CreateOneCourseMutation = { createOneCourse: { id: string, slug: string } };
+export type CreateOneCourseMutation = { createOneCourse: { id: string, slug: string | null } };
 
 export type UpdateOneCourseMutationVariables = Exact<{
   courseId: string | number;
@@ -541,7 +541,7 @@ export type UpdateOneCourseMutationVariables = Exact<{
 }>;
 
 
-export type UpdateOneCourseMutation = { updateOneCourse: { id: string, slug: string } };
+export type UpdateOneCourseMutation = { updateOneCourse: { id: string, slug: string | null } };
 
 export type UpdateManyCoursesMutationVariables = Exact<{
   courseIds: Array<string | number> | string | number;
@@ -556,7 +556,7 @@ export type RemoveOneCourseMutationVariables = Exact<{
 }>;
 
 
-export type RemoveOneCourseMutation = { removeOneCourse: { id: string, slug: string } };
+export type RemoveOneCourseMutation = { removeOneCourse: { id: string, slug: string | null } };
 
 export type RemoveManyCoursesMutationVariables = Exact<{
   courseIds: Array<string | number> | string | number;
@@ -570,7 +570,7 @@ export type CreateOneEducationMutationVariables = Exact<{
 }>;
 
 
-export type CreateOneEducationMutation = { createOneEducation: { id: string, slug: string } };
+export type CreateOneEducationMutation = { createOneEducation: { id: string, slug: string | null } };
 
 export type UpdateOneEducationMutationVariables = Exact<{
   educationId: string | number;
@@ -578,7 +578,7 @@ export type UpdateOneEducationMutationVariables = Exact<{
 }>;
 
 
-export type UpdateOneEducationMutation = { updateOneEducation: { id: string, slug: string } };
+export type UpdateOneEducationMutation = { updateOneEducation: { id: string, slug: string | null } };
 
 export type UpdateManyEducationsMutationVariables = Exact<{
   educationIds: Array<string | number> | string | number;
@@ -593,7 +593,7 @@ export type RemoveOneEducationMutationVariables = Exact<{
 }>;
 
 
-export type RemoveOneEducationMutation = { removeOneEducation: { id: string, slug: string } };
+export type RemoveOneEducationMutation = { removeOneEducation: { id: string, slug: string | null } };
 
 export type RemoveManyEducationsMutationVariables = Exact<{
   educationIds: Array<string | number> | string | number;
@@ -607,7 +607,7 @@ export type CreateOneExperienceMutationVariables = Exact<{
 }>;
 
 
-export type CreateOneExperienceMutation = { createOneExperience: { id: string, slug: string } };
+export type CreateOneExperienceMutation = { createOneExperience: { id: string, slug: string | null } };
 
 export type UpdateOneExperienceMutationVariables = Exact<{
   experienceId: string | number;
@@ -615,7 +615,7 @@ export type UpdateOneExperienceMutationVariables = Exact<{
 }>;
 
 
-export type UpdateOneExperienceMutation = { updateOneExperience: { id: string, slug: string } };
+export type UpdateOneExperienceMutation = { updateOneExperience: { id: string, slug: string | null } };
 
 export type UpdateManyExperiencesMutationVariables = Exact<{
   experienceIds: Array<string | number> | string | number;
@@ -630,7 +630,7 @@ export type RemoveOneExperienceMutationVariables = Exact<{
 }>;
 
 
-export type RemoveOneExperienceMutation = { removeOneExperience: { id: string, slug: string } };
+export type RemoveOneExperienceMutation = { removeOneExperience: { id: string, slug: string | null } };
 
 export type RemoveManyExperiencesMutationVariables = Exact<{
   experienceIds: Array<string | number> | string | number;
@@ -644,7 +644,7 @@ export type CreateOneOrganizationMutationVariables = Exact<{
 }>;
 
 
-export type CreateOneOrganizationMutation = { createOneOrganization: { id: string, slug: string } };
+export type CreateOneOrganizationMutation = { createOneOrganization: { id: string, slug: string | null } };
 
 export type UpdateOneOrganizationMutationVariables = Exact<{
   organizationId: string | number;
@@ -652,7 +652,7 @@ export type UpdateOneOrganizationMutationVariables = Exact<{
 }>;
 
 
-export type UpdateOneOrganizationMutation = { updateOneOrganization: { id: string, slug: string } };
+export type UpdateOneOrganizationMutation = { updateOneOrganization: { id: string, slug: string | null } };
 
 export type UpdateManyOrganizationsMutationVariables = Exact<{
   organizationIds: Array<string | number> | string | number;
@@ -667,7 +667,7 @@ export type DisableOneOrganizationMutationVariables = Exact<{
 }>;
 
 
-export type DisableOneOrganizationMutation = { disableOneOrganization: { id: string, slug: string } };
+export type DisableOneOrganizationMutation = { disableOneOrganization: { id: string, slug: string | null } };
 
 export type DisableManyOrganizationsMutationVariables = Exact<{
   organizationIds: Array<string | number> | string | number;
@@ -681,7 +681,7 @@ export type EnableOneOrganizationMutationVariables = Exact<{
 }>;
 
 
-export type EnableOneOrganizationMutation = { enableOneOrganization: { id: string, slug: string } };
+export type EnableOneOrganizationMutation = { enableOneOrganization: { id: string, slug: string | null } };
 
 export type EnableManyOrganizationsMutationVariables = Exact<{
   organizationIds: Array<string | number> | string | number;
@@ -695,7 +695,7 @@ export type RemoveOneOrganizationMutationVariables = Exact<{
 }>;
 
 
-export type RemoveOneOrganizationMutation = { removeOneOrganization: { id: string, slug: string } };
+export type RemoveOneOrganizationMutation = { removeOneOrganization: { id: string, slug: string | null } };
 
 export type RemoveManyOrganizationsMutationVariables = Exact<{
   organizationIds: Array<string | number> | string | number;
@@ -709,7 +709,7 @@ export type CreateOneProjectMutationVariables = Exact<{
 }>;
 
 
-export type CreateOneProjectMutation = { createOneProject: { id: string, slug: string } };
+export type CreateOneProjectMutation = { createOneProject: { id: string, slug: string | null } };
 
 export type UpdateOneProjectMutationVariables = Exact<{
   projectId: string | number;
@@ -717,7 +717,7 @@ export type UpdateOneProjectMutationVariables = Exact<{
 }>;
 
 
-export type UpdateOneProjectMutation = { updateOneProject: { id: string, slug: string } };
+export type UpdateOneProjectMutation = { updateOneProject: { id: string, slug: string | null } };
 
 export type UpdateManyProjectsMutationVariables = Exact<{
   projectIds: Array<string | number> | string | number;
@@ -732,7 +732,7 @@ export type RemoveOneProjectMutationVariables = Exact<{
 }>;
 
 
-export type RemoveOneProjectMutation = { removeOneProject: { id: string, slug: string } };
+export type RemoveOneProjectMutation = { removeOneProject: { id: string, slug: string | null } };
 
 export type RemoveManyProjectsMutationVariables = Exact<{
   projectIds: Array<string | number> | string | number;
@@ -746,7 +746,7 @@ export type CreateOneSkillMutationVariables = Exact<{
 }>;
 
 
-export type CreateOneSkillMutation = { createOneSkill: { id: string, slug: string, category: string | null, createdAt: string, updatedAt: string, i18n: Array<{ locale: string, messages: { title: string } }> } };
+export type CreateOneSkillMutation = { createOneSkill: { id: string, slug: string | null, category: string | null, createdAt: string, updatedAt: string, i18n: Array<{ locale: string, messages: { title: string } }> } };
 
 export type UpdateOneSkillMutationVariables = Exact<{
   skillId: string | number;
@@ -754,7 +754,7 @@ export type UpdateOneSkillMutationVariables = Exact<{
 }>;
 
 
-export type UpdateOneSkillMutation = { updateOneSkill: { id: string, slug: string, category: string | null, createdAt: string, updatedAt: string, i18n: Array<{ locale: string, messages: { title: string } }> } };
+export type UpdateOneSkillMutation = { updateOneSkill: { id: string, slug: string | null, category: string | null, createdAt: string, updatedAt: string, i18n: Array<{ locale: string, messages: { title: string } }> } };
 
 export type UpdateManySkillsMutationVariables = Exact<{
   skillIds: Array<string | number> | string | number;
@@ -769,7 +769,7 @@ export type DisableOneSkillMutationVariables = Exact<{
 }>;
 
 
-export type DisableOneSkillMutation = { disableOneSkill: { id: string, slug: string } };
+export type DisableOneSkillMutation = { disableOneSkill: { id: string, slug: string | null } };
 
 export type DisableManySkillsMutationVariables = Exact<{
   skillIds: Array<string | number> | string | number;
@@ -783,7 +783,7 @@ export type EnableOneSkillMutationVariables = Exact<{
 }>;
 
 
-export type EnableOneSkillMutation = { enableOneSkill: { id: string, slug: string } };
+export type EnableOneSkillMutation = { enableOneSkill: { id: string, slug: string | null } };
 
 export type EnableManySkillsMutationVariables = Exact<{
   skillIds: Array<string | number> | string | number;
@@ -797,7 +797,7 @@ export type RemoveOneSkillMutationVariables = Exact<{
 }>;
 
 
-export type RemoveOneSkillMutation = { removeOneSkill: { id: string, slug: string } };
+export type RemoveOneSkillMutation = { removeOneSkill: { id: string, slug: string | null } };
 
 export type RemoveManySkillsMutationVariables = Exact<{
   skillIds: Array<string | number> | string | number;
@@ -825,7 +825,7 @@ export type FindManyApiTokensQuery = { findManyApiTokens: { found: number, nodes
 export type GetMeQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetMeQuery = { getMe: { id: string, email: string, name: string, nickname: string, role: UserRole, avatar: string | null, phone: string | null, birth: string | null, address: string | null, skillIds: Array<string> | null, i18n: Array<{ locale: string, messages: { title: string | null, description: string | null } }> | null, urls: Array<{ title: string, value: string }> | null, skills: Array<{ id: string, slug: string, i18n: Array<{ locale: string, messages: { title: string } }> }> | null } };
+export type GetMeQuery = { getMe: { id: string, email: string, name: string, nickname: string, role: UserRole, avatar: string | null, phone: string | null, birth: string | null, address: string | null, skillIds: Array<string> | null, i18n: Array<{ locale: string, messages: { title: string | null, description: string | null } }> | null, urls: Array<{ title: string, value: string }> | null, skills: Array<{ id: string, slug: string | null, i18n: Array<{ locale: string, messages: { title: string } }> }> | null } };
 
 export type FindManyCoursesQueryVariables = Exact<{
   courseFilters?: FilterCourseInput | null | undefined;
@@ -834,7 +834,7 @@ export type FindManyCoursesQueryVariables = Exact<{
 }>;
 
 
-export type FindManyCoursesQuery = { findManyCourses: { found: number, nodes: Array<{ id: string, slug: string, status: CourseStatus, relevance: number, url: string | null, image: string | null, hours: number | null, createdAt: string, updatedAt: string, owner: { id: string, nickname: string, name: string, role: UserRole, email: string, phone: string | null, avatar: string | null }, organization: { id: string, name: string, slug: string } | null, i18n: Array<{ locale: string, messages: { title: string, description: string } }>, skills: Array<{ id: string, slug: string, i18n: Array<{ locale: string, messages: { title: string } }> }> | null }> } };
+export type FindManyCoursesQuery = { findManyCourses: { found: number, nodes: Array<{ id: string, slug: string | null, status: CourseStatus, relevance: number, url: string | null, image: string | null, hours: number | null, createdAt: string, updatedAt: string, owner: { id: string, nickname: string, name: string, role: UserRole, email: string, phone: string | null, avatar: string | null }, organization: { id: string, name: string, slug: string | null } | null, i18n: Array<{ locale: string, messages: { title: string, description: string } }>, skills: Array<{ id: string, slug: string | null, i18n: Array<{ locale: string, messages: { title: string } }> }> | null }> } };
 
 export type DashboardQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -848,7 +848,7 @@ export type FindManyEducationsQueryVariables = Exact<{
 }>;
 
 
-export type FindManyEducationsQuery = { findManyEducations: { found: number, nodes: Array<{ id: string, slug: string, level: EducationLevel, status: EducationStatus, relevance: number, url: string | null, image: string | null, createdAt: string, updatedAt: string, owner: { id: string, nickname: string, name: string, role: UserRole, email: string, phone: string | null, avatar: string | null }, organization: { id: string, name: string, slug: string } | null, i18n: Array<{ locale: string, messages: { title: string, description: string } }>, skills: Array<{ id: string, slug: string, i18n: Array<{ locale: string, messages: { title: string } }> }> | null, period: { from: string | null, to: string | null } | null }> } };
+export type FindManyEducationsQuery = { findManyEducations: { found: number, nodes: Array<{ id: string, slug: string | null, level: EducationLevel, status: EducationStatus, relevance: number, url: string | null, image: string | null, createdAt: string, updatedAt: string, owner: { id: string, nickname: string, name: string, role: UserRole, email: string, phone: string | null, avatar: string | null }, organization: { id: string, name: string, slug: string | null } | null, i18n: Array<{ locale: string, messages: { title: string, description: string } }>, skills: Array<{ id: string, slug: string | null, i18n: Array<{ locale: string, messages: { title: string } }> }> | null, period: { from: string | null, to: string | null } | null }> } };
 
 export type FindManyExperiencesQueryVariables = Exact<{
   experienceFilters?: FilterExperienceInput | null | undefined;
@@ -857,7 +857,7 @@ export type FindManyExperiencesQueryVariables = Exact<{
 }>;
 
 
-export type FindManyExperiencesQuery = { findManyExperiences: { found: number, nodes: Array<{ id: string, slug: string, category: ExperienceCategory, relevance: number, createdAt: string, updatedAt: string, owner: { id: string, nickname: string, name: string, role: UserRole, email: string, phone: string | null, avatar: string | null }, organization: { id: string, name: string, slug: string } | null, roles: Array<{ i18n: Array<{ locale: string, messages: { title: string, description: string } }>, period: { from: string | null, to: string | null } | null, skills: Array<{ id: string, slug: string, i18n: Array<{ locale: string, messages: { title: string } }> }> | null }> }> } };
+export type FindManyExperiencesQuery = { findManyExperiences: { found: number, nodes: Array<{ id: string, slug: string | null, category: ExperienceCategory, relevance: number, createdAt: string, updatedAt: string, owner: { id: string, nickname: string, name: string, role: UserRole, email: string, phone: string | null, avatar: string | null }, organization: { id: string, name: string, slug: string | null } | null, roles: Array<{ i18n: Array<{ locale: string, messages: { title: string, description: string } }>, period: { from: string | null, to: string | null } | null, skills: Array<{ id: string, slug: string | null, i18n: Array<{ locale: string, messages: { title: string } }> }> | null }> }> } };
 
 export type FindManyOrganizationsQueryVariables = Exact<{
   organizationFilters?: FilterOrganizationInput | null | undefined;
@@ -866,7 +866,7 @@ export type FindManyOrganizationsQueryVariables = Exact<{
 }>;
 
 
-export type FindManyOrganizationsQuery = { findManyOrganizations: { found: number, nodes: Array<{ id: string, name: string, slug: string, category: OrganizationCategory, logo: string | null, website: string | null, disabled: boolean, partition: CatalogPartition, createdAt: string, updatedAt: string, owner: { id: string, nickname: string, name: string, role: UserRole, email: string, phone: string | null, avatar: string | null }, i18n: Array<{ locale: string, messages: { description: string } }> }> } };
+export type FindManyOrganizationsQuery = { findManyOrganizations: { found: number, nodes: Array<{ id: string, name: string, slug: string | null, category: OrganizationCategory, logo: string | null, website: string | null, disabled: boolean, partition: CatalogPartition, createdAt: string, updatedAt: string, owner: { id: string, nickname: string, name: string, role: UserRole, email: string, phone: string | null, avatar: string | null }, i18n: Array<{ locale: string, messages: { description: string } }> }> } };
 
 export type FindManyActiveOrganizationsQueryVariables = Exact<{
   organizationFilters?: FilterOrganizationInput | null | undefined;
@@ -875,7 +875,7 @@ export type FindManyActiveOrganizationsQueryVariables = Exact<{
 }>;
 
 
-export type FindManyActiveOrganizationsQuery = { findManyActiveOrganizations: { found: number, nodes: Array<{ id: string, name: string, slug: string, category: OrganizationCategory, logo: string | null, website: string | null, disabled: boolean, partition: CatalogPartition, createdAt: string, updatedAt: string, owner: { id: string, nickname: string, name: string, role: UserRole, email: string, phone: string | null, avatar: string | null }, i18n: Array<{ locale: string, messages: { description: string } }> }> } };
+export type FindManyActiveOrganizationsQuery = { findManyActiveOrganizations: { found: number, nodes: Array<{ id: string, name: string, slug: string | null, category: OrganizationCategory, logo: string | null, website: string | null, disabled: boolean, partition: CatalogPartition, createdAt: string, updatedAt: string, owner: { id: string, nickname: string, name: string, role: UserRole, email: string, phone: string | null, avatar: string | null }, i18n: Array<{ locale: string, messages: { description: string } }> }> } };
 
 export type FindManyProjectsQueryVariables = Exact<{
   projectFilters?: FilterProjectInput | null | undefined;
@@ -884,7 +884,7 @@ export type FindManyProjectsQueryVariables = Exact<{
 }>;
 
 
-export type FindManyProjectsQuery = { findManyProjects: { found: number, nodes: Array<{ id: string, slug: string, relevance: number, images: Array<string> | null, createdAt: string, updatedAt: string, owner: { id: string, nickname: string, name: string, role: UserRole, email: string, phone: string | null, avatar: string | null }, urls: Array<{ title: string, value: string }> | null, i18n: Array<{ locale: string, messages: { title: string, description: string } }>, skills: Array<{ id: string, slug: string, i18n: Array<{ locale: string, messages: { title: string } }> }> | null }> } };
+export type FindManyProjectsQuery = { findManyProjects: { found: number, nodes: Array<{ id: string, slug: string | null, relevance: number, images: Array<string> | null, createdAt: string, updatedAt: string, owner: { id: string, nickname: string, name: string, role: UserRole, email: string, phone: string | null, avatar: string | null }, urls: Array<{ title: string, value: string }> | null, i18n: Array<{ locale: string, messages: { title: string, description: string } }>, skills: Array<{ id: string, slug: string | null, i18n: Array<{ locale: string, messages: { title: string } }> }> | null }> } };
 
 export type FindManySkillsQueryVariables = Exact<{
   skillFilters?: FilterSkillInput | null | undefined;
@@ -893,7 +893,7 @@ export type FindManySkillsQueryVariables = Exact<{
 }>;
 
 
-export type FindManySkillsQuery = { findManySkills: { found: number, nodes: Array<{ id: string, slug: string, category: string | null, disabled: boolean, partition: CatalogPartition, createdAt: string, updatedAt: string, owner: { id: string, nickname: string, name: string, role: UserRole, email: string, phone: string | null, avatar: string | null }, i18n: Array<{ locale: string, messages: { title: string } }> }> } };
+export type FindManySkillsQuery = { findManySkills: { found: number, nodes: Array<{ id: string, slug: string | null, category: string | null, disabled: boolean, partition: CatalogPartition, createdAt: string, updatedAt: string, owner: { id: string, nickname: string, name: string, role: UserRole, email: string, phone: string | null, avatar: string | null }, i18n: Array<{ locale: string, messages: { title: string } }> }> } };
 
 export type FindManyActiveSkillsQueryVariables = Exact<{
   skillFilters?: FilterSkillInput | null | undefined;
@@ -902,7 +902,7 @@ export type FindManyActiveSkillsQueryVariables = Exact<{
 }>;
 
 
-export type FindManyActiveSkillsQuery = { findManyActiveSkills: { found: number, nodes: Array<{ id: string, slug: string, category: string | null, disabled: boolean, partition: CatalogPartition, createdAt: string, updatedAt: string, owner: { id: string, nickname: string, name: string, role: UserRole, email: string, phone: string | null, avatar: string | null }, i18n: Array<{ locale: string, messages: { title: string } }> }> } };
+export type FindManyActiveSkillsQuery = { findManyActiveSkills: { found: number, nodes: Array<{ id: string, slug: string | null, category: string | null, disabled: boolean, partition: CatalogPartition, createdAt: string, updatedAt: string, owner: { id: string, nickname: string, name: string, role: UserRole, email: string, phone: string | null, avatar: string | null }, i18n: Array<{ locale: string, messages: { title: string } }> }> } };
 
 export class TypedDocumentString<TResult, TVariables>
   extends String

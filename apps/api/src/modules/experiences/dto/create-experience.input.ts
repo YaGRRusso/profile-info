@@ -55,10 +55,9 @@ export class CreateExperienceInput {
   @OptionalField(() => Number)
   relevance?: number;
 
-  @RequiredField(() => String)
+  @OptionalField(() => String)
   @IsString()
-  @IsNotEmpty()
-  slug: string;
+  slug?: string;
 
   @RequiredField(() => String)
   @IsMongoId()

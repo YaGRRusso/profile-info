@@ -22,8 +22,8 @@ export class SkillTranslationLocale {
 
 @ObjectType()
 export class SkillEntity extends BaseEntity {
-  @Field(() => String)
-  slug: string;
+  @OptionalField(() => String)
+  slug?: string;
 
   @Field(() => [SkillTranslationLocale])
   i18n: SkillTranslationLocale[];

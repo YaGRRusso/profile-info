@@ -33,8 +33,8 @@ export class SkillModel extends BaseModel {
   })
   ownerId?: mongoose.Types.ObjectId | string;
 
-  @Prop({ type: String, required: true })
-  slug: string;
+  @Prop({ type: String })
+  slug?: string;
 
   @Prop({ type: String })
   category?: string;
@@ -48,4 +48,7 @@ export class SkillModel extends BaseModel {
 
 export const SkillSchema = SchemaFactory.createForClass(SkillModel);
 
-SkillSchema.index({ partition: 1, ownerId: 1, slug: 1 }, { unique: true });
+SkillSchema.index(
+  { partition: 1, ownerId: 1, slug: 1 },
+  { unique: true, sparse: true }
+);

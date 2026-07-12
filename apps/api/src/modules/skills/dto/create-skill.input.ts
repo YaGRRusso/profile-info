@@ -20,10 +20,9 @@ const SkillTranslationInput = createTranslationInput(CreateSkillMessagesInput);
 
 @InputType()
 export class CreateSkillInput {
-  @RequiredField(() => String)
+  @OptionalField(() => String)
   @IsString()
-  @IsNotEmpty()
-  slug: string;
+  slug?: string;
 
   @RequiredField(() => [SkillTranslationInput])
   @IsArray()

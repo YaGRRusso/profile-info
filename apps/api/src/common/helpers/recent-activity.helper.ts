@@ -8,8 +8,8 @@ interface I18nWithTitle {
 }
 
 export function labelFromI18nTitle(
-  slug: string,
+  slug: string | undefined,
   i18n?: I18nWithTitle[]
 ): string {
-  return i18n?.[0]?.messages?.title ?? slug;
+  return i18n?.[0]?.messages?.title ?? slug ?? "";
 }

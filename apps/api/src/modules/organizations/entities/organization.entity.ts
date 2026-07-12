@@ -1,4 +1,5 @@
 import { Field, ID, ObjectType } from "@nestjs/graphql";
+import { OptionalField } from "@/core/decorators/optional-field.decorator";
 import { BaseEntity } from "@/core/entities/base.entity";
 import { CatalogPartition } from "@/core/enums/catalog-partition.enum";
 import { createPaginatedModel } from "@/core/schemas/paginated.schema";
@@ -22,8 +23,8 @@ export class OrganizationTranslationLocale {
 
 @ObjectType()
 export class OrganizationEntity extends BaseEntity {
-  @Field(() => String)
-  slug: string;
+  @OptionalField(() => String)
+  slug?: string;
 
   @Field(() => String)
   name: string;

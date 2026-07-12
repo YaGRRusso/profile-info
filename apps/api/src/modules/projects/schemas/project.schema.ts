@@ -23,8 +23,8 @@ export class ProjectModel extends BaseModel {
   @Prop({ type: Number, required: true, default: 0 })
   relevance: number;
 
-  @Prop({ type: String, required: true })
-  slug: string;
+  @Prop({ type: String })
+  slug?: string;
 
   @Prop({
     type: mongoose.Schema.Types.ObjectId,
@@ -54,4 +54,4 @@ export class ProjectModel extends BaseModel {
 
 export type ProjectDocument = HydratedDocument<ProjectModel>;
 export const ProjectSchema = SchemaFactory.createForClass(ProjectModel);
-ProjectSchema.index({ ownerId: 1, slug: 1 }, { unique: true });
+ProjectSchema.index({ ownerId: 1, slug: 1 }, { unique: true, sparse: true });

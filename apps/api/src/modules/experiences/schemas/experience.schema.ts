@@ -43,8 +43,8 @@ export class ExperienceModel extends BaseModel {
   @Prop({ type: Number, required: true, default: 0 })
   relevance: number;
 
-  @Prop({ type: String, required: true })
-  slug: string;
+  @Prop({ type: String })
+  slug?: string;
 
   @Prop({
     type: mongoose.Schema.Types.ObjectId,
@@ -74,4 +74,4 @@ export class ExperienceModel extends BaseModel {
 
 export type ExperienceDocument = HydratedDocument<ExperienceModel>;
 export const ExperienceSchema = SchemaFactory.createForClass(ExperienceModel);
-ExperienceSchema.index({ ownerId: 1, slug: 1 }, { unique: true });
+ExperienceSchema.index({ ownerId: 1, slug: 1 }, { unique: true, sparse: true });

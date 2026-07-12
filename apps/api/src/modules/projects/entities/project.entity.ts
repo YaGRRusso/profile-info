@@ -26,8 +26,8 @@ export class ProjectEntity extends BaseEntity {
   @Field(() => Number)
   relevance: number;
 
-  @Field(() => String)
-  slug: string;
+  @OptionalField(() => String)
+  slug?: string;
 
   @Field(() => ID)
   ownerId: string;

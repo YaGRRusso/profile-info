@@ -6,5 +6,7 @@ export function resolveSkillTitle(
   skill: Pick<SkillEntityRecord, "slug" | "i18n">,
   locale: LocaleCode | string
 ): string {
-  return pickTranslation(skill.i18n, locale)?.messages.title ?? skill.slug;
+  return (
+    pickTranslation(skill.i18n, locale)?.messages.title ?? skill.slug ?? ""
+  );
 }

@@ -74,7 +74,7 @@ type CourseEntity {
   relevance: Float!
   skillIds: [ID!]
   skills: [SkillEntity!]
-  slug: String!
+  slug: String
   status: CourseStatus!
   updatedAt: DateTime!
   url: String
@@ -109,7 +109,7 @@ input CreateCourseInput {
   organizationId: String!
   relevance: Float
   skillIds: [String!]
-  slug: String!
+  slug: String
   status: CourseStatus!
   url: String
 }
@@ -132,7 +132,7 @@ input CreateEducationInput {
   period: DateRangeInput
   relevance: Float
   skillIds: [String!]
-  slug: String!
+  slug: String
   status: EducationStatus!
   url: String
 }
@@ -152,7 +152,7 @@ input CreateExperienceInput {
   organizationId: String!
   relevance: Float
   roles: [CreateExperienceRoleInput!]!
-  slug: String!
+  slug: String
 }
 
 input CreateExperienceMessagesInput {
@@ -176,7 +176,7 @@ input CreateOrganizationInput {
   i18n: [CreateOrganizationMessagesInputTranslationInput!]!
   logo: String
   name: String!
-  slug: String!
+  slug: String
   website: String
 }
 
@@ -194,7 +194,7 @@ input CreateProjectInput {
   images: [String!]
   relevance: Float
   skillIds: [String!]
-  slug: String!
+  slug: String
   urls: [UrlInput!]
 }
 
@@ -211,7 +211,7 @@ input CreateProjectMessagesInputTranslationInput {
 input CreateSkillInput {
   category: String
   i18n: [CreateSkillMessagesInputTranslationInput!]!
-  slug: String!
+  slug: String
 }
 
 input CreateSkillMessagesInput {
@@ -318,7 +318,7 @@ type EducationEntity {
   relevance: Float!
   skillIds: [ID!]
   skills: [SkillEntity!]
-  slug: String!
+  slug: String
   status: EducationStatus!
   updatedAt: DateTime!
   url: String
@@ -367,7 +367,7 @@ type ExperienceEntity {
   relevance: Float!
   roles: [ExperienceRole!]!
   skills: [SkillEntity!]
-  slug: String!
+  slug: String
   updatedAt: DateTime!
 }
 
@@ -561,7 +561,7 @@ type OrganizationEntity {
   owner: UserEntity!
   ownerId: ID!
   partition: CatalogPartition!
-  slug: String!
+  slug: String
   updatedAt: DateTime!
   website: String
 }
@@ -630,7 +630,7 @@ type ProjectEntity {
   relevance: Float!
   skillIds: [ID!]
   skills: [SkillEntity!]
-  slug: String!
+  slug: String
   updatedAt: DateTime!
   urls: [UrlEntity!]
 }
@@ -709,7 +709,7 @@ type SkillEntity {
   owner: UserEntity!
   ownerId: ID!
   partition: CatalogPartition!
-  slug: String!
+  slug: String
   updatedAt: DateTime!
 }
 
