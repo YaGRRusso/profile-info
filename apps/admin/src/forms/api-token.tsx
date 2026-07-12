@@ -10,13 +10,12 @@ import {
 import type { ApiTokenRow } from "@/hooks/queries/api-tokens";
 import { toDateInput, toIsoDate } from "@/lib/date";
 import { fieldError } from "@/lib/field-error";
+import { FormError } from "@/lib/form-errors";
 import { CommonFormProps } from "./common";
 
 const apiTokenSchema = z.object({
-  name: z.string().min(1, "required field"),
-  permissions: z
-    .array(z.enum(ApiTokenPermission))
-    .min(1, "select at least one permission"),
+  name: z.string().min(1, FormError.requiredField),
+  permissions: z.array(z.enum(ApiTokenPermission)).min(1, FormError.minLength),
   expiresAt: z.string(),
 });
 

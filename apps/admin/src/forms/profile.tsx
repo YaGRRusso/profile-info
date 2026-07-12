@@ -23,39 +23,37 @@ import { useAtsSummarize, useTranslate } from "@/hooks/mutations/ai";
 import { useFindManySkills } from "@/hooks/queries/skills";
 import { toDateInput, toIsoDate } from "@/lib/date";
 import { fieldError } from "@/lib/field-error";
+import { FormError } from "@/lib/form-errors";
 import { hasUniqueLocales } from "@/lib/form-validation";
 import { createEmptyI18n, i18nLabel, i18nLabelsByIds } from "@/lib/i18n";
 import { useSystemMessagesStore } from "@/stores/system-messages";
 import { CommonFormProps } from "./common";
 
 const profileSchema = z.object({
-  name: z.string().min(1, "required field"),
-  nickname: z.string().min(1, "required field"),
-  email: z.email("invalid email"),
+  name: z.string().min(1, FormError.requiredField),
+  nickname: z.string().min(1, FormError.requiredField),
+  email: z.email(FormError.invalidField),
   phone: z.string(),
-  avatar: z.union([z.literal(""), z.url()]),
+  avatar: z.union([z.literal(""), z.url(FormError.invalidField)]),
   birth: z.union([z.literal(""), z.string()]),
   address: z.string(),
   i18n: z
     .array(
       z.object({
-        locale: z.string().min(1, "required field"),
+        locale: z.string().min(1, FormError.requiredField),
         title: z.string(),
         description: z.string(),
       })
     )
-    .refine(hasUniqueLocales, { message: "locales must be unique" }),
+    .refine(hasUniqueLocales, { message: FormError.uniqueField }),
   urls: z.array(
     z.object({
-      title: z.string().min(1, "required field"),
-      value: z.url(),
+      title: z.string().min(1, FormError.requiredField),
+      value: z.url(FormError.invalidField),
     })
   ),
   skillIds: z.array(z.string()),
-  password: z.union([
-    z.literal(""),
-    z.string().min(8, "must be at least 8 characters"),
-  ]),
+  password: z.union([z.literal(""), z.string().min(8, FormError.minLength)]),
 });
 
 export type ProfileSchema = z.infer<typeof profileSchema>;

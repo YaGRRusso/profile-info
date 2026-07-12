@@ -4,14 +4,15 @@ import z from "zod";
 import { PasswordInput } from "@/components/inputs/password";
 import { TextInput } from "@/components/inputs/text";
 import { fieldError } from "@/lib/field-error";
+import { FormError } from "@/lib/form-errors";
 import { CommonFormProps } from "./common";
 
 const userSchema = z.object({
-  email: z.email("invalid email"),
+  email: z.email(FormError.invalidField),
   password: z
     .string()
-    .min(1, "required field")
-    .min(6, "must be at least 6 characters"),
+    .min(1, FormError.requiredField)
+    .min(6, FormError.minLength),
 });
 
 export type UserSchema = z.infer<typeof userSchema>;

@@ -26,6 +26,7 @@ import { useFindManyOrganizations } from "@/hooks/queries/organizations";
 import { useFindManySkills } from "@/hooks/queries/skills";
 import { toDateInput, toIsoDate } from "@/lib/date";
 import { fieldError } from "@/lib/field-error";
+import { FormError } from "@/lib/form-errors";
 import { hasUniqueLocales } from "@/lib/form-validation";
 import {
   createEmptyI18n,
@@ -39,22 +40,22 @@ import { CommonFormProps } from "./common";
 const roleI18nSchema = z
   .array(
     z.object({
-      locale: z.string().min(1, "required field"),
-      title: z.string().min(1, "required field"),
-      description: z.string().min(1, "required field"),
+      locale: z.string().min(1, FormError.requiredField),
+      title: z.string().min(1, FormError.requiredField),
+      description: z.string().min(1, FormError.requiredField),
     })
   )
-  .min(1, "required group")
-  .refine(hasUniqueLocales, { message: "locales must be unique" });
+  .min(1, FormError.requiredGroup)
+  .refine(hasUniqueLocales, { message: FormError.uniqueField });
 
 const experienceSchema = z.object({
   slug: z
     .string()
-    .min(1, "required field")
-    .regex(SLUG_REGEX, "invalid field format"),
-  organizationId: z.string().min(1, "required field"),
-  category: z.enum(ExperienceCategory, "required field"),
-  relevance: z.number().min(1, "required field"),
+    .min(1, FormError.requiredField)
+    .regex(SLUG_REGEX, FormError.invalidField),
+  organizationId: z.string().min(1, FormError.requiredField),
+  category: z.enum(ExperienceCategory, FormError.requiredField),
+  relevance: z.number().min(1, FormError.requiredField),
   roles: z
     .array(
       z.object({
@@ -63,12 +64,12 @@ const experienceSchema = z.object({
           .object({ from: z.string(), to: z.string() })
           .refine(
             (range) => !(range.from && range.to) || range.from <= range.to,
-            { message: "end date must be after start date" }
+            { message: FormError.invalidField }
           ),
         skillIds: z.array(z.string()),
       })
     )
-    .min(1, "required group"),
+    .min(1, FormError.requiredGroup),
 });
 
 export type ExperienceSchema = z.infer<typeof experienceSchema>;
@@ -343,7 +344,7 @@ export function ExperienceForm({
         validators={{
           onChange: ({ value }) => {
             if (isSlugTaken(value, slugsList, defaultValues?.slug)) {
-              return { message: "slug already exists" };
+              return { message: FormError.existingField };
             }
           },
         }}

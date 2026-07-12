@@ -22,6 +22,7 @@ import { useAtsSummarize, useTranslate } from "@/hooks/mutations/ai";
 import type { ProjectRow } from "@/hooks/queries/projects";
 import { useFindManySkills } from "@/hooks/queries/skills";
 import { fieldError } from "@/lib/field-error";
+import { FormError } from "@/lib/form-errors";
 import { hasUniqueLocales } from "@/lib/form-validation";
 import { createEmptyI18n, i18nLabel, i18nLabelsByIds } from "@/lib/i18n";
 import { isSlugTaken } from "@/lib/slug";
@@ -30,27 +31,27 @@ import { CommonFormProps } from "./common";
 const projectSchema = z.object({
   slug: z
     .string()
-    .min(1, "required field")
-    .regex(SLUG_REGEX, "invalid field format"),
-  relevance: z.number().min(1, "required field"),
+    .min(1, FormError.requiredField)
+    .regex(SLUG_REGEX, FormError.invalidField),
+  relevance: z.number().min(1, FormError.requiredField),
   skillIds: z.array(z.string()),
-  images: z.array(z.url()),
+  images: z.array(z.url(FormError.invalidField)),
   urls: z.array(
     z.object({
-      title: z.string().min(1, "required field"),
-      value: z.url(),
+      title: z.string().min(1, FormError.requiredField),
+      value: z.url(FormError.invalidField),
     })
   ),
   i18n: z
     .array(
       z.object({
-        locale: z.string().min(1, "required field"),
-        title: z.string().min(1, "required field"),
-        description: z.string().min(1, "required field"),
+        locale: z.string().min(1, FormError.requiredField),
+        title: z.string().min(1, FormError.requiredField),
+        description: z.string().min(1, FormError.requiredField),
       })
     )
-    .min(1, "required group")
-    .refine(hasUniqueLocales, { message: "locales must be unique" }),
+    .min(1, FormError.requiredGroup)
+    .refine(hasUniqueLocales, { message: FormError.uniqueField }),
 });
 
 export type ProjectSchema = z.infer<typeof projectSchema>;
@@ -241,7 +242,7 @@ export function ProjectForm({
         validators={{
           onChange: ({ value }) => {
             if (isSlugTaken(value, slugsList, defaultValues?.slug)) {
-              return { message: "slug already exists" };
+              return { message: FormError.existingField };
             }
           },
         }}

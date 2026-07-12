@@ -27,6 +27,7 @@ import { useFindManyOrganizations } from "@/hooks/queries/organizations";
 import { useFindManySkills } from "@/hooks/queries/skills";
 import { toDateInput, toIsoDate } from "@/lib/date";
 import { fieldError } from "@/lib/field-error";
+import { FormError } from "@/lib/form-errors";
 import { hasUniqueLocales } from "@/lib/form-validation";
 import {
   createEmptyI18n,
@@ -40,29 +41,29 @@ import { CommonFormProps } from "./common";
 const educationSchema = z.object({
   slug: z
     .string()
-    .min(1, "required field")
-    .regex(SLUG_REGEX, "invalid field format"),
-  organizationId: z.string().min(1, "required field"),
-  level: z.enum(EducationLevel, "required field"),
-  status: z.enum(EducationStatus, "required field"),
-  relevance: z.number().min(1, "required field"),
-  url: z.url().or(z.literal("")),
-  image: z.url().or(z.literal("")),
+    .min(1, FormError.requiredField)
+    .regex(SLUG_REGEX, FormError.invalidField),
+  organizationId: z.string().min(1, FormError.requiredField),
+  level: z.enum(EducationLevel, FormError.requiredField),
+  status: z.enum(EducationStatus, FormError.requiredField),
+  relevance: z.number().min(1, FormError.requiredField),
+  url: z.url(FormError.invalidField).or(z.literal("")),
+  image: z.url(FormError.invalidField).or(z.literal("")),
   skillIds: z.array(z.string()),
   i18n: z
     .array(
       z.object({
-        locale: z.string().min(1, "required field"),
-        title: z.string().min(1, "required field"),
-        description: z.string().min(1, "required field"),
+        locale: z.string().min(1, FormError.requiredField),
+        title: z.string().min(1, FormError.requiredField),
+        description: z.string().min(1, FormError.requiredField),
       })
     )
-    .min(1, "required group")
-    .refine(hasUniqueLocales, { message: "locales must be unique" }),
+    .min(1, FormError.requiredGroup)
+    .refine(hasUniqueLocales, { message: FormError.uniqueField }),
   period: z
     .object({ from: z.string(), to: z.string() })
     .refine((range) => !(range.from && range.to) || range.from <= range.to, {
-      message: "end date must be after start date",
+      message: FormError.invalidField,
     }),
 });
 
@@ -350,7 +351,7 @@ export function EducationForm({
         validators={{
           onChange: ({ value }) => {
             if (isSlugTaken(value, slugsList, defaultValues?.slug)) {
-              return { message: "slug already exists" };
+              return { message: FormError.existingField };
             }
           },
         }}

@@ -236,19 +236,17 @@
     "optimize": "Optimize with AI"
   },
   "validation": {
-    "required": "Required field",
-    "invalidEmail": "Invalid email",
-    "minLength": "Must be at least {{value}} characters",
-    "invalidFieldFormat": "Invalid field format",
+    "requiredField": "Required field",
+    "invalidField": "Invalid field",
+    "uniqueField": "Must be unique",
+    "existingField": "Already exists",
+    "minLength": "Must be at least {{value}}",
+    "maxLength": "Must be at most {{value}}",
     "requiredGroup": "Required group",
-    "localesMustBeUnique": "Locales must be unique",
-    "slugAlreadyExists": "Slug already exists",
-    "selectAtLeastOnePermission": "Select at least one permission",
     "descriptionMin": "Description must be at least {{value}} characters long",
     "atLeastOneSkill": "At least one skill is required",
     "fieldRequired": "{{field}} is required",
-    "positiveNumber": "Must be a positive number",
-    "endDateAfterStartDate": "End date must be after start date"
+    "positiveNumber": "Must be a positive number"
   },
   "fieldArray": {
     "emptyTitle": "Nothing here yet",

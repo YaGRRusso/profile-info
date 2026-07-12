@@ -25,6 +25,7 @@ import type { CourseRow } from "@/hooks/queries/courses";
 import { useFindManyOrganizations } from "@/hooks/queries/organizations";
 import { useFindManySkills } from "@/hooks/queries/skills";
 import { fieldError } from "@/lib/field-error";
+import { FormError } from "@/lib/form-errors";
 import { hasUniqueLocales } from "@/lib/form-validation";
 import {
   createEmptyI18n,
@@ -38,25 +39,25 @@ import { CommonFormProps } from "./common";
 const courseSchema = z.object({
   slug: z
     .string()
-    .min(1, "required field")
-    .regex(SLUG_REGEX, "invalid field format"),
-  organizationId: z.string().min(1, "required field"),
-  status: z.enum(CourseStatus, "required field"),
-  relevance: z.number().min(1, "required field"),
-  url: z.url().or(z.literal("")),
-  image: z.url().or(z.literal("")),
+    .min(1, FormError.requiredField)
+    .regex(SLUG_REGEX, FormError.invalidField),
+  organizationId: z.string().min(1, FormError.requiredField),
+  status: z.enum(CourseStatus, FormError.requiredField),
+  relevance: z.number().min(1, FormError.requiredField),
+  url: z.url(FormError.invalidField).or(z.literal("")),
+  image: z.url(FormError.invalidField).or(z.literal("")),
   hours: z.number(),
   skillIds: z.array(z.string()),
   i18n: z
     .array(
       z.object({
-        locale: z.string().min(1, "required field"),
-        title: z.string().min(1, "required field"),
-        description: z.string().min(1, "required field"),
+        locale: z.string().min(1, FormError.requiredField),
+        title: z.string().min(1, FormError.requiredField),
+        description: z.string().min(1, FormError.requiredField),
       })
     )
-    .min(1, "required group")
-    .refine(hasUniqueLocales, { message: "locales must be unique" }),
+    .min(1, FormError.requiredGroup)
+    .refine(hasUniqueLocales, { message: FormError.uniqueField }),
 });
 
 export type CourseSchema = z.infer<typeof courseSchema>;
@@ -313,7 +314,7 @@ export function CourseForm({
         validators={{
           onChange: ({ value }) => {
             if (isSlugTaken(value, slugsList, defaultValues?.slug)) {
-              return { message: "slug already exists" };
+              return { message: FormError.existingField };
             }
           },
         }}

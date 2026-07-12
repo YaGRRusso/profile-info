@@ -9,12 +9,11 @@ import {
   type UpdateApiTokenInput,
 } from "@/generated/graphql/graphql";
 import { fieldError } from "@/lib/field-error";
+import { FormError } from "@/lib/form-errors";
 import { CommonFormProps } from "./common";
 
 const apiTokenMultiSchema = z.object({
-  permissions: z
-    .array(z.enum(ApiTokenPermission))
-    .min(1, "select at least one permission"),
+  permissions: z.array(z.enum(ApiTokenPermission)).min(1, FormError.minLength),
 });
 
 export type ApiTokenMultiSchema = z.infer<typeof apiTokenMultiSchema>;

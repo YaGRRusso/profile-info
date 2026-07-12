@@ -6,10 +6,11 @@ import { CheckboxInput } from "@/components/inputs/checkbox";
 import { RangeInput } from "@/components/inputs/range";
 import type { UpdateProjectInput } from "@/generated/graphql/graphql";
 import { fieldError } from "@/lib/field-error";
+import { FormError } from "@/lib/form-errors";
 import { CommonFormProps } from "./common";
 
 const projectMultiSchema = z.object({
-  relevance: z.number().min(1),
+  relevance: z.number().min(1, FormError.requiredField),
 });
 
 export type ProjectMultiSchema = z.infer<typeof projectMultiSchema>;

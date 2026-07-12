@@ -10,11 +10,12 @@ import {
   type UpdateExperienceInput,
 } from "@/generated/graphql/graphql";
 import { fieldError } from "@/lib/field-error";
+import { FormError } from "@/lib/form-errors";
 import { CommonFormProps } from "./common";
 
 const experienceMultiSchema = z.object({
   category: z.enum(ExperienceCategory),
-  relevance: z.number().min(1),
+  relevance: z.number().min(1, FormError.requiredField),
 });
 
 export type ExperienceMultiSchema = z.infer<typeof experienceMultiSchema>;

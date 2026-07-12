@@ -20,6 +20,7 @@ import {
 import { useSummarize, useTranslate } from "@/hooks/mutations/ai";
 import { OrganizationRow } from "@/hooks/queries/organizations";
 import { fieldError } from "@/lib/field-error";
+import { FormError } from "@/lib/form-errors";
 import { hasUniqueLocales } from "@/lib/form-validation";
 import { createEmptyI18n } from "@/lib/i18n";
 import { isSlugTaken } from "@/lib/slug";
@@ -28,21 +29,21 @@ import { CommonFormProps } from "./common";
 const organizationSchema = z.object({
   slug: z
     .string()
-    .min(1, "required field")
-    .regex(SLUG_REGEX, "invalid field format"),
-  name: z.string().min(1, "required field"),
-  category: z.enum(OrganizationCategory, "required field"),
-  logo: z.union([z.url(), z.literal("")]),
-  website: z.union([z.url(), z.literal("")]),
+    .min(1, FormError.requiredField)
+    .regex(SLUG_REGEX, FormError.invalidField),
+  name: z.string().min(1, FormError.requiredField),
+  category: z.enum(OrganizationCategory, FormError.requiredField),
+  logo: z.union([z.url(FormError.invalidField), z.literal("")]),
+  website: z.union([z.url(FormError.invalidField), z.literal("")]),
   i18n: z
     .array(
       z.object({
-        locale: z.string().min(1, "required field"),
-        description: z.string().min(1, "required field"),
+        locale: z.string().min(1, FormError.requiredField),
+        description: z.string().min(1, FormError.requiredField),
       })
     )
-    .min(1, "required group")
-    .refine(hasUniqueLocales, { message: "locales must be unique" }),
+    .min(1, FormError.requiredGroup)
+    .refine(hasUniqueLocales, { message: FormError.uniqueField }),
 });
 
 export type OrganizationSchema = z.infer<typeof organizationSchema>;
@@ -217,7 +218,7 @@ export function OrganizationForm({
         validators={{
           onChange: ({ value }) => {
             if (isSlugTaken(value, slugsList, defaultValues?.slug)) {
-              return { message: "slug already exists" };
+              return { message: FormError.existingField };
             }
           },
         }}

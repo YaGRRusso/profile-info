@@ -9,6 +9,7 @@ import { SLUG_REGEX } from "@/consts/regex";
 import { type CreateSkillInput } from "@/generated/graphql/graphql";
 import type { SkillRow } from "@/hooks/queries/skills";
 import { fieldError } from "@/lib/field-error";
+import { FormError } from "@/lib/form-errors";
 import { hasUniqueLocales } from "@/lib/form-validation";
 import { createEmptyI18n } from "@/lib/i18n";
 import { isSlugTaken } from "@/lib/slug";
@@ -17,18 +18,18 @@ import { CommonFormProps } from "./common";
 const skillSchema = z.object({
   slug: z
     .string()
-    .min(1, "required field")
-    .regex(SLUG_REGEX, "invalid field format"),
+    .min(1, FormError.requiredField)
+    .regex(SLUG_REGEX, FormError.invalidField),
   category: z.string(),
   i18n: z
     .array(
       z.object({
-        locale: z.string().min(1, "required field"),
-        title: z.string().min(1, "required field"),
+        locale: z.string().min(1, FormError.requiredField),
+        title: z.string().min(1, FormError.requiredField),
       })
     )
-    .min(1, "required group")
-    .refine(hasUniqueLocales, { message: "locales must be unique" }),
+    .min(1, FormError.requiredGroup)
+    .refine(hasUniqueLocales, { message: FormError.uniqueField }),
 });
 
 export type SkillSchema = z.infer<typeof skillSchema>;
@@ -98,7 +99,7 @@ export function SkillForm({
         validators={{
           onChange: ({ value }) => {
             if (isSlugTaken(value, slugsList, defaultValues?.slug)) {
-              return { message: "slug already exists" };
+              return { message: FormError.existingField };
             }
           },
         }}

@@ -236,19 +236,17 @@
     "optimize": "Otimizar com IA"
   },
   "validation": {
-    "required": "Campo obrigatório",
-    "invalidEmail": "E-mail inválido",
-    "minLength": "Deve ter pelo menos {{value}} caracteres",
-    "invalidFieldFormat": "Formato de campo inválido",
+    "requiredField": "Campo obrigatório",
+    "invalidField": "Campo inválido",
+    "uniqueField": "Deve ser único",
+    "existingField": "Já existe",
+    "minLength": "Deve ter pelo menos {{value}}",
+    "maxLength": "Deve ter no máximo {{value}}",
     "requiredGroup": "Grupo obrigatório",
-    "localesMustBeUnique": "Os idiomas devem ser únicos",
-    "slugAlreadyExists": "Slug já existe",
-    "selectAtLeastOnePermission": "Selecione pelo menos uma permissão",
     "descriptionMin": "A descrição deve ter pelo menos {{value}} caracteres",
     "atLeastOneSkill": "Pelo menos uma habilidade é obrigatória",
     "fieldRequired": "{{field}} é obrigatório",
-    "positiveNumber": "Deve ser um número positivo",
-    "endDateAfterStartDate": "A data final deve ser posterior à data inicial"
+    "positiveNumber": "Deve ser um número positivo"
   },
   "fieldArray": {
     "emptyTitle": "Nada aqui ainda",

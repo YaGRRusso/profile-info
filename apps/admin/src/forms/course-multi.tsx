@@ -10,11 +10,12 @@ import {
   type UpdateCourseInput,
 } from "@/generated/graphql/graphql";
 import { fieldError } from "@/lib/field-error";
+import { FormError } from "@/lib/form-errors";
 import { CommonFormProps } from "./common";
 
 const courseMultiSchema = z.object({
   status: z.enum(CourseStatus),
-  relevance: z.number().min(1),
+  relevance: z.number().min(1, FormError.requiredField),
 });
 
 export type CourseMultiSchema = z.infer<typeof courseMultiSchema>;
