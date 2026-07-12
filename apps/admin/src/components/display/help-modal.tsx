@@ -21,14 +21,14 @@ export function HelpModal({
       <button
         aria-label="help"
         className={cn(
-          "btn btn-circle btn-ghost btn-sm -mb-2 shrink-0",
+          "btn btn-circle btn-ghost btn-sm -mb-1 shrink-0 text-[1em]",
           className
         )}
         onClick={() => setIsOpen(true)}
         type="button"
         {...props}
       >
-        <QuestionIcon size={20} />
+        <QuestionIcon />
       </button>
 
       <Modal isOpen={isOpen} onClose={() => setIsOpen(false)} title={title}>

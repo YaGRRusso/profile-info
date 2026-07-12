@@ -103,6 +103,7 @@ Never build keys dynamically (`t(\`stats.${key}\`)`, `t(item.id)`). Dynamic list
 | Area | Approach |
 |------|----------|
 | Form chrome | `forms.json`; `useTranslation("forms")` as `tForm` — `fields.<key>.label`, `.placeholder`, `.tooltip`; `batch.<key>.label` / `.tooltip`; sections, submit |
+| Field tooltips | Explain what the field **is** and what it is **for** — not optional/required, validation, format rules, or UI instructions |
 | Form validation (Zod) | `FormError` keys in static schemas; `invalidFormat` (shape), `invalidRange` (intervals), `invalidField` (other); `fieldError` → `i18n.t(key, { ns: "validation" })` |
 | AI/ATS validation toasts | `tValidation("minLength", { value })` for text; `tValidation("minCount", { value: 1 })` for skills; `tValidation("requiredField")` |
 | AI textarea buttons | `tForm("ai.translate")`, `tForm("ai.optimize")` inside `textarea.tsx` |

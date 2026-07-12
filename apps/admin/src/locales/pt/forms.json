@@ -3,7 +3,7 @@
     "slug": {
       "label": "Slug",
       "placeholder": "ex.: meu-slug",
-      "tooltip": "Identificador opcional para URLs. Use apenas letras minúsculas, números e hífens quando preenchido."
+      "tooltip": "Identificador curto usado em URLs para referenciar este registro."
     },
     "email": {
       "label": "E-mail",
@@ -13,25 +13,25 @@
     "password": {
       "label": "Senha",
       "placeholder": "ex.: abc#123",
-      "tooltip": "Senha da conta. Deve ter pelo menos 6 caracteres."
+      "tooltip": "Credencial secreta usada para autenticar sua conta."
     },
     "locale": {
       "label": "Idioma",
       "placeholder": "Escolha um...",
-      "tooltip": "Idioma desta tradução. Cada idioma pode aparecer apenas uma vez por registro."
+      "tooltip": "Idioma deste bloco de texto."
     },
     "description": {
       "label": "Descrição",
       "placeholder": "Escreva uma breve descrição...",
-      "tooltip": "Resumo mais longo no idioma selecionado. Usado no perfil e no CV."
+      "tooltip": "Texto detalhado sobre esta entrada, exibido no perfil e no CV."
     },
     "translation": {
       "label": "Tradução",
-      "tooltip": "Conteúdo localizado deste registro. Adicione uma entrada por idioma suportado."
+      "tooltip": "Versões localizadas do conteúdo deste registro."
     },
     "link": {
       "label": "Link",
-      "tooltip": "Links nomeados como site, portfólio ou demo."
+      "tooltip": "Link externo nomeado relacionado a este registro."
     },
     "linkTitle": {
       "placeholder": "ex.: Site, Portfólio, Demo"
@@ -42,181 +42,181 @@
     "image": {
       "label": "Imagem",
       "placeholder": "ex.: https://exemplo.com",
-      "tooltip": "URL opcional de imagem ilustrando esta entrada."
+      "tooltip": "Imagem que ilustra esta entrada no perfil ou no CV."
     },
     "skills": {
       "label": "Habilidades",
       "placeholder": "Digite para buscar...",
-      "tooltip": "Habilidades do catálogo vinculadas a este registro. A ordem importa quando a lista é arrastável."
+      "tooltip": "Habilidades do catálogo associadas a este registro."
     },
     "relevance": {
       "label": "Relevância",
-      "tooltip": "Nota de 1 a 5. Valores maiores aparecem com mais destaque no CV."
+      "tooltip": "Quão em destaque esta entrada deve aparecer no CV."
     },
     "period": {
       "label": "Período",
-      "tooltip": "Datas de início e fim. Deixe a data final vazia se ainda estiver em andamento."
+      "tooltip": "Intervalo de tempo em que esta atividade ocorreu."
     },
     "hours": {
       "label": "Horas",
       "placeholder": "ex.: 24",
-      "tooltip": "Carga horária ou duração total em horas."
+      "tooltip": "Total de horas dedicadas a este curso ou treinamento."
     },
     "url": {
       "label": "URL",
       "placeholder": "ex.: https://exemplo.com",
-      "tooltip": "URL pública opcional para verificação ou referência."
+      "tooltip": "Página pública onde esta entrada pode ser verificada ou consultada."
     },
     "organization": {
       "label": "Organização",
       "placeholder": "Escolha um...",
-      "tooltip": "Empregador, escola ou plataforma do catálogo de Organizações."
+      "tooltip": "Empresa, escola ou instituição vinculada a esta entrada."
     },
     "level": {
       "label": "Nível",
       "placeholder": "Escolha um...",
-      "tooltip": "Nível acadêmico desta formação."
+      "tooltip": "Nível de formação acadêmica desta educação."
     },
     "status": {
       "label": "Status",
       "placeholder": "Escolha um...",
-      "tooltip": "Se o curso ou formação está concluído, em andamento ou planejado."
+      "tooltip": "Estágio de conclusão deste curso ou formação."
     },
     "role": {
       "label": "Função",
-      "tooltip": "Cargo exercido nesta experiência. Adicione mais de um se mudou de função na mesma organização."
+      "tooltip": "Um cargo ou função dentro desta experiência profissional."
     },
     "permissions": {
       "label": "Permissões",
       "placeholder": "Escolha um ou mais...",
-      "tooltip": "Quais ações de API este token pode executar."
+      "tooltip": "Operações de API que este token pode executar."
     },
     "expiresAtOptional": {
       "label": "Expira em (opcional)",
-      "tooltip": "Data de expiração opcional. O token deixa de funcionar após essa data."
+      "tooltip": "Data em que este token deve deixar de funcionar."
     },
     "logo": {
       "label": "Logo",
       "placeholder": "ex.: https://exemplo.com",
-      "tooltip": "URL opcional do logo desta organização."
+      "tooltip": "Logo da organização exibido junto ao nome."
     },
     "website": {
       "label": "Site",
       "placeholder": "ex.: https://exemplo.com",
-      "tooltip": "URL opcional do site desta organização."
+      "tooltip": "Site principal da organização."
     },
     "nickname": {
       "label": "Apelido",
       "placeholder": "ex.: joaosilva",
-      "tooltip": "Apelido ou nome preferido (opcional)."
+      "tooltip": "Nome curto usado informalmente no seu perfil."
     },
     "birthDate": {
       "label": "Data de nascimento",
       "placeholder": "AAAA-MM-DD",
-      "tooltip": "Data de nascimento opcional para o perfil."
+      "tooltip": "Sua data de nascimento exibida no perfil."
     },
     "avatarUrl": {
       "label": "URL do avatar",
       "placeholder": "ex.: https://exemplo.com",
-      "tooltip": "URL opcional da imagem de perfil."
+      "tooltip": "Foto de perfil exibida na conta e no CV."
     },
     "phone": {
       "label": "Telefone",
       "placeholder": "ex.: 11 99999-9999",
-      "tooltip": "Telefone de contato (opcional)."
+      "tooltip": "Telefone de contato no seu perfil."
     },
     "address": {
       "label": "Endereço",
       "placeholder": "ex.: Rua, Cidade, Estado, País",
-      "tooltip": "Endereço ou localização opcional."
+      "tooltip": "Endereço ou localização no seu perfil."
     },
     "newPassword": {
       "label": "Nova senha",
       "placeholder": "ex.: abc#123",
-      "tooltip": "Deixe em branco para manter a senha atual. Mínimo de 8 caracteres se preenchido."
+      "tooltip": "Nova credencial usada para entrar após a alteração."
     },
     "profileName": {
       "label": "Nome",
       "placeholder": "ex.: João Silva",
-      "tooltip": "Seu nome profissional completo como deve aparecer no CV."
+      "tooltip": "Seu nome profissional como aparece no CV."
     },
     "organizationName": {
       "label": "Nome",
       "placeholder": "ex.: Empresa XYZ",
-      "tooltip": "Nome público da organização exibido nos seletores e no CV."
+      "tooltip": "Nome oficial da organização."
     },
     "apiTokenName": {
       "label": "Nome",
       "placeholder": "ex.: Token do Pipeline",
-      "tooltip": "Rótulo amigável para reconhecer este token na lista depois."
+      "tooltip": "Rótulo para identificar este token na lista."
     },
     "skillCategory": {
       "label": "Categoria",
       "placeholder": "ex.: Soft Skills, Saúde, Escritório",
-      "tooltip": "Agrupamento opcional exibido no CV quando as habilidades são listadas por categoria."
+      "tooltip": "Nome do grupo usado para organizar habilidades no CV."
     },
     "organizationCategory": {
       "label": "Categoria",
       "placeholder": "Escolha um...",
-      "tooltip": "Tipo de organização, como empresa, escola ou plataforma."
+      "tooltip": "Tipo de organização, como empresa ou escola."
     },
     "experienceCategory": {
       "label": "Categoria",
       "placeholder": "Escolha um...",
-      "tooltip": "Tipo de vínculo, como tempo integral, meio período, freelance ou voluntário."
+      "tooltip": "Natureza do vínculo, como tempo integral ou freelance."
     },
     "skillTitle": {
       "label": "Título",
       "placeholder": "ex.: Atendimento, Excel, Liderança",
-      "tooltip": "Título exibido no idioma selecionado."
+      "tooltip": "Nome da habilidade como os leitores verão."
     },
     "profileTitle": {
       "label": "Título",
       "placeholder": "ex.: Gerente de Loja, Enfermeiro",
-      "tooltip": "Título exibido no idioma selecionado."
+      "tooltip": "Título profissional no perfil e no CV."
     },
     "experienceTitle": {
       "label": "Título",
       "placeholder": "ex.: Líder de Equipe, Vendedor",
-      "tooltip": "Título exibido no idioma selecionado."
+      "tooltip": "Cargo desta função."
     },
     "educationTitle": {
       "label": "Título",
       "placeholder": "ex.: Administração, Enfermagem",
-      "tooltip": "Título exibido no idioma selecionado."
+      "tooltip": "Nome do curso, programa ou formação."
     },
     "courseTitle": {
       "label": "Título",
       "placeholder": "ex.: Segurança Alimentar, Primeiros Socorros",
-      "tooltip": "Título exibido no idioma selecionado."
+      "tooltip": "Nome deste treinamento ou certificação."
     },
     "projectTitle": {
       "label": "Título",
       "placeholder": "ex.: Projeto Comunitário, Reorganização",
-      "tooltip": "Título exibido no idioma selecionado."
+      "tooltip": "Nome deste projeto como aparece no CV."
     }
   },
   "sections": {
     "translations": {
       "label": "Traduções",
-      "tooltip": "Título e descrição localizados para este registro. Adicione uma entrada por idioma suportado."
+      "tooltip": "Título e descrição em diferentes idiomas."
     },
     "images": {
       "label": "Imagens",
-      "tooltip": "URLs de imagens opcionais que ilustram este projeto."
+      "tooltip": "Imagens que ilustram este projeto."
     },
     "links": {
       "label": "Links",
-      "tooltip": "Links nomeados como site, portfólio ou URLs de demonstração."
+      "tooltip": "URLs relacionadas com um rótulo que o leitor entenda."
     },
     "roles": {
       "title": {
         "label": "Funções",
-        "tooltip": "Cargos exercidos nesta experiência. Adicione mais de um se mudou de função na mesma organização."
+        "tooltip": "Diferentes cargos ocupados durante este emprego."
       },
       "translations": {
         "label": "Traduções",
-        "tooltip": "Título e descrição localizados desta função em cada idioma suportado."
+        "tooltip": "Título e resumo da função em cada idioma."
       }
     },
     "personal": "Pessoal",
@@ -227,23 +227,23 @@
   "batch": {
     "changeCategory": {
       "label": "Alterar categoria",
-      "tooltip": "Quando marcado, atualiza a categoria em todos os registros selecionados."
+      "tooltip": "Categoria a aplicar em todos os registros selecionados."
     },
     "changeLevel": {
       "label": "Alterar nível",
-      "tooltip": "Quando marcado, atualiza o nível em todas as formações selecionadas."
+      "tooltip": "Nível acadêmico a aplicar em todas as formações selecionadas."
     },
     "changeStatus": {
       "label": "Alterar status",
-      "tooltip": "Quando marcado, atualiza o status em todos os registros selecionados."
+      "tooltip": "Status de conclusão a aplicar em todos os registros selecionados."
     },
     "changeRelevance": {
       "label": "Alterar relevância",
-      "tooltip": "Quando marcado, atualiza a relevância em todos os registros selecionados."
+      "tooltip": "Destaque no CV a aplicar em todos os registros selecionados."
     },
     "changePermissions": {
       "label": "Alterar permissões",
-      "tooltip": "Quando marcado, substitui as permissões em todos os tokens selecionados."
+      "tooltip": "Conjunto de permissões a aplicar em todos os tokens selecionados."
     }
   },
   "ai": {

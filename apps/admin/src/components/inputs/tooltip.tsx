@@ -11,12 +11,12 @@ export function FormTooltip({ content }: FormTooltipProps) {
   return (
     <>
       <button
-        className="btn btn-circle btn-ghost btn-xs -mb-1 -ml-1 inline-flex p-0"
+        className="btn btn-circle btn-ghost btn-xs -mb-1 -ml-1 inline-flex p-0 text-[1em]"
         popoverTarget={identifier}
         style={{ anchorName: `--${identifier}` } as CSSProperties}
         type="button"
       >
-        <QuestionIcon size={14} />
+        <QuestionIcon />
       </button>
       <div
         className="dropdown dropdown-hover z-50 max-w-xs rounded bg-neutral p-1 text-neutral-content text-xs"
