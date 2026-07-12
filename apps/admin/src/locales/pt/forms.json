@@ -235,19 +235,6 @@
     "translate": "Traduzir com IA",
     "optimize": "Otimizar com IA"
   },
-  "validation": {
-    "requiredField": "Campo obrigatório",
-    "invalidField": "Campo inválido",
-    "uniqueField": "Deve ser único",
-    "existingField": "Já existe",
-    "minLength": "Deve ter pelo menos {{value}}",
-    "maxLength": "Deve ter no máximo {{value}}",
-    "requiredGroup": "Grupo obrigatório",
-    "descriptionMin": "A descrição deve ter pelo menos {{value}} caracteres",
-    "atLeastOneSkill": "Pelo menos uma habilidade é obrigatória",
-    "fieldRequired": "{{field}} é obrigatório",
-    "positiveNumber": "Deve ser um número positivo"
-  },
   "fieldArray": {
     "emptyTitle": "Nada aqui ainda",
     "emptyDescription": "Clique no botão abaixo para adicionar o primeiro item",

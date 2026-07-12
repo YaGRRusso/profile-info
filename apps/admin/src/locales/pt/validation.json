@@ -1,0 +1,9 @@
+{
+  "requiredField": "Campo obrigatório",
+  "invalidField": "Campo inválido",
+  "uniqueField": "Deve ser único",
+  "existingField": "Já existe",
+  "minLength": "Deve ter pelo menos {{value}}",
+  "maxLength": "Deve ter no máximo {{value}}",
+  "requiredGroup": "Grupo obrigatório"
+}

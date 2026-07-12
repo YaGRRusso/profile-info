@@ -143,6 +143,7 @@ export function EducationForm({
   state,
 }: EducationFormProps) {
   const { t: tForm } = useTranslation("forms");
+  const { t: tValidation } = useTranslation("validation");
   const { t: tAction } = useTranslation("actions");
   const { i18n } = useTranslation();
   const locale = i18n.language;
@@ -206,63 +207,39 @@ export function EducationForm({
       const type = ResourceType.Education;
 
       if (raw.trim().length <= RawSizeEnum.XSMALL)
-        return toast.error(tForm("validation.descriptionMin", { value: 32 }));
+        return toast.error(tValidation("minLength", { value: 32 }));
 
       const skills = i18nLabelsByIds(
         findManySkills.data?.nodes,
         form.getFieldValue("skillIds")
       );
       if (!skills.length)
-        return toast.error(tForm("validation.atLeastOneSkill"));
+        return toast.error(tValidation("minLength", { value: 1 }));
 
       const title = fieldGroup.title;
-      if (!title)
-        return toast.error(
-          tForm("validation.fieldRequired", {
-            field: tForm("fields.educationTitle.label"),
-          })
-        );
+      if (!title) return toast.error(tValidation("requiredField"));
       details.push({ key: "Title", value: [title] });
 
       const period = form.getFieldValue("period");
       if (!period.from && !period.to)
-        return toast.error(
-          tForm("validation.fieldRequired", {
-            field: tForm("fields.period.label"),
-          })
-        );
+        return toast.error(tValidation("requiredField"));
       details.push({
         key: "Period",
         value: [`from ${period.from} to ${period.to}`],
       });
 
       const level = form.getFieldValue("level");
-      if (!level)
-        return toast.error(
-          tForm("validation.fieldRequired", {
-            field: tForm("fields.level.label"),
-          })
-        );
+      if (!level) return toast.error(tValidation("requiredField"));
       details.push({ key: "Level", value: [level] });
 
       const status = form.getFieldValue("status");
-      if (!status)
-        return toast.error(
-          tForm("validation.fieldRequired", {
-            field: tForm("fields.status.label"),
-          })
-        );
+      if (!status) return toast.error(tValidation("requiredField"));
       details.push({ key: "Status", value: [status] });
 
       const organization = findManyOrganizations.data?.nodes.find(
         (org) => org.id === form.getFieldValue("organizationId")
       );
-      if (!organization)
-        return toast.error(
-          tForm("validation.fieldRequired", {
-            field: tForm("fields.organization.label"),
-          })
-        );
+      if (!organization) return toast.error(tValidation("requiredField"));
 
       const organizationName = organization.name;
       details.push({ key: "Organization Name", value: [organizationName] });
@@ -304,7 +281,7 @@ export function EducationForm({
       form.setFieldValue,
       findManyOrganizations.data?.nodes,
       findManySkills.data?.nodes,
-      tForm,
+      tValidation,
     ]
   );
 
@@ -317,7 +294,7 @@ export function EducationForm({
       const raw = fieldValue as string;
 
       if (raw.trim().length <= RawSizeEnum.XSMALL)
-        return toast.error(tForm("validation.descriptionMin", { value: 32 }));
+        return toast.error(tValidation("minLength", { value: 32 }));
 
       const translated = await translate.mutateAsync({
         raw,
@@ -332,7 +309,7 @@ export function EducationForm({
         >
       );
     },
-    [translate.mutateAsync, form.setFieldValue, tForm]
+    [translate.mutateAsync, form.setFieldValue, tValidation]
   );
 
   const { Field, Subscribe } = form;

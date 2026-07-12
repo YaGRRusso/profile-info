@@ -134,6 +134,7 @@ export function ProfileForm({
   const translate = useTranslate();
 
   const { t: tForm } = useTranslation("forms");
+  const { t: tValidation } = useTranslation("validation");
   const { t: tAction } = useTranslation("actions");
   const { t: tSystem } = useTranslation("system");
   const { i18n } = useTranslation();
@@ -200,14 +201,14 @@ export function ProfileForm({
       const type = ResourceType.User;
 
       if (raw.trim().length <= RawSizeEnum.XSMALL)
-        return toast.error(tForm("validation.descriptionMin", { value: 64 }));
+        return toast.error(tValidation("minLength", { value: 64 }));
 
       const skills = i18nLabelsByIds(
         findManySkills.data?.nodes,
         form.getFieldValue("skillIds")
       );
       if (!skills.length) {
-        return toast.error(tForm("validation.atLeastOneSkill"));
+        return toast.error(tValidation("minLength", { value: 1 }));
       }
 
       const name = form.getFieldValue("name");
@@ -239,7 +240,7 @@ export function ProfileForm({
       findManySkills.data?.nodes,
       form.getFieldValue,
       form.setFieldValue,
-      tForm,
+      tValidation,
     ]
   );
 
@@ -252,7 +253,7 @@ export function ProfileForm({
       const raw = fieldValue as string;
 
       if (raw.trim().length <= RawSizeEnum.XSMALL)
-        return toast.error(tForm("validation.descriptionMin", { value: 64 }));
+        return toast.error(tValidation("minLength", { value: 64 }));
 
       const translated = await translate.mutateAsync({
         raw,
@@ -267,7 +268,7 @@ export function ProfileForm({
         >
       );
     },
-    [translate.mutateAsync, form.setFieldValue, tForm]
+    [translate.mutateAsync, form.setFieldValue, tValidation]
   );
 
   const { Field, Subscribe } = form;

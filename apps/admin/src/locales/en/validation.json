@@ -1,0 +1,9 @@
+{
+  "requiredField": "Required field",
+  "invalidField": "Invalid field",
+  "uniqueField": "Must be unique",
+  "existingField": "Already exists",
+  "minLength": "Must be at least {{value}}",
+  "maxLength": "Must be at most {{value}}",
+  "requiredGroup": "Required group"
+}

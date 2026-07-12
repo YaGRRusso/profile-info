@@ -1,4 +1,3 @@
-/** i18n keys under `forms.validation.*` — used in Zod schemas; translate at display layer later. */
 export const FormError = {
   requiredField: "requiredField",
   invalidField: "invalidField",

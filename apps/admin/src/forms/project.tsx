@@ -105,6 +105,7 @@ export function ProjectForm({
   state,
 }: ProjectFormProps) {
   const { t: tForm } = useTranslation("forms");
+  const { t: tValidation } = useTranslation("validation");
   const { t: tAction } = useTranslation("actions");
   const { i18n } = useTranslation();
   const locale = i18n.language;
@@ -151,22 +152,17 @@ export function ProjectForm({
       const type = ResourceType.Project;
 
       if (raw.trim().length <= RawSizeEnum.XSMALL)
-        return toast.error(tForm("validation.descriptionMin", { value: 32 }));
+        return toast.error(tValidation("minLength", { value: 32 }));
 
       const skills = i18nLabelsByIds(
         findManySkills.data?.nodes,
         form.getFieldValue("skillIds")
       );
       if (!skills.length)
-        return toast.error(tForm("validation.atLeastOneSkill"));
+        return toast.error(tValidation("minLength", { value: 1 }));
 
       const title = fieldGroup.title;
-      if (!title)
-        return toast.error(
-          tForm("validation.fieldRequired", {
-            field: tForm("fields.projectTitle.label"),
-          })
-        );
+      if (!title) return toast.error(tValidation("requiredField"));
       details.push({ key: "Title", value: [title] });
 
       const language = fieldGroup.locale;
@@ -195,7 +191,7 @@ export function ProjectForm({
       form.getFieldValue,
       form.setFieldValue,
       findManySkills.data?.nodes,
-      tForm,
+      tValidation,
     ]
   );
 
@@ -208,7 +204,7 @@ export function ProjectForm({
       const raw = fieldValue as string;
 
       if (raw.trim().length <= RawSizeEnum.XSMALL)
-        return toast.error(tForm("validation.descriptionMin", { value: 32 }));
+        return toast.error(tValidation("minLength", { value: 32 }));
 
       const translated = await translate.mutateAsync({
         raw,
@@ -223,7 +219,7 @@ export function ProjectForm({
         >
       );
     },
-    [translate.mutateAsync, form.setFieldValue, tForm]
+    [translate.mutateAsync, form.setFieldValue, tValidation]
   );
 
   const { Field, Subscribe } = form;

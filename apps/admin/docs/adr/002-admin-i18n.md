@@ -33,7 +33,7 @@ It drives UI strings, `i18nLabel` (via `i18n.language`), and `dayjs` (`languageC
 
 ### UI strings (react-i18next)
 
-- Namespaces: `help`, `nav`, `pages`, `actions`, `alerts`, `dashboard`, `login`, `forms`, `tables`, `system`.
+- Namespaces: `help`, `nav`, `pages`, `actions`, `alerts`, `dashboard`, `login`, `forms`, `tables`, `system`, `validation`.
 
 #### `useTranslation` aliases (always prefixed — never bare `t`)
 
@@ -50,7 +50,7 @@ It drives UI strings, `i18nLabel` (via `i18n.language`), and `dayjs` (`languageC
 | Sidebar nav | `tNav` | `tNav("skills")` |
 | Dashboard widgets | `tDashboard` | `tDashboard("stats.skills")` |
 | Login page | `tLogin` (+ `tForm` in `UserForm`) | `tLogin("title")`, `tForm("fields.email.label")` |
-| Entity forms | `tForm`, `tAction` | `tForm("fields.slug.label")`, `tAction("cancel")` |
+| Entity forms | `tForm`, `tAction`, `tValidation` | `tForm("fields.slug.label")`, `tValidation("requiredField")` |
 
 Omit hooks the file does not use. Never build keys dynamically (`t(\`stats.${key}\`)`, `t(item.id)`).
 
@@ -103,7 +103,8 @@ Never build keys dynamically (`t(\`stats.${key}\`)`, `t(item.id)`). Dynamic list
 | Area | Approach |
 |------|----------|
 | Form chrome | `forms.json`; `useTranslation("forms")` as `tForm` — `fields.<key>.label`, `.placeholder`, `.tooltip`; `batch.<key>.label` / `.tooltip`; sections, submit |
-| Form validation (Zod) | `FormError` keys in static schemas (`lib/form-errors.ts` → `forms.validation.*`); `fieldError` passes keys through until display i18n |
+| Form validation (Zod) | `FormError` keys in static schemas; `fieldError` → `i18n.t(key, { ns: "validation" })` |
+| AI/ATS validation toasts | `tValidation("minLength", { value })`, `tValidation("requiredField")` |
 | AI textarea buttons | `tForm("ai.translate")`, `tForm("ai.optimize")` inside `textarea.tsx` |
 | Multi-select chrome | `tForm("multiSelect.*")`, `tAction("clearAll")` inside `multi-select.tsx` |
 | System header alerts | `system.json`; callers pass resolved `title` / `description` via `tSystem` |
@@ -126,11 +127,11 @@ Never build keys dynamically (`t(\`stats.${key}\`)`, `t(item.id)`). Dynamic list
 | **1 — Foundation** | i18next setup, locale switcher, `help` + `nav` + `pages` namespaces (en + pt) | Done |
 | **1 — Wiring** | Page copy, sidebar nav, `i18nLabel` + pickers + dayjs on active locale | Done |
 | **2 — Chrome (non-form)** | `actions`, `alerts`, `dashboard`, `login`; shared buttons, toasts, table toolbar, dashboard widgets | Done |
-| **3 — Form chrome** | `forms` namespace; all entity forms, login form, field-array, labels/placeholders/tooltips/submit, AI buttons, `fieldRequired` validation | Done |
+| **3 — Form chrome** | `forms` namespace; all entity forms, login form, field-array, labels/placeholders/tooltips/submit, AI buttons | Done |
 | **3b — Table chrome (partial)** | `tables` search + relevance placeholders; static English `aria-label`s; removed `consts/placeholders.ts` | Done |
 | **3c — System alerts + multi-select** | `system.json`; `multiSelect` in `forms`; profile unsaved banner | Done |
 | **4a — Form error codes** | `FormError` in `lib/form-errors.ts`; all Zod schemas use keys (no inline English) | Done |
-| **4b — Form error i18n** | `fieldError` resolves `validation.${FormErrorKey}` | Backlog |
+| **4b — Form error i18n** | `validation` namespace; `fieldError` + `tValidation` in toasts | Done |
 | **Later** | Table columns/filters (remaining), `es` UI | Backlog |
 
 ## Where to look
@@ -143,6 +144,8 @@ Never build keys dynamically (`t(\`stats.${key}\`)`, `t(item.id)`). Dynamic list
 | Help content type | `src/consts/page-help.ts` (`PageHelpContent` interface) |
 | Page help builder | `src/lib/page-help.ts` (`pageHelp(tHelp, section)`) |
 | Locale array refine | `src/lib/form-validation.ts` (`hasUniqueLocales`) |
+| Form error codes | `src/lib/form-errors.ts` (`FormError`) |
+| Field error display | `src/lib/field-error.ts` |
 
 ## Verification checklist
 
@@ -155,7 +158,7 @@ Never build keys dynamically (`t(\`stats.${key}\`)`, `t(item.id)`). Dynamic list
 7. CRUD page buttons, modal actions, and success toasts show `pt` when locale is `pt`.
 8. Dashboard stats/charts/recent activity, login page, and login form show `pt` when locale is `pt`.
 9. Table toolbar buttons (`Update selected`, `clear all`, etc.) and search placeholder show `pt`; column headers and filter facet labels stay English.
-10. Entity form labels, placeholders, tooltips, submit buttons, and AI textarea buttons show `pt`; Zod field errors show `FormError` keys until phase 4b; relevance min/max placeholders show `pt`.
+10. Entity form labels, placeholders, tooltips, submit buttons, and AI textarea buttons show `pt`; Zod field errors and AI validation toasts show `pt` via `validation` namespace; relevance min/max placeholders show `pt`.
 11. `lib/i18n.ts` stays free of UI string keys.
 12. No duplicate locale state on auth store.
 

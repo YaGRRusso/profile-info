@@ -104,6 +104,7 @@ export function OrganizationForm({
   state,
 }: OrganizationFormProps) {
   const { t: tForm } = useTranslation("forms");
+  const { t: tValidation } = useTranslation("validation");
   const { t: tAction } = useTranslation("actions");
 
   const [isNameEdited, setIsNameEdited] = useState(!!defaultValues?.name);
@@ -137,7 +138,7 @@ export function OrganizationForm({
       const type = ResourceType.Organization;
 
       if (raw.trim().length <= RawSizeEnum.XSMALL)
-        return toast.error(tForm("validation.descriptionMin", { value: 64 }));
+        return toast.error(tValidation("minLength", { value: 64 }));
 
       const name = form.getFieldValue("name");
       if (name) details.push({ key: "Name", value: [name] });
@@ -165,7 +166,7 @@ export function OrganizationForm({
         >
       );
     },
-    [summarize.mutateAsync, form.getFieldValue, form.setFieldValue, tForm]
+    [summarize.mutateAsync, form.getFieldValue, form.setFieldValue, tValidation]
   );
 
   const handleTranslate = useCallback(
@@ -177,7 +178,7 @@ export function OrganizationForm({
       const raw = fieldValue as string;
 
       if (raw.trim().length <= RawSizeEnum.XSMALL)
-        return toast.error(tForm("validation.descriptionMin", { value: 64 }));
+        return toast.error(tValidation("minLength", { value: 64 }));
 
       const translated = await translate.mutateAsync({
         raw,
@@ -192,7 +193,7 @@ export function OrganizationForm({
         >
       );
     },
-    [translate.mutateAsync, form.setFieldValue, tForm]
+    [translate.mutateAsync, form.setFieldValue, tValidation]
   );
 
   const { Field, Subscribe } = form;

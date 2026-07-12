@@ -235,19 +235,6 @@
     "translate": "Translate with AI",
     "optimize": "Optimize with AI"
   },
-  "validation": {
-    "requiredField": "Required field",
-    "invalidField": "Invalid field",
-    "uniqueField": "Must be unique",
-    "existingField": "Already exists",
-    "minLength": "Must be at least {{value}}",
-    "maxLength": "Must be at most {{value}}",
-    "requiredGroup": "Required group",
-    "descriptionMin": "Description must be at least {{value}} characters long",
-    "atLeastOneSkill": "At least one skill is required",
-    "fieldRequired": "{{field}} is required",
-    "positiveNumber": "Must be a positive number"
-  },
   "fieldArray": {
     "emptyTitle": "Nothing here yet",
     "emptyDescription": "Click on the button below to add your first item",

@@ -30,7 +30,7 @@ export function SystemMessages() {
       {items.map((message) => (
         <div
           className={cn(
-            "alert alert-soft flex-1 animate-system-message gap-2 border p-1.5 text-xs",
+            "alert alert-soft flex-1 animate-system-message gap-2 border px-2 py-1 text-xs",
             ALERT_VARIANT_CLASS[message.variant ?? "info"]
           )}
           key={message.id}

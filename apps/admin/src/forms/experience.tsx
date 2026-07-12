@@ -149,6 +149,7 @@ export function ExperienceForm({
   state,
 }: ExperienceFormProps) {
   const { t: tForm } = useTranslation("forms");
+  const { t: tValidation } = useTranslation("validation");
   const { t: tAction } = useTranslation("actions");
   const { i18n } = useTranslation();
   const locale = i18n.language;
@@ -208,31 +209,22 @@ export function ExperienceForm({
       const type = ResourceType.Experience;
 
       if (raw.trim().length <= RawSizeEnum.XSMALL)
-        return toast.error(tForm("validation.descriptionMin", { value: 32 }));
+        return toast.error(tValidation("minLength", { value: 32 }));
 
       const skills = i18nLabelsByIds(
         findManySkills.data?.nodes,
         fieldParent.skillIds
       );
       if (!skills.length)
-        return toast.error(tForm("validation.atLeastOneSkill"));
+        return toast.error(tValidation("minLength", { value: 1 }));
 
       const title = fieldGroup.title;
-      if (!title)
-        return toast.error(
-          tForm("validation.fieldRequired", {
-            field: tForm("fields.experienceTitle.label"),
-          })
-        );
+      if (!title) return toast.error(tValidation("requiredField"));
       details.push({ key: "Title", value: [title] });
 
       const period = fieldParent.period;
       if (!period.from && !period.to)
-        return toast.error(
-          tForm("validation.fieldRequired", {
-            field: tForm("fields.period.label"),
-          })
-        );
+        return toast.error(tValidation("requiredField"));
       details.push({
         key: "Period",
         value: [
@@ -242,23 +234,13 @@ export function ExperienceForm({
       });
 
       const category = form.getFieldValue("category");
-      if (!category)
-        return toast.error(
-          tForm("validation.fieldRequired", {
-            field: tForm("fields.experienceCategory.label"),
-          })
-        );
+      if (!category) return toast.error(tValidation("requiredField"));
       details.push({ key: "Category", value: [category] });
 
       const organization = findManyOrganizations.data?.nodes.find(
         (org) => org.id === form.getFieldValue("organizationId")
       );
-      if (!organization)
-        return toast.error(
-          tForm("validation.fieldRequired", {
-            field: tForm("fields.organization.label"),
-          })
-        );
+      if (!organization) return toast.error(tValidation("requiredField"));
 
       const organizationName = organization.name;
       details.push({ key: "Organization Name", value: [organizationName] });
@@ -297,7 +279,7 @@ export function ExperienceForm({
       form.setFieldValue,
       findManyOrganizations.data?.nodes,
       findManySkills.data?.nodes,
-      tForm,
+      tValidation,
     ]
   );
 
@@ -310,7 +292,7 @@ export function ExperienceForm({
       const raw = fieldValue as string;
 
       if (raw.trim().length <= RawSizeEnum.XSMALL)
-        return toast.error(tForm("validation.descriptionMin", { value: 32 }));
+        return toast.error(tValidation("minLength", { value: 32 }));
 
       const translated = await translate.mutateAsync({
         raw,
@@ -325,7 +307,7 @@ export function ExperienceForm({
         >
       );
     },
-    [translate.mutateAsync, form.setFieldValue, tForm]
+    [translate.mutateAsync, form.setFieldValue, tValidation]
   );
 
   const { Field, Subscribe } = form;
