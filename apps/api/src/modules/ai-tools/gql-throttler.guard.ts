@@ -18,4 +18,8 @@ export class GqlThrottlerGuard extends ThrottlerGuard {
       res: ctx.res,
     };
   }
+
+  protected getTracker(req: AppRequest): Promise<string> {
+    return Promise.resolve(req.user?.id ?? req.ip ?? "anonymous");
+  }
 }

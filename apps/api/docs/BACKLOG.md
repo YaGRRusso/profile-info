@@ -19,7 +19,8 @@ Deferred API and admin work, ordered by criticality, then value, then effort.
 
 - **Collaborative catalog** — Users submit skill/org requests; `SUPER_ADMIN` moderates; local overrides per tenant.
 - **Private CV + REST auth** — `GET /resume.pdf` is public today; REST routes should accept session JWT or `X-Api-Key`.
-- **User-owned integration keys** — Optional BYOK for OpenRouter, GitHub, Tavily.
+- **Platform token BYOK** — Optional user-owned OpenRouter key. Per-user throttle on AI
+  mutations shipped (ADR 003). See `apps/api/docs/adr/003-ai-usage-quota-byok.md`.
 
 ### UI
 

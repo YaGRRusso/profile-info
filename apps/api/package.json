@@ -119,6 +119,9 @@
         }
       ]
     },
+    "transformIgnorePatterns": [
+      "node_modules/(?!(p-limit|yocto-queue)/)"
+    ],
     "collectCoverageFrom": [
       "src/**/*.ts",
       "!src/**/*.spec.ts"
