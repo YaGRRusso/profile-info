@@ -1,0 +1,14 @@
+{
+  "created": "{{entity}} created successfully",
+  "updated": "{{entity}} updated successfully",
+  "deleted": "{{entity}} deleted successfully",
+  "disabled": "{{entity}} disabled successfully",
+  "enabled": "{{entity}} enabled successfully",
+  "batchDeleted": "{{count}} {{entityPlural}} deleted successfully",
+  "batchUpdated": "{{count}} {{entityPlural}} updated successfully",
+  "batchDisabled": "{{count}} {{entityPlural}} disabled successfully",
+  "batchEnabled": "{{count}} {{entityPlural}} enabled successfully",
+  "profileUpdated": "Profile updated successfully",
+  "tokenCopied": "Token copied to clipboard",
+  "tokenCopyFailed": "Failed to copy token to clipboard"
+}

@@ -1,0 +1,14 @@
+{
+  "cancel": "Cancel",
+  "confirm": "Confirm",
+  "close": "Close",
+  "copyToken": "Copy token",
+  "downloadCv": "Download CV",
+  "saveChanges": "Save changes",
+  "clearAll": "Clear all",
+  "updateSelected": "Update selected ({{count}})",
+  "viewSelected": "View selected ({{count}})",
+  "removeSelected": "Remove selected ({{count}})",
+  "enableSelected": "Enable selected ({{count}})",
+  "disableSelected": "Disable selected ({{count}})"
+}

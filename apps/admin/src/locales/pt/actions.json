@@ -1,0 +1,14 @@
+{
+  "cancel": "Cancelar",
+  "confirm": "Confirmar",
+  "close": "Fechar",
+  "copyToken": "Copiar token",
+  "downloadCv": "Baixar CV",
+  "saveChanges": "Salvar alterações",
+  "clearAll": "Limpar tudo",
+  "updateSelected": "Atualizar selecionados ({{count}})",
+  "viewSelected": "Ver selecionados ({{count}})",
+  "removeSelected": "Remover selecionados ({{count}})",
+  "enableSelected": "Ativar selecionados ({{count}})",
+  "disableSelected": "Desativar selecionados ({{count}})"
+}

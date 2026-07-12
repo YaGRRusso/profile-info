@@ -1,0 +1,31 @@
+{
+  "stats": {
+    "skills": "Habilidades",
+    "courses": "Cursos",
+    "educations": "Formações",
+    "organizations": "Organizações",
+    "projects": "Projetos",
+    "experiences": "Experiências"
+  },
+  "charts": {
+    "experiencesByCategory": "Experiências por categoria",
+    "coursesByStatus": "Cursos por status",
+    "count": "Quantidade"
+  },
+  "profileCompleteness": {
+    "title": "Completude do perfil",
+    "cta": "Preencha suas configurações"
+  },
+  "recentActivity": {
+    "title": "Atividade recente",
+    "empty": "Nenhuma atualização recente.",
+    "types": {
+      "COURSE": "Curso",
+      "EDUCATION": "Formação",
+      "EXPERIENCE": "Experiência",
+      "ORGANIZATION": "Organização",
+      "PROJECT": "Projeto",
+      "SKILL": "Habilidade"
+    }
+  }
+}

@@ -16,7 +16,15 @@
   },
   "settings": {
     "title": "Profile",
-    "description": "Manage your account details."
+    "description": "Manage your account details.",
+    "summary": {
+      "title": "Title",
+      "description": "Description",
+      "email": "Email",
+      "phone": "Phone",
+      "birth": "Birth date",
+      "address": "Address"
+    }
   },
   "home": {
     "title": "Hello, {{name}}!",
@@ -27,6 +35,7 @@
     "manageDescription": "Create, update or delete courses, bootcamps and certificates of your profile.",
     "entity": "course",
     "entityPlural": "courses",
+    "newButton": "New Course",
     "modalManage": "Manage Course",
     "modalBatchUpdate": "Update Courses",
     "modalRead": "Read Course"
@@ -36,6 +45,7 @@
     "manageDescription": "Create, update, disable or enable skills that can be associated with your profile.",
     "entity": "skill",
     "entityPlural": "skills",
+    "newButton": "New Skill",
     "modalManage": "Manage Skill",
     "modalBatchUpdate": "Update Skills",
     "modalRead": "Read Skill"
@@ -45,6 +55,7 @@
     "manageDescription": "Create, update or delete academic degrees of your profile.",
     "entity": "education",
     "entityPlural": "educations",
+    "newButton": "New Education",
     "modalManage": "Manage Education",
     "modalBatchUpdate": "Update Educations",
     "modalRead": "Read Education"
@@ -54,6 +65,7 @@
     "manageDescription": "Create, update, disable or enable organizations referenced across your profile.",
     "entity": "organization",
     "entityPlural": "organizations",
+    "newButton": "New Organization",
     "modalManage": "Manage Organization",
     "modalBatchUpdate": "Update Organizations",
     "modalRead": "Read Organization"
@@ -63,6 +75,7 @@
     "manageDescription": "Create, update or delete projects of your profile.",
     "entity": "project",
     "entityPlural": "projects",
+    "newButton": "New Project",
     "modalManage": "Manage Project",
     "modalBatchUpdate": "Update Projects",
     "modalRead": "Read Project"
@@ -72,6 +85,7 @@
     "manageDescription": "Create, update or delete professional experiences of your profile.",
     "entity": "experience",
     "entityPlural": "experiences",
+    "newButton": "New Experience",
     "modalManage": "Manage Experience",
     "modalBatchUpdate": "Update Experiences",
     "modalRead": "Read Experience"
@@ -81,6 +95,7 @@
     "manageDescription": "Create, update or delete API tokens for programmatic access to your data.",
     "entity": "API token",
     "entityPlural": "API tokens",
+    "newButton": "New API Token",
     "modalManage": "Manage API Token",
     "modalBatchUpdate": "Update API Tokens",
     "modalRead": "Read API Token"

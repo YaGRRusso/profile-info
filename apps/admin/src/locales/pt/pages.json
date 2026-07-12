@@ -16,7 +16,15 @@
   },
   "settings": {
     "title": "Perfil",
-    "description": "Gerencie os dados da sua conta."
+    "description": "Gerencie os dados da sua conta.",
+    "summary": {
+      "title": "Título",
+      "description": "Descrição",
+      "email": "E-mail",
+      "phone": "Telefone",
+      "birth": "Data de nascimento",
+      "address": "Endereço"
+    }
   },
   "home": {
     "title": "Olá, {{name}}!",
@@ -27,6 +35,7 @@
     "manageDescription": "Crie, atualize ou exclua cursos, bootcamps e certificados do seu perfil.",
     "entity": "curso",
     "entityPlural": "cursos",
+    "newButton": "Novo curso",
     "modalManage": "Gerenciar curso",
     "modalBatchUpdate": "Atualizar cursos",
     "modalRead": "Ver curso"
@@ -36,6 +45,7 @@
     "manageDescription": "Crie, atualize, desative ou ative habilidades associadas ao seu perfil.",
     "entity": "habilidade",
     "entityPlural": "habilidades",
+    "newButton": "Nova habilidade",
     "modalManage": "Gerenciar habilidade",
     "modalBatchUpdate": "Atualizar habilidades",
     "modalRead": "Ver habilidade"
@@ -45,6 +55,7 @@
     "manageDescription": "Crie, atualize ou exclua formações acadêmicas do seu perfil.",
     "entity": "formação",
     "entityPlural": "formações",
+    "newButton": "Nova formação",
     "modalManage": "Gerenciar formação",
     "modalBatchUpdate": "Atualizar formações",
     "modalRead": "Ver formação"
@@ -54,6 +65,7 @@
     "manageDescription": "Crie, atualize, desative ou ative organizações referenciadas no seu perfil.",
     "entity": "organização",
     "entityPlural": "organizações",
+    "newButton": "Nova organização",
     "modalManage": "Gerenciar organização",
     "modalBatchUpdate": "Atualizar organizações",
     "modalRead": "Ver organização"
@@ -63,6 +75,7 @@
     "manageDescription": "Crie, atualize ou exclua projetos do seu perfil.",
     "entity": "projeto",
     "entityPlural": "projetos",
+    "newButton": "Novo projeto",
     "modalManage": "Gerenciar projeto",
     "modalBatchUpdate": "Atualizar projetos",
     "modalRead": "Ver projeto"
@@ -72,6 +85,7 @@
     "manageDescription": "Crie, atualize ou exclua experiências profissionais do seu perfil.",
     "entity": "experiência",
     "entityPlural": "experiências",
+    "newButton": "Nova experiência",
     "modalManage": "Gerenciar experiência",
     "modalBatchUpdate": "Atualizar experiências",
     "modalRead": "Ver experiência"
@@ -81,6 +95,7 @@
     "manageDescription": "Crie, atualize ou exclua tokens de API para acesso programático aos seus dados.",
     "entity": "token de API",
     "entityPlural": "tokens de API",
+    "newButton": "Novo token de API",
     "modalManage": "Gerenciar token de API",
     "modalBatchUpdate": "Atualizar tokens de API",
     "modalRead": "Ver token de API"

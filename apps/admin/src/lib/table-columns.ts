@@ -3,7 +3,7 @@ import { UserRole } from "@/generated/graphql/graphql";
 
 export const DEFAULT_META_COLUMN_VISIBILITY: VisibilityState = {
   id: false,
-  // slug: false,
+  slug: false,
   createdAt: false,
   updatedAt: false,
 };
