@@ -530,7 +530,7 @@ export function ProfileForm({
 
       <section className="rounded-box bg-base-200 p-4 sm:p-6">
         <h2 className="mb-4 font-semibold text-lg">
-          {tForm("sections.links")}
+          {tForm("sections.links.label")}
         </h2>
         <Field mode="array" name="urls">
           {(arrayField) => (

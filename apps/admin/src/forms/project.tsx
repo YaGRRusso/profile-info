@@ -287,7 +287,10 @@ export function ProjectForm({
         )}
       </Field>
 
-      <FormDivider label={tForm("sections.images")} />
+      <FormDivider
+        label={tForm("sections.images.label")}
+        tooltip={tForm("sections.images.tooltip")}
+      />
 
       <Field mode="array" name="images">
         {(arrayField) => (
@@ -315,7 +318,10 @@ export function ProjectForm({
         )}
       </Field>
 
-      <FormDivider label={tForm("sections.links")} />
+      <FormDivider
+        label={tForm("sections.links.label")}
+        tooltip={tForm("sections.links.tooltip")}
+      />
 
       <Field mode="array" name="urls">
         {(arrayField) => (
@@ -356,7 +362,10 @@ export function ProjectForm({
         )}
       </Field>
 
-      <FormDivider label={tForm("sections.translations")} />
+      <FormDivider
+        label={tForm("sections.translations.label")}
+        tooltip={tForm("sections.translations.tooltip")}
+      />
 
       <Field mode="array" name="i18n">
         {(arrayField) => (

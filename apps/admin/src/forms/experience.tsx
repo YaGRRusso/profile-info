@@ -393,7 +393,10 @@ export function ExperienceForm({
         )}
       </Field>
 
-      <FormDivider label={tForm("sections.roles.title")} />
+      <FormDivider
+        label={tForm("sections.roles.title.label")}
+        tooltip={tForm("sections.roles.title.tooltip")}
+      />
 
       <Field mode="array" name="roles">
         {(rolesField) => (
@@ -434,7 +437,10 @@ export function ExperienceForm({
                   )}
                 </Field>
 
-                <FormDivider label={tForm("sections.roles.translations")} />
+                <FormDivider
+                  label={tForm("sections.roles.translations.label")}
+                  tooltip={tForm("sections.roles.translations.tooltip")}
+                />
 
                 <Field mode="array" name={`roles[${roleIndex}].i18n`}>
                   {(i18nField) => (

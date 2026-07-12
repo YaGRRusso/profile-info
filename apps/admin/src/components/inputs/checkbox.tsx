@@ -1,6 +1,6 @@
 import { type ComponentProps } from "react";
 import { cn } from "@/lib/cn";
-import { InputTooltip } from "./legend";
+import { FormTooltip } from "./tooltip";
 
 export interface CheckboxInputProps
   extends Omit<ComponentProps<"input">, "onChange" | "checked" | "type"> {
@@ -35,7 +35,7 @@ export function CheckboxInput({
           {...props}
         />
         {label && <span>{label}</span>}
-        {tooltip && <InputTooltip content={tooltip} />}
+        {tooltip && <FormTooltip content={tooltip} />}
       </label>
       {error && <p className="label text-error">{error}</p>}
     </fieldset>

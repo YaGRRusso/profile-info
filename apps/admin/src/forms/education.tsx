@@ -456,7 +456,10 @@ export function EducationForm({
         )}
       </Field>
 
-      <FormDivider label={tForm("sections.translations")} />
+      <FormDivider
+        label={tForm("sections.translations.label")}
+        tooltip={tForm("sections.translations.tooltip")}
+      />
 
       <Field mode="array" name="i18n">
         {(arrayField) => (

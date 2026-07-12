@@ -197,12 +197,27 @@
     }
   },
   "sections": {
-    "translations": "Translations",
-    "images": "Images",
-    "links": "Links",
+    "translations": {
+      "label": "Translations",
+      "tooltip": "Localized title and description for this record. Add one entry per supported language."
+    },
+    "images": {
+      "label": "Images",
+      "tooltip": "Optional image URLs illustrating this project."
+    },
+    "links": {
+      "label": "Links",
+      "tooltip": "Named links such as website, portfolio, or demo URLs."
+    },
     "roles": {
-      "title": "Roles",
-      "translations": "Translations"
+      "title": {
+        "label": "Roles",
+        "tooltip": "Positions held within this experience. Add more than one if you changed roles at the same organization."
+      },
+      "translations": {
+        "label": "Translations",
+        "tooltip": "Localized title and description for this role in each supported language."
+      }
     },
     "personal": "Personal",
     "contact": "Contact",

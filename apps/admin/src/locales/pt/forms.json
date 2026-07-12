@@ -197,12 +197,27 @@
     }
   },
   "sections": {
-    "translations": "Traduções",
-    "images": "Imagens",
-    "links": "Links",
+    "translations": {
+      "label": "Traduções",
+      "tooltip": "Título e descrição localizados para este registro. Adicione uma entrada por idioma suportado."
+    },
+    "images": {
+      "label": "Imagens",
+      "tooltip": "URLs de imagens opcionais que ilustram este projeto."
+    },
+    "links": {
+      "label": "Links",
+      "tooltip": "Links nomeados como site, portfólio ou URLs de demonstração."
+    },
     "roles": {
-      "title": "Funções",
-      "translations": "Traduções"
+      "title": {
+        "label": "Funções",
+        "tooltip": "Cargos exercidos nesta experiência. Adicione mais de um se mudou de função na mesma organização."
+      },
+      "translations": {
+        "label": "Traduções",
+        "tooltip": "Título e descrição localizados desta função em cada idioma suportado."
+      }
     },
     "personal": "Pessoal",
     "contact": "Contato",
