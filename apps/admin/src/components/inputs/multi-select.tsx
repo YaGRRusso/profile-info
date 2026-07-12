@@ -1,5 +1,6 @@
 import { CaretDownIcon, XIcon } from "@phosphor-icons/react";
 import { useEffect, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { cn } from "@/lib/cn";
 import { InputLegend } from "./legend";
 
@@ -30,6 +31,8 @@ export function MultiSelectInput({
   maxSelected = 50,
   showSelected = true,
 }: MultiSelectInputProps) {
+  const { t: tAction } = useTranslation("actions");
+  const { t: tForm } = useTranslation("forms");
   const containerRef = useRef<HTMLDivElement>(null);
 
   const [search, setSearch] = useState("");
@@ -77,7 +80,9 @@ export function MultiSelectInput({
             onChange={(event) => setSearch(event.target.value)}
             onFocus={() => setIsOpen(true)}
             placeholder={
-              value.length ? `${value.length} selected` : placeholder
+              value.length
+                ? tForm("multiSelect.selected", { count: value.length })
+                : placeholder
             }
             type="text"
             value={search}
@@ -122,7 +127,9 @@ export function MultiSelectInput({
                 </li>
               ))}
               {!filteredOptions.length && (
-                <li className="p-2 text-sm opacity-md">No options</li>
+                <li className="p-2 text-sm opacity-md">
+                  {tForm("multiSelect.noOptions")}
+                </li>
               )}
             </ul>
           </div>
@@ -149,7 +156,7 @@ export function MultiSelectInput({
             onClick={() => onChange?.([])}
             type="button"
           >
-            <span>clear all</span>
+            <span>{tAction("clearAll")}</span>
           </button>
         </div>
       )}

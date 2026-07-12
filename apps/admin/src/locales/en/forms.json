@@ -256,6 +256,11 @@
     "addItem": "Add {{item}}",
     "item": "Item"
   },
+  "multiSelect": {
+    "selected_one": "{{count}} selected",
+    "selected_other": "{{count}} selected",
+    "noOptions": "No options"
+  },
   "submit": {
     "signIn": "Sign In",
     "reset": "Reset",

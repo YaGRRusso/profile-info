@@ -39,6 +39,9 @@ export function SystemMessages() {
           <WarningCircleIcon />
           <div className="flex flex-col whitespace-nowrap">
             <span>{message.title}</span>
+            {message.description && (
+              <span className="opacity-md">{message.description}</span>
+            )}
           </div>
           <button
             className={cn(

@@ -137,6 +137,7 @@ export function ProfileForm({
 
   const { t: tForm } = useTranslation("forms");
   const { t: tAction } = useTranslation("actions");
+  const { t: tSystem } = useTranslation("system");
   const { i18n } = useTranslation();
   const locale = i18n.language;
 
@@ -179,7 +180,7 @@ export function ProfileForm({
         if (formApi.state.isDirty) {
           setMessage({
             id: PROFILE_UNSAVED_MESSAGE_ID,
-            title: "You have unsaved changes",
+            title: tSystem("profileUnsaved"),
             variant: "warning",
           });
         } else {
