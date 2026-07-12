@@ -3,6 +3,7 @@ import { useCallback, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { toast } from "react-toastify";
 import z from "zod";
+import { FormDivider } from "@/components/inputs/divider";
 import { DraggableList } from "@/components/inputs/draggable-list";
 import { FieldArray } from "@/components/inputs/field-array";
 import { MultiSelectInput } from "@/components/inputs/multi-select";
@@ -481,7 +482,7 @@ export function ProfileForm({
             )}
           </Field>
         </div>
-        <div className="divider" />
+        <FormDivider />
         <h2 className="mb-4 font-semibold text-lg">
           {tForm("sections.security")}
         </h2>

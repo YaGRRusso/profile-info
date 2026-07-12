@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 import { toast } from "react-toastify";
 import z from "zod";
 import { DateRangeInput } from "@/components/inputs/date-range";
+import { FormDivider } from "@/components/inputs/divider";
 import { FieldArray } from "@/components/inputs/field-array";
 import { MultiSelectInput } from "@/components/inputs/multi-select";
 import { RangeInput } from "@/components/inputs/range";
@@ -455,7 +456,7 @@ export function EducationForm({
         )}
       </Field>
 
-      <div className="divider">{tForm("sections.translations")}</div>
+      <FormDivider label={tForm("sections.translations")} />
 
       <Field mode="array" name="i18n">
         {(arrayField) => (

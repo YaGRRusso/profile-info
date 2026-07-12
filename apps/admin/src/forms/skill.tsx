@@ -1,6 +1,7 @@
 import { useForm } from "@tanstack/react-form";
 import { useTranslation } from "react-i18next";
 import z from "zod";
+import { FormDivider } from "@/components/inputs/divider";
 import { FieldArray } from "@/components/inputs/field-array";
 import { SelectInput } from "@/components/inputs/select";
 import { TextInput } from "@/components/inputs/text";
@@ -131,7 +132,7 @@ export function SkillForm({
         )}
       </Field>
 
-      <div className="divider">{tForm("sections.translations")}</div>
+      <FormDivider label={tForm("sections.translations")} />
 
       <Field mode="array" name="i18n">
         {(arrayField) => (

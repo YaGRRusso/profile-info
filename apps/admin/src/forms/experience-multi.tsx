@@ -3,6 +3,7 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import z from "zod";
 import { CheckboxInput } from "@/components/inputs/checkbox";
+import { FormDivider } from "@/components/inputs/divider";
 import { RangeInput } from "@/components/inputs/range";
 import { SelectInput } from "@/components/inputs/select";
 import {
@@ -89,7 +90,7 @@ export function ExperienceMultiForm({
         )}
       </Field>
 
-      <div className="divider" />
+      <FormDivider />
 
       <CheckboxInput
         checked={changeRelevance}

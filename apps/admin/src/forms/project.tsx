@@ -3,6 +3,7 @@ import { useCallback, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { toast } from "react-toastify";
 import z from "zod";
+import { FormDivider } from "@/components/inputs/divider";
 import { FieldArray } from "@/components/inputs/field-array";
 import { MultiSelectInput } from "@/components/inputs/multi-select";
 import { RangeInput } from "@/components/inputs/range";
@@ -286,7 +287,7 @@ export function ProjectForm({
         )}
       </Field>
 
-      <div className="divider">{tForm("sections.images")}</div>
+      <FormDivider label={tForm("sections.images")} />
 
       <Field mode="array" name="images">
         {(arrayField) => (
@@ -314,7 +315,7 @@ export function ProjectForm({
         )}
       </Field>
 
-      <div className="divider">{tForm("sections.links")}</div>
+      <FormDivider label={tForm("sections.links")} />
 
       <Field mode="array" name="urls">
         {(arrayField) => (
@@ -355,7 +356,7 @@ export function ProjectForm({
         )}
       </Field>
 
-      <div className="divider">{tForm("sections.translations")}</div>
+      <FormDivider label={tForm("sections.translations")} />
 
       <Field mode="array" name="i18n">
         {(arrayField) => (

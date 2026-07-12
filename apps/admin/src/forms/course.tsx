@@ -3,6 +3,7 @@ import { useCallback, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { toast } from "react-toastify";
 import z from "zod";
+import { FormDivider } from "@/components/inputs/divider";
 import { FieldArray } from "@/components/inputs/field-array";
 import { MultiSelectInput } from "@/components/inputs/multi-select";
 import { NumberInput } from "@/components/inputs/number";
@@ -411,7 +412,7 @@ export function CourseForm({
         )}
       </Field>
 
-      <div className="divider">{tForm("sections.translations")}</div>
+      <FormDivider label={tForm("sections.translations")} />
 
       <Field mode="array" name="i18n">
         {(arrayField) => (
