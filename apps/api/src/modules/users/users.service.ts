@@ -10,6 +10,7 @@ import type { MultiPaged } from "@/core/persistence/types/output.type";
 import { SkillsValidatorService } from "@/modules/skills/skills-validator.service";
 import { CreateUserInput } from "./dto/create-user.input";
 import { FilterUserInput } from "./dto/filter-user.input";
+import { RegisterUserInput } from "./dto/register-user.input";
 import { SortUserInput } from "./dto/sort-user.input";
 import { UpdateUserInput } from "./dto/update-user.input";
 import type { UserEntityRecord } from "./entities/user.entity";
@@ -59,6 +60,18 @@ export class UsersService {
     return this.repository.crud.findMany({ filters, sort, skip, limit });
   }
 
+  async register({
+    password,
+    ...input
+  }: RegisterUserInput): Promise<UserEntityRecord> {
+    return this.repository.crud.createOne({
+      ...input,
+      password: await hash(password, 8),
+      role: UserRole.USER,
+      disabled: true,
+    });
+  }
+
   async createOne(
     ctx: AuthContext,
     { password, ...createUserInput }: CreateUserInput
@@ -68,6 +81,7 @@ export class UsersService {
     return this.repository.crud.createOne({
       ...createUserInput,
       password: await hash(password, 8),
+      disabled: false,
     });
   }
 
@@ -84,6 +98,7 @@ export class UsersService {
       createUserInputs.map(async ({ password, ...createUserInput }) => ({
         ...createUserInput,
         password: await hash(password, 8),
+        disabled: false,
       }))
     );
 

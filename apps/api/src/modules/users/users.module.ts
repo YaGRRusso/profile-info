@@ -7,6 +7,7 @@ import { UsersRepository } from "./users.repository";
 import { UsersResolver } from "./users.resolver";
 import { UsersService } from "./users.service";
 import { UsersLoaderService } from "./users-loader.service";
+import { UsersValidatorService } from "./users-validator.service";
 
 @Module({
   imports: [
@@ -18,8 +19,9 @@ import { UsersLoaderService } from "./users-loader.service";
     UsersResolver,
     UsersService,
     UsersLoaderService,
+    UsersValidatorService,
     OnSkillDeletedListener,
   ],
-  exports: [UsersService, UsersLoaderService],
+  exports: [UsersService, UsersLoaderService, UsersValidatorService],
 })
 export class UsersModule {}

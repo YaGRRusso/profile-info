@@ -7,6 +7,7 @@ import { UserRole } from "@/core/enums/user-role.enum";
 import { PERSISTENCE_NOT_FOUND } from "@/core/persistence/persistence.messages";
 import { ApiTokensService } from "@/modules/api-tokens/api-tokens.service";
 import { UsersService } from "@/modules/users/users.service";
+import { UsersValidatorService } from "@/modules/users/users-validator.service";
 import { ApiTokenStrategy } from "./api-token.strategy";
 
 jest.mock("bcryptjs", () => ({
@@ -24,6 +25,7 @@ const mockUser = {
   nickname: "alice",
   email: "alice@example.com",
   role: UserRole.USER,
+  disabled: false,
   i18n: [],
   urls: [],
 };
@@ -43,6 +45,10 @@ const mockApiTokensService: Partial<jest.Mocked<ApiTokensService>> = {
 
 const mockUsersService: Partial<jest.Mocked<UsersService>> = {
   findOneById: jest.fn(),
+};
+
+const mockUsersValidator: Partial<jest.Mocked<UsersValidatorService>> = {
+  assertUserEnabled: jest.fn(),
 };
 
 function mockValidTokenLookup() {
@@ -67,6 +73,7 @@ describe("ApiTokenStrategy", () => {
         ApiTokenStrategy,
         { provide: ApiTokensService, useValue: mockApiTokensService },
         { provide: UsersService, useValue: mockUsersService },
+        { provide: UsersValidatorService, useValue: mockUsersValidator },
       ],
     }).compile();
 
@@ -96,6 +103,9 @@ describe("ApiTokenStrategy", () => {
         mockTokenRecord.hashedSecret
       );
       expect(mockUsersService.findOneById).toHaveBeenCalledWith(ownerId);
+      expect(mockUsersValidator.assertUserEnabled).toHaveBeenCalledWith(
+        mockUser
+      );
     });
 
     it("throws UnauthorizedException when parse fails", async () => {

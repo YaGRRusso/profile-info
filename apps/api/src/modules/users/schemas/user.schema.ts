@@ -46,6 +46,9 @@ export class UserModel extends BaseModel {
   @Prop({ type: [createTranslationModel(UserMessagesModel)] })
   i18n?: TranslationModel<UserMessagesModel>[];
 
+  @Prop({ type: Boolean, required: true, default: false, index: true })
+  disabled: boolean;
+
   @Prop({ type: String, enum: UserRole, default: UserRole.USER })
   role?: UserRole;
 

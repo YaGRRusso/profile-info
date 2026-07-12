@@ -23,6 +23,7 @@ import type { UserModel } from "../schemas/user.schema";
 
 export type UserCreateRecord = Omit<CreateUserInput, "password"> & {
   password: string;
+  disabled?: boolean;
 };
 
 export type UserUpdateRecord = Omit<UpdateUserInput, "password"> & {
@@ -52,6 +53,7 @@ export class UserMapper
       address: model.address,
       i18n: toTranslationEntityList(model.i18n),
       role: model.role,
+      disabled: model.disabled ?? false,
       urls: toUrlEntityList(model.urls),
       skillIds: toIdStrings(model.skillIds),
     };

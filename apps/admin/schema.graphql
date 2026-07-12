@@ -460,6 +460,7 @@ input FilterUserInput {
   address: String
   avatar: String
   birth: String
+  disabled: Boolean
   email: String
   i18n: [CreateUserMessagesInputTranslationInput!]
   name: String
@@ -501,6 +502,7 @@ type Mutation {
   enableManySkills(skillIds: [ID!]!): BatchEntity!
   enableOneOrganization(organizationId: ID!): OrganizationEntity!
   enableOneSkill(skillId: ID!): SkillEntity!
+  register(registerInput: RegisterUserInput!): UserEntity!
   removeManyApiTokens(apiTokenIds: [ID!]!): BatchEntity!
   removeManyCourses(courseIds: [ID!]!): BatchEntity!
   removeManyEducations(educationIds: [ID!]!): BatchEntity!
@@ -684,6 +686,13 @@ type Query {
   findOneUser(userFilters: FilterUserInput): UserEntity!
   findOneUserById(userId: ID!): UserEntity!
   getMe: UserEntity!
+}
+
+input RegisterUserInput {
+  email: String!
+  name: String!
+  nickname: String!
+  password: String!
 }
 
 enum ResourceType {
@@ -871,6 +880,7 @@ input UpdateUserInput {
   address: String
   avatar: String
   birth: String
+  disabled: Boolean
   email: String
   i18n: [CreateUserMessagesInputTranslationInput!]
   name: String
@@ -904,6 +914,7 @@ type UserEntity {
   avatar: String
   birth: String
   createdAt: DateTime!
+  disabled: Boolean!
   email: String!
   i18n: [UserTranslationLocale!]
   id: ID!

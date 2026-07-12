@@ -4,6 +4,7 @@ import { Test, TestingModule } from "@nestjs/testing";
 import { compare } from "bcryptjs";
 import { UserRole } from "@/core/enums/user-role.enum";
 import { UsersService } from "@/modules/users/users.service";
+import { UsersValidatorService } from "@/modules/users/users-validator.service";
 import { AuthService } from "./auth.service";
 
 jest.mock("bcryptjs", () => ({
@@ -15,10 +16,16 @@ const mockUser = {
   email: "user@example.com",
   password: "hashed-password",
   role: UserRole.USER,
+  disabled: false,
 };
 
 const mockUsersService: Partial<jest.Mocked<UsersService>> = {
   findOneByEmailWithPassword: jest.fn(),
+  register: jest.fn(),
+};
+
+const mockUsersValidator: Partial<jest.Mocked<UsersValidatorService>> = {
+  assertUserEnabled: jest.fn(),
 };
 
 const mockJwtService: Partial<jest.Mocked<JwtService>> = {
@@ -35,6 +42,7 @@ describe("AuthService", () => {
       providers: [
         AuthService,
         { provide: UsersService, useValue: mockUsersService },
+        { provide: UsersValidatorService, useValue: mockUsersValidator },
         { provide: JwtService, useValue: mockJwtService },
       ],
     }).compile();
@@ -74,6 +82,25 @@ describe("AuthService", () => {
         sub: mockUser.id,
         role: mockUser.role,
       });
+      expect(mockUsersValidator.assertUserEnabled).toHaveBeenCalledWith(
+        mockUser
+      );
+    });
+
+    it("should throw UnauthorizedException when the account is disabled", async () => {
+      (
+        mockUsersService.findOneByEmailWithPassword as jest.Mock
+      ).mockResolvedValue({ ...mockUser, disabled: true });
+      (compare as jest.Mock).mockResolvedValue(true);
+      (mockUsersValidator.assertUserEnabled as jest.Mock).mockImplementation(
+        () => {
+          throw new UnauthorizedException();
+        }
+      );
+
+      await expect(service.signIn(credentials)).rejects.toThrow(
+        UnauthorizedException
+      );
     });
 
     it("should throw UnauthorizedException when password does not match", async () => {

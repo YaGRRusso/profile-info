@@ -5,6 +5,7 @@ import { CredentialKind } from "@/core/enums/credential-kind.enum";
 import { UserRole } from "@/core/enums/user-role.enum";
 import { PERSISTENCE_NOT_FOUND } from "@/core/persistence/persistence.messages";
 import { UsersService } from "@/modules/users/users.service";
+import { UsersValidatorService } from "@/modules/users/users-validator.service";
 import { JwtStrategy } from "./jwt.strategy";
 
 const userId = "507f1f77bcf86cd799439011";
@@ -15,6 +16,7 @@ const mockUser = {
   nickname: "alice",
   email: "alice@example.com",
   role: UserRole.USER,
+  disabled: false,
   i18n: [],
   urls: [],
 };
@@ -26,6 +28,10 @@ const mockPayload = {
 
 const mockUsersService: Partial<jest.Mocked<UsersService>> = {
   findOneById: jest.fn(),
+};
+
+const mockUsersValidator: Partial<jest.Mocked<UsersValidatorService>> = {
+  assertUserEnabled: jest.fn(),
 };
 
 const mockConfigService = {
@@ -42,6 +48,7 @@ describe("JwtStrategy", () => {
       providers: [
         JwtStrategy,
         { provide: UsersService, useValue: mockUsersService },
+        { provide: UsersValidatorService, useValue: mockUsersValidator },
         { provide: ConfigService, useValue: mockConfigService },
       ],
     }).compile();
@@ -63,6 +70,25 @@ describe("JwtStrategy", () => {
       });
 
       expect(mockUsersService.findOneById).toHaveBeenCalledWith(userId);
+      expect(mockUsersValidator.assertUserEnabled).toHaveBeenCalledWith(
+        mockUser
+      );
+    });
+
+    it("throws UnauthorizedException when the account is disabled", async () => {
+      (mockUsersService.findOneById as jest.Mock).mockResolvedValue({
+        ...mockUser,
+        disabled: true,
+      });
+      (mockUsersValidator.assertUserEnabled as jest.Mock).mockImplementation(
+        () => {
+          throw new UnauthorizedException();
+        }
+      );
+
+      await expect(strategy.validate(mockPayload)).rejects.toThrow(
+        UnauthorizedException
+      );
     });
 
     it("throws UnauthorizedException when findOneById resolves with a falsy user", async () => {

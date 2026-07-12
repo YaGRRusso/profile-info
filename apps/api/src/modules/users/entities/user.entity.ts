@@ -56,6 +56,9 @@ export class UserEntity extends BaseEntity {
   @Field(() => UserRole, { defaultValue: UserRole.USER })
   role?: UserRole;
 
+  @Field(() => Boolean)
+  disabled: boolean;
+
   @OptionalField(() => [UrlEntity])
   urls?: UrlEntity[];
 

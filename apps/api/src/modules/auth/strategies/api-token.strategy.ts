@@ -6,6 +6,7 @@ import { toApiTokenAuthContext } from "@/core/context/auth-context.helper";
 import type { ApiTokenAuthContext } from "@/core/context/auth-context.interface";
 import { ApiTokensService } from "@/modules/api-tokens/api-tokens.service";
 import { UsersService } from "@/modules/users/users.service";
+import { UsersValidatorService } from "@/modules/users/users-validator.service";
 
 export const API_TOKEN_STRATEGY = "api-token" as const;
 export const API_KEY_HEADER = "x-api-key" as const;
@@ -17,7 +18,8 @@ export class ApiTokenStrategy extends PassportStrategy(
 ) {
   constructor(
     private readonly apiTokensService: ApiTokensService,
-    private readonly usersService: UsersService
+    private readonly usersService: UsersService,
+    private readonly usersValidator: UsersValidatorService
   ) {
     super({ header: "X-Api-Key", prefix: "" }, false);
   }
@@ -48,6 +50,8 @@ export class ApiTokenStrategy extends PassportStrategy(
 
     const user = await this.usersService.findOneById(token.ownerId);
     if (!user) throw new UnauthorizedException();
+
+    this.usersValidator.assertUserEnabled(user);
 
     return toApiTokenAuthContext(user, token.permissions);
   }

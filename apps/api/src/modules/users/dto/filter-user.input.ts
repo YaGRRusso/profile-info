@@ -1,4 +1,6 @@
 import { InputType, PartialType, PickType } from "@nestjs/graphql";
+import { IsBoolean } from "class-validator";
+import { OptionalField } from "@/core/decorators/optional-field.decorator";
 import { CreateUserInput } from "./create-user.input";
 
 @InputType()
@@ -15,4 +17,8 @@ export class FilterUserInput extends PartialType(
     "role",
     "urls",
   ] as const)
-) {}
+) {
+  @OptionalField(() => Boolean)
+  @IsBoolean()
+  disabled?: boolean;
+}

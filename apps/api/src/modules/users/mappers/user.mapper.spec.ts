@@ -26,6 +26,7 @@ describe("UserMapper", () => {
       nickname: "alice",
       email: "alice@profile.info",
       role: UserRole.USER,
+      disabled: false,
       avatar: undefined,
       phone: undefined,
       birth: undefined,

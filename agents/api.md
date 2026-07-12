@@ -10,7 +10,7 @@ when schemas, references, or delete behavior change.
 
 ## Overview
 
-The NestJS GraphQL API for profile-info. It is code-first: GraphQL types are TypeScript classes with `@ObjectType` / `@InputType` / `@Field` decorators, and the schema is generated to `src/schema.gql`. Data lives in MongoDB via Mongoose. Every operation except `signIn` requires a JWT. The admin app is the only known client.
+The NestJS GraphQL API for profile-info. It is code-first: GraphQL types are TypeScript classes with `@ObjectType` / `@InputType` / `@Field` decorators, and the schema is generated to `src/schema.gql`. Data lives in MongoDB via Mongoose. Every operation except `signIn` and `register` requires a JWT. The admin app is the only known client.
 
 The source is a modular monolith with a strict dependency rule (`modules → platform → integrations → core → common`; `platform` imports `modules` for composition only; `common` imports nothing; `integrations` never import from `modules`). The top-level layers under `src/` are `common/` (pure TS), `core/` (cross-cutting NestJS infra), `integrations/` (external system adapters), `platform/` (transport composition — GraphQL wiring, DataLoader aggregation), and `modules/` (business domains).
 
@@ -116,7 +116,7 @@ modules/<entity>/
 
 Notable specifics:
 
-- `modules/users/users.service.ts`: hashes password on create; `findOneByEmailWithPassword` (with `select("+password")`) is auth-only — public CRUD methods never load password. Password validation lives in `AuthService.validate`.
+- `modules/users/users.service.ts`: hashes password on create; `findOneByEmailWithPassword` (with `select("+password")`) is auth-only — public CRUD methods never load password. Password validation lives in `AuthService.validate`. Public `register` creates `USER` rows with `disabled: true`; `createOneUser` / `createManyUsers` create enabled accounts. `UsersValidatorService.assertUserEnabled` blocks `signIn`, JWT, and API-token auth for disabled users. `SUPER_ADMIN` enables via `updateOneUser { disabled: false }`.
 - `modules/api-tokens/api-tokens.service.ts`: hashes secret on create; `findOneByIdWithHashedSecret` (with `select("+hashedSecret")`) is auth-only — public CRUD methods never load `hashedSecret`. Credential validation (parse, expiry, bcrypt compare) lives in `ApiTokenStrategy.validate`; `parseApiToken` is shared with create formatting.
 - `modules/experiences/experiences.resolver.ts`: `@ResolveField` for `organization`, `skills`, sorted `roles`.
 - `modules/skills/` and `modules/organizations/` export loader and validator services. **Catalog (ADR 001):** browse = caller `ctx` (`findMany*` / `findOne*` vs `*Active*`); resolve stored refs with disabled included; validate writes via `assert*Enabled`. Principles only — `apps/api/docs/adr/001-local-catalog.md`.

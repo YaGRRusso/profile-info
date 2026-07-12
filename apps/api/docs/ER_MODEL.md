@@ -143,7 +143,9 @@ inputs use `organizationId` and `skillIds` (no `ownerId` — injected from conte
 
 - **Source:** `src/modules/users/schemas/user.schema.ts`
 - **Key fields:** `name`, `nickname` (unique), `email` (unique), `password` (required,
-  `select: false`, not exposed in API), `role` (enum: `USER`, `SUPER_ADMIN`), `phone`,
+  `select: false`, not exposed in API), `role` (enum: `USER`, `SUPER_ADMIN`), `disabled`
+  (default `false`; public `register` creates `disabled: true` until a `SUPER_ADMIN` sets
+  `disabled: false` via `updateOneUser`), `phone`,
   `avatar`, `birth`, `address`, `i18n[]` (embed: `locale`, `messages.title`,
   `messages.description`)
 - **Embedded:** `urls[]` (`UrlEmbed`: `title`, `value`), `i18n[]` translations

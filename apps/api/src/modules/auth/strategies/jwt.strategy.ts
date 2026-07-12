@@ -6,6 +6,7 @@ import type { Env } from "@/core/configs/env.validation";
 import { toSessionAuthContext } from "@/core/context/auth-context.helper";
 import type { SessionAuthContext } from "@/core/context/auth-context.interface";
 import { UsersService } from "@/modules/users/users.service";
+import { UsersValidatorService } from "@/modules/users/users-validator.service";
 import { JwtPayload } from "../entities/jwt.entity";
 
 export const JWT_STRATEGY = "jwt" as const;
@@ -14,7 +15,8 @@ export const JWT_STRATEGY = "jwt" as const;
 export class JwtStrategy extends PassportStrategy(Strategy, JWT_STRATEGY) {
   constructor(
     config: ConfigService<Env, true>,
-    private readonly usersService: UsersService
+    private readonly usersService: UsersService,
+    private readonly usersValidator: UsersValidatorService
   ) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
@@ -25,6 +27,8 @@ export class JwtStrategy extends PassportStrategy(Strategy, JWT_STRATEGY) {
   async validate(payload: JwtPayload): Promise<SessionAuthContext> {
     const user = await this.usersService.findOneById(payload.sub);
     if (!user) throw new UnauthorizedException();
+
+    this.usersValidator.assertUserEnabled(user);
 
     return toSessionAuthContext(user);
   }

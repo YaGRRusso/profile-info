@@ -23,6 +23,7 @@ const fakeUser = {
   nickname: "john",
   email: "john@example.com",
   role: UserRole.USER,
+  disabled: false,
   i18n: [],
   urls: [],
 };
@@ -117,6 +118,31 @@ describe("UsersService", () => {
     });
   });
 
+  describe("register", () => {
+    const registerInput = {
+      name: "Jane",
+      nickname: "jane",
+      email: "jane@example.com",
+      password: "plain-pass",
+    };
+
+    it("creates a disabled USER account", async () => {
+      crud.createOne.mockResolvedValue({ ...fakeUser, ...registerInput });
+
+      await expect(service.register(registerInput)).resolves.toEqual({
+        ...fakeUser,
+        ...registerInput,
+      });
+
+      expect(crud.createOne).toHaveBeenCalledWith({
+        ...registerInput,
+        password: "hashed-password",
+        role: UserRole.USER,
+        disabled: true,
+      });
+    });
+  });
+
   describe("createOne", () => {
     const createInput = {
       name: "John",
@@ -140,6 +166,7 @@ describe("UsersService", () => {
         email: "john@example.com",
         role: UserRole.USER,
         password: "hashed-password",
+        disabled: false,
       });
       expect(skillsValidator.assertSkillsEnabled).not.toHaveBeenCalled();
     });
@@ -159,6 +186,7 @@ describe("UsersService", () => {
         email: "john@example.com",
         role: UserRole.USER,
         password: "hashed-password",
+        disabled: false,
         skillIds: [skillId],
       });
     });
@@ -198,6 +226,7 @@ describe("UsersService", () => {
           email: "alice@example.com",
           role: UserRole.USER,
           password: "hashed-password",
+          disabled: false,
         },
         {
           name: "Bob",
@@ -205,6 +234,7 @@ describe("UsersService", () => {
           email: "bob@example.com",
           role: UserRole.USER,
           password: "hashed-password",
+          disabled: false,
         },
       ]);
     });
