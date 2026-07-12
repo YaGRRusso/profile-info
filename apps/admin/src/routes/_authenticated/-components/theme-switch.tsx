@@ -1,8 +1,11 @@
 import { MoonIcon, SunIcon } from "@phosphor-icons/react";
-import { useEffect } from "react";
+import { ComponentProps, useEffect } from "react";
+import { cn } from "@/lib/cn";
 import { useThemeStore } from "@/stores/theme";
 
-export function ThemeSwitch() {
+interface ThemeSwitchProps extends ComponentProps<"label"> {}
+
+export function ThemeSwitch({ className, ...props }: ThemeSwitchProps) {
   const { theme, setTheme } = useThemeStore();
   const isDark = theme === "dracula";
 
@@ -11,7 +14,13 @@ export function ThemeSwitch() {
   }, [theme]);
 
   return (
-    <label className="toggle border-base-content/40 text-base-content/80">
+    <label
+      className={cn(
+        "toggle border-base-content/40 text-base-content/80",
+        className
+      )}
+      {...props}
+    >
       <input
         checked={isDark}
         onChange={(event) =>

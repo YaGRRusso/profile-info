@@ -1,11 +1,21 @@
+import { ComponentProps } from "react";
 import { useTranslation } from "react-i18next";
 import { LOCALES } from "@/consts/locales";
+import { cn } from "@/lib/cn";
 
-export function LocaleSwitch() {
+interface LocaleSwitchProps extends ComponentProps<"div"> {}
+
+export function LocaleSwitch({ className, ...props }: LocaleSwitchProps) {
   const { i18n } = useTranslation();
 
   return (
-    <div className="join my-2 is-drawer-close:hidden w-full rounded">
+    <div
+      className={cn(
+        "join my-2 is-drawer-close:hidden w-full rounded",
+        className
+      )}
+      {...props}
+    >
       {LOCALES.map((option) => (
         <label
           className="btn btn-xs join-item flex-1 border-base-content/40 text-base-content/80 has-checked:bg-neutral has-checked:text-neutral-content"

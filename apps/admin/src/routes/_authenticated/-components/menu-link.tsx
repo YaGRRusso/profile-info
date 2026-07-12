@@ -1,20 +1,22 @@
-import { Link, type LinkProps } from "@tanstack/react-router";
-import { type ReactNode } from "react";
+import { Link } from "@tanstack/react-router";
+import { ComponentProps, type ReactNode } from "react";
+import { cn } from "@/lib/cn";
 
-export interface MenuLinkProps {
+interface MenuLinkProps extends ComponentProps<typeof Link> {
   icon: ReactNode;
   label: string;
-  to: LinkProps["to"];
-  type: "link";
 }
 
-export function MenuLink({ icon, label, to }: Omit<MenuLinkProps, "type">) {
+export function MenuLink({ icon, label, className, ...props }: MenuLinkProps) {
   return (
     <Link
       activeProps={{ className: "menu-active" }}
-      className="is-drawer-close:tooltip is-drawer-close:tooltip-right"
+      className={cn(
+        "is-drawer-close:tooltip is-drawer-close:tooltip-right",
+        className
+      )}
       data-tip={label}
-      to={to}
+      {...props}
     >
       {icon}
       <span className="is-drawer-close:hidden">{label}</span>

@@ -1,23 +1,27 @@
-import { type ReactNode } from "react";
+import { ComponentProps, type ReactNode } from "react";
+import { cn } from "@/lib/cn";
 
-export interface MenuActionProps {
+interface MenuActionProps extends ComponentProps<"button"> {
   icon: ReactNode;
   label: string;
-  onClick: () => void;
-  type: "action";
 }
 
 export function MenuAction({
   icon,
   label,
-  onClick,
-}: Omit<MenuActionProps, "type">) {
+  className,
+  type = "button",
+  ...props
+}: MenuActionProps) {
   return (
     <button
-      className="is-drawer-close:tooltip is-drawer-close:tooltip-right"
+      className={cn(
+        "is-drawer-close:tooltip is-drawer-close:tooltip-right",
+        className
+      )}
       data-tip={label}
-      onClick={onClick}
-      type="button"
+      type={type}
+      {...props}
     >
       {icon}
       <span className="line-clamp-1 is-drawer-close:hidden">{label}</span>
