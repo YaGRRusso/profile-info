@@ -1,8 +1,8 @@
 import { useForm } from "@tanstack/react-form";
+import { useTranslation } from "react-i18next";
 import z from "zod";
 import { MultiSelectInput } from "@/components/inputs/multi-select";
 import { TextInput } from "@/components/inputs/text";
-import { PLACEHOLDERS } from "@/consts/placeholders";
 import {
   ApiTokenPermission,
   type CreateApiTokenInput,
@@ -55,6 +55,9 @@ export function ApiTokenForm({
   isLoading,
   state,
 }: ApiTokenFormProps) {
+  const { t: tForm } = useTranslation("forms");
+  const { t: tAction } = useTranslation("actions");
+
   const form = useForm({
     defaultValues: {
       name: "",
@@ -81,10 +84,11 @@ export function ApiTokenForm({
         {(field) => (
           <TextInput
             error={fieldError(field.state.meta)}
-            label="Name"
+            label={tForm("fields.apiTokenName.label")}
             name={field.name}
             onChange={field.handleChange}
-            placeholder={PLACEHOLDERS.apiTokenName}
+            placeholder={tForm("fields.apiTokenName.placeholder")}
+            tooltip={tForm("fields.apiTokenName.tooltip")}
             value={field.state.value}
           />
         )}
@@ -94,12 +98,13 @@ export function ApiTokenForm({
         {(field) => (
           <MultiSelectInput
             error={fieldError(field.state.meta)}
-            label="Permissions"
+            label={tForm("fields.permissions.label")}
             onChange={(value) =>
               field.handleChange(value as ApiTokenPermission[])
             }
             options={PERMISSION_OPTIONS}
-            placeholder={PLACEHOLDERS.chooseMulti}
+            placeholder={tForm("fields.permissions.placeholder")}
+            tooltip={tForm("fields.permissions.tooltip")}
             value={field.state.value}
           />
         )}
@@ -109,9 +114,10 @@ export function ApiTokenForm({
         {(field) => (
           <TextInput
             error={fieldError(field.state.meta)}
-            label="Expires at (optional)"
+            label={tForm("fields.expiresAtOptional.label")}
             name={field.name}
             onChange={field.handleChange}
+            tooltip={tForm("fields.expiresAtOptional.tooltip")}
             type="date"
             value={field.state.value}
           />
@@ -125,7 +131,7 @@ export function ApiTokenForm({
             onClick={onCancel}
             type="button"
           >
-            Cancel
+            {tAction("cancel")}
           </button>
         )}
         <Subscribe>
@@ -144,7 +150,9 @@ export function ApiTokenForm({
               {(isSubmitting || isLoading) && (
                 <span className="loading loading-spinner loading-xs" />
               )}
-              {state === "UPDATING" ? "Update API Token" : "Create API Token"}
+              {state === "UPDATING"
+                ? tForm("submit.updateApiToken")
+                : tForm("submit.createApiToken")}
             </button>
           )}
         </Subscribe>

@@ -1,10 +1,10 @@
 import { useForm } from "@tanstack/react-form";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import z from "zod";
 import { CheckboxInput } from "@/components/inputs/checkbox";
 import { RangeInput } from "@/components/inputs/range";
 import { SelectInput } from "@/components/inputs/select";
-import { PLACEHOLDERS } from "@/consts/placeholders";
 import {
   CourseStatus,
   type UpdateCourseInput,
@@ -14,7 +14,7 @@ import { CommonFormProps } from "./common";
 
 const courseMultiSchema = z.object({
   status: z.enum(CourseStatus),
-  relevance: z.number().min(1, "must be a positive number"),
+  relevance: z.number().min(1),
 });
 
 export type CourseMultiSchema = z.infer<typeof courseMultiSchema>;
@@ -33,6 +33,8 @@ export function CourseMultiForm({
   isDisabled,
   isLoading,
 }: CourseMultiFormProps) {
+  const { t: tForm } = useTranslation("forms");
+  const { t: tAction } = useTranslation("actions");
   const [changeStatus, setChangeStatus] = useState(false);
   const [changeRelevance, setChangeRelevance] = useState(false);
 
@@ -63,8 +65,9 @@ export function CourseMultiForm({
     >
       <CheckboxInput
         checked={changeStatus}
-        label="Change Status"
+        label={tForm("batch.changeStatus.label")}
         onChange={setChangeStatus}
+        tooltip={tForm("batch.changeStatus.tooltip")}
       />
 
       <Field name="status">
@@ -72,11 +75,12 @@ export function CourseMultiForm({
           <SelectInput
             disabled={!changeStatus}
             error={fieldError(field.state.meta)}
-            label="Status"
+            label={tForm("fields.status.label")}
             name={field.name}
             onChange={(value) => field.handleChange(value as CourseStatus)}
             options={STATUS_OPTIONS}
-            placeholder={PLACEHOLDERS.chooseOne}
+            placeholder={tForm("fields.status.placeholder")}
+            tooltip={tForm("fields.status.tooltip")}
             value={field.state.value}
           />
         )}
@@ -86,8 +90,9 @@ export function CourseMultiForm({
 
       <CheckboxInput
         checked={changeRelevance}
-        label="Change Relevance"
+        label={tForm("batch.changeRelevance.label")}
         onChange={setChangeRelevance}
+        tooltip={tForm("batch.changeRelevance.tooltip")}
       />
 
       <Field name="relevance">
@@ -96,13 +101,14 @@ export function CourseMultiForm({
             className="range-xs"
             disabled={!changeRelevance}
             error={fieldError(field.state.meta)}
-            label="Relevance"
+            label={tForm("fields.relevance.label")}
             max={5}
             min={1}
             name={field.name}
             onChange={field.handleChange}
             ruler
             step={1}
+            tooltip={tForm("fields.relevance.tooltip")}
             value={field.state.value}
           />
         )}
@@ -115,7 +121,7 @@ export function CourseMultiForm({
             onClick={onCancel}
             type="button"
           >
-            Cancel
+            {tAction("cancel")}
           </button>
         )}
         <Subscribe>
@@ -134,7 +140,7 @@ export function CourseMultiForm({
               {(isSubmitting || isLoading) && (
                 <span className="loading loading-spinner loading-xs" />
               )}
-              Update Courses
+              {tForm("submit.updateCourses")}
             </button>
           )}
         </Subscribe>

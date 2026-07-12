@@ -10,7 +10,6 @@ import { SelectInput } from "@/components/inputs/select";
 import { TextInput } from "@/components/inputs/text";
 import { TextareaInput } from "@/components/inputs/textarea";
 import { LOCALES } from "@/consts/locales";
-import { PLACEHOLDERS } from "@/consts/placeholders";
 import { RawSizeEnum } from "@/consts/raw-size";
 import { SLUG_REGEX } from "@/consts/regex";
 import {
@@ -23,6 +22,7 @@ import { useAtsSummarize, useTranslate } from "@/hooks/mutations/ai";
 import type { ProjectRow } from "@/hooks/queries/projects";
 import { useFindManySkills } from "@/hooks/queries/skills";
 import { fieldError } from "@/lib/field-error";
+import { hasUniqueLocales } from "@/lib/form-validation";
 import { createEmptyI18n, i18nLabel, i18nLabelsByIds } from "@/lib/i18n";
 import { isSlugTaken } from "@/lib/slug";
 import { CommonFormProps } from "./common";
@@ -32,7 +32,7 @@ const projectSchema = z.object({
     .string()
     .min(1, "required field")
     .regex(SLUG_REGEX, "invalid field format"),
-  relevance: z.number().min(1, "must be a positive number"),
+  relevance: z.number().min(1, "required field"),
   skillIds: z.array(z.string()),
   images: z.array(z.url()),
   urls: z.array(
@@ -50,13 +50,7 @@ const projectSchema = z.object({
       })
     )
     .min(1, "required group")
-    .refine(
-      (items) => {
-        const locales = items.map((item) => item.locale);
-        return new Set(locales).size === locales.length;
-      },
-      { message: "locales must be unique" }
-    ),
+    .refine(hasUniqueLocales, { message: "locales must be unique" }),
 });
 
 export type ProjectSchema = z.infer<typeof projectSchema>;
@@ -109,11 +103,13 @@ export function ProjectForm({
   isLoading,
   state,
 }: ProjectFormProps) {
-  const findManySkills = useFindManySkills();
-  useQueryAllPages(findManySkills);
-
+  const { t: tForm } = useTranslation("forms");
+  const { t: tAction } = useTranslation("actions");
   const { i18n } = useTranslation();
   const locale = i18n.language;
+
+  const findManySkills = useFindManySkills();
+  useQueryAllPages(findManySkills);
 
   const skillOptions = useMemo(
     () =>
@@ -154,16 +150,17 @@ export function ProjectForm({
       const type = ResourceType.Project;
 
       if (raw.trim().length <= RawSizeEnum.XSMALL)
-        return toast.error("Description must be at least 32 characters long");
+        return toast.error(tForm("validation.descriptionMin", { value: 32 }));
 
       const skills = i18nLabelsByIds(
         findManySkills.data?.nodes,
         form.getFieldValue("skillIds")
       );
-      if (!skills.length) return toast.error("At least one skill is required");
+      if (!skills.length)
+        return toast.error(tForm("validation.atLeastOneSkill"));
 
       const title = fieldGroup.title;
-      if (!title) return toast.error("Title is required");
+      if (!title) return toast.error(tForm("validation.titleRequired"));
       details.push({ key: "Title", value: [title] });
 
       const language = fieldGroup.locale;
@@ -192,6 +189,7 @@ export function ProjectForm({
       form.getFieldValue,
       form.setFieldValue,
       findManySkills.data?.nodes,
+      tForm,
     ]
   );
 
@@ -204,7 +202,7 @@ export function ProjectForm({
       const raw = fieldValue as string;
 
       if (raw.trim().length <= RawSizeEnum.XSMALL)
-        return toast.error("Description must be at least 32 characters long");
+        return toast.error(tForm("validation.descriptionMin", { value: 32 }));
 
       const translated = await translate.mutateAsync({
         raw,
@@ -219,7 +217,7 @@ export function ProjectForm({
         >
       );
     },
-    [translate.mutateAsync, form.setFieldValue]
+    [translate.mutateAsync, form.setFieldValue, tForm]
   );
 
   const { Field, Subscribe } = form;
@@ -246,10 +244,11 @@ export function ProjectForm({
         {(field) => (
           <TextInput
             error={fieldError(field.state.meta)}
-            label="Slug"
+            label={tForm("fields.slug.label")}
             name={field.name}
             onChange={field.handleChange}
-            placeholder={PLACEHOLDERS.slug}
+            placeholder={tForm("fields.slug.placeholder")}
+            tooltip={tForm("fields.slug.tooltip")}
             value={field.state.value}
           />
         )}
@@ -259,13 +258,14 @@ export function ProjectForm({
           <RangeInput
             className="range-xs"
             error={fieldError(field.state.meta)}
-            label="Relevance"
+            label={tForm("fields.relevance.label")}
             max={5}
             min={1}
             name={field.name}
             onChange={field.handleChange}
             ruler
             step={1}
+            tooltip={tForm("fields.relevance.tooltip")}
             value={field.state.value}
           />
         )}
@@ -274,22 +274,23 @@ export function ProjectForm({
         {(field) => (
           <MultiSelectInput
             error={fieldError(field.state.meta)}
-            label="Skills"
+            label={tForm("fields.skills.label")}
             onChange={field.handleChange}
             options={skillOptions}
-            placeholder={PLACEHOLDERS.search}
+            placeholder={tForm("fields.skills.placeholder")}
+            tooltip={tForm("fields.skills.tooltip")}
             value={field.state.value}
           />
         )}
       </Field>
 
-      <div className="divider">Images</div>
+      <div className="divider">{tForm("sections.images")}</div>
 
       <Field mode="array" name="images">
         {(arrayField) => (
           <FieldArray
             error={fieldError(arrayField.state.meta)}
-            label="Image"
+            label={tForm("fields.image.label")}
             onAdd={() => arrayField.pushValue("")}
             onRemove={(index) => arrayField.removeValue(index)}
             values={arrayField.state.value}
@@ -301,7 +302,7 @@ export function ProjectForm({
                     error={fieldError(field.state.meta)}
                     name={field.name}
                     onChange={field.handleChange}
-                    placeholder={PLACEHOLDERS.url}
+                    placeholder={tForm("fields.image.placeholder")}
                     value={field.state.value}
                   />
                 )}
@@ -311,13 +312,13 @@ export function ProjectForm({
         )}
       </Field>
 
-      <div className="divider">Links</div>
+      <div className="divider">{tForm("sections.links")}</div>
 
       <Field mode="array" name="urls">
         {(arrayField) => (
           <FieldArray
             error={fieldError(arrayField.state.meta)}
-            label="Link"
+            label={tForm("fields.link.label")}
             onAdd={() => arrayField.pushValue({ title: "", value: "" })}
             onRemove={(index) => arrayField.removeValue(index)}
             values={arrayField.state.value}
@@ -330,7 +331,7 @@ export function ProjectForm({
                       error={fieldError(field.state.meta)}
                       name={field.name}
                       onChange={field.handleChange}
-                      placeholder={PLACEHOLDERS.linkTitle}
+                      placeholder={tForm("fields.linkTitle.placeholder")}
                       value={field.state.value}
                     />
                   )}
@@ -341,7 +342,7 @@ export function ProjectForm({
                       error={fieldError(field.state.meta)}
                       name={field.name}
                       onChange={field.handleChange}
-                      placeholder={PLACEHOLDERS.url}
+                      placeholder={tForm("fields.linkUrl.placeholder")}
                       value={field.state.value}
                     />
                   )}
@@ -352,13 +353,13 @@ export function ProjectForm({
         )}
       </Field>
 
-      <div className="divider">Translations</div>
+      <div className="divider">{tForm("sections.translations")}</div>
 
       <Field mode="array" name="i18n">
         {(arrayField) => (
           <FieldArray
             error={fieldError(arrayField.state.meta)}
-            label="Translation"
+            label={tForm("fields.translation.label")}
             onAdd={() =>
               arrayField.pushValue({ locale: "", title: "", description: "" })
             }
@@ -371,11 +372,12 @@ export function ProjectForm({
                   {(field) => (
                     <SelectInput
                       error={fieldError(field.state.meta)}
-                      label="Locale"
+                      label={tForm("fields.locale.label")}
                       name={field.name}
                       onChange={field.handleChange}
                       options={LOCALES}
-                      placeholder={PLACEHOLDERS.chooseOne}
+                      placeholder={tForm("fields.locale.placeholder")}
+                      tooltip={tForm("fields.locale.tooltip")}
                       value={field.state.value}
                     />
                   )}
@@ -384,10 +386,11 @@ export function ProjectForm({
                   {(field) => (
                     <TextInput
                       error={fieldError(field.state.meta)}
-                      label="Title"
+                      label={tForm("fields.projectTitle.label")}
                       name={field.name}
                       onChange={field.handleChange}
-                      placeholder={PLACEHOLDERS.projectTitle}
+                      placeholder={tForm("fields.projectTitle.placeholder")}
+                      tooltip={tForm("fields.projectTitle.tooltip")}
                       value={field.state.value}
                     />
                   )}
@@ -397,7 +400,7 @@ export function ProjectForm({
                     <TextareaInput
                       disabled={atsSummarize.isPending || translate.isPending}
                       error={fieldError(field.state.meta)}
-                      label="Description"
+                      label={tForm("fields.description.label")}
                       name={field.name}
                       onChange={field.handleChange}
                       onOptimize={() =>
@@ -414,7 +417,8 @@ export function ProjectForm({
                           field.state.value
                         )
                       }
-                      placeholder={PLACEHOLDERS.description}
+                      placeholder={tForm("fields.description.placeholder")}
+                      tooltip={tForm("fields.description.tooltip")}
                       value={field.state.value}
                     />
                   )}
@@ -432,7 +436,7 @@ export function ProjectForm({
             onClick={onCancel}
             type="button"
           >
-            Cancel
+            {tAction("cancel")}
           </button>
         )}
         <Subscribe
@@ -457,7 +461,9 @@ export function ProjectForm({
               {(isSubmitting || isLoading) && (
                 <span className="loading loading-spinner loading-xs" />
               )}
-              {state === "UPDATING" ? "Update Project" : "Create Project"}
+              {state === "UPDATING"
+                ? tForm("submit.updateProject")
+                : tForm("submit.createProject")}
             </button>
           )}
         </Subscribe>

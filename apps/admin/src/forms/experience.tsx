@@ -11,7 +11,6 @@ import { SelectInput } from "@/components/inputs/select";
 import { TextInput } from "@/components/inputs/text";
 import { TextareaInput } from "@/components/inputs/textarea";
 import { LOCALES } from "@/consts/locales";
-import { PLACEHOLDERS } from "@/consts/placeholders";
 import { RawSizeEnum } from "@/consts/raw-size";
 import { SLUG_REGEX } from "@/consts/regex";
 import {
@@ -27,6 +26,7 @@ import { useFindManyOrganizations } from "@/hooks/queries/organizations";
 import { useFindManySkills } from "@/hooks/queries/skills";
 import { toDateInput, toIsoDate } from "@/lib/date";
 import { fieldError } from "@/lib/field-error";
+import { hasUniqueLocales } from "@/lib/form-validation";
 import {
   createEmptyI18n,
   i18nLabel,
@@ -36,6 +36,17 @@ import {
 import { isSlugTaken } from "@/lib/slug";
 import { CommonFormProps } from "./common";
 
+const roleI18nSchema = z
+  .array(
+    z.object({
+      locale: z.string().min(1, "required field"),
+      title: z.string().min(1, "required field"),
+      description: z.string().min(1, "required field"),
+    })
+  )
+  .min(1, "required group")
+  .refine(hasUniqueLocales, { message: "locales must be unique" });
+
 const experienceSchema = z.object({
   slug: z
     .string()
@@ -43,26 +54,11 @@ const experienceSchema = z.object({
     .regex(SLUG_REGEX, "invalid field format"),
   organizationId: z.string().min(1, "required field"),
   category: z.enum(ExperienceCategory, "required field"),
-  relevance: z.number().min(1, "must be a positive number"),
+  relevance: z.number().min(1, "required field"),
   roles: z
     .array(
       z.object({
-        i18n: z
-          .array(
-            z.object({
-              locale: z.string().min(1, "required field"),
-              title: z.string().min(1, "required field"),
-              description: z.string().min(1, "required field"),
-            })
-          )
-          .min(1, "required group")
-          .refine(
-            (items) => {
-              const locales = items.map((item) => item.locale);
-              return new Set(locales).size === locales.length;
-            },
-            { message: "locales must be unique" }
-          ),
+        i18n: roleI18nSchema,
         period: z
           .object({ from: z.string(), to: z.string() })
           .refine(
@@ -151,14 +147,16 @@ export function ExperienceForm({
   isLoading,
   state,
 }: ExperienceFormProps) {
+  const { t: tForm } = useTranslation("forms");
+  const { t: tAction } = useTranslation("actions");
+  const { i18n } = useTranslation();
+  const locale = i18n.language;
+
   const findManyOrganizations = useFindManyOrganizations();
   useQueryAllPages(findManyOrganizations);
 
   const findManySkills = useFindManySkills();
   useQueryAllPages(findManySkills);
-
-  const { i18n } = useTranslation();
-  const locale = i18n.language;
 
   const skillOptions = useMemo(
     () =>
@@ -209,20 +207,22 @@ export function ExperienceForm({
       const type = ResourceType.Experience;
 
       if (raw.trim().length <= RawSizeEnum.XSMALL)
-        return toast.error("Description must be at least 32 characters long");
+        return toast.error(tForm("validation.descriptionMin", { value: 32 }));
 
       const skills = i18nLabelsByIds(
         findManySkills.data?.nodes,
         fieldParent.skillIds
       );
-      if (!skills.length) return toast.error("At least one skill is required");
+      if (!skills.length)
+        return toast.error(tForm("validation.atLeastOneSkill"));
 
       const title = fieldGroup.title;
-      if (!title) return toast.error("Title is required");
+      if (!title) return toast.error(tForm("validation.titleRequired"));
       details.push({ key: "Title", value: [title] });
 
       const period = fieldParent.period;
-      if (!period.from && !period.to) return toast.error("Period is required");
+      if (!period.from && !period.to)
+        return toast.error(tForm("validation.periodRequired"));
       details.push({
         key: "Period",
         value: [
@@ -232,13 +232,14 @@ export function ExperienceForm({
       });
 
       const category = form.getFieldValue("category");
-      if (!category) return toast.error("Category is required");
+      if (!category) return toast.error(tForm("validation.categoryRequired"));
       details.push({ key: "Category", value: [category] });
 
       const organization = findManyOrganizations.data?.nodes.find(
         (org) => org.id === form.getFieldValue("organizationId")
       );
-      if (!organization) return toast.error("Organization is required");
+      if (!organization)
+        return toast.error(tForm("validation.organizationRequired"));
 
       const organizationName = organization.name;
       details.push({ key: "Organization Name", value: [organizationName] });
@@ -277,6 +278,7 @@ export function ExperienceForm({
       form.setFieldValue,
       findManyOrganizations.data?.nodes,
       findManySkills.data?.nodes,
+      tForm,
     ]
   );
 
@@ -289,7 +291,7 @@ export function ExperienceForm({
       const raw = fieldValue as string;
 
       if (raw.trim().length <= RawSizeEnum.XSMALL)
-        return toast.error("Description must be at least 32 characters long");
+        return toast.error(tForm("validation.descriptionMin", { value: 32 }));
 
       const translated = await translate.mutateAsync({
         raw,
@@ -304,7 +306,7 @@ export function ExperienceForm({
         >
       );
     },
-    [translate.mutateAsync, form.setFieldValue]
+    [translate.mutateAsync, form.setFieldValue, tForm]
   );
 
   const { Field, Subscribe } = form;
@@ -331,10 +333,11 @@ export function ExperienceForm({
         {(field) => (
           <TextInput
             error={fieldError(field.state.meta)}
-            label="Slug"
+            label={tForm("fields.slug.label")}
             name={field.name}
             onChange={field.handleChange}
-            placeholder={PLACEHOLDERS.slug}
+            placeholder={tForm("fields.slug.placeholder")}
+            tooltip={tForm("fields.slug.tooltip")}
             value={field.state.value}
           />
         )}
@@ -344,11 +347,12 @@ export function ExperienceForm({
           <SelectInput
             disabled={!organizationOptions.length}
             error={fieldError(field.state.meta)}
-            label="Organization"
+            label={tForm("fields.organization.label")}
             name={field.name}
             onChange={field.handleChange}
             options={organizationOptions}
-            placeholder={PLACEHOLDERS.chooseOne}
+            placeholder={tForm("fields.organization.placeholder")}
+            tooltip={tForm("fields.organization.tooltip")}
             value={field.state.value}
           />
         )}
@@ -357,13 +361,14 @@ export function ExperienceForm({
         {(field) => (
           <SelectInput
             error={fieldError(field.state.meta)}
-            label="Category"
+            label={tForm("fields.experienceCategory.label")}
             name={field.name}
             onChange={(value) =>
               field.handleChange(value as ExperienceCategory)
             }
             options={CATEGORY_OPTIONS}
-            placeholder={PLACEHOLDERS.chooseOne}
+            placeholder={tForm("fields.experienceCategory.placeholder")}
+            tooltip={tForm("fields.experienceCategory.tooltip")}
             value={field.state.value}
           />
         )}
@@ -373,25 +378,26 @@ export function ExperienceForm({
           <RangeInput
             className="range-xs"
             error={fieldError(field.state.meta)}
-            label="Relevance"
+            label={tForm("fields.relevance.label")}
             max={5}
             min={1}
             name={field.name}
             onChange={field.handleChange}
             ruler
             step={1}
+            tooltip={tForm("fields.relevance.tooltip")}
             value={field.state.value}
           />
         )}
       </Field>
 
-      <div className="divider">Roles</div>
+      <div className="divider">{tForm("sections.roles.title")}</div>
 
       <Field mode="array" name="roles">
         {(rolesField) => (
           <FieldArray
             error={fieldError(rolesField.state.meta)}
-            label="Role"
+            label={tForm("fields.role.label")}
             onAdd={() => rolesField.pushValue(emptyRole())}
             onMoveDown={(index) => rolesField.swapValues(index, index + 1)}
             onMoveUp={(index) => rolesField.swapValues(index, index - 1)}
@@ -404,8 +410,9 @@ export function ExperienceForm({
                   {(field) => (
                     <DateRangeInput
                       error={fieldError(field.state.meta)}
-                      label="Period"
+                      label={tForm("fields.period.label")}
                       onChange={field.handleChange}
+                      tooltip={tForm("fields.period.tooltip")}
                       value={field.state.value}
                     />
                   )}
@@ -415,22 +422,25 @@ export function ExperienceForm({
                   {(field) => (
                     <MultiSelectInput
                       error={fieldError(field.state.meta)}
-                      label="Skills"
+                      label={tForm("fields.skills.label")}
                       onChange={field.handleChange}
                       options={skillOptions}
-                      placeholder={PLACEHOLDERS.search}
+                      placeholder={tForm("fields.skills.placeholder")}
+                      tooltip={tForm("fields.skills.tooltip")}
                       value={field.state.value}
                     />
                   )}
                 </Field>
 
-                <div className="divider">Translations</div>
+                <div className="divider">
+                  {tForm("sections.roles.translations")}
+                </div>
 
                 <Field mode="array" name={`roles[${roleIndex}].i18n`}>
                   {(i18nField) => (
                     <FieldArray
                       error={fieldError(i18nField.state.meta)}
-                      label="Translation"
+                      label={tForm("fields.translation.label")}
                       onAdd={() =>
                         i18nField.pushValue({
                           locale: "",
@@ -450,11 +460,12 @@ export function ExperienceForm({
                             {(field) => (
                               <SelectInput
                                 error={fieldError(field.state.meta)}
-                                label="Locale"
+                                label={tForm("fields.locale.label")}
                                 name={field.name}
                                 onChange={field.handleChange}
                                 options={LOCALES}
-                                placeholder={PLACEHOLDERS.chooseOne}
+                                placeholder={tForm("fields.locale.placeholder")}
+                                tooltip={tForm("fields.locale.tooltip")}
                                 value={field.state.value}
                               />
                             )}
@@ -465,10 +476,15 @@ export function ExperienceForm({
                             {(field) => (
                               <TextInput
                                 error={fieldError(field.state.meta)}
-                                label="Title"
+                                label={tForm("fields.experienceTitle.label")}
                                 name={field.name}
                                 onChange={field.handleChange}
-                                placeholder={PLACEHOLDERS.experienceTitle}
+                                placeholder={tForm(
+                                  "fields.experienceTitle.placeholder"
+                                )}
+                                tooltip={tForm(
+                                  "fields.experienceTitle.tooltip"
+                                )}
                                 value={field.state.value}
                               />
                             )}
@@ -482,7 +498,7 @@ export function ExperienceForm({
                                   atsSummarize.isPending || translate.isPending
                                 }
                                 error={fieldError(field.state.meta)}
-                                label="Description"
+                                label={tForm("fields.description.label")}
                                 name={field.name}
                                 onChange={field.handleChange}
                                 onOptimize={() =>
@@ -502,7 +518,10 @@ export function ExperienceForm({
                                     field.state.value
                                   )
                                 }
-                                placeholder={PLACEHOLDERS.description}
+                                placeholder={tForm(
+                                  "fields.description.placeholder"
+                                )}
+                                tooltip={tForm("fields.description.tooltip")}
                                 value={field.state.value}
                               />
                             )}
@@ -525,7 +544,7 @@ export function ExperienceForm({
             onClick={onCancel}
             type="button"
           >
-            Cancel
+            {tAction("cancel")}
           </button>
         )}
         <Subscribe>
@@ -544,7 +563,9 @@ export function ExperienceForm({
               {(isSubmitting || isLoading) && (
                 <span className="loading loading-spinner loading-xs" />
               )}
-              {state === "UPDATING" ? "Update Experience" : "Create Experience"}
+              {state === "UPDATING"
+                ? tForm("submit.updateExperience")
+                : tForm("submit.createExperience")}
             </button>
           )}
         </Subscribe>

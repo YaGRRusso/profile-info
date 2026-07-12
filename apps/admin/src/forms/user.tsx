@@ -1,8 +1,8 @@
 import { useForm } from "@tanstack/react-form";
+import { useTranslation } from "react-i18next";
 import z from "zod";
 import { PasswordInput } from "@/components/inputs/password";
 import { TextInput } from "@/components/inputs/text";
-import { PLACEHOLDERS } from "@/consts/placeholders";
 import { fieldError } from "@/lib/field-error";
 import { CommonFormProps } from "./common";
 
@@ -24,6 +24,8 @@ export function UserForm({
   isDisabled,
   isLoading,
 }: UserFormProps) {
+  const { t: tForm } = useTranslation("forms");
+
   const form = useForm({
     defaultValues: {
       email: "",
@@ -49,10 +51,11 @@ export function UserForm({
         {(field) => (
           <TextInput
             error={fieldError(field.state.meta)}
-            label="Email"
+            label={tForm("fields.email.label")}
             name={field.name}
             onChange={field.handleChange}
-            placeholder={PLACEHOLDERS.email}
+            placeholder={tForm("fields.email.placeholder")}
+            tooltip={tForm("fields.email.tooltip")}
             type="email"
             value={field.state.value}
           />
@@ -62,10 +65,11 @@ export function UserForm({
         {(field) => (
           <PasswordInput
             error={fieldError(field.state.meta)}
-            label="Password"
+            label={tForm("fields.password.label")}
             name={field.name}
             onChange={field.handleChange}
-            placeholder={PLACEHOLDERS.password}
+            placeholder={tForm("fields.password.placeholder")}
+            tooltip={tForm("fields.password.tooltip")}
             value={field.state.value}
           />
         )}
@@ -87,7 +91,7 @@ export function UserForm({
               {(isSubmitting || isLoading) && (
                 <span className="loading loading-spinner loading-xs" />
               )}
-              Sign In
+              {tForm("submit.signIn")}
             </button>
           )}
         </Subscribe>

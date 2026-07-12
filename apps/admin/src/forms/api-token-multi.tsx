@@ -1,9 +1,9 @@
 import { useForm } from "@tanstack/react-form";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import z from "zod";
 import { CheckboxInput } from "@/components/inputs/checkbox";
 import { MultiSelectInput } from "@/components/inputs/multi-select";
-import { PLACEHOLDERS } from "@/consts/placeholders";
 import {
   ApiTokenPermission,
   type UpdateApiTokenInput,
@@ -35,6 +35,8 @@ export function ApiTokenMultiForm({
   isDisabled,
   isLoading,
 }: ApiTokenMultiFormProps) {
+  const { t: tForm } = useTranslation("forms");
+  const { t: tAction } = useTranslation("actions");
   const [changePermissions, setChangePermissions] = useState(false);
 
   const form = useForm({
@@ -63,8 +65,9 @@ export function ApiTokenMultiForm({
     >
       <CheckboxInput
         checked={changePermissions}
-        label="Change Permissions"
+        label={tForm("batch.changePermissions.label")}
         onChange={setChangePermissions}
+        tooltip={tForm("batch.changePermissions.tooltip")}
       />
 
       <Field name="permissions">
@@ -72,12 +75,13 @@ export function ApiTokenMultiForm({
           <MultiSelectInput
             disabled={!changePermissions}
             error={fieldError(field.state.meta)}
-            label="Permissions"
+            label={tForm("fields.permissions.label")}
             onChange={(value) =>
               field.handleChange(value as ApiTokenPermission[])
             }
             options={PERMISSION_OPTIONS}
-            placeholder={PLACEHOLDERS.chooseMulti}
+            placeholder={tForm("fields.permissions.placeholder")}
+            tooltip={tForm("fields.permissions.tooltip")}
             value={field.state.value}
           />
         )}
@@ -90,7 +94,7 @@ export function ApiTokenMultiForm({
             onClick={onCancel}
             type="button"
           >
-            Cancel
+            {tAction("cancel")}
           </button>
         )}
         <Subscribe>
@@ -109,7 +113,7 @@ export function ApiTokenMultiForm({
               {(isSubmitting || isLoading) && (
                 <span className="loading loading-spinner loading-xs" />
               )}
-              Update API Tokens
+              {tForm("submit.updateApiTokens")}
             </button>
           )}
         </Subscribe>

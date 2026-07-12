@@ -1,14 +1,15 @@
 import { useForm } from "@tanstack/react-form";
+import { useTranslation } from "react-i18next";
 import z from "zod";
 import { FieldArray } from "@/components/inputs/field-array";
 import { SelectInput } from "@/components/inputs/select";
 import { TextInput } from "@/components/inputs/text";
 import { LOCALES } from "@/consts/locales";
-import { PLACEHOLDERS } from "@/consts/placeholders";
 import { SLUG_REGEX } from "@/consts/regex";
 import { type CreateSkillInput } from "@/generated/graphql/graphql";
 import type { SkillRow } from "@/hooks/queries/skills";
 import { fieldError } from "@/lib/field-error";
+import { hasUniqueLocales } from "@/lib/form-validation";
 import { createEmptyI18n } from "@/lib/i18n";
 import { isSlugTaken } from "@/lib/slug";
 import { CommonFormProps } from "./common";
@@ -27,13 +28,7 @@ const skillSchema = z.object({
       })
     )
     .min(1, "required group")
-    .refine(
-      (items) => {
-        const locales = items.map((item) => item.locale);
-        return new Set(locales).size === locales.length;
-      },
-      { message: "locales must be unique" }
-    ),
+    .refine(hasUniqueLocales, { message: "locales must be unique" }),
 });
 
 export type SkillSchema = z.infer<typeof skillSchema>;
@@ -73,6 +68,9 @@ export function SkillForm({
   isLoading,
   state,
 }: SkillFormProps) {
+  const { t: tForm } = useTranslation("forms");
+  const { t: tAction } = useTranslation("actions");
+
   const form = useForm({
     defaultValues: {
       slug: "",
@@ -108,10 +106,11 @@ export function SkillForm({
         {(field) => (
           <TextInput
             error={fieldError(field.state.meta)}
-            label="Slug"
+            label={tForm("fields.slug.label")}
             name={field.name}
             onChange={field.handleChange}
-            placeholder={PLACEHOLDERS.slug}
+            placeholder={tForm("fields.slug.placeholder")}
+            tooltip={tForm("fields.slug.tooltip")}
             value={field.state.value}
           />
         )}
@@ -121,22 +120,23 @@ export function SkillForm({
         {(field) => (
           <TextInput
             error={fieldError(field.state.meta)}
-            label="Category"
+            label={tForm("fields.skillCategory.label")}
             name={field.name}
             onChange={field.handleChange}
-            placeholder={PLACEHOLDERS.category}
+            placeholder={tForm("fields.skillCategory.placeholder")}
+            tooltip={tForm("fields.skillCategory.tooltip")}
             value={field.state.value ?? ""}
           />
         )}
       </Field>
 
-      <div className="divider">Translations</div>
+      <div className="divider">{tForm("sections.translations")}</div>
 
       <Field mode="array" name="i18n">
         {(arrayField) => (
           <FieldArray
             error={fieldError(arrayField.state.meta)}
-            label="Translation"
+            label={tForm("fields.translation.label")}
             onAdd={() => arrayField.pushValue({ locale: "", title: "" })}
             onRemove={(index) => arrayField.removeValue(index)}
             values={arrayField.state.value}
@@ -147,11 +147,12 @@ export function SkillForm({
                   {(field) => (
                     <SelectInput
                       error={fieldError(field.state.meta)}
-                      label="Locale"
+                      label={tForm("fields.locale.label")}
                       name={field.name}
                       onChange={field.handleChange}
                       options={LOCALES}
-                      placeholder={PLACEHOLDERS.chooseOne}
+                      placeholder={tForm("fields.locale.placeholder")}
+                      tooltip={tForm("fields.locale.tooltip")}
                       value={field.state.value}
                     />
                   )}
@@ -160,10 +161,11 @@ export function SkillForm({
                   {(field) => (
                     <TextInput
                       error={fieldError(field.state.meta)}
-                      label="Title"
+                      label={tForm("fields.skillTitle.label")}
                       name={field.name}
                       onChange={field.handleChange}
-                      placeholder={PLACEHOLDERS.skillTitle}
+                      placeholder={tForm("fields.skillTitle.placeholder")}
+                      tooltip={tForm("fields.skillTitle.tooltip")}
                       value={field.state.value}
                     />
                   )}
@@ -181,7 +183,7 @@ export function SkillForm({
             onClick={onCancel}
             type="button"
           >
-            Cancel
+            {tAction("cancel")}
           </button>
         )}
         <Subscribe>
@@ -200,7 +202,9 @@ export function SkillForm({
               {(isSubmitting || isLoading) && (
                 <span className="loading loading-spinner loading-xs" />
               )}
-              {state === "UPDATING" ? "Update Skill" : "Create Skill"}
+              {state === "UPDATING"
+                ? tForm("submit.updateSkill")
+                : tForm("submit.createSkill")}
             </button>
           )}
         </Subscribe>

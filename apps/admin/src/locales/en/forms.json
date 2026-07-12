@@ -1,0 +1,286 @@
+{
+  "fields": {
+    "slug": {
+      "label": "Slug",
+      "placeholder": "e.g. my-slug",
+      "tooltip": "Unique URL-friendly identifier. Use lowercase letters, numbers, and hyphens only."
+    },
+    "email": {
+      "label": "Email",
+      "placeholder": "e.g. you@example.com",
+      "tooltip": "Email address used to sign in to your account."
+    },
+    "password": {
+      "label": "Password",
+      "placeholder": "e.g. abc#123",
+      "tooltip": "Account password. Must be at least 6 characters."
+    },
+    "locale": {
+      "label": "Locale",
+      "placeholder": "Choose one...",
+      "tooltip": "Language of this translation. Each locale can appear only once per record."
+    },
+    "description": {
+      "label": "Description",
+      "placeholder": "Write a brief description...",
+      "tooltip": "Longer summary in the selected language. Used on your profile and CV."
+    },
+    "translation": {
+      "label": "Translation",
+      "tooltip": "Localized content for this record. Add one entry per supported language."
+    },
+    "link": {
+      "label": "Link",
+      "tooltip": "Named links such as website, portfolio, or demo URLs."
+    },
+    "linkTitle": {
+      "placeholder": "e.g. Website, Portfolio, Demo"
+    },
+    "linkUrl": {
+      "placeholder": "e.g. https://example.com"
+    },
+    "image": {
+      "label": "Image",
+      "placeholder": "e.g. https://example.com",
+      "tooltip": "Optional image URL illustrating this entry."
+    },
+    "skills": {
+      "label": "Skills",
+      "placeholder": "Type to search...",
+      "tooltip": "Skills from the catalog linked to this record. Order matters where the list is draggable."
+    },
+    "relevance": {
+      "label": "Relevance",
+      "tooltip": "Score from 1 to 5. Higher values appear more prominently on your CV."
+    },
+    "period": {
+      "label": "Period",
+      "tooltip": "Start and end dates. Leave the end date empty if still ongoing."
+    },
+    "hours": {
+      "label": "Hours",
+      "placeholder": "e.g. 24",
+      "tooltip": "Total workload or duration in hours."
+    },
+    "url": {
+      "label": "URL",
+      "placeholder": "e.g. https://example.com",
+      "tooltip": "Optional public URL for verification or reference."
+    },
+    "organization": {
+      "label": "Organization",
+      "placeholder": "Choose one...",
+      "tooltip": "Employer, school, or platform from the Organizations catalog."
+    },
+    "level": {
+      "label": "Level",
+      "placeholder": "Choose one...",
+      "tooltip": "Academic level of this education entry."
+    },
+    "status": {
+      "label": "Status",
+      "placeholder": "Choose one...",
+      "tooltip": "Whether this course or education is completed, in progress, or planned."
+    },
+    "role": {
+      "label": "Role",
+      "tooltip": "A position held within this experience. Add more than one if you changed roles at the same organization."
+    },
+    "permissions": {
+      "label": "Permissions",
+      "placeholder": "Choose one or more...",
+      "tooltip": "Which API actions this token is allowed to perform."
+    },
+    "expiresAtOptional": {
+      "label": "Expires at (optional)",
+      "tooltip": "Optional expiration date. The token stops working after this date."
+    },
+    "logo": {
+      "label": "Logo",
+      "placeholder": "e.g. https://example.com",
+      "tooltip": "Optional logo image URL for this organization."
+    },
+    "website": {
+      "label": "Website",
+      "placeholder": "e.g. https://example.com",
+      "tooltip": "Optional website URL for this organization."
+    },
+    "nickname": {
+      "label": "Nickname",
+      "placeholder": "e.g. johndoe",
+      "tooltip": "Short handle or preferred name (optional)."
+    },
+    "birthDate": {
+      "label": "Birth date",
+      "placeholder": "YYYY-MM-DD",
+      "tooltip": "Optional birth date for your profile."
+    },
+    "avatarUrl": {
+      "label": "Avatar URL",
+      "placeholder": "e.g. https://example.com",
+      "tooltip": "Optional image URL for your profile photo."
+    },
+    "phone": {
+      "label": "Phone",
+      "placeholder": "e.g. 11 99999-9999",
+      "tooltip": "Contact phone number (optional)."
+    },
+    "address": {
+      "label": "Address",
+      "placeholder": "e.g. Street, City, State, Country",
+      "tooltip": "Optional mailing or location text."
+    },
+    "newPassword": {
+      "label": "New password",
+      "placeholder": "e.g. abc#123",
+      "tooltip": "Leave blank to keep your current password. Minimum 8 characters when set."
+    },
+    "profileName": {
+      "label": "Name",
+      "placeholder": "e.g. John Doe",
+      "tooltip": "Your full professional name as it should appear on your CV."
+    },
+    "organizationName": {
+      "label": "Name",
+      "placeholder": "e.g. Acme Corp",
+      "tooltip": "Public name of the organization as shown in pickers and on your CV."
+    },
+    "apiTokenName": {
+      "label": "Name",
+      "placeholder": "e.g. Pipeline Token",
+      "tooltip": "Friendly label to recognize this token in the list later."
+    },
+    "skillCategory": {
+      "label": "Category",
+      "placeholder": "e.g. Soft Skills, Healthcare, Office",
+      "tooltip": "Optional grouping shown on your CV when skills are listed by category."
+    },
+    "organizationCategory": {
+      "label": "Category",
+      "placeholder": "Choose one...",
+      "tooltip": "Type of organization, such as company, school, or platform."
+    },
+    "experienceCategory": {
+      "label": "Category",
+      "placeholder": "Choose one...",
+      "tooltip": "Engagement type such as full-time, part-time, freelance, or volunteer."
+    },
+    "skillTitle": {
+      "label": "Title",
+      "placeholder": "e.g. Customer Service, Excel, Team Leadership",
+      "tooltip": "Display title in the selected language."
+    },
+    "profileTitle": {
+      "label": "Title",
+      "placeholder": "e.g. Store Manager, Registered Nurse",
+      "tooltip": "Display title in the selected language."
+    },
+    "experienceTitle": {
+      "label": "Title",
+      "placeholder": "e.g. Team Lead, Sales Associate",
+      "tooltip": "Display title in the selected language."
+    },
+    "educationTitle": {
+      "label": "Title",
+      "placeholder": "e.g. Business Administration, Nursing",
+      "tooltip": "Display title in the selected language."
+    },
+    "courseTitle": {
+      "label": "Title",
+      "placeholder": "e.g. Food Safety Certification, First Aid",
+      "tooltip": "Display title in the selected language."
+    },
+    "projectTitle": {
+      "label": "Title",
+      "placeholder": "e.g. Community Outreach, Warehouse Relayout",
+      "tooltip": "Display title in the selected language."
+    }
+  },
+  "sections": {
+    "translations": "Translations",
+    "images": "Images",
+    "links": "Links",
+    "roles": {
+      "title": "Roles",
+      "translations": "Translations"
+    },
+    "personal": "Personal",
+    "contact": "Contact",
+    "security": "Security",
+    "mainSkills": "Main Skills"
+  },
+  "batch": {
+    "changeCategory": {
+      "label": "Change Category",
+      "tooltip": "When checked, updates the category on all selected records."
+    },
+    "changeLevel": {
+      "label": "Change Level",
+      "tooltip": "When checked, updates the level on all selected educations."
+    },
+    "changeStatus": {
+      "label": "Change Status",
+      "tooltip": "When checked, updates the status on all selected records."
+    },
+    "changeRelevance": {
+      "label": "Change Relevance",
+      "tooltip": "When checked, updates the relevance score on all selected records."
+    },
+    "changePermissions": {
+      "label": "Change Permissions",
+      "tooltip": "When checked, replaces permissions on all selected tokens."
+    }
+  },
+  "validation": {
+    "required": "Required field",
+    "invalidEmail": "Invalid email",
+    "minLength": "Must be at least {{value}} characters",
+    "invalidFieldFormat": "Invalid field format",
+    "requiredGroup": "Required group",
+    "localesMustBeUnique": "Locales must be unique",
+    "slugAlreadyExists": "Slug already exists",
+    "selectAtLeastOnePermission": "Select at least one permission",
+    "descriptionMin": "Description must be at least {{value}} characters long",
+    "atLeastOneSkill": "At least one skill is required",
+    "titleRequired": "Title is required",
+    "periodRequired": "Period is required",
+    "levelRequired": "Level is required",
+    "statusRequired": "Status is required",
+    "hoursRequired": "Hours is required",
+    "categoryRequired": "Category is required",
+    "organizationRequired": "Organization is required",
+    "positiveNumber": "Must be a positive number",
+    "endDateAfterStartDate": "End date must be after start date"
+  },
+  "fieldArray": {
+    "emptyTitle": "Nothing here yet",
+    "emptyDescription": "Click on the button below to add your first item",
+    "addItem": "Add {{item}}",
+    "item": "Item"
+  },
+  "submit": {
+    "signIn": "Sign In",
+    "reset": "Reset",
+    "createSkill": "Create Skill",
+    "updateSkill": "Update Skill",
+    "createOrganization": "Create Organization",
+    "updateOrganization": "Update Organization",
+    "createApiToken": "Create API Token",
+    "updateApiToken": "Update API Token",
+    "createCourse": "Create Course",
+    "updateCourse": "Update Course",
+    "createEducation": "Create Education",
+    "updateEducation": "Update Education",
+    "createProject": "Create Project",
+    "updateProject": "Update Project",
+    "createExperience": "Create Experience",
+    "updateExperience": "Update Experience",
+    "updateSkills": "Update Skills",
+    "updateOrganizations": "Update Organizations",
+    "updateCourses": "Update Courses",
+    "updateEducations": "Update Educations",
+    "updateProjects": "Update Projects",
+    "updateExperiences": "Update Experiences",
+    "updateApiTokens": "Update API Tokens"
+  }
+}

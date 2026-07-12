@@ -1,9 +1,9 @@
 import { useForm } from "@tanstack/react-form";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import z from "zod";
 import { CheckboxInput } from "@/components/inputs/checkbox";
 import { SelectInput } from "@/components/inputs/select";
-import { PLACEHOLDERS } from "@/consts/placeholders";
 import {
   OrganizationCategory,
   type UpdateOrganizationInput,
@@ -33,6 +33,8 @@ export function OrganizationMultiForm({
   isDisabled,
   isLoading,
 }: OrganizationMultiFormProps) {
+  const { t: tForm } = useTranslation("forms");
+  const { t: tAction } = useTranslation("actions");
   const [changeCategory, setChangeCategory] = useState(false);
 
   const form = useForm({
@@ -59,8 +61,9 @@ export function OrganizationMultiForm({
     >
       <CheckboxInput
         checked={changeCategory}
-        label="Change Category"
+        label={tForm("batch.changeCategory.label")}
         onChange={setChangeCategory}
+        tooltip={tForm("batch.changeCategory.tooltip")}
       />
 
       <Field name="category">
@@ -68,13 +71,14 @@ export function OrganizationMultiForm({
           <SelectInput
             disabled={!changeCategory}
             error={fieldError(field.state.meta)}
-            label="Category"
+            label={tForm("fields.organizationCategory.label")}
             name={field.name}
             onChange={(value) =>
               field.handleChange(value as OrganizationCategory)
             }
             options={CATEGORY_OPTIONS}
-            placeholder={PLACEHOLDERS.chooseOne}
+            placeholder={tForm("fields.organizationCategory.placeholder")}
+            tooltip={tForm("fields.organizationCategory.tooltip")}
             value={field.state.value}
           />
         )}
@@ -87,7 +91,7 @@ export function OrganizationMultiForm({
             onClick={onCancel}
             type="button"
           >
-            Cancel
+            {tAction("cancel")}
           </button>
         )}
         <Subscribe>
@@ -106,7 +110,7 @@ export function OrganizationMultiForm({
               {(isSubmitting || isLoading) && (
                 <span className="loading loading-spinner loading-xs" />
               )}
-              Update Organizations
+              {tForm("submit.updateOrganizations")}
             </button>
           )}
         </Subscribe>

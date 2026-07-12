@@ -1,9 +1,9 @@
 import { useForm } from "@tanstack/react-form";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import z from "zod";
 import { CheckboxInput } from "@/components/inputs/checkbox";
 import { TextInput } from "@/components/inputs/text";
-import { PLACEHOLDERS } from "@/consts/placeholders";
 import type { UpdateSkillInput } from "@/generated/graphql/graphql";
 import { fieldError } from "@/lib/field-error";
 import { CommonFormProps } from "./common";
@@ -23,6 +23,8 @@ export function SkillMultiForm({
   isDisabled,
   isLoading,
 }: SkillMultiFormProps) {
+  const { t: tForm } = useTranslation("forms");
+  const { t: tAction } = useTranslation("actions");
   const [changeCategory, setChangeCategory] = useState(false);
 
   const form = useForm({
@@ -49,8 +51,9 @@ export function SkillMultiForm({
     >
       <CheckboxInput
         checked={changeCategory}
-        label="Change Category"
+        label={tForm("batch.changeCategory.label")}
         onChange={setChangeCategory}
+        tooltip={tForm("batch.changeCategory.tooltip")}
       />
 
       <Field name="category">
@@ -58,10 +61,11 @@ export function SkillMultiForm({
           <TextInput
             disabled={!changeCategory}
             error={fieldError(field.state.meta)}
-            label="Category"
+            label={tForm("fields.skillCategory.label")}
             name={field.name}
             onChange={field.handleChange}
-            placeholder={PLACEHOLDERS.category}
+            placeholder={tForm("fields.skillCategory.placeholder")}
+            tooltip={tForm("fields.skillCategory.tooltip")}
             value={field.state.value ?? ""}
           />
         )}
@@ -74,7 +78,7 @@ export function SkillMultiForm({
             onClick={onCancel}
             type="button"
           >
-            Cancel
+            {tAction("cancel")}
           </button>
         )}
         <Subscribe>
@@ -93,7 +97,7 @@ export function SkillMultiForm({
               {(isSubmitting || isLoading) && (
                 <span className="loading loading-spinner loading-xs" />
               )}
-              Update Skills
+              {tForm("submit.updateSkills")}
             </button>
           )}
         </Subscribe>

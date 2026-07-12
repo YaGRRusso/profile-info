@@ -1,6 +1,7 @@
 import { DeepKeys, DeepValue, useForm } from "@tanstack/react-form";
 import lodash from "lodash";
 import { useCallback, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { toast } from "react-toastify";
 import z from "zod";
 import { FieldArray } from "@/components/inputs/field-array";
@@ -8,7 +9,6 @@ import { SelectInput } from "@/components/inputs/select";
 import { TextInput } from "@/components/inputs/text";
 import { TextareaInput } from "@/components/inputs/textarea";
 import { LOCALES } from "@/consts/locales";
-import { PLACEHOLDERS } from "@/consts/placeholders";
 import { RawSizeEnum } from "@/consts/raw-size";
 import { SLUG_REGEX } from "@/consts/regex";
 import {
@@ -20,6 +20,7 @@ import {
 import { useSummarize, useTranslate } from "@/hooks/mutations/ai";
 import { OrganizationRow } from "@/hooks/queries/organizations";
 import { fieldError } from "@/lib/field-error";
+import { hasUniqueLocales } from "@/lib/form-validation";
 import { createEmptyI18n } from "@/lib/i18n";
 import { isSlugTaken } from "@/lib/slug";
 import { CommonFormProps } from "./common";
@@ -41,13 +42,7 @@ const organizationSchema = z.object({
       })
     )
     .min(1, "required group")
-    .refine(
-      (items) => {
-        const locales = items.map((item) => item.locale);
-        return new Set(locales).size === locales.length;
-      },
-      { message: "locales must be unique" }
-    ),
+    .refine(hasUniqueLocales, { message: "locales must be unique" }),
 });
 
 export type OrganizationSchema = z.infer<typeof organizationSchema>;
@@ -107,6 +102,9 @@ export function OrganizationForm({
   isLoading,
   state,
 }: OrganizationFormProps) {
+  const { t: tForm } = useTranslation("forms");
+  const { t: tAction } = useTranslation("actions");
+
   const [isNameEdited, setIsNameEdited] = useState(!!defaultValues?.name);
 
   const summarize = useSummarize();
@@ -138,7 +136,7 @@ export function OrganizationForm({
       const type = ResourceType.Organization;
 
       if (raw.trim().length <= RawSizeEnum.XSMALL)
-        return toast.error("Description must be at least 64 characters long");
+        return toast.error(tForm("validation.descriptionMin", { value: 64 }));
 
       const name = form.getFieldValue("name");
       if (name) details.push({ key: "Name", value: [name] });
@@ -166,7 +164,7 @@ export function OrganizationForm({
         >
       );
     },
-    [summarize.mutateAsync, form.getFieldValue, form.setFieldValue]
+    [summarize.mutateAsync, form.getFieldValue, form.setFieldValue, tForm]
   );
 
   const handleTranslate = useCallback(
@@ -178,7 +176,7 @@ export function OrganizationForm({
       const raw = fieldValue as string;
 
       if (raw.trim().length <= RawSizeEnum.XSMALL)
-        return toast.error("Description must be at least 64 characters long");
+        return toast.error(tForm("validation.descriptionMin", { value: 64 }));
 
       const translated = await translate.mutateAsync({
         raw,
@@ -193,7 +191,7 @@ export function OrganizationForm({
         >
       );
     },
-    [translate.mutateAsync, form.setFieldValue]
+    [translate.mutateAsync, form.setFieldValue, tForm]
   );
 
   const { Field, Subscribe } = form;
@@ -227,10 +225,11 @@ export function OrganizationForm({
         {(field) => (
           <TextInput
             error={fieldError(field.state.meta)}
-            label="Slug"
+            label={tForm("fields.slug.label")}
             name={field.name}
             onChange={field.handleChange}
-            placeholder={PLACEHOLDERS.slug}
+            placeholder={tForm("fields.slug.placeholder")}
+            tooltip={tForm("fields.slug.tooltip")}
             value={field.state.value}
           />
         )}
@@ -239,13 +238,14 @@ export function OrganizationForm({
         {(field) => (
           <TextInput
             error={fieldError(field.state.meta)}
-            label="Name"
+            label={tForm("fields.organizationName.label")}
             name={field.name}
             onChange={(value) => {
               setIsNameEdited(true);
               field.handleChange(value);
             }}
-            placeholder={PLACEHOLDERS.organizationName}
+            placeholder={tForm("fields.organizationName.placeholder")}
+            tooltip={tForm("fields.organizationName.tooltip")}
             value={field.state.value}
           />
         )}
@@ -254,13 +254,14 @@ export function OrganizationForm({
         {(field) => (
           <SelectInput
             error={fieldError(field.state.meta)}
-            label="Category"
+            label={tForm("fields.organizationCategory.label")}
             name={field.name}
             onChange={(value) =>
               field.handleChange(value as OrganizationCategory)
             }
             options={CATEGORY_OPTIONS}
-            placeholder={PLACEHOLDERS.chooseOne}
+            placeholder={tForm("fields.organizationCategory.placeholder")}
+            tooltip={tForm("fields.organizationCategory.tooltip")}
             value={field.state.value}
           />
         )}
@@ -269,10 +270,11 @@ export function OrganizationForm({
         {(field) => (
           <TextInput
             error={fieldError(field.state.meta)}
-            label="Logo"
+            label={tForm("fields.logo.label")}
             name={field.name}
             onChange={field.handleChange}
-            placeholder={PLACEHOLDERS.url}
+            placeholder={tForm("fields.logo.placeholder")}
+            tooltip={tForm("fields.logo.tooltip")}
             value={field.state.value}
           />
         )}
@@ -281,20 +283,23 @@ export function OrganizationForm({
         {(field) => (
           <TextInput
             error={fieldError(field.state.meta)}
-            label="Website"
+            label={tForm("fields.website.label")}
             name={field.name}
             onChange={field.handleChange}
-            placeholder={PLACEHOLDERS.url}
+            placeholder={tForm("fields.website.placeholder")}
+            tooltip={tForm("fields.website.tooltip")}
             value={field.state.value}
           />
         )}
       </Field>
 
+      <div className="divider">{tForm("sections.translations")}</div>
+
       <Field mode="array" name="i18n">
         {(arrayField) => (
           <FieldArray
             error={fieldError(arrayField.state.meta)}
-            label="Translation"
+            label={tForm("fields.translation.label")}
             onAdd={() => arrayField.pushValue({ locale: "", description: "" })}
             onRemove={(index) => arrayField.removeValue(index)}
             values={arrayField.state.value}
@@ -305,11 +310,12 @@ export function OrganizationForm({
                   {(field) => (
                     <SelectInput
                       error={fieldError(field.state.meta)}
-                      label="Locale"
+                      label={tForm("fields.locale.label")}
                       name={field.name}
                       onChange={field.handleChange}
                       options={LOCALES}
-                      placeholder={PLACEHOLDERS.chooseOne}
+                      placeholder={tForm("fields.locale.placeholder")}
+                      tooltip={tForm("fields.locale.tooltip")}
                       value={field.state.value}
                     />
                   )}
@@ -319,7 +325,7 @@ export function OrganizationForm({
                     <TextareaInput
                       disabled={summarize.isPending || translate.isPending}
                       error={fieldError(field.state.meta)}
-                      label="Description"
+                      label={tForm("fields.description.label")}
                       name={field.name}
                       onChange={field.handleChange}
                       onOptimize={() =>
@@ -336,7 +342,8 @@ export function OrganizationForm({
                           field.state.value
                         )
                       }
-                      placeholder={PLACEHOLDERS.description}
+                      placeholder={tForm("fields.description.placeholder")}
+                      tooltip={tForm("fields.description.tooltip")}
                       value={field.state.value}
                     />
                   )}
@@ -354,7 +361,7 @@ export function OrganizationForm({
             onClick={onCancel}
             type="button"
           >
-            Cancel
+            {tAction("cancel")}
           </button>
         )}
         <Subscribe>
@@ -374,8 +381,8 @@ export function OrganizationForm({
                 <span className="loading loading-spinner loading-xs" />
               )}
               {state === "UPDATING"
-                ? "Update Organization"
-                : "Create Organization"}
+                ? tForm("submit.updateOrganization")
+                : tForm("submit.createOrganization")}
             </button>
           )}
         </Subscribe>

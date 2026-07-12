@@ -1,10 +1,10 @@
 import { useForm } from "@tanstack/react-form";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import z from "zod";
 import { CheckboxInput } from "@/components/inputs/checkbox";
 import { RangeInput } from "@/components/inputs/range";
 import { SelectInput } from "@/components/inputs/select";
-import { PLACEHOLDERS } from "@/consts/placeholders";
 import {
   EducationLevel,
   EducationStatus,
@@ -16,7 +16,7 @@ import { CommonFormProps } from "./common";
 const educationMultiSchema = z.object({
   level: z.enum(EducationLevel),
   status: z.enum(EducationStatus),
-  relevance: z.number().min(1, "must be a positive number"),
+  relevance: z.number().min(1),
 });
 
 export type EducationMultiSchema = z.infer<typeof educationMultiSchema>;
@@ -40,6 +40,8 @@ export function EducationMultiForm({
   isDisabled,
   isLoading,
 }: EducationMultiFormProps) {
+  const { t: tForm } = useTranslation("forms");
+  const { t: tAction } = useTranslation("actions");
   const [changeLevel, setChangeLevel] = useState(false);
   const [changeStatus, setChangeStatus] = useState(false);
   const [changeRelevance, setChangeRelevance] = useState(false);
@@ -73,8 +75,9 @@ export function EducationMultiForm({
     >
       <CheckboxInput
         checked={changeLevel}
-        label="Change Level"
+        label={tForm("batch.changeLevel.label")}
         onChange={setChangeLevel}
+        tooltip={tForm("batch.changeLevel.tooltip")}
       />
 
       <Field name="level">
@@ -82,11 +85,12 @@ export function EducationMultiForm({
           <SelectInput
             disabled={!changeLevel}
             error={fieldError(field.state.meta)}
-            label="Level"
+            label={tForm("fields.level.label")}
             name={field.name}
             onChange={(value) => field.handleChange(value as EducationLevel)}
             options={LEVEL_OPTIONS}
-            placeholder={PLACEHOLDERS.chooseOne}
+            placeholder={tForm("fields.level.placeholder")}
+            tooltip={tForm("fields.level.tooltip")}
             value={field.state.value}
           />
         )}
@@ -96,8 +100,9 @@ export function EducationMultiForm({
 
       <CheckboxInput
         checked={changeStatus}
-        label="Change Status"
+        label={tForm("batch.changeStatus.label")}
         onChange={setChangeStatus}
+        tooltip={tForm("batch.changeStatus.tooltip")}
       />
 
       <Field name="status">
@@ -105,11 +110,12 @@ export function EducationMultiForm({
           <SelectInput
             disabled={!changeStatus}
             error={fieldError(field.state.meta)}
-            label="Status"
+            label={tForm("fields.status.label")}
             name={field.name}
             onChange={(value) => field.handleChange(value as EducationStatus)}
             options={STATUS_OPTIONS}
-            placeholder={PLACEHOLDERS.chooseOne}
+            placeholder={tForm("fields.status.placeholder")}
+            tooltip={tForm("fields.status.tooltip")}
             value={field.state.value}
           />
         )}
@@ -119,8 +125,9 @@ export function EducationMultiForm({
 
       <CheckboxInput
         checked={changeRelevance}
-        label="Change Relevance"
+        label={tForm("batch.changeRelevance.label")}
         onChange={setChangeRelevance}
+        tooltip={tForm("batch.changeRelevance.tooltip")}
       />
 
       <Field name="relevance">
@@ -129,13 +136,14 @@ export function EducationMultiForm({
             className="range-xs"
             disabled={!changeRelevance}
             error={fieldError(field.state.meta)}
-            label="Relevance"
+            label={tForm("fields.relevance.label")}
             max={5}
             min={1}
             name={field.name}
             onChange={field.handleChange}
             ruler
             step={1}
+            tooltip={tForm("fields.relevance.tooltip")}
             value={field.state.value}
           />
         )}
@@ -148,7 +156,7 @@ export function EducationMultiForm({
             onClick={onCancel}
             type="button"
           >
-            Cancel
+            {tAction("cancel")}
           </button>
         )}
         <Subscribe>
@@ -167,7 +175,7 @@ export function EducationMultiForm({
               {(isSubmitting || isLoading) && (
                 <span className="loading loading-spinner loading-xs" />
               )}
-              Update Educations
+              {tForm("submit.updateEducations")}
             </button>
           )}
         </Subscribe>

@@ -6,6 +6,7 @@ import {
   WarningIcon,
 } from "@phosphor-icons/react";
 import { type ReactNode } from "react";
+import { useTranslation } from "react-i18next";
 import { cn } from "@/lib/cn";
 import { Alert } from "../display/alert";
 
@@ -32,14 +33,17 @@ export function FieldArray({
   sublevel,
   values,
 }: FieldArrayProps) {
+  const { t: tForm } = useTranslation("forms");
+  const itemLabel = label ?? tForm("fieldArray.item");
+
   return (
     <div>
       <div className="fieldset gap-2" key={JSON.stringify(values)}>
         {!values.length && (
           <Alert
-            description="Click on the button below to add your first item"
+            description={tForm("fieldArray.emptyDescription")}
             icon={<WarningIcon />}
-            title="Nothing here yet"
+            title={tForm("fieldArray.emptyTitle")}
           />
         )}
         {values.map((_, index) => (
@@ -52,7 +56,7 @@ export function FieldArray({
           >
             <div className="flex items-center justify-between">
               <span className="font-semibold">
-                {[label ?? "Item", index + 1].join(" ")}
+                {[itemLabel, index + 1].join(" ")}
               </span>
               <div className="flex gap-1">
                 {onMoveUp && (
@@ -93,7 +97,7 @@ export function FieldArray({
         ))}
         <button className="btn btn-soft btn-sm" onClick={onAdd} type="button">
           <PlusIcon />
-          {["Add", label ?? "Item"].join(" ")}
+          {tForm("fieldArray.addItem", { item: itemLabel })}
         </button>
         {error && <p className="label text-error">{error}</p>}
       </div>

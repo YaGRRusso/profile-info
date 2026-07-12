@@ -11,7 +11,6 @@ import { SelectInput } from "@/components/inputs/select";
 import { TextInput } from "@/components/inputs/text";
 import { TextareaInput } from "@/components/inputs/textarea";
 import { LOCALES } from "@/consts/locales";
-import { PLACEHOLDERS } from "@/consts/placeholders";
 import { RawSizeEnum } from "@/consts/raw-size";
 import type { GetMeQuery } from "@/generated/graphql/graphql";
 import {
@@ -24,22 +23,18 @@ import { useAtsSummarize, useTranslate } from "@/hooks/mutations/ai";
 import { useFindManySkills } from "@/hooks/queries/skills";
 import { toDateInput, toIsoDate } from "@/lib/date";
 import { fieldError } from "@/lib/field-error";
+import { hasUniqueLocales } from "@/lib/form-validation";
 import { createEmptyI18n, i18nLabel, i18nLabelsByIds } from "@/lib/i18n";
 import { useSystemMessagesStore } from "@/stores/system-messages";
 import { CommonFormProps } from "./common";
-
-const urlSchema = z.object({
-  title: z.string().min(1, "required field"),
-  value: z.url("invalid url"),
-});
 
 const profileSchema = z.object({
   name: z.string().min(1, "required field"),
   nickname: z.string().min(1, "required field"),
   email: z.email("invalid email"),
   phone: z.string(),
-  avatar: z.union([z.literal(""), z.url("invalid url")]),
-  birth: z.union([z.literal(""), z.string("invalid date")]),
+  avatar: z.union([z.literal(""), z.url()]),
+  birth: z.union([z.literal(""), z.string()]),
   address: z.string(),
   i18n: z
     .array(
@@ -49,14 +44,13 @@ const profileSchema = z.object({
         description: z.string(),
       })
     )
-    .refine(
-      (items) => {
-        const locales = items.map((item) => item.locale);
-        return new Set(locales).size === locales.length;
-      },
-      { message: "locales must be unique" }
-    ),
-  urls: z.array(urlSchema),
+    .refine(hasUniqueLocales, { message: "locales must be unique" }),
+  urls: z.array(
+    z.object({
+      title: z.string().min(1, "required field"),
+      value: z.url(),
+    })
+  ),
   skillIds: z.array(z.string()),
   password: z.union([
     z.literal(""),
@@ -141,6 +135,8 @@ export function ProfileForm({
   const atsSummarize = useAtsSummarize();
   const translate = useTranslate();
 
+  const { t: tForm } = useTranslation("forms");
+  const { t: tAction } = useTranslation("actions");
   const { i18n } = useTranslation();
   const locale = i18n.language;
 
@@ -205,14 +201,14 @@ export function ProfileForm({
       const type = ResourceType.User;
 
       if (raw.trim().length <= RawSizeEnum.XSMALL)
-        return toast.error("Description must be at least 64 characters long");
+        return toast.error(tForm("validation.descriptionMin", { value: 64 }));
 
       const skills = i18nLabelsByIds(
         findManySkills.data?.nodes,
         form.getFieldValue("skillIds")
       );
       if (!skills.length) {
-        return toast.error("At least one skill is required");
+        return toast.error(tForm("validation.atLeastOneSkill"));
       }
 
       const name = form.getFieldValue("name");
@@ -244,6 +240,7 @@ export function ProfileForm({
       findManySkills.data?.nodes,
       form.getFieldValue,
       form.setFieldValue,
+      tForm,
     ]
   );
 
@@ -256,7 +253,7 @@ export function ProfileForm({
       const raw = fieldValue as string;
 
       if (raw.trim().length <= RawSizeEnum.XSMALL)
-        return toast.error("Description must be at least 64 characters long");
+        return toast.error(tForm("validation.descriptionMin", { value: 64 }));
 
       const translated = await translate.mutateAsync({
         raw,
@@ -271,7 +268,7 @@ export function ProfileForm({
         >
       );
     },
-    [translate.mutateAsync, form.setFieldValue]
+    [translate.mutateAsync, form.setFieldValue, tForm]
   );
 
   const { Field, Subscribe } = form;
@@ -287,16 +284,19 @@ export function ProfileForm({
       }}
     >
       <section className="rounded-box bg-base-200 p-4 sm:p-6">
-        <h2 className="mb-4 font-semibold text-lg">Personal</h2>
+        <h2 className="mb-4 font-semibold text-lg">
+          {tForm("sections.personal")}
+        </h2>
         <div className="grid gap-4 md:grid-cols-2">
           <Field name="name">
             {(field) => (
               <TextInput
                 error={fieldError(field.state.meta)}
-                label="Name"
+                label={tForm("fields.profileName.label")}
                 name={field.name}
                 onChange={field.handleChange}
-                placeholder={PLACEHOLDERS.profileName}
+                placeholder={tForm("fields.profileName.placeholder")}
+                tooltip={tForm("fields.profileName.tooltip")}
                 value={field.state.value}
               />
             )}
@@ -306,10 +306,11 @@ export function ProfileForm({
             {(field) => (
               <TextInput
                 error={fieldError(field.state.meta)}
-                label="Nickname"
+                label={tForm("fields.nickname.label")}
                 name={field.name}
                 onChange={field.handleChange}
-                placeholder={PLACEHOLDERS.nickname}
+                placeholder={tForm("fields.nickname.placeholder")}
+                tooltip={tForm("fields.nickname.tooltip")}
                 value={field.state.value}
               />
             )}
@@ -319,10 +320,11 @@ export function ProfileForm({
             {(field) => (
               <TextInput
                 error={fieldError(field.state.meta)}
-                label="Birth date"
+                label={tForm("fields.birthDate.label")}
                 name={field.name}
                 onChange={field.handleChange}
-                placeholder={PLACEHOLDERS.date}
+                placeholder={tForm("fields.birthDate.placeholder")}
+                tooltip={tForm("fields.birthDate.tooltip")}
                 type="date"
                 value={field.state.value}
               />
@@ -333,10 +335,11 @@ export function ProfileForm({
             {(field) => (
               <TextInput
                 error={fieldError(field.state.meta)}
-                label="Avatar URL"
+                label={tForm("fields.avatarUrl.label")}
                 name={field.name}
                 onChange={field.handleChange}
-                placeholder={PLACEHOLDERS.url}
+                placeholder={tForm("fields.avatarUrl.placeholder")}
+                tooltip={tForm("fields.avatarUrl.tooltip")}
                 value={field.state.value}
               />
             )}
@@ -348,7 +351,7 @@ export function ProfileForm({
             {(arrayField) => (
               <FieldArray
                 error={fieldError(arrayField.state.meta)}
-                label="Translation"
+                label={tForm("fields.translation.label")}
                 onAdd={() =>
                   arrayField.pushValue({
                     locale: "",
@@ -366,11 +369,12 @@ export function ProfileForm({
                       {(field) => (
                         <SelectInput
                           error={fieldError(field.state.meta)}
-                          label="Locale"
+                          label={tForm("fields.locale.label")}
                           name={field.name}
                           onChange={field.handleChange}
                           options={LOCALES}
-                          placeholder={PLACEHOLDERS.chooseOne}
+                          placeholder={tForm("fields.locale.placeholder")}
+                          tooltip={tForm("fields.locale.tooltip")}
                           value={field.state.value}
                         />
                       )}
@@ -379,10 +383,11 @@ export function ProfileForm({
                       {(field) => (
                         <TextInput
                           error={fieldError(field.state.meta)}
-                          label="Title"
+                          label={tForm("fields.profileTitle.label")}
                           name={field.name}
                           onChange={field.handleChange}
-                          placeholder={PLACEHOLDERS.profileTitle}
+                          placeholder={tForm("fields.profileTitle.placeholder")}
+                          tooltip={tForm("fields.profileTitle.tooltip")}
                           value={field.state.value}
                         />
                       )}
@@ -394,7 +399,7 @@ export function ProfileForm({
                             atsSummarize.isPending || translate.isPending
                           }
                           error={fieldError(field.state.meta)}
-                          label="Description"
+                          label={tForm("fields.description.label")}
                           name={field.name}
                           onChange={field.handleChange}
                           onOptimize={() =>
@@ -411,7 +416,8 @@ export function ProfileForm({
                               field.state.value
                             )
                           }
-                          placeholder={PLACEHOLDERS.description}
+                          placeholder={tForm("fields.description.placeholder")}
+                          tooltip={tForm("fields.description.tooltip")}
                           value={field.state.value}
                         />
                       )}
@@ -425,16 +431,19 @@ export function ProfileForm({
       </section>
 
       <section className="rounded-box bg-base-200 p-4 sm:p-6">
-        <h2 className="mb-4 font-semibold text-lg">Contact</h2>
+        <h2 className="mb-4 font-semibold text-lg">
+          {tForm("sections.contact")}
+        </h2>
         <div className="grid gap-4 md:grid-cols-2">
           <Field name="email">
             {(field) => (
               <TextInput
                 error={fieldError(field.state.meta)}
-                label="Email"
+                label={tForm("fields.email.label")}
                 name={field.name}
                 onChange={field.handleChange}
-                placeholder={PLACEHOLDERS.email}
+                placeholder={tForm("fields.email.placeholder")}
+                tooltip={tForm("fields.email.tooltip")}
                 type="email"
                 value={field.state.value}
               />
@@ -445,10 +454,11 @@ export function ProfileForm({
             {(field) => (
               <TextInput
                 error={fieldError(field.state.meta)}
-                label="Phone"
+                label={tForm("fields.phone.label")}
                 name={field.name}
                 onChange={field.handleChange}
-                placeholder={PLACEHOLDERS.phone}
+                placeholder={tForm("fields.phone.placeholder")}
+                tooltip={tForm("fields.phone.tooltip")}
                 type="tel"
                 value={field.state.value}
               />
@@ -460,10 +470,11 @@ export function ProfileForm({
               <div className="md:col-span-2">
                 <TextareaInput
                   error={fieldError(field.state.meta)}
-                  label="Address"
+                  label={tForm("fields.address.label")}
                   name={field.name}
                   onChange={field.handleChange}
-                  placeholder={PLACEHOLDERS.address}
+                  placeholder={tForm("fields.address.placeholder")}
+                  tooltip={tForm("fields.address.tooltip")}
                   value={field.state.value}
                 />
               </div>
@@ -471,15 +482,18 @@ export function ProfileForm({
           </Field>
         </div>
         <div className="divider" />
-        <h2 className="mb-4 font-semibold text-lg">Security</h2>
+        <h2 className="mb-4 font-semibold text-lg">
+          {tForm("sections.security")}
+        </h2>
         <Field name="password">
           {(field) => (
             <PasswordInput
               error={fieldError(field.state.meta)}
-              label="New password"
+              label={tForm("fields.newPassword.label")}
               name={field.name}
               onChange={field.handleChange}
-              placeholder={PLACEHOLDERS.password}
+              placeholder={tForm("fields.newPassword.placeholder")}
+              tooltip={tForm("fields.newPassword.tooltip")}
               value={field.state.value}
             />
           )}
@@ -487,17 +501,20 @@ export function ProfileForm({
       </section>
 
       <section className="rounded-box bg-base-200 p-4 sm:p-6">
-        <h2 className="mb-4 font-semibold text-lg">Main Skills</h2>
+        <h2 className="mb-4 font-semibold text-lg">
+          {tForm("sections.mainSkills")}
+        </h2>
         <Field name="skillIds">
           {(field) => (
             <>
               <MultiSelectInput
                 error={fieldError(field.state.meta)}
-                label="Skills"
+                label={tForm("fields.skills.label")}
                 onChange={field.handleChange}
                 options={skillOptions}
-                placeholder={PLACEHOLDERS.search}
+                placeholder={tForm("fields.skills.placeholder")}
                 showSelected={false}
+                tooltip={tForm("fields.skills.tooltip")}
                 value={field.state.value}
               />
               <DraggableList
@@ -511,12 +528,14 @@ export function ProfileForm({
       </section>
 
       <section className="rounded-box bg-base-200 p-4 sm:p-6">
-        <h2 className="mb-4 font-semibold text-lg">Links</h2>
+        <h2 className="mb-4 font-semibold text-lg">
+          {tForm("sections.links")}
+        </h2>
         <Field mode="array" name="urls">
           {(arrayField) => (
             <FieldArray
               error={fieldError(arrayField.state.meta)}
-              label="Link"
+              label={tForm("fields.link.label")}
               onAdd={() => arrayField.pushValue({ title: "", value: "" })}
               onRemove={(index) => arrayField.removeValue(index)}
               sublevel
@@ -530,7 +549,7 @@ export function ProfileForm({
                         error={fieldError(field.state.meta)}
                         name={field.name}
                         onChange={field.handleChange}
-                        placeholder={PLACEHOLDERS.linkTitle}
+                        placeholder={tForm("fields.linkTitle.placeholder")}
                         value={field.state.value}
                       />
                     )}
@@ -541,7 +560,7 @@ export function ProfileForm({
                         error={fieldError(field.state.meta)}
                         name={field.name}
                         onChange={field.handleChange}
-                        placeholder={PLACEHOLDERS.url}
+                        placeholder={tForm("fields.linkUrl.placeholder")}
                         value={field.state.value}
                       />
                     )}
@@ -565,7 +584,7 @@ export function ProfileForm({
           }}
           type="button"
         >
-          Reset
+          {tForm("submit.reset")}
         </button>
         <Subscribe
           selector={(state) => ({
@@ -589,7 +608,7 @@ export function ProfileForm({
               {(isSubmitting || isLoading) && (
                 <span className="loading loading-spinner loading-xs" />
               )}
-              Save changes
+              {tAction("saveChanges")}
             </button>
           )}
         </Subscribe>

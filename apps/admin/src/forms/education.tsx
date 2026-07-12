@@ -11,7 +11,6 @@ import { SelectInput } from "@/components/inputs/select";
 import { TextInput } from "@/components/inputs/text";
 import { TextareaInput } from "@/components/inputs/textarea";
 import { LOCALES } from "@/consts/locales";
-import { PLACEHOLDERS } from "@/consts/placeholders";
 import { RawSizeEnum } from "@/consts/raw-size";
 import { SLUG_REGEX } from "@/consts/regex";
 import {
@@ -28,6 +27,7 @@ import { useFindManyOrganizations } from "@/hooks/queries/organizations";
 import { useFindManySkills } from "@/hooks/queries/skills";
 import { toDateInput, toIsoDate } from "@/lib/date";
 import { fieldError } from "@/lib/field-error";
+import { hasUniqueLocales } from "@/lib/form-validation";
 import {
   createEmptyI18n,
   i18nLabel,
@@ -45,7 +45,7 @@ const educationSchema = z.object({
   organizationId: z.string().min(1, "required field"),
   level: z.enum(EducationLevel, "required field"),
   status: z.enum(EducationStatus, "required field"),
-  relevance: z.number().min(1, "must be a positive number"),
+  relevance: z.number().min(1, "required field"),
   url: z.url().or(z.literal("")),
   image: z.url().or(z.literal("")),
   skillIds: z.array(z.string()),
@@ -58,13 +58,7 @@ const educationSchema = z.object({
       })
     )
     .min(1, "required group")
-    .refine(
-      (items) => {
-        const locales = items.map((item) => item.locale);
-        return new Set(locales).size === locales.length;
-      },
-      { message: "locales must be unique" }
-    ),
+    .refine(hasUniqueLocales, { message: "locales must be unique" }),
   period: z
     .object({ from: z.string(), to: z.string() })
     .refine((range) => !(range.from && range.to) || range.from <= range.to, {
@@ -147,14 +141,16 @@ export function EducationForm({
   isLoading,
   state,
 }: EducationFormProps) {
+  const { t: tForm } = useTranslation("forms");
+  const { t: tAction } = useTranslation("actions");
+  const { i18n } = useTranslation();
+  const locale = i18n.language;
+
   const findManyOrganizations = useFindManyOrganizations();
   useQueryAllPages(findManyOrganizations);
 
   const findManySkills = useFindManySkills();
   useQueryAllPages(findManySkills);
-
-  const { i18n } = useTranslation();
-  const locale = i18n.language;
 
   const skillOptions = useMemo(
     () =>
@@ -209,37 +205,40 @@ export function EducationForm({
       const type = ResourceType.Education;
 
       if (raw.trim().length <= RawSizeEnum.XSMALL)
-        return toast.error("Description must be at least 32 characters long");
+        return toast.error(tForm("validation.descriptionMin", { value: 32 }));
 
       const skills = i18nLabelsByIds(
         findManySkills.data?.nodes,
         form.getFieldValue("skillIds")
       );
-      if (!skills.length) return toast.error("At least one skill is required");
+      if (!skills.length)
+        return toast.error(tForm("validation.atLeastOneSkill"));
 
       const title = fieldGroup.title;
-      if (!title) return toast.error("Title is required");
+      if (!title) return toast.error(tForm("validation.titleRequired"));
       details.push({ key: "Title", value: [title] });
 
       const period = form.getFieldValue("period");
-      if (!period.from && !period.to) return toast.error("Period is required");
+      if (!period.from && !period.to)
+        return toast.error(tForm("validation.periodRequired"));
       details.push({
         key: "Period",
         value: [`from ${period.from} to ${period.to}`],
       });
 
       const level = form.getFieldValue("level");
-      if (!level) return toast.error("Level is required");
+      if (!level) return toast.error(tForm("validation.levelRequired"));
       details.push({ key: "Level", value: [level] });
 
       const status = form.getFieldValue("status");
-      if (!status) return toast.error("Status is required");
+      if (!status) return toast.error(tForm("validation.statusRequired"));
       details.push({ key: "Status", value: [status] });
 
       const organization = findManyOrganizations.data?.nodes.find(
         (org) => org.id === form.getFieldValue("organizationId")
       );
-      if (!organization) return toast.error("Organization is required");
+      if (!organization)
+        return toast.error(tForm("validation.organizationRequired"));
 
       const organizationName = organization.name;
       details.push({ key: "Organization Name", value: [organizationName] });
@@ -281,6 +280,7 @@ export function EducationForm({
       form.setFieldValue,
       findManyOrganizations.data?.nodes,
       findManySkills.data?.nodes,
+      tForm,
     ]
   );
 
@@ -293,7 +293,7 @@ export function EducationForm({
       const raw = fieldValue as string;
 
       if (raw.trim().length <= RawSizeEnum.XSMALL)
-        return toast.error("Description must be at least 32 characters long");
+        return toast.error(tForm("validation.descriptionMin", { value: 32 }));
 
       const translated = await translate.mutateAsync({
         raw,
@@ -308,7 +308,7 @@ export function EducationForm({
         >
       );
     },
-    [translate.mutateAsync, form.setFieldValue]
+    [translate.mutateAsync, form.setFieldValue, tForm]
   );
 
   const { Field, Subscribe } = form;
@@ -335,10 +335,11 @@ export function EducationForm({
         {(field) => (
           <TextInput
             error={fieldError(field.state.meta)}
-            label="Slug"
+            label={tForm("fields.slug.label")}
             name={field.name}
             onChange={field.handleChange}
-            placeholder={PLACEHOLDERS.slug}
+            placeholder={tForm("fields.slug.placeholder")}
+            tooltip={tForm("fields.slug.tooltip")}
             value={field.state.value}
           />
         )}
@@ -348,11 +349,12 @@ export function EducationForm({
           <SelectInput
             disabled={!organizationOptions.length}
             error={fieldError(field.state.meta)}
-            label="Organization"
+            label={tForm("fields.organization.label")}
             name={field.name}
             onChange={field.handleChange}
             options={organizationOptions}
-            placeholder={PLACEHOLDERS.chooseOne}
+            placeholder={tForm("fields.organization.placeholder")}
+            tooltip={tForm("fields.organization.tooltip")}
             value={field.state.value}
           />
         )}
@@ -361,11 +363,12 @@ export function EducationForm({
         {(field) => (
           <SelectInput
             error={fieldError(field.state.meta)}
-            label="Level"
+            label={tForm("fields.level.label")}
             name={field.name}
             onChange={(value) => field.handleChange(value as EducationLevel)}
             options={LEVEL_OPTIONS}
-            placeholder={PLACEHOLDERS.chooseOne}
+            placeholder={tForm("fields.level.placeholder")}
+            tooltip={tForm("fields.level.tooltip")}
             value={field.state.value}
           />
         )}
@@ -374,11 +377,12 @@ export function EducationForm({
         {(field) => (
           <SelectInput
             error={fieldError(field.state.meta)}
-            label="Status"
+            label={tForm("fields.status.label")}
             name={field.name}
             onChange={(value) => field.handleChange(value as EducationStatus)}
             options={STATUS_OPTIONS}
-            placeholder={PLACEHOLDERS.chooseOne}
+            placeholder={tForm("fields.status.placeholder")}
+            tooltip={tForm("fields.status.tooltip")}
             value={field.state.value}
           />
         )}
@@ -387,10 +391,11 @@ export function EducationForm({
         {(field) => (
           <TextInput
             error={fieldError(field.state.meta)}
-            label="URL"
+            label={tForm("fields.url.label")}
             name={field.name}
             onChange={field.handleChange}
-            placeholder={PLACEHOLDERS.url}
+            placeholder={tForm("fields.url.placeholder")}
+            tooltip={tForm("fields.url.tooltip")}
             value={field.state.value}
           />
         )}
@@ -399,10 +404,10 @@ export function EducationForm({
         {(field) => (
           <TextInput
             error={fieldError(field.state.meta)}
-            label="Image"
+            label={tForm("fields.image.label")}
             name={field.name}
             onChange={field.handleChange}
-            placeholder={PLACEHOLDERS.url}
+            placeholder={tForm("fields.image.placeholder")}
             value={field.state.value}
           />
         )}
@@ -412,13 +417,14 @@ export function EducationForm({
           <RangeInput
             className="range-xs"
             error={fieldError(field.state.meta)}
-            label="Relevance"
+            label={tForm("fields.relevance.label")}
             max={5}
             min={1}
             name={field.name}
             onChange={field.handleChange}
             ruler
             step={1}
+            tooltip={tForm("fields.relevance.tooltip")}
             value={field.state.value}
           />
         )}
@@ -427,8 +433,9 @@ export function EducationForm({
         {(field) => (
           <DateRangeInput
             error={fieldError(field.state.meta)}
-            label="Period"
+            label={tForm("fields.period.label")}
             onChange={field.handleChange}
+            tooltip={tForm("fields.period.tooltip")}
             value={field.state.value}
           />
         )}
@@ -437,22 +444,23 @@ export function EducationForm({
         {(field) => (
           <MultiSelectInput
             error={fieldError(field.state.meta)}
-            label="Skills"
+            label={tForm("fields.skills.label")}
             onChange={field.handleChange}
             options={skillOptions}
-            placeholder={PLACEHOLDERS.search}
+            placeholder={tForm("fields.skills.placeholder")}
+            tooltip={tForm("fields.skills.tooltip")}
             value={field.state.value}
           />
         )}
       </Field>
 
-      <div className="divider">Translations</div>
+      <div className="divider">{tForm("sections.translations")}</div>
 
       <Field mode="array" name="i18n">
         {(arrayField) => (
           <FieldArray
             error={fieldError(arrayField.state.meta)}
-            label="Translation"
+            label={tForm("fields.translation.label")}
             onAdd={() =>
               arrayField.pushValue({ locale: "", title: "", description: "" })
             }
@@ -465,11 +473,12 @@ export function EducationForm({
                   {(field) => (
                     <SelectInput
                       error={fieldError(field.state.meta)}
-                      label="Locale"
+                      label={tForm("fields.locale.label")}
                       name={field.name}
                       onChange={field.handleChange}
                       options={LOCALES}
-                      placeholder={PLACEHOLDERS.chooseOne}
+                      placeholder={tForm("fields.locale.placeholder")}
+                      tooltip={tForm("fields.locale.tooltip")}
                       value={field.state.value}
                     />
                   )}
@@ -478,10 +487,11 @@ export function EducationForm({
                   {(field) => (
                     <TextInput
                       error={fieldError(field.state.meta)}
-                      label="Title"
+                      label={tForm("fields.educationTitle.label")}
                       name={field.name}
                       onChange={field.handleChange}
-                      placeholder={PLACEHOLDERS.educationTitle}
+                      placeholder={tForm("fields.educationTitle.placeholder")}
+                      tooltip={tForm("fields.educationTitle.tooltip")}
                       value={field.state.value}
                     />
                   )}
@@ -491,7 +501,7 @@ export function EducationForm({
                     <TextareaInput
                       disabled={atsSummarize.isPending || translate.isPending}
                       error={fieldError(field.state.meta)}
-                      label="Description"
+                      label={tForm("fields.description.label")}
                       name={field.name}
                       onChange={field.handleChange}
                       onOptimize={() =>
@@ -508,7 +518,8 @@ export function EducationForm({
                           field.state.value
                         )
                       }
-                      placeholder={PLACEHOLDERS.description}
+                      placeholder={tForm("fields.description.placeholder")}
+                      tooltip={tForm("fields.description.tooltip")}
                       value={field.state.value}
                     />
                   )}
@@ -526,7 +537,7 @@ export function EducationForm({
             onClick={onCancel}
             type="button"
           >
-            Cancel
+            {tAction("cancel")}
           </button>
         )}
         <Subscribe
@@ -551,7 +562,9 @@ export function EducationForm({
               {(isSubmitting || isLoading) && (
                 <span className="loading loading-spinner loading-xs" />
               )}
-              {state === "UPDATING" ? "Update Education" : "Create Education"}
+              {state === "UPDATING"
+                ? tForm("submit.updateEducation")
+                : tForm("submit.createEducation")}
             </button>
           )}
         </Subscribe>

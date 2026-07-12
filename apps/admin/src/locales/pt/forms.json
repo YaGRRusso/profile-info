@@ -1,0 +1,286 @@
+{
+  "fields": {
+    "slug": {
+      "label": "Slug",
+      "placeholder": "ex.: meu-slug",
+      "tooltip": "Identificador único para URLs. Use apenas letras minúsculas, números e hífens."
+    },
+    "email": {
+      "label": "E-mail",
+      "placeholder": "ex.: voce@exemplo.com",
+      "tooltip": "E-mail usado para entrar na sua conta."
+    },
+    "password": {
+      "label": "Senha",
+      "placeholder": "ex.: abc#123",
+      "tooltip": "Senha da conta. Deve ter pelo menos 6 caracteres."
+    },
+    "locale": {
+      "label": "Idioma",
+      "placeholder": "Escolha um...",
+      "tooltip": "Idioma desta tradução. Cada idioma pode aparecer apenas uma vez por registro."
+    },
+    "description": {
+      "label": "Descrição",
+      "placeholder": "Escreva uma breve descrição...",
+      "tooltip": "Resumo mais longo no idioma selecionado. Usado no perfil e no CV."
+    },
+    "translation": {
+      "label": "Tradução",
+      "tooltip": "Conteúdo localizado deste registro. Adicione uma entrada por idioma suportado."
+    },
+    "link": {
+      "label": "Link",
+      "tooltip": "Links nomeados como site, portfólio ou demo."
+    },
+    "linkTitle": {
+      "placeholder": "ex.: Site, Portfólio, Demo"
+    },
+    "linkUrl": {
+      "placeholder": "ex.: https://exemplo.com"
+    },
+    "image": {
+      "label": "Imagem",
+      "placeholder": "ex.: https://exemplo.com",
+      "tooltip": "URL opcional de imagem ilustrando esta entrada."
+    },
+    "skills": {
+      "label": "Habilidades",
+      "placeholder": "Digite para buscar...",
+      "tooltip": "Habilidades do catálogo vinculadas a este registro. A ordem importa quando a lista é arrastável."
+    },
+    "relevance": {
+      "label": "Relevância",
+      "tooltip": "Nota de 1 a 5. Valores maiores aparecem com mais destaque no CV."
+    },
+    "period": {
+      "label": "Período",
+      "tooltip": "Datas de início e fim. Deixe a data final vazia se ainda estiver em andamento."
+    },
+    "hours": {
+      "label": "Horas",
+      "placeholder": "ex.: 24",
+      "tooltip": "Carga horária ou duração total em horas."
+    },
+    "url": {
+      "label": "URL",
+      "placeholder": "ex.: https://exemplo.com",
+      "tooltip": "URL pública opcional para verificação ou referência."
+    },
+    "organization": {
+      "label": "Organização",
+      "placeholder": "Escolha um...",
+      "tooltip": "Empregador, escola ou plataforma do catálogo de Organizações."
+    },
+    "level": {
+      "label": "Nível",
+      "placeholder": "Escolha um...",
+      "tooltip": "Nível acadêmico desta formação."
+    },
+    "status": {
+      "label": "Status",
+      "placeholder": "Escolha um...",
+      "tooltip": "Se o curso ou formação está concluído, em andamento ou planejado."
+    },
+    "role": {
+      "label": "Função",
+      "tooltip": "Cargo exercido nesta experiência. Adicione mais de um se mudou de função na mesma organização."
+    },
+    "permissions": {
+      "label": "Permissões",
+      "placeholder": "Escolha um ou mais...",
+      "tooltip": "Quais ações de API este token pode executar."
+    },
+    "expiresAtOptional": {
+      "label": "Expira em (opcional)",
+      "tooltip": "Data de expiração opcional. O token deixa de funcionar após essa data."
+    },
+    "logo": {
+      "label": "Logo",
+      "placeholder": "ex.: https://exemplo.com",
+      "tooltip": "URL opcional do logo desta organização."
+    },
+    "website": {
+      "label": "Site",
+      "placeholder": "ex.: https://exemplo.com",
+      "tooltip": "URL opcional do site desta organização."
+    },
+    "nickname": {
+      "label": "Apelido",
+      "placeholder": "ex.: joaosilva",
+      "tooltip": "Apelido ou nome preferido (opcional)."
+    },
+    "birthDate": {
+      "label": "Data de nascimento",
+      "placeholder": "AAAA-MM-DD",
+      "tooltip": "Data de nascimento opcional para o perfil."
+    },
+    "avatarUrl": {
+      "label": "URL do avatar",
+      "placeholder": "ex.: https://exemplo.com",
+      "tooltip": "URL opcional da imagem de perfil."
+    },
+    "phone": {
+      "label": "Telefone",
+      "placeholder": "ex.: 11 99999-9999",
+      "tooltip": "Telefone de contato (opcional)."
+    },
+    "address": {
+      "label": "Endereço",
+      "placeholder": "ex.: Rua, Cidade, Estado, País",
+      "tooltip": "Endereço ou localização opcional."
+    },
+    "newPassword": {
+      "label": "Nova senha",
+      "placeholder": "ex.: abc#123",
+      "tooltip": "Deixe em branco para manter a senha atual. Mínimo de 8 caracteres se preenchido."
+    },
+    "profileName": {
+      "label": "Nome",
+      "placeholder": "ex.: João Silva",
+      "tooltip": "Seu nome profissional completo como deve aparecer no CV."
+    },
+    "organizationName": {
+      "label": "Nome",
+      "placeholder": "ex.: Empresa XYZ",
+      "tooltip": "Nome público da organização exibido nos seletores e no CV."
+    },
+    "apiTokenName": {
+      "label": "Nome",
+      "placeholder": "ex.: Token do Pipeline",
+      "tooltip": "Rótulo amigável para reconhecer este token na lista depois."
+    },
+    "skillCategory": {
+      "label": "Categoria",
+      "placeholder": "ex.: Soft Skills, Saúde, Escritório",
+      "tooltip": "Agrupamento opcional exibido no CV quando as habilidades são listadas por categoria."
+    },
+    "organizationCategory": {
+      "label": "Categoria",
+      "placeholder": "Escolha um...",
+      "tooltip": "Tipo de organização, como empresa, escola ou plataforma."
+    },
+    "experienceCategory": {
+      "label": "Categoria",
+      "placeholder": "Escolha um...",
+      "tooltip": "Tipo de vínculo, como tempo integral, meio período, freelance ou voluntário."
+    },
+    "skillTitle": {
+      "label": "Título",
+      "placeholder": "ex.: Atendimento, Excel, Liderança",
+      "tooltip": "Título exibido no idioma selecionado."
+    },
+    "profileTitle": {
+      "label": "Título",
+      "placeholder": "ex.: Gerente de Loja, Enfermeiro",
+      "tooltip": "Título exibido no idioma selecionado."
+    },
+    "experienceTitle": {
+      "label": "Título",
+      "placeholder": "ex.: Líder de Equipe, Vendedor",
+      "tooltip": "Título exibido no idioma selecionado."
+    },
+    "educationTitle": {
+      "label": "Título",
+      "placeholder": "ex.: Administração, Enfermagem",
+      "tooltip": "Título exibido no idioma selecionado."
+    },
+    "courseTitle": {
+      "label": "Título",
+      "placeholder": "ex.: Segurança Alimentar, Primeiros Socorros",
+      "tooltip": "Título exibido no idioma selecionado."
+    },
+    "projectTitle": {
+      "label": "Título",
+      "placeholder": "ex.: Projeto Comunitário, Reorganização",
+      "tooltip": "Título exibido no idioma selecionado."
+    }
+  },
+  "sections": {
+    "translations": "Traduções",
+    "images": "Imagens",
+    "links": "Links",
+    "roles": {
+      "title": "Funções",
+      "translations": "Traduções"
+    },
+    "personal": "Pessoal",
+    "contact": "Contato",
+    "security": "Segurança",
+    "mainSkills": "Principais habilidades"
+  },
+  "batch": {
+    "changeCategory": {
+      "label": "Alterar categoria",
+      "tooltip": "Quando marcado, atualiza a categoria em todos os registros selecionados."
+    },
+    "changeLevel": {
+      "label": "Alterar nível",
+      "tooltip": "Quando marcado, atualiza o nível em todas as formações selecionadas."
+    },
+    "changeStatus": {
+      "label": "Alterar status",
+      "tooltip": "Quando marcado, atualiza o status em todos os registros selecionados."
+    },
+    "changeRelevance": {
+      "label": "Alterar relevância",
+      "tooltip": "Quando marcado, atualiza a relevância em todos os registros selecionados."
+    },
+    "changePermissions": {
+      "label": "Alterar permissões",
+      "tooltip": "Quando marcado, substitui as permissões em todos os tokens selecionados."
+    }
+  },
+  "validation": {
+    "required": "Campo obrigatório",
+    "invalidEmail": "E-mail inválido",
+    "minLength": "Deve ter pelo menos {{value}} caracteres",
+    "invalidFieldFormat": "Formato de campo inválido",
+    "requiredGroup": "Grupo obrigatório",
+    "localesMustBeUnique": "Os idiomas devem ser únicos",
+    "slugAlreadyExists": "Slug já existe",
+    "selectAtLeastOnePermission": "Selecione pelo menos uma permissão",
+    "descriptionMin": "A descrição deve ter pelo menos {{value}} caracteres",
+    "atLeastOneSkill": "Pelo menos uma habilidade é obrigatória",
+    "titleRequired": "Título é obrigatório",
+    "periodRequired": "Período é obrigatório",
+    "levelRequired": "Nível é obrigatório",
+    "statusRequired": "Status é obrigatório",
+    "hoursRequired": "Horas é obrigatório",
+    "categoryRequired": "Categoria é obrigatória",
+    "organizationRequired": "Organização é obrigatória",
+    "positiveNumber": "Deve ser um número positivo",
+    "endDateAfterStartDate": "A data final deve ser posterior à data inicial"
+  },
+  "fieldArray": {
+    "emptyTitle": "Nada aqui ainda",
+    "emptyDescription": "Clique no botão abaixo para adicionar o primeiro item",
+    "addItem": "Adicionar {{item}}",
+    "item": "Item"
+  },
+  "submit": {
+    "signIn": "Entrar",
+    "reset": "Redefinir",
+    "createSkill": "Criar habilidade",
+    "updateSkill": "Atualizar habilidade",
+    "createOrganization": "Criar organização",
+    "updateOrganization": "Atualizar organização",
+    "createApiToken": "Criar token de API",
+    "updateApiToken": "Atualizar token de API",
+    "createCourse": "Criar curso",
+    "updateCourse": "Atualizar curso",
+    "createEducation": "Criar formação",
+    "updateEducation": "Atualizar formação",
+    "createProject": "Criar projeto",
+    "updateProject": "Atualizar projeto",
+    "createExperience": "Criar experiência",
+    "updateExperience": "Atualizar experiência",
+    "updateSkills": "Atualizar habilidades",
+    "updateOrganizations": "Atualizar organizações",
+    "updateCourses": "Atualizar cursos",
+    "updateEducations": "Atualizar formações",
+    "updateProjects": "Atualizar projetos",
+    "updateExperiences": "Atualizar experiências",
+    "updateApiTokens": "Atualizar tokens de API"
+  }
+}

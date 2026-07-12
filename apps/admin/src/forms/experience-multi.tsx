@@ -1,10 +1,10 @@
 import { useForm } from "@tanstack/react-form";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import z from "zod";
 import { CheckboxInput } from "@/components/inputs/checkbox";
 import { RangeInput } from "@/components/inputs/range";
 import { SelectInput } from "@/components/inputs/select";
-import { PLACEHOLDERS } from "@/consts/placeholders";
 import {
   ExperienceCategory,
   type UpdateExperienceInput,
@@ -14,7 +14,7 @@ import { CommonFormProps } from "./common";
 
 const experienceMultiSchema = z.object({
   category: z.enum(ExperienceCategory),
-  relevance: z.number().min(1, "must be a positive number"),
+  relevance: z.number().min(1),
 });
 
 export type ExperienceMultiSchema = z.infer<typeof experienceMultiSchema>;
@@ -33,6 +33,8 @@ export function ExperienceMultiForm({
   isDisabled,
   isLoading,
 }: ExperienceMultiFormProps) {
+  const { t: tForm } = useTranslation("forms");
+  const { t: tAction } = useTranslation("actions");
   const [changeCategory, setChangeCategory] = useState(false);
   const [changeRelevance, setChangeRelevance] = useState(false);
 
@@ -63,8 +65,9 @@ export function ExperienceMultiForm({
     >
       <CheckboxInput
         checked={changeCategory}
-        label="Change Category"
+        label={tForm("batch.changeCategory.label")}
         onChange={setChangeCategory}
+        tooltip={tForm("batch.changeCategory.tooltip")}
       />
 
       <Field name="category">
@@ -72,13 +75,14 @@ export function ExperienceMultiForm({
           <SelectInput
             disabled={!changeCategory}
             error={fieldError(field.state.meta)}
-            label="Category"
+            label={tForm("fields.experienceCategory.label")}
             name={field.name}
             onChange={(value) =>
               field.handleChange(value as ExperienceCategory)
             }
             options={CATEGORY_OPTIONS}
-            placeholder={PLACEHOLDERS.chooseOne}
+            placeholder={tForm("fields.experienceCategory.placeholder")}
+            tooltip={tForm("fields.experienceCategory.tooltip")}
             value={field.state.value}
           />
         )}
@@ -88,8 +92,9 @@ export function ExperienceMultiForm({
 
       <CheckboxInput
         checked={changeRelevance}
-        label="Change Relevance"
+        label={tForm("batch.changeRelevance.label")}
         onChange={setChangeRelevance}
+        tooltip={tForm("batch.changeRelevance.tooltip")}
       />
 
       <Field name="relevance">
@@ -98,13 +103,14 @@ export function ExperienceMultiForm({
             className="range-xs"
             disabled={!changeRelevance}
             error={fieldError(field.state.meta)}
-            label="Relevance"
+            label={tForm("fields.relevance.label")}
             max={5}
             min={1}
             name={field.name}
             onChange={field.handleChange}
             ruler
             step={1}
+            tooltip={tForm("fields.relevance.tooltip")}
             value={field.state.value}
           />
         )}
@@ -117,7 +123,7 @@ export function ExperienceMultiForm({
             onClick={onCancel}
             type="button"
           >
-            Cancel
+            {tAction("cancel")}
           </button>
         )}
         <Subscribe>
@@ -136,7 +142,7 @@ export function ExperienceMultiForm({
               {(isSubmitting || isLoading) && (
                 <span className="loading loading-spinner loading-xs" />
               )}
-              Update Experiences
+              {tForm("submit.updateExperiences")}
             </button>
           )}
         </Subscribe>

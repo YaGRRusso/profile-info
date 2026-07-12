@@ -1,5 +1,6 @@
 import { useForm } from "@tanstack/react-form";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import z from "zod";
 import { CheckboxInput } from "@/components/inputs/checkbox";
 import { RangeInput } from "@/components/inputs/range";
@@ -8,7 +9,7 @@ import { fieldError } from "@/lib/field-error";
 import { CommonFormProps } from "./common";
 
 const projectMultiSchema = z.object({
-  relevance: z.number().min(1, "must be a positive number"),
+  relevance: z.number().min(1),
 });
 
 export type ProjectMultiSchema = z.infer<typeof projectMultiSchema>;
@@ -22,6 +23,8 @@ export function ProjectMultiForm({
   isDisabled,
   isLoading,
 }: ProjectMultiFormProps) {
+  const { t: tForm } = useTranslation("forms");
+  const { t: tAction } = useTranslation("actions");
   const [changeRelevance, setChangeRelevance] = useState(false);
 
   const form = useForm({
@@ -49,8 +52,9 @@ export function ProjectMultiForm({
     >
       <CheckboxInput
         checked={changeRelevance}
-        label="Change Relevance"
+        label={tForm("batch.changeRelevance.label")}
         onChange={setChangeRelevance}
+        tooltip={tForm("batch.changeRelevance.tooltip")}
       />
 
       <Field name="relevance">
@@ -59,13 +63,14 @@ export function ProjectMultiForm({
             className="range-xs"
             disabled={!changeRelevance}
             error={fieldError(field.state.meta)}
-            label="Relevance"
+            label={tForm("fields.relevance.label")}
             max={5}
             min={1}
             name={field.name}
             onChange={field.handleChange}
             ruler
             step={1}
+            tooltip={tForm("fields.relevance.tooltip")}
             value={field.state.value}
           />
         )}
@@ -78,7 +83,7 @@ export function ProjectMultiForm({
             onClick={onCancel}
             type="button"
           >
-            Cancel
+            {tAction("cancel")}
           </button>
         )}
         <Subscribe>
@@ -97,7 +102,7 @@ export function ProjectMultiForm({
               {(isSubmitting || isLoading) && (
                 <span className="loading loading-spinner loading-xs" />
               )}
-              Update Projects
+              {tForm("submit.updateProjects")}
             </button>
           )}
         </Subscribe>
