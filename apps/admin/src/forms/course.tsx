@@ -40,12 +40,12 @@ const courseSchema = z.object({
   slug: z
     .string()
     .min(1, FormError.requiredField)
-    .regex(SLUG_REGEX, FormError.invalidField),
+    .regex(SLUG_REGEX, FormError.invalidFormat),
   organizationId: z.string().min(1, FormError.requiredField),
   status: z.enum(CourseStatus, FormError.requiredField),
-  relevance: z.number().min(1, FormError.requiredField),
-  url: z.url(FormError.invalidField).or(z.literal("")),
-  image: z.url(FormError.invalidField).or(z.literal("")),
+  relevance: z.number().min(1, FormError.minValue),
+  url: z.url(FormError.invalidFormat).or(z.literal("")),
+  image: z.url(FormError.invalidFormat).or(z.literal("")),
   hours: z.number(),
   skillIds: z.array(z.string()),
   i18n: z
@@ -189,7 +189,7 @@ export function CourseForm({
         form.getFieldValue("skillIds")
       );
       if (!skills.length)
-        return toast.error(tValidation("minLength", { value: 1 }));
+        return toast.error(tValidation("minCount", { value: 1 }));
 
       const title = fieldGroup.title;
       if (!title) return toast.error(tValidation("requiredField"));

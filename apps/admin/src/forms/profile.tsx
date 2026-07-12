@@ -32,9 +32,9 @@ import { CommonFormProps } from "./common";
 const profileSchema = z.object({
   name: z.string().min(1, FormError.requiredField),
   nickname: z.string().min(1, FormError.requiredField),
-  email: z.email(FormError.invalidField),
+  email: z.email(FormError.invalidFormat),
   phone: z.string(),
-  avatar: z.union([z.literal(""), z.url(FormError.invalidField)]),
+  avatar: z.union([z.literal(""), z.url(FormError.invalidFormat)]),
   birth: z.union([z.literal(""), z.string()]),
   address: z.string(),
   i18n: z
@@ -49,7 +49,7 @@ const profileSchema = z.object({
   urls: z.array(
     z.object({
       title: z.string().min(1, FormError.requiredField),
-      value: z.url(FormError.invalidField),
+      value: z.url(FormError.invalidFormat),
     })
   ),
   skillIds: z.array(z.string()),
@@ -208,7 +208,7 @@ export function ProfileForm({
         form.getFieldValue("skillIds")
       );
       if (!skills.length) {
-        return toast.error(tValidation("minLength", { value: 1 }));
+        return toast.error(tValidation("minCount", { value: 1 }));
       }
 
       const name = form.getFieldValue("name");

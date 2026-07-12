@@ -42,13 +42,13 @@ const educationSchema = z.object({
   slug: z
     .string()
     .min(1, FormError.requiredField)
-    .regex(SLUG_REGEX, FormError.invalidField),
+    .regex(SLUG_REGEX, FormError.invalidFormat),
   organizationId: z.string().min(1, FormError.requiredField),
   level: z.enum(EducationLevel, FormError.requiredField),
   status: z.enum(EducationStatus, FormError.requiredField),
-  relevance: z.number().min(1, FormError.requiredField),
-  url: z.url(FormError.invalidField).or(z.literal("")),
-  image: z.url(FormError.invalidField).or(z.literal("")),
+  relevance: z.number().min(1, FormError.minValue),
+  url: z.url(FormError.invalidFormat).or(z.literal("")),
+  image: z.url(FormError.invalidFormat).or(z.literal("")),
   skillIds: z.array(z.string()),
   i18n: z
     .array(
@@ -63,7 +63,7 @@ const educationSchema = z.object({
   period: z
     .object({ from: z.string(), to: z.string() })
     .refine((range) => !(range.from && range.to) || range.from <= range.to, {
-      message: FormError.invalidField,
+      message: FormError.invalidRange,
     }),
 });
 
@@ -214,7 +214,7 @@ export function EducationForm({
         form.getFieldValue("skillIds")
       );
       if (!skills.length)
-        return toast.error(tValidation("minLength", { value: 1 }));
+        return toast.error(tValidation("minCount", { value: 1 }));
 
       const title = fieldGroup.title;
       if (!title) return toast.error(tValidation("requiredField"));

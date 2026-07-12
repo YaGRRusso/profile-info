@@ -15,7 +15,7 @@ import { CommonFormProps } from "./common";
 
 const courseMultiSchema = z.object({
   status: z.enum(CourseStatus),
-  relevance: z.number().min(1, FormError.requiredField),
+  relevance: z.number().min(1, FormError.minValue),
 });
 
 export type CourseMultiSchema = z.infer<typeof courseMultiSchema>;

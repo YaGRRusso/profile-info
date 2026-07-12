@@ -52,10 +52,10 @@ const experienceSchema = z.object({
   slug: z
     .string()
     .min(1, FormError.requiredField)
-    .regex(SLUG_REGEX, FormError.invalidField),
+    .regex(SLUG_REGEX, FormError.invalidFormat),
   organizationId: z.string().min(1, FormError.requiredField),
   category: z.enum(ExperienceCategory, FormError.requiredField),
-  relevance: z.number().min(1, FormError.requiredField),
+  relevance: z.number().min(1, FormError.minValue),
   roles: z
     .array(
       z.object({
@@ -64,7 +64,7 @@ const experienceSchema = z.object({
           .object({ from: z.string(), to: z.string() })
           .refine(
             (range) => !(range.from && range.to) || range.from <= range.to,
-            { message: FormError.invalidField }
+            { message: FormError.invalidRange }
           ),
         skillIds: z.array(z.string()),
       })
@@ -216,7 +216,7 @@ export function ExperienceForm({
         fieldParent.skillIds
       );
       if (!skills.length)
-        return toast.error(tValidation("minLength", { value: 1 }));
+        return toast.error(tValidation("minCount", { value: 1 }));
 
       const title = fieldGroup.title;
       if (!title) return toast.error(tValidation("requiredField"));

@@ -1,9 +1,16 @@
 {
   "requiredField": "Required field",
+  "requiredGroup": "Required group",
   "invalidField": "Invalid field",
+  "invalidGroup": "Invalid group",
+  "invalidFormat": "Invalid format",
+  "invalidRange": "Invalid range",
   "uniqueField": "Must be unique",
   "existingField": "Already exists",
-  "minLength": "Must be at least {{value}}",
-  "maxLength": "Must be at most {{value}}",
-  "requiredGroup": "Required group"
+  "minLength": "Must be at least {{value}} characters",
+  "maxLength": "Must be at most {{value}} characters",
+  "minCount": "Select at least {{value}}",
+  "maxCount": "Select at most {{value}}",
+  "minValue": "Must be at least {{value}}",
+  "maxValue": "Must be at most {{value}}"
 }

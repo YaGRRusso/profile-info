@@ -8,7 +8,7 @@ import { FormError } from "@/lib/form-errors";
 import { CommonFormProps } from "./common";
 
 const userSchema = z.object({
-  email: z.email(FormError.invalidField),
+  email: z.email(FormError.invalidFormat),
   password: z
     .string()
     .min(1, FormError.requiredField)

@@ -10,7 +10,7 @@ import { FormError } from "@/lib/form-errors";
 import { CommonFormProps } from "./common";
 
 const projectMultiSchema = z.object({
-  relevance: z.number().min(1, FormError.requiredField),
+  relevance: z.number().min(1, FormError.minValue),
 });
 
 export type ProjectMultiSchema = z.infer<typeof projectMultiSchema>;

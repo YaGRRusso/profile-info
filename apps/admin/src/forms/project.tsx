@@ -32,14 +32,14 @@ const projectSchema = z.object({
   slug: z
     .string()
     .min(1, FormError.requiredField)
-    .regex(SLUG_REGEX, FormError.invalidField),
-  relevance: z.number().min(1, FormError.requiredField),
+    .regex(SLUG_REGEX, FormError.invalidFormat),
+  relevance: z.number().min(1, FormError.minValue),
   skillIds: z.array(z.string()),
-  images: z.array(z.url(FormError.invalidField)),
+  images: z.array(z.url(FormError.invalidFormat)),
   urls: z.array(
     z.object({
       title: z.string().min(1, FormError.requiredField),
-      value: z.url(FormError.invalidField),
+      value: z.url(FormError.invalidFormat),
     })
   ),
   i18n: z
@@ -159,7 +159,7 @@ export function ProjectForm({
         form.getFieldValue("skillIds")
       );
       if (!skills.length)
-        return toast.error(tValidation("minLength", { value: 1 }));
+        return toast.error(tValidation("minCount", { value: 1 }));
 
       const title = fieldGroup.title;
       if (!title) return toast.error(tValidation("requiredField"));

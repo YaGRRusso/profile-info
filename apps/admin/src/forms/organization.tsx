@@ -30,11 +30,11 @@ const organizationSchema = z.object({
   slug: z
     .string()
     .min(1, FormError.requiredField)
-    .regex(SLUG_REGEX, FormError.invalidField),
+    .regex(SLUG_REGEX, FormError.invalidFormat),
   name: z.string().min(1, FormError.requiredField),
   category: z.enum(OrganizationCategory, FormError.requiredField),
-  logo: z.union([z.url(FormError.invalidField), z.literal("")]),
-  website: z.union([z.url(FormError.invalidField), z.literal("")]),
+  logo: z.union([z.url(FormError.invalidFormat), z.literal("")]),
+  website: z.union([z.url(FormError.invalidFormat), z.literal("")]),
   i18n: z
     .array(
       z.object({

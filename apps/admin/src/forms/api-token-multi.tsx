@@ -13,7 +13,7 @@ import { FormError } from "@/lib/form-errors";
 import { CommonFormProps } from "./common";
 
 const apiTokenMultiSchema = z.object({
-  permissions: z.array(z.enum(ApiTokenPermission)).min(1, FormError.minLength),
+  permissions: z.array(z.enum(ApiTokenPermission)).min(1, FormError.minCount),
 });
 
 export type ApiTokenMultiSchema = z.infer<typeof apiTokenMultiSchema>;

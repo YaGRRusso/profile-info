@@ -1,9 +1,16 @@
 {
   "requiredField": "Campo obrigatório",
+  "requiredGroup": "Grupo obrigatório",
   "invalidField": "Campo inválido",
+  "invalidGroup": "Grupo inválido",
+  "invalidFormat": "Formato inválido",
+  "invalidRange": "Intervalo inválido",
   "uniqueField": "Deve ser único",
   "existingField": "Já existe",
-  "minLength": "Deve ter pelo menos {{value}}",
-  "maxLength": "Deve ter no máximo {{value}}",
-  "requiredGroup": "Grupo obrigatório"
+  "minLength": "Deve ter pelo menos {{value}} caracteres",
+  "maxLength": "Deve ter no máximo {{value}} caracteres",
+  "minCount": "Selecione pelo menos {{value}}",
+  "maxCount": "Selecione no máximo {{value}}",
+  "minValue": "Deve ser pelo menos {{value}}",
+  "maxValue": "Deve ser no máximo {{value}}"
 }

@@ -19,7 +19,7 @@ const skillSchema = z.object({
   slug: z
     .string()
     .min(1, FormError.requiredField)
-    .regex(SLUG_REGEX, FormError.invalidField),
+    .regex(SLUG_REGEX, FormError.invalidFormat),
   category: z.string(),
   i18n: z
     .array(

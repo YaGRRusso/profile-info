@@ -15,7 +15,7 @@ import { CommonFormProps } from "./common";
 
 const experienceMultiSchema = z.object({
   category: z.enum(ExperienceCategory),
-  relevance: z.number().min(1, FormError.requiredField),
+  relevance: z.number().min(1, FormError.minValue),
 });
 
 export type ExperienceMultiSchema = z.infer<typeof experienceMultiSchema>;

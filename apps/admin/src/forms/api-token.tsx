@@ -15,7 +15,7 @@ import { CommonFormProps } from "./common";
 
 const apiTokenSchema = z.object({
   name: z.string().min(1, FormError.requiredField),
-  permissions: z.array(z.enum(ApiTokenPermission)).min(1, FormError.minLength),
+  permissions: z.array(z.enum(ApiTokenPermission)).min(1, FormError.minCount),
   expiresAt: z.string(),
 });
 

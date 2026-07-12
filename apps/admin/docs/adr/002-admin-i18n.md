@@ -103,8 +103,8 @@ Never build keys dynamically (`t(\`stats.${key}\`)`, `t(item.id)`). Dynamic list
 | Area | Approach |
 |------|----------|
 | Form chrome | `forms.json`; `useTranslation("forms")` as `tForm` — `fields.<key>.label`, `.placeholder`, `.tooltip`; `batch.<key>.label` / `.tooltip`; sections, submit |
-| Form validation (Zod) | `FormError` keys in static schemas; `fieldError` → `i18n.t(key, { ns: "validation" })` |
-| AI/ATS validation toasts | `tValidation("minLength", { value })`, `tValidation("requiredField")` |
+| Form validation (Zod) | `FormError` keys in static schemas; `invalidFormat` (shape), `invalidRange` (intervals), `invalidField` (other); `fieldError` → `i18n.t(key, { ns: "validation" })` |
+| AI/ATS validation toasts | `tValidation("minLength", { value })` for text; `tValidation("minCount", { value: 1 })` for skills; `tValidation("requiredField")` |
 | AI textarea buttons | `tForm("ai.translate")`, `tForm("ai.optimize")` inside `textarea.tsx` |
 | Multi-select chrome | `tForm("multiSelect.*")`, `tAction("clearAll")` inside `multi-select.tsx` |
 | System header alerts | `system.json`; callers pass resolved `title` / `description` via `tSystem` |
@@ -146,6 +146,23 @@ Never build keys dynamically (`t(\`stats.${key}\`)`, `t(item.id)`). Dynamic list
 | Locale array refine | `src/lib/form-validation.ts` (`hasUniqueLocales`) |
 | Form error codes | `src/lib/form-errors.ts` (`FormError`) |
 | Field error display | `src/lib/field-error.ts` |
+
+### `FormError` taxonomy (`validation.json`)
+
+| Key | Use when |
+|-----|----------|
+| `requiredField` | Scalar missing / empty |
+| `requiredGroup` | Array must have ≥1 entry (`i18n[]`, `roles[]`) |
+| `minLength` / `maxLength` | String character bounds (`{{value}}`) |
+| `minCount` / `maxCount` | Array selection bounds (`{{value}}`) |
+| `minValue` / `maxValue` | Numeric bounds (`{{value}}`) |
+| `invalidFormat` | Shape/format wrong — regex, email, url |
+| `invalidRange` | Interval relation wrong — `from > to`, etc. |
+| `invalidField` | Other business-rule invalidity (reserve; prefer specific keys above) |
+| `uniqueField` | Duplicate within the same form (e.g. repeated locale) |
+| `existingField` | Conflicts with persisted data (e.g. slug taken) |
+
+New keys: name by validation category, not field or entity; must appear in 2+ places or fill a gap the generics cannot cover.
 
 ## Verification checklist
 
