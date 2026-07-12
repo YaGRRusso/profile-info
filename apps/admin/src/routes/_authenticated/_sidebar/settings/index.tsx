@@ -5,9 +5,9 @@ import { toast } from "react-toastify";
 import { DataState } from "@/components/display/data-state";
 import { PageTitle } from "@/components/display/page-title";
 import { ProfileForm, profileToForm, profileToInput } from "@/forms/profile";
-import { usePageHelp } from "@/hooks/custom/use-page-help";
 import { useUpdateMe } from "@/hooks/mutations/users";
 import { useGetMe } from "@/hooks/queries/auth";
+import { pageHelp } from "@/lib/page-help";
 import { useAuthStore } from "@/stores/auth";
 import { DownloadCvControl } from "../-components/download-cv";
 import { ProfileSummary } from "./-components/profile-summary";
@@ -17,8 +17,9 @@ export const Route = createFileRoute("/_authenticated/_sidebar/settings/")({
 });
 
 function RouteComponent() {
-  const { t } = useTranslation("pages");
-  const help = usePageHelp("settings");
+  const { t: tPage } = useTranslation("pages");
+  const { t: tHelp } = useTranslation("help");
+  const { t: tAlert } = useTranslation("alerts");
   const setUser = useAuthStore((state) => state.setUser);
   const getMe = useGetMe();
   const updateMe = useUpdateMe();
@@ -31,9 +32,9 @@ function RouteComponent() {
     <div className="flex flex-col gap-4">
       <div className="flex flex-wrap items-start justify-between gap-4">
         <PageTitle
-          description={t("settings.description")}
-          help={help}
-          title={t("settings.title")}
+          description={tPage("settings.description")}
+          help={pageHelp(tHelp, "settings")}
+          title={tPage("settings.title")}
         />
         <DownloadCvControl />
       </div>
@@ -58,7 +59,7 @@ function RouteComponent() {
                     const updated = await updateMe.mutateAsync(
                       profileToInput(values)
                     );
-                    toast.success("Profile updated successfully");
+                    toast.success(tAlert("profileUpdateSuccess"));
                     setUser({
                       id: updated.updateMe.id,
                       email: updated.updateMe.email,

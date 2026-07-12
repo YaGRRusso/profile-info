@@ -20,8 +20,6 @@ import {
   skillToInput,
 } from "@/forms/skill";
 import { SkillMultiForm } from "@/forms/skill-multi";
-import { usePageCopy } from "@/hooks/custom/use-page-copy";
-import { usePageHelp } from "@/hooks/custom/use-page-help";
 import { useQueryAllPages } from "@/hooks/custom/use-query-all-pages";
 import {
   useCreateOneSkill,
@@ -37,6 +35,7 @@ import {
 import { type SkillRow, useFindManySkills } from "@/hooks/queries/skills";
 import { cn } from "@/lib/cn";
 import { i18nLabel } from "@/lib/i18n";
+import { pageHelp } from "@/lib/page-help";
 import { SkillsTable } from "./-components/table";
 
 export const Route = createFileRoute("/_authenticated/_sidebar/skills/")({
@@ -44,10 +43,14 @@ export const Route = createFileRoute("/_authenticated/_sidebar/skills/")({
 });
 
 function RouteComponent() {
+  const { t: tAction } = useTranslation("actions");
+  const { t: tAlert } = useTranslation("alerts");
+  const { t: tPage } = useTranslation("pages");
+  const { t: tHelp } = useTranslation("help");
   const { i18n } = useTranslation();
   const locale = i18n.language;
-  const page = usePageCopy("skills");
-  const help = usePageHelp("skills");
+  const entity = tPage("skills.entity");
+  const entityPlural = tPage("skills.entityPlural");
   const [formValues, setFormValues] =
     useState<CommonFormValuesProps<SkillSchema, SkillRow[]>>();
 
@@ -83,7 +86,7 @@ function RouteComponent() {
           createOneSkill.mutate(skillToInput(data), {
             onSuccess: () => {
               closeForm();
-              toast.success("Skill created successfully");
+              toast.success(tAlert("created", { entity }));
             },
           });
           break;
@@ -96,7 +99,7 @@ function RouteComponent() {
             {
               onSuccess: () => {
                 closeForm();
-                toast.success("Skill updated successfully");
+                toast.success(tAlert("updated", { entity }));
               },
             }
           );
@@ -106,6 +109,8 @@ function RouteComponent() {
       }
     },
     [
+      tAlert,
+      entity,
       createOneSkill.mutate,
       closeForm,
       formValues?.state,
@@ -120,7 +125,7 @@ function RouteComponent() {
         disableOneSkill.mutate(selectedSkillIds[0], {
           onSuccess: () => {
             closeForm();
-            toast.success("Skill disabled successfully");
+            toast.success(tAlert("disabled", { entity }));
           },
         });
         break;
@@ -129,7 +134,10 @@ function RouteComponent() {
           onSuccess: (data) => {
             closeForm();
             toast.success(
-              `${data.disableManySkills.succeeded} skills disabled successfully`
+              tAlert("batchDisabled", {
+                count: data.disableManySkills.succeeded,
+                entityPlural,
+              })
             );
           },
         });
@@ -138,6 +146,9 @@ function RouteComponent() {
         break;
     }
   }, [
+    tAlert,
+    entity,
+    entityPlural,
     formValues?.state,
     disableOneSkill,
     selectedSkillIds,
@@ -151,7 +162,7 @@ function RouteComponent() {
         enableOneSkill.mutate(selectedSkillIds[0], {
           onSuccess: () => {
             closeForm();
-            toast.success("Skill enabled successfully");
+            toast.success(tAlert("enabled", { entity }));
           },
         });
         break;
@@ -160,7 +171,10 @@ function RouteComponent() {
           onSuccess: (data) => {
             closeForm();
             toast.success(
-              `${data.enableManySkills.succeeded} skills enabled successfully`
+              tAlert("batchEnabled", {
+                count: data.enableManySkills.succeeded,
+                entityPlural,
+              })
             );
           },
         });
@@ -169,6 +183,9 @@ function RouteComponent() {
         break;
     }
   }, [
+    tAlert,
+    entity,
+    entityPlural,
     formValues?.state,
     enableOneSkill,
     selectedSkillIds,
@@ -182,7 +199,7 @@ function RouteComponent() {
         removeOneSkill.mutate(selectedSkillIds[0], {
           onSuccess: () => {
             closeForm();
-            toast.success("Skill deleted successfully");
+            toast.success(tAlert("deleted", { entity }));
           },
         });
         break;
@@ -191,7 +208,10 @@ function RouteComponent() {
           onSuccess: (data) => {
             closeForm();
             toast.success(
-              `${data.removeManySkills.succeeded} skills deleted successfully`
+              tAlert("batchDeleted", {
+                count: data.removeManySkills.succeeded,
+                entityPlural,
+              })
             );
           },
         });
@@ -200,6 +220,9 @@ function RouteComponent() {
         break;
     }
   }, [
+    tAlert,
+    entity,
+    entityPlural,
     formValues?.state,
     removeOneSkill,
     selectedSkillIds,
@@ -223,23 +246,23 @@ function RouteComponent() {
           },
           {
             icon: <PlusIcon />,
-            label: "New Skill",
+            label: tPage("skills.newButton"),
             className: "btn-soft",
             onClick: () => setFormValues({ state: "CREATING" }),
           },
         ]}
-        description={page.manageDescription}
-        help={help}
-        title={page.manageTitle}
+        description={tPage("skills.manageDescription")}
+        help={pageHelp(tHelp, "skills")}
+        title={tPage("skills.manageTitle")}
       />
 
       <Modal
-        description={page.modalFillDetails}
+        description={tPage("shared.modalFillDetails")}
         isOpen={
           formValues?.state === "CREATING" || formValues?.state === "UPDATING"
         }
         onClose={() => setFormValues(undefined)}
-        title={page.modalManage}
+        title={tPage("skills.modalManage")}
       >
         <SkillForm
           customValues={formValues?.customValues}
@@ -253,12 +276,13 @@ function RouteComponent() {
       </Modal>
 
       <Modal
-        description={page.batchUpdateDescription(
-          formValues?.customValues?.length ?? 0
-        )}
+        description={tPage("shared.modalBatchUpdateDescription", {
+          count: formValues?.customValues?.length ?? 0,
+          entityPlural,
+        })}
         isOpen={formValues?.state === "MULTI_UPDATING"}
         onClose={() => setFormValues(undefined)}
-        title={page.modalBatchUpdate}
+        title={tPage("skills.modalBatchUpdate")}
       >
         <SkillMultiForm
           isLoading={updateManySkills.isPending}
@@ -270,7 +294,10 @@ function RouteComponent() {
                 onSuccess: (data) => {
                   closeForm();
                   toast.success(
-                    `${data.updateManySkills.succeeded} skills updated successfully`
+                    tAlert("batchUpdated", {
+                      count: data.updateManySkills.succeeded,
+                      entityPlural,
+                    })
                   );
                 },
               }
@@ -283,18 +310,18 @@ function RouteComponent() {
       <Modal
         actions={[
           {
-            label: "Close",
+            label: tAction("close"),
             className: "btn-ghost",
             onClick: () => setFormValues(undefined),
           },
         ]}
-        description={page.modalReadDescription}
+        description={tPage("shared.modalReadDescription", { entity })}
         isOpen={
           formValues?.state === "READING" ||
           formValues?.state === "MULTI_READING"
         }
         onClose={() => setFormValues(undefined)}
-        title={page.modalRead}
+        title={tPage("skills.modalRead")}
       >
         {formValues?.customValues?.map((skill) => (
           <Json data={skill} key={skill?.id} />
@@ -304,24 +331,24 @@ function RouteComponent() {
       <Modal
         actions={[
           {
-            label: "Cancel",
+            label: tAction("cancel"),
             className: "btn-ghost",
             onClick: () => setFormValues(undefined),
           },
           {
-            label: "Confirm",
+            label: tAction("confirm"),
             className: "btn-soft btn-error",
             disabled: disableOneSkill.isPending || disableManySkills.isPending,
             onClick: () => handleDisable(),
           },
         ]}
-        description={page.disableDescription}
+        description={tPage("shared.disableDescription", { entityPlural })}
         isOpen={
           formValues?.state === "MULTI_DISABLING" ||
           formValues?.state === "DISABLING"
         }
         onClose={() => setFormValues(undefined)}
-        title={page.disableTitle}
+        title={tPage("shared.disableTitle", { entityPlural })}
       >
         <ul className="flex flex-wrap items-center gap-1">
           {formValues?.customValues?.map((skill) => (
@@ -335,24 +362,24 @@ function RouteComponent() {
       <Modal
         actions={[
           {
-            label: "Cancel",
+            label: tAction("cancel"),
             className: "btn-ghost",
             onClick: () => setFormValues(undefined),
           },
           {
-            label: "Confirm",
+            label: tAction("confirm"),
             className: "btn-soft btn-success",
             disabled: enableOneSkill.isPending || enableManySkills.isPending,
             onClick: () => handleEnable(),
           },
         ]}
-        description={page.enableDescription}
+        description={tPage("shared.enableDescription", { entityPlural })}
         isOpen={
           formValues?.state === "MULTI_ENABLING" ||
           formValues?.state === "ENABLING"
         }
         onClose={() => setFormValues(undefined)}
-        title={page.enableTitle}
+        title={tPage("shared.enableTitle", { entityPlural })}
       >
         <ul className="flex flex-wrap items-center gap-1">
           {formValues?.customValues?.map((skill) => (
@@ -366,24 +393,24 @@ function RouteComponent() {
       <Modal
         actions={[
           {
-            label: "Cancel",
+            label: tAction("cancel"),
             className: "btn-ghost",
             onClick: () => setFormValues(undefined),
           },
           {
-            label: "Confirm",
+            label: tAction("confirm"),
             className: "btn-soft btn-error",
             disabled: removeOneSkill.isPending || removeManySkills.isPending,
             onClick: () => handleDelete(),
           },
         ]}
-        description={page.deleteDescription}
+        description={tPage("shared.deleteDescription", { entityPlural })}
         isOpen={
           formValues?.state === "MULTI_DELETING" ||
           formValues?.state === "DELETING"
         }
         onClose={() => setFormValues(undefined)}
-        title={page.deleteTitle}
+        title={tPage("shared.deleteTitle", { entityPlural })}
       >
         <ul className="flex flex-wrap items-center gap-1">
           {formValues?.customValues?.map((skill) => (
@@ -405,9 +432,9 @@ function RouteComponent() {
 
         <DataState.Empty>
           <Alert
-            description={page.emptyDescription}
+            description={tPage("shared.emptyDescription", { entity })}
             icon={<WarningIcon weight="bold" />}
-            title={page.emptyTitle}
+            title={tPage("shared.emptyTitle")}
           />
         </DataState.Empty>
 

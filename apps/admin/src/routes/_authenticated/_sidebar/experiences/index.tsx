@@ -5,6 +5,7 @@ import {
 } from "@phosphor-icons/react";
 import { createFileRoute } from "@tanstack/react-router";
 import { useCallback, useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { toast } from "react-toastify";
 import { Alert } from "@/components/display/alert";
 import { DataState } from "@/components/display/data-state";
@@ -19,8 +20,6 @@ import {
   experienceToInput,
 } from "@/forms/experience";
 import { ExperienceMultiForm } from "@/forms/experience-multi";
-import { usePageCopy } from "@/hooks/custom/use-page-copy";
-import { usePageHelp } from "@/hooks/custom/use-page-help";
 import { useQueryAllPages } from "@/hooks/custom/use-query-all-pages";
 import {
   useCreateOneExperience,
@@ -34,6 +33,7 @@ import {
   useFindManyExperiences,
 } from "@/hooks/queries/experiences";
 import { cn } from "@/lib/cn";
+import { pageHelp } from "@/lib/page-help";
 import { ExperiencesTable } from "./-components/table";
 
 export const Route = createFileRoute("/_authenticated/_sidebar/experiences/")({
@@ -41,8 +41,12 @@ export const Route = createFileRoute("/_authenticated/_sidebar/experiences/")({
 });
 
 function RouteComponent() {
-  const page = usePageCopy("experiences");
-  const help = usePageHelp("experiences");
+  const { t: tAction } = useTranslation("actions");
+  const { t: tAlert } = useTranslation("alerts");
+  const { t: tPage } = useTranslation("pages");
+  const { t: tHelp } = useTranslation("help");
+  const entity = tPage("experiences.entity");
+  const entityPlural = tPage("experiences.entityPlural");
   const [formValues, setFormValues] =
     useState<CommonFormValuesProps<ExperienceSchema, ExperienceRow[]>>();
 
@@ -77,7 +81,7 @@ function RouteComponent() {
           createOneExperience.mutate(experienceToInput(data), {
             onSuccess: () => {
               closeAndRefetch();
-              toast.success("Experience created successfully");
+              toast.success(tAlert("created", { entity }));
             },
           });
           break;
@@ -90,7 +94,7 @@ function RouteComponent() {
             {
               onSuccess: () => {
                 closeAndRefetch();
-                toast.success("Experience updated successfully");
+                toast.success(tAlert("updated", { entity }));
               },
             }
           );
@@ -100,6 +104,8 @@ function RouteComponent() {
       }
     },
     [
+      tAlert,
+      entity,
       createOneExperience.mutate,
       closeAndRefetch,
       formValues?.state,
@@ -114,7 +120,7 @@ function RouteComponent() {
         removeOneExperience.mutate(selectedExperienceIds[0], {
           onSuccess: () => {
             closeAndRefetch();
-            toast.success("Experience deleted successfully");
+            toast.success(tAlert("deleted", { entity }));
           },
         });
         break;
@@ -123,7 +129,10 @@ function RouteComponent() {
           onSuccess: (data) => {
             closeAndRefetch();
             toast.success(
-              `${data.removeManyExperiences.succeeded} experiences deleted successfully`
+              tAlert("batchDeleted", {
+                count: data.removeManyExperiences.succeeded,
+                entityPlural,
+              })
             );
           },
         });
@@ -132,11 +141,14 @@ function RouteComponent() {
         break;
     }
   }, [
+    tAlert,
+    entity,
     formValues?.state,
     removeOneExperience,
     selectedExperienceIds,
     closeAndRefetch,
     removeManyExperiences,
+    entityPlural,
   ]);
 
   return (
@@ -155,23 +167,23 @@ function RouteComponent() {
           },
           {
             icon: <PlusIcon />,
-            label: "New Experience",
+            label: tPage("experiences.newButton"),
             className: "btn-soft",
             onClick: () => setFormValues({ state: "CREATING" }),
           },
         ]}
-        description={page.manageDescription}
-        help={help}
-        title={page.manageTitle}
+        description={tPage("experiences.manageDescription")}
+        help={pageHelp(tHelp, "experiences")}
+        title={tPage("experiences.manageTitle")}
       />
 
       <Modal
-        description={page.modalFillDetails}
+        description={tPage("shared.modalFillDetails")}
         isOpen={
           formValues?.state === "CREATING" || formValues?.state === "UPDATING"
         }
         onClose={() => setFormValues(undefined)}
-        title={page.modalManage}
+        title={tPage("experiences.modalManage")}
       >
         <ExperienceForm
           customValues={formValues?.customValues}
@@ -189,12 +201,13 @@ function RouteComponent() {
       </Modal>
 
       <Modal
-        description={page.batchUpdateDescription(
-          formValues?.customValues?.length ?? 0
-        )}
+        description={tPage("shared.modalBatchUpdateDescription", {
+          count: formValues?.customValues?.length ?? 0,
+          entityPlural,
+        })}
         isOpen={formValues?.state === "MULTI_UPDATING"}
         onClose={() => setFormValues(undefined)}
-        title={page.modalBatchUpdate}
+        title={tPage("experiences.modalBatchUpdate")}
       >
         <ExperienceMultiForm
           isLoading={updateManyExperiences.isPending}
@@ -206,7 +219,10 @@ function RouteComponent() {
                 onSuccess: (data) => {
                   closeAndRefetch();
                   toast.success(
-                    `${data.updateManyExperiences.succeeded} experiences updated successfully`
+                    tAlert("batchUpdated", {
+                      count: data.updateManyExperiences.succeeded,
+                      entityPlural,
+                    })
                   );
                 },
               }
@@ -219,18 +235,18 @@ function RouteComponent() {
       <Modal
         actions={[
           {
-            label: "Close",
+            label: tAction("close"),
             className: "btn-ghost",
             onClick: () => setFormValues(undefined),
           },
         ]}
-        description={page.modalReadDescription}
+        description={tPage("shared.modalReadDescription", { entity })}
         isOpen={
           formValues?.state === "READING" ||
           formValues?.state === "MULTI_READING"
         }
         onClose={() => setFormValues(undefined)}
-        title={page.modalRead}
+        title={tPage("experiences.modalRead")}
       >
         {formValues?.customValues?.map((experience) => (
           <Json data={experience} key={experience?.id} />
@@ -240,25 +256,25 @@ function RouteComponent() {
       <Modal
         actions={[
           {
-            label: "Cancel",
+            label: tAction("cancel"),
             className: "btn-ghost",
             onClick: () => setFormValues(undefined),
           },
           {
-            label: "Confirm",
+            label: tAction("confirm"),
             className: "btn-soft btn-error",
             disabled:
               removeOneExperience.isPending || removeManyExperiences.isPending,
             onClick: () => handleDelete(),
           },
         ]}
-        description={page.deleteDescription}
+        description={tPage("shared.deleteDescription", { entityPlural })}
         isOpen={
           formValues?.state === "MULTI_DELETING" ||
           formValues?.state === "DELETING"
         }
         onClose={() => setFormValues(undefined)}
-        title={page.deleteTitle}
+        title={tPage("shared.deleteTitle", { entityPlural })}
       >
         <ul className="flex flex-wrap items-center gap-1">
           {formValues?.customValues?.map((experience) => (
@@ -280,9 +296,9 @@ function RouteComponent() {
 
         <DataState.Empty>
           <Alert
-            description={page.emptyDescription}
+            description={tPage("shared.emptyDescription", { entity })}
             icon={<WarningIcon weight="bold" />}
-            title={page.emptyTitle}
+            title={tPage("shared.emptyTitle")}
           />
         </DataState.Empty>
 

@@ -68,7 +68,7 @@ Never build keys dynamically (`t(\`stats.${key}\`)`, `t(item.id)`). Dynamic list
 
 | Area | Approach |
 |------|----------|
-| Page help | `help.json`; `useTranslation("help")` directly in routes |
+| Page help | `help.json`; `pageHelp(tHelp, "courses")` in routes |
 | Sidebar nav | `nav.json`; `useTranslation("nav")` in `_sidebar.tsx` |
 | Page / modal titles & descriptions | `pages.json`; `useTranslation("pages")` directly in routes |
 | Entity i18n labels | `i18nLabel(item)` defaults to `i18n.language`; tables may pass locale explicitly |
@@ -85,6 +85,14 @@ Never build keys dynamically (`t(\`stats.${key}\`)`, `t(item.id)`). Dynamic list
 | Dashboard widgets | `dashboard.json`; stats, charts, profile completeness, recent activity |
 | Login chrome | `login.json` — title/subtitle only (not `UserForm`) |
 | Table toolbar buttons | `useTranslation("actions")` in `*-components/table.tsx` |
+
+**`alerts.json` key naming:**
+
+| Family | Pattern | Examples |
+|--------|---------|----------|
+| Entity CRUD (parameterized) | past-tense verb | `created`, `updated`, `batchDeleted` |
+| Action pair (success + error) | `{verb}{Noun}Success` / `{verb}{Noun}Failed` | `tokenCopySuccess`, `tokenCopyFailed` |
+| Standalone success | `{subject}{Action}Success` | `profileUpdateSuccess` |
 
 **Explicitly out of scope (backlog — do not add without revisiting this ADR):**
 
@@ -112,6 +120,7 @@ Never build keys dynamically (`t(\`stats.${key}\`)`, `t(item.id)`). Dynamic list
 | Locale init + persistence | `src/i18n/index.ts` |
 | Relative time | `src/lib/dayjs.ts` (`syncDayjsLocale`) |
 | Help content type | `src/consts/page-help.ts` (`PageHelpContent` interface) |
+| Page help builder | `src/lib/page-help.ts` (`pageHelp(tHelp, section)`) |
 
 ## Verification checklist
 

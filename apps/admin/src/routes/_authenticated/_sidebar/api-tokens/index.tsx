@@ -6,6 +6,7 @@ import {
 } from "@phosphor-icons/react";
 import { createFileRoute } from "@tanstack/react-router";
 import { useCallback, useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { toast } from "react-toastify";
 import { Alert } from "@/components/display/alert";
 import { DataState } from "@/components/display/data-state";
@@ -21,8 +22,6 @@ import {
 } from "@/forms/api-token";
 import { ApiTokenMultiForm } from "@/forms/api-token-multi";
 import type { CommonFormValuesProps } from "@/forms/common";
-import { usePageCopy } from "@/hooks/custom/use-page-copy";
-import { usePageHelp } from "@/hooks/custom/use-page-help";
 import { useQueryAllPages } from "@/hooks/custom/use-query-all-pages";
 import {
   useCreateOneApiToken,
@@ -36,6 +35,7 @@ import {
   useFindManyApiTokens,
 } from "@/hooks/queries/api-tokens";
 import { cn } from "@/lib/cn";
+import { pageHelp } from "@/lib/page-help";
 import { ApiTokensTable } from "./-components/table";
 
 export const Route = createFileRoute("/_authenticated/_sidebar/api-tokens/")({
@@ -43,8 +43,12 @@ export const Route = createFileRoute("/_authenticated/_sidebar/api-tokens/")({
 });
 
 function RouteComponent() {
-  const page = usePageCopy("apiTokens");
-  const help = usePageHelp("apiTokens");
+  const { t: tAction } = useTranslation("actions");
+  const { t: tAlert } = useTranslation("alerts");
+  const { t: tPage } = useTranslation("pages");
+  const { t: tHelp } = useTranslation("help");
+  const entity = tPage("apiTokens.entity");
+  const entityPlural = tPage("apiTokens.entityPlural");
   const [formValues, setFormValues] =
     useState<CommonFormValuesProps<ApiTokenSchema, ApiTokenRow[]>>();
   const [createdToken, setCreatedToken] = useState<string>();
@@ -79,7 +83,7 @@ function RouteComponent() {
             onSuccess: (response) => {
               closeAndRefetch();
               setCreatedToken(response.createOneApiToken.token);
-              toast.success("API token created successfully");
+              toast.success(tAlert("created", { entity }));
             },
           });
           break;
@@ -92,7 +96,7 @@ function RouteComponent() {
             {
               onSuccess: () => {
                 closeAndRefetch();
-                toast.success("API token updated successfully");
+                toast.success(tAlert("updated", { entity }));
               },
             }
           );
@@ -102,6 +106,8 @@ function RouteComponent() {
       }
     },
     [
+      tAlert,
+      entity,
       createOneApiToken.mutate,
       closeAndRefetch,
       formValues?.state,
@@ -116,7 +122,7 @@ function RouteComponent() {
         removeOneApiToken.mutate(selectedApiTokenIds[0], {
           onSuccess: () => {
             closeAndRefetch();
-            toast.success("API token deleted successfully");
+            toast.success(tAlert("deleted", { entity }));
           },
         });
         break;
@@ -125,7 +131,10 @@ function RouteComponent() {
           onSuccess: (data) => {
             closeAndRefetch();
             toast.success(
-              `${data.removeManyApiTokens.succeeded} API tokens deleted successfully`
+              tAlert("batchDeleted", {
+                count: data.removeManyApiTokens.succeeded,
+                entityPlural,
+              })
             );
           },
         });
@@ -134,11 +143,14 @@ function RouteComponent() {
         break;
     }
   }, [
+    tAlert,
+    entity,
     formValues?.state,
     removeOneApiToken,
     selectedApiTokenIds,
     closeAndRefetch,
     removeManyApiTokens,
+    entityPlural,
   ]);
 
   const copyCreatedToken = useCallback(async () => {
@@ -146,11 +158,11 @@ function RouteComponent() {
 
     try {
       await navigator.clipboard.writeText(createdToken);
-      toast.success("Token copied to clipboard");
+      toast.success(tAlert("tokenCopySuccess"));
     } catch {
-      toast.error("Failed to copy token to clipboard");
+      toast.error(tAlert("tokenCopyFailed"));
     }
-  }, [createdToken]);
+  }, [createdToken, tAlert]);
 
   return (
     <div className="flex flex-col gap-4">
@@ -168,23 +180,23 @@ function RouteComponent() {
           },
           {
             icon: <PlusIcon />,
-            label: "New API Token",
+            label: tPage("apiTokens.newButton"),
             className: "btn-soft",
             onClick: () => setFormValues({ state: "CREATING" }),
           },
         ]}
-        description={page.manageDescription}
-        help={help}
-        title={page.manageTitle}
+        description={tPage("apiTokens.manageDescription")}
+        help={pageHelp(tHelp, "apiTokens")}
+        title={tPage("apiTokens.manageTitle")}
       />
 
       <Modal
-        description={page.modalFillDetails}
+        description={tPage("shared.modalFillDetails")}
         isOpen={
           formValues?.state === "CREATING" || formValues?.state === "UPDATING"
         }
         onClose={() => setFormValues(undefined)}
-        title={page.modalManage}
+        title={tPage("apiTokens.modalManage")}
       >
         <ApiTokenForm
           customValues={formValues?.customValues}
@@ -199,21 +211,21 @@ function RouteComponent() {
       <Modal
         actions={[
           {
-            label: "Close",
+            label: tAction("close"),
             className: "btn-ghost",
             onClick: () => setCreatedToken(undefined),
           },
           {
-            label: "Copy token",
+            label: tAction("copyToken"),
             className: "btn-soft btn-primary",
             icon: <CopyIcon />,
             onClick: () => copyCreatedToken(),
           },
         ]}
-        description={page.newApiTokenDescription}
+        description={tPage("shared.newApiTokenDescription")}
         isOpen={Boolean(createdToken)}
         onClose={() => setCreatedToken(undefined)}
-        title={page.newApiTokenTitle}
+        title={tPage("shared.newApiTokenTitle")}
       >
         <TextInput
           className="font-mono text-xs"
@@ -223,12 +235,13 @@ function RouteComponent() {
       </Modal>
 
       <Modal
-        description={page.batchUpdateDescription(
-          formValues?.customValues?.length ?? 0
-        )}
+        description={tPage("shared.modalBatchUpdateDescription", {
+          count: formValues?.customValues?.length ?? 0,
+          entityPlural,
+        })}
         isOpen={formValues?.state === "MULTI_UPDATING"}
         onClose={() => setFormValues(undefined)}
-        title={page.modalBatchUpdate}
+        title={tPage("apiTokens.modalBatchUpdate")}
       >
         <ApiTokenMultiForm
           isLoading={updateManyApiTokens.isPending}
@@ -240,7 +253,10 @@ function RouteComponent() {
                 onSuccess: (data) => {
                   closeAndRefetch();
                   toast.success(
-                    `${data.updateManyApiTokens.succeeded} API tokens updated successfully`
+                    tAlert("batchUpdated", {
+                      count: data.updateManyApiTokens.succeeded,
+                      entityPlural,
+                    })
                   );
                 },
               }
@@ -253,18 +269,18 @@ function RouteComponent() {
       <Modal
         actions={[
           {
-            label: "Close",
+            label: tAction("close"),
             className: "btn-ghost",
             onClick: () => setFormValues(undefined),
           },
         ]}
-        description={page.modalReadDescription}
+        description={tPage("shared.modalReadDescription", { entity })}
         isOpen={
           formValues?.state === "READING" ||
           formValues?.state === "MULTI_READING"
         }
         onClose={() => setFormValues(undefined)}
-        title={page.modalRead}
+        title={tPage("apiTokens.modalRead")}
       >
         {formValues?.customValues?.map((token) => (
           <Json data={token} key={token?.id} />
@@ -274,25 +290,25 @@ function RouteComponent() {
       <Modal
         actions={[
           {
-            label: "Cancel",
+            label: tAction("cancel"),
             className: "btn-ghost",
             onClick: () => setFormValues(undefined),
           },
           {
-            label: "Confirm",
+            label: tAction("confirm"),
             className: "btn-soft btn-error",
             disabled:
               removeOneApiToken.isPending || removeManyApiTokens.isPending,
             onClick: () => handleDelete(),
           },
         ]}
-        description={page.deleteDescription}
+        description={tPage("shared.deleteDescription", { entityPlural })}
         isOpen={
           formValues?.state === "MULTI_DELETING" ||
           formValues?.state === "DELETING"
         }
         onClose={() => setFormValues(undefined)}
-        title={page.deleteTitle}
+        title={tPage("shared.deleteTitle", { entityPlural })}
       >
         <ul className="flex flex-wrap items-center gap-1">
           {formValues?.customValues?.map((token) => (
@@ -314,9 +330,9 @@ function RouteComponent() {
 
         <DataState.Empty>
           <Alert
-            description={page.emptyDescription}
+            description={tPage("shared.emptyDescription", { entity })}
             icon={<WarningIcon weight="bold" />}
-            title={page.emptyTitle}
+            title={tPage("shared.emptyTitle")}
           />
         </DataState.Empty>
 

@@ -4,6 +4,7 @@ import { DataState } from "@/components/display/data-state";
 import { PageTitle } from "@/components/display/page-title";
 import { useGetMe } from "@/hooks/queries/auth";
 import { useDashboard } from "@/hooks/queries/dashboard";
+import { pageHelp } from "@/lib/page-help";
 import { DashboardCharts } from "./-components/dashboard-charts";
 import { DashboardSkeleton } from "./-components/dashboard-skeleton";
 import { DashboardStats } from "./-components/dashboard-stats";
@@ -27,12 +28,7 @@ function RouteComponent() {
       <div className="flex flex-wrap items-start justify-between gap-4">
         <PageTitle
           description={tPage("home.description")}
-          help={{
-            title: tHelp("home.title"),
-            paragraphs: tHelp("home.paragraphs", {
-              returnObjects: true,
-            }) as string[],
-          }}
+          help={pageHelp(tHelp, "home")}
           title={tPage("home.title", { name: user?.name ?? "" })}
         />
         <ProfileCompleteness user={user} />

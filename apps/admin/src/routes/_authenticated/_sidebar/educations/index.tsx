@@ -5,6 +5,7 @@ import {
 } from "@phosphor-icons/react";
 import { createFileRoute } from "@tanstack/react-router";
 import { useCallback, useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { toast } from "react-toastify";
 import { Alert } from "@/components/display/alert";
 import { DataState } from "@/components/display/data-state";
@@ -19,8 +20,6 @@ import {
   educationToInput,
 } from "@/forms/education";
 import { EducationMultiForm } from "@/forms/education-multi";
-import { usePageCopy } from "@/hooks/custom/use-page-copy";
-import { usePageHelp } from "@/hooks/custom/use-page-help";
 import { useQueryAllPages } from "@/hooks/custom/use-query-all-pages";
 import {
   useCreateOneEducation,
@@ -34,6 +33,7 @@ import {
   useFindManyEducations,
 } from "@/hooks/queries/educations";
 import { cn } from "@/lib/cn";
+import { pageHelp } from "@/lib/page-help";
 import { EducationsTable } from "./-components/table";
 
 export const Route = createFileRoute("/_authenticated/_sidebar/educations/")({
@@ -41,8 +41,12 @@ export const Route = createFileRoute("/_authenticated/_sidebar/educations/")({
 });
 
 function RouteComponent() {
-  const page = usePageCopy("educations");
-  const help = usePageHelp("educations");
+  const { t: tAction } = useTranslation("actions");
+  const { t: tAlert } = useTranslation("alerts");
+  const { t: tPage } = useTranslation("pages");
+  const { t: tHelp } = useTranslation("help");
+  const entity = tPage("educations.entity");
+  const entityPlural = tPage("educations.entityPlural");
   const [formValues, setFormValues] =
     useState<CommonFormValuesProps<EducationSchema, EducationRow[]>>();
 
@@ -75,7 +79,7 @@ function RouteComponent() {
           createOneEducation.mutate(educationToInput(data), {
             onSuccess: () => {
               closeAndRefetch();
-              toast.success("Education created successfully");
+              toast.success(tAlert("created", { entity }));
             },
           });
           break;
@@ -88,7 +92,7 @@ function RouteComponent() {
             {
               onSuccess: () => {
                 closeAndRefetch();
-                toast.success("Education updated successfully");
+                toast.success(tAlert("updated", { entity }));
               },
             }
           );
@@ -98,6 +102,8 @@ function RouteComponent() {
       }
     },
     [
+      tAlert,
+      entity,
       createOneEducation.mutate,
       closeAndRefetch,
       formValues?.state,
@@ -112,7 +118,7 @@ function RouteComponent() {
         removeOneEducation.mutate(selectedEducationIds[0], {
           onSuccess: () => {
             closeAndRefetch();
-            toast.success("Education deleted successfully");
+            toast.success(tAlert("deleted", { entity }));
           },
         });
         break;
@@ -121,7 +127,10 @@ function RouteComponent() {
           onSuccess: (data) => {
             closeAndRefetch();
             toast.success(
-              `${data.removeManyEducations.succeeded} educations deleted successfully`
+              tAlert("batchDeleted", {
+                count: data.removeManyEducations.succeeded,
+                entityPlural,
+              })
             );
           },
         });
@@ -130,11 +139,14 @@ function RouteComponent() {
         break;
     }
   }, [
+    tAlert,
+    entity,
     formValues?.state,
     removeOneEducation,
     selectedEducationIds,
     closeAndRefetch,
     removeManyEducations,
+    entityPlural,
   ]);
 
   return (
@@ -153,23 +165,23 @@ function RouteComponent() {
           },
           {
             icon: <PlusIcon />,
-            label: "New Education",
+            label: tPage("educations.newButton"),
             className: "btn-soft",
             onClick: () => setFormValues({ state: "CREATING" }),
           },
         ]}
-        description={page.manageDescription}
-        help={help}
-        title={page.manageTitle}
+        description={tPage("educations.manageDescription")}
+        help={pageHelp(tHelp, "educations")}
+        title={tPage("educations.manageTitle")}
       />
 
       <Modal
-        description={page.modalFillDetails}
+        description={tPage("shared.modalFillDetails")}
         isOpen={
           formValues?.state === "CREATING" || formValues?.state === "UPDATING"
         }
         onClose={() => setFormValues(undefined)}
-        title={page.modalManage}
+        title={tPage("educations.modalManage")}
       >
         <EducationForm
           customValues={formValues?.customValues}
@@ -187,12 +199,13 @@ function RouteComponent() {
       </Modal>
 
       <Modal
-        description={page.batchUpdateDescription(
-          formValues?.customValues?.length ?? 0
-        )}
+        description={tPage("shared.modalBatchUpdateDescription", {
+          count: formValues?.customValues?.length ?? 0,
+          entityPlural,
+        })}
         isOpen={formValues?.state === "MULTI_UPDATING"}
         onClose={() => setFormValues(undefined)}
-        title={page.modalBatchUpdate}
+        title={tPage("educations.modalBatchUpdate")}
       >
         <EducationMultiForm
           isLoading={updateManyEducations.isPending}
@@ -204,7 +217,10 @@ function RouteComponent() {
                 onSuccess: (data) => {
                   closeAndRefetch();
                   toast.success(
-                    `${data.updateManyEducations.succeeded} educations updated successfully`
+                    tAlert("batchUpdated", {
+                      count: data.updateManyEducations.succeeded,
+                      entityPlural,
+                    })
                   );
                 },
               }
@@ -217,18 +233,18 @@ function RouteComponent() {
       <Modal
         actions={[
           {
-            label: "Close",
+            label: tAction("close"),
             className: "btn-ghost",
             onClick: () => setFormValues(undefined),
           },
         ]}
-        description={page.modalReadDescription}
+        description={tPage("shared.modalReadDescription", { entity })}
         isOpen={
           formValues?.state === "READING" ||
           formValues?.state === "MULTI_READING"
         }
         onClose={() => setFormValues(undefined)}
-        title={page.modalRead}
+        title={tPage("educations.modalRead")}
       >
         {formValues?.customValues?.map((education) => (
           <Json data={education} key={education?.id} />
@@ -238,25 +254,25 @@ function RouteComponent() {
       <Modal
         actions={[
           {
-            label: "Cancel",
+            label: tAction("cancel"),
             className: "btn-ghost",
             onClick: () => setFormValues(undefined),
           },
           {
-            label: "Confirm",
+            label: tAction("confirm"),
             className: "btn-soft btn-error",
             disabled:
               removeOneEducation.isPending || removeManyEducations.isPending,
             onClick: () => handleDelete(),
           },
         ]}
-        description={page.deleteDescription}
+        description={tPage("shared.deleteDescription", { entityPlural })}
         isOpen={
           formValues?.state === "MULTI_DELETING" ||
           formValues?.state === "DELETING"
         }
         onClose={() => setFormValues(undefined)}
-        title={page.deleteTitle}
+        title={tPage("shared.deleteTitle", { entityPlural })}
       >
         <ul className="flex flex-wrap items-center gap-1">
           {formValues?.customValues?.map((education) => (
@@ -278,9 +294,9 @@ function RouteComponent() {
 
         <DataState.Empty>
           <Alert
-            description={page.emptyDescription}
+            description={tPage("shared.emptyDescription", { entity })}
             icon={<WarningIcon weight="bold" />}
-            title={page.emptyTitle}
+            title={tPage("shared.emptyTitle")}
           />
         </DataState.Empty>
 

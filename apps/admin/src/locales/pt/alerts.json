@@ -8,7 +8,7 @@
   "batchUpdated": "{{count}} {{entityPlural}} atualizados com sucesso",
   "batchDisabled": "{{count}} {{entityPlural}} desativados com sucesso",
   "batchEnabled": "{{count}} {{entityPlural}} ativados com sucesso",
-  "profileUpdated": "Perfil atualizado com sucesso",
-  "tokenCopied": "Token copiado para a área de transferência",
+  "profileUpdateSuccess": "Perfil atualizado com sucesso",
+  "tokenCopySuccess": "Token copiado para a área de transferência",
   "tokenCopyFailed": "Falha ao copiar o token para a área de transferência"
 }

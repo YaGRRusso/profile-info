@@ -5,6 +5,7 @@ import {
 } from "@phosphor-icons/react";
 import { createFileRoute } from "@tanstack/react-router";
 import { useCallback, useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { toast } from "react-toastify";
 import { Alert } from "@/components/display/alert";
 import { DataState } from "@/components/display/data-state";
@@ -19,8 +20,6 @@ import {
   organizationToInput,
 } from "@/forms/organization";
 import { OrganizationMultiForm } from "@/forms/organization-multi";
-import { usePageCopy } from "@/hooks/custom/use-page-copy";
-import { usePageHelp } from "@/hooks/custom/use-page-help";
 import { useQueryAllPages } from "@/hooks/custom/use-query-all-pages";
 import {
   useCreateOneOrganization,
@@ -38,6 +37,7 @@ import {
   useFindManyOrganizations,
 } from "@/hooks/queries/organizations";
 import { cn } from "@/lib/cn";
+import { pageHelp } from "@/lib/page-help";
 import { OrganizationsTable } from "./-components/table";
 
 export const Route = createFileRoute("/_authenticated/_sidebar/organizations/")(
@@ -47,8 +47,12 @@ export const Route = createFileRoute("/_authenticated/_sidebar/organizations/")(
 );
 
 function RouteComponent() {
-  const page = usePageCopy("organizations");
-  const help = usePageHelp("organizations");
+  const { t: tAction } = useTranslation("actions");
+  const { t: tAlert } = useTranslation("alerts");
+  const { t: tPage } = useTranslation("pages");
+  const { t: tHelp } = useTranslation("help");
+  const entity = tPage("organizations.entity");
+  const entityPlural = tPage("organizations.entityPlural");
   const [formValues, setFormValues] =
     useState<CommonFormValuesProps<OrganizationSchema, OrganizationRow[]>>();
 
@@ -86,7 +90,7 @@ function RouteComponent() {
           createOneOrganization.mutate(organizationToInput(data), {
             onSuccess: () => {
               closeForm();
-              toast.success("Organization created successfully");
+              toast.success(tAlert("created", { entity }));
             },
           });
           break;
@@ -99,7 +103,7 @@ function RouteComponent() {
             {
               onSuccess: () => {
                 closeForm();
-                toast.success("Organization updated successfully");
+                toast.success(tAlert("updated", { entity }));
               },
             }
           );
@@ -109,6 +113,8 @@ function RouteComponent() {
       }
     },
     [
+      tAlert,
+      entity,
       createOneOrganization.mutate,
       closeForm,
       formValues?.state,
@@ -123,7 +129,7 @@ function RouteComponent() {
         disableOneOrganization.mutate(selectedOrganizationIds[0], {
           onSuccess: () => {
             closeForm();
-            toast.success("Organization disabled successfully");
+            toast.success(tAlert("disabled", { entity }));
           },
         });
         break;
@@ -132,7 +138,10 @@ function RouteComponent() {
           onSuccess: (data) => {
             closeForm();
             toast.success(
-              `${data.disableManyOrganizations.succeeded} organizations disabled successfully`
+              tAlert("batchDisabled", {
+                count: data.disableManyOrganizations.succeeded,
+                entityPlural,
+              })
             );
           },
         });
@@ -141,11 +150,14 @@ function RouteComponent() {
         break;
     }
   }, [
+    tAlert,
+    entity,
     formValues?.state,
     disableOneOrganization,
     selectedOrganizationIds,
     closeForm,
     disableManyOrganizations,
+    entityPlural,
   ]);
 
   const handleEnable = useCallback(() => {
@@ -154,7 +166,7 @@ function RouteComponent() {
         enableOneOrganization.mutate(selectedOrganizationIds[0], {
           onSuccess: () => {
             closeForm();
-            toast.success("Organization enabled successfully");
+            toast.success(tAlert("enabled", { entity }));
           },
         });
         break;
@@ -163,7 +175,10 @@ function RouteComponent() {
           onSuccess: (data) => {
             closeForm();
             toast.success(
-              `${data.enableManyOrganizations.succeeded} organizations enabled successfully`
+              tAlert("batchEnabled", {
+                count: data.enableManyOrganizations.succeeded,
+                entityPlural,
+              })
             );
           },
         });
@@ -172,11 +187,14 @@ function RouteComponent() {
         break;
     }
   }, [
+    tAlert,
+    entity,
     formValues?.state,
     enableOneOrganization,
     selectedOrganizationIds,
     closeForm,
     enableManyOrganizations,
+    entityPlural,
   ]);
 
   const handleDelete = useCallback(() => {
@@ -185,7 +203,7 @@ function RouteComponent() {
         removeOneOrganization.mutate(selectedOrganizationIds[0], {
           onSuccess: () => {
             closeForm();
-            toast.success("Organization deleted successfully");
+            toast.success(tAlert("deleted", { entity }));
           },
         });
         break;
@@ -194,7 +212,10 @@ function RouteComponent() {
           onSuccess: (data) => {
             closeForm();
             toast.success(
-              `${data.removeManyOrganizations.succeeded} organizations deleted successfully`
+              tAlert("batchDeleted", {
+                count: data.removeManyOrganizations.succeeded,
+                entityPlural,
+              })
             );
           },
         });
@@ -203,11 +224,14 @@ function RouteComponent() {
         break;
     }
   }, [
+    tAlert,
+    entity,
     formValues?.state,
     removeOneOrganization,
     selectedOrganizationIds,
     closeForm,
     removeManyOrganizations,
+    entityPlural,
   ]);
 
   return (
@@ -228,23 +252,23 @@ function RouteComponent() {
           },
           {
             icon: <PlusIcon />,
-            label: "New Organization",
+            label: tPage("organizations.newButton"),
             className: "btn-soft",
             onClick: () => setFormValues({ state: "CREATING" }),
           },
         ]}
-        description={page.manageDescription}
-        help={help}
-        title={page.manageTitle}
+        description={tPage("organizations.manageDescription")}
+        help={pageHelp(tHelp, "organizations")}
+        title={tPage("organizations.manageTitle")}
       />
 
       <Modal
-        description={page.modalFillDetails}
+        description={tPage("shared.modalFillDetails")}
         isOpen={
           formValues?.state === "CREATING" || formValues?.state === "UPDATING"
         }
         onClose={() => setFormValues(undefined)}
-        title={page.modalManage}
+        title={tPage("organizations.modalManage")}
       >
         <OrganizationForm
           customValues={formValues?.customValues}
@@ -262,12 +286,13 @@ function RouteComponent() {
       </Modal>
 
       <Modal
-        description={page.batchUpdateDescription(
-          formValues?.customValues?.length ?? 0
-        )}
+        description={tPage("shared.modalBatchUpdateDescription", {
+          count: formValues?.customValues?.length ?? 0,
+          entityPlural,
+        })}
         isOpen={formValues?.state === "MULTI_UPDATING"}
         onClose={() => setFormValues(undefined)}
-        title={page.modalBatchUpdate}
+        title={tPage("organizations.modalBatchUpdate")}
       >
         <OrganizationMultiForm
           isLoading={updateManyOrganizations.isPending}
@@ -282,7 +307,10 @@ function RouteComponent() {
                 onSuccess: (data) => {
                   closeForm();
                   toast.success(
-                    `${data.updateManyOrganizations.succeeded} organizations updated successfully`
+                    tAlert("batchUpdated", {
+                      count: data.updateManyOrganizations.succeeded,
+                      entityPlural,
+                    })
                   );
                 },
               }
@@ -295,18 +323,18 @@ function RouteComponent() {
       <Modal
         actions={[
           {
-            label: "Close",
+            label: tAction("close"),
             className: "btn-ghost",
             onClick: () => setFormValues(undefined),
           },
         ]}
-        description={page.modalReadDescription}
+        description={tPage("shared.modalReadDescription", { entity })}
         isOpen={
           formValues?.state === "READING" ||
           formValues?.state === "MULTI_READING"
         }
         onClose={() => setFormValues(undefined)}
-        title={page.modalRead}
+        title={tPage("organizations.modalRead")}
       >
         {formValues?.customValues?.map((organization) => (
           <Json data={organization} key={organization?.id} />
@@ -316,12 +344,12 @@ function RouteComponent() {
       <Modal
         actions={[
           {
-            label: "Cancel",
+            label: tAction("cancel"),
             className: "btn-ghost",
             onClick: () => setFormValues(undefined),
           },
           {
-            label: "Confirm",
+            label: tAction("confirm"),
             className: "btn-soft btn-error",
             disabled:
               disableOneOrganization.isPending ||
@@ -329,13 +357,13 @@ function RouteComponent() {
             onClick: () => handleDisable(),
           },
         ]}
-        description={page.disableDescription}
+        description={tPage("shared.disableDescription", { entityPlural })}
         isOpen={
           formValues?.state === "MULTI_DISABLING" ||
           formValues?.state === "DISABLING"
         }
         onClose={() => setFormValues(undefined)}
-        title={page.disableTitle}
+        title={tPage("shared.disableTitle", { entityPlural })}
       >
         <ul className="flex flex-wrap items-center gap-1">
           {formValues?.customValues?.map((organization) => (
@@ -349,12 +377,12 @@ function RouteComponent() {
       <Modal
         actions={[
           {
-            label: "Cancel",
+            label: tAction("cancel"),
             className: "btn-ghost",
             onClick: () => setFormValues(undefined),
           },
           {
-            label: "Confirm",
+            label: tAction("confirm"),
             className: "btn-soft btn-success",
             disabled:
               enableOneOrganization.isPending ||
@@ -362,13 +390,13 @@ function RouteComponent() {
             onClick: () => handleEnable(),
           },
         ]}
-        description={page.enableDescription}
+        description={tPage("shared.enableDescription", { entityPlural })}
         isOpen={
           formValues?.state === "MULTI_ENABLING" ||
           formValues?.state === "ENABLING"
         }
         onClose={() => setFormValues(undefined)}
-        title={page.enableTitle}
+        title={tPage("shared.enableTitle", { entityPlural })}
       >
         <ul className="flex flex-wrap items-center gap-1">
           {formValues?.customValues?.map((organization) => (
@@ -382,12 +410,12 @@ function RouteComponent() {
       <Modal
         actions={[
           {
-            label: "Cancel",
+            label: tAction("cancel"),
             className: "btn-ghost",
             onClick: () => setFormValues(undefined),
           },
           {
-            label: "Confirm",
+            label: tAction("confirm"),
             className: "btn-soft btn-error",
             disabled:
               removeOneOrganization.isPending ||
@@ -395,13 +423,13 @@ function RouteComponent() {
             onClick: () => handleDelete(),
           },
         ]}
-        description={page.deleteDescription}
+        description={tPage("shared.deleteDescription", { entityPlural })}
         isOpen={
           formValues?.state === "MULTI_DELETING" ||
           formValues?.state === "DELETING"
         }
         onClose={() => setFormValues(undefined)}
-        title={page.deleteTitle}
+        title={tPage("shared.deleteTitle", { entityPlural })}
       >
         <ul className="flex flex-wrap items-center gap-1">
           {formValues?.customValues?.map((organization) => (
@@ -423,9 +451,9 @@ function RouteComponent() {
 
         <DataState.Empty>
           <Alert
-            description={page.emptyDescription}
+            description={tPage("shared.emptyDescription", { entity })}
             icon={<WarningIcon weight="bold" />}
-            title={page.emptyTitle}
+            title={tPage("shared.emptyTitle")}
           />
         </DataState.Empty>
 

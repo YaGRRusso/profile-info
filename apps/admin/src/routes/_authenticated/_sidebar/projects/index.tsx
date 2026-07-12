@@ -5,6 +5,7 @@ import {
 } from "@phosphor-icons/react";
 import { createFileRoute } from "@tanstack/react-router";
 import { useCallback, useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { toast } from "react-toastify";
 import { Alert } from "@/components/display/alert";
 import { DataState } from "@/components/display/data-state";
@@ -19,8 +20,6 @@ import {
   projectToInput,
 } from "@/forms/project";
 import { ProjectMultiForm } from "@/forms/project-multi";
-import { usePageCopy } from "@/hooks/custom/use-page-copy";
-import { usePageHelp } from "@/hooks/custom/use-page-help";
 import { useQueryAllPages } from "@/hooks/custom/use-query-all-pages";
 import {
   useCreateOneProject,
@@ -31,6 +30,7 @@ import {
 } from "@/hooks/mutations/projects";
 import { type ProjectRow, useFindManyProjects } from "@/hooks/queries/projects";
 import { cn } from "@/lib/cn";
+import { pageHelp } from "@/lib/page-help";
 import { ProjectsTable } from "./-components/table";
 
 export const Route = createFileRoute("/_authenticated/_sidebar/projects/")({
@@ -38,8 +38,12 @@ export const Route = createFileRoute("/_authenticated/_sidebar/projects/")({
 });
 
 function RouteComponent() {
-  const page = usePageCopy("projects");
-  const help = usePageHelp("projects");
+  const { t: tAction } = useTranslation("actions");
+  const { t: tAlert } = useTranslation("alerts");
+  const { t: tPage } = useTranslation("pages");
+  const { t: tHelp } = useTranslation("help");
+  const entity = tPage("projects.entity");
+  const entityPlural = tPage("projects.entityPlural");
   const [formValues, setFormValues] =
     useState<CommonFormValuesProps<ProjectSchema, ProjectRow[]>>();
 
@@ -72,7 +76,7 @@ function RouteComponent() {
           createOneProject.mutate(projectToInput(data), {
             onSuccess: () => {
               closeAndRefetch();
-              toast.success("Project created successfully");
+              toast.success(tAlert("created", { entity }));
             },
           });
           break;
@@ -85,7 +89,7 @@ function RouteComponent() {
             {
               onSuccess: () => {
                 closeAndRefetch();
-                toast.success("Project updated successfully");
+                toast.success(tAlert("updated", { entity }));
               },
             }
           );
@@ -95,6 +99,8 @@ function RouteComponent() {
       }
     },
     [
+      tAlert,
+      entity,
       createOneProject.mutate,
       closeAndRefetch,
       formValues?.state,
@@ -109,7 +115,7 @@ function RouteComponent() {
         removeOneProject.mutate(selectedProjectIds[0], {
           onSuccess: () => {
             closeAndRefetch();
-            toast.success("Project deleted successfully");
+            toast.success(tAlert("deleted", { entity }));
           },
         });
         break;
@@ -118,7 +124,10 @@ function RouteComponent() {
           onSuccess: (data) => {
             closeAndRefetch();
             toast.success(
-              `${data.removeManyProjects.succeeded} projects deleted successfully`
+              tAlert("batchDeleted", {
+                count: data.removeManyProjects.succeeded,
+                entityPlural,
+              })
             );
           },
         });
@@ -127,11 +136,14 @@ function RouteComponent() {
         break;
     }
   }, [
+    tAlert,
+    entity,
     formValues?.state,
     removeOneProject,
     selectedProjectIds,
     closeAndRefetch,
     removeManyProjects,
+    entityPlural,
   ]);
 
   return (
@@ -150,23 +162,23 @@ function RouteComponent() {
           },
           {
             icon: <PlusIcon />,
-            label: "New Project",
+            label: tPage("projects.newButton"),
             className: "btn-soft",
             onClick: () => setFormValues({ state: "CREATING" }),
           },
         ]}
-        description={page.manageDescription}
-        help={help}
-        title={page.manageTitle}
+        description={tPage("projects.manageDescription")}
+        help={pageHelp(tHelp, "projects")}
+        title={tPage("projects.manageTitle")}
       />
 
       <Modal
-        description={page.modalFillDetails}
+        description={tPage("shared.modalFillDetails")}
         isOpen={
           formValues?.state === "CREATING" || formValues?.state === "UPDATING"
         }
         onClose={() => setFormValues(undefined)}
-        title={page.modalManage}
+        title={tPage("projects.modalManage")}
       >
         <ProjectForm
           customValues={formValues?.customValues}
@@ -182,12 +194,13 @@ function RouteComponent() {
       </Modal>
 
       <Modal
-        description={page.batchUpdateDescription(
-          formValues?.customValues?.length ?? 0
-        )}
+        description={tPage("shared.modalBatchUpdateDescription", {
+          count: formValues?.customValues?.length ?? 0,
+          entityPlural,
+        })}
         isOpen={formValues?.state === "MULTI_UPDATING"}
         onClose={() => setFormValues(undefined)}
-        title={page.modalBatchUpdate}
+        title={tPage("projects.modalBatchUpdate")}
       >
         <ProjectMultiForm
           isLoading={updateManyProjects.isPending}
@@ -199,7 +212,10 @@ function RouteComponent() {
                 onSuccess: (data) => {
                   closeAndRefetch();
                   toast.success(
-                    `${data.updateManyProjects.succeeded} projects updated successfully`
+                    tAlert("batchUpdated", {
+                      count: data.updateManyProjects.succeeded,
+                      entityPlural,
+                    })
                   );
                 },
               }
@@ -212,18 +228,18 @@ function RouteComponent() {
       <Modal
         actions={[
           {
-            label: "Close",
+            label: tAction("close"),
             className: "btn-ghost",
             onClick: () => setFormValues(undefined),
           },
         ]}
-        description={page.modalReadDescription}
+        description={tPage("shared.modalReadDescription", { entity })}
         isOpen={
           formValues?.state === "READING" ||
           formValues?.state === "MULTI_READING"
         }
         onClose={() => setFormValues(undefined)}
-        title={page.modalRead}
+        title={tPage("projects.modalRead")}
       >
         {formValues?.customValues?.map((project) => (
           <Json data={project} key={project?.id} />
@@ -233,25 +249,25 @@ function RouteComponent() {
       <Modal
         actions={[
           {
-            label: "Cancel",
+            label: tAction("cancel"),
             className: "btn-ghost",
             onClick: () => setFormValues(undefined),
           },
           {
-            label: "Confirm",
+            label: tAction("confirm"),
             className: "btn-soft btn-error",
             disabled:
               removeOneProject.isPending || removeManyProjects.isPending,
             onClick: () => handleDelete(),
           },
         ]}
-        description={page.deleteDescription}
+        description={tPage("shared.deleteDescription", { entityPlural })}
         isOpen={
           formValues?.state === "MULTI_DELETING" ||
           formValues?.state === "DELETING"
         }
         onClose={() => setFormValues(undefined)}
-        title={page.deleteTitle}
+        title={tPage("shared.deleteTitle", { entityPlural })}
       >
         <ul className="flex flex-wrap items-center gap-1">
           {formValues?.customValues?.map((project) => (
@@ -273,9 +289,9 @@ function RouteComponent() {
 
         <DataState.Empty>
           <Alert
-            description={page.emptyDescription}
+            description={tPage("shared.emptyDescription", { entity })}
             icon={<WarningIcon weight="bold" />}
-            title={page.emptyTitle}
+            title={tPage("shared.emptyTitle")}
           />
         </DataState.Empty>
 

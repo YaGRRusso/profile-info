@@ -8,7 +8,7 @@
   "batchUpdated": "{{count}} {{entityPlural}} updated successfully",
   "batchDisabled": "{{count}} {{entityPlural}} disabled successfully",
   "batchEnabled": "{{count}} {{entityPlural}} enabled successfully",
-  "profileUpdated": "Profile updated successfully",
-  "tokenCopied": "Token copied to clipboard",
+  "profileUpdateSuccess": "Profile updated successfully",
+  "tokenCopySuccess": "Token copied to clipboard",
   "tokenCopyFailed": "Failed to copy token to clipboard"
 }
