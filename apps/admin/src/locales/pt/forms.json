@@ -1,5 +1,14 @@
 {
-  "optional": "Opcional",
+  "labels": {
+    "optional": {
+      "label": "Opcional",
+      "tooltip": "Este campo é opcional."
+    },
+    "context": {
+      "label": "Usado como contexto para IA",
+      "tooltip": "Este campo é usado como contexto para IA."
+    }
+  },
   "fields": {
     "slug": {
       "label": "Slug",

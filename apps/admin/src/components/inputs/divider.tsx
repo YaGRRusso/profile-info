@@ -1,3 +1,4 @@
+import { QuestionIcon } from "@phosphor-icons/react";
 import { ComponentProps } from "react";
 import { cn } from "@/lib/cn";
 import { FormTooltip } from "./tooltip";
@@ -16,7 +17,11 @@ export function FormDivider({
   return (
     <div className={cn("divider", className)} {...props}>
       {label && <span>{label}</span>}
-      {tooltip && <FormTooltip content={tooltip} />}
+      {tooltip && (
+        <FormTooltip content={tooltip}>
+          <QuestionIcon />
+        </FormTooltip>
+      )}
     </div>
   );
 }

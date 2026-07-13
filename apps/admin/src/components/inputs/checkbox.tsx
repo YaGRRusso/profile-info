@@ -1,3 +1,4 @@
+import { QuestionIcon } from "@phosphor-icons/react";
 import { type ComponentProps } from "react";
 import { cn } from "@/lib/cn";
 import { FormTooltip } from "./tooltip";
@@ -35,7 +36,11 @@ export function CheckboxInput({
           {...props}
         />
         {label && <span>{label}</span>}
-        {tooltip && <FormTooltip content={tooltip} />}
+        {tooltip && (
+          <FormTooltip content={tooltip}>
+            <QuestionIcon />
+          </FormTooltip>
+        )}
       </label>
       {error && <p className="label text-error">{error}</p>}
     </fieldset>

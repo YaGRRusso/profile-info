@@ -1,12 +1,17 @@
-import { QuestionIcon } from "@phosphor-icons/react";
 import { Arrow, Content, Portal, Root, Trigger } from "@radix-ui/react-popover";
-import { useState } from "react";
+import { ComponentProps, useState } from "react";
+import { cn } from "@/lib/cn";
 
-export interface FormTooltipProps {
+export interface FormTooltipProps extends ComponentProps<"button"> {
   content: string;
 }
 
-export function FormTooltip({ content }: FormTooltipProps) {
+export function FormTooltip({
+  content,
+  children,
+  className,
+  ...props
+}: FormTooltipProps) {
   const [open, setOpen] = useState(false);
 
   return (
@@ -14,10 +19,14 @@ export function FormTooltip({ content }: FormTooltipProps) {
       <Trigger asChild>
         <button
           aria-label={content}
-          className="btn btn-circle btn-ghost btn-xs -ml-1 inline-flex p-0 text-[1em]"
+          className={cn(
+            "cursor-pointer text-[1em] transition-colors hover:text-primary",
+            className
+          )}
           type="button"
+          {...props}
         >
-          <QuestionIcon />
+          {children}
         </button>
       </Trigger>
 

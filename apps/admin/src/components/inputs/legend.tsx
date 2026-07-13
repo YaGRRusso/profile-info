@@ -1,3 +1,4 @@
+import { QuestionIcon } from "@phosphor-icons/react";
 import { type ComponentProps } from "react";
 import { useTranslation } from "react-i18next";
 import { cn } from "@/lib/cn";
@@ -21,14 +22,24 @@ export function InputLegend({
   if (!label) return null;
 
   return (
-    <legend className={cn("fieldset-legend gap-1", className)} {...props}>
+    <legend
+      className={cn("fieldset-legend justify-start gap-1", className)}
+      {...props}
+    >
       <span>{label}</span>
       {optional && (
-        <span className="font-normal text-xs opacity-md">
-          ({tForm("optional")})
-        </span>
+        <FormTooltip
+          className="opacity-md"
+          content={tForm("labels.optional.tooltip")}
+        >
+          ({tForm("labels.optional.label")})
+        </FormTooltip>
       )}
-      {tooltip && <FormTooltip content={tooltip} />}
+      {tooltip && (
+        <FormTooltip content={tooltip}>
+          <QuestionIcon />
+        </FormTooltip>
+      )}
     </legend>
   );
 }
