@@ -1,22 +1,22 @@
 {
   "shared": {
-    "modalFillDetails": "Preencha os dados abaixo e envie.",
-    "modalBatchUpdateDescription": "Atualize os campos abaixo para aplicar a todos os {{count}} {{entityPlural}} selecionados.",
-    "modalReadDescription": "Visualização somente leitura do {{entity}}.",
+    "modalFillDetails": "Preencha os dados abaixo e salve.",
+    "modalBatchUpdateDescription": "O que você alterar abaixo vale para todos os {{count}} {{entityPlural}} selecionados.",
+    "modalReadDescription": "Só para consultar — sem edição.",
     "deleteTitle": "Excluir {{entityPlural}}?",
-    "deleteDescription": "Tem certeza de que deseja excluir os seguintes {{entityPlural}}?",
+    "deleteDescription": "Confirma excluir estes {{entityPlural}}? A ação não tem volta.",
     "disableTitle": "Desativar {{entityPlural}}?",
-    "disableDescription": "Tem certeza de que deseja desativar os seguintes {{entityPlural}}?",
+    "disableDescription": "Confirma desativar estes {{entityPlural}}?",
     "enableTitle": "Ativar {{entityPlural}}?",
-    "enableDescription": "Tem certeza de que deseja ativar os seguintes {{entityPlural}}?",
+    "enableDescription": "Confirma ativar estes {{entityPlural}}?",
     "newApiTokenTitle": "Seu novo token de API",
-    "newApiTokenDescription": "Copie este token agora. Você não poderá vê-lo novamente.",
-    "emptyTitle": "Nada encontrado!",
-    "emptyDescription": "Tente atualizar a página ou criar um novo {{entity}}."
+    "newApiTokenDescription": "Copie agora. Depois você não consegue ver de novo.",
+    "emptyTitle": "Nada por aqui ainda",
+    "emptyDescription": "Atualize a página ou crie um novo {{entity}}."
   },
   "settings": {
     "title": "Perfil",
-    "description": "Seu currículo: dados pessoais e resumo profissional.",
+    "description": "Seus dados pessoais e o texto que abre o currículo.",
     "summary": {
       "title": "Título",
       "description": "Descrição",
@@ -28,75 +28,75 @@
   },
   "home": {
     "title": "Olá, {{name}}!",
-    "description": "Resumo do que você já cadastrou no perfil."
+    "description": "Visão rápida do que já está no seu perfil."
   },
   "courses": {
-    "manageTitle": "Gerenciar cursos",
-    "manageDescription": "Cursos rápidos, certificados e treinamentos.",
+    "manageTitle": "Cursos",
+    "manageDescription": "Certificados, treinamentos e cursos rápidos.",
     "entity": "curso",
     "entityPlural": "cursos",
     "newButton": "Novo curso",
-    "modalManage": "Gerenciar curso",
+    "modalManage": "Curso",
     "modalBatchUpdate": "Atualizar cursos",
     "modalRead": "Ver curso"
   },
   "skills": {
-    "manageTitle": "Gerenciar habilidades",
-    "manageDescription": "O que você sabe fazer, no perfil e no currículo.",
+    "manageTitle": "Habilidades",
+    "manageDescription": "O que você sabe fazer — no perfil e no currículo.",
     "entity": "habilidade",
     "entityPlural": "habilidades",
     "newButton": "Nova habilidade",
-    "modalManage": "Gerenciar habilidade",
+    "modalManage": "Habilidade",
     "modalBatchUpdate": "Atualizar habilidades",
     "modalRead": "Ver habilidade"
   },
   "educations": {
-    "manageTitle": "Gerenciar formações",
-    "manageDescription": "Estudos formais: escola, faculdade ou técnico.",
+    "manageTitle": "Formações",
+    "manageDescription": "Escola, faculdade, técnico e outros estudos formais.",
     "entity": "formação",
     "entityPlural": "formações",
     "newButton": "Nova formação",
-    "modalManage": "Gerenciar formação",
+    "modalManage": "Formação",
     "modalBatchUpdate": "Atualizar formações",
     "modalRead": "Ver formação"
   },
   "organizations": {
-    "manageTitle": "Gerenciar organizações",
-    "manageDescription": "Cadastro de empresas e escolas para reutilizar no currículo.",
+    "manageTitle": "Organizações",
+    "manageDescription": "Empresas e escolas para reutilizar no currículo.",
     "entity": "organização",
     "entityPlural": "organizações",
     "newButton": "Nova organização",
-    "modalManage": "Gerenciar organização",
+    "modalManage": "Organização",
     "modalBatchUpdate": "Atualizar organizações",
     "modalRead": "Ver organização"
   },
   "projects": {
-    "manageTitle": "Gerenciar projetos",
-    "manageDescription": "Trabalhos feitos por conta própria ou em paralelo ao emprego.",
+    "manageTitle": "Projetos",
+    "manageDescription": "Freela, voluntariado e trabalhos feitos por conta própria.",
     "entity": "projeto",
     "entityPlural": "projetos",
     "newButton": "Novo projeto",
-    "modalManage": "Gerenciar projeto",
+    "modalManage": "Projeto",
     "modalBatchUpdate": "Atualizar projetos",
     "modalRead": "Ver projeto"
   },
   "experiences": {
-    "manageTitle": "Gerenciar experiências",
-    "manageDescription": "Empregos e trabalhos do seu histórico.",
+    "manageTitle": "Experiências",
+    "manageDescription": "Empregos e funções da sua trajetória profissional.",
     "entity": "experiência",
     "entityPlural": "experiências",
     "newButton": "Nova experiência",
-    "modalManage": "Gerenciar experiência",
+    "modalManage": "Experiência",
     "modalBatchUpdate": "Atualizar experiências",
     "modalRead": "Ver experiência"
   },
   "apiTokens": {
-    "manageTitle": "Gerenciar tokens de API",
-    "manageDescription": "Para sistemas externos acessarem seu perfil automaticamente.",
+    "manageTitle": "Tokens de API",
+    "manageDescription": "Chaves para outros sistemas lerem ou atualizarem seu perfil.",
     "entity": "token de API",
     "entityPlural": "tokens de API",
     "newButton": "Novo token de API",
-    "modalManage": "Gerenciar token de API",
+    "modalManage": "Token de API",
     "modalBatchUpdate": "Atualizar tokens de API",
     "modalRead": "Ver token de API"
   }

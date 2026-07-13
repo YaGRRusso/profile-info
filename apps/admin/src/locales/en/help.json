@@ -2,79 +2,79 @@
   "home": {
     "title": "Home",
     "paragraphs": [
-      "Your professional profile home page after sign-in.",
-      "Numbers and charts show how many jobs, courses, studies, and other details you have filled in. A more complete profile produces a better exported CV.",
-      "Profile completeness points out important details that are still missing, such as contact information, photo, or professional summary.",
-      "Recent activity shows what changed last so you can pick up where you left off."
+      "This is the overview of your profile after sign-in.",
+      "Numbers and charts show how many jobs, courses, studies, and other details you have added. A fuller profile makes a better PDF CV.",
+      "Completeness points out what is still missing — contact info, photo, or professional summary.",
+      "Recent activity lists the latest changes so you can pick up where you left off."
     ]
   },
   "settings": {
-    "title": "Settings",
+    "title": "Profile",
     "paragraphs": [
-      "Your main profile details live here: name, contact information, photo, address, and the professional summary on your CV.",
-      "The summary can be written in more than one language, which helps when your CV is read abroad.",
-      "In main skills, you choose what to highlight and the order in which skills appear on your CV.",
-      "Download generates a PDF with your profile, jobs, studies, courses, projects, and skills, in the order you defined."
+      "Name, contact details, photo, address, and the professional summary that opens your CV live here.",
+      "The summary can exist in more than one language — useful when your CV is read abroad.",
+      "In main skills, choose what to highlight and the order on your CV.",
+      "Download builds a PDF with your profile, jobs, studies, courses, projects, and skills, in the order you set."
     ]
   },
   "skills": {
     "title": "Skills",
     "paragraphs": [
-      "Words that describe what you know how to do at work, in your studies, or in your professional life.",
-      "You can pick from the existing list or create a new one with the name you prefer.",
-      "They appear on your profile and on jobs, courses, studies, and projects, showing where you use each capability.",
-      "On your CV, profile skills are grouped by category when you set one."
+      "Plain words for what you know how to do at work, in study, or day to day.",
+      "Pick from the list or create a new one with the name you prefer.",
+      "They show on your profile and on jobs, courses, studies, and projects — showing where you use each one.",
+      "On your CV, profile skills can be grouped by category."
     ]
   },
   "courses": {
     "title": "Courses",
     "paragraphs": [
-      "Short courses, certificates, and training, such as a technical course, safety certification, or professional workshop.",
-      "Use this area for short-form learning. Formal school, college, or technical studies belong in Educations.",
-      "Record who provided it, the period, a description, and related skills. Everything appears on your CV; relevance sets how prominently each entry shows."
+      "Short courses, certificates, and training — for example a trade course, safety certification, or workshop.",
+      "Use this area for short-form learning. School, college, and technical programs belong in Education.",
+      "Add who ran it, the dates, a description, and related skills. Everything lands on your CV; relevance sets the prominence."
     ]
   },
   "educations": {
-    "title": "Educations",
+    "title": "Education",
     "paragraphs": [
-      "Formal studies: high school, technical programs, college degrees, postgraduate work, and similar levels.",
-      "Use this area for your main academic path. Short courses and certificates belong in Courses.",
-      "Record the institution, level, status, period, and a description. You can attach skills gained in that study.",
-      "On your CV, more relevant educations appear with greater prominence."
+      "Formal studies: high school, technical programs, degrees, postgraduate work, and similar levels.",
+      "This is your main academic path. Short courses and certificates belong in Courses.",
+      "Add the institution, level, status, dates, and a description. You can link skills you gained.",
+      "On your CV, more relevant education entries get more prominence."
     ]
   },
   "organizations": {
     "title": "Organizations",
     "paragraphs": [
-      "Companies, schools, and institutions you mention on your CV, whether where you worked, studied, or took a course.",
-      "Save each name once and reuse it when recording jobs, studies, or courses. If it is not on the list, create it with the correct name.",
-      "The name appears with the records that use it, as a shared reference across your CV."
+      "Companies, schools, and institutions you name on your CV — where you worked, studied, or took a course.",
+      "Save each name once and reuse it on jobs, studies, and courses. If it is missing, create it with the correct name.",
+      "The name shows with every record that uses that organization."
     ]
   },
   "projects": {
     "title": "Projects",
     "paragraphs": [
-      "Work done on your own or alongside a job, such as freelance jobs, renovations, volunteer work, or a deliverable you want to highlight beyond the job title.",
-      "Describe what you did, attach skills that work demonstrates, and add photos or links if you want.",
-      "Relevance sets how prominently each project appears on your exported CV."
+      "Work on your own or alongside a job: freelance, renovations, volunteering, or a deliverable you want to highlight beyond the job title.",
+      "Describe what you did, link skills that work shows, and add photos or links if you want.",
+      "Relevance sets how prominently each project appears on the PDF CV."
     ]
   },
   "experiences": {
-    "title": "Experiences",
+    "title": "Experience",
     "paragraphs": [
-      "Jobs and work in your professional history, each one linked to a company or client.",
-      "Within the same experience you can record more than one role, useful when you changed positions without changing employers.",
-      "Each role has a title, period, description, and skills used in that function.",
+      "Jobs and work in your history — each one linked to a company or client.",
+      "Within the same experience you can record more than one role, useful when you changed title without changing employer.",
+      "Each role has a title, dates, description, and skills used in that job.",
       "Also set the job type and how important that job is on your CV."
     ]
   },
   "apiTokens": {
-    "title": "API Tokens",
+    "title": "API tokens",
     "paragraphs": [
-      "For when another system needs to read or update your data automatically, without opening the site.",
-      "Common in integrations with apps, scripts, or tools that sync your profile.",
-      "Each token gets a name so you can recognize it in the list, such as the system or routine that will use it.",
-      "When creating one, choose whether it can only read data or also change it. The secret appears once: store it safely and revoke tokens you no longer use."
+      "Use these when another system needs to read or update your data on its own, without opening this site.",
+      "Common with apps, scripts, or tools that sync your profile.",
+      "Give each token a name you will recognize in the list — for example the system that will use it.",
+      "When creating one, choose whether it can only read data or also change it. The secret appears once: store it safely and revoke what you no longer need."
     ]
   }
 }

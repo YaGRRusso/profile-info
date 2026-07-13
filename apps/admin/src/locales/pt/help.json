@@ -2,79 +2,79 @@
   "home": {
     "title": "Início",
     "paragraphs": [
-      "Página inicial do seu perfil profissional após o login.",
-      "Números e gráficos mostram quantos empregos, cursos, estudos e outras informações você já preencheu. Quanto mais completo o perfil, melhor fica o currículo exportado.",
-      "A completude do perfil indica dados importantes que ainda faltam, como contato, foto ou resumo profissional.",
-      "Atividade recente mostra o que mudou por último, para você retomar de onde parou."
+      "Esta é a visão geral do seu perfil após o login.",
+      "Os números e gráficos mostram quantos empregos, cursos, estudos e outros dados você já cadastrou. Quanto mais completo o perfil, melhor fica o currículo em PDF.",
+      "A completude aponta o que ainda falta — contato, foto ou resumo profissional.",
+      "A atividade recente lista as últimas mudanças, para você retomar de onde parou."
     ]
   },
   "settings": {
-    "title": "Configurações",
+    "title": "Perfil",
     "paragraphs": [
-      "Aqui ficam os dados principais do seu perfil: nome, contato, foto, endereço e o resumo profissional que aparece no currículo.",
-      "O resumo pode ser escrito em mais de um idioma, útil se o currículo for lido fora do Brasil.",
-      "Em habilidades principais, você escolhe o que destacar e a ordem em que aparecem no currículo.",
+      "Aqui ficam nome, contato, foto, endereço e o resumo profissional que abre o currículo.",
+      "O resumo pode existir em mais de um idioma — útil se alguém ler o currículo fora do Brasil.",
+      "Em habilidades principais, escolha o que destacar e a ordem em que aparecem no currículo.",
       "O download gera um PDF com perfil, empregos, estudos, cursos, projetos e habilidades, na ordem que você definiu."
     ]
   },
   "skills": {
     "title": "Habilidades",
     "paragraphs": [
-      "Palavras que descrevem o que você sabe fazer no trabalho, nos estudos ou no dia a dia profissional.",
-      "Você pode escolher da lista existente ou criar uma nova com o nome que preferir.",
-      "Elas aparecem no perfil e também em empregos, cursos, estudos e projetos, mostrando em que situações você usa cada capacidade.",
-      "No currículo, as habilidades do perfil são agrupadas por categoria quando você define uma."
+      "Palavras simples para o que você sabe fazer no trabalho, nos estudos ou no dia a dia.",
+      "Escolha da lista ou crie uma nova com o nome que preferir.",
+      "Elas aparecem no perfil e também nos empregos, cursos, estudos e projetos — mostrando onde você usa cada uma.",
+      "No currículo, as habilidades do perfil podem ficar agrupadas por categoria."
     ]
   },
   "courses": {
     "title": "Cursos",
     "paragraphs": [
-      "Cursos rápidos, certificados e treinamentos, como um curso do SENAI, certificação de segurança ou workshop profissional.",
-      "Use esta área para formações curtas. Estudos formais de escola, faculdade ou técnico ficam em Formações.",
-      "Informe quem ministrou, o período, a descrição e as habilidades relacionadas. Tudo entra no currículo; a relevância define o destaque de cada um."
+      "Cursos rápidos, certificados e treinamentos — por exemplo SENAI, segurança do trabalho ou um workshop.",
+      "Use esta área para formações curtas. Escola, faculdade e técnico ficam em Formações.",
+      "Informe quem ministrou, o período, a descrição e as habilidades ligadas. Tudo entra no currículo; a relevância define o destaque."
     ]
   },
   "educations": {
     "title": "Formações",
     "paragraphs": [
-      "Estudos formais: ensino médio, curso técnico, graduação, pós-graduação e níveis parecidos.",
-      "Use esta área para a trajetória acadêmica principal. Cursos curtos e certificações ficam em Cursos.",
-      "Informe a instituição, o nível, a situação, o período e uma descrição. Habilidades aprendidas podem ser associadas.",
-      "No currículo, formações mais relevantes aparecem com mais destaque."
+      "Estudos formais: ensino médio, técnico, graduação, pós e níveis parecidos.",
+      "Aqui fica a trajetória acadêmica principal. Cursos curtos e certificados ficam em Cursos.",
+      "Informe a instituição, o nível, a situação, o período e uma descrição. Dá para ligar habilidades aprendidas.",
+      "No currículo, as formações mais relevantes aparecem com mais destaque."
     ]
   },
   "organizations": {
     "title": "Organizações",
     "paragraphs": [
-      "Empresas, escolas e instituições que você cita no currículo, seja onde trabalhou, estudou ou fez um curso.",
-      "Cadastre cada nome uma vez e reutilize ao registrar empregos, estudos ou cursos. Se não estiver na lista, crie com o nome correto.",
-      "O nome aparece junto aos registros em que foi usado, como referência compartilhada no currículo."
+      "Empresas, escolas e instituições que você cita no currículo — onde trabalhou, estudou ou fez um curso.",
+      "Cadastre cada nome uma vez e reutilize nos empregos, estudos e cursos. Se não estiver na lista, crie com o nome certo.",
+      "O nome aparece junto aos registros que usam essa organização."
     ]
   },
   "projects": {
     "title": "Projetos",
     "paragraphs": [
-      "Trabalhos feitos por conta própria ou em paralelo ao emprego, como freela, reforma, voluntariado ou uma entrega que você quer destacar além do cargo.",
-      "Descreva o que fez, associe habilidades que esse trabalho demonstra e adicione fotos ou links se quiser.",
-      "A relevância define o destaque de cada projeto no currículo exportado."
+      "Trabalhos por conta própria ou em paralelo ao emprego: freela, reforma, voluntariado ou uma entrega que você quer destacar além do cargo.",
+      "Descreva o que fez, ligue as habilidades que esse trabalho mostra e, se quiser, adicione fotos ou links.",
+      "A relevância define o destaque de cada projeto no currículo em PDF."
     ]
   },
   "experiences": {
     "title": "Experiências",
     "paragraphs": [
-      "Empregos e trabalhos do seu histórico profissional, cada um ligado a uma empresa ou cliente.",
+      "Empregos e trabalhos da sua trajetória — cada um ligado a uma empresa ou cliente.",
       "Na mesma experiência você pode registrar mais de um cargo, útil quando mudou de função sem trocar de empresa.",
       "Cada cargo tem título, período, descrição e habilidades usadas naquela função.",
-      "Informe também o tipo de trabalho e o quanto esse emprego é importante no seu currículo."
+      "Informe também o tipo de trabalho e o quanto esse emprego importa no currículo."
     ]
   },
   "apiTokens": {
     "title": "Tokens de API",
     "paragraphs": [
-      "Servem quando outro sistema precisa ler ou atualizar seus dados automaticamente, sem abrir o site.",
-      "Comum em integrações com apps, scripts ou ferramentas que sincronizam o perfil.",
-      "Cada token recebe um nome para você reconhecer na lista, como o sistema ou rotina que vai usá-lo.",
-      "Na criação, defina se o token só consulta ou também altera dados. O segredo aparece uma vez: guarde com cuidado e revogue o que não usar mais."
+      "Serve quando outro sistema precisa ler ou atualizar seus dados sozinho, sem abrir este site.",
+      "É comum em apps, scripts ou ferramentas que sincronizam o perfil.",
+      "Dê um nome a cada token para reconhecer na lista — por exemplo o sistema que vai usá-lo.",
+      "Na criação, escolha se o token só consulta ou também altera dados. O segredo aparece uma vez: guarde com cuidado e desative o que não usar mais."
     ]
   }
 }

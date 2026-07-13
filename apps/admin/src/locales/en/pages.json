@@ -1,22 +1,22 @@
 {
   "shared": {
-    "modalFillDetails": "Fill the details below and submit.",
-    "modalBatchUpdateDescription": "Update the fields below to apply them to all {{count}} selected {{entityPlural}}.",
-    "modalReadDescription": "Read only view of the {{entity}}.",
+    "modalFillDetails": "Fill in the details below and save.",
+    "modalBatchUpdateDescription": "Changes below apply to all {{count}} selected {{entityPlural}}.",
+    "modalReadDescription": "View only — no editing.",
     "deleteTitle": "Delete {{entityPlural}}?",
-    "deleteDescription": "Are you sure you want to delete the following {{entityPlural}}?",
+    "deleteDescription": "Delete these {{entityPlural}}? This cannot be undone.",
     "disableTitle": "Disable {{entityPlural}}?",
-    "disableDescription": "Are you sure you want to disable the following {{entityPlural}}?",
+    "disableDescription": "Disable these {{entityPlural}}?",
     "enableTitle": "Enable {{entityPlural}}?",
-    "enableDescription": "Are you sure you want to enable the following {{entityPlural}}?",
+    "enableDescription": "Enable these {{entityPlural}}?",
     "newApiTokenTitle": "Your new API token",
-    "newApiTokenDescription": "Copy this token now. You will not be able to see it again.",
-    "emptyTitle": "Nothing found!",
-    "emptyDescription": "Try refreshing the page or create a new {{entity}}."
+    "newApiTokenDescription": "Copy it now. You will not see it again.",
+    "emptyTitle": "Nothing here yet",
+    "emptyDescription": "Refresh the page or create a new {{entity}}."
   },
   "settings": {
     "title": "Profile",
-    "description": "Your CV: personal details and professional summary.",
+    "description": "Your personal details and the text that opens your CV.",
     "summary": {
       "title": "Title",
       "description": "Description",
@@ -28,76 +28,76 @@
   },
   "home": {
     "title": "Hello, {{name}}!",
-    "description": "Summary of what you have added to your profile."
+    "description": "A quick look at what is already on your profile."
   },
   "courses": {
-    "manageTitle": "Manage Courses",
-    "manageDescription": "Short courses, certificates, and training.",
+    "manageTitle": "Courses",
+    "manageDescription": "Certificates, training, and short courses.",
     "entity": "course",
     "entityPlural": "courses",
-    "newButton": "New Course",
-    "modalManage": "Manage Course",
-    "modalBatchUpdate": "Update Courses",
-    "modalRead": "Read Course"
+    "newButton": "New course",
+    "modalManage": "Course",
+    "modalBatchUpdate": "Update courses",
+    "modalRead": "View course"
   },
   "skills": {
-    "manageTitle": "Manage Skills",
-    "manageDescription": "What you know how to do, on your profile and CV.",
+    "manageTitle": "Skills",
+    "manageDescription": "What you know how to do — on your profile and CV.",
     "entity": "skill",
     "entityPlural": "skills",
-    "newButton": "New Skill",
-    "modalManage": "Manage Skill",
-    "modalBatchUpdate": "Update Skills",
-    "modalRead": "Read Skill"
+    "newButton": "New skill",
+    "modalManage": "Skill",
+    "modalBatchUpdate": "Update skills",
+    "modalRead": "View skill"
   },
   "educations": {
-    "manageTitle": "Manage Educations",
-    "manageDescription": "Formal studies: school, college, or technical program.",
+    "manageTitle": "Education",
+    "manageDescription": "School, college, technical programs, and other formal studies.",
     "entity": "education",
     "entityPlural": "educations",
-    "newButton": "New Education",
-    "modalManage": "Manage Education",
-    "modalBatchUpdate": "Update Educations",
-    "modalRead": "Read Education"
+    "newButton": "New education",
+    "modalManage": "Education",
+    "modalBatchUpdate": "Update educations",
+    "modalRead": "View education"
   },
   "organizations": {
-    "manageTitle": "Manage Organizations",
-    "manageDescription": "Saved companies and schools to reuse on your CV.",
+    "manageTitle": "Organizations",
+    "manageDescription": "Companies and schools to reuse on your CV.",
     "entity": "organization",
     "entityPlural": "organizations",
-    "newButton": "New Organization",
-    "modalManage": "Manage Organization",
-    "modalBatchUpdate": "Update Organizations",
-    "modalRead": "Read Organization"
+    "newButton": "New organization",
+    "modalManage": "Organization",
+    "modalBatchUpdate": "Update organizations",
+    "modalRead": "View organization"
   },
   "projects": {
-    "manageTitle": "Manage Projects",
-    "manageDescription": "Work done on your own or alongside a job.",
+    "manageTitle": "Projects",
+    "manageDescription": "Freelance, volunteer work, and work done on your own.",
     "entity": "project",
     "entityPlural": "projects",
-    "newButton": "New Project",
-    "modalManage": "Manage Project",
-    "modalBatchUpdate": "Update Projects",
-    "modalRead": "Read Project"
+    "newButton": "New project",
+    "modalManage": "Project",
+    "modalBatchUpdate": "Update projects",
+    "modalRead": "View project"
   },
   "experiences": {
-    "manageTitle": "Manage Experiences",
-    "manageDescription": "Jobs and work in your history.",
+    "manageTitle": "Experience",
+    "manageDescription": "Jobs and roles in your professional history.",
     "entity": "experience",
     "entityPlural": "experiences",
-    "newButton": "New Experience",
-    "modalManage": "Manage Experience",
-    "modalBatchUpdate": "Update Experiences",
-    "modalRead": "Read Experience"
+    "newButton": "New experience",
+    "modalManage": "Experience",
+    "modalBatchUpdate": "Update experiences",
+    "modalRead": "View experience"
   },
   "apiTokens": {
-    "manageTitle": "Manage API Tokens",
-    "manageDescription": "For external systems to access your profile automatically.",
+    "manageTitle": "API tokens",
+    "manageDescription": "Keys for other systems to read or update your profile.",
     "entity": "API token",
     "entityPlural": "API tokens",
-    "newButton": "New API Token",
-    "modalManage": "Manage API Token",
-    "modalBatchUpdate": "Update API Tokens",
-    "modalRead": "Read API Token"
+    "newButton": "New API token",
+    "modalManage": "API token",
+    "modalBatchUpdate": "Update API tokens",
+    "modalRead": "View API token"
   }
 }
