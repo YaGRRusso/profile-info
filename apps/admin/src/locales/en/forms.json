@@ -261,6 +261,11 @@
     "selected_other": "{{count}} selected",
     "noOptions": "No options"
   },
+  "dateRange": {
+    "current": "Currently",
+    "from": "Start date",
+    "to": "End date"
+  },
   "submit": {
     "signIn": "Sign In",
     "reset": "Reset",

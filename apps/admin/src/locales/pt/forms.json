@@ -261,6 +261,11 @@
     "selected_other": "{{count}} selecionados",
     "noOptions": "Nenhuma opção"
   },
+  "dateRange": {
+    "current": "Atualmente",
+    "from": "Data de início",
+    "to": "Data de término"
+  },
   "submit": {
     "signIn": "Entrar",
     "reset": "Redefinir",
