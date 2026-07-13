@@ -1,4 +1,10 @@
-import { compact } from "lodash";
+import { DetailInput } from "../dto/detail.input";
+import {
+  createDetailsSection,
+  createSection,
+  createUserInputSection,
+  joinPromptSections,
+} from "../helpers/prompt.helper";
 
 export const SUMMARIZE_SYSTEM_PROMPT = `
 # Persona
@@ -29,29 +35,38 @@ Your output must compress the following information into a single cohesive narra
 `.trim();
 
 export interface SummarizeContextArgs {
-  details?: string[];
+  extractedDetails: DetailInput[];
+  extraDetails: DetailInput[];
   raw: string;
-  type: string;
+  resourceContext: {
+    type: string;
+  };
 }
 
 export const createSummarizeContextPrompt = ({
+  extractedDetails,
+  extraDetails,
   raw,
-  type,
-  details,
-}: SummarizeContextArgs) =>
-  `
-# Resource Context
-- Type: ${type}
+  resourceContext,
+}: SummarizeContextArgs) => {
+  const resourceContextSection = createSection("Resource Context", [
+    { key: "Type", value: resourceContext.type },
+  ]);
 
-# Extra Details & Context Layer:
-${compact(details)
-  ?.map((detail) => `- ${detail}`)
-  .join("\n")}
+  const extraDetailsSection = createDetailsSection(
+    "Extra Details",
+    extraDetails
+  );
+  const extractedDetailsSection = createDetailsSection(
+    "Resource Details",
+    extractedDetails
+  );
 
----
-
-# Input Data to be Processed
-<user_input>
-${raw}
-</user_input>
-`.trim();
+  const userRawInput = createUserInputSection(raw);
+  return joinPromptSections(
+    resourceContextSection,
+    extraDetailsSection,
+    extractedDetailsSection,
+    userRawInput
+  ).trim();
+};

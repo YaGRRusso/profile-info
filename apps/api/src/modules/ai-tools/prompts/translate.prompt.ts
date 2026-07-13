@@ -1,3 +1,9 @@
+import {
+  createSection,
+  createUserInputSection,
+  joinPromptSections,
+} from "../helpers/prompt.helper";
+
 export const TRANSLATE_SYSTEM_PROMPT = `
 # Persona
 You are a helpful assistant that translates text to the target language.
@@ -21,24 +27,21 @@ Translate the user's raw input text to the target language specified in the user
 
 export interface TranslateContextArgs {
   raw: string;
-  sourceLanguage?: string;
-  targetLanguage: string;
+  resourceContext: {
+    sourceLanguage?: string;
+    targetLanguage: string;
+  };
 }
 
 export const createTranslateContextPrompt = ({
   raw,
-  targetLanguage,
-  sourceLanguage,
-}: TranslateContextArgs) =>
-  `
-# Resource Context
-- Target Language: ${targetLanguage}
-- Source Language: ${sourceLanguage}
+  resourceContext,
+}: TranslateContextArgs) => {
+  const resourceContextSection = createSection("Resource Context", [
+    { key: "Target Language", value: resourceContext.targetLanguage },
+    { key: "Source Language", value: resourceContext.sourceLanguage },
+  ]);
 
----
-
-# User Raw Input
-<user_input>
-${raw}
-</user_input>
-`.trim();
+  const userRawInput = createUserInputSection(raw);
+  return joinPromptSections(resourceContextSection, userRawInput).trim();
+};

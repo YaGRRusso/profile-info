@@ -4,7 +4,10 @@ import { AtsSummarizeInput } from "./dto/ats-summarize.input";
 import { SummarizeInput } from "./dto/summarize.input";
 import { TranslateInput } from "./dto/translate.input";
 import { AiEntity } from "./entities/ai-response.entity";
-import { createDetails } from "./helpers/detail";
+import {
+  createAtsSummarizeLengthBudget,
+  createAtsSummarizeTypeRules,
+} from "./helpers/ats-context.helper";
 import { mapChatResultToEntity } from "./mappers/chat-result.mapper";
 import {
   ATS_SUMMARIZE_SYSTEM_PROMPT,
@@ -33,13 +36,12 @@ export class AiToolsService {
     type,
     details,
   }: AtsSummarizeInput): Promise<AiEntity> {
-    const parsedDetails = createDetails(details || []);
+    const extractedDetails = details
+      ? await this.resourceDetailService.getResourceDetails(details, type)
+      : [];
 
-    if (details) {
-      const resourceDetails =
-        await this.resourceDetailService.getResourceDetails(details, type);
-      parsedDetails.push(...createDetails(resourceDetails));
-    }
+    const lengthBudget = createAtsSummarizeLengthBudget(type);
+    const typeRules = createAtsSummarizeTypeRules(type);
 
     const result = await this.aiChatProvider.chat({
       messages: [
@@ -48,9 +50,14 @@ export class AiToolsService {
           role: "user",
           content: createAtsSummarizeContextPrompt({
             raw,
-            skills,
-            type,
-            details: parsedDetails,
+            resourceContext: {
+              type,
+              skillsList: skills,
+              maxLength: lengthBudget,
+            },
+            sectionFocus: typeRules,
+            extraDetails: details ?? [],
+            extractedDetails,
           }),
         },
       ],
@@ -60,13 +67,9 @@ export class AiToolsService {
   }
 
   async summarize({ raw, type, details }: SummarizeInput): Promise<AiEntity> {
-    const parsedDetails = createDetails(details || []);
-
-    if (details) {
-      const resourceDetails =
-        await this.resourceDetailService.getResourceDetails(details, type);
-      parsedDetails.push(...createDetails(resourceDetails));
-    }
+    const extractedDetails = details
+      ? await this.resourceDetailService.getResourceDetails(details, type)
+      : [];
 
     const result = await this.aiChatProvider.chat({
       messages: [
@@ -75,8 +78,9 @@ export class AiToolsService {
           role: "user",
           content: createSummarizeContextPrompt({
             raw,
-            type,
-            details: parsedDetails,
+            resourceContext: { type },
+            extraDetails: details ?? [],
+            extractedDetails,
           }),
         },
       ],
@@ -97,8 +101,7 @@ export class AiToolsService {
           role: "user",
           content: createTranslateContextPrompt({
             raw,
-            targetLanguage,
-            sourceLanguage,
+            resourceContext: { targetLanguage, sourceLanguage },
           }),
         },
       ],

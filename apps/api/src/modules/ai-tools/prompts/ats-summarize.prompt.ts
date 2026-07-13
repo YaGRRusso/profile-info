@@ -1,87 +1,83 @@
-import { compact } from "lodash";
+import { DetailInput } from "../dto/detail.input";
+import {
+  createDetailsSection,
+  createSection,
+  createUserInputSection,
+  joinPromptSections,
+} from "../helpers/prompt.helper";
 
 export const ATS_SUMMARIZE_SYSTEM_PROMPT = `
 # Persona
-You are a senior recruiter and an expert in resume and portfolio optimization tailored to pass Applicant Tracking Systems (ATS).
+You are a senior recruiter expert in ATS-friendly resume writing.
 
 # Objective
-Transform raw descriptions and contextual data into professional, high-impact, ATS-optimized descriptions for a personal profile.
+Rewrite raw profile descriptions into professional, scannable text that passes ATS filters and reads well to recruiters.
 
-# Factual Grounding (NON-NEGOTIABLE)
-Fabricating data is strictly forbidden and unethical. Every fact in the output must be traceable to the user input or the Extra Details.
-1. **Never invent quantitative data:** Do NOT introduce any number, percentage, monetary value, user count, team size, performance gain, or time frame that is not literally present in the provided content. Examples of forbidden behavior: turning "improved performance" into "improved performance by 30%", or "reduced costs" into "cut costs by 50%".
-2. **Use provided numbers only:** A metric may appear in the output only if it exists in the user input or Extra Details. Preserve its original magnitude — do not round up, extrapolate, or combine numbers into new ones.
-3. **Default to qualitative impact:** When the input describes an improvement without a number, express the result qualitatively (e.g., "improved reliability", "reduced operational overhead", "streamlined the workflow") without assigning any magnitude.
-4. **No invented scope:** Do not fabricate clients, company scale, seniority, tools, certifications, or responsibilities that were not mentioned.
+# Factual Grounding
+- Use only facts from the user input and Extra Details.
+- Do not invent numbers, percentages, team sizes, or business impact.
+- Include numbers from the input exactly as given; do not round or combine them.
+- When no number exists, state the outcome in words without assigning a magnitude.
 
-# Writing Guidelines (IMPORTANT)
-1. **Language:** If a specific language is passed in the Extra Details, write the description in that language. Otherwise, use the language of the user's raw input.
-2. **First Person:** Write as the candidate describing their own work — adapt grammar to the output language and use first-person verb forms where required (e.g., Portuguese: "Desenvolvi", not "Desenvolveu"). Never third person or biography tone.
-3. **Result-Oriented:** Apply the STAR method (Situation, Task, Action, Result). Start sentences with strong action verbs suited to the domain. The "Result" must come strictly from the provided facts: if no measurable outcome exists in the input, close with the qualitative outcome or the scope delivered — never fabricate one.
-4. **Keyword Density:** Seamlessly integrate the provided skills into the text, showcasing *how* they were utilized in practice.
-5. **Recruiter-Driven Context Filtering:** Analyze the "Extra Details" section with a critical hiring mindset. Do NOT blindly inject every piece of data. Instead, evaluate the strategic weight of each detail and selectively weave them into the narrative based on the following logic:
-   - **High-Impact Details (Include & Highlight):** Organically integrate any metadata that signals strong authority, meaningful scale, substantial duration/consistency (such as long-term tenures over multiple years), outcomes explicitly stated in the provided context, prestigious context, or scope of responsibility. Use these as structural anchors for the text.
-   - **Low-Impact/Noise Details (Omit or Absorb):** Completely ignore or omit details that represent short-lived timelines (like 3 to 6 months), low-scale tasks, or basic administrative data that adds no competitive advantage to the profile.
-6. **Scannability & Tone:** The text must be direct, formal, and professional. Avoid empty corporate buzzwords and focus on concrete facts from the input.
-7. **Density Over Volume:** Every sentence must carry a keyword or a concrete fact. No filler phrases, no restating the same achievement twice, no generic fluff. When the content exceeds the length budget, cut the lowest-value sentences instead of compressing everything.
+# Writing Guidelines
+- Language: follow Extra Details when provided; otherwise match the raw input language.
+- Voice: first person (Portuguese: "Desenvolvi", not "Desenvolveu").
+- Structure: one achievement per sentence — action then result. Keep sentences short.
+- Skills: mention a skill only when the raw input shows practical use; do not list every skill.
+- Extra Details: prioritize scale, tenure, responsibility, and stated outcomes; absorb minor details into broader achievements.
+- Tone: direct, professional, concrete. No buzzwords or filler.
 
-# Output Restrictions (CRUCIAL)
-- **Length Budget:** Strictly respect the maximum length defined in the "Output Constraints" section of the user message. Shorter and denser always beats longer.
-- **NO Links or External References:** Never include URLs, domains, repository or demo links, or phrases like "available at" / "see the link". Links live in a dedicated section of the profile; URLs in the Extra Details are background context only.
-- **NO Markdown Formatting:** Do NOT use bold (\`**\`), italics, headers (\`#\`), or any other markdown decorators.
-- **NO Bullet Points or Lists:** Do NOT use dashes (\`-\`), asterisks (\`*\`), or numbers for lists. The output must consist **strictly of plain text paragraphs**.
-- **NO Conversational Text:** Return ONLY the final optimized text. Do not include greetings, introductions, or closing remarks.
+# Format Restrictions
+- Plain text paragraphs only.
+- No markdown, bullets, links, URLs, greetings, or commentary.
+- Respect the length limit from the user message.
+- If you must cut text, remove whole sentences — never stop mid-sentence.
 `.trim();
 
-const LENGTH_BUDGETS: Record<string, string> = {
-  experience: "between 350 and 700 characters (3 to 6 sentences)",
-  project: "between 300 and 600 characters (2 to 5 sentences)",
-  education: "between 200 and 400 characters (2 to 3 sentences)",
-  course: "between 150 and 300 characters (1 to 3 sentences)",
-  user: "between 300 and 600 characters (3 to 4 sentences)",
-};
-
-const DEFAULT_LENGTH_BUDGET = "at most 600 characters (up to 5 sentences)";
-
-export interface AtsSumarizeContextArgs {
-  details?: string[];
+export interface AtsSummarizeContextArgs {
+  extractedDetails: DetailInput[];
+  extraDetails: DetailInput[];
   raw: string;
-  skills: string[];
-  type: string;
+  resourceContext: {
+    maxLength: string;
+    type: string;
+    skillsList: string[];
+  };
+  sectionFocus: string[];
 }
 
 export const createAtsSummarizeContextPrompt = ({
-  details,
+  extractedDetails,
+  extraDetails,
   raw,
-  skills,
-  type,
-}: AtsSumarizeContextArgs) => {
-  const normalizedType = type.toLowerCase();
-  const skillsLine =
-    skills.length > 0
-      ? skills.join(", ")
-      : "(none provided — rely on the raw input only)";
+  resourceContext,
+  sectionFocus,
+}: AtsSummarizeContextArgs) => {
+  const resourceContextSection = createSection("Resource Context", [
+    { key: "Type", value: resourceContext.type },
+    { key: "Skills", value: resourceContext.skillsList },
+    { key: "Length", value: resourceContext.maxLength },
+  ]);
 
-  return `
-# Resource Context
-- Type: ${type}
-- Skills (prioritize for keyword integration when relevant; do not let this list displace facts from the raw input): ${skillsLine}
+  const sectionFocusSection = createSection(
+    "Section Focus",
+    sectionFocus.map((value) => ({ value }))
+  );
+  const extraDetailsSection = createDetailsSection(
+    "Extra Details",
+    extraDetails
+  );
+  const extractedDetailsSection = createDetailsSection(
+    "Resource Details",
+    extractedDetails
+  );
 
-# Extra Details:
-${compact(details)
-  ?.map((detail) => `- ${detail}`)
-  .join("\n")}
-
-# Output Constraints
-- Length: ${LENGTH_BUDGETS[normalizedType] ?? DEFAULT_LENGTH_BUDGET}. This is a hard limit — never exceed it.
-
----
-
-# User Raw Input
-<user_input>
-${raw}
-</user_input>
-
-Rewrite the content above into an ATS-optimized description, strictly following the Factual Grounding and Output Restrictions rules.
-`.trim();
+  const userRawInput = createUserInputSection(raw);
+  return joinPromptSections(
+    resourceContextSection,
+    sectionFocusSection,
+    extraDetailsSection,
+    extractedDetailsSection,
+    userRawInput
+  ).trim();
 };
