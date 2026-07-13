@@ -1,9 +1,5 @@
 import { Injectable, NotFoundException } from "@nestjs/common";
 import { EventEmitter2 } from "@nestjs/event-emitter";
-import {
-  labelFromI18nTitle,
-  type RecentActivityRecord,
-} from "@/common/helpers/recent-activity.helper";
 import type { AuthContext } from "@/core/context/auth-context.interface";
 import { BatchEntity } from "@/core/entities/batch.entity";
 import { DomainEvents } from "@/core/events/domain-events";
@@ -12,6 +8,7 @@ import { PERSISTENCE_NOT_FOUND } from "@/core/persistence/persistence.messages";
 import type {
   FieldCount,
   MultiPaged,
+  RecentActivityRecord,
 } from "@/core/persistence/types/output.type";
 import { CreateSkillInput } from "./dto/create-skill.input";
 import { FilterSkillInput } from "./dto/filter-skill.input";
@@ -211,10 +208,8 @@ export class SkillsService {
       "slug i18n updatedAt"
     );
     return rows.map((row) => ({
-      label: labelFromI18nTitle(
-        row.slug as string,
-        row.i18n as Parameters<typeof labelFromI18nTitle>[1]
-      ),
+      slug: row.slug as string | undefined,
+      i18n: (row.i18n as RecentActivityRecord["i18n"]) ?? [],
       updatedAt: row.updatedAt,
     }));
   }

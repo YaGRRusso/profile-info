@@ -1,11 +1,10 @@
 import { Injectable } from "@nestjs/common";
-import {
-  labelFromI18nTitle,
-  RecentActivityRecord,
-} from "@/common/helpers/recent-activity.helper";
 import type { AuthContext } from "@/core/context/auth-context.interface";
 import { BatchEntity } from "@/core/entities/batch.entity";
-import type { MultiPaged } from "@/core/persistence/types/output.type";
+import type {
+  MultiPaged,
+  RecentActivityRecord,
+} from "@/core/persistence/types/output.type";
 import { OrganizationsValidatorService } from "@/modules/organizations/organizations-validator.service";
 import { SkillsValidatorService } from "@/modules/skills/skills-validator.service";
 import { CreateEducationInput } from "./dto/create-education.input";
@@ -130,10 +129,8 @@ export class EducationsService {
       .tenantStats(ctx)
       .findRecentlyUpdated(limit, "slug i18n updatedAt");
     return rows.map((row) => ({
-      label: labelFromI18nTitle(
-        row.slug as string,
-        row.i18n as Parameters<typeof labelFromI18nTitle>[1]
-      ),
+      slug: row.slug as string | undefined,
+      i18n: (row.i18n as RecentActivityRecord["i18n"]) ?? [],
       updatedAt: row.updatedAt,
     }));
   }

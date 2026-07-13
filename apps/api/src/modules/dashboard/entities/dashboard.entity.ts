@@ -1,4 +1,5 @@
 import { Field, Int, ObjectType } from "@nestjs/graphql";
+import { OptionalField } from "@/core/decorators/optional-field.decorator";
 import { DashboardActivityType } from "../enums/activity-type.enum";
 
 @ObjectType()
@@ -38,12 +39,30 @@ export class DashboardTotals {
 }
 
 @ObjectType()
+export class DashboardActivityMessages {
+  @Field(() => String)
+  title: string;
+}
+
+@ObjectType()
+export class DashboardActivityTranslationLocale {
+  @Field(() => String)
+  locale: string;
+
+  @Field(() => DashboardActivityMessages)
+  messages: DashboardActivityMessages;
+}
+
+@ObjectType()
 export class DashboardActivityItem {
   @Field(() => DashboardActivityType)
   type: DashboardActivityType;
 
-  @Field(() => String)
-  label: string;
+  @OptionalField(() => String)
+  slug?: string;
+
+  @Field(() => [DashboardActivityTranslationLocale])
+  i18n: DashboardActivityTranslationLocale[];
 
   @Field(() => Date)
   updatedAt: Date;

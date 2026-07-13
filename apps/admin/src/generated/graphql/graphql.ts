@@ -839,7 +839,7 @@ export type FindManyCoursesQuery = { findManyCourses: { found: number, nodes: Ar
 export type DashboardQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type DashboardQuery = { dashboard: { totals: { skills: number, courses: number, educations: number, organizations: number, projects: number, experiences: number, ownedLocalSkills: number, ownedLocalOrganizations: number }, experiencesByCategory: Array<{ label: string, value: number }>, coursesByStatus: Array<{ label: string, value: number }>, recentActivity: Array<{ type: DashboardActivityType, label: string, updatedAt: string }> } };
+export type DashboardQuery = { dashboard: { totals: { skills: number, courses: number, educations: number, organizations: number, projects: number, experiences: number, ownedLocalSkills: number, ownedLocalOrganizations: number }, experiencesByCategory: Array<{ label: string, value: number }>, coursesByStatus: Array<{ label: string, value: number }>, recentActivity: Array<{ type: DashboardActivityType, slug: string | null, updatedAt: string, i18n: Array<{ locale: string, messages: { title: string } }> }> } };
 
 export type FindManyEducationsQueryVariables = Exact<{
   educationFilters?: FilterEducationInput | null | undefined;
@@ -1556,7 +1556,13 @@ export const DashboardDocument = new TypedDocumentString(`
     }
     recentActivity {
       type
-      label
+      slug
+      i18n {
+        locale
+        messages {
+          title
+        }
+      }
       updatedAt
     }
   }

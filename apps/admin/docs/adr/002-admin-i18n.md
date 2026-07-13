@@ -120,7 +120,6 @@ Never build keys dynamically (`t(\`stats.${key}\`)`, `t(item.id)`). Dynamic list
 - Locale `es` in switcher / JSON (enum exists; not enabled in UI yet)
 - API / backend error messages and toasts (`main.tsx` `toast.error(error.message)`)
 - Route error boundaries (`error.tsx`)
-- API recent-activity entity labels (`i18n[0]`) — optional API follow-up
 
 ## Phased delivery
 

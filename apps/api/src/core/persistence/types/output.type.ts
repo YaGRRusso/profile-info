@@ -17,3 +17,9 @@ export interface FieldCount {
 }
 
 export type RecentUpdateRow = Record<string, unknown> & { updatedAt: Date };
+
+export interface RecentActivityRecord {
+  i18n: Array<{ locale: string; messages: { title: string } }>;
+  slug?: string;
+  updatedAt: Date;
+}

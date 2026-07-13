@@ -10,12 +10,13 @@ import {
 import { Link } from "@tanstack/react-router";
 import type { ReactNode } from "react";
 import { useTranslation } from "react-i18next";
-import type { DashboardActivityType } from "@/generated/graphql/graphql";
 import { formatRelativeTime } from "@/lib/dayjs";
+import { i18nLabel } from "@/lib/i18n";
 
 interface RecentActivityItem {
-  label: string;
-  type: DashboardActivityType;
+  i18n?: Array<{ locale: string; messages: { title: string } }>;
+  slug?: string | null;
+  type: string;
   updatedAt: string;
 }
 
@@ -74,7 +75,8 @@ export function RecentActivity({ items }: RecentActivityProps) {
       ) : (
         <ul className="menu w-full rounded-box p-0">
           {items.map((item) => {
-            const key = `${item.type}-${item.label}-${item.updatedAt}`;
+            const key = `${item.type}-${item.slug}-${item.updatedAt}`;
+            const label = i18nLabel(item);
 
             switch (item.type) {
               case "COURSE":
@@ -83,7 +85,7 @@ export function RecentActivity({ items }: RecentActivityProps) {
                     href="/courses"
                     icon={<CertificateIcon size={20} weight="duotone" />}
                     key={key}
-                    label={item.label}
+                    label={label}
                     typeLabel={tDashboard("recentActivity.types.COURSE")}
                     updatedAt={item.updatedAt}
                   />
@@ -94,7 +96,7 @@ export function RecentActivity({ items }: RecentActivityProps) {
                     href="/educations"
                     icon={<GraduationCapIcon size={20} weight="duotone" />}
                     key={key}
-                    label={item.label}
+                    label={label}
                     typeLabel={tDashboard("recentActivity.types.EDUCATION")}
                     updatedAt={item.updatedAt}
                   />
@@ -105,7 +107,7 @@ export function RecentActivity({ items }: RecentActivityProps) {
                     href="/experiences"
                     icon={<BriefcaseIcon size={20} weight="duotone" />}
                     key={key}
-                    label={item.label}
+                    label={label}
                     typeLabel={tDashboard("recentActivity.types.EXPERIENCE")}
                     updatedAt={item.updatedAt}
                   />
@@ -116,7 +118,7 @@ export function RecentActivity({ items }: RecentActivityProps) {
                     href="/organizations"
                     icon={<BuildingsIcon size={20} weight="duotone" />}
                     key={key}
-                    label={item.label}
+                    label={label}
                     typeLabel={tDashboard("recentActivity.types.ORGANIZATION")}
                     updatedAt={item.updatedAt}
                   />
@@ -127,7 +129,7 @@ export function RecentActivity({ items }: RecentActivityProps) {
                     href="/projects"
                     icon={<RocketLaunchIcon size={20} weight="duotone" />}
                     key={key}
-                    label={item.label}
+                    label={label}
                     typeLabel={tDashboard("recentActivity.types.PROJECT")}
                     updatedAt={item.updatedAt}
                   />
@@ -138,15 +140,13 @@ export function RecentActivity({ items }: RecentActivityProps) {
                     href="/skills"
                     icon={<PackageIcon size={20} weight="duotone" />}
                     key={key}
-                    label={item.label}
+                    label={label}
                     typeLabel={tDashboard("recentActivity.types.SKILL")}
                     updatedAt={item.updatedAt}
                   />
                 );
-              default: {
-                const _exhaustiveCheck: never = item.type;
-                return _exhaustiveCheck;
-              }
+              default:
+                return null;
             }
           })}
         </ul>

@@ -248,9 +248,19 @@ input CreateUserMessagesInputTranslationInput {
 }
 
 type DashboardActivityItem {
-  label: String!
+  i18n: [DashboardActivityTranslationLocale!]!
+  slug: String
   type: DashboardActivityType!
   updatedAt: DateTime!
+}
+
+type DashboardActivityMessages {
+  title: String!
+}
+
+type DashboardActivityTranslationLocale {
+  locale: String!
+  messages: DashboardActivityMessages!
 }
 
 enum DashboardActivityType {

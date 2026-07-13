@@ -25,7 +25,13 @@ const dashboard = graphql(`
       }
       recentActivity {
         type
-        label
+        slug
+        i18n {
+          locale
+          messages {
+            title
+          }
+        }
         updatedAt
       }
     }

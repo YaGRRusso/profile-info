@@ -1,6 +1,5 @@
 import { Injectable, NotFoundException } from "@nestjs/common";
 import { EventEmitter2 } from "@nestjs/event-emitter";
-import { RecentActivityRecord } from "@/common/helpers/recent-activity.helper";
 import type { AuthContext } from "@/core/context/auth-context.interface";
 import { BatchEntity } from "@/core/entities/batch.entity";
 import { DomainEvents } from "@/core/events/domain-events";
@@ -9,6 +8,7 @@ import { PERSISTENCE_NOT_FOUND } from "@/core/persistence/persistence.messages";
 import type {
   FieldCount,
   MultiPaged,
+  RecentActivityRecord,
 } from "@/core/persistence/types/output.type";
 import { CreateOrganizationInput } from "./dto/create-organization.input";
 import { FilterOrganizationInput } from "./dto/filter-organization.input";
@@ -216,7 +216,8 @@ export class OrganizationsService {
       "name updatedAt"
     );
     return rows.map((row) => ({
-      label: row.name as string,
+      slug: row.name as string,
+      i18n: [],
       updatedAt: row.updatedAt,
     }));
   }

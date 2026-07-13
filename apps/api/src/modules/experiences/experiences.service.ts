@@ -1,10 +1,10 @@
 import { Injectable } from "@nestjs/common";
-import { RecentActivityRecord } from "@/common/helpers/recent-activity.helper";
 import type { AuthContext } from "@/core/context/auth-context.interface";
 import { BatchEntity } from "@/core/entities/batch.entity";
 import type {
   FieldCount,
   MultiPaged,
+  RecentActivityRecord,
 } from "@/core/persistence/types/output.type";
 import { OrganizationsValidatorService } from "@/modules/organizations/organizations-validator.service";
 import { SkillsValidatorService } from "@/modules/skills/skills-validator.service";
@@ -133,13 +133,15 @@ export class ExperiencesService {
     const rows = await this.repository
       .tenantStats(ctx)
       .findRecentlyUpdated(limit, "slug roles updatedAt");
+
     return rows.map((row) => {
       const roles = row.roles as
-        | Array<{ i18n?: Array<{ messages?: { title?: string } }> }>
+        | Array<{ i18n?: RecentActivityRecord["i18n"] }>
         | undefined;
-      const title = roles?.[0]?.i18n?.[0]?.messages?.title;
+
       return {
-        label: title ?? (row.slug as string),
+        slug: row.slug as string | undefined,
+        i18n: roles?.[0]?.i18n ?? [],
         updatedAt: row.updatedAt,
       };
     });

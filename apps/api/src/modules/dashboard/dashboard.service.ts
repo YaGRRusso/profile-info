@@ -1,6 +1,6 @@
 import { Injectable } from "@nestjs/common";
-import { RecentActivityRecord } from "@/common/helpers/recent-activity.helper";
 import type { AuthContext } from "@/core/context/auth-context.interface";
+import type { RecentActivityRecord } from "@/core/persistence/types/output.type";
 import { CoursesService } from "@/modules/courses/courses.service";
 import { EducationsService } from "@/modules/educations/educations.service";
 import { ExperiencesService } from "@/modules/experiences/experiences.service";
@@ -104,13 +104,7 @@ export class DashboardService {
     }>
   ) {
     return groups
-      .flatMap(({ type, items }) =>
-        items.map((item) => ({
-          type,
-          label: item.label,
-          updatedAt: item.updatedAt,
-        }))
-      )
+      .flatMap(({ type, items }) => items.map((item) => ({ type, ...item })))
       .sort((a, b) => b.updatedAt.getTime() - a.updatedAt.getTime())
       .slice(0, RECENT_ACTIVITY_LIMIT);
   }
