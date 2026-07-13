@@ -70,7 +70,7 @@ Adding a form: copy `src/forms/skill.tsx` (Zod + TanStack Form + generic inputs)
 
 Adding a page: route under `src/routes/_authenticated/_sidebar/`; page components in `-components/`.
 
-Keep `components/`, `hooks/custom/`, and `lib/` domain-agnostic.
+Keep `components/`, `hooks/custom/`, and `lib/` domain-agnostic. Table toolbar chrome lives in `components/table/` (`VisibilityButton`, `FiltersButton`, `FiltersSelect`, `FiltersRadio`, `FiltersRange` + `DATE_FILTER_OPTIONS`).
 
 ## Environment variables
 

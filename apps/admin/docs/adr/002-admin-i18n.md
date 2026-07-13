@@ -44,7 +44,7 @@ It drives UI strings, `i18nLabel` (via `i18n.language`), and `dayjs` (`languageC
 | Settings / home route | `tPage`, `tHelp`, `tAlert` (omit unused) | `tPage("settings.title")` |
 | System header alerts | `tSystem` at call site; store holds `title` / `description` | `title: tSystem("profileUnsaved")` |
 | Table toolbar | `tAction` only | `tAction("clearAll")` |
-| Table search / relevance placeholders | `tTable` | `tTable("search")`, `tTable("relevanceMin", { value })` |
+| Table search / range placeholders | `tTable` | `tTable("search")`; `FiltersRange` uses `tTable("rangeMin"|"rangeMax")` internally |
 | Table + `i18nLabel` in cells | `tAction`, `tTable`, then `i18n` / `locale` | `i18nLabel(skill, locale)` |
 | Actions chrome (modal backdrop, download CV, profile save) | `tAction` | `tAction("close")` |
 | Sidebar nav | `tNav` | `tNav("skills")` |
@@ -88,7 +88,7 @@ Never build keys dynamically (`t(\`stats.${key}\`)`, `t(item.id)`). Dynamic list
 | Dashboard widgets | `dashboard.json`; stats, charts, profile completeness, recent activity |
 | Login chrome | `login.json` — page title/subtitle; `UserForm` in `forms.json` |
 | Table toolbar buttons | `useTranslation("actions")` in `*-components/table.tsx` |
-| Table search + relevance min/max placeholders | `useTranslation("tables")` as `tTable` in `*-components/table.tsx` |
+| Table search + range min/max placeholders | `useTranslation("tables")` as `tTable` — search in `*-components/table.tsx`; `rangeMin`/`rangeMax` inside `FiltersRange` |
 
 **`alerts.json` key naming:**
 

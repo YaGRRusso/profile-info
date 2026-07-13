@@ -3,10 +3,8 @@ import {
   ArrowsDownUpIcon,
   ArrowUpIcon,
   EyeIcon,
-  GearIcon,
   MagnifyingGlassIcon,
   PencilIcon,
-  SlidersHorizontalIcon,
   TrashSimpleIcon,
   XIcon,
 } from "@phosphor-icons/react";
@@ -31,6 +29,13 @@ import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { z } from "zod";
 import { BadgeList } from "@/components/display/badge-list";
+import { FiltersButton } from "@/components/table/filters-button";
+import {
+  DATE_FILTER_OPTIONS,
+  FiltersRadio,
+} from "@/components/table/filters-radio";
+import { FiltersSelect } from "@/components/table/filters-select";
+import { VisibilityButton } from "@/components/table/visibility-button";
 import { ApiTokenPermission } from "@/generated/graphql/graphql";
 import { useActiveFilters } from "@/hooks/custom/use-active-filters";
 import { usePersistedState } from "@/hooks/custom/use-persisted-state";
@@ -74,12 +79,6 @@ const STATUS_LABELS: Array<{
   { value: "active", label: "Active" },
   { value: "expired", label: "Expired" },
   { value: "no-expiry", label: "No expiry" },
-];
-
-const DATE_OPTIONS = [
-  { value: "", label: "Any date" },
-  { value: "week", label: "Last 7 days" },
-  { value: "month", label: "This month" },
 ];
 
 export function isApiTokenExpired(expiresAt?: string | null): boolean {
@@ -463,153 +462,47 @@ export function ApiTokensTable({
         </div>
 
         <div className="flex min-w-64 flex-1 items-center gap-2">
-          <select
-            className="select flex-1 bg-base-200"
-            disabled={!permissionFacets.length}
-            onChange={(event) => setPermission(event.target.value || null)}
-            value={permission ?? ""}
-          >
-            <option value="">All permissions</option>
-            {permissionFacets.map(({ value, label, count }) => (
-              <option key={value} value={value}>
-                {label} ({count})
-              </option>
-            ))}
-          </select>
+          <FiltersSelect
+            allLabel="All permissions"
+            onChange={setPermission}
+            options={permissionFacets}
+            value={permission}
+          />
 
-          <div className="dropdown dropdown-bottom dropdown-end">
-            <button className="btn btn-square btn-soft" type="button">
-              <SlidersHorizontalIcon />
-            </button>
-            <div className="dropdown-content z-10 w-52 rounded-box bg-base-200 p-4">
-              <fieldset className="flex flex-col gap-2">
-                <span className="font-semibold">Status</span>
-                <label className="flex items-center gap-2 text-sm">
-                  <input
-                    checked={!status}
-                    className="radio radio-sm"
-                    name="status"
-                    onChange={() => setStatus(null)}
-                    type="radio"
-                    value=""
-                  />
-                  <span>All statuses</span>
-                </label>
-                {statusFacets.map(({ value, label, count }) => (
-                  <label
-                    className="flex items-center gap-2 text-sm"
-                    key={value}
-                  >
-                    <input
-                      checked={status === value}
-                      className="radio radio-sm"
-                      name="status"
-                      onChange={() => setStatus(value)}
-                      type="radio"
-                      value={value}
-                    />
-                    <span>
-                      {label} ({count})
-                    </span>
-                  </label>
-                ))}
-              </fieldset>
-              <div className="divider mt-2 mb-0" />
-              <fieldset className="flex flex-col gap-2">
-                <span className="font-semibold">Created</span>
-                {DATE_OPTIONS.map(({ value, label }) => (
-                  <label
-                    className="flex items-center gap-2 text-sm"
-                    key={value}
-                  >
-                    <input
-                      checked={
-                        createdAt === value || (!createdAt && value === "")
-                      }
-                      className="radio radio-sm"
-                      name="created"
-                      onChange={() => setCreatedAt(value || null)}
-                      type="radio"
-                      value={value}
-                    />
-                    <span>{label}</span>
-                  </label>
-                ))}
-              </fieldset>
-              <div className="divider mt-2 mb-0" />
-              <fieldset className="flex flex-col gap-2">
-                <span className="font-semibold">Updated</span>
-                {DATE_OPTIONS.map(({ value, label }) => (
-                  <label
-                    className="flex items-center gap-2 text-sm"
-                    key={value}
-                  >
-                    <input
-                      checked={
-                        updatedAt === value || (!updatedAt && value === "")
-                      }
-                      className="radio radio-sm"
-                      name="updated"
-                      onChange={() => setUpdatedAt(value || null)}
-                      type="radio"
-                      value={value}
-                    />
-                    <span>{label}</span>
-                  </label>
-                ))}
-              </fieldset>
-              <div className="divider mt-2 mb-0" />
-              <fieldset className="flex flex-col gap-2">
-                <span className="font-semibold">Expires</span>
-                {DATE_OPTIONS.map(({ value, label }) => (
-                  <label
-                    className="flex items-center gap-2 text-sm"
-                    key={value}
-                  >
-                    <input
-                      checked={
-                        expiresAt === value || (!expiresAt && value === "")
-                      }
-                      className="radio radio-sm"
-                      name="expires"
-                      onChange={() => setExpiresAt(value || null)}
-                      type="radio"
-                      value={value}
-                    />
-                    <span>{label}</span>
-                  </label>
-                ))}
-              </fieldset>
-            </div>
-          </div>
+          <FiltersSelect
+            allLabel="All statuses"
+            onChange={setStatus}
+            options={statusFacets}
+            value={status}
+          />
 
-          <div className="dropdown dropdown-bottom dropdown-end">
-            <button className="btn btn-square btn-soft" type="button">
-              <GearIcon />
-            </button>
-            <div className="dropdown-content z-10 w-40 rounded-box bg-base-200 p-4">
-              <div className="flex flex-col gap-2">
-                <span className="font-semibold">Visibility</span>
-                {table
-                  .getAllColumns()
-                  .filter((col) => col.getCanHide())
-                  .map((col) => (
-                    <label
-                      className="flex items-center gap-2 text-sm"
-                      key={col.id}
-                    >
-                      <input
-                        checked={col.getIsVisible()}
-                        className="checkbox checkbox-sm"
-                        onChange={col.getToggleVisibilityHandler()}
-                        type="checkbox"
-                      />
-                      <span>{col.columnDef.header as string}</span>
-                    </label>
-                  ))}
-              </div>
-            </div>
-          </div>
+          <FiltersButton>
+            <FiltersRadio
+              label="Created"
+              name="created"
+              onChange={setCreatedAt}
+              options={DATE_FILTER_OPTIONS}
+              value={createdAt}
+            />
+            <div className="divider" />
+            <FiltersRadio
+              label="Updated"
+              name="updated"
+              onChange={setUpdatedAt}
+              options={DATE_FILTER_OPTIONS}
+              value={updatedAt}
+            />
+            <div className="divider" />
+            <FiltersRadio
+              label="Expires"
+              name="expires"
+              onChange={setExpiresAt}
+              options={DATE_FILTER_OPTIONS}
+              value={expiresAt}
+            />
+          </FiltersButton>
+
+          <VisibilityButton columns={table.getAllColumns()} />
         </div>
       </div>
 

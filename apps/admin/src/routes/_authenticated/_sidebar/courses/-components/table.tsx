@@ -3,10 +3,8 @@ import {
   ArrowsDownUpIcon,
   ArrowUpIcon,
   EyeIcon,
-  GearIcon,
   MagnifyingGlassIcon,
   PencilIcon,
-  SlidersHorizontalIcon,
   TrashSimpleIcon,
   XIcon,
 } from "@phosphor-icons/react";
@@ -33,6 +31,14 @@ import { z } from "zod";
 import { BadgeList } from "@/components/display/badge-list";
 import { EmptyValue } from "@/components/display/empty-value";
 import { Link } from "@/components/display/link";
+import { FiltersButton } from "@/components/table/filters-button";
+import {
+  DATE_FILTER_OPTIONS,
+  FiltersRadio,
+} from "@/components/table/filters-radio";
+import { FiltersRange } from "@/components/table/filters-range";
+import { FiltersSelect } from "@/components/table/filters-select";
+import { VisibilityButton } from "@/components/table/visibility-button";
 import { CourseStatus, UserRole } from "@/generated/graphql/graphql";
 import { useActiveFilters } from "@/hooks/custom/use-active-filters";
 import { usePersistedState } from "@/hooks/custom/use-persisted-state";
@@ -83,12 +89,6 @@ const STATUS_LABELS: { value: CourseStatus; label: string }[] = [
   { value: CourseStatus.Complete, label: "Complete" },
   { value: CourseStatus.Incomplete, label: "Incomplete" },
   { value: CourseStatus.InProgress, label: "In Progress" },
-];
-
-const DATE_OPTIONS: { value: string; label: string }[] = [
-  { value: "", label: "Any date" },
-  { value: "week", label: "Last 7 days" },
-  { value: "month", label: "This month" },
 ];
 
 const RESTRICTED_COLUMNS: RestrictedColumns = {
@@ -392,18 +392,6 @@ export function CoursesTable({
     onColumnVisibilityChange: setColumnVisibility,
   });
 
-  function setRelevanceFilter(inputIndex: 0 | 1, rawValue: string) {
-    const parsedValue = rawValue === "" ? undefined : Number(rawValue);
-    const nextRange: [number | undefined, number | undefined] = [
-      relevance?.min,
-      relevance?.max,
-    ];
-    nextRange[inputIndex] = parsedValue;
-    const [nextMin, nextMax] = nextRange;
-    const hasAnyValue = nextMin !== undefined || nextMax !== undefined;
-    setRelevance(hasAnyValue ? { min: nextMin, max: nextMax } : null);
-  }
-
   const selected = data.filter((course) => rowSelection[course.id]);
 
   const statusFacets = getUniqueFacets(
@@ -461,129 +449,46 @@ export function CoursesTable({
         </div>
 
         <div className="flex min-w-64 flex-1 items-center gap-2">
-          <select
-            className="select flex-1 bg-base-200"
-            disabled={!statusFacets.length}
-            onChange={(event) => setStatus(event.target.value || null)}
-            value={status ?? ""}
-          >
-            <option value="">All statuses</option>
-            {statusFacets.map(({ value, label, count }) => (
-              <option key={value} value={value}>
-                {label} ({count})
-              </option>
-            ))}
-          </select>
+          <FiltersSelect
+            allLabel="All statuses"
+            onChange={setStatus}
+            options={statusFacets}
+            value={status}
+          />
 
-          <div className="dropdown dropdown-bottom dropdown-end">
-            <button className="btn btn-square btn-soft" type="button">
-              <SlidersHorizontalIcon />
-            </button>
-            <div className="dropdown-content z-10 w-52 rounded-box bg-base-200 p-4">
-              <fieldset className="flex flex-col gap-2">
-                <span className="font-semibold">Relevance</span>
-                <div className="flex items-center gap-2">
-                  <input
-                    className="input input-sm w-full"
-                    max={relevanceFacets.max ?? 100}
-                    min={relevanceFacets.min ?? 0}
-                    onChange={(e) => setRelevanceFilter(0, e.target.value)}
-                    placeholder={tTable("relevanceMin", {
-                      value: relevanceFacets.min ?? "–",
-                    })}
-                    type="number"
-                    value={relevance?.min ?? ""}
-                  />
-                  <input
-                    className="input input-sm w-full"
-                    max={relevanceFacets.max ?? 100}
-                    min={relevanceFacets.min ?? 0}
-                    onChange={(e) => setRelevanceFilter(1, e.target.value)}
-                    placeholder={tTable("relevanceMax", {
-                      value: relevanceFacets.max ?? "–",
-                    })}
-                    type="number"
-                    value={relevance?.max ?? ""}
-                  />
-                </div>
-              </fieldset>
-              <div className="divider mt-2 mb-0" />
-              <fieldset className="flex flex-col gap-2">
-                <span className="font-semibold">Created</span>
-                {DATE_OPTIONS.map(({ value, label }) => (
-                  <label
-                    className="flex items-center gap-2 text-sm"
-                    key={value}
-                  >
-                    <input
-                      checked={
-                        createdAt === value || (!createdAt && value === "")
-                      }
-                      className="radio radio-sm"
-                      name="created"
-                      onChange={() => setCreatedAt(value || null)}
-                      type="radio"
-                      value={value}
-                    />
-                    <span>{label}</span>
-                  </label>
-                ))}
-              </fieldset>
-              <div className="divider mt-2 mb-0" />
-              <fieldset className="flex flex-col gap-2">
-                <span className="font-semibold">Updated</span>
-                {DATE_OPTIONS.map(({ value, label }) => (
-                  <label
-                    className="flex items-center gap-2 text-sm"
-                    key={value}
-                  >
-                    <input
-                      checked={
-                        updatedAt === value || (!updatedAt && value === "")
-                      }
-                      className="radio radio-sm"
-                      name="updated"
-                      onChange={() => setUpdatedAt(value || null)}
-                      type="radio"
-                      value={value}
-                    />
-                    <span>{label}</span>
-                  </label>
-                ))}
-              </fieldset>
-            </div>
-          </div>
+          <FiltersButton>
+            <FiltersRange
+              label="Relevance"
+              max={relevanceFacets.max}
+              min={relevanceFacets.min}
+              onChange={setRelevance}
+              value={relevance}
+            />
+            <div className="divider" />
+            <FiltersRadio
+              label="Created"
+              name="created"
+              onChange={setCreatedAt}
+              options={DATE_FILTER_OPTIONS}
+              value={createdAt}
+            />
+            <div className="divider" />
+            <FiltersRadio
+              label="Updated"
+              name="updated"
+              onChange={setUpdatedAt}
+              options={DATE_FILTER_OPTIONS}
+              value={updatedAt}
+            />
+          </FiltersButton>
 
-          <div className="dropdown dropdown-bottom dropdown-end">
-            <button className="btn btn-square btn-soft" type="button">
-              <GearIcon />
-            </button>
-            <div className="dropdown-content z-10 w-40 rounded-box bg-base-200 p-4">
-              <div className="flex flex-col gap-2">
-                <span className="font-semibold">Visibility</span>
-                {table
-                  .getAllColumns()
-                  .filter((col) => col.getCanHide())
-                  .filter((col) =>
-                    canSeeColumn(RESTRICTED_COLUMNS, col.id, userRole)
-                  )
-                  .map((col) => (
-                    <label
-                      className="flex items-center gap-2 text-sm"
-                      key={col.id}
-                    >
-                      <input
-                        checked={col.getIsVisible()}
-                        className="checkbox checkbox-sm"
-                        onChange={col.getToggleVisibilityHandler()}
-                        type="checkbox"
-                      />
-                      <span>{col.columnDef.header as string}</span>
-                    </label>
-                  ))}
-              </div>
-            </div>
-          </div>
+          <VisibilityButton
+            columns={table
+              .getAllColumns()
+              .filter((col) =>
+                canSeeColumn(RESTRICTED_COLUMNS, col.id, userRole)
+              )}
+          />
         </div>
       </div>
 
