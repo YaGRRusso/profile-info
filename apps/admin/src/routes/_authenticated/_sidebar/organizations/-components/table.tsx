@@ -143,11 +143,11 @@ const getColumns = (
       <span className="font-mono text-xs">{data.getValue()}</span>
     ),
   }),
-  columnHelper.accessor("name", {
-    header: "Name",
-  }),
   columnHelper.accessor("slug", {
     header: "Slug",
+  }),
+  columnHelper.accessor("name", {
+    header: "Name",
   }),
   columnHelper.accessor("category", {
     header: "Category",
@@ -178,40 +178,6 @@ const getColumns = (
       </span>
     ),
   }),
-  columnHelper.accessor((row) => row.owner?.nickname ?? "", {
-    id: "owner",
-    header: "Owner",
-    enableGlobalFilter: false,
-    enableSorting: false,
-    cell: (data) => {
-      const value = data.getValue();
-      if (isEmptyValue(value)) return <EmptyValue />;
-      return <span className="badge badge-soft badge-sm">{value}</span>;
-    },
-  }),
-  columnHelper.accessor("logo", {
-    header: "Logo",
-    enableGlobalFilter: false,
-    enableSorting: false,
-    cell: (data) => {
-      const url = data.getValue();
-      if (!url) return <EmptyValue />;
-      return <Link href={url} />;
-    },
-  }),
-  columnHelper.accessor("website", {
-    header: "Website",
-    enableGlobalFilter: false,
-    cell: (data) => {
-      const url = data.getValue();
-      if (!url) return <EmptyValue />;
-      return (
-        <a className="link" href={url} rel="noreferrer" target="_blank">
-          {url}
-        </a>
-      );
-    },
-  }),
   columnHelper.accessor("disabled", {
     header: "Status",
     enableGlobalFilter: false,
@@ -226,6 +192,40 @@ const getColumns = (
         {data.getValue() ? "Disabled" : "Active"}
       </span>
     ),
+  }),
+  columnHelper.accessor("website", {
+    header: "Website",
+    enableGlobalFilter: false,
+    cell: (data) => {
+      const url = data.getValue();
+      if (!url) return <EmptyValue />;
+      return (
+        <a className="link" href={url} rel="noreferrer" target="_blank">
+          {url}
+        </a>
+      );
+    },
+  }),
+  columnHelper.accessor("logo", {
+    header: "Logo",
+    enableGlobalFilter: false,
+    enableSorting: false,
+    cell: (data) => {
+      const url = data.getValue();
+      if (!url) return <EmptyValue />;
+      return <Link href={url} />;
+    },
+  }),
+  columnHelper.accessor((row) => row.owner?.nickname ?? "", {
+    id: "owner",
+    header: "Owner",
+    enableGlobalFilter: false,
+    enableSorting: false,
+    cell: (data) => {
+      const value = data.getValue();
+      if (isEmptyValue(value)) return <EmptyValue />;
+      return <span className="badge badge-soft badge-sm">{value}</span>;
+    },
   }),
   columnHelper.accessor("createdAt", {
     header: "Created",

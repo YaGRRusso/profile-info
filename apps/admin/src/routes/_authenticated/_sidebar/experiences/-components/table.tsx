@@ -156,16 +156,14 @@ const getColumns = (
       },
     }
   ),
-  columnHelper.accessor((row) => row.owner?.nickname ?? "", {
-    id: "owner",
-    header: "Owner",
+  columnHelper.accessor("relevance", {
+    header: "Relevance",
+    enableColumnFilter: true,
     enableGlobalFilter: false,
-    enableSorting: false,
-    cell: (data) => {
-      const value = data.getValue();
-      if (isEmptyValue(value)) return <EmptyValue />;
-      return <span className="badge badge-soft badge-sm">{value}</span>;
-    },
+    filterFn: numberRangeFilter,
+    cell: (data) => (
+      <span className="badge badge-soft badge-sm">{data.getValue()}</span>
+    ),
   }),
   columnHelper.accessor((row) => row.organization?.name ?? "", {
     id: "organization",
@@ -186,15 +184,6 @@ const getColumns = (
     id: "roles",
     header: "Roles",
     enableGlobalFilter: false,
-    cell: (data) => (
-      <span className="badge badge-soft badge-sm">{data.getValue()}</span>
-    ),
-  }),
-  columnHelper.accessor("relevance", {
-    header: "Relevance",
-    enableColumnFilter: true,
-    enableGlobalFilter: false,
-    filterFn: numberRangeFilter,
     cell: (data) => (
       <span className="badge badge-soft badge-sm">{data.getValue()}</span>
     ),
@@ -222,6 +211,17 @@ const getColumns = (
       cell: (data) => <BadgeList values={data.getValue()} />,
     }
   ),
+  columnHelper.accessor((row) => row.owner?.nickname ?? "", {
+    id: "owner",
+    header: "Owner",
+    enableGlobalFilter: false,
+    enableSorting: false,
+    cell: (data) => {
+      const value = data.getValue();
+      if (isEmptyValue(value)) return <EmptyValue />;
+      return <span className="badge badge-soft badge-sm">{value}</span>;
+    },
+  }),
   columnHelper.accessor("createdAt", {
     header: "Created",
     enableColumnFilter: true,

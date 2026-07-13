@@ -173,6 +173,17 @@ const getColumns = (
   columnHelper.accessor("name", {
     header: "Name",
   }),
+  columnHelper.accessor((row) => tokenStatus(row.expiresAt), {
+    id: "status",
+    header: "Status",
+    enableColumnFilter: true,
+    enableSorting: false,
+    enableGlobalFilter: false,
+    filterFn: "equals",
+    cell: (data) => (
+      <span className="badge badge-soft badge-sm">{data.getValue()}</span>
+    ),
+  }),
   columnHelper.accessor("permissions", {
     header: "Permissions",
     enableColumnFilter: true,
@@ -188,17 +199,6 @@ const getColumns = (
       <BadgeList
         values={data.getValue().map((permission) => permission.toString())}
       />
-    ),
-  }),
-  columnHelper.accessor((row) => tokenStatus(row.expiresAt), {
-    id: "status",
-    header: "Status",
-    enableColumnFilter: true,
-    enableSorting: false,
-    enableGlobalFilter: false,
-    filterFn: "equals",
-    cell: (data) => (
-      <span className="badge badge-soft badge-sm">{data.getValue()}</span>
     ),
   }),
   columnHelper.accessor("expiresAt", {

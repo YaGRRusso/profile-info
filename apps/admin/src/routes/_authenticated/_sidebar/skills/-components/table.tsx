@@ -178,24 +178,6 @@ const getColumns = (
       </span>
     ),
   }),
-  columnHelper.accessor((row) => row.owner?.nickname ?? "", {
-    id: "owner",
-    header: "Owner",
-    enableGlobalFilter: false,
-    enableSorting: false,
-    cell: (data) => {
-      const value = data.getValue();
-      if (isEmptyValue(value)) return <EmptyValue />;
-      return <span className="badge badge-soft badge-sm">{value}</span>;
-    },
-  }),
-  columnHelper.accessor((row) => row.i18n.map((entry) => entry.locale), {
-    id: "languages",
-    header: "Languages",
-    enableGlobalFilter: false,
-    enableSorting: false,
-    cell: (data) => <BadgeList values={data.getValue()} />,
-  }),
   columnHelper.accessor("disabled", {
     header: "Status",
     enableGlobalFilter: false,
@@ -210,6 +192,24 @@ const getColumns = (
         {data.getValue() ? "Disabled" : "Active"}
       </span>
     ),
+  }),
+  columnHelper.accessor((row) => row.i18n.map((entry) => entry.locale), {
+    id: "languages",
+    header: "Languages",
+    enableGlobalFilter: false,
+    enableSorting: false,
+    cell: (data) => <BadgeList values={data.getValue()} />,
+  }),
+  columnHelper.accessor((row) => row.owner?.nickname ?? "", {
+    id: "owner",
+    header: "Owner",
+    enableGlobalFilter: false,
+    enableSorting: false,
+    cell: (data) => {
+      const value = data.getValue();
+      if (isEmptyValue(value)) return <EmptyValue />;
+      return <span className="badge badge-soft badge-sm">{value}</span>;
+    },
   }),
   columnHelper.accessor("createdAt", {
     header: "Created",

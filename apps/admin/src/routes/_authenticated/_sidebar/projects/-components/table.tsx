@@ -142,17 +142,6 @@ const getColumns = (
       return value;
     },
   }),
-  columnHelper.accessor((row) => row.owner?.nickname ?? "", {
-    id: "owner",
-    header: "Owner",
-    enableGlobalFilter: false,
-    enableSorting: false,
-    cell: (data) => {
-      const value = data.getValue();
-      if (isEmptyValue(value)) return <EmptyValue />;
-      return <span className="badge badge-soft badge-sm">{value}</span>;
-    },
-  }),
   columnHelper.accessor("relevance", {
     header: "Relevance",
     enableColumnFilter: true,
@@ -172,13 +161,12 @@ const getColumns = (
       cell: (data) => <BadgeList values={data.getValue()} />,
     }
   ),
-  columnHelper.accessor((row) => row.images?.length ?? 0, {
-    id: "images",
-    header: "Images",
+  columnHelper.accessor((row) => row.i18n.map((entry) => entry.locale), {
+    id: "languages",
+    header: "Languages",
     enableGlobalFilter: false,
-    cell: (data) => (
-      <span className="badge badge-soft badge-sm">{data.getValue()}</span>
-    ),
+    enableSorting: false,
+    cell: (data) => <BadgeList values={data.getValue()} />,
   }),
   columnHelper.accessor((row) => row.urls?.map((url) => url.title) ?? [], {
     id: "links",
@@ -187,12 +175,24 @@ const getColumns = (
     enableSorting: false,
     cell: (data) => <BadgeList values={data.getValue()} />,
   }),
-  columnHelper.accessor((row) => row.i18n.map((entry) => entry.locale), {
-    id: "languages",
-    header: "Languages",
+  columnHelper.accessor((row) => row.images?.length ?? 0, {
+    id: "images",
+    header: "Images",
+    enableGlobalFilter: false,
+    cell: (data) => (
+      <span className="badge badge-soft badge-sm">{data.getValue()}</span>
+    ),
+  }),
+  columnHelper.accessor((row) => row.owner?.nickname ?? "", {
+    id: "owner",
+    header: "Owner",
     enableGlobalFilter: false,
     enableSorting: false,
-    cell: (data) => <BadgeList values={data.getValue()} />,
+    cell: (data) => {
+      const value = data.getValue();
+      if (isEmptyValue(value)) return <EmptyValue />;
+      return <span className="badge badge-soft badge-sm">{value}</span>;
+    },
   }),
   columnHelper.accessor("createdAt", {
     header: "Created",
