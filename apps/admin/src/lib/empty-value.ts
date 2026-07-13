@@ -9,7 +9,3 @@ export function isEmptyValue(value: unknown): boolean {
   }
   return false;
 }
-
-export function formatDisplayValue(value: unknown): string {
-  return isEmptyValue(value) ? EMPTY_MARKER : String(value);
-}

@@ -39,7 +39,7 @@ import { usePersistedState } from "@/hooks/custom/use-persisted-state";
 import { useStableValue } from "@/hooks/custom/use-stable-value";
 import type { CourseRow } from "@/hooks/queries/courses";
 import { cn } from "@/lib/cn";
-import { formatDisplayValue, isEmptyValue } from "@/lib/empty-value";
+import { isEmptyValue } from "@/lib/empty-value";
 import { getMinMaxFacets, getUniqueFacets } from "@/lib/facets";
 import { i18nLabel } from "@/lib/i18n";
 import { parseAsShape } from "@/lib/parsers";
@@ -197,7 +197,11 @@ const getColumns = (
   columnHelper.accessor("hours", {
     header: "Hours",
     enableGlobalFilter: false,
-    cell: (data) => formatDisplayValue(data.getValue()),
+    cell: (data) => {
+      const value = data.getValue();
+      if (isEmptyValue(value)) return <EmptyValue />;
+      return value;
+    },
   }),
   columnHelper.accessor("relevance", {
     header: "Relevance",
