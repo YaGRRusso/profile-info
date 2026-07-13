@@ -113,7 +113,7 @@ export function profileToInput(data: ProfileSchema): UpdateMeInput {
     email: data.email,
     phone: data.phone || undefined,
     avatar: data.avatar || undefined,
-    birth: toIsoDate(data.birth),
+    birth: toIsoDate(data.birth) || undefined,
     address: data.address || undefined,
     i18n: i18n.length ? i18n : undefined,
     urls: data.urls.length ? data.urls : undefined,

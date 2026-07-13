@@ -11,6 +11,7 @@ export function OptionalField(
   options?: FieldOptions
 ): PropertyDecorator {
   return applyDecorators(
+    // Transform(({ value }) => value ?? undefined),
     IsOptional(),
     Field(typeFunction, { ...options, nullable: true })
   );

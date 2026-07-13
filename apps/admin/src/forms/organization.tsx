@@ -58,8 +58,8 @@ export function organizationToInput(
     name: data.name,
     slug: data.slug || undefined,
     category: data.category,
-    logo: data.logo,
-    website: data.website,
+    logo: data.logo || undefined,
+    website: data.website || undefined,
     i18n: data.i18n.map((translation) => ({
       locale: translation.locale,
       messages: {

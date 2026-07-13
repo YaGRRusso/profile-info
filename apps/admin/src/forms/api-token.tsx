@@ -34,7 +34,7 @@ export function apiTokenToInput(data: ApiTokenSchema): CreateApiTokenInput {
   return {
     name: data.name,
     permissions: data.permissions,
-    expiresAt: toIsoDate(data.expiresAt),
+    expiresAt: toIsoDate(data.expiresAt) || undefined,
   };
 }
 
