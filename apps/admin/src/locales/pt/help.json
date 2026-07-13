@@ -76,5 +76,12 @@
       "Dê um nome a cada token para reconhecer na lista — por exemplo o sistema que vai usá-lo.",
       "Na criação, escolha se o token só consulta ou também altera dados. O segredo aparece uma vez: guarde com cuidado e desative o que não usar mais."
     ]
+  },
+  "users": {
+    "title": "Usuários",
+    "paragraphs": [
+      "Gerencie as contas que podem entrar e trabalhar nas informações do perfil.",
+      "Novos cadastros ficam desativados até você revisar e aprovar. Mantenha cada papel de acesso limitado às responsabilidades da pessoa."
+    ]
   }
 }

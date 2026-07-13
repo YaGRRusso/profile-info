@@ -76,5 +76,12 @@
       "Give each token a name you will recognize in the list — for example the system that will use it.",
       "When creating one, choose whether it can only read data or also change it. The secret appears once: store it safely and revoke what you no longer need."
     ]
+  },
+  "users": {
+    "title": "Users",
+    "paragraphs": [
+      "Manage the accounts that can sign in and work on profile information.",
+      "New registrations stay disabled until you review and enable them. Keep access roles limited to the responsibilities each person needs."
+    ]
   }
 }

@@ -10,6 +10,7 @@ import {
   RocketLaunchIcon,
   SignOutIcon,
   UserIcon,
+  UsersIcon,
 } from "@phosphor-icons/react";
 import { createFileRoute, Outlet } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
@@ -142,6 +143,15 @@ function RouteComponent() {
                   to="/experiences"
                 />
               </li>
+              {user?.role === "SUPER_ADMIN" && (
+                <li>
+                  <MenuLink
+                    icon={<UsersIcon size={24} weight="duotone" />}
+                    label={tNav("users")}
+                    to="/users"
+                  />
+                </li>
+              )}
             </ul>
             <ul className="menu w-full gap-2">
               <li>

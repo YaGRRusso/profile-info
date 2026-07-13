@@ -170,6 +170,21 @@ export type CreateSkillMessagesInputTranslationInput = {
   messages: CreateSkillMessagesInput;
 };
 
+export type CreateUserInput = {
+  address?: string | null | undefined;
+  avatar?: string | null | undefined;
+  birth?: string | null | undefined;
+  email: string;
+  i18n?: Array<CreateUserMessagesInputTranslationInput> | null | undefined;
+  name: string;
+  nickname: string;
+  password: string;
+  phone?: string | null | undefined;
+  role?: UserRole | null | undefined;
+  skillIds?: Array<string> | null | undefined;
+  urls?: Array<UrlInput> | null | undefined;
+};
+
 export type CreateUserMessagesInput = {
   description?: string | null | undefined;
   title?: string | null | undefined;
@@ -289,6 +304,20 @@ export type FilterSkillInput = {
   slug?: string | null | undefined;
 };
 
+export type FilterUserInput = {
+  address?: string | null | undefined;
+  avatar?: string | null | undefined;
+  birth?: string | null | undefined;
+  disabled?: boolean | null | undefined;
+  email?: string | null | undefined;
+  i18n?: Array<CreateUserMessagesInputTranslationInput> | null | undefined;
+  name?: string | null | undefined;
+  nickname?: string | null | undefined;
+  phone?: string | null | undefined;
+  role?: UserRole | null | undefined;
+  urls?: Array<UrlInput> | null | undefined;
+};
+
 export enum OrganizationCategory {
   Company = 'COMPANY',
   Other = 'OTHER',
@@ -366,6 +395,12 @@ export type SortProjectInput = {
 export type SortSkillInput = {
   createdAt?: SortEnum | null | undefined;
   slug?: SortEnum | null | undefined;
+  updatedAt?: SortEnum | null | undefined;
+};
+
+export type SortUserInput = {
+  createdAt?: SortEnum | null | undefined;
+  name?: SortEnum | null | undefined;
   updatedAt?: SortEnum | null | undefined;
 };
 
@@ -458,6 +493,22 @@ export type UpdateSkillInput = {
   disabled?: boolean | null | undefined;
   i18n?: Array<CreateSkillMessagesInputTranslationInput> | null | undefined;
   slug?: string | null | undefined;
+};
+
+export type UpdateUserInput = {
+  address?: string | null | undefined;
+  avatar?: string | null | undefined;
+  birth?: string | null | undefined;
+  disabled?: boolean | null | undefined;
+  email?: string | null | undefined;
+  i18n?: Array<CreateUserMessagesInputTranslationInput> | null | undefined;
+  name?: string | null | undefined;
+  nickname?: string | null | undefined;
+  password?: string | null | undefined;
+  phone?: string | null | undefined;
+  role?: UserRole | null | undefined;
+  skillIds?: Array<string> | null | undefined;
+  urls?: Array<UrlInput> | null | undefined;
 };
 
 export type UrlInput = {
@@ -827,6 +878,50 @@ export type UpdateMeMutationVariables = Exact<{
 
 export type UpdateMeMutation = { updateMe: { id: string, email: string, name: string, nickname: string, role: UserRole, avatar: string | null, phone: string | null, birth: string | null, address: string | null, i18n: Array<{ locale: string, messages: { title: string | null, description: string | null } }> | null, urls: Array<{ title: string, value: string }> | null } };
 
+export type CreateOneUserMutationVariables = Exact<{
+  createUserInput: CreateUserInput;
+}>;
+
+
+export type CreateOneUserMutation = { createOneUser: { id: string } };
+
+export type CreateManyUsersMutationVariables = Exact<{
+  createUserInputs: Array<CreateUserInput> | CreateUserInput;
+}>;
+
+
+export type CreateManyUsersMutation = { createManyUsers: { succeeded: number, failed: number } };
+
+export type UpdateOneUserMutationVariables = Exact<{
+  userId: string | number;
+  updateUserInput: UpdateUserInput;
+}>;
+
+
+export type UpdateOneUserMutation = { updateOneUser: { id: string } };
+
+export type UpdateManyUsersMutationVariables = Exact<{
+  userIds: Array<string | number> | string | number;
+  updateUserInput: UpdateUserInput;
+}>;
+
+
+export type UpdateManyUsersMutation = { updateManyUsers: { succeeded: number, failed: number } };
+
+export type RemoveOneUserMutationVariables = Exact<{
+  userId: string | number;
+}>;
+
+
+export type RemoveOneUserMutation = { removeOneUser: { id: string } };
+
+export type RemoveManyUsersMutationVariables = Exact<{
+  userIds: Array<string | number> | string | number;
+}>;
+
+
+export type RemoveManyUsersMutation = { removeManyUsers: { succeeded: number, failed: number } };
+
 export type FindManyApiTokensQueryVariables = Exact<{
   apiTokenFilters?: FilterApiTokenInput | null | undefined;
   apiTokenPagination?: PaginationInput | null | undefined;
@@ -917,6 +1012,15 @@ export type FindManyActiveSkillsQueryVariables = Exact<{
 
 
 export type FindManyActiveSkillsQuery = { findManyActiveSkills: { found: number, nodes: Array<{ id: string, slug: string | null, category: string | null, disabled: boolean, partition: CatalogPartition, createdAt: string, updatedAt: string, owner: { id: string, nickname: string, name: string, role: UserRole, email: string, phone: string | null, avatar: string | null }, i18n: Array<{ locale: string, messages: { title: string } }> }> } };
+
+export type FindManyUsersQueryVariables = Exact<{
+  userFilters?: FilterUserInput | null | undefined;
+  userPagination?: PaginationInput | null | undefined;
+  userSort?: SortUserInput | null | undefined;
+}>;
+
+
+export type FindManyUsersQuery = { findManyUsers: { found: number, nodes: Array<{ id: string, name: string, nickname: string, email: string, avatar: string | null, phone: string | null, role: UserRole, disabled: boolean, createdAt: string, updatedAt: string }> } };
 
 export class TypedDocumentString<TResult, TVariables>
   extends String
@@ -1446,6 +1550,51 @@ export const UpdateMeDocument = new TypedDocumentString(`
   }
 }
     `) as unknown as TypedDocumentString<UpdateMeMutation, UpdateMeMutationVariables>;
+export const CreateOneUserDocument = new TypedDocumentString(`
+    mutation CreateOneUser($createUserInput: CreateUserInput!) {
+  createOneUser(createUserInput: $createUserInput) {
+    id
+  }
+}
+    `) as unknown as TypedDocumentString<CreateOneUserMutation, CreateOneUserMutationVariables>;
+export const CreateManyUsersDocument = new TypedDocumentString(`
+    mutation CreateManyUsers($createUserInputs: [CreateUserInput!]!) {
+  createManyUsers(createUserInputs: $createUserInputs) {
+    succeeded
+    failed
+  }
+}
+    `) as unknown as TypedDocumentString<CreateManyUsersMutation, CreateManyUsersMutationVariables>;
+export const UpdateOneUserDocument = new TypedDocumentString(`
+    mutation UpdateOneUser($userId: ID!, $updateUserInput: UpdateUserInput!) {
+  updateOneUser(userId: $userId, updateUserInput: $updateUserInput) {
+    id
+  }
+}
+    `) as unknown as TypedDocumentString<UpdateOneUserMutation, UpdateOneUserMutationVariables>;
+export const UpdateManyUsersDocument = new TypedDocumentString(`
+    mutation UpdateManyUsers($userIds: [ID!]!, $updateUserInput: UpdateUserInput!) {
+  updateManyUsers(userIds: $userIds, updateUserInput: $updateUserInput) {
+    succeeded
+    failed
+  }
+}
+    `) as unknown as TypedDocumentString<UpdateManyUsersMutation, UpdateManyUsersMutationVariables>;
+export const RemoveOneUserDocument = new TypedDocumentString(`
+    mutation RemoveOneUser($userId: ID!) {
+  removeOneUser(userId: $userId) {
+    id
+  }
+}
+    `) as unknown as TypedDocumentString<RemoveOneUserMutation, RemoveOneUserMutationVariables>;
+export const RemoveManyUsersDocument = new TypedDocumentString(`
+    mutation RemoveManyUsers($userIds: [ID!]!) {
+  removeManyUsers(userIds: $userIds) {
+    succeeded
+    failed
+  }
+}
+    `) as unknown as TypedDocumentString<RemoveManyUsersMutation, RemoveManyUsersMutationVariables>;
 export const FindManyApiTokensDocument = new TypedDocumentString(`
     query FindManyApiTokens($apiTokenFilters: FilterApiTokenInput, $apiTokenPagination: PaginationInput, $apiTokenSort: SortApiTokenInput) {
   findManyApiTokens(
@@ -1899,3 +2048,26 @@ export const FindManyActiveSkillsDocument = new TypedDocumentString(`
   }
 }
     `) as unknown as TypedDocumentString<FindManyActiveSkillsQuery, FindManyActiveSkillsQueryVariables>;
+export const FindManyUsersDocument = new TypedDocumentString(`
+    query FindManyUsers($userFilters: FilterUserInput, $userPagination: PaginationInput, $userSort: SortUserInput) {
+  findManyUsers(
+    userFilters: $userFilters
+    userPagination: $userPagination
+    userSort: $userSort
+  ) {
+    found
+    nodes {
+      id
+      name
+      nickname
+      email
+      avatar
+      phone
+      role
+      disabled
+      createdAt
+      updatedAt
+    }
+  }
+}
+    `) as unknown as TypedDocumentString<FindManyUsersQuery, FindManyUsersQueryVariables>;

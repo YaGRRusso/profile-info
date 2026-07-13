@@ -101,6 +101,11 @@
       "label": "Role",
       "tooltip": "Job title you held in this role."
     },
+    "userRole": {
+      "label": "Account role",
+      "placeholder": "Choose one...",
+      "tooltip": "Controls the administrative access this account has."
+    },
     "permissions": {
       "label": "Permissions",
       "placeholder": "Choose one or more...",
@@ -259,6 +264,10 @@
     "changePermissions": {
       "label": "Change Permissions",
       "tooltip": "New permissions for the selected tokens."
+    },
+    "changeRole": {
+      "label": "Change account role",
+      "tooltip": "New administrative role for the selected accounts."
     }
   },
   "ai": {
@@ -305,6 +314,9 @@
     "updateEducations": "Update Educations",
     "updateProjects": "Update Projects",
     "updateExperiences": "Update Experiences",
-    "updateApiTokens": "Update API Tokens"
+    "updateApiTokens": "Update API Tokens",
+    "createUser": "Create User",
+    "updateUser": "Update User",
+    "updateUsers": "Update Users"
   }
 }

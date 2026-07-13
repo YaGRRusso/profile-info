@@ -99,5 +99,15 @@
     "modalManage": "Token de API",
     "modalBatchUpdate": "Atualizar tokens de API",
     "modalRead": "Ver token de API"
+  },
+  "users": {
+    "manageTitle": "Usuários",
+    "manageDescription": "Gerencie contas e aprove cadastros pendentes.",
+    "entity": "usuário",
+    "entityPlural": "usuários",
+    "newButton": "Novo usuário",
+    "modalManage": "Usuário",
+    "modalBatchUpdate": "Atualizar usuários",
+    "modalRead": "Ver usuário"
   }
 }

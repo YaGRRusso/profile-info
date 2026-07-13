@@ -47,6 +47,15 @@ const FIND_MANY_USERS = `
   }
 `;
 
+const FIND_ONE_USER = `
+  query FindOneUser($userFilters: FilterUserInput) {
+    findOneUser(userFilters: $userFilters) {
+      id
+      email
+    }
+  }
+`;
+
 describe("Catalog reads (e2e)", () => {
   let app: INestApplication<App>;
   let userToken: string;
@@ -119,24 +128,73 @@ describe("Catalog reads (e2e)", () => {
     expect(response.errors?.[0]?.extensions?.code).toBe("UNAUTHENTICATED");
   });
 
-  it("should allow authenticated USER to read catalog and user lists", async () => {
-    const [skills, organizations, users] = await Promise.all([
+  it("should allow authenticated USER to read catalog lists", async () => {
+    const [skills, organizations] = await Promise.all([
       graphqlRequest<{
         findManySkills: { found: number };
       }>(app, { query: FIND_MANY_SKILLS, token: userToken }),
       graphqlRequest<{
         findManyOrganizations: { found: number };
       }>(app, { query: FIND_MANY_ORGANIZATIONS, token: userToken }),
-      graphqlRequest<{
-        findManyUsers: { found: number };
-      }>(app, { query: FIND_MANY_USERS, token: userToken }),
     ]);
 
     expect(skills.errors).toBeUndefined();
     expect(skills.data?.findManySkills.found).toBe(1);
     expect(organizations.errors).toBeUndefined();
     expect(organizations.data?.findManyOrganizations.found).toBe(1);
-    expect(users.errors).toBeUndefined();
-    expect(users.data?.findManyUsers.found).toBeGreaterThanOrEqual(2);
+  });
+
+  it("should forbid USER from filter-based user reads", async () => {
+    const [many, one] = await Promise.all([
+      graphqlRequest(app, {
+        query: FIND_MANY_USERS,
+        token: userToken,
+      }),
+      graphqlRequest(app, {
+        query: FIND_ONE_USER,
+        token: userToken,
+        variables: { userFilters: { email: "admin@profile.info" } },
+      }),
+    ]);
+
+    expect(many.data?.findManyUsers).toBeUndefined();
+    expect(many.errors?.[0]?.extensions?.code).toBe("FORBIDDEN");
+    expect(one.data?.findOneUser).toBeUndefined();
+    expect(one.errors?.[0]?.extensions?.code).toBe("FORBIDDEN");
+  });
+
+  it("should allow SUPER_ADMIN filter-based user reads", async () => {
+    const adminSignIn = await graphqlRequest<{ signIn: string }>(app, {
+      query: `
+        mutation SignIn($signInInput: SignInInput!) {
+          signIn(signInInput: $signInInput)
+        }
+      `,
+      variables: {
+        signInInput: { email: "admin@profile.info", password: "123123" },
+      },
+    });
+    const adminToken = adminSignIn.data?.signIn ?? "";
+
+    const [many, one] = await Promise.all([
+      graphqlRequest<{
+        findManyUsers: { found: number };
+      }>(app, {
+        query: FIND_MANY_USERS,
+        token: adminToken,
+      }),
+      graphqlRequest<{
+        findOneUser: { email: string };
+      }>(app, {
+        query: FIND_ONE_USER,
+        token: adminToken,
+        variables: { userFilters: { email: "joao@profile.info" } },
+      }),
+    ]);
+
+    expect(many.errors).toBeUndefined();
+    expect(many.data?.findManyUsers.found).toBeGreaterThanOrEqual(2);
+    expect(one.errors).toBeUndefined();
+    expect(one.data?.findOneUser.email).toBe("joao@profile.info");
   });
 });

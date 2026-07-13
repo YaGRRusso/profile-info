@@ -38,6 +38,7 @@ export class UsersResolver {
     return this.usersService.findOneById(userId);
   }
 
+  @Roles(UserRole.SUPER_ADMIN)
   @Query(() => UserEntity)
   findOneUser(
     @Args("userFilters", {
@@ -54,6 +55,7 @@ export class UsersResolver {
     return this.usersService.findManyById(userIds);
   }
 
+  @Roles(UserRole.SUPER_ADMIN)
   @Query(() => PaginatedUserEntity)
   findManyUsers(
     @Args("userFilters", {

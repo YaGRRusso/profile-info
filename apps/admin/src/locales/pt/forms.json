@@ -101,6 +101,11 @@
       "label": "Função",
       "tooltip": "Cargo que você exerceu neste emprego."
     },
+    "userRole": {
+      "label": "Papel da conta",
+      "placeholder": "Escolha um...",
+      "tooltip": "Controla o acesso administrativo desta conta."
+    },
     "permissions": {
       "label": "Permissões",
       "placeholder": "Escolha um ou mais...",
@@ -259,6 +264,10 @@
     "changePermissions": {
       "label": "Alterar permissões",
       "tooltip": "Novas permissões para os tokens selecionados."
+    },
+    "changeRole": {
+      "label": "Alterar papel da conta",
+      "tooltip": "Novo papel administrativo para as contas selecionadas."
     }
   },
   "ai": {
@@ -305,6 +314,9 @@
     "updateEducations": "Atualizar formações",
     "updateProjects": "Atualizar projetos",
     "updateExperiences": "Atualizar experiências",
-    "updateApiTokens": "Atualizar tokens de API"
+    "updateApiTokens": "Atualizar tokens de API",
+    "createUser": "Criar usuário",
+    "updateUser": "Atualizar usuário",
+    "updateUsers": "Atualizar usuários"
   }
 }

@@ -29,6 +29,7 @@ import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { z } from "zod";
 import { BadgeList } from "@/components/display/badge-list";
+import { BatchButton, BatchToolbar } from "@/components/table/batch-buttons";
 import { FiltersButton } from "@/components/table/filters-button";
 import {
   DATE_FILTER_OPTIONS,
@@ -416,37 +417,27 @@ export function ApiTokensTable({
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="-mb-2 flex justify-end">
-        <div className="scrollbar-thin flex items-center gap-2 overflow-x-auto">
-          <button
-            className="btn btn-ghost btn-sm"
-            disabled={!selected?.length}
-            onClick={() => onMultiEdit(selected)}
-            type="button"
-          >
-            <PencilIcon />
-            <span>{tAction("updateSelected", { count: selected.length })}</span>
-          </button>
-          <button
-            className="btn btn-ghost btn-sm"
-            disabled={!selected?.length}
-            onClick={() => onMultiView(selected)}
-            type="button"
-          >
-            <EyeIcon />
-            <span>{tAction("viewSelected", { count: selected.length })}</span>
-          </button>
-          <button
-            className="btn btn-ghost btn-sm btn-error"
-            disabled={!selected?.length}
-            onClick={() => onMultiDelete(selected)}
-            type="button"
-          >
-            <TrashSimpleIcon />
-            <span>{tAction("removeSelected", { count: selected.length })}</span>
-          </button>
-        </div>
-      </div>
+      <BatchToolbar>
+        <BatchButton
+          disabled={!selected?.length}
+          icon={<PencilIcon />}
+          label={tAction("updateSelected", { count: selected.length })}
+          onClick={() => onMultiEdit(selected)}
+        />
+        <BatchButton
+          disabled={!selected?.length}
+          icon={<EyeIcon />}
+          label={tAction("viewSelected", { count: selected.length })}
+          onClick={() => onMultiView(selected)}
+        />
+        <BatchButton
+          className="btn-error"
+          disabled={!selected?.length}
+          icon={<TrashSimpleIcon />}
+          label={tAction("removeSelected", { count: selected.length })}
+          onClick={() => onMultiDelete(selected)}
+        />
+      </BatchToolbar>
 
       <div className="flex flex-wrap items-center gap-2">
         <div className="flex min-w-64 flex-1 items-center gap-2">

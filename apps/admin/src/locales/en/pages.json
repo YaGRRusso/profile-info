@@ -99,5 +99,15 @@
     "modalManage": "API token",
     "modalBatchUpdate": "Update API tokens",
     "modalRead": "View API token"
+  },
+  "users": {
+    "manageTitle": "Users",
+    "manageDescription": "Manage accounts and approve pending sign-ups.",
+    "entity": "user",
+    "entityPlural": "users",
+    "newButton": "New user",
+    "modalManage": "User",
+    "modalBatchUpdate": "Update users",
+    "modalRead": "View user"
   }
 }
