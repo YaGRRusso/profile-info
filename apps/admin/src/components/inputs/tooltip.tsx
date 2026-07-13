@@ -11,7 +11,7 @@ export function FormTooltip({ content }: FormTooltipProps) {
   return (
     <>
       <button
-        className="btn btn-circle btn-ghost btn-xs -mb-1 -ml-1 inline-flex p-0 text-[1em]"
+        className="btn btn-circle btn-ghost btn-xs -ml-1 inline-flex p-0 text-[1em]"
         popoverTarget={identifier}
         style={{ anchorName: `--${identifier}` } as CSSProperties}
         type="button"
