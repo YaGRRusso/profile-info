@@ -1,6 +1,7 @@
 export function DashboardSkeleton() {
   return (
     <div className="flex flex-col gap-4">
+      <div className="skeleton h-32 rounded-box" />
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3">
         {Array.from({ length: 6 }).map((_, index) => (
           <div className="skeleton h-24 rounded-box" key={index} />

@@ -18,7 +18,6 @@
   },
   "firstSteps": {
     "title": "First steps",
-    "description": "Follow these steps to build your profile and generate your CV.",
     "progress": "{{completed}} of {{total}} completed",
     "steps": {
       "profile": "Configure your profile",

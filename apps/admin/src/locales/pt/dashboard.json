@@ -18,7 +18,6 @@
   },
   "firstSteps": {
     "title": "Primeiros passos",
-    "description": "Siga estes passos para montar seu perfil e gerar seu CV.",
     "progress": "{{completed}} de {{total}} concluídos",
     "steps": {
       "profile": "Configure seu perfil",
