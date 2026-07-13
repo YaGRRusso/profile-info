@@ -279,6 +279,8 @@ type DashboardTotals {
   educations: Int!
   experiences: Int!
   organizations: Int!
+  ownedLocalOrganizations: Int!
+  ownedLocalSkills: Int!
   projects: Int!
   skills: Int!
 }

@@ -3,6 +3,7 @@ import { InjectModel } from "@nestjs/mongoose";
 import { Model } from "mongoose";
 import { catalogPersistenceScope } from "@/core/context/auth-context.helper";
 import type { AuthContext } from "@/core/context/auth-context.interface";
+import { CatalogPartition } from "@/core/enums/catalog-partition.enum";
 import { CrudRepository } from "@/core/persistence/repositories/crud/crud.repository";
 import { StatsRepository } from "@/core/persistence/repositories/stats/stats.repository";
 import type { FieldCount } from "@/core/persistence/types/output.type";
@@ -43,6 +44,14 @@ export class SkillsRepository {
 
   countActive(ctx: AuthContext): Promise<number> {
     return this.catalogStats(ctx).count(NOT_DISABLED);
+  }
+
+  countOwnedLocalActive(ctx: AuthContext): Promise<number> {
+    return this.catalogStats(ctx).count({
+      ...NOT_DISABLED,
+      partition: CatalogPartition.LOCAL,
+      ownerId: ctx.id,
+    });
   }
 
   countByField(ctx: AuthContext, field: string): Promise<FieldCount[]> {

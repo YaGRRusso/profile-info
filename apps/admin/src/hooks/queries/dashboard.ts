@@ -12,6 +12,8 @@ const dashboard = graphql(`
         organizations
         projects
         experiences
+        ownedLocalSkills
+        ownedLocalOrganizations
       }
       experiencesByCategory {
         label

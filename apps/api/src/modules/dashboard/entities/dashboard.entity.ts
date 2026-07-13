@@ -29,6 +29,12 @@ export class DashboardTotals {
 
   @Field(() => Int)
   experiences: number;
+
+  @Field(() => Int)
+  ownedLocalOrganizations: number;
+
+  @Field(() => Int)
+  ownedLocalSkills: number;
 }
 
 @ObjectType()

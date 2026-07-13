@@ -35,6 +35,7 @@ describe("OrganizationsService", () => {
     catalogCrud: jest.Mock;
     catalogStats: jest.Mock;
     countActive: jest.Mock;
+    countOwnedLocalActive: jest.Mock;
     countByField: jest.Mock;
     findRecentlyUpdatedActive: jest.Mock;
   };
@@ -48,6 +49,7 @@ describe("OrganizationsService", () => {
       catalogCrud: jest.fn().mockReturnValue(crud),
       catalogStats: jest.fn().mockReturnValue(stats),
       countActive: jest.fn().mockResolvedValue(2),
+      countOwnedLocalActive: jest.fn().mockResolvedValue(1),
       countByField: jest.fn().mockResolvedValue([]),
       findRecentlyUpdatedActive: jest.fn(),
     };
@@ -107,6 +109,13 @@ describe("OrganizationsService", () => {
     it("delegates to repository.countActive", async () => {
       await expect(service.count(ctx)).resolves.toBe(2);
       expect(repository.countActive).toHaveBeenCalledWith(ctx);
+    });
+  });
+
+  describe("countOwnedLocal", () => {
+    it("delegates to repository.countOwnedLocalActive", async () => {
+      await expect(service.countOwnedLocal(ctx)).resolves.toBe(1);
+      expect(repository.countOwnedLocalActive).toHaveBeenCalledWith(ctx);
     });
   });
 

@@ -34,6 +34,8 @@ const DASHBOARD_QUERY = `
         organizations
         projects
         experiences
+        ownedLocalSkills
+        ownedLocalOrganizations
       }
       coursesByStatus {
         label
@@ -234,6 +236,8 @@ describe("Dashboard (e2e)", () => {
           organizations: number;
           projects: number;
           experiences: number;
+          ownedLocalSkills: number;
+          ownedLocalOrganizations: number;
         };
         coursesByStatus: Array<{ label: string; value: number }>;
         experiencesByCategory: Array<{ label: string; value: number }>;
@@ -253,6 +257,8 @@ describe("Dashboard (e2e)", () => {
     expect(dashboard?.totals.experiences).toBe(2);
     expect(dashboard?.totals.skills).toBe(1);
     expect(dashboard?.totals.organizations).toBe(1);
+    expect(dashboard?.totals.ownedLocalSkills).toBe(0);
+    expect(dashboard?.totals.ownedLocalOrganizations).toBe(0);
     expect(dashboard?.coursesByStatus).toEqual(
       expect.arrayContaining([
         { label: CourseStatus.COMPLETE, value: 1 },

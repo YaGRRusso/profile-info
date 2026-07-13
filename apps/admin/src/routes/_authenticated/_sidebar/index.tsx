@@ -8,6 +8,7 @@ import { pageHelp } from "@/lib/page-help";
 import { DashboardCharts } from "./-components/dashboard-charts";
 import { DashboardSkeleton } from "./-components/dashboard-skeleton";
 import { DashboardStats } from "./-components/dashboard-stats";
+import { FirstSteps } from "./-components/first-steps";
 import { ProfileCompleteness } from "./-components/profile-completeness";
 import { RecentActivity } from "./-components/recent-activity";
 
@@ -45,6 +46,7 @@ function RouteComponent() {
         <DataState.Content>
           {data && (
             <div className="flex flex-col gap-4">
+              <FirstSteps totals={data.totals} user={user} />
               <DashboardStats totals={data.totals} />
               <DashboardCharts data={data} />
               <RecentActivity items={data.recentActivity} />

@@ -198,6 +198,10 @@ export class OrganizationsService {
     return this.repository.countActive(ctx);
   }
 
+  countOwnedLocal(ctx: AuthContext): Promise<number> {
+    return this.repository.countOwnedLocalActive(ctx);
+  }
+
   countByField(ctx: AuthContext, field: string): Promise<FieldCount[]> {
     return this.repository.countByField(ctx, field);
   }
