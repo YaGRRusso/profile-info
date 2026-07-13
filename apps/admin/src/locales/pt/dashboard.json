@@ -16,6 +16,21 @@
     "title": "Completude do perfil",
     "cta": "Preencha suas configurações"
   },
+  "firstSteps": {
+    "title": "Primeiros passos",
+    "description": "Siga estes passos para montar seu perfil e gerar seu CV.",
+    "progress": "{{completed}} de {{total}} concluídos",
+    "steps": {
+      "profile": "Configure seu perfil",
+      "skills": "Crie habilidades",
+      "organization": "Crie uma organização",
+      "education": "Adicione uma formação",
+      "course": "Adicione um curso",
+      "project": "Adicione um projeto",
+      "experience": "Adicione uma experiência",
+      "cv": "Gere seu CV"
+    }
+  },
   "recentActivity": {
     "title": "Atividade recente",
     "empty": "Nenhuma atualização recente.",

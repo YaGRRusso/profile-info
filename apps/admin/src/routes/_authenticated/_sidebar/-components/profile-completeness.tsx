@@ -20,7 +20,7 @@ const PROFILE_FIELDS: Array<(user: ProfileUser) => boolean> = [
   (user) => Boolean(user.urls?.length),
 ];
 
-function computeProfileCompleteness(user?: ProfileUser | null): number {
+export function computeProfileCompleteness(user?: ProfileUser | null): number {
   if (!user) return 0;
 
   const filled = PROFILE_FIELDS.filter((check) => check(user)).length;

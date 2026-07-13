@@ -16,6 +16,21 @@
     "title": "Profile completeness",
     "cta": "Fill in your settings"
   },
+  "firstSteps": {
+    "title": "First steps",
+    "description": "Follow these steps to build your profile and generate your CV.",
+    "progress": "{{completed}} of {{total}} completed",
+    "steps": {
+      "profile": "Configure your profile",
+      "skills": "Create skills",
+      "organization": "Create an organization",
+      "education": "Add an education",
+      "course": "Add a course",
+      "project": "Add a project",
+      "experience": "Add an experience",
+      "cv": "Generate your CV"
+    }
+  },
   "recentActivity": {
     "title": "Recent activity",
     "empty": "No recent updates yet.",
