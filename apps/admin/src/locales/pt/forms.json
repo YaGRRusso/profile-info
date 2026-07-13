@@ -283,6 +283,7 @@
   },
   "submit": {
     "signIn": "Entrar",
+    "signUp": "Criar conta",
     "reset": "Redefinir",
     "createSkill": "Criar habilidade",
     "updateSkill": "Atualizar habilidade",

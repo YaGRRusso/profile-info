@@ -24,6 +24,7 @@ type Documents = {
     "\n  mutation RemoveOneApiToken($apiTokenId: ID!) {\n    removeOneApiToken(apiTokenId: $apiTokenId) {\n      id\n      name\n      permissions\n      expiresAt\n      createdAt\n      updatedAt\n    }\n  }\n": typeof types.RemoveOneApiTokenDocument,
     "\n  mutation RemoveManyApiTokens($apiTokenIds: [ID!]!) {\n    removeManyApiTokens(apiTokenIds: $apiTokenIds) {\n      succeeded\n      failed\n    }\n  }\n": typeof types.RemoveManyApiTokensDocument,
     "\n  mutation SignIn($signInInput: SignInInput!) {\n    signIn(signInInput: $signInInput)\n  }\n": typeof types.SignInDocument,
+    "\n  mutation Register($registerInput: RegisterUserInput!) {\n    register(registerInput: $registerInput) {\n      id\n      email\n      disabled\n    }\n  }\n": typeof types.RegisterDocument,
     "\n  mutation CreateOneCourse($createCourseInput: CreateCourseInput!) {\n    createOneCourse(createCourseInput: $createCourseInput) {\n      id\n      slug\n    }\n  }\n": typeof types.CreateOneCourseDocument,
     "\n  mutation UpdateOneCourse(\n    $courseId: ID!\n    $updateCourseInput: UpdateCourseInput!\n  ) {\n    updateOneCourse(courseId: $courseId, updateCourseInput: $updateCourseInput) {\n      id\n      slug\n    }\n  }\n": typeof types.UpdateOneCourseDocument,
     "\n  mutation UpdateManyCourses(\n    $courseIds: [ID!]!\n    $updateCourseInput: UpdateCourseInput!\n  ) {\n    updateManyCourses(\n      courseIds: $courseIds\n      updateCourseInput: $updateCourseInput\n    ) {\n      succeeded\n      failed\n    }\n  }\n": typeof types.UpdateManyCoursesDocument,
@@ -85,6 +86,7 @@ const documents: Documents = {
     "\n  mutation RemoveOneApiToken($apiTokenId: ID!) {\n    removeOneApiToken(apiTokenId: $apiTokenId) {\n      id\n      name\n      permissions\n      expiresAt\n      createdAt\n      updatedAt\n    }\n  }\n": types.RemoveOneApiTokenDocument,
     "\n  mutation RemoveManyApiTokens($apiTokenIds: [ID!]!) {\n    removeManyApiTokens(apiTokenIds: $apiTokenIds) {\n      succeeded\n      failed\n    }\n  }\n": types.RemoveManyApiTokensDocument,
     "\n  mutation SignIn($signInInput: SignInInput!) {\n    signIn(signInInput: $signInInput)\n  }\n": types.SignInDocument,
+    "\n  mutation Register($registerInput: RegisterUserInput!) {\n    register(registerInput: $registerInput) {\n      id\n      email\n      disabled\n    }\n  }\n": types.RegisterDocument,
     "\n  mutation CreateOneCourse($createCourseInput: CreateCourseInput!) {\n    createOneCourse(createCourseInput: $createCourseInput) {\n      id\n      slug\n    }\n  }\n": types.CreateOneCourseDocument,
     "\n  mutation UpdateOneCourse(\n    $courseId: ID!\n    $updateCourseInput: UpdateCourseInput!\n  ) {\n    updateOneCourse(courseId: $courseId, updateCourseInput: $updateCourseInput) {\n      id\n      slug\n    }\n  }\n": types.UpdateOneCourseDocument,
     "\n  mutation UpdateManyCourses(\n    $courseIds: [ID!]!\n    $updateCourseInput: UpdateCourseInput!\n  ) {\n    updateManyCourses(\n      courseIds: $courseIds\n      updateCourseInput: $updateCourseInput\n    ) {\n      succeeded\n      failed\n    }\n  }\n": types.UpdateManyCoursesDocument,
@@ -173,6 +175,10 @@ export function graphql(source: "\n  mutation RemoveManyApiTokens($apiTokenIds: 
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function graphql(source: "\n  mutation SignIn($signInInput: SignInInput!) {\n    signIn(signInInput: $signInInput)\n  }\n"): typeof import('./graphql').SignInDocument;
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation Register($registerInput: RegisterUserInput!) {\n    register(registerInput: $registerInput) {\n      id\n      email\n      disabled\n    }\n  }\n"): typeof import('./graphql').RegisterDocument;
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

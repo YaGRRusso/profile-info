@@ -7,34 +7,38 @@ import { fieldError } from "@/lib/field-error";
 import { FormError } from "@/lib/form-errors";
 import { CommonFormProps } from "./common";
 
-const userSchema = z.object({
+const signUpSchema = z.object({
+  name: z.string().min(1, FormError.requiredField),
+  nickname: z.string().min(1, FormError.requiredField),
   email: z.email(FormError.invalidFormat),
   password: z
     .string()
     .min(1, FormError.requiredField)
-    .min(6, FormError.minLength),
+    .min(8, FormError.minLength),
 });
 
-export type UserSchema = z.infer<typeof userSchema>;
+export type SignUpSchema = z.infer<typeof signUpSchema>;
 
-export interface UserFormProps extends CommonFormProps<UserSchema> {}
+export interface SignUpFormProps extends CommonFormProps<SignUpSchema> {}
 
-export function UserForm({
+export function SignUpForm({
   onSubmit,
   defaultValues,
   isDisabled,
   isLoading,
-}: UserFormProps) {
+}: SignUpFormProps) {
   const { t: tForm } = useTranslation("forms");
 
   const form = useForm({
     defaultValues: {
+      name: "",
+      nickname: "",
       email: "",
       password: "",
       ...defaultValues,
     },
     onSubmit: ({ value }) => onSubmit?.(value),
-    validators: { onChange: userSchema },
+    validators: { onChange: signUpSchema },
   });
 
   const { Field, Subscribe } = form;
@@ -48,6 +52,32 @@ export function UserForm({
         form.handleSubmit();
       }}
     >
+      <Field name="name">
+        {(field) => (
+          <TextInput
+            error={fieldError(field.state.meta)}
+            label={tForm("fields.profileName.label")}
+            name={field.name}
+            onChange={field.handleChange}
+            placeholder={tForm("fields.profileName.placeholder")}
+            tooltip={tForm("fields.profileName.tooltip")}
+            value={field.state.value}
+          />
+        )}
+      </Field>
+      <Field name="nickname">
+        {(field) => (
+          <TextInput
+            error={fieldError(field.state.meta)}
+            label={tForm("fields.nickname.label")}
+            name={field.name}
+            onChange={field.handleChange}
+            placeholder={tForm("fields.nickname.placeholder")}
+            tooltip={tForm("fields.nickname.tooltip")}
+            value={field.state.value}
+          />
+        )}
+      </Field>
       <Field name="email">
         {(field) => (
           <TextInput
@@ -92,7 +122,7 @@ export function UserForm({
               {(isSubmitting || isLoading) && (
                 <span className="loading loading-spinner loading-xs" />
               )}
-              {tForm("submit.signIn")}
+              {tForm("submit.signUp")}
             </button>
           )}
         </Subscribe>

@@ -15,14 +15,14 @@ import { createFileRoute, Outlet } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Avatar } from "@/components/display/avatar";
+import { LocaleSwitch } from "@/components/display/locale-switch";
 import { SystemMessages } from "@/components/display/system-messages";
+import { ThemeSwitch } from "@/components/display/theme-switch";
 import { useDebounce } from "@/hooks/custom/use-debounce";
 import { useMediaQuery } from "@/hooks/custom/use-media-query";
 import { useAuthStore } from "@/stores/auth";
-import { LocaleSwitch } from "./-components/locale-switch";
 import { MenuAction } from "./-components/menu-action";
 import { MenuLink } from "./-components/menu-link";
-import { ThemeSwitch } from "./-components/theme-switch";
 
 export const Route = createFileRoute("/_authenticated/_sidebar")({
   component: RouteComponent,
@@ -87,9 +87,9 @@ function RouteComponent() {
               <p className="line-clamp-1 text-xs opacity-md">{user?.role}</p>
             </div>
           </div>
-          <div className="flex w-full items-center gap-2 px-3 pt-1">
-            <ThemeSwitch />
-            <LocaleSwitch />
+          <div className="mt-2 mb-1 flex w-full items-center gap-2 px-3">
+            <LocaleSwitch className="is-drawer-close:hidden" />
+            <ThemeSwitch className="is-drawer-close:toggle-md" />
           </div>
           <div className="flex w-full flex-1 flex-col justify-between gap-2">
             <ul className="menu w-full gap-2">

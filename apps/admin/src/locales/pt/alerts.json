@@ -8,6 +8,7 @@
   "batchUpdated": "{{count}} {{entityPlural}} atualizados com sucesso",
   "batchDisabled": "{{count}} {{entityPlural}} desativados com sucesso",
   "batchEnabled": "{{count}} {{entityPlural}} ativados com sucesso",
+  "signUpSuccess": "Conta solicitada, aguarde aprovação!",
   "profileUpdateSuccess": "Perfil atualizado com sucesso",
   "tokenCopySuccess": "Token copiado para a área de transferência",
   "tokenCopyFailed": "Falha ao copiar o token para a área de transferência"

@@ -1,0 +1,102 @@
+import { useForm } from "@tanstack/react-form";
+import { useTranslation } from "react-i18next";
+import z from "zod";
+import { PasswordInput } from "@/components/inputs/password";
+import { TextInput } from "@/components/inputs/text";
+import { fieldError } from "@/lib/field-error";
+import { FormError } from "@/lib/form-errors";
+import { CommonFormProps } from "./common";
+
+const signInSchema = z.object({
+  email: z.email(FormError.invalidFormat),
+  password: z
+    .string()
+    .min(1, FormError.requiredField)
+    .min(6, FormError.minLength),
+});
+
+export type SignInSchema = z.infer<typeof signInSchema>;
+
+export interface SignInFormProps extends CommonFormProps<SignInSchema> {}
+
+export function SignInForm({
+  onSubmit,
+  defaultValues,
+  isDisabled,
+  isLoading,
+}: SignInFormProps) {
+  const { t: tForm } = useTranslation("forms");
+
+  const form = useForm({
+    defaultValues: {
+      email: "",
+      password: "",
+      ...defaultValues,
+    },
+    onSubmit: ({ value }) => onSubmit?.(value),
+    validators: { onChange: signInSchema },
+  });
+
+  const { Field, Subscribe } = form;
+
+  return (
+    <form
+      className="form"
+      onSubmit={(e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        form.handleSubmit();
+      }}
+    >
+      <Field name="email">
+        {(field) => (
+          <TextInput
+            error={fieldError(field.state.meta)}
+            label={tForm("fields.email.label")}
+            name={field.name}
+            onChange={field.handleChange}
+            placeholder={tForm("fields.email.placeholder")}
+            tooltip={tForm("fields.email.tooltip")}
+            type="email"
+            value={field.state.value}
+          />
+        )}
+      </Field>
+      <Field name="password">
+        {(field) => (
+          <PasswordInput
+            error={fieldError(field.state.meta)}
+            label={tForm("fields.password.label")}
+            name={field.name}
+            onChange={field.handleChange}
+            placeholder={tForm("fields.password.placeholder")}
+            tooltip={tForm("fields.password.tooltip")}
+            value={field.state.value}
+          />
+        )}
+      </Field>
+      <div className="form-footer">
+        <Subscribe>
+          {({ canSubmit, isSubmitting, isTouched }) => (
+            <button
+              className="btn btn-soft btn-block btn-primary"
+              disabled={
+                !canSubmit ||
+                !isTouched ||
+                isSubmitting ||
+                isDisabled ||
+                isLoading
+              }
+              type="submit"
+            >
+              {(isSubmitting || isLoading) && (
+                <span className="loading loading-spinner loading-xs" />
+              )}
+              {tForm("submit.signIn")}
+            </button>
+          )}
+        </Subscribe>
+      </div>
+    </form>
+  );
+}

@@ -24,7 +24,7 @@ Data flow: GraphQL hooks call `execute()` from `src/lib/execute.ts` (POST to `VI
 
 Routing:
 
-- `_authenticated.tsx`: protected layout; waits for auth store hydration, then `useGetMe()` when a token exists. Child routes mount only after session is valid — queries do not gate auth themselves. Login when unauthenticated. Dev-only quick login buttons (`DevQuickLogin` on login screen, `import.meta.env.DEV`) sign in as seed personas with password `123123`.
+- `_authenticated.tsx`: protected layout; waits for auth store hydration, then `useGetMe()` when a token exists. Child routes mount only after session is valid — queries do not gate auth themselves. Unauthenticated → `Auth` shell (`-components/auth.tsx`), which toggles `SignIn` (`SignInForm` + `useSignIn`) and `SignUp` (`SignUpForm` + `useSignUp`) and includes shared `ThemeSwitch` / `LocaleSwitch` (`components/display/`, also used in the sidebar). Public GraphQL `register` (admin hook `useSignUp`) creates a disabled `USER` until a `SUPER_ADMIN` sets `disabled: false` via `updateOneUser`. Dev-only quick login (`DevQuickLogin` inside `SignIn`, `import.meta.env.DEV`) signs in as seed personas with password `123123`.
 - `index.tsx`: dashboard via `useDashboard()` (stats + recharts).
 - `_authenticated/_sidebar/settings/`: profile form + `DownloadCvControl` in page header.
 - `_authenticated/_sidebar/`: CRUD pages per entity with `-components/table.tsx`.
@@ -83,7 +83,7 @@ Keep `components/`, `hooks/custom/`, and `lib/` domain-agnostic. Table toolbar c
 
 ## Gotchas & notes
 
-- **i18n (ADR 002):** `i18next` is the single locale source (`i18n.changeLanguage` / `i18n.language`) — drives UI copy (`help`, `nav`, `pages`, `actions`, `alerts`, `dashboard`, `login`, `forms`, `tables`, `system`, `validation`), `i18nLabel`, skill pickers, and `dayjs` relative time. Form field copy uses `tForm("fields.<key>.label|placeholder|tooltip")`. Page help and subtitles follow persona-inclusive copy rules in ADR 002. Zod errors use `FormError` keys (`invalidFormat`, `invalidRange`, …) → `field-error`; AI/ATS toasts use `tValidation`. Table search/relevance placeholders use `tables`. System header alerts via `tSystem`. See `apps/admin/docs/adr/002-admin-i18n.md`.
+- **i18n (ADR 002):** `i18next` is the single locale source (`i18n.changeLanguage` / `i18n.language`) — drives UI copy (`help`, `nav`, `pages`, `actions`, `alerts`, `dashboard`, `auth`, `forms`, `tables`, `system`, `validation`), `i18nLabel`, skill pickers, and `dayjs` relative time. Form field copy uses `tForm("fields.<key>.label|placeholder|tooltip")`. Page help and subtitles follow persona-inclusive copy rules in ADR 002. Zod errors use `FormError` keys (`invalidFormat`, `invalidRange`, …) → `field-error`; AI/ATS toasts use `tValidation`. Table search/relevance placeholders use `tables`. System header alerts via `tSystem`. See `apps/admin/docs/adr/002-admin-i18n.md`.
 - Catalog list tables hide meta columns by default (`id`, `slug`, `createdAt`, `updatedAt`) via `DEFAULT_META_COLUMN_VISIBILITY` in `lib/table-columns.ts` + `usePersistedState`; users can toggle visibility in the table gear menu.
 - Codegen reads `../api/src/schema.gql` from disk; keep it up to date after API changes.
 - GraphQL Codegen `client` preset (v6+) defaults `enumType` to `string-literal` (union types) and leaves unmapped scalars as `unknown`. This admin relies on runtime enum values (`ExperienceCategory.FullTime`, `Object.values`, `z.enum`) — keep `codegen.ts` on `enumType: "enum"` and map `DateTime` → `string`.

@@ -300,6 +300,13 @@ export type PaginationInput = {
   skip?: number | null | undefined;
 };
 
+export type RegisterUserInput = {
+  email: string;
+  name: string;
+  nickname: string;
+  password: string;
+};
+
 export enum ResourceType {
   Course = 'COURSE',
   Education = 'EDUCATION',
@@ -527,6 +534,13 @@ export type SignInMutationVariables = Exact<{
 
 
 export type SignInMutation = { signIn: string };
+
+export type RegisterMutationVariables = Exact<{
+  registerInput: RegisterUserInput;
+}>;
+
+
+export type RegisterMutation = { register: { id: string, email: string, disabled: boolean } };
 
 export type CreateOneCourseMutationVariables = Exact<{
   createCourseInput: CreateCourseInput;
@@ -1054,6 +1068,15 @@ export const SignInDocument = new TypedDocumentString(`
   signIn(signInInput: $signInInput)
 }
     `) as unknown as TypedDocumentString<SignInMutation, SignInMutationVariables>;
+export const RegisterDocument = new TypedDocumentString(`
+    mutation Register($registerInput: RegisterUserInput!) {
+  register(registerInput: $registerInput) {
+    id
+    email
+    disabled
+  }
+}
+    `) as unknown as TypedDocumentString<RegisterMutation, RegisterMutationVariables>;
 export const CreateOneCourseDocument = new TypedDocumentString(`
     mutation CreateOneCourse($createCourseInput: CreateCourseInput!) {
   createOneCourse(createCourseInput: $createCourseInput) {

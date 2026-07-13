@@ -4,7 +4,7 @@ import { DataState } from "@/components/display/data-state";
 import { useAuthHydrated } from "@/hooks/custom/use-auth-hydrated";
 import { useGetMe } from "@/hooks/queries/auth";
 import { useAuthStore } from "@/stores/auth";
-import { Login } from "./-components/login";
+import { Auth } from "./-components/auth";
 
 export const Route = createFileRoute("/_authenticated")({
   component: RouteComponent,
@@ -38,7 +38,7 @@ function RouteComponent() {
   }, [user, setUser]);
 
   if (!token) {
-    return <Login />;
+    return <Auth />;
   }
 
   return (
@@ -49,7 +49,7 @@ function RouteComponent() {
     >
       <DataState.Loading />
       <DataState.Empty>
-        <Login />
+        <Auth />
       </DataState.Empty>
       <DataState.Content>
         <Outlet />

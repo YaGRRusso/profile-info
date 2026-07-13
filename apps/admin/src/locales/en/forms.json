@@ -283,6 +283,7 @@
   },
   "submit": {
     "signIn": "Sign In",
+    "signUp": "Create account",
     "reset": "Reset",
     "createSkill": "Create Skill",
     "updateSkill": "Update Skill",

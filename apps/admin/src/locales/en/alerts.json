@@ -8,6 +8,7 @@
   "batchUpdated": "{{count}} {{entityPlural}} updated successfully",
   "batchDisabled": "{{count}} {{entityPlural}} disabled successfully",
   "batchEnabled": "{{count}} {{entityPlural}} enabled successfully",
+  "signUpSuccess": "Account requested, wait for approval!",
   "profileUpdateSuccess": "Profile updated successfully",
   "tokenCopySuccess": "Token copied to clipboard",
   "tokenCopyFailed": "Failed to copy token to clipboard"

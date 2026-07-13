@@ -16,7 +16,7 @@ export function ThemeSwitch({ className, ...props }: ThemeSwitchProps) {
   return (
     <label
       className={cn(
-        "toggle border-base-content/40 text-base-content/80",
+        "toggle toggle-xl rounded-lg border-base-content/20 bg-base-100 text-base-content/80 before:rounded-lg",
         className
       )}
       {...props}
@@ -28,8 +28,8 @@ export function ThemeSwitch({ className, ...props }: ThemeSwitchProps) {
         }
         type="checkbox"
       />
-      <SunIcon />
-      <MoonIcon />
+      <SunIcon aria-hidden className="size-full p-1" />
+      <MoonIcon aria-hidden className="size-full p-1" />
     </label>
   );
 }
