@@ -24,6 +24,7 @@ import type { ProjectRow } from "@/hooks/queries/projects";
 import { useFindManySkills } from "@/hooks/queries/skills";
 import { fieldError } from "@/lib/field-error";
 import { FormError } from "@/lib/form-errors";
+import { nullIfEmpty } from "@/lib/form-input";
 import { hasUniqueLocales } from "@/lib/form-validation";
 import { createEmptyI18n, i18nLabel, i18nLabelsByIds } from "@/lib/i18n";
 import { isSlugTaken } from "@/lib/slug";
@@ -60,11 +61,11 @@ export interface ProjectFormProps extends CommonFormProps<ProjectSchema> {
 
 export function projectToInput(data: ProjectSchema): CreateProjectInput {
   return {
-    slug: data.slug || undefined,
+    slug: nullIfEmpty(data.slug),
     relevance: data.relevance,
-    skillIds: data.skillIds.length ? data.skillIds : undefined,
-    images: data.images.length ? data.images : undefined,
-    urls: data.urls.length ? data.urls : undefined,
+    skillIds: nullIfEmpty(data.skillIds),
+    images: nullIfEmpty(data.images),
+    urls: nullIfEmpty(data.urls),
     i18n: data.i18n.map((translation) => ({
       locale: translation.locale,
       messages: {

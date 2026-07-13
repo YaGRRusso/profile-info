@@ -22,6 +22,7 @@ import { useSummarize, useTranslate } from "@/hooks/mutations/ai";
 import { OrganizationRow } from "@/hooks/queries/organizations";
 import { fieldError } from "@/lib/field-error";
 import { FormError } from "@/lib/form-errors";
+import { nullIfEmpty } from "@/lib/form-input";
 import { hasUniqueLocales } from "@/lib/form-validation";
 import { createEmptyI18n } from "@/lib/i18n";
 import { isSlugTaken } from "@/lib/slug";
@@ -56,10 +57,10 @@ export function organizationToInput(
 ): CreateOrganizationInput {
   return {
     name: data.name,
-    slug: data.slug || undefined,
+    slug: nullIfEmpty(data.slug),
     category: data.category,
-    logo: data.logo || undefined,
-    website: data.website || undefined,
+    logo: nullIfEmpty(data.logo),
+    website: nullIfEmpty(data.website),
     i18n: data.i18n.map((translation) => ({
       locale: translation.locale,
       messages: {

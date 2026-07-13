@@ -11,6 +11,7 @@ import type { ApiTokenRow } from "@/hooks/queries/api-tokens";
 import { toDateInput, toIsoDate } from "@/lib/date";
 import { fieldError } from "@/lib/field-error";
 import { FormError } from "@/lib/form-errors";
+import { nullIfEmpty } from "@/lib/form-input";
 import { CommonFormProps } from "./common";
 
 const apiTokenSchema = z.object({
@@ -34,7 +35,7 @@ export function apiTokenToInput(data: ApiTokenSchema): CreateApiTokenInput {
   return {
     name: data.name,
     permissions: data.permissions,
-    expiresAt: toIsoDate(data.expiresAt) || undefined,
+    expiresAt: nullIfEmpty(toIsoDate(data.expiresAt)),
   };
 }
 

@@ -49,7 +49,7 @@ Rich forms map flat Zod schemas to nested GraphQL shapes (`i18n`, `organizationI
 
 ## Module / directory breakdown
 
-- `src/lib/execute.ts`: GraphQL transport. `src/lib/api.ts`: REST transport (`getApiOrigin`, `apiRequest`). Other helpers: `gql.ts`, `tc.ts`, `cn.ts`, `parsers.ts`, `field-error.ts`, `form-errors.ts`, `form-validation.ts`, `chart-theme.ts`, `dayjs.ts`, `i18n.ts` (entity `pickTranslation` / `i18nLabel`), etc.
+- `src/lib/execute.ts`: GraphQL transport. `src/lib/api.ts`: REST transport (`getApiOrigin`, `apiRequest`). Other helpers: `gql.ts`, `tc.ts`, `cn.ts`, `parsers.ts`, `field-error.ts`, `form-errors.ts`, `form-validation.ts`, `form-input.ts` (`omitIfEmpty` / `nullIfEmpty` in `*ToInput` mappers), `chart-theme.ts`, `dayjs.ts`, `i18n.ts` (entity `pickTranslation` / `i18nLabel`), etc.
 - `src/hooks/queries/` and `mutations/`: one file per entity; `graphql` tag must use static string literals (no interpolated fragments). Paginated list hooks use `hooks/custom/paginated-query.ts` helpers inside `useInfiniteQuery` — each helper receives an explicit key (`withPagination`: variables pagination key; `paginatedNextPageParam` / `paginatedSelect`: response field name).
 - `src/generated/graphql/`: codegen output — regenerate, do not edit.
 - `src/forms/`: entity forms + `*ToInput`/`*ToForm` mappers co-located.

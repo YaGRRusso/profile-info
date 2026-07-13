@@ -29,6 +29,7 @@ import { useFindManySkills } from "@/hooks/queries/skills";
 import { toDateInput, toIsoDate } from "@/lib/date";
 import { fieldError } from "@/lib/field-error";
 import { FormError } from "@/lib/form-errors";
+import { nullIfEmpty } from "@/lib/form-input";
 import { hasUniqueLocales } from "@/lib/form-validation";
 import {
   createEmptyI18n,
@@ -72,21 +73,22 @@ export interface EducationFormProps extends CommonFormProps<EducationSchema> {
 }
 
 export function educationToInput(data: EducationSchema): CreateEducationInput {
-  const period =
-    data.period.from || data.period.to
-      ? { from: toIsoDate(data.period.from), to: toIsoDate(data.period.to) }
-      : undefined;
-
   return {
-    slug: data.slug || undefined,
+    slug: nullIfEmpty(data.slug),
     organizationId: data.organizationId,
     level: data.level,
     status: data.status,
     relevance: data.relevance,
-    url: data.url || undefined,
-    image: data.image || undefined,
-    skillIds: data.skillIds.length ? data.skillIds : undefined,
-    period,
+    url: nullIfEmpty(data.url),
+    image: nullIfEmpty(data.image),
+    skillIds: nullIfEmpty(data.skillIds),
+    period:
+      !data.period.from && !data.period.to
+        ? null
+        : {
+            from: nullIfEmpty(toIsoDate(data.period.from)),
+            to: nullIfEmpty(toIsoDate(data.period.to)),
+          },
     i18n: data.i18n.map((translation) => ({
       locale: translation.locale,
       messages: {

@@ -27,6 +27,7 @@ import { useFindManyOrganizations } from "@/hooks/queries/organizations";
 import { useFindManySkills } from "@/hooks/queries/skills";
 import { fieldError } from "@/lib/field-error";
 import { FormError } from "@/lib/form-errors";
+import { nullIfEmpty } from "@/lib/form-input";
 import { hasUniqueLocales } from "@/lib/form-validation";
 import {
   createEmptyI18n,
@@ -66,14 +67,14 @@ export interface CourseFormProps extends CommonFormProps<CourseSchema> {
 
 export function courseToInput(data: CourseSchema): CreateCourseInput {
   return {
-    slug: data.slug || undefined,
+    slug: nullIfEmpty(data.slug),
     organizationId: data.organizationId,
     status: data.status,
     relevance: data.relevance,
-    url: data.url || undefined,
-    image: data.image || undefined,
-    hours: data.hours || undefined,
-    skillIds: data.skillIds.length ? data.skillIds : undefined,
+    url: nullIfEmpty(data.url),
+    image: nullIfEmpty(data.image),
+    hours: nullIfEmpty(data.hours),
+    skillIds: nullIfEmpty(data.skillIds),
     i18n: data.i18n.map((translation) => ({
       locale: translation.locale,
       messages: {

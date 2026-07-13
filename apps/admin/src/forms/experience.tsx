@@ -28,6 +28,7 @@ import { useFindManySkills } from "@/hooks/queries/skills";
 import { toDateInput, toIsoDate } from "@/lib/date";
 import { fieldError } from "@/lib/field-error";
 import { FormError } from "@/lib/form-errors";
+import { nullIfEmpty } from "@/lib/form-input";
 import { hasUniqueLocales } from "@/lib/form-validation";
 import {
   createEmptyI18n,
@@ -80,7 +81,7 @@ export function experienceToInput(
   data: ExperienceSchema
 ): CreateExperienceInput {
   return {
-    slug: data.slug || undefined,
+    slug: nullIfEmpty(data.slug),
     organizationId: data.organizationId,
     category: data.category,
     relevance: data.relevance,
@@ -93,10 +94,13 @@ export function experienceToInput(
         },
       })),
       period:
-        role.period.from || role.period.to
-          ? { from: toIsoDate(role.period.from), to: toIsoDate(role.period.to) }
-          : undefined,
-      skillIds: role.skillIds.length ? role.skillIds : undefined,
+        !role.period.from && !role.period.to
+          ? null
+          : {
+              from: nullIfEmpty(toIsoDate(role.period.from)),
+              to: nullIfEmpty(toIsoDate(role.period.to)),
+            },
+      skillIds: nullIfEmpty(role.skillIds),
     })),
   };
 }

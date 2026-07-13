@@ -11,6 +11,7 @@ import { type CreateSkillInput } from "@/generated/graphql/graphql";
 import type { SkillRow } from "@/hooks/queries/skills";
 import { fieldError } from "@/lib/field-error";
 import { FormError } from "@/lib/form-errors";
+import { nullIfEmpty } from "@/lib/form-input";
 import { hasUniqueLocales } from "@/lib/form-validation";
 import { createEmptyI18n } from "@/lib/i18n";
 import { isSlugTaken } from "@/lib/slug";
@@ -38,8 +39,8 @@ export interface SkillFormProps extends CommonFormProps<SkillSchema> {
 
 export function skillToInput(data: SkillSchema): CreateSkillInput {
   return {
-    slug: data.slug || undefined,
-    category: data.category || undefined,
+    slug: nullIfEmpty(data.slug),
+    category: nullIfEmpty(data.category),
     i18n: data.i18n.map((translation) => ({
       locale: translation.locale,
       messages: { title: translation.title },

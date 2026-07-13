@@ -25,6 +25,7 @@ import { useFindManySkills } from "@/hooks/queries/skills";
 import { toDateInput, toIsoDate } from "@/lib/date";
 import { fieldError } from "@/lib/field-error";
 import { FormError } from "@/lib/form-errors";
+import { nullIfEmpty, omitIfEmpty } from "@/lib/form-input";
 import { hasUniqueLocales } from "@/lib/form-validation";
 import { createEmptyI18n, i18nLabel, i18nLabelsByIds } from "@/lib/i18n";
 import { useSystemMessagesStore } from "@/stores/system-messages";
@@ -102,8 +103,8 @@ export function profileToInput(data: ProfileSchema): UpdateMeInput {
     .map((translation) => ({
       locale: translation.locale,
       messages: {
-        title: translation.title || undefined,
-        description: translation.description || undefined,
+        title: nullIfEmpty(translation.title),
+        description: nullIfEmpty(translation.description),
       },
     }));
 
@@ -111,14 +112,14 @@ export function profileToInput(data: ProfileSchema): UpdateMeInput {
     name: data.name,
     nickname: data.nickname,
     email: data.email,
-    phone: data.phone || undefined,
-    avatar: data.avatar || undefined,
-    birth: toIsoDate(data.birth) || undefined,
-    address: data.address || undefined,
-    i18n: i18n.length ? i18n : undefined,
-    urls: data.urls.length ? data.urls : undefined,
-    skillIds: data.skillIds.length ? data.skillIds : undefined,
-    password: data.password || undefined,
+    phone: nullIfEmpty(data.phone),
+    avatar: nullIfEmpty(data.avatar),
+    birth: nullIfEmpty(toIsoDate(data.birth)),
+    address: nullIfEmpty(data.address),
+    i18n: nullIfEmpty(i18n),
+    urls: nullIfEmpty(data.urls),
+    skillIds: nullIfEmpty(data.skillIds),
+    password: omitIfEmpty(data.password),
   };
 }
 
