@@ -2,73 +2,79 @@
   "home": {
     "title": "Início",
     "paragraphs": [
-      "Seu ponto de partida após o login. O painel resume quantos dados de perfil você tem e o que mudou recentemente.",
-      "Use as estatísticas e gráficos para identificar lacunas (por exemplo, nenhum curso ou experiências vazias). A completude do perfil destaca os principais campos ainda faltando na sua conta.",
-      "A atividade recente lista as últimas criações e atualizações em todas as entidades para você retomar de onde parou."
+      "Página inicial do seu perfil profissional após o login.",
+      "Números e gráficos mostram quantos empregos, cursos, estudos e outras informações você já preencheu. Quanto mais completo o perfil, melhor fica o currículo exportado.",
+      "A completude do perfil indica dados importantes que ainda faltam, como contato, foto ou resumo profissional.",
+      "Atividade recente mostra o que mudou por último, para você retomar de onde parou."
     ]
   },
   "settings": {
     "title": "Configurações",
     "paragraphs": [
-      "Edite seu perfil público: nome, contato, avatar, idiomas e o resumo profissional exibido no CV.",
-      "As habilidades selecionadas aqui aparecem no perfil e no CV na ordem que você definir. Elas vêm do catálogo de Habilidades (entradas globais e as que você criou localmente).",
-      "Baixar CV exporta um PDF montado a partir do perfil, experiências, formações, cursos, projetos e habilidades do perfil — na ordem definida."
+      "Aqui ficam os dados principais do seu perfil: nome, contato, foto, endereço e o resumo profissional que aparece no currículo.",
+      "O resumo pode ser escrito em mais de um idioma, útil se o currículo for lido fora do Brasil.",
+      "Em habilidades principais, você escolhe o que destacar e a ordem em que aparecem no currículo.",
+      "O download gera um PDF com perfil, empregos, estudos, cursos, projetos e habilidades, na ordem que você definiu."
     ]
   },
   "skills": {
     "title": "Habilidades",
     "paragraphs": [
-      "Habilidades são etiquetas reutilizáveis do que você sabe ou faz. Associe-as ao perfil, cargos, cursos, formações e projetos.",
-      "Habilidades globais são compartilhadas por todos e mantidas por um administrador. Habilidades locais são só suas — úteis para termos de nicho ou pessoais.",
-      "Habilidades desativadas continuam visíveis nas listas, mas não podem ser vinculadas a novos registros. No CV, habilidades são agrupadas por categoria quando definida."
+      "Palavras que descrevem o que você sabe fazer no trabalho, nos estudos ou no dia a dia profissional.",
+      "Você pode escolher da lista existente ou criar uma nova com o nome que preferir.",
+      "Elas aparecem no perfil e também em empregos, cursos, estudos e projetos, mostrando em que situações você usa cada capacidade.",
+      "No currículo, as habilidades do perfil são agrupadas por categoria quando você define uma."
     ]
   },
   "courses": {
     "title": "Cursos",
     "paragraphs": [
-      "Cursos cobrem certificados, bootcamps, workshops e outras formações curtas — distintas de diplomas formais em Formações.",
-      "Cada curso vincula-se a uma Organização (plataforma ou escola que emitiu ou hospedou) e pode listar habilidades relacionadas.",
-      "Defina status e relevância para o CV priorizar entradas concluídas e relevantes. URL e carga horária são opcionais, mas ajudam na verificação."
+      "Cursos rápidos, certificados e treinamentos, como um curso do SENAI, certificação de segurança ou workshop profissional.",
+      "Use esta área para formações curtas. Estudos formais de escola, faculdade ou técnico ficam em Formações.",
+      "Informe quem ministrou, o período, a descrição e as habilidades relacionadas. Tudo entra no currículo; a relevância define o destaque de cada um."
     ]
   },
   "educations": {
     "title": "Formações",
     "paragraphs": [
-      "Formações são trajetórias acadêmicas formais: graduações, cursos técnicos e credenciais similares, com nível e status de conclusão.",
-      "Vincule cada entrada a uma Organização (universidade, faculdade ou instituto). Habilidades podem refletir disciplinas ou competências adquiridas.",
-      "Formações concluídas com maior relevância aparecem com mais destaque no CV exportado."
+      "Estudos formais: ensino médio, curso técnico, graduação, pós-graduação e níveis parecidos.",
+      "Use esta área para a trajetória acadêmica principal. Cursos curtos e certificações ficam em Cursos.",
+      "Informe a instituição, o nível, a situação, o período e uma descrição. Habilidades aprendidas podem ser associadas.",
+      "No currículo, formações mais relevantes aparecem com mais destaque."
     ]
   },
   "organizations": {
     "title": "Organizações",
     "paragraphs": [
-      "Organizações são escolas, empregadores e plataformas referenciadas por experiências, formações e cursos — não são seções autônomas do perfil.",
-      "Como habilidades, podem ser globais (catálogo compartilhado) ou locais (criadas por você). Escolha a mais próxima nos formulários; crie uma local se nada servir.",
-      "A categoria distingue empresas, escolas e outros tipos. Organizações desativadas não podem ser selecionadas em novos vínculos."
+      "Empresas, escolas e instituições que você cita no currículo, seja onde trabalhou, estudou ou fez um curso.",
+      "Cadastre cada nome uma vez e reutilize ao registrar empregos, estudos ou cursos. Se não estiver na lista, crie com o nome correto.",
+      "O nome aparece junto aos registros em que foi usado, como referência compartilhada no currículo."
     ]
   },
   "projects": {
     "title": "Projetos",
     "paragraphs": [
-      "Projetos mostram trabalhos feitos fora ou junto ao emprego: builds pessoais, entregas freelance, voluntariado e portfólios.",
-      "Associe habilidades para descrever o que cada projeto demonstra. A relevância controla o destaque no CV.",
-      "Projetos não exigem organização, mas você pode adicionar URL ou imagem para linkar demo ou repositório."
+      "Trabalhos feitos por conta própria ou em paralelo ao emprego, como freela, reforma, voluntariado ou uma entrega que você quer destacar além do cargo.",
+      "Descreva o que fez, associe habilidades que esse trabalho demonstra e adicione fotos ou links se quiser.",
+      "A relevância define o destaque de cada projeto no currículo exportado."
     ]
   },
   "experiences": {
     "title": "Experiências",
     "paragraphs": [
-      "Experiências são empregos e engajamentos similares ao longo de um período. Cada uma tem uma organização (empregador ou cliente) e um ou mais cargos.",
-      "Cargos têm título, período, descrição e habilidades próprios — útil quando você mudou de função na mesma empresa.",
-      "A categoria (integral, meio período, freelance, voluntário) descreve o tipo de engajamento. A relevância ajuda o CV a manter só as entradas mais fortes."
+      "Empregos e trabalhos do seu histórico profissional, cada um ligado a uma empresa ou cliente.",
+      "Na mesma experiência você pode registrar mais de um cargo, útil quando mudou de função sem trocar de empresa.",
+      "Cada cargo tem título, período, descrição e habilidades usadas naquela função.",
+      "Informe também o tipo de trabalho e o quanto esse emprego é importante no seu currículo."
     ]
   },
   "apiTokens": {
     "title": "Tokens de API",
     "paragraphs": [
-      "Tokens de API permitem que scripts ou ferramentas leiam ou atualizem seus dados sem a interface web. Cada token tem nome e escopo de permissão.",
-      "O valor secreto é exibido apenas uma vez na criação — guarde com segurança. Revogue tokens que não usar mais.",
-      "Tokens de consulta são somente leitura. Tokens de mutação alteram dados. Tokens combinados fazem ambos, dentro das mesmas regras de catálogo e tenant da sua conta."
+      "Servem quando outro sistema precisa ler ou atualizar seus dados automaticamente, sem abrir o site.",
+      "Comum em integrações com apps, scripts ou ferramentas que sincronizam o perfil.",
+      "Cada token recebe um nome para você reconhecer na lista, como o sistema ou rotina que vai usá-lo.",
+      "Na criação, defina se o token só consulta ou também altera dados. O segredo aparece uma vez: guarde com cuidado e revogue o que não usar mais."
     ]
   }
 }

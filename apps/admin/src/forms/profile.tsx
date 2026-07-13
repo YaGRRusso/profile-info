@@ -520,12 +520,12 @@ export function ProfileForm({
             <>
               <MultiSelectInput
                 error={fieldError(field.state.meta)}
-                label={tForm("fields.skills.label")}
+                label={tForm("fields.profileSkills.label")}
                 onChange={field.handleChange}
                 options={skillOptions}
-                placeholder={tForm("fields.skills.placeholder")}
+                placeholder={tForm("fields.profileSkills.placeholder")}
                 showSelected={false}
-                tooltip={tForm("fields.skills.tooltip")}
+                tooltip={tForm("fields.profileSkills.tooltip")}
                 value={field.state.value}
               />
               <DraggableList

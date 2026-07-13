@@ -104,6 +104,7 @@ Never build keys dynamically (`t(\`stats.${key}\`)`, `t(item.id)`). Dynamic list
 |------|----------|
 | Form chrome | `forms.json`; `useTranslation("forms")` as `tForm` — `fields.<key>.label`, `.placeholder`, `.tooltip`; `batch.<key>.label` / `.tooltip`; sections, submit |
 | Field tooltips | Explain what the field **is** and what it is **for** — not optional/required, validation, format rules, or UI instructions |
+| Page help copy | `help.json` paragraphs + `pages.json` descriptions — same bar as tooltips, plus persona-inclusive plain language (see below) |
 | Form validation (Zod) | `FormError` keys in static schemas; `invalidFormat` (shape), `invalidRange` (intervals), `invalidField` (other); `fieldError` → `i18n.t(key, { ns: "validation" })` |
 | AI/ATS validation toasts | `tValidation("minLength", { value })` for text; `tValidation("minCount", { value: 1 })` for skills; `tValidation("requiredField")` |
 | AI textarea buttons | `tForm("ai.translate")`, `tForm("ai.optimize")` inside `textarea.tsx` |
@@ -164,6 +165,38 @@ Never build keys dynamically (`t(\`stats.${key}\`)`, `t(item.id)`). Dynamic list
 | `existingField` | Conflicts with persisted data (e.g. slug taken) |
 
 New keys: name by validation category, not field or entity; must appear in 2+ places or fill a gap the generics cannot cover.
+
+### Help and page description copy
+
+Three layers — do not mix roles:
+
+| Layer | Keys | Role |
+|-------|------|------|
+| Page subtitle | `pages.*.description`, `pages.*.manageDescription` | One self-contained sentence when the page opens |
+| Help modal | `help.*.paragraphs` (via `pageHelp`) | Several short paragraphs in the `?` modal — more descriptive than tooltips; answer likely questions in plain language |
+| Field tooltip | `forms.fields.*.tooltip` | One sentence per field |
+
+Shared rules (all three layers): no examples in tooltips or subtitles (those belong in placeholders), no validation or optional/required rules, no UI walkthroughs.
+
+**Length by layer:** field tooltips and page subtitles stay to one short sentence; help modal paragraphs may be longer and more descriptive — that is the place to clarify entity purpose, differences (e.g. courses vs educations), and how data appears on the exported CV.
+
+**Persona-inclusive plain language** (profile users span many education levels and tech familiarity):
+
+1. **Concrete before abstract** — real-world terms (job, school, certificate) before app structure.
+2. **No meta-language** — do not reference other screens or entity names without a plain-word gloss ("empregos", "estudos", "cursos rápidos").
+3. **No negative explanations** — say what something *is*, not what it is not.
+4. **English only when clearer** — keep CV, link, PDF, e-mail, status where natural in pt-BR; avoid tag/script/API on universal screens; API token screens may use token/API with a plain first sentence of purpose.
+5. **Preferred pt vocabulary in help/descriptions** (nav labels may stay shorter):
+
+| Entity (nav) | Prefer in help / subtitles |
+|--------------|----------------------------|
+| Experiences | empregos e trabalhos |
+| Educations | estudos formais |
+| Organizations | empresas e escolas |
+| Projects | trabalhos por conta própria |
+| Skills | o que você sabe fazer |
+
+6. **API tokens** — slightly more technical is acceptable; the first sentence must still say who needs it in plain language.
 
 ## Verification checklist
 

@@ -361,6 +361,7 @@ export function CourseForm({
             name={field.name}
             onChange={field.handleChange}
             placeholder={tForm("fields.image.placeholder")}
+            tooltip={tForm("fields.image.tooltip")}
             value={field.state.value}
           />
         )}

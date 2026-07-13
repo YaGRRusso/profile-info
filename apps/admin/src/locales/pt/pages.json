@@ -16,7 +16,7 @@
   },
   "settings": {
     "title": "Perfil",
-    "description": "Gerencie os dados da sua conta.",
+    "description": "Seu currículo: dados pessoais e resumo profissional.",
     "summary": {
       "title": "Título",
       "description": "Descrição",
@@ -28,11 +28,11 @@
   },
   "home": {
     "title": "Olá, {{name}}!",
-    "description": "Painel principal do seu perfil."
+    "description": "Resumo do que você já cadastrou no perfil."
   },
   "courses": {
     "manageTitle": "Gerenciar cursos",
-    "manageDescription": "Crie, atualize ou exclua cursos, bootcamps e certificados do seu perfil.",
+    "manageDescription": "Cursos rápidos, certificados e treinamentos.",
     "entity": "curso",
     "entityPlural": "cursos",
     "newButton": "Novo curso",
@@ -42,7 +42,7 @@
   },
   "skills": {
     "manageTitle": "Gerenciar habilidades",
-    "manageDescription": "Crie, atualize, desative ou ative habilidades associadas ao seu perfil.",
+    "manageDescription": "O que você sabe fazer, no perfil e no currículo.",
     "entity": "habilidade",
     "entityPlural": "habilidades",
     "newButton": "Nova habilidade",
@@ -52,7 +52,7 @@
   },
   "educations": {
     "manageTitle": "Gerenciar formações",
-    "manageDescription": "Crie, atualize ou exclua formações acadêmicas do seu perfil.",
+    "manageDescription": "Estudos formais: escola, faculdade ou técnico.",
     "entity": "formação",
     "entityPlural": "formações",
     "newButton": "Nova formação",
@@ -62,7 +62,7 @@
   },
   "organizations": {
     "manageTitle": "Gerenciar organizações",
-    "manageDescription": "Crie, atualize, desative ou ative organizações referenciadas no seu perfil.",
+    "manageDescription": "Cadastro de empresas e escolas para reutilizar no currículo.",
     "entity": "organização",
     "entityPlural": "organizações",
     "newButton": "Nova organização",
@@ -72,7 +72,7 @@
   },
   "projects": {
     "manageTitle": "Gerenciar projetos",
-    "manageDescription": "Crie, atualize ou exclua projetos do seu perfil.",
+    "manageDescription": "Trabalhos feitos por conta própria ou em paralelo ao emprego.",
     "entity": "projeto",
     "entityPlural": "projetos",
     "newButton": "Novo projeto",
@@ -82,7 +82,7 @@
   },
   "experiences": {
     "manageTitle": "Gerenciar experiências",
-    "manageDescription": "Crie, atualize ou exclua experiências profissionais do seu perfil.",
+    "manageDescription": "Empregos e trabalhos do seu histórico.",
     "entity": "experiência",
     "entityPlural": "experiências",
     "newButton": "Nova experiência",
@@ -92,7 +92,7 @@
   },
   "apiTokens": {
     "manageTitle": "Gerenciar tokens de API",
-    "manageDescription": "Crie, atualize ou exclua tokens de API para acesso programático aos seus dados.",
+    "manageDescription": "Para sistemas externos acessarem seu perfil automaticamente.",
     "entity": "token de API",
     "entityPlural": "tokens de API",
     "newButton": "Novo token de API",

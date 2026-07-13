@@ -16,7 +16,7 @@
   },
   "settings": {
     "title": "Profile",
-    "description": "Manage your account details.",
+    "description": "Your CV: personal details and professional summary.",
     "summary": {
       "title": "Title",
       "description": "Description",
@@ -28,11 +28,11 @@
   },
   "home": {
     "title": "Hello, {{name}}!",
-    "description": "Main dashboard for your profile."
+    "description": "Summary of what you have added to your profile."
   },
   "courses": {
     "manageTitle": "Manage Courses",
-    "manageDescription": "Create, update or delete courses, bootcamps and certificates of your profile.",
+    "manageDescription": "Short courses, certificates, and training.",
     "entity": "course",
     "entityPlural": "courses",
     "newButton": "New Course",
@@ -42,7 +42,7 @@
   },
   "skills": {
     "manageTitle": "Manage Skills",
-    "manageDescription": "Create, update, disable or enable skills that can be associated with your profile.",
+    "manageDescription": "What you know how to do, on your profile and CV.",
     "entity": "skill",
     "entityPlural": "skills",
     "newButton": "New Skill",
@@ -52,7 +52,7 @@
   },
   "educations": {
     "manageTitle": "Manage Educations",
-    "manageDescription": "Create, update or delete academic degrees of your profile.",
+    "manageDescription": "Formal studies: school, college, or technical program.",
     "entity": "education",
     "entityPlural": "educations",
     "newButton": "New Education",
@@ -62,7 +62,7 @@
   },
   "organizations": {
     "manageTitle": "Manage Organizations",
-    "manageDescription": "Create, update, disable or enable organizations referenced across your profile.",
+    "manageDescription": "Saved companies and schools to reuse on your CV.",
     "entity": "organization",
     "entityPlural": "organizations",
     "newButton": "New Organization",
@@ -72,7 +72,7 @@
   },
   "projects": {
     "manageTitle": "Manage Projects",
-    "manageDescription": "Create, update or delete projects of your profile.",
+    "manageDescription": "Work done on your own or alongside a job.",
     "entity": "project",
     "entityPlural": "projects",
     "newButton": "New Project",
@@ -82,7 +82,7 @@
   },
   "experiences": {
     "manageTitle": "Manage Experiences",
-    "manageDescription": "Create, update or delete professional experiences of your profile.",
+    "manageDescription": "Jobs and work in your history.",
     "entity": "experience",
     "entityPlural": "experiences",
     "newButton": "New Experience",
@@ -92,7 +92,7 @@
   },
   "apiTokens": {
     "manageTitle": "Manage API Tokens",
-    "manageDescription": "Create, update or delete API tokens for programmatic access to your data.",
+    "manageDescription": "For external systems to access your profile automatically.",
     "entity": "API token",
     "entityPlural": "API tokens",
     "newButton": "New API Token",
