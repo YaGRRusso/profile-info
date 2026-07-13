@@ -28,7 +28,7 @@ export function FiltersSelect({
     >
       <option value="">{allLabel}</option>
       {options.map(({ value: optionValue, label, count }) => (
-        <option key={optionValue} value={optionValue}>
+        <option className="capitalize" key={optionValue} value={optionValue}>
           {label} ({count})
         </option>
       ))}

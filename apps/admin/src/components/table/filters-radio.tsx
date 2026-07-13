@@ -37,7 +37,7 @@ export function FiltersRadio({
             type="radio"
             value={optionValue}
           />
-          <span>{optionLabel}</span>
+          <span className="capitalize">{optionLabel}</span>
         </label>
       ))}
     </fieldset>
