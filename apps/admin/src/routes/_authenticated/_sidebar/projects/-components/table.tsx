@@ -133,6 +133,15 @@ const getColumns = (
   columnHelper.accessor("slug", {
     header: "Slug",
   }),
+  columnHelper.accessor((row) => i18nLabel(row, locale), {
+    id: `title-${locale}`,
+    header: "Title",
+    cell: (data) => {
+      const value = data.getValue();
+      if (isEmptyValue(value)) return <EmptyValue />;
+      return value;
+    },
+  }),
   columnHelper.accessor((row) => row.owner?.nickname ?? "", {
     id: "owner",
     header: "Owner",
@@ -156,7 +165,7 @@ const getColumns = (
   columnHelper.accessor(
     (row) => row.skills?.map((skill) => i18nLabel(skill, locale)) ?? [],
     {
-      id: "skills",
+      id: `skills-${locale}`,
       header: "Skills",
       enableGlobalFilter: false,
       enableSorting: false,

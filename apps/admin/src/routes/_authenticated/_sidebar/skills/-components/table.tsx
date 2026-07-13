@@ -45,6 +45,7 @@ import {
 import { cn } from "@/lib/cn";
 import { EMPTY_MARKER, isEmptyValue } from "@/lib/empty-value";
 import { getUniqueFacets } from "@/lib/facets";
+import { i18nLabel } from "@/lib/i18n";
 import { parseAsShape } from "@/lib/parsers";
 import {
   canSeeColumn,
@@ -97,6 +98,7 @@ function SortIcon({ sorted }: { sorted: false | "asc" | "desc" }) {
 }
 
 const getColumns = (
+  locale: string,
   onEdit: (skill: SkillRow) => void,
   onDisable: (skill: SkillRow) => void,
   onEnable: (skill: SkillRow) => void,
@@ -135,6 +137,15 @@ const getColumns = (
   }),
   columnHelper.accessor("slug", {
     header: "Slug",
+  }),
+  columnHelper.accessor((row) => i18nLabel(row, locale), {
+    id: `title-${locale}`,
+    header: "Title",
+    cell: (data) => {
+      const value = data.getValue();
+      if (isEmptyValue(value)) return <EmptyValue />;
+      return value;
+    },
   }),
   columnHelper.accessor("category", {
     header: "Category",
@@ -324,6 +335,8 @@ export function SkillsTable({
 }: SkillsTableProps) {
   const { t: tAction } = useTranslation("actions");
   const { t: tTable } = useTranslation("tables");
+  const { i18n } = useTranslation();
+  const locale = i18n.language;
   const userRole = useAuthStore((state) => state.user?.role);
   const isSuperAdmin = userRole === "SUPER_ADMIN";
 
@@ -394,7 +407,7 @@ export function SkillsTable({
 
   const table = useReactTable({
     data,
-    columns: getColumns(onEdit, onDisable, onEnable, onRemove, onView, {
+    columns: getColumns(locale, onEdit, onDisable, onEnable, onRemove, onView, {
       isSuperAdmin,
     }),
     getCoreRowModel: getCoreRowModel(),

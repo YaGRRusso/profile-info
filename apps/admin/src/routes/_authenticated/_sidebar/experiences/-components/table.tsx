@@ -141,6 +141,21 @@ const getColumns = (
   columnHelper.accessor("slug", {
     header: "Slug",
   }),
+  columnHelper.accessor(
+    (row) => {
+      const role = row.roles?.[0];
+      return role ? i18nLabel({ i18n: role.i18n }, locale) : "";
+    },
+    {
+      id: `title-${locale}`,
+      header: "Title",
+      cell: (data) => {
+        const value = data.getValue();
+        if (isEmptyValue(value)) return <EmptyValue />;
+        return value;
+      },
+    }
+  ),
   columnHelper.accessor((row) => row.owner?.nickname ?? "", {
     id: "owner",
     header: "Owner",
@@ -190,7 +205,7 @@ const getColumns = (
         (role) => role.skills?.map((s) => i18nLabel(s, locale)) ?? []
       ) ?? [],
     {
-      id: "skills",
+      id: `skills-${locale}`,
       header: "Skills",
       enableGlobalFilter: false,
       enableSorting: false,
