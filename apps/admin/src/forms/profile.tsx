@@ -62,13 +62,6 @@ export type ProfileSchema = z.infer<typeof profileSchema>;
 const PROFILE_UNSAVED_MESSAGE_ID = "profile-unsaved-changes";
 export const PROFILE_SETTINGS_FORM_ID = "profile-settings-form";
 
-function hasUnsavedProfileChanges(state: {
-  isDefaultValue: boolean;
-  isTouched: boolean;
-}): boolean {
-  return state.isTouched && !state.isDefaultValue;
-}
-
 export interface ProfileFormProps extends CommonFormProps<ProfileSchema> {}
 
 type GetMeUser = GetMeQuery["getMe"];
@@ -184,7 +177,7 @@ export function ProfileForm({
       onChange: ({ formApi }) => {
         const { setMessage, clearMessage } = useSystemMessagesStore.getState();
 
-        if (hasUnsavedProfileChanges(formApi.state)) {
+        if (formApi.state.isDirty) {
           setMessage({
             id: PROFILE_UNSAVED_MESSAGE_ID,
             title: tSystem("profileUnsaved"),
@@ -607,15 +600,15 @@ export function ProfileForm({
           selector={(state) => ({
             canSubmit: state.canSubmit,
             isSubmitting: state.isSubmitting,
-            hasUnsavedChanges: hasUnsavedProfileChanges(state),
+            isDirty: state.isDirty,
           })}
         >
-          {({ canSubmit, isSubmitting, hasUnsavedChanges }) => (
+          {({ canSubmit, isSubmitting, isDirty }) => (
             <button
               className="btn btn-soft btn-primary flex-1 lg:hidden"
               disabled={
                 !canSubmit ||
-                !hasUnsavedChanges ||
+                !isDirty ||
                 isSubmitting ||
                 isDisabled ||
                 isLoading
