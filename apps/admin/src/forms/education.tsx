@@ -37,7 +37,6 @@ import {
   i18nLabelsByIds,
   pickTranslation,
 } from "@/lib/i18n";
-import { isSlugTaken } from "@/lib/slug";
 import { CommonFormProps } from "./common";
 
 const educationSchema = z.object({
@@ -138,7 +137,6 @@ export function EducationForm({
   onCancel,
   defaultValues,
   isDisabled,
-  slugsList,
   isLoading,
   state,
 }: EducationFormProps) {
@@ -323,6 +321,7 @@ export function EducationForm({
         form.handleSubmit();
       }}
     >
+      {/* TODO: slug field hidden temporarily
       <Field
         name="slug"
         validators={{
@@ -345,6 +344,7 @@ export function EducationForm({
           />
         )}
       </Field>
+      */}
       <Field name="organizationId">
         {(field) => (
           <SelectInput

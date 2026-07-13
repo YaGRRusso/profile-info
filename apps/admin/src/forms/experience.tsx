@@ -36,7 +36,6 @@ import {
   i18nLabelsByIds,
   pickTranslation,
 } from "@/lib/i18n";
-import { isSlugTaken } from "@/lib/slug";
 import { CommonFormProps } from "./common";
 
 const roleI18nSchema = z
@@ -146,7 +145,6 @@ export function ExperienceForm({
   onCancel,
   defaultValues,
   isDisabled,
-  slugsList,
   isLoading,
   state,
 }: ExperienceFormProps) {
@@ -323,6 +321,7 @@ export function ExperienceForm({
         form.handleSubmit();
       }}
     >
+      {/* TODO: slug field hidden temporarily
       <Field
         name="slug"
         validators={{
@@ -345,6 +344,7 @@ export function ExperienceForm({
           />
         )}
       </Field>
+      */}
       <Field name="organizationId">
         {(field) => (
           <SelectInput

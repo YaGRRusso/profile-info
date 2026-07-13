@@ -27,7 +27,6 @@ import { FormError } from "@/lib/form-errors";
 import { nullIfEmpty } from "@/lib/form-input";
 import { hasUniqueLocales } from "@/lib/form-validation";
 import { createEmptyI18n, i18nLabel, i18nLabelsByIds } from "@/lib/i18n";
-import { isSlugTaken } from "@/lib/slug";
 import { CommonFormProps } from "./common";
 
 const projectSchema = z.object({
@@ -99,7 +98,6 @@ export function ProjectForm({
   onCancel,
   defaultValues,
   isDisabled,
-  slugsList,
   isLoading,
   state,
 }: ProjectFormProps) {
@@ -232,6 +230,7 @@ export function ProjectForm({
         form.handleSubmit();
       }}
     >
+      {/* TODO: slug field hidden temporarily
       <Field
         name="slug"
         validators={{
@@ -254,6 +253,7 @@ export function ProjectForm({
           />
         )}
       </Field>
+      */}
       <Field name="relevance">
         {(field) => (
           <RangeInput

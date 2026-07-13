@@ -14,7 +14,6 @@ import { FormError } from "@/lib/form-errors";
 import { nullIfEmpty } from "@/lib/form-input";
 import { hasUniqueLocales } from "@/lib/form-validation";
 import { createEmptyI18n } from "@/lib/i18n";
-import { isSlugTaken } from "@/lib/slug";
 import { CommonFormProps } from "./common";
 
 const skillSchema = z.object({
@@ -64,7 +63,6 @@ export function SkillForm({
   onCancel,
   defaultValues,
   isDisabled,
-  slugsList,
   isLoading,
   state,
 }: SkillFormProps) {
@@ -93,6 +91,7 @@ export function SkillForm({
         form.handleSubmit();
       }}
     >
+      {/* TODO: slug field hidden temporarily
       <Field
         name="slug"
         validators={{
@@ -115,6 +114,7 @@ export function SkillForm({
           />
         )}
       </Field>
+      */}
 
       <Field name="category">
         {(field) => (

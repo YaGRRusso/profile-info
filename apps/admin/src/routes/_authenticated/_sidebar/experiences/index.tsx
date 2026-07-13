@@ -193,9 +193,9 @@ function RouteComponent() {
           }
           onCancel={() => setFormValues(undefined)}
           onSubmit={handleSubmit}
-          slugsList={findManyExperiences.data?.nodes
-            .map((experience) => experience.slug)
-            .filter((slug): slug is string => slug != null && slug !== "")}
+          // slugsList={findManyExperiences.data?.nodes
+          //   .map((experience) => experience.slug)
+          //   .filter((slug): slug is string => slug != null && slug !== "")}
           state={formValues?.state}
         />
       </Modal>

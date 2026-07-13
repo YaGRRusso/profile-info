@@ -1,5 +1,5 @@
 import { DeepKeys, DeepValue, useForm } from "@tanstack/react-form";
-import lodash from "lodash";
+// import lodash from "lodash";
 import { useCallback, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { toast } from "react-toastify";
@@ -25,7 +25,6 @@ import { FormError } from "@/lib/form-errors";
 import { nullIfEmpty } from "@/lib/form-input";
 import { hasUniqueLocales } from "@/lib/form-validation";
 import { createEmptyI18n } from "@/lib/i18n";
-import { isSlugTaken } from "@/lib/slug";
 import { CommonFormProps } from "./common";
 
 const organizationSchema = z.object({
@@ -98,7 +97,6 @@ export function OrganizationForm({
   onCancel,
   defaultValues,
   isDisabled,
-  slugsList,
   isLoading,
   state,
 }: OrganizationFormProps) {
@@ -106,7 +104,7 @@ export function OrganizationForm({
   const { t: tValidation } = useTranslation("validation");
   const { t: tAction } = useTranslation("actions");
 
-  const [isNameEdited, setIsNameEdited] = useState(!!defaultValues?.name);
+  const [, setIsNameEdited] = useState(!!defaultValues?.name);
 
   const summarize = useSummarize();
   const translate = useTranslate();
@@ -206,6 +204,7 @@ export function OrganizationForm({
         form.handleSubmit();
       }}
     >
+      {/* TODO: slug field hidden temporarily
       <Field
         listeners={{
           onChange: ({ value }) => {
@@ -235,6 +234,7 @@ export function OrganizationForm({
           />
         )}
       </Field>
+      */}
       <Field name="name">
         {(field) => (
           <TextInput
