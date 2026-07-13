@@ -1,5 +1,5 @@
 import { DeepKeys, DeepValue, useForm } from "@tanstack/react-form";
-import { useCallback, useMemo } from "react";
+import { useCallback, useEffect, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { toast } from "react-toastify";
 import z from "zod";
@@ -61,6 +61,13 @@ export type ProfileSchema = z.infer<typeof profileSchema>;
 
 const PROFILE_UNSAVED_MESSAGE_ID = "profile-unsaved-changes";
 export const PROFILE_SETTINGS_FORM_ID = "profile-settings-form";
+
+function hasUnsavedProfileChanges(state: {
+  isDefaultValue: boolean;
+  isTouched: boolean;
+}): boolean {
+  return state.isTouched && !state.isDefaultValue;
+}
 
 export interface ProfileFormProps extends CommonFormProps<ProfileSchema> {}
 
@@ -177,7 +184,7 @@ export function ProfileForm({
       onChange: ({ formApi }) => {
         const { setMessage, clearMessage } = useSystemMessagesStore.getState();
 
-        if (formApi.state.isDirty) {
+        if (hasUnsavedProfileChanges(formApi.state)) {
           setMessage({
             id: PROFILE_UNSAVED_MESSAGE_ID,
             title: tSystem("profileUnsaved"),
@@ -189,6 +196,15 @@ export function ProfileForm({
       },
     },
   });
+
+  useEffect(
+    () => () => {
+      useSystemMessagesStore
+        .getState()
+        .clearMessage(PROFILE_UNSAVED_MESSAGE_ID);
+    },
+    []
+  );
 
   const handleAtsOptimize = useCallback(
     async <Field extends DeepKeys<ProfileSchema>>(
@@ -591,15 +607,15 @@ export function ProfileForm({
           selector={(state) => ({
             canSubmit: state.canSubmit,
             isSubmitting: state.isSubmitting,
-            isDirty: state.isDirty,
+            hasUnsavedChanges: hasUnsavedProfileChanges(state),
           })}
         >
-          {({ canSubmit, isSubmitting, isDirty }) => (
+          {({ canSubmit, isSubmitting, hasUnsavedChanges }) => (
             <button
               className="btn btn-soft btn-primary flex-1 lg:hidden"
               disabled={
                 !canSubmit ||
-                !isDirty ||
+                !hasUnsavedChanges ||
                 isSubmitting ||
                 isDisabled ||
                 isLoading
