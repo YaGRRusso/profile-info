@@ -108,6 +108,7 @@ export function SkillForm({
             label={tForm("fields.slug.label")}
             name={field.name}
             onChange={field.handleChange}
+            optional
             placeholder={tForm("fields.slug.placeholder")}
             tooltip={tForm("fields.slug.tooltip")}
             value={field.state.value}
@@ -123,6 +124,7 @@ export function SkillForm({
             label={tForm("fields.skillCategory.label")}
             name={field.name}
             onChange={field.handleChange}
+            optional
             placeholder={tForm("fields.skillCategory.placeholder")}
             tooltip={tForm("fields.skillCategory.tooltip")}
             value={field.state.value ?? ""}

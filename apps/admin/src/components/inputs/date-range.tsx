@@ -14,6 +14,7 @@ export interface DateRangeInputProps {
   error?: string;
   label?: string;
   onChange?: (value: DateRangeValue) => void;
+  optional?: boolean;
   tooltip?: string;
   value?: DateRangeValue;
 }
@@ -24,6 +25,7 @@ export function DateRangeInput({
   error,
   onChange,
   label,
+  optional,
   tooltip,
   value,
 }: DateRangeInputProps) {
@@ -45,7 +47,7 @@ export function DateRangeInput({
 
   return (
     <fieldset className="fieldset">
-      <InputLegend label={label} tooltip={tooltip} />
+      <InputLegend label={label} optional={optional} tooltip={tooltip} />
       <div className="flex flex-col gap-2">
         <div className="flex flex-wrap items-center gap-2">
           <input

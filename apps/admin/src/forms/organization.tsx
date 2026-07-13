@@ -228,6 +228,7 @@ export function OrganizationForm({
             label={tForm("fields.slug.label")}
             name={field.name}
             onChange={field.handleChange}
+            optional
             placeholder={tForm("fields.slug.placeholder")}
             tooltip={tForm("fields.slug.tooltip")}
             value={field.state.value}
@@ -274,6 +275,7 @@ export function OrganizationForm({
             label={tForm("fields.logo.label")}
             name={field.name}
             onChange={field.handleChange}
+            optional
             placeholder={tForm("fields.logo.placeholder")}
             tooltip={tForm("fields.logo.tooltip")}
             value={field.state.value}
@@ -287,6 +289,7 @@ export function OrganizationForm({
             label={tForm("fields.website.label")}
             name={field.name}
             onChange={field.handleChange}
+            optional
             placeholder={tForm("fields.website.placeholder")}
             tooltip={tForm("fields.website.tooltip")}
             value={field.state.value}

@@ -304,6 +304,7 @@ export function CourseForm({
             label={tForm("fields.slug.label")}
             name={field.name}
             onChange={field.handleChange}
+            optional
             placeholder={tForm("fields.slug.placeholder")}
             tooltip={tForm("fields.slug.tooltip")}
             value={field.state.value}
@@ -347,6 +348,7 @@ export function CourseForm({
             label={tForm("fields.url.label")}
             name={field.name}
             onChange={field.handleChange}
+            optional
             placeholder={tForm("fields.url.placeholder")}
             tooltip={tForm("fields.url.tooltip")}
             value={field.state.value}
@@ -360,6 +362,7 @@ export function CourseForm({
             label={tForm("fields.image.label")}
             name={field.name}
             onChange={field.handleChange}
+            optional
             placeholder={tForm("fields.image.placeholder")}
             tooltip={tForm("fields.image.tooltip")}
             value={field.state.value}
@@ -374,6 +377,7 @@ export function CourseForm({
             min={0}
             name={field.name}
             onChange={field.handleChange}
+            optional
             placeholder={tForm("fields.hours.placeholder")}
             tooltip={tForm("fields.hours.tooltip")}
             value={field.state.value}
@@ -403,6 +407,7 @@ export function CourseForm({
             error={fieldError(field.state.meta)}
             label={tForm("fields.skills.label")}
             onChange={field.handleChange}
+            optional
             options={skillOptions}
             placeholder={tForm("fields.skills.placeholder")}
             tooltip={tForm("fields.skills.tooltip")}

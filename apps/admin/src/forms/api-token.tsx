@@ -114,10 +114,11 @@ export function ApiTokenForm({
         {(field) => (
           <TextInput
             error={fieldError(field.state.meta)}
-            label={tForm("fields.expiresAtOptional.label")}
+            label={tForm("fields.expiresAt.label")}
             name={field.name}
             onChange={field.handleChange}
-            tooltip={tForm("fields.expiresAtOptional.tooltip")}
+            optional
+            tooltip={tForm("fields.expiresAt.tooltip")}
             type="date"
             value={field.state.value}
           />

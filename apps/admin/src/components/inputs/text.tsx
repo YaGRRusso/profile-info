@@ -7,6 +7,7 @@ export interface TextInputProps
   error?: string;
   label?: string;
   onChange?: (value: string) => void;
+  optional?: boolean;
   tooltip?: string;
   value?: string;
 }
@@ -17,13 +18,14 @@ export function TextInput({
   onChange,
   placeholder,
   label,
+  optional,
   tooltip,
   value,
   ...props
 }: TextInputProps) {
   return (
     <fieldset className="fieldset">
-      <InputLegend label={label} tooltip={tooltip} />
+      <InputLegend label={label} optional={optional} tooltip={tooltip} />
       <input
         className={cn("input w-full", error && "input-error", className)}
         onChange={(event) => onChange?.(event.target.value)}

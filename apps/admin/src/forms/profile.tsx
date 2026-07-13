@@ -334,6 +334,7 @@ export function ProfileForm({
                 label={tForm("fields.birthDate.label")}
                 name={field.name}
                 onChange={field.handleChange}
+                optional
                 placeholder={tForm("fields.birthDate.placeholder")}
                 tooltip={tForm("fields.birthDate.tooltip")}
                 type="date"
@@ -349,6 +350,7 @@ export function ProfileForm({
                 label={tForm("fields.avatarUrl.label")}
                 name={field.name}
                 onChange={field.handleChange}
+                optional
                 placeholder={tForm("fields.avatarUrl.placeholder")}
                 tooltip={tForm("fields.avatarUrl.tooltip")}
                 value={field.state.value}
@@ -397,6 +399,7 @@ export function ProfileForm({
                           label={tForm("fields.profileTitle.label")}
                           name={field.name}
                           onChange={field.handleChange}
+                          optional
                           placeholder={tForm("fields.profileTitle.placeholder")}
                           tooltip={tForm("fields.profileTitle.tooltip")}
                           value={field.state.value}
@@ -427,6 +430,7 @@ export function ProfileForm({
                               field.state.value
                             )
                           }
+                          optional
                           placeholder={tForm("fields.description.placeholder")}
                           tooltip={tForm("fields.description.tooltip")}
                           value={field.state.value}
@@ -468,6 +472,7 @@ export function ProfileForm({
                 label={tForm("fields.phone.label")}
                 name={field.name}
                 onChange={field.handleChange}
+                optional
                 placeholder={tForm("fields.phone.placeholder")}
                 tooltip={tForm("fields.phone.tooltip")}
                 type="tel"
@@ -484,6 +489,7 @@ export function ProfileForm({
                   label={tForm("fields.address.label")}
                   name={field.name}
                   onChange={field.handleChange}
+                  optional
                   placeholder={tForm("fields.address.placeholder")}
                   tooltip={tForm("fields.address.tooltip")}
                   value={field.state.value}
@@ -503,6 +509,7 @@ export function ProfileForm({
               label={tForm("fields.newPassword.label")}
               name={field.name}
               onChange={field.handleChange}
+              optional
               placeholder={tForm("fields.newPassword.placeholder")}
               tooltip={tForm("fields.newPassword.tooltip")}
               value={field.state.value}
@@ -522,6 +529,7 @@ export function ProfileForm({
                 error={fieldError(field.state.meta)}
                 label={tForm("fields.profileSkills.label")}
                 onChange={field.handleChange}
+                optional
                 options={skillOptions}
                 placeholder={tForm("fields.profileSkills.placeholder")}
                 showSelected={false}

@@ -247,6 +247,7 @@ export function ProjectForm({
             label={tForm("fields.slug.label")}
             name={field.name}
             onChange={field.handleChange}
+            optional
             placeholder={tForm("fields.slug.placeholder")}
             tooltip={tForm("fields.slug.tooltip")}
             value={field.state.value}
@@ -277,6 +278,7 @@ export function ProjectForm({
             error={fieldError(field.state.meta)}
             label={tForm("fields.skills.label")}
             onChange={field.handleChange}
+            optional
             options={skillOptions}
             placeholder={tForm("fields.skills.placeholder")}
             tooltip={tForm("fields.skills.tooltip")}

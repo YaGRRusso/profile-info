@@ -338,6 +338,7 @@ export function ExperienceForm({
             label={tForm("fields.slug.label")}
             name={field.name}
             onChange={field.handleChange}
+            optional
             placeholder={tForm("fields.slug.placeholder")}
             tooltip={tForm("fields.slug.tooltip")}
             value={field.state.value}
@@ -418,6 +419,7 @@ export function ExperienceForm({
                       error={fieldError(field.state.meta)}
                       label={tForm("fields.period.label")}
                       onChange={field.handleChange}
+                      optional
                       tooltip={tForm("fields.period.tooltip")}
                       value={field.state.value}
                     />
@@ -430,6 +432,7 @@ export function ExperienceForm({
                       error={fieldError(field.state.meta)}
                       label={tForm("fields.skills.label")}
                       onChange={field.handleChange}
+                      optional
                       options={skillOptions}
                       placeholder={tForm("fields.skills.placeholder")}
                       tooltip={tForm("fields.skills.tooltip")}

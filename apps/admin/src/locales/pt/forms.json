@@ -1,4 +1,5 @@
 {
+  "optional": "Opcional",
   "fields": {
     "slug": {
       "label": "Slug",
@@ -96,8 +97,8 @@
       "placeholder": "Escolha um ou mais...",
       "tooltip": "O que este token pode fazer com seus dados."
     },
-    "expiresAtOptional": {
-      "label": "Expira em (opcional)",
+    "expiresAt": {
+      "label": "Expira em",
       "tooltip": "Data em que este token deixa de funcionar."
     },
     "logo": {
