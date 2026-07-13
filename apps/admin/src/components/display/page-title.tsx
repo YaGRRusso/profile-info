@@ -32,8 +32,8 @@ export function PageTitle({
       {...props}
     >
       <div className="flex flex-col">
-        <div className="flex items-center gap-2 font-bold text-4xl">
-          <h1>{title}</h1>
+        <div className="flex items-center gap-2 text-4xl">
+          <h1 className="font-bold">{title}</h1>
           {help && (
             <HelpModal paragraphs={help.paragraphs} title={help.title} />
           )}
