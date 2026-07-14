@@ -21,6 +21,7 @@ import {
   userToUpdateInput,
 } from "@/forms/user";
 import { UserMultiForm } from "@/forms/user-multi";
+import { UserRole } from "@/generated/graphql/graphql";
 import { useQueryAllPages } from "@/hooks/custom/use-query-all-pages";
 import {
   useCreateOneUser,
@@ -36,9 +37,11 @@ import {
 import { type UserRow, useFindManyUsers } from "@/hooks/queries/users";
 import { cn } from "@/lib/cn";
 import { pageHelp } from "@/lib/page-help";
+import { requireRoles } from "@/lib/require-roles";
 import { UsersTable } from "./-components/table";
 
 export const Route = createFileRoute("/_authenticated/_sidebar/users/")({
+  beforeLoad: requireRoles(UserRole.SuperAdmin),
   component: RouteComponent,
 });
 
