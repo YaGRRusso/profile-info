@@ -38,7 +38,9 @@ export class UsersService {
     return this.repository.crud.findOne({ filters });
   }
 
-  findOneByEmailWithPassword(email: string): Promise<UserWithPasswordEntity> {
+  findOneByEmailWithPassword(
+    email: string
+  ): Promise<UserWithPasswordEntity | null> {
     return this.repository.findOneByEmailWithPassword(email);
   }
 
@@ -57,7 +59,7 @@ export class UsersService {
     limit?: number;
     skip?: number;
   }): Promise<MultiPaged<UserEntityRecord>> {
-    return this.repository.crud.findMany({ filters, sort, skip, limit });
+    return this.repository.crud.findMany({ filters, limit, skip, sort });
   }
 
   async register({
@@ -66,9 +68,9 @@ export class UsersService {
   }: RegisterUserInput): Promise<UserEntityRecord> {
     return this.repository.crud.createOne({
       ...input,
+      disabled: true,
       password: await hash(password, 8),
       role: UserRole.USER,
-      disabled: true,
     });
   }
 
@@ -80,8 +82,8 @@ export class UsersService {
 
     return this.repository.crud.createOne({
       ...createUserInput,
-      password: await hash(password, 8),
       disabled: false,
+      password: await hash(password, 8),
     });
   }
 
@@ -97,8 +99,8 @@ export class UsersService {
     const inputs: UserCreateRecord[] = await Promise.all(
       createUserInputs.map(async ({ password, ...createUserInput }) => ({
         ...createUserInput,
-        password: await hash(password, 8),
         disabled: false,
+        password: await hash(password, 8),
       }))
     );
 
@@ -164,12 +166,14 @@ export class UsersService {
       this.assertDeletable(user);
     }
 
-    for (const user of users) {
-      await this.eventEmitter.emitAsync(
-        DomainEvents.user.deleted,
-        new UserDeletedEvent(user.id)
-      );
-    }
+    await Promise.all(
+      users.map((user) =>
+        this.eventEmitter.emitAsync(
+          DomainEvents.user.deleted,
+          new UserDeletedEvent(user.id)
+        )
+      )
+    );
 
     return this.repository.crud.deleteManyById(ids);
   }

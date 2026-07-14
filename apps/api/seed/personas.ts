@@ -1,13 +1,20 @@
 import { UserRole } from "@/core/enums/user-role.enum";
 
-export type PersonaKey = "empty" | "lite" | "joao" | "maria" | "full" | "admin";
+export type PersonaKey =
+  | "empty"
+  | "joao"
+  | "maria"
+  | "full"
+  | "pending"
+  | "admin";
 
 /**
  * Dev personas for manual QA and e2e fixtures (`@test/fixtures/sign-in-persona`).
  *
  * Catalog: GLOBAL pool is owned by `admin`; each USER persona may add LOCAL skills/orgs.
  * The first LOCAL skill and org per persona is always `disabled: true` for picker UX.
- * `empty` / `admin` have no LOCAL catalog rows.
+ * `empty` / `pending` / `admin` have no LOCAL catalog rows.
+ * `pending` mirrors post-register approval (`disabled: true`; sign-in rejected).
  */
 export interface PersonaEntityCounts {
   courses: number;
@@ -22,6 +29,8 @@ export interface PersonaLocalCatalogCounts {
 }
 
 export interface PersonaDefinition {
+  /** When true, user cannot sign in (approval queue QA). Defaults to false. */
+  disabled?: boolean;
   email: string;
   entities: PersonaEntityCounts;
   key: PersonaKey;
@@ -34,65 +43,66 @@ export interface PersonaDefinition {
 }
 
 export const PERSONAS: Record<PersonaKey, PersonaDefinition> = {
-  empty: {
-    key: "empty",
-    email: "empty@profile.info",
-    name: "E",
-    nickname: "empty",
-    role: UserRole.USER,
-    entities: { courses: 0, educations: 0, experiences: 0, projects: 0 },
-    localCatalog: { skills: 0, organizations: 0 },
-    profileSkillCount: 0,
-  },
-  lite: {
-    key: "lite",
-    email: "lite@profile.info",
-    name: "Lite",
-    nickname: "lite",
-    role: UserRole.USER,
-    entities: { courses: 1, educations: 1, experiences: 1, projects: 1 },
-    localCatalog: { skills: 2, organizations: 1 },
-    profileSkillCount: 4,
-  },
-  joao: {
-    key: "joao",
-    email: "joao@profile.info",
-    name: "João",
-    nickname: "joao",
-    role: UserRole.USER,
-    entities: { courses: 4, educations: 2, experiences: 2, projects: 3 },
-    localCatalog: { skills: 4, organizations: 2 },
-    profileSkillCount: 10,
-  },
-  maria: {
-    key: "maria",
-    email: "maria@profile.info",
-    name: "Maria",
-    nickname: "maria",
-    role: UserRole.USER,
-    entities: { courses: 4, educations: 2, experiences: 2, projects: 3 },
-    localCatalog: { skills: 4, organizations: 2 },
-    profileSkillCount: 10,
-  },
-  full: {
-    key: "full",
-    email: "full@profile.info",
-    name: "Dr. Prof. Eng. Arquiteto de Software Sênior Especialista em Plataformas Distribuídas e Liderança Técnica",
-    nickname: "full",
-    role: UserRole.USER,
-    entities: { courses: 20, educations: 5, experiences: 5, projects: 10 },
-    localCatalog: { skills: 8, organizations: 4 },
-    profileSkillCount: 24,
-  },
   admin: {
-    key: "admin",
     email: "admin@profile.info",
+    entities: { courses: 0, educations: 0, experiences: 0, projects: 0 },
+    key: "admin",
+    localCatalog: { organizations: 0, skills: 0 },
     name: "Admin",
     nickname: "admin",
-    role: UserRole.SUPER_ADMIN,
-    entities: { courses: 0, educations: 0, experiences: 0, projects: 0 },
-    localCatalog: { skills: 0, organizations: 0 },
     profileSkillCount: 0,
+    role: UserRole.SUPER_ADMIN,
+  },
+  empty: {
+    email: "empty@profile.info",
+    entities: { courses: 0, educations: 0, experiences: 0, projects: 0 },
+    key: "empty",
+    localCatalog: { organizations: 0, skills: 0 },
+    name: "E",
+    nickname: "empty",
+    profileSkillCount: 0,
+    role: UserRole.USER,
+  },
+  full: {
+    email: "full@profile.info",
+    entities: { courses: 20, educations: 5, experiences: 5, projects: 10 },
+    key: "full",
+    localCatalog: { organizations: 4, skills: 8 },
+    name: "Dr. Prof. Eng. Arquiteto de Software Sênior Especialista em Plataformas Distribuídas e Liderança Técnica",
+    nickname: "full",
+    profileSkillCount: 24,
+    role: UserRole.USER,
+  },
+  joao: {
+    email: "joao@profile.info",
+    entities: { courses: 4, educations: 2, experiences: 2, projects: 3 },
+    key: "joao",
+    localCatalog: { organizations: 2, skills: 4 },
+    name: "João",
+    nickname: "joao",
+    profileSkillCount: 10,
+    role: UserRole.USER,
+  },
+  maria: {
+    email: "maria@profile.info",
+    entities: { courses: 4, educations: 2, experiences: 2, projects: 3 },
+    key: "maria",
+    localCatalog: { organizations: 2, skills: 4 },
+    name: "Maria",
+    nickname: "maria",
+    profileSkillCount: 10,
+    role: UserRole.USER,
+  },
+  pending: {
+    disabled: true,
+    email: "pending@profile.info",
+    entities: { courses: 0, educations: 0, experiences: 0, projects: 0 },
+    key: "pending",
+    localCatalog: { organizations: 0, skills: 0 },
+    name: "Pending",
+    nickname: "pending",
+    profileSkillCount: 0,
+    role: UserRole.USER,
   },
 };
 

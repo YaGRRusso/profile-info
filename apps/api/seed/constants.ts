@@ -40,34 +40,52 @@ export const CATALOG_ORGANIZATION_COUNT = 32;
 
 /** Stable faker offsets so local catalog slugs do not collide across personas. */
 export const PERSONA_CATALOG_SEED_OFFSETS = {
+  admin: 5000,
   empty: 0,
-  lite: 1000,
+  full: 4000,
   joao: 2000,
   maria: 3000,
-  full: 4000,
-  admin: 5000,
+  pending: 6000,
 } as const;
+
+/** Fixed past expiry for the expired joão token (deterministic seed QA). */
+export const SEED_EXPIRED_API_TOKEN_AT = new Date("2020-01-01T00:00:00.000Z");
 
 export const SEED_API_TOKENS = [
   {
     id: "674a00000000000000000001",
-    owner: "joao" as const,
     name: "João dev (query)",
+    owner: "joao" as const,
     permissions: [ApiTokenPermission.QUERY],
     secret: "joao-query-dev-secret-32-chars!!",
   },
   {
     id: "674a00000000000000000002",
-    owner: "joao" as const,
     name: "João dev (mutate)",
+    owner: "joao" as const,
     permissions: [ApiTokenPermission.MUTATE],
     secret: "joao-mutate-dev-secret-32-chars!!",
   },
   {
     id: "674a00000000000000000003",
-    owner: "maria" as const,
     name: "Maria dev (query + mutate)",
+    owner: "maria" as const,
     permissions: [ApiTokenPermission.QUERY, ApiTokenPermission.MUTATE],
     secret: "maria-combined-dev-secret-32-chars!!",
+  },
+  {
+    id: "674a00000000000000000004",
+    name: "Admin dev (query)",
+    owner: "admin" as const,
+    permissions: [ApiTokenPermission.QUERY],
+    secret: "admin-query-dev-secret-32-chars!!",
+  },
+  {
+    expiresAt: SEED_EXPIRED_API_TOKEN_AT,
+    id: "674a00000000000000000005",
+    name: "João dev (expired query)",
+    owner: "joao" as const,
+    permissions: [ApiTokenPermission.QUERY],
+    secret: "joao-expired-dev-secret-32-chars!",
   },
 ] as const;

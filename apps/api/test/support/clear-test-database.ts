@@ -6,4 +6,6 @@ export async function clearTestDatabase(module: TestingModule): Promise<void> {
   const connection = module.get<Connection>(getConnectionToken());
   if (!connection.db) return;
   await connection.db.dropDatabase();
+  // dropDatabase removes indexes; rebuild schema indexes so uniqueness holds.
+  await connection.syncIndexes();
 }

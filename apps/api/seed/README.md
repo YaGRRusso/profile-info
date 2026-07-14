@@ -10,11 +10,11 @@ Password for all personas: `123123` (`DEV_PASSWORD` in `constants.ts`).
 | Key | Email | Role | LOCAL catalog | Private entities | Notes |
 |-----|-------|------|---------------|------------------|-------|
 | `empty` | empty@profile.info | USER | — | — | Empty profile |
-| `lite` | lite@profile.info | USER | 2 skills, 1 org | 1 each | Minimal tenant |
-| `joao` | joao@profile.info | USER | 4 skills, 2 orgs | moderate | QUERY + MUTATE API tokens |
+| `joao` | joao@profile.info | USER | 4 skills, 2 orgs | moderate | QUERY + MUTATE + expired API tokens |
 | `maria` | maria@profile.info | USER | 4 skills, 2 orgs | moderate | Combined API token |
 | `full` | full@profile.info | USER | 8 skills, 4 orgs | stress counts | Long display name |
-| `admin` | admin@profile.info | SUPER_ADMIN | — | — | Owns GLOBAL catalog pool |
+| `pending` | pending@profile.info | USER | — | — | `disabled: true` (approval queue; sign-in rejected) |
+| `admin` | admin@profile.info | SUPER_ADMIN | — | — | Owns GLOBAL catalog pool; QUERY API token |
 
 ## Catalog layout
 
@@ -32,6 +32,14 @@ Password for all personas: `123123` (`DEV_PASSWORD` in `constants.ts`).
 ## API tokens
 
 Logged after seed (`SEED_API_TOKENS` in `constants.ts`). Send as header `X-Api-Key: pi_<id>_<secret>`.
+
+| Owner | Permissions | Notes |
+|-------|-------------|-------|
+| joão | QUERY | Active |
+| joão | MUTATE | Active |
+| maria | QUERY+MUTATE | Active |
+| admin | QUERY | Active (SUPER_ADMIN key) |
+| joão | QUERY | `expiresAt` in the past (`SEED_EXPIRED_API_TOKEN_AT`) — rejected by strategy |
 
 ## Tests
 

@@ -12,11 +12,11 @@ jest.mock("bcryptjs", () => ({
 }));
 
 const mockUser = {
-  id: "user-id-123",
+  disabled: false,
   email: "user@example.com",
+  id: "user-id-123",
   password: "hashed-password",
   role: UserRole.USER,
-  disabled: false,
 };
 
 const mockUsersService: Partial<jest.Mocked<UsersService>> = {
@@ -79,8 +79,8 @@ describe("AuthService", () => {
         mockUser.password
       );
       expect(mockJwtService.signAsync).toHaveBeenCalledWith({
-        sub: mockUser.id,
         role: mockUser.role,
+        sub: mockUser.id,
       });
       expect(mockUsersValidator.assertUserEnabled).toHaveBeenCalledWith(
         mockUser
@@ -114,7 +114,7 @@ describe("AuthService", () => {
       );
     });
 
-    it("should throw NotFoundException when user is not found", async () => {
+    it("should throw UnauthorizedException when user is not found", async () => {
       (
         mockUsersService.findOneByEmailWithPassword as jest.Mock
       ).mockResolvedValue(null);

@@ -19,33 +19,39 @@ export async function createPersonaUser(
 ) {
   const profileIndex = persona.key.length;
 
-  return users.create({
-    name: persona.name,
-    nickname: persona.nickname,
-    email: persona.email,
-    password: await hash(DEV_PASSWORD, 8),
-    role: persona.role,
+  // Consume faker synchronously before any await so parallel callers stay deterministic.
+  const document = {
+    address: optionalForIndex(profileIndex + 3, () =>
+      faker.location.streetAddress()
+    ),
     avatar: optionalForIndex(profileIndex, () => faker.image.urlPicsumPhotos()),
     birth: optionalForIndex(profileIndex + 1, () =>
       faker.date.past({ years: 30 })
     ),
-    phone: optionalForIndex(profileIndex + 2, () => faker.phone.number()),
-    address: optionalForIndex(profileIndex + 3, () =>
-      faker.location.streetAddress()
-    ),
+    disabled: persona.disabled ?? false,
+    email: persona.email,
     i18n: optionalForIndex(profileIndex + 4, () =>
       SEED_LOCALES.map((locale) => ({
         locale,
         messages: {
-          title: loremSentences(pickTextSize(profileIndex), locale),
           description: loremSentences(pickTextSize(profileIndex + 1), locale),
+          title: loremSentences(pickTextSize(profileIndex), locale),
         },
       }))
     ),
+    name: persona.name,
+    nickname: persona.nickname,
+    phone: optionalForIndex(profileIndex + 2, () => faker.phone.number()),
+    role: persona.role,
+    skillIds: profileSkillIds.length > 0 ? profileSkillIds : undefined,
     urls: arrayBySize(pickArraySize(profileIndex), () => ({
       title: faker.helpers.arrayElement(URL_TYPES),
       value: faker.internet.url(),
     })),
-    skillIds: profileSkillIds.length > 0 ? profileSkillIds : undefined,
+  };
+
+  return users.create({
+    ...document,
+    password: await hash(DEV_PASSWORD, 8),
   });
 }

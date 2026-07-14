@@ -1,9 +1,11 @@
 import { Module } from "@nestjs/common";
 import { ConfigModule, ConfigService } from "@nestjs/config";
+import { APP_FILTER } from "@nestjs/core";
 import { EventEmitterModule } from "@nestjs/event-emitter";
 import { MongooseModule } from "@nestjs/mongoose";
 import { AppController } from "@/app.controller";
 import { AppService } from "@/app.service";
+import { PersistenceExceptionFilter } from "@/core/filters/persistence-exception.filter";
 import { ApiTokensModule } from "@/modules/api-tokens/api-tokens.module";
 import { AuthModule } from "@/modules/auth/auth.module";
 import { CoursesModule } from "@/modules/courses/courses.module";
@@ -18,6 +20,7 @@ import { UsersModule } from "@/modules/users/users.module";
 import { GraphqlModule } from "@/platform/graphql/graphql.module";
 
 @Module({
+  controllers: [AppController],
   imports: [
     EventEmitterModule.forRoot({ global: true }),
     ConfigModule.forRoot({ isGlobal: true }),
@@ -25,9 +28,9 @@ import { GraphqlModule } from "@/platform/graphql/graphql.module";
       imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: (config: ConfigService) => ({
-        uri: config.getOrThrow("DATABASE_URL"),
-        serverSelectionTimeoutMS: 3000,
         connectTimeoutMS: 3000,
+        serverSelectionTimeoutMS: 3000,
+        uri: config.getOrThrow("DATABASE_URL"),
       }),
     }),
     GraphqlModule,
@@ -43,7 +46,9 @@ import { GraphqlModule } from "@/platform/graphql/graphql.module";
     DashboardModule,
     ResumeModule,
   ],
-  controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+    { provide: APP_FILTER, useClass: PersistenceExceptionFilter },
+  ],
 })
 export class TestAppModule {}

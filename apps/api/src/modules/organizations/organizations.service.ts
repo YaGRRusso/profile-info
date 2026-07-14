@@ -85,7 +85,7 @@ export class OrganizationsService {
   ): Promise<MultiPaged<OrganizationEntityRecord>> {
     return this.repository
       .catalogCrud(ctx)
-      .findMany({ filters, sort, skip, limit });
+      .findMany({ filters, limit, skip, sort });
   }
 
   findManyActive(
@@ -104,9 +104,9 @@ export class OrganizationsService {
   ): Promise<MultiPaged<OrganizationEntityRecord>> {
     return this.repository.catalogCrud(ctx).findMany({
       filters: this.withActiveFilter(filters),
-      sort,
-      skip,
       limit,
+      skip,
+      sort,
     });
   }
 
@@ -184,12 +184,14 @@ export class OrganizationsService {
       .catalogCrud(ctx)
       .findManyById(ids);
 
-    for (const organization of organizations) {
-      await this.eventEmitter.emitAsync(
-        DomainEvents.organization.deleted,
-        new OrganizationDeletedEvent(organization.id)
-      );
-    }
+    await Promise.all(
+      organizations.map((organization) =>
+        this.eventEmitter.emitAsync(
+          DomainEvents.organization.deleted,
+          new OrganizationDeletedEvent(organization.id)
+        )
+      )
+    );
 
     return this.repository.catalogCrud(ctx).deleteManyById(ids);
   }
@@ -216,8 +218,8 @@ export class OrganizationsService {
       "name updatedAt"
     );
     return rows.map((row) => ({
-      slug: row.name as string,
       i18n: [],
+      slug: row.name as string,
       updatedAt: row.updatedAt,
     }));
   }

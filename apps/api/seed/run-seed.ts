@@ -92,62 +92,87 @@ export async function runSeed(): Promise<void> {
   const skillIdsByPersona: Record<PersonaKey, string[]> = {
     admin: [...globalSkillIds],
     empty: [...globalSkillIds],
-    lite: [...globalSkillIds],
+    full: [...globalSkillIds],
     joao: [...globalSkillIds],
     maria: [...globalSkillIds],
-    full: [...globalSkillIds],
+    pending: [...globalSkillIds],
   };
 
   const organizationIdsByPersona: Record<PersonaKey, string[]> = {
     admin: [...globalOrganizationIds],
     empty: [...globalOrganizationIds],
-    lite: [...globalOrganizationIds],
+    full: [...globalOrganizationIds],
     joao: [...globalOrganizationIds],
     maria: [...globalOrganizationIds],
-    full: [...globalOrganizationIds],
+    pending: [...globalOrganizationIds],
   };
 
-  for (const key of PERSONA_KEYS) {
-    if (key === "admin") continue;
+  const nonAdminKeys = PERSONA_KEYS.filter((key) => key !== "admin");
 
+  const createdUsers = await Promise.all(
+    nonAdminKeys.map((key) => {
+      const persona = PERSONAS[key];
+      const profileSkillIds = pickProfileSkillIds(
+        globalSkillIds,
+        persona.profileSkillCount
+      );
+
+      return createPersonaUser(users, persona, profileSkillIds).then(
+        (user) => ({
+          key,
+          user,
+        })
+      );
+    })
+  );
+
+  for (const { key, user } of createdUsers) {
+    userDocs[key] = user;
+  }
+
+  const localCatalogWrites: Promise<void>[] = [];
+
+  for (const key of nonAdminKeys) {
     const persona = PERSONAS[key];
-    const profileSkillIds = pickProfileSkillIds(
-      globalSkillIds,
-      persona.profileSkillCount
-    );
-
-    userDocs[key] = await createPersonaUser(users, persona, profileSkillIds);
-
     const ownerId = String(userDocs[key]._id);
     const catalogSeedOffset = PERSONA_CATALOG_SEED_OFFSETS[key];
 
     if (persona.localCatalog.skills > 0) {
-      const localSkillDocs = await skills.create(
-        buildLocalSkillsForPersona(
-          ownerId,
-          persona.localCatalog.skills,
-          catalogSeedOffset
-        )
+      const localSkillPayload = buildLocalSkillsForPersona(
+        ownerId,
+        persona.localCatalog.skills,
+        catalogSeedOffset
       );
-      skillIdsByPersona[key].push(
-        ...localSkillDocs.map((doc) => String(doc._id))
+      localCatalogWrites.push(
+        skills.create(localSkillPayload).then((localSkillDocs) => {
+          skillIdsByPersona[key].push(
+            ...localSkillDocs.map((doc) => String(doc._id))
+          );
+        })
       );
     }
 
     if (persona.localCatalog.organizations > 0) {
-      const localOrganizationDocs = await organizations.create(
-        buildLocalOrganizationsForPersona(
-          ownerId,
-          persona.localCatalog.organizations,
-          catalogSeedOffset
-        )
+      const localOrganizationPayload = buildLocalOrganizationsForPersona(
+        ownerId,
+        persona.localCatalog.organizations,
+        catalogSeedOffset
       );
-      organizationIdsByPersona[key].push(
-        ...localOrganizationDocs.map((doc) => String(doc._id))
+      localCatalogWrites.push(
+        organizations
+          .create(localOrganizationPayload)
+          .then((localOrganizationDocs) => {
+            organizationIdsByPersona[key].push(
+              ...localOrganizationDocs.map((doc) => String(doc._id))
+            );
+          })
       );
     }
   }
 
+  await Promise.all(localCatalogWrites);
+
+  const privateEntityWrites: Promise<unknown>[] = [];
   let entityOffset = 0;
 
   for (const key of PERSONA_KEYS) {
@@ -157,54 +182,64 @@ export async function runSeed(): Promise<void> {
     const organizationIds = organizationIdsByPersona[key];
 
     if (persona.entities.courses > 0) {
-      await courses.create(
-        buildCoursesForPersona(
-          ownerId,
-          persona.entities,
-          organizationIds,
-          skillIds,
-          entityOffset
+      privateEntityWrites.push(
+        courses.create(
+          buildCoursesForPersona(
+            ownerId,
+            persona.entities,
+            organizationIds,
+            skillIds,
+            entityOffset
+          )
         )
       );
     }
 
     if (persona.entities.educations > 0) {
-      await educations.create(
-        buildEducationsForPersona(
-          ownerId,
-          persona.entities,
-          organizationIds,
-          skillIds,
-          entityOffset + 100
+      privateEntityWrites.push(
+        educations.create(
+          buildEducationsForPersona(
+            ownerId,
+            persona.entities,
+            organizationIds,
+            skillIds,
+            entityOffset + 100
+          )
         )
       );
     }
 
     if (persona.entities.projects > 0) {
-      await projects.create(
-        buildProjectsForPersona(
-          ownerId,
-          persona.entities,
-          skillIds,
-          entityOffset + 200
+      privateEntityWrites.push(
+        projects.create(
+          buildProjectsForPersona(
+            ownerId,
+            persona.entities,
+            skillIds,
+            entityOffset + 200
+          )
         )
       );
     }
 
     if (persona.entities.experiences > 0) {
-      await experiences.create(
-        buildExperiencesForPersona(
-          ownerId,
-          persona.entities,
-          organizationIds,
-          skillIds,
-          entityOffset + 300
+      privateEntityWrites.push(
+        experiences.create(
+          buildExperiencesForPersona(
+            ownerId,
+            persona.entities,
+            organizationIds,
+            skillIds,
+            entityOffset + 300
+          )
         )
       );
     }
 
     entityOffset += 500;
   }
+
+  await Promise.all(privateEntityWrites);
 
   const ownersByKey = Object.fromEntries(
     PERSONA_KEYS.map((key) => [key, userDocs[key]._id])
@@ -214,37 +249,43 @@ export async function runSeed(): Promise<void> {
     await Promise.all(
       SEED_API_TOKENS.map(async (token) => ({
         _id: token.id,
-        ownerId: ownersByKey[token.owner],
-        name: token.name,
         hashedSecret: await hash(token.secret, 8),
+        name: token.name,
+        ownerId: ownersByKey[token.owner],
         permissions: [...token.permissions],
+        ...("expiresAt" in token && token.expiresAt
+          ? { expiresAt: token.expiresAt }
+          : {}),
       }))
     )
   );
 
   const counts = {
-    skills: await skills.countDocuments(),
-    organizations: await organizations.countDocuments(),
+    apiTokens: await apiTokens.countDocuments(),
     courses: await courses.countDocuments(),
     educations: await educations.countDocuments(),
-    projects: await projects.countDocuments(),
     experiences: await experiences.countDocuments(),
+    organizations: await organizations.countDocuments(),
+    projects: await projects.countDocuments(),
+    skills: await skills.countDocuments(),
     users: await users.countDocuments(),
-    apiTokens: await apiTokens.countDocuments(),
   };
 
   console.info(`faker.seed(${FAKER_SEED})`);
   console.info(`password for all personas: ${DEV_PASSWORD}`);
   for (const key of PERSONA_KEYS) {
     const persona = PERSONAS[key];
+    const disabledNote = persona.disabled ? ", disabled" : "";
     console.info(
-      `${persona.email} / ${DEV_PASSWORD} (${persona.role}) — ${persona.name}`
+      `${persona.email} / ${DEV_PASSWORD} (${persona.role}${disabledNote}) — ${persona.name}`
     );
   }
   for (const token of SEED_API_TOKENS) {
     const value = `${API_TOKEN_PREFIX}${token.id}_${token.secret}`;
+    const expiredNote =
+      "expiresAt" in token && token.expiresAt ? ", expired" : "";
     console.info(
-      `${token.owner} API token (${token.permissions.join("+")}): X-Api-Key: ${value}`
+      `${token.owner} API token (${token.permissions.join("+")}${expiredNote}): X-Api-Key: ${value}`
     );
   }
   console.info("seeded:", counts);

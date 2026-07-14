@@ -82,7 +82,7 @@ export class SkillsService {
   ): Promise<MultiPaged<SkillEntityRecord>> {
     return this.repository
       .catalogCrud(ctx)
-      .findMany({ filters, sort, skip, limit });
+      .findMany({ filters, limit, skip, sort });
   }
 
   findManyActive(
@@ -101,9 +101,9 @@ export class SkillsService {
   ): Promise<MultiPaged<SkillEntityRecord>> {
     return this.repository.catalogCrud(ctx).findMany({
       filters: this.withActiveFilter(filters),
-      sort,
-      skip,
       limit,
+      skip,
+      sort,
     });
   }
 
@@ -176,12 +176,14 @@ export class SkillsService {
   async removeMany(ctx: AuthContext, ids: string[]): Promise<BatchEntity> {
     const skills = await this.repository.catalogCrud(ctx).findManyById(ids);
 
-    for (const skill of skills) {
-      await this.eventEmitter.emitAsync(
-        DomainEvents.skill.deleted,
-        new SkillDeletedEvent(skill.id)
-      );
-    }
+    await Promise.all(
+      skills.map((skill) =>
+        this.eventEmitter.emitAsync(
+          DomainEvents.skill.deleted,
+          new SkillDeletedEvent(skill.id)
+        )
+      )
+    );
 
     return this.repository.catalogCrud(ctx).deleteManyById(ids);
   }
@@ -208,8 +210,8 @@ export class SkillsService {
       "slug i18n updatedAt"
     );
     return rows.map((row) => ({
-      slug: row.slug as string | undefined,
       i18n: (row.i18n as RecentActivityRecord["i18n"]) ?? [],
+      slug: row.slug as string | undefined,
       updatedAt: row.updatedAt,
     }));
   }

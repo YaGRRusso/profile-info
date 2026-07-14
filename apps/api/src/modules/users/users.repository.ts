@@ -1,8 +1,7 @@
-import { Injectable, NotFoundException } from "@nestjs/common";
+import { Injectable } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import { isNil } from "lodash";
 import { Model } from "mongoose";
-import { PERSISTENCE_NOT_FOUND } from "@/core/persistence/persistence.messages";
 import { CrudRepository } from "@/core/persistence/repositories/crud/crud.repository";
 import { FilterUserInput } from "./dto/filter-user.input";
 import { SortUserInput } from "./dto/sort-user.input";
@@ -35,13 +34,13 @@ export class UsersRepository {
 
   async findOneByEmailWithPassword(
     email: string
-  ): Promise<UserWithPasswordEntity> {
+  ): Promise<UserWithPasswordEntity | null> {
     const document = await this.model
       .findOne({ email })
       .select("+password")
       .exec();
 
-    if (isNil(document)) throw new NotFoundException(PERSISTENCE_NOT_FOUND);
+    if (isNil(document)) return null;
 
     return {
       ...this.mapper.toDomain(document),
