@@ -1,54 +1,54 @@
 import { UserRole } from "@/core/enums/user-role.enum";
 import type { UserModel } from "../schemas/user.schema";
-import { UserMapper } from "./user.mapper";
+import { UserMapper, type UserUpdateRecord } from "./user.mapper";
 
 describe("UserMapper", () => {
   const mapper = new UserMapper();
 
   it("maps persistence fields to the domain entity", () => {
     const model = {
-      id: "507f1f77bcf86cd799439011",
       createdAt: new Date("2024-01-01"),
-      updatedAt: new Date("2024-01-02"),
+      email: "alice@profile.info",
+      id: "507f1f77bcf86cd799439011",
       name: "Alice",
       nickname: "alice",
-      email: "alice@profile.info",
       password: "secret",
       role: UserRole.USER,
+      updatedAt: new Date("2024-01-02"),
       urls: [{ title: "GitHub", value: "https://github.com/alice" }],
     } as UserModel;
 
     expect(mapper.toDomain(model)).toEqual({
-      id: "507f1f77bcf86cd799439011",
+      address: undefined,
+      avatar: undefined,
+      birth: undefined,
       createdAt: model.createdAt,
-      updatedAt: model.updatedAt,
+      disabled: false,
+      email: "alice@profile.info",
+      i18n: undefined,
+      id: "507f1f77bcf86cd799439011",
       name: "Alice",
       nickname: "alice",
-      email: "alice@profile.info",
-      role: UserRole.USER,
-      disabled: false,
-      avatar: undefined,
       phone: undefined,
-      birth: undefined,
-      address: undefined,
-      i18n: undefined,
-      urls: [{ title: "GitHub", value: "https://github.com/alice" }],
+      role: UserRole.USER,
       skillIds: undefined,
+      updatedAt: model.updatedAt,
+      urls: [{ title: "GitHub", value: "https://github.com/alice" }],
     });
   });
 
   it("maps skillIds to string ids on the domain entity", () => {
     const skillId = "507f1f77bcf86cd799439014";
     const model = {
-      id: "507f1f77bcf86cd799439011",
       createdAt: new Date("2024-01-01"),
-      updatedAt: new Date("2024-01-02"),
+      email: "alice@profile.info",
+      id: "507f1f77bcf86cd799439011",
       name: "Alice",
       nickname: "alice",
-      email: "alice@profile.info",
       password: "secret",
       role: UserRole.USER,
       skillIds: [skillId],
+      updatedAt: new Date("2024-01-02"),
     } as UserModel;
 
     expect(mapper.toDomain(model).skillIds).toEqual([skillId]);
@@ -59,9 +59,9 @@ describe("UserMapper", () => {
 
     expect(
       mapper.toPersistenceForCreate({
+        email: "alice@profile.info",
         name: "Alice",
         nickname: "alice",
-        email: "alice@profile.info",
         password: "hashed",
         role: UserRole.USER,
         skillIds: [skillId],
@@ -71,19 +71,25 @@ describe("UserMapper", () => {
     });
   });
 
+  it("maps update input with skillIds null to clear the field", () => {
+    expect(
+      mapper.toPersistenceForUpdate({ skillIds: null } as UserUpdateRecord)
+    ).toMatchObject({ skillIds: null });
+  });
+
   it("maps create input to a persistence payload", () => {
     expect(
       mapper.toPersistenceForCreate({
+        email: "alice@profile.info",
         name: "Alice",
         nickname: "alice",
-        email: "alice@profile.info",
         password: "hashed",
         role: UserRole.USER,
       })
     ).toEqual({
+      email: "alice@profile.info",
       name: "Alice",
       nickname: "alice",
-      email: "alice@profile.info",
       password: "hashed",
       role: UserRole.USER,
     });

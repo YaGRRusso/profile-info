@@ -31,6 +31,10 @@ describe("base.mapper", () => {
       expect(toObjectIds(undefined)).toBeUndefined();
     });
 
+    it("returns null when values are null (clear on update)", () => {
+      expect(toObjectIds(null)).toBeNull();
+    });
+
     it("rejects when any id is invalid", () => {
       const validId = new mongoose.Types.ObjectId().toHexString();
 
