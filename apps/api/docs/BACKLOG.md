@@ -20,12 +20,11 @@ Deferred API and admin work, ordered by criticality, then value, then effort.
 - **Collaborative catalog** — Users submit skill/org requests; `SUPER_ADMIN` moderates; local overrides per tenant.
 - **Private CV + REST auth** — `GET /resume.pdf` is public today; REST routes should accept session JWT or `X-Api-Key`.
 - **Platform token BYOK** — Optional user-owned OpenRouter key. Per-user throttle on AI
-  mutations shipped (ADR 003). See `apps/api/docs/adr/003-ai-usage-quota-byok.md`.
+  mutations shipped (ADR 003). See `apps/api/docs/adr/003-platform-ai-throttle.md`.
 
 ### UI
 
-- **Admin panel multi-tenant** — Role-aware UI, token management, super-admin tenant view.
-- **Users table (admin)** — Super-admin user list/management.
+- **Admin panel multi-tenant** — Broader role-aware chrome beyond Users CRUD (API token management UX, super-admin tenant overview). Users list/CRUD for `SUPER_ADMIN` is shipped (`routes/.../users/`).
 - **Profile skill suggestions** — On profile edit, surface skills already linked on the user's experiences, educations, courses, and projects as suggestions when picking `skillIds`. Read-only hints only; user still opts in manually (no auto-sync to profile).
 
 ### Local catalog follow-ups (ADR 001 — improvements, not defects)
@@ -49,14 +48,14 @@ These items were deferred; scope and security behave as documented and tested.
 
 ### Multi Users Expand
 
-- **User registration flow** — Decision needed: public sign-up, invite-only, or paid.
+- **User registration policy** — Self-serve `register` + admin enable (`disabled` gate, seed `pending`, Users admin) is shipped. Product decision still open: invite-only, paid, or keep open sign-up with approval.
 - **CORS per tenant / domain** — Fixed allowlist breaks when portfolios run on other origins.
 - **API token hardening** — `lastUsedAt`, per-user limits, rotation, rate limiting, audit log.
-- **AI tools plans / rate limits** — Cost control when user base grows; optional paid tier.
+- **AI tools plans / rate limits** — Cost control when user base grows; optional paid tier (beyond ADR 003 platform throttle).
 
 ### Deferred polish (from shipped ADRs)
 
-- **Admin i18n (ADR 002)** — Form field labels/placeholders/validation; table headers, filters, toolbar; dashboard copy (stats, greeting); login, toasts; locale `es` in switcher + JSON. See `apps/admin/docs/adr/002-admin-i18n.md`.
+- **Admin i18n (ADR 002)** — Remaining: table column headers, filter facet labels, enum labels in cells; locale `es` in switcher + JSON. Phases 1–4b (foundation, chrome, forms, validation) are shipped. See `apps/admin/docs/adr/002-admin-i18n.md`.
 - **Resume label** — "Certifications" section label vs `Course` entity naming.
 - **Skill form AI** — Translate/AI on skill descriptions (organization form already has it).
 - **Skill category i18n** — `category` is a free string today; translate per locale if needed.

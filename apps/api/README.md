@@ -11,7 +11,7 @@ by the `@profile-info/admin` dashboard.
 - **Apollo GraphQL (code-first)**: schema generated to `src/schema.gql`.
 - **MongoDB + Mongoose**: ODM schemas in `src/modules/<name>/schemas/`.
 - **Passport JWT**: global `GqlAuthenticationGuard` with `@Public()` opt-out and `GqlAuthorizationGuard` for roles and API token permissions.
-- **DataLoader**: batches skill and organization lookups on nested fields.
+- **DataLoader**: batches skill, organization, and user lookups on nested fields.
 - **Jest**: unit (`src/**/*.spec.ts`, including `core/persistence/repositories/*.spec.ts`), e2e (`test/e2e/`), and integration (`test/integration/`). E2e/integration require MongoDB on `localhost:27017`. Coverage: `npm run test:coverage`.
 
 ## Dependency map
@@ -27,7 +27,8 @@ integrations    ← external APIs; each folder = one adapter + port (abstract cl
   ↑
 modules         ← business domains (resolvers, services, schemas)
   ↑
-platform        ← transport composition (GraphQL wiring, DataLoader aggregation)
+platform        ← transport composition (GraphQL wiring, DataLoader aggregation);
+                  may import modules for composition only
 ```
 
 | Folder | What it is | Why it exists |
@@ -58,24 +59,25 @@ The threat model is intentional, not accidental:
 
 | Operation class | Auth | Who |
 |-----------------|------|-----|
-| Catalog reads (`findManySkills`, `findManyOrganizations`, `findManyUsers`) | JWT | Authenticated users |
+| Catalog reads (`findManySkills`, `findManyOrganizations`) | JWT | Authenticated; scoped (`USER`: GLOBAL + own LOCAL; `SUPER_ADMIN`: all) — ADR 001 |
+| User list / user admin mutations | JWT + `@Roles(SUPER_ADMIN)` | Super admin only |
 | Private entity reads (`findManyCourses`, …) | JWT + `@Auth()` | Tenant-scoped |
 | `GET /resume.pdf?userId=` | None (REST; `@Public()`) | Anyone with profile owner id |
-| `signIn` | None (`@Public()`) | Anyone |
-| `getMe` / `updateMe` | JWT | Any authenticated user |
+| `signIn` / `register` | None (`@Public()`) | Anyone (`register` creates `disabled: true` USER) |
+| `getMe` / `updateMe` | JWT | Any authenticated enabled user |
 | `dashboard` | JWT + `@Auth()` | USER (own data) / `SUPER_ADMIN` (cross-tenant) |
-| AI mutations (`atsSummarize`, `summarize`, `translate`) | JWT | Any authenticated user |
-| Catalog / user CRUD mutations | JWT + `SUPER_ADMIN` | Super admin only |
+| AI mutations (`atsSummarize`, `summarize`, `translate`) | JWT + per-user throttle | Any authenticated user (ADR 003) |
+| Catalog mutations | JWT + `@Auth()` | `USER`: own LOCAL only; `SUPER_ADMIN`: GLOBAL only (ADR 001) |
 | Private entity CRUD mutations | JWT + `@Auth()` | Tenant-scoped (`USER` own data; `SUPER_ADMIN` by explicit ID) |
 
 **Decisions:**
 
-- Private portfolio data requires JWT; `USER` sees only `ownerId === ctx.userId` (404 on wrong ID).
-- Catalog reads require JWT (phase 5a); mutations remain `SUPER_ADMIN`.
+- Private portfolio data requires JWT; `USER` sees only own rows (404 on wrong ID).
+- Catalog writes follow partition rules in ADR 001 — not a blanket `SUPER_ADMIN`-only mutate gate.
+- Public `register` creates disabled accounts; `SUPER_ADMIN` enables via Users admin / `updateOneUser`.
 - Missing or invalid JWT: guards throw `UnauthorizedException`; Apollo `formatError` exposes `extensions.code: UNAUTHENTICATED`. Insufficient role → `ForbiddenException` → `FORBIDDEN`. Admin clears auth on `UNAUTHENTICATED`.
 - `signIn` always returns `401 Unauthorized` for invalid credentials — no email enumeration via `404`.
 - Passwords are bcrypt-hashed on create **and** update; the hash is never exposed via GraphQL (`select: false`).
-
 ### AI flow
 
 ```
@@ -89,6 +91,7 @@ Resolver → AiToolsService → AiChatProvider.chat()  [loose integration DTO]
 | From | Can import |
 |------|------------|
 | `modules/*` | `common`, `core`, `integrations/*` **modules** (for DI); inject **ports** by type |
+| `platform/*` | `common`, `core`, `modules/*` (composition only) |
 | `integrations/*` | `common`, own internals |
 | `core` | `common` |
 | `common` | nothing |
@@ -109,12 +112,15 @@ src/
 │   ├── open-router/          # AI port + OpenRouter adapter
 │   ├── github/
 │   └── tavily/
+├── platform/
+│   └── graphql/              # GraphqlModule, LoadersService, loader registry
 └── modules/
-    ├── graphql/
     ├── auth/
     ├── dashboard/
     ├── resume/               # PDF export (REST GET /resume.pdf)
     ├── skills/               # Catalog CRUD; exports SkillsLoaderService
+    ├── organizations/
+    ├── users/                # UsersLoaderService (batchUsers)
     ├── ai-tools/
     │   ├── resource-detail/  # Orchestrator + *ExtractorService per source
     │   ├── prompts/
@@ -183,3 +189,6 @@ Seed credentials: personas at `*@profile.info` with password `123123` (`empty`, 
 
 - `docs/ER_MODEL.md`: MongoDB entity-relationship diagram and delete behavior
 - `docs/CLEAN_ARCHITECTURE.md`: dependency rules and layer breakdown
+- `docs/adr/001-local-catalog.md`: skill/organization partition scope
+- `docs/adr/003-platform-ai-throttle.md`: per-user AI mutation throttle
+- `docs/BACKLOG.md`: deferred work

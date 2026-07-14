@@ -42,12 +42,16 @@ src/
 │                       Cada um tem: Port (abstract class) + Adapter (service).
 │                       Regra: NÃO importa de modules/.
 │
+├── platform/        ← Composição de transporte (Apollo, LoadersService).
+│   └── graphql/        Pode importar modules/ só para agregar loaders.
+│
 └── modules/         ← Domínios de negócio. Cada módulo é uma feature completa.
-    ├── auth/           JWT + Guards
-    ├── graphql/        Apollo wiring + DataLoaders
-    ├── skills/         ← Módulo referência (detalhado abaixo)
+    ├── auth/           JWT + Guards + API tokens strategies
+    ├── skills/         ← Módulo catálogo (ADR 001)
     ├── organizations/
     ├── experiences/
+    ├── users/          UsersLoaderService (batchUsers)
+    ├── ai-tools/       Mutations AI + throttle (ADR 003)
     ├── ...
     └── dashboard/      Agregação read-only (consome services de outros módulos)
 ```
@@ -55,10 +59,10 @@ src/
 ### Regra de Dependência (Dependency Rule)
 
 ```
-modules → core → common         (OK: de fora pra dentro)
-modules → integrations → common (OK: de fora pra dentro)
-common → ??? (PROIBIDO)          (common não importa NADA)
-integrations → modules (PROIBIDO) (adapters não conhecem domínio)
+modules → integrations → core → common   (OK: de fora pra dentro)
+platform → modules (OK: só composição de loaders / GraphQL)
+common → ??? (PROIBIDO)                  (common não importa NADA)
+integrations → modules (PROIBIDO)        (adapters não conhecem domínio)
 ```
 
 ---
@@ -122,13 +126,13 @@ export class SkillsService {
     private readonly eventEmitter: EventEmitter2
   ) {}
 
-  async createOne(input: CreateSkillInput): Promise<SkillModel> {
-    const skill = await this.repository.createOne(input); // E11000 → 409 via MongoExceptionFilter
-    await this.eventEmitter.emitAsync(              // ← Efeito colateral
-      DomainEvents.skill.created,
-      new SkillCreatedEvent(skill._id.toString(), skill.slug)
+  async removeOne(ctx: AuthContext, id: string): Promise<SkillEntity> {
+    const skill = await this.repository.catalogCrud(ctx).findOneByIdOrFail(id);
+    await this.eventEmitter.emitAsync(              // ← Efeito colateral antes do delete
+      DomainEvents.skill.deleted,
+      new SkillDeletedEvent(skill.id)
     );
-    return skill;
+    return this.repository.catalogCrud(ctx).removeOne(id);
   }
 }
 ```
@@ -148,9 +152,9 @@ export class OnSkillDeletedListener {
 
 ### Acesso a dados genérico → `core/persistence/`
 ```typescript
-// CrudRepository + CrudMapperInterface — find/create/update/delete; batch → BatchCount
-// StatsRepository — count, countByField, findRecentlyUpdated
-// scoped(TenantScope) — ownerId filter composition (no separate wrapper class)
+// CrudRepository + CrudMapperInterface — find/create/update/delete; batch → BatchEntity
+// StatsRepository — count, countByField, countByOwnerIds, findRecentlyUpdated
+// scoped(PersistenceScope) — tenantScope / catalogScope (no separate wrapper class)
 
 @Injectable()
 export class CoursesRepository {
@@ -176,7 +180,7 @@ export class CoursesRepository {
 | **Error Handling** | `PersistenceExceptionFilter` (`APP_FILTER`) | Converte erros de Mongo/Mongoose em 4xx/503 globalmente; `assertDuplicate` / `assertReferencesExist` em services só para mensagens específicas |
 | **Port/Adapter** | `integrations/` (abstract class + impl) | Troca OpenRouter por outro LLM sem tocar nos modules |
 | **Modular Monolith** | Cada module é autocontido | Migrar para microservice = extrair o módulo inteiro |
-| **DataLoader** | Per-request batching em `graphql/` | N+1 resolvido sem cache global |
+| **DataLoader** | Per-request batching em `platform/graphql/` | N+1 resolvido sem cache global |
 | **Guard + Decorator** | `@Public()`, `@Roles()` | Cross-cutting auth sem poluir lógica de negócio |
 
 ---

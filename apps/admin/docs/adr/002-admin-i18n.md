@@ -215,4 +215,4 @@ Shared rules (all three layers): no examples in tooltips or subtitles (those bel
 ## Related
 
 - Content locales: `apps/api/src/common/i18n/locales.ts`
-- Admin i18n backlog items also listed under **Deferred polish** in `apps/api/docs/BACKLOG.md`
+- Admin i18n backlog (remaining table chrome + locale `es`) is listed under **Deferred polish** in `apps/api/docs/BACKLOG.md`

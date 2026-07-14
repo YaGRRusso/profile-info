@@ -113,7 +113,7 @@ See **NestJS GraphQL resolver hot-reload** in `agents/api.md` for a concrete exa
 
 The root has no env file of its own. Each app reads its own. Full per-app catalogs are in the scoped rules. Summary:
 
-- API: `DATABASE_URL`, `JWT_SECRET`, `HOST`, `PORT`. Examples in `apps/api/.env.example`. Loaded from `.env.development` / `.env.production` via Nest's `--env-file` flag.
+- API: `DATABASE_URL`, `JWT_SECRET`, `HOST`, `PORT`, `GRAPHQL_INTROSPECTION`, plus `OPENROUTER_*` / `GITHUB_API_KEY` / `TAVILY_API_KEY` for `ai-tools`. Full catalog in `agents/api.md` and `apps/api/.env.example`. Loaded from `.env.development` / `.env.production` via Nest's `--env-file` flag.
 - Admin: `VITE_API_URL` (the GraphQL endpoint), and `VITE_BASE_PATH` (build-time, used by CI for the GitHub Pages subpath). Example in `apps/admin/.env.example`.
 
 ## Scripts / commands

@@ -45,11 +45,11 @@ Full diagram and field detail: `apps/api/docs/ER_MODEL.md`.
 ## Core technologies
 
 - **@nestjs/graphql + @nestjs/apollo**: code-first schema in `src/schema.gql`.
-- **@nestjs/mongoose + mongoose**: models in `src/schemas/`, registered per feature module.
+- **@nestjs/mongoose + mongoose**: models in `modules/*/schemas/`, registered per feature module.
 - **@nestjs/jwt + passport**: global 8h JWT in `modules/auth/`.
 - **@nestjs/event-emitter**: domain events on delete (see below).
 - **bcryptjs**: password hashing in `users/users.service.ts`.
-- **dataloader + lodash**: per-entity `*LoaderService` in feature modules; `platform/graphql/loaders.service.ts` composes them per request.
+- **dataloader + lodash**: per-entity `*LoaderService` in feature modules (`skills`, `organizations`, `users`); `platform/graphql/loaders.service.ts` composes them per request (`batchSkills`, `batchOrganizations`, `batchUsers`).
 - **class-validator / class-transformer**: input validation via global `ValidationPipe`.
 
 ## Module / directory breakdown
@@ -94,7 +94,7 @@ DI pattern is the NestJS-idiomatic **abstract class as token**: ports are abstra
 
 `modules/` (business domains):
 - `auth/`: `strategies/` (`JwtStrategy`, `ApiTokenStrategy`), `guards/` (`GqlAuthenticationGuard`, `GqlAuthorizationGuard`), `decorators/` (`@Auth`). Session: `Authorization: Bearer <jwt>`. API token: `X-Api-Key: pi_…`.
-- `ai-tools/`: AI use-cases (`atsSummarize`, `summarize`, `translate`). Any authenticated user (JWT); `@Roles(SUPER_ADMIN)` removed in phase 5b. `GqlThrottlerGuard` tracks throttle by `userId`; `@Throttle({ limit: 5, ttl: 60_000 })` on resolver — see ADR 003. Owns `AiEntity` GraphQL types, enums (`ChatRole`, `ChatFinishReason`), and mappers (`IntegrationChatResult` → `AiEntity`). `resource-detail/` orchestrates `*ExtractorService` classes. Injects `AiChatProvider`, `RepositoryMetadataProvider`, `WebContentProvider`. `AiToolsModule` imports `OpenRouterModule`, `GithubModule`, `TavilyModule`.
+- `ai-tools/`: AI use-cases (`atsSummarize`, `summarize`, `translate`). Any authenticated user (JWT); `@Roles(SUPER_ADMIN)` removed in phase 5b. `GqlThrottlerGuard` tracks throttle by `userId`; `@Throttle({ default: { limit: 5, ttl: 60_000 } })` on resolver (app `ThrottlerModule` default is 10/min) — see ADR 003 (`apps/api/docs/adr/003-platform-ai-throttle.md`). Owns `AiEntity` GraphQL types, enums (`ChatRole`, `ChatFinishReason`), and mappers (`IntegrationChatResult` → `AiEntity`). `resource-detail/` orchestrates `*ExtractorService` classes. Injects `AiChatProvider`, `RepositoryMetadataProvider`, `WebContentProvider`. `AiToolsModule` imports `OpenRouterModule`, `GithubModule`, `TavilyModule`.
 - `dashboard/`: read-only aggregation via feature **services**. `@Auth() ctx` on `dashboard` query. Private entities: `count(ctx)` / `countByField(ctx)` / `findRecentActivity(ctx)` (tenant-scoped). Catalog (`skills`, `organizations`): `count(ctx)` / `findRecentActivity(ctx)` via `catalogStats(ctx)` (scoped: GLOBAL + own LOCAL for USER; all rows for SUPER_ADMIN). USER sees own private totals + scoped catalog; `SUPER_ADMIN` sees all private data (`crossTenant`) and full catalog. Recent activity returns `slug` + title `i18n` for client-side `i18nLabel`, same idea as admin tables.
 - `resume/`: `ResumeService.buildResume(userId, locale)` aggregates one user's profile (top by `relevance`, completed educations/courses); skills section uses ordered `user.skillIds` with localized display via `resolveSkillTitle` / `pickTranslation` (`i18n.messages.title`, fallback `slug`). PDF export via public `GET /resume.pdf?userId=&locale=` (`normalizeLocale`, `pickTranslation`, `formatPeriod`, `resolveResumeLabels` in `resume.labels.ts`). Filename is always `resume.pdf`. Private entities use owner-scoped `ctx` for the requested `userId` (forced `USER` role so `SUPER_ADMIN` profiles do not pull cross-tenant data). Org refs resolved via `OrganizationsService.findManyById`. CV-specific rendering in `resume/pdf/` (`renderResumeDocument`, section renderers); uses `PdfRenderService` from `core/pdf/PdfModule`.
 - CRUD feature modules (`skills/`, `users/`, `api-tokens/`, `experiences/`, `educations/`, `courses/`, `organizations/`, `projects/`): canonical skeleton:
@@ -168,7 +168,7 @@ Loaded via `--env-file .env.development` / `.env.production` and `ConfigModule`.
 - `JWT_SECRET` (required): JWT signing secret.
 - `HOST` (optional, default `0.0.0.0`), `PORT` (optional, default `8080`).
 - `GRAPHQL_INTROSPECTION` (required, `true` | `false`): Apollo Sandbox schema introspection. Set `true` in development; `false` in production unless you explicitly want the public schema explorer.
-- `OPENROUTER_API_KEY`, `OPENROUTER_AI_MODELS`, `GITHUB_API_KEY`, `TAVILY_API_KEY` (required for the `ai-tools` module): read via `ConfigService`. `OPENROUTER_AI_MODELS` is a comma-separated list of model ids, tried in order; on any failure (unavailable, paid-only, rate limit, token budget, timeout, etc.) `OpenRouterService` tries the next model and only throws after the last one fails. Exception: OpenRouter **401 / auth** errors stop immediately (same API key; another model cannot recover).
+- `OPENROUTER_API_KEY`, `OPENROUTER_AI_MODELS`, `GITHUB_API_KEY`, `TAVILY_API_KEY` (required for the `ai-tools` module): read via `ConfigService`. `OPENROUTER_AI_MODELS` is a comma-separated list of model ids, tried in order; on any failure (unavailable, paid-only, rate limit, token budget, timeout, etc.) `OpenRouterService` tries the next model and only throws after the last one fails. Exception: OpenRouter **401 / auth** errors stop immediately via `isOpenRouterAuthError` (same API key; another model cannot recover).
 
 ## Scripts / commands
 
@@ -187,6 +187,7 @@ Run from `apps/api/` or via root `api:*` aliases: `dev`, `prod`, `build`, `start
 - Regenerate `src/schema.gql` after type changes so admin codegen stays in sync. E2E/integration tests use in-memory schema (`autoSchemaFile: true` when `NODE_ENV=test`) so they never overwrite the committed file — `TestAppModule` omits `AiToolsModule` and would strip AI types if it wrote to disk.
 - New public GraphQL fields need `@Public()` or they 401.
 - Password is `select: false` and absent from `UserEntity`; never expose it in GraphQL.
-- DataLoaders exist only for skills and organizations today.
+- DataLoaders today: skills, organizations, and users (`batchUsers` for `owner` on ApiToken and private entities).
+- Private entity services expose `countByOwners` → `StatsRepository.countByOwnerIds` (global aggregate by `ownerId`). Infra is ready; dashboard does not call it yet.
 - Startup log says "Playground" but `playground` is disabled; Apollo landing page is at `/graphql`. Introspection follows `GRAPHQL_INTROSPECTION` in env.
 - `app.controller.ts` exposes REST `GET /` for health/e2e smoke test.

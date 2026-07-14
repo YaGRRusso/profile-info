@@ -10,7 +10,7 @@
 - **Top-level entities:** User, Skill, Organization, Experience, Education, Course, Project, ApiToken
 - **Schema sources:** `apps/api/src/modules/*/schemas/`, `apps/api/src/core/schemas/`
 - **Tenancy:** A tenant is a `User`. Private entities (`Experience`, `Education`, `Course`, `Project`) require `ownerId` → `User`. Catalog entities (`Skill`, `Organization`) use `partition` (`GLOBAL` | `LOCAL`; enum `CatalogPartition`) and always store `ownerId` → `User` (creator); `partition` drives visibility and slug uniqueness.
-- **FK naming (Mongo):** every stored reference uses an explicit `*Id` / `*Ids` suffix (`ownerId`, `organizationId`, `skillIds`). GraphQL output resolves related entities (`owner`, `organization`, `skills`) via `@ResolveField` + DataLoaders — FK scalars are not exposed on output types.
+- **FK naming (Mongo):** every stored reference uses an explicit `*Id` / `*Ids` suffix (`ownerId`, `organizationId`, `skillIds`). GraphQL output often exposes both the FK scalar (`ownerId`, …) and the resolved relation (`owner`, `organization`, `skills`) via `@ResolveField` + DataLoaders.
 
 ## Diagram
 
@@ -87,8 +87,8 @@ erDiagram
     string partition "GLOBAL LOCAL"
     ObjectId ownerId FK "creator every row"
     string slug "optional UK per partition"
-    string name
     string category
+    object i18n "embed title"
   }
   ApiToken {
     ObjectId _id PK
@@ -134,8 +134,10 @@ Both are MongoDB `ObjectId` references. The FK always lives on the document that
 - **Private entities:** `ownerId` → `User` (required). Slug uniqueness is compound
   `{ ownerId, slug }`, not global.
 
-GraphQL exposes resolved `owner`, `organization`, and `skills` objects on output; create/update
-inputs use `organizationId` and `skillIds` (no `ownerId` — injected from context).
+GraphQL exposes FK scalars (`ownerId`, …) alongside resolved `owner`, `organization`,
+and `skills` on output; create/update inputs use `organizationId` and `skillIds`
+(no client `ownerId` on private creates — injected from context). Catalog creates also
+set `ownerId` / `partition` from auth scope, not from client input.
 
 ## Entities
 
@@ -218,7 +220,7 @@ inputs use `organizationId` and `skillIds` (no `ownerId` — injected from conte
 - **Plaintext format:** `pi_<tokenId>_<secret>` — returned once on `createOneApiToken`
   (session JWT only); send as `X-Api-Key` on GraphQL requests; dev seed logs fixed tokens
   (see `npm run seed`)
-- **References:** `ownerId` → User
+- **References:** `ownerId` → User (GraphQL also resolves `owner` via `batchUsers`)
 - **Delete:** cascade when parent `User` is deleted (`user.deleted`)
 
 ## Shared value objects
@@ -243,7 +245,8 @@ inputs use `organizationId` and `skillIds` (no `ownerId` — injected from conte
 5. Experience embeds an ordered list of roles; each role embeds its own i18n, period, and
    `skillIds[]`.
 6. **ApiToken** belongs to one **User** via `ownerId`. CRUD requires session JWT;
-   `X-Api-Key` header authenticates GraphQL (see `BACKLOG.md` permission matrix).
+   `X-Api-Key` header authenticates GraphQL (QUERY / MUTATE permissions). See
+   `agents/api.md` auth and `BACKLOG.md` for token hardening.
 
 ## Delete and lifecycle notes
 
@@ -252,13 +255,12 @@ inputs use `organizationId` and `skillIds` (no `ownerId` — injected from conte
 - `skill.deleted` event: consumers `$pull` skill refs from Project, Course, Education,
   User (`skillIds`), and nested Experience role arrays (`detachSkill`).
 - `organization.deleted` event: hard `deleteMany` on Course, Education, Experience tied
-  to that organization **across all tenants** (`purgeByOrganization`) — intentional;
-  softer detach is [backlog](./BACKLOG.md).
+  to that organization **across all tenants** (`purgeByOrganization`) — intentional.
 - `user.deleted` event: hard `deleteMany` on Experience, Education, Course, Project,
   and ApiToken with matching `ownerId` (`purgeByOwner`). **`SUPER_ADMIN` users cannot
-  be deleted.**
-- Private entity updates never change `ownerId` — transfer is delete + recreate (see
-  [backlog](./BACKLOG.md)).
+  be deleted.** LOCAL catalog rows for that user are not purged (see `BACKLOG.md`).
+- Private entity updates never change `ownerId` — transfer ownership is delete + recreate
+  if ever needed (not a product flow today).
 - No Mongoose `pre('deleteOne')` hooks; deletes go through services that emit events first.
 
 ## GraphQL filter inputs

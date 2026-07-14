@@ -34,19 +34,24 @@ src/
 │   │   └── _sidebar/
 │   │       ├── index.tsx      # Home page (dashboard + Download CV).
 │   │       ├── settings/      # Account settings (profile update via updateMe).
-│   │       └── skills/        # Skills management page + its table component.
-│   └── -components/           # login, error, not-found pages.
+│   │       ├── users/         # SUPER_ADMIN user list / enable / CRUD.
+│   │       ├── skills/        # Catalog + private entity CRUD pages…
+│   │       └── …              # organizations, experiences, educations, courses, projects, api-tokens
+│   └── -components/           # Auth shell (SignIn/SignUp + AuthBrandPanel), error, not-found.
 ├── hooks/
-│   ├── queries/              # useQuery / useInfiniteQuery hooks (auth, skills, base).
-│   ├── mutations/            # useMutation hooks (auth, skills, users).
-│   └── custom/               # Generic helpers (debounce, query-all-pages, etc.).
+│   ├── queries/              # useQuery / useInfiniteQuery hooks.
+│   ├── mutations/            # useMutation hooks.
+│   └── custom/               # Generic helpers (debounce, paginated-query, etc.).
 ├── generated/
 │   └── graphql/              # Generated typed documents and helpers (codegen output).
-├── forms/                    # TanStack Form + Zod forms (skill, user/login, profile).
+├── forms/                    # TanStack Form + Zod forms (entities, profile, auth).
 ├── components/
 │   ├── display/              # Generic display components (modal, alert, data-state).
-│   └── inputs/               # Generic input components (text, password, select, ...).
-├── lib/                      # execute (GraphQL client), cn, parsers, small helpers.
+│   ├── inputs/               # Generic input components (text, password, select, …).
+│   └── table/                # Shared table toolbar chrome.
+├── lib/                      # execute (GraphQL), api (REST), i18n helpers, form helpers.
+├── i18n/                     # i18next init (see ADR 002).
+├── locales/                  # en + pt JSON namespaces.
 ├── stores/                   # Zustand: auth, theme (persisted); system-messages.
 └── styles/globals.css        # Tailwind v4 + DaisyUI setup and custom utilities.
 ```
@@ -92,4 +97,4 @@ The **Settings** page (`/settings`) loads the authenticated user via `useGetMe()
 
 ### Locale / i18n
 
-Sidebar **locale switcher** calls `i18n.changeLanguage`. Locale persists via `i18next-browser-languagedetector` (`localStorage` key `i18nextLng`). Same active locale drives `react-i18next` (`help`, `nav`, `pages`), `i18nLabel` in tables/pickers, and `dayjs` relative time. Phase 1 scope and backlog: `docs/adr/002-admin-i18n.md`.
+Sidebar **locale switcher** calls `i18n.changeLanguage`. Locale persists via `i18next-browser-languagedetector` (`localStorage` key `i18nextLng`). Same active locale drives `react-i18next` (namespaces: `help`, `nav`, `pages`, `actions`, `alerts`, `dashboard`, `auth`, `forms`, `tables`, `system`, `validation`), `i18nLabel` in tables/pickers, and `dayjs` relative time. Phases 1–4b shipped; remaining backlog (table column/filter labels, locale `es`): `docs/adr/002-admin-i18n.md`.
