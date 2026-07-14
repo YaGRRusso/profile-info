@@ -65,15 +65,14 @@ const removeManyExperiences = graphql(`
 
 export function useCreateOneExperience() {
   return useMutation({
-    mutationKey: ["createOneExperience"],
     mutationFn: (createExperienceInput: CreateExperienceInput) =>
       execute(createOneExperience, { createExperienceInput }),
+    mutationKey: ["createOneExperience"],
   });
 }
 
 export function useUpdateOneExperience() {
   return useMutation({
-    mutationKey: ["updateOneExperience"],
     mutationFn: ({
       experienceId,
       updateExperienceInput,
@@ -81,12 +80,12 @@ export function useUpdateOneExperience() {
       experienceId: string;
       updateExperienceInput: UpdateExperienceInput;
     }) => execute(updateOneExperience, { experienceId, updateExperienceInput }),
+    mutationKey: ["updateOneExperience"],
   });
 }
 
 export function useUpdateManyExperiences() {
   return useMutation({
-    mutationKey: ["updateManyExperiences"],
     mutationFn: ({
       experienceIds,
       updateExperienceInput,
@@ -98,21 +97,22 @@ export function useUpdateManyExperiences() {
         experienceIds,
         updateExperienceInput,
       }),
+    mutationKey: ["updateManyExperiences"],
   });
 }
 
 export function useRemoveOneExperience() {
   return useMutation({
-    mutationKey: ["removeOneExperience"],
     mutationFn: (experienceId: string) =>
       execute(removeOneExperience, { experienceId }),
+    mutationKey: ["removeOneExperience"],
   });
 }
 
 export function useRemoveManyExperiences() {
   return useMutation({
-    mutationKey: ["removeManyExperiences"],
     mutationFn: (experienceIds: string[]) =>
       execute(removeManyExperiences, { experienceIds }),
+    mutationKey: ["removeManyExperiences"],
   });
 }

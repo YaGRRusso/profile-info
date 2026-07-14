@@ -16,6 +16,6 @@ export interface RouterContext {
 
 export const Route = createRootRoute({
   component: RootLayout,
-  notFoundComponent: NotFoundLayout,
   errorComponent: ErrorLayout,
+  notFoundComponent: NotFoundLayout,
 });

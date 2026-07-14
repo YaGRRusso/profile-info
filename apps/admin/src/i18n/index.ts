@@ -11,17 +11,17 @@ i18n
   .use(LanguageDetector)
   .use(initReactI18next)
   .init({
-    resources: i18nResources,
-    fallbackLng: LocaleEnum.ENGLISH,
-    supportedLngs: Object.values(LocaleEnum),
     defaultNS: "pages",
-    ns: [...i18nNamespaces],
-    interpolation: { escapeValue: false },
-    react: { useSuspense: false },
     detection: {
-      order: ["localStorage"],
       caches: ["localStorage"],
+      order: ["localStorage"],
     },
+    fallbackLng: LocaleEnum.ENGLISH,
+    interpolation: { escapeValue: false },
+    ns: [...i18nNamespaces],
+    react: { useSuspense: false },
+    resources: i18nResources,
+    supportedLngs: Object.values(LocaleEnum),
   });
 
 i18n.on("languageChanged", (locale) => {

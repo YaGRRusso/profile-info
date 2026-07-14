@@ -51,9 +51,9 @@ export class GithubService extends RepositoryMetadataProvider {
         repo,
       }),
       this.octokit.request("GET /repos/{owner}/{repo}/readme", {
+        headers: { accept: "application/vnd.github.raw" },
         owner,
         repo,
-        headers: { accept: "application/vnd.github.raw" },
       }),
       this.octokit.request("GET /repos/{owner}/{repo}/topics", {
         owner,

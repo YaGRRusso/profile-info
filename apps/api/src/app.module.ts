@@ -24,20 +24,21 @@ import { UsersModule } from "./modules/users/users.module";
 import { GraphqlModule } from "./platform/graphql/graphql.module";
 
 @Module({
+  controllers: [AppController],
   imports: [
     EventEmitterModule.forRoot({ global: true }),
     ConfigModule.forRoot({
       isGlobal: true,
       validate: validateEnv,
     }),
-    ThrottlerModule.forRoot([{ ttl: 60_000, limit: 10 }]),
+    ThrottlerModule.forRoot([{ limit: 10, ttl: 60_000 }]),
     MongooseModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: (config: ConfigService<Env, true>) => ({
-        uri: config.getOrThrow("DATABASE_URL"),
-        serverSelectionTimeoutMS: 3000,
         connectTimeoutMS: 3000,
+        serverSelectionTimeoutMS: 3000,
+        uri: config.getOrThrow("DATABASE_URL"),
       }),
     }),
     GraphqlModule,
@@ -55,7 +56,6 @@ import { GraphqlModule } from "./platform/graphql/graphql.module";
     ResumeModule,
     AiToolsModule,
   ],
-  controllers: [AppController],
   providers: [
     AppService,
     { provide: APP_FILTER, useClass: PersistenceExceptionFilter },

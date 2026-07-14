@@ -11,8 +11,8 @@ interface ThemeStore {
 export const useThemeStore = create<ThemeStore>()(
   persist(
     (set) => ({
-      theme: "dracula",
       setTheme: (theme) => set({ theme }),
+      theme: "dracula",
     }),
     { name: "theme", storage: createJSONStorage(() => localStorage) }
   )

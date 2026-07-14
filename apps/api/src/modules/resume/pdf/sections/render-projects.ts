@@ -17,9 +17,9 @@ export function renderProjects(
     items: document.projects,
     title,
     ...entryBlockSectionHandlers<ResumeProject>((project) => ({
+      description: project.description,
       title: project.title,
       url: project.url,
-      description: project.description,
     })),
   });
 }

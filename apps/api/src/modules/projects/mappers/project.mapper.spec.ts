@@ -9,44 +9,44 @@ describe("ProjectMapper", () => {
 
   it("maps persistence fields to the domain entity", () => {
     const model = {
-      id: "507f1f77bcf86cd799439011",
       createdAt: new Date("2024-01-01"),
-      updatedAt: new Date("2024-01-02"),
-      relevance: 5,
-      slug: "portfolio-app",
-      ownerId,
-      images: ["https://example.com/image.png"],
-      skillIds: [skillId],
       i18n: [
         {
           locale: "en",
           messages: {
-            title: "Portfolio",
             description: "My portfolio app",
+            title: "Portfolio",
           },
         },
       ],
+      id: "507f1f77bcf86cd799439011",
+      images: ["https://example.com/image.png"],
+      ownerId,
+      relevance: 5,
+      skillIds: [skillId],
+      slug: "portfolio-app",
+      updatedAt: new Date("2024-01-02"),
       urls: [{ title: "GitHub", value: "https://github.com/example" }],
     } as ProjectModel;
 
     expect(mapper.toDomain(model)).toEqual({
-      id: "507f1f77bcf86cd799439011",
       createdAt: model.createdAt,
-      updatedAt: model.updatedAt,
-      relevance: 5,
-      slug: "portfolio-app",
-      ownerId,
-      images: ["https://example.com/image.png"],
-      skillIds: [skillId],
       i18n: [
         {
           locale: "en",
           messages: {
-            title: "Portfolio",
             description: "My portfolio app",
+            title: "Portfolio",
           },
         },
       ],
+      id: "507f1f77bcf86cd799439011",
+      images: ["https://example.com/image.png"],
+      ownerId,
+      relevance: 5,
+      skillIds: [skillId],
+      slug: "portfolio-app",
+      updatedAt: model.updatedAt,
       urls: [{ title: "GitHub", value: "https://github.com/example" }],
     });
   });
@@ -54,42 +54,42 @@ describe("ProjectMapper", () => {
   it("maps create input to a persistence payload", () => {
     expect(
       mapper.toPersistenceForCreate({
-        slug: "portfolio-app",
         i18n: [
           {
             locale: "en",
             messages: {
-              title: "Portfolio",
               description: "My portfolio app",
+              title: "Portfolio",
             },
           },
         ],
         skillIds: [skillId],
+        slug: "portfolio-app",
       })
     ).toEqual({
-      slug: "portfolio-app",
       i18n: [
         {
           locale: "en",
           messages: {
-            title: "Portfolio",
             description: "My portfolio app",
+            title: "Portfolio",
           },
         },
       ],
       skillIds: [new mongoose.Types.ObjectId(skillId)],
+      slug: "portfolio-app",
     });
   });
 
   it("maps filter input to a persistence query", () => {
     expect(
       mapper.toPersistenceForFilter({
-        slug: "portfolio-app",
         skillIds: [skillId],
+        slug: "portfolio-app",
       })
     ).toEqual({
-      slug: "portfolio-app",
       skillIds: [new mongoose.Types.ObjectId(skillId)],
+      slug: "portfolio-app",
     });
   });
 

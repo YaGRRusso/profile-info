@@ -7,8 +7,8 @@ describe("toTenantScope", () => {
     const ctx = testAuthContext({ id: "user-a" });
 
     expect(toTenantScope(ctx)).toEqual({
-      userId: "user-a",
       crossTenant: false,
+      userId: "user-a",
     });
   });
 
@@ -16,8 +16,8 @@ describe("toTenantScope", () => {
     const ctx = testAuthContext({ role: UserRole.SUPER_ADMIN });
 
     expect(toTenantScope(ctx)).toEqual({
-      userId: ctx.id,
       crossTenant: true,
+      userId: ctx.id,
     });
   });
 });
@@ -27,8 +27,8 @@ describe("toCatalogScope", () => {
     const ctx = testAuthContext({ id: "user-a" });
 
     expect(toCatalogScope(ctx)).toEqual({
-      userId: "user-a",
       crossCatalog: false,
+      userId: "user-a",
     });
   });
 
@@ -36,8 +36,8 @@ describe("toCatalogScope", () => {
     const ctx = testAuthContext({ role: UserRole.SUPER_ADMIN });
 
     expect(toCatalogScope(ctx)).toEqual({
-      userId: ctx.id,
       crossCatalog: true,
+      userId: ctx.id,
     });
   });
 });

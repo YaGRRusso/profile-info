@@ -36,19 +36,19 @@ export class ProjectMapper
   toDomain(model: ProjectModel): ProjectEntityRecord {
     return {
       ...toBaseEntityFields(model),
-      relevance: model.relevance,
-      slug: model.slug,
-      ownerId: toIdString(model.ownerId) ?? "",
-      images: model.images,
-      skillIds: toIdStrings(model.skillIds),
       i18n:
         toTranslationEntityList(model.i18n)?.map((entry) => ({
           locale: entry.locale,
           messages: {
-            title: entry.messages.title,
             description: entry.messages.description,
+            title: entry.messages.title,
           },
         })) ?? [],
+      images: model.images,
+      ownerId: toIdString(model.ownerId) ?? "",
+      relevance: model.relevance,
+      skillIds: toIdStrings(model.skillIds),
+      slug: model.slug,
       urls: toUrlEntityList(model.urls),
     };
   }

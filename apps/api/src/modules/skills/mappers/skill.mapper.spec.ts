@@ -7,26 +7,26 @@ describe("SkillMapper", () => {
 
   it("maps persistence fields to the domain entity", () => {
     const model = {
-      id: "507f1f77bcf86cd799439011",
-      createdAt: new Date("2024-01-01"),
-      updatedAt: new Date("2024-01-02"),
-      slug: "typescript",
-      i18n: [{ locale: "en", messages: { title: "TypeScript" } }],
       category: "Programming",
+      createdAt: new Date("2024-01-01"),
       disabled: false,
+      i18n: [{ locale: "en", messages: { title: "TypeScript" } }],
+      id: "507f1f77bcf86cd799439011",
       partition: CatalogPartition.GLOBAL,
+      slug: "typescript",
+      updatedAt: new Date("2024-01-02"),
     } as SkillModel;
 
     expect(mapper.toDomain(model)).toEqual({
-      id: "507f1f77bcf86cd799439011",
-      createdAt: model.createdAt,
-      updatedAt: model.updatedAt,
-      slug: "typescript",
-      i18n: [{ locale: "en", messages: { title: "TypeScript" } }],
       category: "Programming",
+      createdAt: model.createdAt,
       disabled: false,
-      partition: CatalogPartition.GLOBAL,
+      i18n: [{ locale: "en", messages: { title: "TypeScript" } }],
+      id: "507f1f77bcf86cd799439011",
       ownerId: "",
+      partition: CatalogPartition.GLOBAL,
+      slug: "typescript",
+      updatedAt: model.updatedAt,
     });
   });
 

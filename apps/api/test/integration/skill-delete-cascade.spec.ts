@@ -24,7 +24,7 @@ describe("Skill delete cascade (integration)", () => {
 
   beforeAll(async () => {
     const testApp = await createTestApp();
-    app = testApp.app;
+    ({ app } = testApp);
     await clearTestDatabase(testApp.module);
 
     skillsService = testApp.module.get(SkillsService);
@@ -39,9 +39,9 @@ describe("Skill delete cascade (integration)", () => {
   it("should detach a deleted skill from courses", async () => {
     const usersService = app!.get(UsersService);
     const owner = await usersService.createOne(testSuperAdminContext(), {
+      email: "owner@profile.info",
       name: "Owner",
       nickname: "owner",
-      email: "owner@profile.info",
       password: "owner.123",
       role: UserRole.USER,
     });
@@ -49,10 +49,6 @@ describe("Skill delete cascade (integration)", () => {
     const organization = await organizationsService.createOne(
       testSuperAdminContext(),
       {
-        slug: "acme-corp",
-        name: "Acme Corp",
-        website: "https://acme.example",
-        logo: "https://acme.example/logo.png",
         category: OrganizationCategory.COMPANY,
         i18n: [
           {
@@ -60,31 +56,35 @@ describe("Skill delete cascade (integration)", () => {
             messages: { description: "Acme Corp description" },
           },
         ],
+        logo: "https://acme.example/logo.png",
+        name: "Acme Corp",
+        slug: "acme-corp",
+        website: "https://acme.example",
       }
     );
 
     const skill = await skillsService.createOne(testSuperAdminContext(), {
-      slug: "typescript",
-      i18n: skillI18n("TypeScript"),
       category: "Programming",
+      i18n: skillI18n("TypeScript"),
+      slug: "typescript",
     });
 
     const ownerCtx = testAuthContext({ id: owner.id });
 
     const course = await coursesService.createOne(ownerCtx, {
-      slug: "typescript-course",
-      organizationId: organization.id,
-      status: CourseStatus.COMPLETE,
       i18n: [
         {
           locale: "en",
           messages: {
-            title: "TypeScript Course",
             description: "Learn TypeScript",
+            title: "TypeScript Course",
           },
         },
       ],
+      organizationId: organization.id,
       skillIds: [skill.id],
+      slug: "typescript-course",
+      status: CourseStatus.COMPLETE,
     } as CreateCourseInput);
 
     expect(course.skillIds?.map((id) => id.toString())).toContain(skill.id);
@@ -101,15 +101,15 @@ describe("Skill delete cascade (integration)", () => {
     const usersService = app!.get(UsersService);
 
     const skill = await skillsService.createOne(testSuperAdminContext(), {
-      slug: "first-aid",
-      i18n: skillI18n("First Aid"),
       category: "Healthcare",
+      i18n: skillI18n("First Aid"),
+      slug: "first-aid",
     });
 
     const user = await usersService.createOne(testSuperAdminContext(), {
+      email: "profile-owner@profile.info",
       name: "Profile Owner",
       nickname: "profile-owner",
-      email: "profile-owner@profile.info",
       password: "owner.123",
       role: UserRole.USER,
       skillIds: [skill.id],

@@ -51,14 +51,14 @@ export function toDocumentForUpdate<T>(
 
 export function tenantScope(scope: TenantScope): PersistenceScope {
   return {
-    query: {
-      forRead: (filter) => toQueryForRead(scope, filter),
-      forMutate: (filter) => toQueryForMutate(scope, filter),
-      forAggregate: (filter) => toQueryForAggregate(scope, filter),
-    },
     document: {
       forCreate: (payload) => toDocumentForCreate(scope, payload),
       forUpdate: (payload) => toDocumentForUpdate(scope, payload),
+    },
+    query: {
+      forAggregate: (filter) => toQueryForAggregate(scope, filter),
+      forMutate: (filter) => toQueryForMutate(scope, filter),
+      forRead: (filter) => toQueryForRead(scope, filter),
     },
   };
 }

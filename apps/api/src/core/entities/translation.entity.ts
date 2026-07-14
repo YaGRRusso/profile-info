@@ -9,7 +9,7 @@ export interface TranslationEntity<T> {
 export function createTranslationEntity<T>(
   MessagesModel: Type<T>
 ): Type<TranslationEntity<T>> {
-  const name = MessagesModel.name;
+  const { name } = MessagesModel;
 
   @ObjectType(`${name}TranslationEntity`, { isAbstract: true })
   class TranslationEntityClass {

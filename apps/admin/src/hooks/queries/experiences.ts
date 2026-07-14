@@ -85,7 +85,10 @@ export function useFindManyExperiences(
   options?: { enabled?: boolean }
 ) {
   return useInfiniteQuery({
-    queryKey: ["findManyExperiences", variables],
+    getNextPageParam: paginatedNextPageParam<FindManyExperiencesQuery>(
+      "findManyExperiences"
+    ),
+    initialPageParam: 0,
     queryFn: ({ pageParam }) =>
       execute(
         findManyExperiences,
@@ -95,10 +98,7 @@ export function useFindManyExperiences(
           variables
         )
       ),
-    initialPageParam: 0,
-    getNextPageParam: paginatedNextPageParam<FindManyExperiencesQuery>(
-      "findManyExperiences"
-    ),
+    queryKey: ["findManyExperiences", variables],
     select: paginatedSelect<FindManyExperiencesQuery>("findManyExperiences"),
     ...options,
   });

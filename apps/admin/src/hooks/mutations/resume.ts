@@ -12,7 +12,6 @@ export async function fetchResumePdf(locale: LocaleEnum, userId: string) {
 
 export function useDownloadResume() {
   return useMutation({
-    mutationKey: ["resume", "download"],
     mutationFn: async (locale: LocaleEnum) => {
       const userId = useAuthStore.getState().user?.id;
       if (!userId) throw new Error("User is not authenticated");
@@ -20,5 +19,6 @@ export function useDownloadResume() {
       const blob = await fetchResumePdf(locale, userId);
       downloadBlob(blob, `resume-${locale}.pdf`);
     },
+    mutationKey: ["resume", "download"],
   });
 }

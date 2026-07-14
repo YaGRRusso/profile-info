@@ -13,6 +13,7 @@ export interface ResumeLabels {
 
 const RESUME_LABELS: Record<LocaleCode, ResumeLabels> = {
   [Locale.EN]: {
+    formatHours: (hours) => `${hours} hours`,
     sections: {
       certifications: "Certifications",
       education: "Education",
@@ -20,9 +21,9 @@ const RESUME_LABELS: Record<LocaleCode, ResumeLabels> = {
       projects: "Projects",
       skills: "Skills",
     },
-    formatHours: (hours) => `${hours} hours`,
   },
   [Locale.PT]: {
+    formatHours: (hours) => `${hours} horas`,
     sections: {
       certifications: "Certificações",
       education: "Formação",
@@ -30,9 +31,9 @@ const RESUME_LABELS: Record<LocaleCode, ResumeLabels> = {
       projects: "Projetos",
       skills: "Habilidades",
     },
-    formatHours: (hours) => `${hours} horas`,
   },
   [Locale.ES]: {
+    formatHours: (hours) => `${hours} horas`,
     sections: {
       certifications: "Certificaciones",
       education: "Formación",
@@ -40,7 +41,6 @@ const RESUME_LABELS: Record<LocaleCode, ResumeLabels> = {
       projects: "Proyectos",
       skills: "Habilidades",
     },
-    formatHours: (hours) => `${hours} horas`,
   },
 };
 

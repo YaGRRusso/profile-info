@@ -71,29 +71,29 @@ export class DashboardService {
     ]);
 
     return {
+      coursesByStatus,
+      experiencesByCategory,
+      recentActivity: this.mergeRecentActivity([
+        { items: skillActivity, type: DashboardActivityType.SKILL },
+        { items: courseActivity, type: DashboardActivityType.COURSE },
+        { items: educationActivity, type: DashboardActivityType.EDUCATION },
+        {
+          items: organizationActivity,
+          type: DashboardActivityType.ORGANIZATION,
+        },
+        { items: projectActivity, type: DashboardActivityType.PROJECT },
+        { items: experienceActivity, type: DashboardActivityType.EXPERIENCE },
+      ]),
       totals: {
-        skills,
         courses,
         educations,
-        organizations,
-        projects,
         experiences,
-        ownedLocalSkills,
+        organizations,
         ownedLocalOrganizations,
+        ownedLocalSkills,
+        projects,
+        skills,
       },
-      experiencesByCategory,
-      coursesByStatus,
-      recentActivity: this.mergeRecentActivity([
-        { type: DashboardActivityType.SKILL, items: skillActivity },
-        { type: DashboardActivityType.COURSE, items: courseActivity },
-        { type: DashboardActivityType.EDUCATION, items: educationActivity },
-        {
-          type: DashboardActivityType.ORGANIZATION,
-          items: organizationActivity,
-        },
-        { type: DashboardActivityType.PROJECT, items: projectActivity },
-        { type: DashboardActivityType.EXPERIENCE, items: experienceActivity },
-      ]),
     };
   }
 

@@ -24,15 +24,15 @@ const signUp = graphql(`
 
 export function useSignIn() {
   return useMutation({
-    mutationKey: ["signIn"],
     mutationFn: (signInInput: SignInInput) => execute(signIn, { signInInput }),
+    mutationKey: ["signIn"],
   });
 }
 
 export function useSignUp() {
   return useMutation({
-    mutationKey: ["signUp"],
     mutationFn: (registerInput: RegisterUserInput) =>
       execute(signUp, { registerInput }),
+    mutationKey: ["signUp"],
   });
 }

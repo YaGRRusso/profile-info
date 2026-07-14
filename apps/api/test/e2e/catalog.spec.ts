@@ -62,7 +62,7 @@ describe("Catalog reads (e2e)", () => {
 
   beforeAll(async () => {
     const testApp = await createTestApp();
-    app = testApp.app;
+    ({ app } = testApp);
     await clearTestDatabase(testApp.module);
 
     const usersService = testApp.module.get(UsersService);
@@ -70,34 +70,34 @@ describe("Catalog reads (e2e)", () => {
     const organizationsService = testApp.module.get(OrganizationsService);
 
     await usersService.createOne(testSuperAdminContext(), {
+      email: "admin@profile.info",
       name: "Admin",
       nickname: "admin",
-      email: "admin@profile.info",
       password: "123123",
       role: UserRole.SUPER_ADMIN,
     });
 
     await usersService.createOne(testSuperAdminContext(), {
+      email: "joao@profile.info",
       name: "João",
       nickname: "joao",
-      email: "joao@profile.info",
       password: "123123",
       role: UserRole.USER,
     });
 
     await organizationsService.createOne(testSuperAdminContext(), {
-      slug: "catalog-org",
-      name: "Catalog Org",
-      website: "https://catalog.example",
-      logo: "https://catalog.example/logo.png",
       category: OrganizationCategory.COMPANY,
       i18n: [{ locale: "en", messages: { description: "Catalog org" } }],
+      logo: "https://catalog.example/logo.png",
+      name: "Catalog Org",
+      slug: "catalog-org",
+      website: "https://catalog.example",
     });
 
     await skillsService.createOne(testSuperAdminContext(), {
-      slug: "catalog-skill",
-      i18n: skillI18n("Catalog Skill"),
       category: "Programming",
+      i18n: skillI18n("Catalog Skill"),
+      slug: "catalog-skill",
     });
 
     const signIn = await graphqlRequest<{ signIn: string }>(app, {

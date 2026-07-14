@@ -1,12 +1,15 @@
 import type { CodegenConfig } from "@graphql-codegen/cli";
 
 const config: CodegenConfig = {
-  schema: "../api/src/schema.gql",
   documents: ["src/hooks/queries/*.ts", "src/hooks/mutations/*.ts"],
-  ignoreNoDocuments: true,
   generates: {
+    "./schema.graphql": {
+      config: {
+        includeDirectives: true,
+      },
+      plugins: ["schema-ast"],
+    },
     "./src/generated/graphql/": {
-      preset: "client",
       config: {
         documentMode: "string",
         enumType: "enum",
@@ -14,14 +17,11 @@ const config: CodegenConfig = {
           DateTime: "string",
         },
       },
-    },
-    "./schema.graphql": {
-      plugins: ["schema-ast"],
-      config: {
-        includeDirectives: true,
-      },
+      preset: "client",
     },
   },
+  ignoreNoDocuments: true,
+  schema: "../api/src/schema.gql",
 };
 
 export default config;

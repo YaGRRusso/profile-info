@@ -108,13 +108,13 @@ function buildPrimitiveParser(
   primitiveType: string
 ): SingleParserBuilder<PrimitiveValue> {
   return createParser<PrimitiveValue>({
+    eq: Object.is,
     parse: (rawString) => {
       const parsedValue = parsePrimitive(rawString, primitiveType);
       if (parsedValue === null) return null;
       return validate(schema, parsedValue) ? parsedValue : null;
     },
     serialize: String,
-    eq: Object.is,
   });
 }
 
@@ -123,13 +123,13 @@ function buildObjectParser(
   objectShape: ObjectShape
 ): SingleParserBuilder<PrimitiveObject> {
   return createParser<PrimitiveObject>({
+    eq: deepEqual,
     parse: (rawString) => {
       const parsedObject = parseObjectFields(rawString, objectShape);
       if (!parsedObject) return null;
       return validate(schema, parsedObject) ? parsedObject : null;
     },
     serialize: serializeObjectFields,
-    eq: deepEqual,
   });
 }
 
@@ -138,6 +138,7 @@ function buildPrimitiveArrayParser(
   itemPrimitiveType: string
 ): MultiParserBuilder<PrimitiveValue[]> {
   return createMultiParser<PrimitiveValue[]>({
+    eq: deepEqual,
     parse: (rawValues) => {
       const decodedItems = rawValues
         .map((rawItem) => parsePrimitive(rawItem, itemPrimitiveType))
@@ -146,7 +147,6 @@ function buildPrimitiveArrayParser(
       return validate(schema, decodedItems) ? decodedItems : null;
     },
     serialize: (primitiveArray) => primitiveArray.map(String),
-    eq: deepEqual,
   });
 }
 
@@ -155,6 +155,7 @@ function buildObjectArrayParser(
   itemShape: ObjectShape
 ): MultiParserBuilder<PrimitiveObject[]> {
   return createMultiParser<PrimitiveObject[]>({
+    eq: deepEqual,
     parse: (rawValues) => {
       const decodedItems = rawValues
         .map((rawItem) => parseObjectFields(rawItem, itemShape))
@@ -164,7 +165,6 @@ function buildObjectArrayParser(
     },
     serialize: (objectArray) =>
       objectArray.map(serializeObjectFields).filter(Boolean),
-    eq: deepEqual,
   });
 }
 

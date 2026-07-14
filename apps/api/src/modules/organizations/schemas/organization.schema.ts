@@ -10,33 +10,33 @@ import { UserModel } from "@/modules/users/schemas/user.schema";
 
 @Schema({ _id: false })
 export class OrganizationMessagesModel {
-  @Prop({ type: String, required: true })
+  @Prop({ required: true, type: String })
   description: string;
 }
 
 @Schema({ timestamps: true })
 export class OrganizationModel extends BaseModel {
-  @Prop({ type: Boolean, required: true, default: false, index: true })
+  @Prop({ default: false, index: true, required: true, type: Boolean })
   disabled: boolean;
 
   @Prop({
-    type: String,
-    required: true,
-    enum: CatalogPartition,
     default: CatalogPartition.GLOBAL,
+    enum: CatalogPartition,
+    required: true,
+    type: String,
   })
   partition: CatalogPartition;
 
   @Prop({
-    type: mongoose.Schema.Types.ObjectId,
     ref: UserModel.name,
+    type: mongoose.Schema.Types.ObjectId,
   })
   ownerId?: mongoose.Types.ObjectId | string;
 
   @Prop({ type: String })
   slug?: string;
 
-  @Prop({ type: String, required: true })
+  @Prop({ required: true, type: String })
   name: string;
 
   @Prop({ type: String })
@@ -46,16 +46,16 @@ export class OrganizationModel extends BaseModel {
   logo?: string;
 
   @Prop({
-    type: [createTranslationModel(OrganizationMessagesModel)],
     required: true,
+    type: [createTranslationModel(OrganizationMessagesModel)],
   })
   i18n: TranslationModel<OrganizationMessagesModel>[];
 
   @Prop({
-    type: String,
-    required: true,
     enum: ["COMPANY", "SCHOOL", "OTHER"],
     index: true,
+    required: true,
+    type: String,
   })
   category: string;
 }
@@ -64,6 +64,6 @@ export const OrganizationSchema =
   SchemaFactory.createForClass(OrganizationModel);
 
 OrganizationSchema.index(
-  { partition: 1, ownerId: 1, slug: 1 },
-  { unique: true, sparse: true }
+  { ownerId: 1, partition: 1, slug: 1 },
+  { sparse: true, unique: true }
 );

@@ -30,12 +30,12 @@ function mockExecChain(returnValue: unknown) {
 
 function mockQueryChain(returnValue: unknown) {
   const chain = {
-    sort: jest.fn(),
-    skip: jest.fn(),
+    exec: jest.fn().mockResolvedValue(returnValue),
+    lean: jest.fn(),
     limit: jest.fn(),
     select: jest.fn(),
-    lean: jest.fn(),
-    exec: jest.fn().mockResolvedValue(returnValue),
+    skip: jest.fn(),
+    sort: jest.fn(),
   };
 
   chain.sort.mockReturnValue(chain);
@@ -80,21 +80,21 @@ describe("CrudRepository", () => {
   const ownerId = new mongoose.Types.ObjectId().toHexString();
   const otherOwnerId = new mongoose.Types.ObjectId().toHexString();
   const docId = new mongoose.Types.ObjectId().toHexString();
-  const fakeDoc = { _id: docId, ownerId, name: "Test" } as unknown as TestModel;
-  const tenant = { userId: ownerId, crossTenant: false };
+  const fakeDoc = { _id: docId, name: "Test", ownerId } as unknown as TestModel;
+  const tenant = { crossTenant: false, userId: ownerId };
 
   beforeEach(() => {
     jest.clearAllMocks();
 
     model = {
-      findOne: jest.fn(),
-      find: jest.fn(),
-      create: jest.fn(),
       countDocuments: jest.fn(),
+      create: jest.fn(),
+      deleteMany: jest.fn(),
+      find: jest.fn(),
+      findOne: jest.fn(),
+      findOneAndDelete: jest.fn(),
       findOneAndUpdate: jest.fn(),
       updateMany: jest.fn(),
-      findOneAndDelete: jest.fn(),
-      deleteMany: jest.fn(),
     };
 
     mapper = createPassThroughMapper<TestModel>();
@@ -194,8 +194,8 @@ describe("CrudRepository", () => {
       model.countDocuments.mockReturnValue(mockQueryChain(1));
 
       await expect(repository.findMany({})).resolves.toEqual({
-        nodes: [fakeDoc],
         found: 1,
+        nodes: [fakeDoc],
       });
     });
 
@@ -209,8 +209,8 @@ describe("CrudRepository", () => {
 
       await repository.findMany({
         filters: { name: "Test" },
-        sort: { relevance: 1 },
         skip: 10,
+        sort: { relevance: 1 },
       });
 
       expect(mapper.toPersistenceForFilter).toHaveBeenCalledWith({
@@ -238,8 +238,8 @@ describe("CrudRepository", () => {
   describe("createMany", () => {
     it("should return zero counts for empty input", async () => {
       await expect(repository.createMany([])).resolves.toEqual({
-        succeeded: 0,
         failed: 0,
+        succeeded: 0,
       });
     });
 
@@ -248,7 +248,7 @@ describe("CrudRepository", () => {
 
       await expect(
         repository.createMany([{ name: "A" }, { name: "B" }] as never)
-      ).resolves.toEqual({ succeeded: 2, failed: 0 });
+      ).resolves.toEqual({ failed: 0, succeeded: 2 });
     });
 
     it("should throw when nothing is created", async () => {
@@ -304,7 +304,7 @@ describe("CrudRepository", () => {
 
       await expect(
         repository.updateManyById([docId, otherId], { name: "Updated" })
-      ).resolves.toEqual({ succeeded: 1, failed: 1 });
+      ).resolves.toEqual({ failed: 1, succeeded: 1 });
     });
 
     it("should throw when no documents match", async () => {
@@ -367,7 +367,7 @@ describe("CrudRepository", () => {
 
       await expect(
         repository.deleteManyById([docId, otherId])
-      ).resolves.toEqual({ succeeded: 1, failed: 1 });
+      ).resolves.toEqual({ failed: 1, succeeded: 1 });
     });
 
     it("should throw when nothing is deleted", async () => {
@@ -416,7 +416,7 @@ describe("CrudRepository", () => {
         model.findOne.mockReturnValue(mockQueryChain(fakeDoc));
 
         await repository
-          .scoped(tenantScope({ userId: ownerId, crossTenant: true }))
+          .scoped(tenantScope({ crossTenant: true, userId: ownerId }))
           .findOneById(docId);
 
         expect(model.findOne).toHaveBeenCalledWith({ _id: docId });
@@ -427,7 +427,7 @@ describe("CrudRepository", () => {
 
         await expect(
           repository
-            .scoped(tenantScope({ userId: otherOwnerId, crossTenant: false }))
+            .scoped(tenantScope({ crossTenant: false, userId: otherOwnerId }))
             .findOneById(docId)
         ).rejects.toThrow(new NotFoundException(PERSISTENCE_NOT_FOUND));
       });
@@ -459,7 +459,7 @@ describe("CrudRepository", () => {
           .createOne({ name: "Test" } as never);
 
         expect(model.create).toHaveBeenCalledWith(
-          expect.objectContaining({ ownerId, name: "Test" })
+          expect.objectContaining({ name: "Test", ownerId })
         );
       });
 
@@ -480,7 +480,7 @@ describe("CrudRepository", () => {
         model.create.mockResolvedValue(fakeDoc);
 
         await repository
-          .scoped(tenantScope({ userId: ownerId, crossTenant: true }))
+          .scoped(tenantScope({ crossTenant: true, userId: ownerId }))
           .createOne({ name: "Test", ownerId: otherOwnerId } as never);
 
         expect(model.create).toHaveBeenCalledWith(
@@ -499,11 +499,11 @@ describe("CrudRepository", () => {
           .updateManyById([docId, otherId], { name: "Updated" });
 
         expect(model.updateMany).toHaveBeenCalledWith(
-          expect.objectContaining({ ownerId, _id: { $in: [docId, otherId] } }),
+          expect.objectContaining({ _id: { $in: [docId, otherId] }, ownerId }),
           { name: "Updated" },
           expect.objectContaining({ runValidators: true })
         );
-        expect(result).toEqual({ succeeded: 1, failed: 1 });
+        expect(result).toEqual({ failed: 1, succeeded: 1 });
       });
     });
 
@@ -517,9 +517,9 @@ describe("CrudRepository", () => {
           .deleteManyById([docId, otherId]);
 
         expect(model.deleteMany).toHaveBeenCalledWith(
-          expect.objectContaining({ ownerId, _id: { $in: [docId, otherId] } })
+          expect.objectContaining({ _id: { $in: [docId, otherId] }, ownerId })
         );
-        expect(result).toEqual({ succeeded: 1, failed: 1 });
+        expect(result).toEqual({ failed: 1, succeeded: 1 });
       });
     });
   });

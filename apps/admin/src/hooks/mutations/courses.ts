@@ -62,15 +62,14 @@ const removeManyCourses = graphql(`
 
 export function useCreateOneCourse() {
   return useMutation({
-    mutationKey: ["createOneCourse"],
     mutationFn: (createCourseInput: CreateCourseInput) =>
       execute(createOneCourse, { createCourseInput }),
+    mutationKey: ["createOneCourse"],
   });
 }
 
 export function useUpdateOneCourse() {
   return useMutation({
-    mutationKey: ["updateOneCourse"],
     mutationFn: ({
       courseId,
       updateCourseInput,
@@ -78,12 +77,12 @@ export function useUpdateOneCourse() {
       courseId: string;
       updateCourseInput: UpdateCourseInput;
     }) => execute(updateOneCourse, { courseId, updateCourseInput }),
+    mutationKey: ["updateOneCourse"],
   });
 }
 
 export function useUpdateManyCourses() {
   return useMutation({
-    mutationKey: ["updateManyCourses"],
     mutationFn: ({
       courseIds,
       updateCourseInput,
@@ -91,20 +90,21 @@ export function useUpdateManyCourses() {
       courseIds: string[];
       updateCourseInput: UpdateCourseInput;
     }) => execute(updateManyCourses, { courseIds, updateCourseInput }),
+    mutationKey: ["updateManyCourses"],
   });
 }
 
 export function useRemoveOneCourse() {
   return useMutation({
-    mutationKey: ["removeOneCourse"],
     mutationFn: (courseId: string) => execute(removeOneCourse, { courseId }),
+    mutationKey: ["removeOneCourse"],
   });
 }
 
 export function useRemoveManyCourses() {
   return useMutation({
-    mutationKey: ["removeManyCourses"],
     mutationFn: (courseIds: string[]) =>
       execute(removeManyCourses, { courseIds }),
+    mutationKey: ["removeManyCourses"],
   });
 }

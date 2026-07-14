@@ -15,10 +15,10 @@ const ownerId = "507f1f77bcf86cd799439011";
 const ctx = testAuthContext({ id: ownerId });
 
 const fakeEntity = {
-  id: validId,
-  ownerId,
-  name: "dev-token",
   hashedSecret: "hashed-secret",
+  id: validId,
+  name: "dev-token",
+  ownerId,
   permissions: [ApiTokenPermission.QUERY],
 };
 
@@ -45,8 +45,8 @@ describe("ApiTokensService", () => {
       )
       .mockReturnValue({
         plaintext: `pi_${validId}_secret-value`,
-        tokenId: validId,
         secret: "secret-value",
+        tokenId: validId,
       });
 
     purgeByOwner = jest.fn();
@@ -56,7 +56,7 @@ describe("ApiTokensService", () => {
         ApiTokensService,
         {
           provide: ApiTokensRepository,
-          useValue: { tenantCrud, purgeByOwner },
+          useValue: { purgeByOwner, tenantCrud },
         },
       ],
     }).compile();
@@ -90,17 +90,17 @@ describe("ApiTokensService", () => {
       crud.createOne.mockResolvedValue(fakeEntity);
 
       await expect(service.createOne(ctx, createInput)).resolves.toEqual({
-        token: `pi_${validId}_secret-value`,
         apiToken: fakeEntity,
+        token: `pi_${validId}_secret-value`,
       });
 
       expect(hash).toHaveBeenCalledWith("secret-value", 8);
       expect(tenantCrud).toHaveBeenCalledWith(ctx);
       expect(crud.createOne).toHaveBeenCalledWith({
+        hashedSecret: "hashed-secret",
+        id: validId,
         name: "dev-token",
         permissions: [ApiTokenPermission.QUERY],
-        id: validId,
-        hashedSecret: "hashed-secret",
       });
     });
   });

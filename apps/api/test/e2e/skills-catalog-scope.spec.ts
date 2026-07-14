@@ -52,33 +52,33 @@ describe("Skills catalog scope (e2e)", () => {
 
   beforeAll(async () => {
     const testApp = await createTestApp();
-    app = testApp.app;
+    ({ app } = testApp);
     await clearTestDatabase(testApp.module);
 
     const usersService = testApp.module.get(UsersService);
     skillsService = testApp.module.get(SkillsService);
 
     await usersService.createOne(testSuperAdminContext(), {
+      email: "admin@profile.info",
       name: "Admin",
       nickname: "admin",
-      email: "admin@profile.info",
       password: "123123",
       role: UserRole.SUPER_ADMIN,
     });
 
     const userA = await usersService.createOne(testSuperAdminContext(), {
+      email: "user-a@profile.info",
       name: "User A",
       nickname: "user-a",
-      email: "user-a@profile.info",
       password: "user-a.123",
       role: UserRole.USER,
     });
     userAId = userA.id;
 
     const userB = await usersService.createOne(testSuperAdminContext(), {
+      email: "user-b@profile.info",
       name: "User B",
       nickname: "user-b",
-      email: "user-b@profile.info",
       password: "user-b.123",
       role: UserRole.USER,
     });
@@ -88,9 +88,9 @@ describe("Skills catalog scope (e2e)", () => {
     userAToken = await signIn(app, "user-a@profile.info", "user-a.123");
 
     const globalSkill = await skillsService.createOne(testSuperAdminContext(), {
-      slug: "scope-global-skill",
-      i18n: skillI18n("Scope Global"),
       category: "Programming",
+      i18n: skillI18n("Scope Global"),
+      slug: "scope-global-skill",
     });
     globalSkillId = globalSkill.id;
 
@@ -98,9 +98,9 @@ describe("Skills catalog scope (e2e)", () => {
     const userBLocalSkill = await skillsService.createOne(
       testAuthContext({ id: userBId }),
       {
-        slug: userBLocalSlug,
-        i18n: skillI18n("User B Local"),
         category: "Programming",
+        i18n: skillI18n("User B Local"),
+        slug: userBLocalSlug,
       }
     );
     userBLocalSkillId = userBLocalSkill.id;
@@ -122,14 +122,14 @@ describe("Skills catalog scope (e2e)", () => {
           }
         }
       `,
+      token: userAToken,
       variables: {
         createSkillInput: {
-          slug: "user-a-local-skill",
-          i18n: skillI18n("User A Local"),
           category: "Programming",
+          i18n: skillI18n("User A Local"),
+          slug: "user-a-local-skill",
         },
       },
-      token: userAToken,
     });
 
     expect(response.errors).toBeUndefined();
@@ -146,8 +146,8 @@ describe("Skills catalog scope (e2e)", () => {
           disableOneSkill(skillId: $skillId) { id }
         }
       `,
-      variables: { skillId: globalSkillId },
       token: userAToken,
+      variables: { skillId: globalSkillId },
     });
     expect(firstGraphqlErrorMessage(disableResponse.errors)).toMatch(
       MUTATION_BLOCKED_MESSAGE
@@ -161,11 +161,11 @@ describe("Skills catalog scope (e2e)", () => {
           }
         }
       `,
+      token: userAToken,
       variables: {
         skillId: globalSkillId,
         updateSkillInput: { slug: "hijacked-global" },
       },
-      token: userAToken,
     });
     expect(firstGraphqlErrorMessage(updateResponse.errors)).toMatch(
       MUTATION_BLOCKED_MESSAGE
@@ -177,8 +177,8 @@ describe("Skills catalog scope (e2e)", () => {
           removeOneSkill(skillId: $skillId) { id }
         }
       `,
-      variables: { skillId: globalSkillId },
       token: userAToken,
+      variables: { skillId: globalSkillId },
     });
     expect(firstGraphqlErrorMessage(removeResponse.errors)).toMatch(
       MUTATION_BLOCKED_MESSAGE
@@ -192,8 +192,8 @@ describe("Skills catalog scope (e2e)", () => {
           findOneSkillById(skillId: $skillId) { id slug }
         }
       `,
-      variables: { skillId: userBLocalSkillId },
       token: userAToken,
+      variables: { skillId: userBLocalSkillId },
     });
     expect(findOneById.errors?.[0]?.message).toContain("Not Found");
 
@@ -205,8 +205,8 @@ describe("Skills catalog scope (e2e)", () => {
           findManySkillById(skillIds: $skillIds) { id slug }
         }
       `,
-      variables: { skillIds: [userBLocalSkillId] },
       token: userAToken,
+      variables: { skillIds: [userBLocalSkillId] },
     });
     expect(findManyById.errors).toBeUndefined();
     expect(findManyById.data?.findManySkillById).toEqual([]);
@@ -222,13 +222,13 @@ describe("Skills catalog scope (e2e)", () => {
           }
         }
       `,
+      token: userAToken,
       variables: {
         skillFilters: {
-          slug: userBLocalSlug,
           partition: CatalogPartition.LOCAL,
+          slug: userBLocalSlug,
         },
       },
-      token: userAToken,
     });
     expect(findManySkills.errors).toBeUndefined();
     expect(findManySkills.data?.findManySkills.found).toBe(0);
@@ -265,8 +265,8 @@ describe("Skills catalog scope (e2e)", () => {
           disableOneSkill(skillId: $skillId) { id }
         }
       `,
-      variables: { skillId: userBLocalSkillId },
       token: adminToken,
+      variables: { skillId: userBLocalSkillId },
     });
 
     expect(firstGraphqlErrorMessage(response.errors)).toMatch(
@@ -287,14 +287,14 @@ describe("Skills catalog scope (e2e)", () => {
           }
         }
       `,
+      token: adminToken,
       variables: {
         createSkillInput: {
-          slug: "admin-global-skill",
-          i18n: skillI18n("Admin Global"),
           category: "Programming",
+          i18n: skillI18n("Admin Global"),
+          slug: "admin-global-skill",
         },
       },
-      token: adminToken,
     });
 
     expect(createResponse.errors).toBeUndefined();
@@ -314,11 +314,11 @@ describe("Skills catalog scope (e2e)", () => {
           }
         }
       `,
+      token: adminToken,
       variables: {
         skillId,
         updateSkillInput: { slug: "admin-global-renamed" },
       },
-      token: adminToken,
     });
     expect(updateResponse.errors).toBeUndefined();
     expect(updateResponse.data?.updateOneSkill.slug).toBe(
@@ -333,8 +333,8 @@ describe("Skills catalog scope (e2e)", () => {
           disableOneSkill(skillId: $skillId) { id }
         }
       `,
-      variables: { skillId },
       token: adminToken,
+      variables: { skillId },
     });
     expect(disableResponse.errors).toBeUndefined();
     expect(disableResponse.data?.disableOneSkill.id).toBe(skillId);
@@ -344,9 +344,9 @@ describe("Skills catalog scope (e2e)", () => {
     const disabledSkill = await skillsService.createOne(
       testSuperAdminContext(),
       {
-        slug: "scope-disabled-skill",
-        i18n: skillI18n("Scope Disabled"),
         category: "Programming",
+        i18n: skillI18n("Scope Disabled"),
+        slug: "scope-disabled-skill",
       }
     );
 
@@ -362,8 +362,8 @@ describe("Skills catalog scope (e2e)", () => {
           }
         }
       `,
-      variables: { skillFilters: { slug: "scope-disabled-skill" } },
       token: userAToken,
+      variables: { skillFilters: { slug: "scope-disabled-skill" } },
     });
     expect(browseResponse.errors).toBeUndefined();
     expect(browseResponse.data?.findManySkills.nodes).toHaveLength(1);
@@ -379,8 +379,8 @@ describe("Skills catalog scope (e2e)", () => {
           }
         }
       `,
-      variables: { skillFilters: { slug: "scope-disabled-skill" } },
       token: userAToken,
+      variables: { skillFilters: { slug: "scope-disabled-skill" } },
     });
     expect(activeResponse.errors).toBeUndefined();
     expect(activeResponse.data?.findManyActiveSkills.found).toBe(0);
@@ -391,9 +391,9 @@ describe("Skills catalog scope (e2e)", () => {
     const disabledSkill = await skillsService.createOne(
       testSuperAdminContext(),
       {
-        slug: "attach-disabled-skill",
-        i18n: skillI18n("Attach Disabled"),
         category: "Programming",
+        i18n: skillI18n("Attach Disabled"),
+        slug: "attach-disabled-skill",
       }
     );
 
@@ -405,8 +405,8 @@ describe("Skills catalog scope (e2e)", () => {
           updateMe(updateMeInput: $updateMeInput) { id }
         }
       `,
-      variables: { updateMeInput: { skillIds: [disabledSkill.id] } },
       token: userAToken,
+      variables: { updateMeInput: { skillIds: [disabledSkill.id] } },
     });
 
     expect(response.errors?.[0]?.message).toContain(PERSISTENCE_NOT_FOUND);
@@ -426,14 +426,14 @@ describe("Skills catalog scope (e2e)", () => {
           }
         }
       `,
+      token: userBToken,
       variables: {
         skillFilters: {
-          partition: CatalogPartition.LOCAL,
           ownerId: userAId,
+          partition: CatalogPartition.LOCAL,
           slug: "user-a-local-skill",
         },
       },
-      token: userBToken,
     });
 
     expect(response.errors).toBeUndefined();

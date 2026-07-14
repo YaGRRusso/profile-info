@@ -45,20 +45,20 @@ export class AiToolsService {
 
     const result = await this.aiChatProvider.chat({
       messages: [
-        { role: "system", content: ATS_SUMMARIZE_SYSTEM_PROMPT },
+        { content: ATS_SUMMARIZE_SYSTEM_PROMPT, role: "system" },
         {
-          role: "user",
           content: createAtsSummarizeContextPrompt({
+            extractedDetails,
+            extraDetails: details ?? [],
             raw,
             resourceContext: {
-              type,
-              skillsList: skills,
               maxLength: lengthBudget,
+              skillsList: skills,
+              type,
             },
             sectionFocus: typeRules,
-            extraDetails: details ?? [],
-            extractedDetails,
           }),
+          role: "user",
         },
       ],
     });
@@ -73,15 +73,15 @@ export class AiToolsService {
 
     const result = await this.aiChatProvider.chat({
       messages: [
-        { role: "system", content: SUMMARIZE_SYSTEM_PROMPT },
+        { content: SUMMARIZE_SYSTEM_PROMPT, role: "system" },
         {
-          role: "user",
           content: createSummarizeContextPrompt({
+            extractedDetails,
+            extraDetails: details ?? [],
             raw,
             resourceContext: { type },
-            extraDetails: details ?? [],
-            extractedDetails,
           }),
+          role: "user",
         },
       ],
     });
@@ -96,13 +96,13 @@ export class AiToolsService {
   }: TranslateInput): Promise<AiEntity> {
     const result = await this.aiChatProvider.chat({
       messages: [
-        { role: "system", content: TRANSLATE_SYSTEM_PROMPT },
+        { content: TRANSLATE_SYSTEM_PROMPT, role: "system" },
         {
-          role: "user",
           content: createTranslateContextPrompt({
             raw,
-            resourceContext: { targetLanguage, sourceLanguage },
+            resourceContext: { sourceLanguage, targetLanguage },
           }),
+          role: "user",
         },
       ],
     });

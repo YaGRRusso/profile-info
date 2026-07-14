@@ -44,8 +44,8 @@ export class EducationsResolver {
   findOneEducation(
     @Auth() ctx: AuthContext,
     @Args("educationFilters", {
-      type: () => FilterEducationInput,
       nullable: true,
+      type: () => FilterEducationInput,
     })
     educationFilters?: FilterEducationInput
   ) {
@@ -64,26 +64,26 @@ export class EducationsResolver {
   findManyEducations(
     @Auth() ctx: AuthContext,
     @Args("educationFilters", {
-      type: () => FilterEducationInput,
       nullable: true,
+      type: () => FilterEducationInput,
     })
     educationFilters?: FilterEducationInput,
     @Args("educationPagination", {
-      type: () => PaginationInput,
       nullable: true,
+      type: () => PaginationInput,
     })
     educationPagination?: PaginationInput,
     @Args("educationSort", {
-      type: () => SortEducationInput,
       nullable: true,
+      type: () => SortEducationInput,
     })
     educationSort?: SortEducationInput
   ) {
     return this.educationsService.findMany(ctx, {
       filters: educationFilters,
-      sort: educationSort,
       limit: educationPagination?.limit,
       skip: educationPagination?.skip,
+      sort: educationSort,
     });
   }
 

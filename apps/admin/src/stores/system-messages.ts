@@ -18,6 +18,16 @@ interface SystemMessagesStore {
 
 export const useSystemMessagesStore = create<SystemMessagesStore>((set) => ({
   clearAllMessages: () => set({ messages: {} }),
+  clearMessage: (id) =>
+    set((state) => {
+      if (!(id in state.messages)) {
+        return state;
+      }
+
+      const messages = { ...state.messages };
+      delete messages[id];
+      return { messages };
+    }),
   messages: {},
   setMessage: (message) =>
     set((state) => {
@@ -34,15 +44,5 @@ export const useSystemMessagesStore = create<SystemMessagesStore>((set) => ({
       return {
         messages: { ...state.messages, [message.id]: message },
       };
-    }),
-  clearMessage: (id) =>
-    set((state) => {
-      if (!(id in state.messages)) {
-        return state;
-      }
-
-      const messages = { ...state.messages };
-      delete messages[id];
-      return { messages };
     }),
 }));

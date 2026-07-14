@@ -49,13 +49,13 @@ describe("ResumeService", () => {
 
   it("should scope private entities to the requested userId", async () => {
     usersService.findOneById.mockResolvedValue({
+      email: "alice@profile.info",
+      i18n: [],
       id: userId,
       name: "Alice",
-      email: "alice@profile.info",
       role: UserRole.SUPER_ADMIN,
-      i18n: [],
-      urls: [],
       skillIds: [],
+      urls: [],
     });
 
     skillsService.findManyById.mockResolvedValue([]);
@@ -68,9 +68,9 @@ describe("ResumeService", () => {
     await service.buildResume(userId);
 
     const ownerCtx = expect.objectContaining({
+      credentialKind: "session",
       id: userId,
       role: UserRole.USER,
-      credentialKind: "session",
     });
 
     expect(experiencesService.findMany).toHaveBeenCalledWith(
@@ -97,19 +97,19 @@ describe("ResumeService", () => {
 
   it("should build header data from the requested user", async () => {
     usersService.findOneById.mockResolvedValue({
-      id: userId,
-      name: "Alice",
       email: "alice@profile.info",
-      phone: "+5511999999999",
-      role: UserRole.USER,
       i18n: [
         {
           locale: "en",
-          messages: { title: "Engineer", description: "Backend developer" },
+          messages: { description: "Backend developer", title: "Engineer" },
         },
       ],
-      urls: [{ title: "GitHub", value: "https://github.com/alice" }],
+      id: userId,
+      name: "Alice",
+      phone: "+5511999999999",
+      role: UserRole.USER,
       skillIds: [],
+      urls: [{ title: "GitHub", value: "https://github.com/alice" }],
     });
 
     skillsService.findManyById.mockResolvedValue([]);
@@ -123,23 +123,23 @@ describe("ResumeService", () => {
 
     expect(document.header).toEqual(
       expect.objectContaining({
-        name: "Alice",
-        title: "Engineer",
         email: "alice@profile.info",
+        name: "Alice",
         phone: "+5511999999999",
+        title: "Engineer",
       })
     );
   });
 
   it("should include course descriptions in certifications", async () => {
     usersService.findOneById.mockResolvedValue({
+      email: "alice@profile.info",
+      i18n: [],
       id: userId,
       name: "Alice",
-      email: "alice@profile.info",
       role: UserRole.USER,
-      i18n: [],
-      urls: [],
       skillIds: [],
+      urls: [],
     });
 
     skillsService.findManyById.mockResolvedValue([]);
@@ -153,17 +153,17 @@ describe("ResumeService", () => {
     coursesService.findMany.mockResolvedValue({
       nodes: [
         {
-          organizationId: "org-1",
           hours: 40,
           i18n: [
             {
               locale: "en",
               messages: {
-                title: "Advanced TypeScript",
                 description: "Deep dive into generics and utility types.",
+                title: "Advanced TypeScript",
               },
             },
           ],
+          organizationId: "org-1",
         },
       ],
     });
@@ -172,10 +172,10 @@ describe("ResumeService", () => {
 
     expect(document.certifications).toEqual([
       {
-        title: "Advanced TypeScript",
-        organization: "Example Org",
-        hours: 40,
         description: "Deep dive into generics and utility types.",
+        hours: 40,
+        organization: "Example Org",
+        title: "Advanced TypeScript",
       },
     ]);
   });

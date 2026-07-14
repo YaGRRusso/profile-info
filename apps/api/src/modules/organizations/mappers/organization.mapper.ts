@@ -31,19 +31,19 @@ export class OrganizationMapper
   toDomain(model: OrganizationModel): OrganizationEntityRecord {
     return {
       ...toBaseEntityFields(model),
-      slug: model.slug,
-      name: model.name,
-      website: model.website,
-      logo: model.logo,
+      category: model.category as OrganizationCategory,
+      disabled: model.disabled,
       i18n:
         toTranslationEntityList(model.i18n)?.map((entry) => ({
           locale: entry.locale,
           messages: { description: entry.messages.description },
         })) ?? [],
-      category: model.category as OrganizationCategory,
-      disabled: model.disabled,
-      partition: model.partition,
+      logo: model.logo,
+      name: model.name,
       ownerId: toIdString(model.ownerId) ?? "",
+      partition: model.partition,
+      slug: model.slug,
+      website: model.website,
     };
   }
 

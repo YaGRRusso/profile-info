@@ -9,6 +9,6 @@ export function cleanTestCache(): void {
   for (const entry of removableCacheEntries) {
     const target = path.join(cacheRoot, entry);
     if (!existsSync(target)) continue;
-    rmSync(target, { recursive: true, force: true });
+    rmSync(target, { force: true, recursive: true });
   }
 }

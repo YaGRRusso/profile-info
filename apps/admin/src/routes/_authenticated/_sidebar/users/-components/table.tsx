@@ -58,7 +58,7 @@ const queryParser = parseAsShape(z.string())
     limitUrlUpdates: { method: "debounce", timeMs: 500 },
   });
 const sortParser = parseAsShape(
-  z.array(z.object({ id: z.string(), desc: z.boolean() }))
+  z.array(z.object({ desc: z.boolean(), id: z.string() }))
 )
   .withDefault([])
   .withOptions(persistentOptions);
@@ -91,7 +91,14 @@ const getColumns = (
   onView: (user: UserRow) => void
 ) => [
   columnHelper.display({
-    id: "select",
+    cell: ({ row }) => (
+      <input
+        checked={row.getIsSelected()}
+        className="checkbox checkbox-sm"
+        onChange={row.getToggleSelectedHandler()}
+        type="checkbox"
+      />
+    ),
     enableHiding: false,
     header: ({ table }) => (
       <input
@@ -101,27 +108,17 @@ const getColumns = (
         type="checkbox"
       />
     ),
-    cell: ({ row }) => (
-      <input
-        checked={row.getIsSelected()}
-        className="checkbox checkbox-sm"
-        onChange={row.getToggleSelectedHandler()}
-        type="checkbox"
-      />
-    ),
+    id: "select",
   }),
   columnHelper.accessor("id", {
-    header: "ID",
-    enableGlobalFilter: false,
-    enableSorting: false,
     cell: (data) => (
       <span className="font-mono text-xs">{data.getValue()}</span>
     ),
-  }),
-  columnHelper.accessor("avatar", {
-    header: "Avatar",
     enableGlobalFilter: false,
     enableSorting: false,
+    header: "ID",
+  }),
+  columnHelper.accessor("avatar", {
     cell: ({ row }) => (
       <Avatar
         avatar={row.original.avatar}
@@ -129,24 +126,23 @@ const getColumns = (
         name={row.original.name}
       />
     ),
+    enableGlobalFilter: false,
+    enableSorting: false,
+    header: "Avatar",
   }),
   columnHelper.accessor("name", { header: "Name" }),
   columnHelper.accessor("nickname", { header: "Nickname" }),
   columnHelper.accessor("email", { header: "Email" }),
   columnHelper.accessor("role", {
-    header: "Role",
-    enableGlobalFilter: false,
-    enableSorting: false,
-    filterFn: "equals",
     cell: (data) => (
       <span className="badge badge-sm badge-soft">{data.getValue()}</span>
     ),
-  }),
-  columnHelper.accessor("disabled", {
-    header: "Status",
     enableGlobalFilter: false,
     enableSorting: false,
     filterFn: "equals",
+    header: "Role",
+  }),
+  columnHelper.accessor("disabled", {
     cell: (data) => (
       <span
         className={cn(
@@ -157,24 +153,26 @@ const getColumns = (
         {data.getValue() ? "Disabled" : "Active"}
       </span>
     ),
+    enableGlobalFilter: false,
+    enableSorting: false,
+    filterFn: "equals",
+    header: "Status",
   }),
   columnHelper.accessor("createdAt", {
-    header: "Created",
+    cell: ({ getValue }) => new Date(getValue()).toLocaleDateString(),
     enableGlobalFilter: false,
     filterFn: dateRangeFilter,
+    header: "Created",
     sortingFn: "datetime",
-    cell: ({ getValue }) => new Date(getValue()).toLocaleDateString(),
   }),
   columnHelper.accessor("updatedAt", {
-    header: "Updated",
+    cell: ({ getValue }) => new Date(getValue()).toLocaleDateString(),
     enableGlobalFilter: false,
     filterFn: dateRangeFilter,
+    header: "Updated",
     sortingFn: "datetime",
-    cell: ({ getValue }) => new Date(getValue()).toLocaleDateString(),
   }),
   columnHelper.display({
-    id: "actions",
-    enableHiding: false,
     cell: ({ row }) => {
       const canRemove = row.original.role !== UserRole.SuperAdmin;
       const actions: ReactNode[] = [
@@ -227,6 +225,8 @@ const getColumns = (
         <div className="flex items-center justify-end gap-1">{actions}</div>
       );
     },
+    enableHiding: false,
+    id: "actions",
   }),
 ];
 
@@ -270,24 +270,24 @@ export function UsersTable(props: UsersTableProps) {
   }, [role, disabled, createdAt, updatedAt]);
   const { filters: activeFilters, clearAll: clearAllFilters } =
     useActiveFilters([
-      { id: "role", label: "Role", state: role, setState: setRole },
+      { id: "role", label: "Role", setState: setRole, state: role },
       {
         id: "disabled",
         label: "Status",
-        state: disabled,
         setState: setDisabled,
+        state: disabled,
       },
       {
         id: "createdAt",
         label: "Created",
-        state: createdAt,
         setState: setCreatedAt,
+        state: createdAt,
       },
       {
         id: "updatedAt",
         label: "Updated",
-        state: updatedAt,
         setState: setUpdatedAt,
+        state: updatedAt,
       },
     ]);
   const data = useMemo(
@@ -295,7 +295,6 @@ export function UsersTable(props: UsersTableProps) {
     [props.data, currentUserId]
   );
   const table = useReactTable({
-    data,
     columns: getColumns(
       props.onEdit,
       props.onDisable,
@@ -303,26 +302,27 @@ export function UsersTable(props: UsersTableProps) {
       props.onRemove,
       props.onView
     ),
+    data,
     getCoreRowModel: getCoreRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
-    getSortedRowModel: getSortedRowModel(),
+    getFacetedMinMaxValues: getFacetedMinMaxValues(),
     getFacetedRowModel: getFacetedRowModel(),
     getFacetedUniqueValues: getFacetedUniqueValues(),
-    getFacetedMinMaxValues: getFacetedMinMaxValues(),
+    getFilteredRowModel: getFilteredRowModel(),
     getRowId: (row) => row.id,
-    state: {
-      globalFilter: query,
-      sorting: sort,
-      columnFilters,
-      rowSelection,
-      columnVisibility,
-    },
+    getSortedRowModel: getSortedRowModel(),
+    onColumnVisibilityChange: setColumnVisibility,
+    onRowSelectionChange: setRowSelection,
     onSortingChange: ((updater) =>
       setSort((current) =>
         typeof updater === "function" ? updater(current) : updater
       )) as OnChangeFn<SortingState>,
-    onRowSelectionChange: setRowSelection,
-    onColumnVisibilityChange: setColumnVisibility,
+    state: {
+      columnFilters,
+      columnVisibility,
+      globalFilter: query,
+      rowSelection,
+      sorting: sort,
+    },
   });
   const selected = data.filter((user) => rowSelection[user.id]);
   const selectionHasSuperAdmin = selected.some(

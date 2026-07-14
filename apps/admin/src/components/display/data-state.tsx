@@ -25,7 +25,7 @@ export function DataState({
   children,
 }: DataStateProps) {
   return (
-    <DataStateContext.Provider value={{ isLoading, isFetching, isEmpty }}>
+    <DataStateContext.Provider value={{ isEmpty, isFetching, isLoading }}>
       {children}
     </DataStateContext.Provider>
   );

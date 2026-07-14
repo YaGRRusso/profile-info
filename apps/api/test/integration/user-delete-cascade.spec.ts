@@ -39,7 +39,7 @@ describe("User delete cascade (integration)", () => {
 
   beforeAll(async () => {
     const testApp = await createTestApp();
-    app = testApp.app;
+    ({ app } = testApp);
     await clearTestDatabase(testApp.module);
 
     usersService = testApp.module.get(UsersService);
@@ -65,10 +65,6 @@ describe("User delete cascade (integration)", () => {
     const organization = await organizationsService.createOne(
       testSuperAdminContext(),
       {
-        slug: "acme-corp",
-        name: "Acme Corp",
-        website: "https://acme.example",
-        logo: "https://acme.example/logo.png",
         category: OrganizationCategory.COMPANY,
         i18n: [
           {
@@ -76,21 +72,25 @@ describe("User delete cascade (integration)", () => {
             messages: { description: "Acme Corp description" },
           },
         ],
+        logo: "https://acme.example/logo.png",
+        name: "Acme Corp",
+        slug: "acme-corp",
+        website: "https://acme.example",
       }
     );
 
     const doomedUser = await usersService.createOne(testSuperAdminContext(), {
+      email: "doomed@profile.info",
       name: "Doomed",
       nickname: "doomed",
-      email: "doomed@profile.info",
       password: "doomed.123",
       role: UserRole.USER,
     });
 
     const survivorUser = await usersService.createOne(testSuperAdminContext(), {
+      email: "survivor@profile.info",
       name: "Survivor",
       nickname: "survivor",
-      email: "survivor@profile.info",
       password: "survivor.123",
       role: UserRole.USER,
     });
@@ -99,54 +99,54 @@ describe("User delete cascade (integration)", () => {
     const survivorCtx = testAuthContext({ id: survivorUser.id });
 
     await coursesService.createOne(doomedCtx, {
-      slug: "doomed-course",
-      organizationId: organization.id,
-      status: CourseStatus.COMPLETE,
       i18n: [
         {
           locale: "en",
-          messages: { title: "Doomed Course", description: "Gone soon" },
+          messages: { description: "Gone soon", title: "Doomed Course" },
         },
       ],
+      organizationId: organization.id,
+      slug: "doomed-course",
+      status: CourseStatus.COMPLETE,
     });
 
     await educationsService.createOne(doomedCtx, {
-      slug: "doomed-education",
-      organizationId: organization.id,
-      level: EducationLevel.BACHELOR,
-      status: EducationStatus.COMPLETE,
       i18n: [
         {
           locale: "en",
-          messages: { title: "Doomed Education", description: "Gone soon" },
+          messages: { description: "Gone soon", title: "Doomed Education" },
         },
       ],
+      level: EducationLevel.BACHELOR,
+      organizationId: organization.id,
+      slug: "doomed-education",
+      status: EducationStatus.COMPLETE,
     });
 
     await experiencesService.createOne(doomedCtx, {
-      slug: "doomed-experience",
-      organizationId: organization.id,
       category: ExperienceCategory.FULL_TIME,
+      organizationId: organization.id,
       roles: [
         {
           i18n: [
             {
               locale: "en",
-              messages: { title: "Doomed Role", description: "Gone soon" },
+              messages: { description: "Gone soon", title: "Doomed Role" },
             },
           ],
         },
       ],
+      slug: "doomed-experience",
     });
 
     await projectsService.createOne(doomedCtx, {
-      slug: "doomed-project",
       i18n: [
         {
           locale: "en",
-          messages: { title: "Doomed Project", description: "Gone soon" },
+          messages: { description: "Gone soon", title: "Doomed Project" },
         },
       ],
+      slug: "doomed-project",
     });
 
     await apiTokensService.createOne(doomedCtx, {
@@ -155,15 +155,15 @@ describe("User delete cascade (integration)", () => {
     });
 
     await coursesService.createOne(survivorCtx, {
-      slug: "survivor-course",
-      organizationId: organization.id,
-      status: CourseStatus.COMPLETE,
       i18n: [
         {
           locale: "en",
-          messages: { title: "Survivor Course", description: "Stays" },
+          messages: { description: "Stays", title: "Survivor Course" },
         },
       ],
+      organizationId: organization.id,
+      slug: "survivor-course",
+      status: CourseStatus.COMPLETE,
     });
 
     expect(await courseModel.countDocuments({ ownerId: doomedUser.id })).toBe(
@@ -208,9 +208,9 @@ describe("User delete cascade (integration)", () => {
 
   it("should reject SUPER_ADMIN deletion", async () => {
     const admin = await usersService.createOne(testSuperAdminContext(), {
+      email: "admin-delete-test@profile.info",
       name: "Admin",
       nickname: "admin-delete-test",
-      email: "admin-delete-test@profile.info",
       password: "admin.123",
       role: UserRole.SUPER_ADMIN,
     });

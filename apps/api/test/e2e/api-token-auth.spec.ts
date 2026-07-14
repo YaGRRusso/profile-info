@@ -66,7 +66,7 @@ describe("API token authentication (e2e)", () => {
 
   beforeAll(async () => {
     const testApp = await createTestApp();
-    app = testApp.app;
+    ({ app } = testApp);
     await clearTestDatabase(testApp.module);
 
     const usersService = testApp.module.get(UsersService);
@@ -76,9 +76,9 @@ describe("API token authentication (e2e)", () => {
     );
 
     const joao = await usersService.createOne(testSuperAdminContext(), {
+      email: "joao@profile.info",
       name: "João",
       nickname: "joao",
-      email: "joao@profile.info",
       password: "123123",
       role: UserRole.USER,
     });
@@ -86,12 +86,12 @@ describe("API token authentication (e2e)", () => {
     const organization = await organizationsService.createOne(
       testSuperAdminContext(),
       {
-        slug: "api-token-org",
-        name: "API Token Org",
-        website: "https://api-token.example",
-        logo: "https://api-token.example/logo.png",
         category: OrganizationCategory.COMPANY,
         i18n: [{ locale: "en", messages: { description: "Org" } }],
+        logo: "https://api-token.example/logo.png",
+        name: "API Token Org",
+        slug: "api-token-org",
+        website: "https://api-token.example",
       }
     );
     organizationId = organization.id;
@@ -99,16 +99,16 @@ describe("API token authentication (e2e)", () => {
     await apiTokenModel.create([
       {
         _id: QUERY_TOKEN_ID,
-        ownerId: joao.id,
-        name: "Alice query",
         hashedSecret: await hash(QUERY_TOKEN_SECRET, 8),
+        name: "Alice query",
+        ownerId: joao.id,
         permissions: [ApiTokenPermission.QUERY],
       },
       {
         _id: MUTATE_TOKEN_ID,
-        ownerId: joao.id,
-        name: "Alice mutate",
         hashedSecret: await hash(MUTATE_TOKEN_SECRET, 8),
+        name: "Alice mutate",
+        ownerId: joao.id,
         permissions: [ApiTokenPermission.MUTATE],
       },
     ]);
@@ -129,24 +129,24 @@ describe("API token authentication (e2e)", () => {
 
     await graphqlRequest(app, {
       query: CREATE_ONE_COURSE,
+      token: sessionToken.data?.signIn,
       variables: {
         createCourseInput: {
-          slug: "alice-api-token-course",
-          organizationId,
-          status: "COMPLETE",
-          relevance: 1,
           i18n: [
             {
               locale: "en",
               messages: {
-                title: "Course title",
                 description: "Course description",
+                title: "Course title",
               },
             },
           ],
+          organizationId,
+          relevance: 1,
+          slug: "alice-api-token-course",
+          status: "COMPLETE",
         },
       },
-      token: sessionToken.data?.signIn,
     });
   });
 
@@ -158,8 +158,8 @@ describe("API token authentication (e2e)", () => {
     const response = await graphqlRequest<{
       findManyCourses: { found: number; nodes: Array<{ slug: string }> };
     }>(app, {
-      query: FIND_MANY_COURSES,
       apiKey: queryApiToken,
+      query: FIND_MANY_COURSES,
     });
 
     expect(response.errors).toBeUndefined();
@@ -173,8 +173,8 @@ describe("API token authentication (e2e)", () => {
     const response = await graphqlRequest<{
       getMe: { email: string };
     }>(app, {
-      query: GET_ME,
       apiKey: queryApiToken,
+      query: GET_ME,
     });
 
     expect(response.errors).toBeUndefined();
@@ -183,25 +183,25 @@ describe("API token authentication (e2e)", () => {
 
   it("should forbid QUERY tokens from mutations", async () => {
     const response = await graphqlRequest(app, {
+      apiKey: queryApiToken,
       query: CREATE_ONE_COURSE,
       variables: {
         createCourseInput: {
-          slug: "blocked-by-query-token",
-          organizationId,
-          status: "COMPLETE",
-          relevance: 1,
           i18n: [
             {
               locale: "en",
               messages: {
-                title: "Course title",
                 description: "Course description",
+                title: "Course title",
               },
             },
           ],
+          organizationId,
+          relevance: 1,
+          slug: "blocked-by-query-token",
+          status: "COMPLETE",
         },
       },
-      apiKey: queryApiToken,
     });
 
     expect(response.errors?.[0]?.message).toBe(
@@ -213,25 +213,25 @@ describe("API token authentication (e2e)", () => {
     const response = await graphqlRequest<{
       createOneCourse: { slug: string };
     }>(app, {
+      apiKey: mutateApiToken,
       query: CREATE_ONE_COURSE,
       variables: {
         createCourseInput: {
-          slug: "created-by-mutate-token",
-          organizationId,
-          status: "COMPLETE",
-          relevance: 1,
           i18n: [
             {
               locale: "en",
               messages: {
-                title: "Course title",
                 description: "Course description",
+                title: "Course title",
               },
             },
           ],
+          organizationId,
+          relevance: 1,
+          slug: "created-by-mutate-token",
+          status: "COMPLETE",
         },
       },
-      apiKey: mutateApiToken,
     });
 
     expect(response.errors).toBeUndefined();
@@ -240,8 +240,8 @@ describe("API token authentication (e2e)", () => {
 
   it("should forbid MUTATE tokens from queries", async () => {
     const response = await graphqlRequest(app, {
-      query: FIND_MANY_COURSES,
       apiKey: mutateApiToken,
+      query: FIND_MANY_COURSES,
     });
 
     expect(response.errors?.[0]?.message).toBe(
@@ -251,8 +251,8 @@ describe("API token authentication (e2e)", () => {
 
   it("should forbid API tokens from session-only routes", async () => {
     const response = await graphqlRequest(app, {
-      query: FIND_MANY_API_TOKENS,
       apiKey: queryApiToken,
+      query: FIND_MANY_API_TOKENS,
     });
 
     expect(response.errors?.[0]?.message).toBe("Session required");

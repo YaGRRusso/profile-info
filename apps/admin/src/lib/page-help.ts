@@ -9,9 +9,9 @@ export function pageHelp(
   section: HelpSection
 ): PageHelpContent {
   return {
-    title: tHelp(`${section}.title`),
     paragraphs: tHelp(`${section}.paragraphs`, {
       returnObjects: true,
     }) as string[],
+    title: tHelp(`${section}.title`),
   };
 }

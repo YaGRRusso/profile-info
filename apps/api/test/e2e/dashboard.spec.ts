@@ -62,7 +62,7 @@ describe("Dashboard (e2e)", () => {
 
   beforeAll(async () => {
     const testApp = await createTestApp();
-    app = testApp.app;
+    ({ app } = testApp);
     await clearTestDatabase(testApp.module);
 
     const usersService = testApp.module.get(UsersService);
@@ -73,25 +73,25 @@ describe("Dashboard (e2e)", () => {
     organizationsService = testApp.module.get(OrganizationsService);
 
     await usersService.createOne(testSuperAdminContext(), {
+      email: "admin@profile.info",
       name: "Admin",
       nickname: "admin",
-      email: "admin@profile.info",
       password: "123123",
       role: UserRole.SUPER_ADMIN,
     });
 
     const joao = await usersService.createOne(testSuperAdminContext(), {
+      email: "joao@profile.info",
       name: "João",
       nickname: "joao",
-      email: "joao@profile.info",
       password: "123123",
       role: UserRole.USER,
     });
 
     const maria = await usersService.createOne(testSuperAdminContext(), {
+      email: "maria@profile.info",
       name: "Maria",
       nickname: "maria",
-      email: "maria@profile.info",
       password: "123123",
       role: UserRole.USER,
     });
@@ -115,104 +115,104 @@ describe("Dashboard (e2e)", () => {
     const organization = await organizationsService.createOne(
       testSuperAdminContext(),
       {
-        slug: "dashboard-org",
-        name: "Dashboard Org",
-        website: "https://dashboard.example",
-        logo: "https://dashboard.example/logo.png",
         category: OrganizationCategory.COMPANY,
         i18n: [{ locale: "en", messages: { description: "Org" } }],
+        logo: "https://dashboard.example/logo.png",
+        name: "Dashboard Org",
+        slug: "dashboard-org",
+        website: "https://dashboard.example",
       }
     );
     organizationId = organization.id;
 
     await skillsService.createOne(testSuperAdminContext(), {
-      slug: "dashboard-skill",
-      i18n: skillI18n("Dashboard Skill"),
       category: "Programming",
+      i18n: skillI18n("Dashboard Skill"),
+      slug: "dashboard-skill",
     });
 
     const joaoCtx = testAuthContext({ id: joao.id });
     const bobCtx = testAuthContext({ id: maria.id });
 
     await coursesService.createOne(joaoCtx, {
-      slug: "alice-course-complete",
-      organizationId,
-      status: CourseStatus.COMPLETE,
       i18n: [
         {
           locale: "en",
-          messages: { title: "Alice Complete", description: "Done" },
+          messages: { description: "Done", title: "Alice Complete" },
         },
       ],
+      organizationId,
+      slug: "alice-course-complete",
+      status: CourseStatus.COMPLETE,
     } as CreateCourseInput);
 
     await coursesService.createOne(joaoCtx, {
-      slug: "alice-course-progress",
-      organizationId,
-      status: CourseStatus.IN_PROGRESS,
       i18n: [
         {
           locale: "en",
-          messages: { title: "Alice Progress", description: "Ongoing" },
+          messages: { description: "Ongoing", title: "Alice Progress" },
         },
       ],
+      organizationId,
+      slug: "alice-course-progress",
+      status: CourseStatus.IN_PROGRESS,
     } as CreateCourseInput);
 
     await educationsService.createOne(joaoCtx, {
-      slug: "alice-education",
-      organizationId,
-      level: EducationLevel.BACHELOR,
-      status: EducationStatus.COMPLETE,
       i18n: [
         {
           locale: "en",
-          messages: { title: "Alice Degree", description: "CS" },
+          messages: { description: "CS", title: "Alice Degree" },
         },
       ],
+      level: EducationLevel.BACHELOR,
+      organizationId,
+      slug: "alice-education",
+      status: EducationStatus.COMPLETE,
     } as CreateEducationInput);
 
     await experiencesService.createOne(joaoCtx, {
-      slug: "alice-experience-full-time",
-      organizationId,
       category: ExperienceCategory.FULL_TIME,
+      organizationId,
       roles: [
         {
           i18n: [
             {
               locale: "en",
-              messages: { title: "Engineer", description: "Backend work" },
+              messages: { description: "Backend work", title: "Engineer" },
             },
           ],
         },
       ],
+      slug: "alice-experience-full-time",
     } as CreateExperienceInput);
 
     await experiencesService.createOne(joaoCtx, {
-      slug: "alice-experience-freelance",
-      organizationId,
       category: ExperienceCategory.FREELANCE,
+      organizationId,
       roles: [
         {
           i18n: [
             {
               locale: "en",
-              messages: { title: "Consultant", description: "Side projects" },
+              messages: { description: "Side projects", title: "Consultant" },
             },
           ],
         },
       ],
+      slug: "alice-experience-freelance",
     } as CreateExperienceInput);
 
     await coursesService.createOne(bobCtx, {
-      slug: "bob-course",
-      organizationId,
-      status: CourseStatus.COMPLETE,
       i18n: [
         {
           locale: "en",
-          messages: { title: "Bob Course", description: "Done" },
+          messages: { description: "Done", title: "Bob Course" },
         },
       ],
+      organizationId,
+      slug: "bob-course",
+      status: CourseStatus.COMPLETE,
     } as CreateCourseInput);
   });
 

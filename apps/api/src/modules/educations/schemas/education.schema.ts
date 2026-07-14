@@ -12,35 +12,33 @@ import { UserModel } from "@/modules/users/schemas/user.schema";
 
 @Schema({ _id: false })
 export class EducationMessagesModel {
-  @Prop({ type: String, required: true })
+  @Prop({ required: true, type: String })
   title: string;
 
-  @Prop({ type: String, required: true })
+  @Prop({ required: true, type: String })
   description: string;
 }
 
 @Schema({ timestamps: true })
 export class EducationModel extends BaseModel {
-  @Prop({ type: Number, required: true, default: 0 })
+  @Prop({ default: 0, required: true, type: Number })
   relevance: number;
 
   @Prop({ type: String })
   slug?: string;
 
   @Prop({
-    type: mongoose.Schema.Types.ObjectId,
+    index: true,
     ref: UserModel.name,
     required: true,
-    index: true,
+    type: mongoose.Schema.Types.ObjectId,
   })
   ownerId: mongoose.Types.ObjectId | string;
 
-  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: OrganizationModel.name })
+  @Prop({ ref: OrganizationModel.name, type: mongoose.Schema.Types.ObjectId })
   organizationId?: (mongoose.Types.ObjectId | string) | string;
 
   @Prop({
-    type: String,
-    required: true,
     enum: [
       "HIGH_SCHOOL",
       "TECHNICAL",
@@ -50,14 +48,16 @@ export class EducationModel extends BaseModel {
       "DOCTORATE",
     ],
     index: true,
+    required: true,
+    type: String,
   })
   level: string;
 
   @Prop({
-    type: String,
-    required: true,
     enum: ["COMPLETE", "INCOMPLETE", "IN_PROGRESS"],
     index: true,
+    required: true,
+    type: String,
   })
   status: string;
 
@@ -68,13 +68,13 @@ export class EducationModel extends BaseModel {
   image?: string;
 
   @Prop({
-    type: [createTranslationModel(EducationMessagesModel)],
     required: true,
+    type: [createTranslationModel(EducationMessagesModel)],
   })
   i18n: TranslationModel<EducationMessagesModel>[];
 
   @Prop({
-    type: [{ type: mongoose.Schema.Types.ObjectId, ref: SkillModel.name }],
+    type: [{ ref: SkillModel.name, type: mongoose.Schema.Types.ObjectId }],
   })
   skillIds?: ((mongoose.Types.ObjectId | string) | string)[];
 
@@ -86,4 +86,4 @@ export class EducationModel extends BaseModel {
 
 export type EducationDocument = HydratedDocument<EducationModel>;
 export const EducationSchema = SchemaFactory.createForClass(EducationModel);
-EducationSchema.index({ ownerId: 1, slug: 1 }, { unique: true, sparse: true });
+EducationSchema.index({ ownerId: 1, slug: 1 }, { sparse: true, unique: true });

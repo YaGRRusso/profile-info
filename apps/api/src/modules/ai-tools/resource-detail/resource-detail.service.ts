@@ -42,7 +42,7 @@ export class ResourceDetailService {
       for (const value of detail.value) {
         for (const extractor of matchedExtractors) {
           if (extractor.accepts(value)) {
-            tasks.push({ value, extractor });
+            tasks.push({ extractor, value });
           }
         }
       }

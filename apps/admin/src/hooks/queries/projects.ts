@@ -78,7 +78,9 @@ export function useFindManyProjects(
   options?: { enabled?: boolean }
 ) {
   return useInfiniteQuery({
-    queryKey: ["findManyProjects", variables],
+    getNextPageParam:
+      paginatedNextPageParam<FindManyProjectsQuery>("findManyProjects"),
+    initialPageParam: 0,
     queryFn: ({ pageParam }) =>
       execute(
         findManyProjects,
@@ -88,9 +90,7 @@ export function useFindManyProjects(
           variables
         )
       ),
-    initialPageParam: 0,
-    getNextPageParam:
-      paginatedNextPageParam<FindManyProjectsQuery>("findManyProjects"),
+    queryKey: ["findManyProjects", variables],
     select: paginatedSelect<FindManyProjectsQuery>("findManyProjects"),
     ...options,
   });

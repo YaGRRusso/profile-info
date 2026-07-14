@@ -69,22 +69,22 @@ export class ResumeService {
         ? this.skillsService.findManyById(ctx, skillIds)
         : Promise.resolve([]),
       this.experiencesService.findMany(ctx, {
-        sort: { relevance: -1 },
         limit: RESUME_LIMITS.experiences,
+        sort: { relevance: -1 },
       }),
       this.educationsService.findMany(ctx, {
         filters: { status: EducationStatus.COMPLETE },
-        sort: { relevance: -1 },
         limit: RESUME_LIMITS.educations,
+        sort: { relevance: -1 },
       }),
       this.coursesService.findMany(ctx, {
         filters: { status: CourseStatus.COMPLETE },
-        sort: { relevance: -1 },
         limit: RESUME_LIMITS.certifications,
+        sort: { relevance: -1 },
       }),
       this.projectsService.findMany(ctx, {
-        sort: { relevance: -1 },
         limit: RESUME_LIMITS.projects,
+        sort: { relevance: -1 },
       }),
     ]);
 
@@ -116,11 +116,11 @@ export class ResumeService {
     const userTranslation = pickTranslation(user.i18n, locale);
 
     const header: ResumeHeader = {
-      name: user.name,
-      title: userTranslation?.messages.title,
-      email: user.email,
-      phone: user.phone,
       description: userTranslation?.messages.description || undefined,
+      email: user.email,
+      name: user.name,
+      phone: user.phone,
+      title: userTranslation?.messages.title,
       urls: (user.urls ?? []).map(({ title, value }) => ({ title, value })),
     };
 
@@ -146,13 +146,13 @@ export class ResumeService {
     const projects = this.buildProjects(projectsResult.nodes, locale);
 
     return {
-      locale,
-      header,
-      skills,
-      experiences,
-      educations,
       certifications,
+      educations,
+      experiences,
+      header,
+      locale,
       projects,
+      skills,
     };
   }
 
@@ -174,9 +174,9 @@ export class ResumeService {
 
           return [
             {
-              title: translation.messages.title,
               description: translation.messages.description,
               period: formatPeriod(role.period, locale),
+              title: translation.messages.title,
             },
           ];
         });
@@ -201,14 +201,14 @@ export class ResumeService {
         String(education.organizationId ?? "")
       );
 
-      const description = translation.messages.description;
+      const { description } = translation.messages;
 
       return [
         {
-          title: translation.messages.title,
+          description: description || undefined,
           organization: organization?.name ?? "Unknown organization",
           period: formatPeriod(education.period, locale),
-          description: description || undefined,
+          title: translation.messages.title,
         },
       ];
     });
@@ -227,14 +227,14 @@ export class ResumeService {
         String(course.organizationId ?? "")
       );
 
-      const description = translation.messages.description;
+      const { description } = translation.messages;
 
       return [
         {
-          title: translation.messages.title,
-          organization: organization?.name ?? "Unknown organization",
-          hours: course.hours,
           description: description || undefined,
+          hours: course.hours,
+          organization: organization?.name ?? "Unknown organization",
+          title: translation.messages.title,
         },
       ];
     });
@@ -250,8 +250,8 @@ export class ResumeService {
 
       return [
         {
-          title: translation.messages.title,
           description: translation.messages.description,
+          title: translation.messages.title,
           url: project.urls?.[0]?.value,
         },
       ];

@@ -121,9 +121,9 @@ export function useCreateOneSkill() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationKey: ["createOneSkill"],
     mutationFn: (createSkillInput: CreateSkillInput) =>
       execute(createOneSkill, { createSkillInput }),
+    mutationKey: ["createOneSkill"],
     onSuccess: () => invalidateSkillQueries(queryClient),
   });
 }
@@ -132,7 +132,6 @@ export function useUpdateOneSkill() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationKey: ["updateOneSkill"],
     mutationFn: ({
       skillId,
       updateSkillInput,
@@ -140,6 +139,7 @@ export function useUpdateOneSkill() {
       skillId: string;
       updateSkillInput: UpdateSkillInput;
     }) => execute(updateOneSkill, { skillId, updateSkillInput }),
+    mutationKey: ["updateOneSkill"],
     onSuccess: () => invalidateSkillQueries(queryClient),
   });
 }
@@ -148,7 +148,6 @@ export function useUpdateManySkills() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationKey: ["updateManySkills"],
     mutationFn: ({
       skillIds,
       updateSkillInput,
@@ -156,6 +155,7 @@ export function useUpdateManySkills() {
       skillIds: string[];
       updateSkillInput: UpdateSkillInput;
     }) => execute(updateManySkills, { skillIds, updateSkillInput }),
+    mutationKey: ["updateManySkills"],
     onSuccess: () => invalidateSkillQueries(queryClient),
   });
 }
@@ -164,8 +164,8 @@ export function useDisableOneSkill() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationKey: ["disableOneSkill"],
     mutationFn: (skillId: string) => execute(disableOneSkill, { skillId }),
+    mutationKey: ["disableOneSkill"],
     onSuccess: () => invalidateSkillQueries(queryClient),
   });
 }
@@ -174,9 +174,9 @@ export function useDisableManySkills() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationKey: ["disableManySkills"],
     mutationFn: (skillIds: string[]) =>
       execute(disableManySkills, { skillIds }),
+    mutationKey: ["disableManySkills"],
     onSuccess: () => invalidateSkillQueries(queryClient),
   });
 }
@@ -185,8 +185,8 @@ export function useEnableOneSkill() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationKey: ["enableOneSkill"],
     mutationFn: (skillId: string) => execute(enableOneSkill, { skillId }),
+    mutationKey: ["enableOneSkill"],
     onSuccess: () => invalidateSkillQueries(queryClient),
   });
 }
@@ -195,8 +195,8 @@ export function useEnableManySkills() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationKey: ["enableManySkills"],
     mutationFn: (skillIds: string[]) => execute(enableManySkills, { skillIds }),
+    mutationKey: ["enableManySkills"],
     onSuccess: () => invalidateSkillQueries(queryClient),
   });
 }
@@ -205,8 +205,8 @@ export function useRemoveOneSkill() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationKey: ["removeOneSkill"],
     mutationFn: (skillId: string) => execute(removeOneSkill, { skillId }),
+    mutationKey: ["removeOneSkill"],
     onSuccess: () => invalidateSkillQueries(queryClient),
   });
 }
@@ -215,8 +215,8 @@ export function useRemoveManySkills() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationKey: ["removeManySkills"],
     mutationFn: (skillIds: string[]) => execute(removeManySkills, { skillIds }),
+    mutationKey: ["removeManySkills"],
     onSuccess: () => invalidateSkillQueries(queryClient),
   });
 }

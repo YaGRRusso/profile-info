@@ -72,6 +72,6 @@ function extractDuplicateField(error: MongoServerError): string {
 }
 
 function formatValidationError(error: MongooseError.ValidationError): string {
-  const first = Object.values(error.errors)[0];
+  const [first] = Object.values(error.errors);
   return first?.message ?? "Validation failed.";
 }

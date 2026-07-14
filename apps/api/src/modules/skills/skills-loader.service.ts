@@ -21,7 +21,7 @@ export class SkillsLoaderService {
         const map = keyBy(list, (item) => item.id);
         return ids.map((id) => map[id] ?? null);
       },
-      { name: "batchSkills", maxBatchSize: 100 }
+      { maxBatchSize: 100, name: "batchSkills" }
     );
   }
 }

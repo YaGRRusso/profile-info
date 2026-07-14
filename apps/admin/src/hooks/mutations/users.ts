@@ -93,9 +93,9 @@ export function useUpdateMe() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationKey: ["updateMe"],
     mutationFn: (updateMeInput: UpdateMeInput) =>
       execute(updateMe, { updateMeInput }),
+    mutationKey: ["updateMe"],
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: ["getMe"],
@@ -107,9 +107,9 @@ export function useUpdateMe() {
 export function useCreateOneUser() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationKey: ["createOneUser"],
     mutationFn: (createUserInput: CreateUserInput) =>
       execute(createOneUser, { createUserInput }),
+    mutationKey: ["createOneUser"],
     onSuccess: () => invalidateUserQueries(queryClient),
   });
 }
@@ -117,9 +117,9 @@ export function useCreateOneUser() {
 export function useCreateManyUsers() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationKey: ["createManyUsers"],
     mutationFn: (createUserInputs: CreateUserInput[]) =>
       execute(createManyUsers, { createUserInputs }),
+    mutationKey: ["createManyUsers"],
     onSuccess: () => invalidateUserQueries(queryClient),
   });
 }
@@ -127,14 +127,14 @@ export function useCreateManyUsers() {
 export function useUpdateOneUser() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationKey: ["updateOneUser"],
     mutationFn: ({
       userId,
       updateUserInput,
     }: {
       userId: string;
       updateUserInput: UpdateUserInput;
-    }) => execute(updateOneUser, { userId, updateUserInput }),
+    }) => execute(updateOneUser, { updateUserInput, userId }),
+    mutationKey: ["updateOneUser"],
     onSuccess: () => invalidateUserQueries(queryClient),
   });
 }
@@ -142,14 +142,14 @@ export function useUpdateOneUser() {
 export function useUpdateManyUsers() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationKey: ["updateManyUsers"],
     mutationFn: ({
       userIds,
       updateUserInput,
     }: {
       userIds: string[];
       updateUserInput: UpdateUserInput;
-    }) => execute(updateManyUsers, { userIds, updateUserInput }),
+    }) => execute(updateManyUsers, { updateUserInput, userIds }),
+    mutationKey: ["updateManyUsers"],
     onSuccess: () => invalidateUserQueries(queryClient),
   });
 }
@@ -157,8 +157,8 @@ export function useUpdateManyUsers() {
 export function useRemoveOneUser() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationKey: ["removeOneUser"],
     mutationFn: (userId: string) => execute(removeOneUser, { userId }),
+    mutationKey: ["removeOneUser"],
     onSuccess: () => invalidateUserQueries(queryClient),
   });
 }
@@ -166,8 +166,8 @@ export function useRemoveOneUser() {
 export function useRemoveManyUsers() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationKey: ["removeManyUsers"],
     mutationFn: (userIds: string[]) => execute(removeManyUsers, { userIds }),
+    mutationKey: ["removeManyUsers"],
     onSuccess: () => invalidateUserQueries(queryClient),
   });
 }
@@ -181,7 +181,7 @@ export function useEnableOneUser() {
       options?: Parameters<typeof updateOneUserMutation.mutate>[1]
     ) =>
       updateOneUserMutation.mutate(
-        { userId, updateUserInput: { disabled: false } },
+        { updateUserInput: { disabled: false }, userId },
         options
       ),
   };
@@ -196,7 +196,7 @@ export function useDisableOneUser() {
       options?: Parameters<typeof updateOneUserMutation.mutate>[1]
     ) =>
       updateOneUserMutation.mutate(
-        { userId, updateUserInput: { disabled: true } },
+        { updateUserInput: { disabled: true }, userId },
         options
       ),
   };
@@ -211,7 +211,7 @@ export function useEnableManyUsers() {
       options?: Parameters<typeof updateManyUsersMutation.mutate>[1]
     ) =>
       updateManyUsersMutation.mutate(
-        { userIds, updateUserInput: { disabled: false } },
+        { updateUserInput: { disabled: false }, userIds },
         options
       ),
   };
@@ -226,7 +226,7 @@ export function useDisableManyUsers() {
       options?: Parameters<typeof updateManyUsersMutation.mutate>[1]
     ) =>
       updateManyUsersMutation.mutate(
-        { userIds, updateUserInput: { disabled: true } },
+        { updateUserInput: { disabled: true }, userIds },
         options
       ),
   };

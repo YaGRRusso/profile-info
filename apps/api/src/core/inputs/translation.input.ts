@@ -11,7 +11,7 @@ export interface TranslationInput<T> {
 export function createTranslationInput<T>(
   MessagesModel: Type<T>
 ): Type<TranslationInput<T>> {
-  const name = MessagesModel.name;
+  const { name } = MessagesModel;
 
   @InputType(`${name}TranslationInput`, { isAbstract: true })
   class TranslationInputClass {

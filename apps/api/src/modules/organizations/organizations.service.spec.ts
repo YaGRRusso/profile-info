@@ -17,14 +17,14 @@ const ctx = testAuthContext();
 const validId = "507f1f77bcf86cd799439013";
 
 const fakeEntity = {
+  category: "COMPANY",
+  disabled: false,
+  i18n: [],
   id: validId,
   name: "Acme Corp",
-  slug: "acme-corp",
-  category: "COMPANY",
-  i18n: [],
-  disabled: false,
-  partition: CatalogPartition.GLOBAL,
   ownerId: "507f1f77bcf86cd799439012",
+  partition: CatalogPartition.GLOBAL,
+  slug: "acme-corp",
 };
 
 describe("OrganizationsService", () => {
@@ -49,8 +49,8 @@ describe("OrganizationsService", () => {
       catalogCrud: jest.fn().mockReturnValue(crud),
       catalogStats: jest.fn().mockReturnValue(stats),
       countActive: jest.fn().mockResolvedValue(2),
-      countOwnedLocalActive: jest.fn().mockResolvedValue(1),
       countByField: jest.fn().mockResolvedValue([]),
+      countOwnedLocalActive: jest.fn().mockResolvedValue(1),
       findRecentlyUpdatedActive: jest.fn(),
     };
 
@@ -153,7 +153,7 @@ describe("OrganizationsService", () => {
         service.findOneActive(ctx, { filters: { slug: "acme-corp" } })
       ).resolves.toEqual(fakeEntity);
       expect(crud.findOne).toHaveBeenCalledWith({
-        filters: { slug: "acme-corp", disabled: false },
+        filters: { disabled: false, slug: "acme-corp" },
       });
     });
 
@@ -161,11 +161,11 @@ describe("OrganizationsService", () => {
       crud.findOne.mockResolvedValue(fakeEntity);
 
       await service.findOneActive(ctx, {
-        filters: { slug: "acme-corp", disabled: true },
+        filters: { disabled: true, slug: "acme-corp" },
       });
 
       expect(crud.findOne).toHaveBeenCalledWith({
-        filters: { slug: "acme-corp", disabled: false },
+        filters: { disabled: false, slug: "acme-corp" },
       });
     });
   });
@@ -196,10 +196,10 @@ describe("OrganizationsService", () => {
   describe("createOne", () => {
     it("delegates to scoped crud", async () => {
       const createInput = {
-        slug: "acme-corp",
-        name: "Acme Corp",
         category: "COMPANY" as const,
         i18n: [{ locale: "en", messages: { description: "Acme" } }],
+        name: "Acme Corp",
+        slug: "acme-corp",
       };
       crud.createOne.mockResolvedValue(fakeEntity);
 
@@ -244,11 +244,11 @@ describe("OrganizationsService", () => {
   describe("removeMany", () => {
     it("emits organization.deleted for each organization before deleteManyById", async () => {
       crud.findManyById.mockResolvedValue([fakeEntity]);
-      crud.deleteManyById.mockResolvedValue({ succeeded: 1, failed: 0 });
+      crud.deleteManyById.mockResolvedValue({ failed: 0, succeeded: 1 });
 
       await expect(service.removeMany(ctx, [validId])).resolves.toEqual({
-        succeeded: 1,
         failed: 0,
+        succeeded: 1,
       });
 
       expect(eventEmitter.emitAsync).toHaveBeenCalledWith(

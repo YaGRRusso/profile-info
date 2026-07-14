@@ -21,7 +21,7 @@ function skillTitle(index: number, locale: LocaleCode): string {
   if (size === "medium") {
     return `${localeFaker.person.jobArea()} ${localeFaker.hacker.noun()}`;
   }
-  return `${localeFaker.person.jobArea()} ${localeFaker.lorem.words({ min: 4, max: 8 })}`;
+  return `${localeFaker.person.jobArea()} ${localeFaker.lorem.words({ max: 8, min: 4 })}`;
 }
 
 type SkillSeed = Pick<
@@ -43,15 +43,15 @@ function buildSkills(
         : CATEGORY_POOL[globalIndex % CATEGORY_POOL.length];
 
     return {
-      partition,
-      ownerId,
-      disabled: globalIndex % 17 === 0,
-      slug: slugFor(skillTitle(globalIndex, SEED_LOCALES[0]), globalIndex),
       category,
+      disabled: globalIndex % 17 === 0,
       i18n: SEED_LOCALES.map((locale) => ({
         locale,
         messages: { title: skillTitle(globalIndex, locale) },
       })),
+      ownerId,
+      partition,
+      slug: slugFor(skillTitle(globalIndex, SEED_LOCALES[0]), globalIndex),
     };
   });
 }
@@ -102,8 +102,8 @@ export function pickSkillIds(
   return optionalForIndex(index, () =>
     faker.helpers
       .arrayElements(allSkillIds, {
-        min: Math.min(3, allSkillIds.length),
         max: Math.min(9, allSkillIds.length),
+        min: Math.min(3, allSkillIds.length),
       })
       .map(String)
   );

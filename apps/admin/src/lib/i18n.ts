@@ -4,12 +4,12 @@ import i18n from "@/i18n";
 const SUPPORTED_LOCALES = new Set<string>(Object.values(LocaleEnum));
 
 export function resolveActiveLocale(): LocaleEnum {
-  const language = i18n.language;
+  const { language } = i18n;
   if (SUPPORTED_LOCALES.has(language)) {
     return language as LocaleEnum;
   }
 
-  const base = language.split("-")[0];
+  const [base] = language.split("-");
   if (SUPPORTED_LOCALES.has(base)) {
     return base as LocaleEnum;
   }

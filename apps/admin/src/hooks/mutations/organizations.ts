@@ -114,9 +114,9 @@ export function useCreateOneOrganization() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationKey: ["createOneOrganization"],
     mutationFn: (createOrganizationInput: CreateOrganizationInput) =>
       execute(createOneOrganization, { createOrganizationInput }),
+    mutationKey: ["createOneOrganization"],
     onSuccess: () => invalidateOrganizationQueries(queryClient),
   });
 }
@@ -125,7 +125,6 @@ export function useUpdateOneOrganization() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationKey: ["updateOneOrganization"],
     mutationFn: ({
       organizationId,
       updateOrganizationInput,
@@ -137,6 +136,7 @@ export function useUpdateOneOrganization() {
         organizationId,
         updateOrganizationInput,
       }),
+    mutationKey: ["updateOneOrganization"],
     onSuccess: () => invalidateOrganizationQueries(queryClient),
   });
 }
@@ -145,7 +145,6 @@ export function useUpdateManyOrganizations() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationKey: ["updateManyOrganizations"],
     mutationFn: ({
       organizationIds,
       updateOrganizationInput,
@@ -157,6 +156,7 @@ export function useUpdateManyOrganizations() {
         organizationIds,
         updateOrganizationInput,
       }),
+    mutationKey: ["updateManyOrganizations"],
     onSuccess: () => invalidateOrganizationQueries(queryClient),
   });
 }
@@ -165,9 +165,9 @@ export function useDisableOneOrganization() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationKey: ["disableOneOrganization"],
     mutationFn: (organizationId: string) =>
       execute(disableOneOrganization, { organizationId }),
+    mutationKey: ["disableOneOrganization"],
     onSuccess: () => invalidateOrganizationQueries(queryClient),
   });
 }
@@ -176,9 +176,9 @@ export function useDisableManyOrganizations() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationKey: ["disableManyOrganizations"],
     mutationFn: (organizationIds: string[]) =>
       execute(disableManyOrganizations, { organizationIds }),
+    mutationKey: ["disableManyOrganizations"],
     onSuccess: () => invalidateOrganizationQueries(queryClient),
   });
 }
@@ -187,9 +187,9 @@ export function useEnableOneOrganization() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationKey: ["enableOneOrganization"],
     mutationFn: (organizationId: string) =>
       execute(enableOneOrganization, { organizationId }),
+    mutationKey: ["enableOneOrganization"],
     onSuccess: () => invalidateOrganizationQueries(queryClient),
   });
 }
@@ -198,9 +198,9 @@ export function useEnableManyOrganizations() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationKey: ["enableManyOrganizations"],
     mutationFn: (organizationIds: string[]) =>
       execute(enableManyOrganizations, { organizationIds }),
+    mutationKey: ["enableManyOrganizations"],
     onSuccess: () => invalidateOrganizationQueries(queryClient),
   });
 }
@@ -209,9 +209,9 @@ export function useRemoveOneOrganization() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationKey: ["removeOneOrganization"],
     mutationFn: (organizationId: string) =>
       execute(removeOneOrganization, { organizationId }),
+    mutationKey: ["removeOneOrganization"],
     onSuccess: () => invalidateOrganizationQueries(queryClient),
   });
 }
@@ -220,9 +220,9 @@ export function useRemoveManyOrganizations() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationKey: ["removeManyOrganizations"],
     mutationFn: (organizationIds: string[]) =>
       execute(removeManyOrganizations, { organizationIds }),
+    mutationKey: ["removeManyOrganizations"],
     onSuccess: () => invalidateOrganizationQueries(queryClient),
   });
 }

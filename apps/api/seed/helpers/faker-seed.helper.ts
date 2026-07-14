@@ -24,33 +24,33 @@ export function fakerForLocale(locale: LocaleCode) {
 
 function textRange(size: TextSize) {
   return size === "small"
-    ? { min: 1, max: 1 }
+    ? { max: 1, min: 1 }
     : size === "medium"
-      ? { min: 2, max: 4 }
-      : { min: 10, max: 20 };
+      ? { max: 4, min: 2 }
+      : { max: 20, min: 10 };
 }
 
 function wordRange(size: TextSize) {
   return size === "small"
-    ? { min: 2, max: 4 }
+    ? { max: 4, min: 2 }
     : size === "medium"
-      ? { min: 5, max: 10 }
-      : { min: 12, max: 24 };
+      ? { max: 10, min: 5 }
+      : { max: 24, min: 12 };
 }
 
 export function loremSentences(size: TextSize, locale: LocaleCode) {
   const range = textRange(size);
   return fakerForLocale(locale).lorem.sentences({
-    min: range.min,
     max: range.max,
+    min: range.min,
   });
 }
 
 export function loremWords(size: TextSize, locale: LocaleCode) {
   const range = wordRange(size);
   return fakerForLocale(locale).lorem.words({
-    min: range.min,
     max: range.max,
+    min: range.min,
   });
 }
 
@@ -77,12 +77,12 @@ export function bilingualMessages(
 
 export function bilingualTitleDescription(index: number) {
   return bilingualMessages(index, (size, locale) => ({
-    title: loremWords(size, locale),
     description: loremSentences(size, locale),
+    title: loremWords(size, locale),
   }));
 }
 
-export const relevance = () => faker.number.int({ min: 1, max: 5 });
+export const relevance = () => faker.number.int({ max: 5, min: 1 });
 
 export const period = () => {
   const from = faker.date.past({ years: 8 });

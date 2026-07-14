@@ -8,6 +8,7 @@ import { SkillsLoaderService } from "./skills-loader.service";
 import { SkillsValidatorService } from "./skills-validator.service";
 
 @Module({
+  exports: [SkillsService, SkillsLoaderService, SkillsValidatorService],
   imports: [
     MongooseModule.forFeature([{ name: SkillModel.name, schema: SkillSchema }]),
   ],
@@ -18,6 +19,5 @@ import { SkillsValidatorService } from "./skills-validator.service";
     SkillsLoaderService,
     SkillsValidatorService,
   ],
-  exports: [SkillsService, SkillsLoaderService, SkillsValidatorService],
 })
 export class SkillsModule {}

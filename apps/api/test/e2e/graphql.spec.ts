@@ -27,7 +27,7 @@ describe("GraphQL (e2e)", () => {
 
   beforeAll(async () => {
     const testApp = await createTestApp();
-    app = testApp.app;
+    ({ app } = testApp);
     await clearTestDatabase(testApp.module);
     usersService = testApp.module.get(UsersService);
     organizationsService = testApp.module.get(OrganizationsService);
@@ -35,17 +35,17 @@ describe("GraphQL (e2e)", () => {
     skillsService = testApp.module.get(SkillsService);
 
     await usersService.createOne(testSuperAdminContext(), {
+      email: "admin@profile.info",
       name: "Admin",
       nickname: "admin",
-      email: "admin@profile.info",
       password: "123123",
       role: UserRole.SUPER_ADMIN,
     });
 
     const user = await usersService.createOne(testSuperAdminContext(), {
+      email: "user@profile.info",
       name: "User",
       nickname: "user",
-      email: "user@profile.info",
       password: "user.123",
       role: UserRole.USER,
     });
@@ -80,9 +80,9 @@ describe("GraphQL (e2e)", () => {
       `,
       variables: {
         createSkillInput: {
-          slug: "graphql-skill",
-          i18n: skillI18n("GraphQL"),
           category: "Programming",
+          i18n: skillI18n("GraphQL"),
+          slug: "graphql-skill",
         },
       },
     });
@@ -119,10 +119,10 @@ describe("GraphQL (e2e)", () => {
           }
         }
       `,
+      token: userToken,
       variables: {
         updateMeInput: { phone: "+5511999999999" },
       },
-      token: userToken,
     });
 
     expect(response.errors).toBeUndefined();
@@ -131,9 +131,9 @@ describe("GraphQL (e2e)", () => {
 
   it("should resolve profile skills on getMe", async () => {
     const skill = await skillsService.createOne(testSuperAdminContext(), {
-      slug: "get-me-skill",
-      i18n: skillI18n("Get Me Skill"),
       category: "Programming",
+      i18n: skillI18n("Get Me Skill"),
+      slug: "get-me-skill",
     });
 
     await graphqlRequest(app, {
@@ -144,10 +144,10 @@ describe("GraphQL (e2e)", () => {
           }
         }
       `,
+      token: userToken,
       variables: {
         updateMeInput: { skillIds: [skill.id] },
       },
-      token: userToken,
     });
 
     const response = await graphqlRequest<{
@@ -179,9 +179,9 @@ describe("GraphQL (e2e)", () => {
 
   it("should allow authenticated users to set profile skillIds via updateMe", async () => {
     const skill = await skillsService.createOne(testSuperAdminContext(), {
-      slug: "profile-skill",
-      i18n: skillI18n("Profile Skill"),
       category: "Programming",
+      i18n: skillI18n("Profile Skill"),
+      slug: "profile-skill",
     });
 
     const response = await graphqlRequest<{
@@ -203,10 +203,10 @@ describe("GraphQL (e2e)", () => {
           }
         }
       `,
+      token: userToken,
       variables: {
         updateMeInput: { skillIds: [skill.id] },
       },
-      token: userToken,
     });
 
     expect(response.errors).toBeUndefined();
@@ -220,10 +220,6 @@ describe("GraphQL (e2e)", () => {
     const organization = await organizationsService.createOne(
       testSuperAdminContext(),
       {
-        slug: "nested-org",
-        name: "Nested Org",
-        website: "https://nested.example",
-        logo: "https://nested.example/logo.png",
         category: OrganizationCategory.COMPANY,
         i18n: [
           {
@@ -231,34 +227,38 @@ describe("GraphQL (e2e)", () => {
             messages: { description: "Nested organization" },
           },
         ],
+        logo: "https://nested.example/logo.png",
+        name: "Nested Org",
+        slug: "nested-org",
+        website: "https://nested.example",
       }
     );
 
     const portfolioCtx = testAuthContext({ id: portfolioUserId });
 
     const experience = await experiencesService.createOne(portfolioCtx, {
-      slug: "nested-experience",
-      organizationId: organization.id,
       category: ExperienceCategory.FULL_TIME,
+      organizationId: organization.id,
       roles: [
         {
           i18n: [
             {
               locale: "en",
               messages: {
-                title: "Engineer",
                 description: "Built APIs",
+                title: "Engineer",
               },
             },
           ],
         },
       ],
+      slug: "nested-experience",
     });
 
     await skillsService.createOne(testSuperAdminContext(), {
-      slug: "loader-skill",
-      i18n: skillI18n("Loader Skill"),
       category: "Programming",
+      i18n: skillI18n("Loader Skill"),
+      slug: "loader-skill",
     });
 
     const response = await graphqlRequest<{
@@ -278,8 +278,8 @@ describe("GraphQL (e2e)", () => {
           }
         }
       `,
-      variables: { experienceId: experience.id },
       token: userToken,
+      variables: { experienceId: experience.id },
     });
 
     expect(response.errors).toBeUndefined();

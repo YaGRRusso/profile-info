@@ -1,22 +1,22 @@
 /** Fixed rule for seeds and test data: cycle sizes so every run covers all buckets. */
 
 export const TEXT_SENTENCE_RANGES = {
-  small: { min: 1, max: 1 },
-  medium: { min: 2, max: 4 },
-  large: { min: 10, max: 20 },
+  large: { max: 20, min: 10 },
+  medium: { max: 4, min: 2 },
+  small: { max: 1, min: 1 },
 } as const;
 
 export const TEXT_WORD_RANGES = {
-  small: { min: 2, max: 4 },
-  medium: { min: 5, max: 10 },
-  large: { min: 12, max: 24 },
+  large: { max: 24, min: 12 },
+  medium: { max: 10, min: 5 },
+  small: { max: 4, min: 2 },
 } as const;
 
 export const ARRAY_COUNTS = {
   empty: 0,
-  short: 2,
-  medium: 5,
   large: 12,
+  medium: 5,
+  short: 2,
 } as const;
 
 export type TextSize = keyof typeof TEXT_SENTENCE_RANGES;

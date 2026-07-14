@@ -65,15 +65,14 @@ const removeManyEducations = graphql(`
 
 export function useCreateOneEducation() {
   return useMutation({
-    mutationKey: ["createOneEducation"],
     mutationFn: (createEducationInput: CreateEducationInput) =>
       execute(createOneEducation, { createEducationInput }),
+    mutationKey: ["createOneEducation"],
   });
 }
 
 export function useUpdateOneEducation() {
   return useMutation({
-    mutationKey: ["updateOneEducation"],
     mutationFn: ({
       educationId,
       updateEducationInput,
@@ -81,12 +80,12 @@ export function useUpdateOneEducation() {
       educationId: string;
       updateEducationInput: UpdateEducationInput;
     }) => execute(updateOneEducation, { educationId, updateEducationInput }),
+    mutationKey: ["updateOneEducation"],
   });
 }
 
 export function useUpdateManyEducations() {
   return useMutation({
-    mutationKey: ["updateManyEducations"],
     mutationFn: ({
       educationIds,
       updateEducationInput,
@@ -94,21 +93,22 @@ export function useUpdateManyEducations() {
       educationIds: string[];
       updateEducationInput: UpdateEducationInput;
     }) => execute(updateManyEducations, { educationIds, updateEducationInput }),
+    mutationKey: ["updateManyEducations"],
   });
 }
 
 export function useRemoveOneEducation() {
   return useMutation({
-    mutationKey: ["removeOneEducation"],
     mutationFn: (educationId: string) =>
       execute(removeOneEducation, { educationId }),
+    mutationKey: ["removeOneEducation"],
   });
 }
 
 export function useRemoveManyEducations() {
   return useMutation({
-    mutationKey: ["removeManyEducations"],
     mutationFn: (educationIds: string[]) =>
       execute(removeManyEducations, { educationIds }),
+    mutationKey: ["removeManyEducations"],
   });
 }

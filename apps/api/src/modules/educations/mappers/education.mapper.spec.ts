@@ -12,78 +12,78 @@ describe("EducationMapper", () => {
 
   it("maps persistence fields to the domain entity", () => {
     const model = {
-      id: "507f1f77bcf86cd799439011",
       createdAt: new Date("2024-01-01"),
-      updatedAt: new Date("2024-01-02"),
-      relevance: 5,
-      slug: "bachelor-cs",
-      ownerId,
-      organizationId,
-      level: EducationLevel.BACHELOR,
-      status: EducationStatus.COMPLETE,
-      url: "https://example.com",
+      i18n: [
+        {
+          locale: "en",
+          messages: {
+            description: "Bachelor degree",
+            title: "Computer Science",
+          },
+        },
+      ],
+      id: "507f1f77bcf86cd799439011",
       image: "https://example.com/image.png",
-      skillIds: [skillId],
+      level: EducationLevel.BACHELOR,
+      organizationId,
+      ownerId,
       period: {
         from: new Date("2020-01-01"),
         to: new Date("2024-01-01"),
       },
+      relevance: 5,
+      skillIds: [skillId],
+      slug: "bachelor-cs",
+      status: EducationStatus.COMPLETE,
+      updatedAt: new Date("2024-01-02"),
+      url: "https://example.com",
+    } as EducationModel;
+
+    expect(mapper.toDomain(model)).toEqual({
+      createdAt: model.createdAt,
       i18n: [
         {
           locale: "en",
           messages: {
-            title: "Computer Science",
             description: "Bachelor degree",
+            title: "Computer Science",
           },
         },
       ],
-    } as EducationModel;
-
-    expect(mapper.toDomain(model)).toEqual({
       id: "507f1f77bcf86cd799439011",
-      createdAt: model.createdAt,
-      updatedAt: model.updatedAt,
-      relevance: 5,
-      slug: "bachelor-cs",
-      ownerId,
-      organizationId,
-      level: EducationLevel.BACHELOR,
-      status: EducationStatus.COMPLETE,
-      url: "https://example.com",
       image: "https://example.com/image.png",
-      skillIds: [skillId],
+      level: EducationLevel.BACHELOR,
+      organizationId,
+      ownerId,
       period: {
         from: model.period?.from,
         to: model.period?.to,
       },
-      i18n: [
-        {
-          locale: "en",
-          messages: {
-            title: "Computer Science",
-            description: "Bachelor degree",
-          },
-        },
-      ],
+      relevance: 5,
+      skillIds: [skillId],
+      slug: "bachelor-cs",
+      status: EducationStatus.COMPLETE,
+      updatedAt: model.updatedAt,
+      url: "https://example.com",
     });
   });
 
   it("omits organizationId when the persistence record has no organization", () => {
     const model = {
-      id: "507f1f77bcf86cd799439011",
       createdAt: new Date("2024-01-01"),
-      updatedAt: new Date("2024-01-02"),
-      relevance: 0,
-      slug: "informal-course",
-      ownerId,
-      status: EducationStatus.IN_PROGRESS,
-      level: EducationLevel.OTHER,
       i18n: [
         {
           locale: "en",
-          messages: { title: "Informal", description: "No org" },
+          messages: { description: "No org", title: "Informal" },
         },
       ],
+      id: "507f1f77bcf86cd799439011",
+      level: EducationLevel.OTHER,
+      ownerId,
+      relevance: 0,
+      slug: "informal-course",
+      status: EducationStatus.IN_PROGRESS,
+      updatedAt: new Date("2024-01-02"),
     } as EducationModel;
 
     expect(mapper.toDomain(model).organizationId).toBeUndefined();
@@ -92,50 +92,50 @@ describe("EducationMapper", () => {
   it("maps create input to a persistence payload", () => {
     expect(
       mapper.toPersistenceForCreate({
-        slug: "bachelor-cs",
-        organizationId,
-        level: EducationLevel.BACHELOR,
-        status: EducationStatus.COMPLETE,
         i18n: [
           {
             locale: "en",
             messages: {
-              title: "Computer Science",
               description: "Bachelor degree",
+              title: "Computer Science",
             },
           },
         ],
+        level: EducationLevel.BACHELOR,
+        organizationId,
         skillIds: [skillId],
+        slug: "bachelor-cs",
+        status: EducationStatus.COMPLETE,
       })
     ).toEqual({
-      slug: "bachelor-cs",
-      organizationId: new mongoose.Types.ObjectId(organizationId),
-      level: EducationLevel.BACHELOR,
-      status: EducationStatus.COMPLETE,
       i18n: [
         {
           locale: "en",
           messages: {
-            title: "Computer Science",
             description: "Bachelor degree",
+            title: "Computer Science",
           },
         },
       ],
+      level: EducationLevel.BACHELOR,
+      organizationId: new mongoose.Types.ObjectId(organizationId),
       skillIds: [new mongoose.Types.ObjectId(skillId)],
+      slug: "bachelor-cs",
+      status: EducationStatus.COMPLETE,
     });
   });
 
   it("maps filter input to a persistence query", () => {
     expect(
       mapper.toPersistenceForFilter({
-        slug: "bachelor-cs",
         organizationId,
         skillIds: [skillId],
+        slug: "bachelor-cs",
       })
     ).toEqual({
-      slug: "bachelor-cs",
       organizationId: new mongoose.Types.ObjectId(organizationId),
       skillIds: [new mongoose.Types.ObjectId(skillId)],
+      slug: "bachelor-cs",
     });
   });
 

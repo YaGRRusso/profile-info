@@ -20,34 +20,34 @@ describe("ResumeController (e2e)", () => {
 
   beforeAll(async () => {
     const testApp = await createTestApp();
-    app = testApp.app;
+    ({ app } = testApp);
     await clearTestDatabase(testApp.module);
 
     const usersService = testApp.module.get(UsersService);
     const skillsService = testApp.module.get(SkillsService);
 
     const profileUser = await usersService.createOne(testSuperAdminContext(), {
-      name: "Admin User",
-      nickname: "admin",
       email: "admin@profile.info",
-      password: "123123",
-      role: UserRole.SUPER_ADMIN,
       i18n: [
         {
           locale: "en",
           messages: {
-            title: "Software Engineer",
             description: "Backend developer",
+            title: "Software Engineer",
           },
         },
       ],
+      name: "Admin User",
+      nickname: "admin",
+      password: "123123",
+      role: UserRole.SUPER_ADMIN,
     });
     profileUserId = profileUser.id;
 
     await skillsService.createOne(testSuperAdminContext(), {
-      slug: "typescript",
-      i18n: skillI18n("TypeScript"),
       category: "Programming",
+      i18n: skillI18n("TypeScript"),
+      slug: "typescript",
     });
   });
 
@@ -108,28 +108,28 @@ describe("ResumeController (e2e)", () => {
     const skillsService = app!.get(SkillsService);
 
     const owner = await usersService.createOne(testSuperAdminContext(), {
-      name: "Resume Local Owner",
-      nickname: "resume-local",
       email: "resume-local@profile.info",
-      password: "owner.123",
-      role: UserRole.USER,
       i18n: [
         {
           locale: "en",
           messages: {
-            title: "Engineer",
             description: "Uses local catalog skills",
+            title: "Engineer",
           },
         },
       ],
+      name: "Resume Local Owner",
+      nickname: "resume-local",
+      password: "owner.123",
+      role: UserRole.USER,
     });
 
     const localSkill = await skillsService.createOne(
       testAuthContext({ id: owner.id }),
       {
-        slug: "resume-local-skill",
-        i18n: skillI18n("Resume Local Skill"),
         category: "Programming",
+        i18n: skillI18n("Resume Local Skill"),
+        slug: "resume-local-skill",
       }
     );
 

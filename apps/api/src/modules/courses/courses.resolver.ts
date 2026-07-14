@@ -41,8 +41,8 @@ export class CoursesResolver {
   findOneCourse(
     @Auth() ctx: AuthContext,
     @Args("courseFilters", {
-      type: () => FilterCourseInput,
       nullable: true,
+      type: () => FilterCourseInput,
     })
     courseFilters?: FilterCourseInput
   ) {
@@ -61,26 +61,26 @@ export class CoursesResolver {
   findManyCourses(
     @Auth() ctx: AuthContext,
     @Args("courseFilters", {
-      type: () => FilterCourseInput,
       nullable: true,
+      type: () => FilterCourseInput,
     })
     courseFilters?: FilterCourseInput,
     @Args("coursePagination", {
-      type: () => PaginationInput,
       nullable: true,
+      type: () => PaginationInput,
     })
     coursePagination?: PaginationInput,
     @Args("courseSort", {
-      type: () => SortCourseInput,
       nullable: true,
+      type: () => SortCourseInput,
     })
     courseSort?: SortCourseInput
   ) {
     return this.coursesService.findMany(ctx, {
       filters: courseFilters,
-      sort: courseSort,
       limit: coursePagination?.limit,
       skip: coursePagination?.skip,
+      sort: courseSort,
     });
   }
 

@@ -38,12 +38,17 @@ import "./loaders.registry";
         const nodeEnv = config.getOrThrow("NODE_ENV");
 
         return {
-          plugins: [ApolloServerPluginLandingPageLocalDefault()],
           autoSchemaFile:
             nodeEnv === "test" ? true : join(process.cwd(), "src/schema.gql"),
-          introspection: config.getOrThrow("GRAPHQL_INTROSPECTION"),
-          sortSchema: true,
-          playground: false,
+          context: ({ req, res }) => ({
+            loaders: new LoadersService(
+              skillsLoaderService,
+              organizationsLoaderService,
+              usersLoaderService
+            ).createLoaders(req),
+            req,
+            res,
+          }),
           formatError: (
             formattedError: GraphQLFormattedError
           ): GraphQLFormattedError => {
@@ -55,15 +60,10 @@ import "./loaders.registry";
 
             return formattedError;
           },
-          context: ({ req, res }) => ({
-            loaders: new LoadersService(
-              skillsLoaderService,
-              organizationsLoaderService,
-              usersLoaderService
-            ).createLoaders(req),
-            req,
-            res,
-          }),
+          introspection: config.getOrThrow("GRAPHQL_INTROSPECTION"),
+          playground: false,
+          plugins: [ApolloServerPluginLandingPageLocalDefault()],
+          sortSchema: true,
         };
       },
     }),

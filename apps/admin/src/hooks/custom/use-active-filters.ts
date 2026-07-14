@@ -10,7 +10,7 @@ export interface ActiveFilter {
 export interface FilterEntry<Value = unknown> {
   id: string;
   label?: string;
-  setState(next: Value | null): void;
+  setState: (next: Value | null) => void;
   state: Value;
 }
 
@@ -98,9 +98,9 @@ function filterForFilter({
   setState,
 }: FilterEntry): ActiveFilter[] {
   return previewsFromValue(state).map(({ display, valueAfterClear }) => ({
+    clear: () => setState(valueAfterClear),
     id,
     value: label ? `${label}: ${display}` : display,
-    clear: () => setState(valueAfterClear),
   }));
 }
 
@@ -117,10 +117,10 @@ export function useActiveFilters(filters: FilterEntry[]): {
   const stableFilters = useStableValue(filters);
   return useMemo(
     () => ({
-      filters: stableFilters.flatMap(filterForFilter),
       clearAll: () => {
         for (const filter of stableFilters) filter.setState(null);
       },
+      filters: stableFilters.flatMap(filterForFilter),
     }),
     [stableFilters]
   );

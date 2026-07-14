@@ -8,7 +8,7 @@ describe("AppController (e2e)", () => {
 
   beforeAll(async () => {
     const testApp = await createTestApp();
-    app = testApp.app;
+    ({ app } = testApp);
   });
 
   afterAll(async () => {

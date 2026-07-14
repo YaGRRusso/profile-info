@@ -51,7 +51,6 @@ export function renderSkills(
 ): void {
   renderSection(ctx, {
     items: document.skills,
-    title,
     measureItem: (context, group) => {
       const lineHeight = measureSkillGroupHeight(context, group);
 
@@ -60,5 +59,6 @@ export function renderSkills(
     renderItem: (context, group) => {
       renderSkillGroup(context, group);
     },
+    title,
   });
 }

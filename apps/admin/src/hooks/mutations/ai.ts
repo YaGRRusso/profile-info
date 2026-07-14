@@ -31,9 +31,9 @@ const atsSummarize = graphql(`
 
 export function useAtsSummarize() {
   return useMutation({
-    mutationKey: ["atsSummarize"],
     mutationFn: (atsSummarizeInput: AtsSummarizeInput) =>
       execute(atsSummarize, { atsSummarizeInput }),
+    mutationKey: ["atsSummarize"],
   });
 }
 
@@ -61,9 +61,9 @@ const summarize = graphql(`
 
 export function useSummarize() {
   return useMutation({
-    mutationKey: ["summarize"],
     mutationFn: (summarizeInput: SummarizeInput) =>
       execute(summarize, { summarizeInput }),
+    mutationKey: ["summarize"],
   });
 }
 
@@ -91,8 +91,8 @@ const translate = graphql(`
 
 export function useTranslate() {
   return useMutation({
-    mutationKey: ["translate"],
     mutationFn: (translateInput: TranslateInput) =>
       execute(translate, { translateInput }),
+    mutationKey: ["translate"],
   });
 }

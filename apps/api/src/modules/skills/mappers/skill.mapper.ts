@@ -30,16 +30,16 @@ export class SkillMapper
   toDomain(model: SkillModel): SkillEntityRecord {
     return {
       ...toBaseEntityFields(model),
-      slug: model.slug,
+      category: model.category,
+      disabled: model.disabled,
       i18n:
         toTranslationEntityList(model.i18n)?.map((entry) => ({
           locale: entry.locale,
           messages: { title: entry.messages.title },
         })) ?? [],
-      category: model.category,
-      disabled: model.disabled,
-      partition: model.partition,
       ownerId: toIdString(model.ownerId) ?? "",
+      partition: model.partition,
+      slug: model.slug,
     };
   }
 

@@ -18,8 +18,8 @@ describe("ExperienceMapper", () => {
         {
           locale: "en",
           messages: {
-            title: "Software Engineer",
             description: "Backend development",
+            title: "Software Engineer",
           },
         },
       ],
@@ -31,34 +31,32 @@ describe("ExperienceMapper", () => {
     } as ExperienceRoleModel;
 
     const model = {
-      id: "507f1f77bcf86cd799439011",
-      createdAt: new Date("2024-01-01"),
-      updatedAt: new Date("2024-01-02"),
-      relevance: 5,
-      slug: "acme-corp",
-      ownerId,
-      organizationId,
       category: ExperienceCategory.FULL_TIME,
+      createdAt: new Date("2024-01-01"),
+      id: "507f1f77bcf86cd799439011",
+      organizationId,
+      ownerId,
+      relevance: 5,
       roles: [role],
+      slug: "acme-corp",
+      updatedAt: new Date("2024-01-02"),
     } as ExperienceModel;
 
     expect(mapper.toDomain(model)).toEqual({
-      id: "507f1f77bcf86cd799439011",
-      createdAt: model.createdAt,
-      updatedAt: model.updatedAt,
-      relevance: 5,
-      slug: "acme-corp",
-      ownerId,
-      organizationId,
       category: ExperienceCategory.FULL_TIME,
+      createdAt: model.createdAt,
+      id: "507f1f77bcf86cd799439011",
+      organizationId,
+      ownerId,
+      relevance: 5,
       roles: [
         {
           i18n: [
             {
               locale: "en",
               messages: {
-                title: "Software Engineer",
                 description: "Backend development",
+                title: "Software Engineer",
               },
             },
           ],
@@ -69,28 +67,30 @@ describe("ExperienceMapper", () => {
           skillIds: [skillId],
         },
       ],
+      slug: "acme-corp",
+      updatedAt: model.updatedAt,
     });
   });
 
   it("omits organizationId when the persistence record has no organization", () => {
     const model = {
-      id: "507f1f77bcf86cd799439011",
-      createdAt: new Date("2024-01-01"),
-      updatedAt: new Date("2024-01-02"),
-      relevance: 0,
-      slug: "freelance",
-      ownerId,
       category: ExperienceCategory.FREELANCE,
+      createdAt: new Date("2024-01-01"),
+      id: "507f1f77bcf86cd799439011",
+      ownerId,
+      relevance: 0,
       roles: [
         {
           i18n: [
             {
               locale: "en",
-              messages: { title: "Consultant", description: "No org" },
+              messages: { description: "No org", title: "Consultant" },
             },
           ],
         },
       ],
+      slug: "freelance",
+      updatedAt: new Date("2024-01-02"),
     } as ExperienceModel;
 
     expect(mapper.toDomain(model).organizationId).toBeUndefined();
@@ -99,76 +99,76 @@ describe("ExperienceMapper", () => {
   it("maps create input to a persistence payload", () => {
     expect(
       mapper.toPersistenceForCreate({
-        slug: "acme-corp",
-        organizationId,
         category: ExperienceCategory.FULL_TIME,
+        organizationId,
         roles: [
           {
             i18n: [
               {
                 locale: "en",
                 messages: {
-                  title: "Software Engineer",
                   description: "Backend development",
+                  title: "Software Engineer",
                 },
               },
             ],
             skillIds: [skillId],
           },
         ],
+        slug: "acme-corp",
       })
     ).toEqual({
-      slug: "acme-corp",
-      organizationId: new mongoose.Types.ObjectId(organizationId),
       category: ExperienceCategory.FULL_TIME,
+      organizationId: new mongoose.Types.ObjectId(organizationId),
       roles: [
         {
           i18n: [
             {
               locale: "en",
               messages: {
-                title: "Software Engineer",
                 description: "Backend development",
+                title: "Software Engineer",
               },
             },
           ],
           skillIds: [new mongoose.Types.ObjectId(skillId)],
         },
       ],
+      slug: "acme-corp",
     });
   });
 
   it("maps filter input to a persistence query", () => {
     expect(
       mapper.toPersistenceForFilter({
-        slug: "acme-corp",
         organizationId,
         roles: [
           {
-            skillIds: [skillId],
             i18n: [
               {
                 locale: "en",
-                messages: { title: "Engineer", description: "Work" },
+                messages: { description: "Work", title: "Engineer" },
               },
             ],
+            skillIds: [skillId],
           },
         ],
+        slug: "acme-corp",
       })
     ).toEqual({
-      slug: "acme-corp",
       organizationId: new mongoose.Types.ObjectId(organizationId),
       roles: [
         {
-          skillIds: [new mongoose.Types.ObjectId(skillId)],
           i18n: [
             {
               locale: "en",
-              messages: { title: "Engineer", description: "Work" },
+              messages: { description: "Work", title: "Engineer" },
             },
           ],
+          skillIds: [new mongoose.Types.ObjectId(skillId)],
         },
       ],
+      slug: "acme-corp",
     });
   });
 

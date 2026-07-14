@@ -17,9 +17,9 @@ export function renderEducations(
     items: document.educations,
     title,
     ...entryBlockSectionHandlers<ResumeEducation>((education) => ({
-      title: education.title,
-      meta: [education.organization, education.period],
       description: education.description,
+      meta: [education.organization, education.period],
+      title: education.title,
     })),
   });
 }

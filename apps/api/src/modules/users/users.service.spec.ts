@@ -18,13 +18,13 @@ const ctx = testSuperAdminContext();
 const validId = "507f1f77bcf86cd799439013";
 
 const fakeUser = {
+  disabled: false,
+  email: "john@example.com",
+  i18n: [],
   id: validId,
   name: "John",
   nickname: "john",
-  email: "john@example.com",
   role: UserRole.USER,
-  disabled: false,
-  i18n: [],
   urls: [],
 };
 
@@ -51,8 +51,8 @@ describe("UsersService", () => {
     crud = createMockCrud();
     repository = {
       crud,
-      findOneByEmailWithPassword: jest.fn(),
       detachSkill: jest.fn().mockResolvedValue(undefined),
+      findOneByEmailWithPassword: jest.fn(),
     };
 
     const module: TestingModule = await Test.createTestingModule({
@@ -120,9 +120,9 @@ describe("UsersService", () => {
 
   describe("register", () => {
     const registerInput = {
+      email: "jane@example.com",
       name: "Jane",
       nickname: "jane",
-      email: "jane@example.com",
       password: "plain-pass",
     };
 
@@ -136,18 +136,18 @@ describe("UsersService", () => {
 
       expect(crud.createOne).toHaveBeenCalledWith({
         ...registerInput,
+        disabled: true,
         password: "hashed-password",
         role: UserRole.USER,
-        disabled: true,
       });
     });
   });
 
   describe("createOne", () => {
     const createInput = {
+      email: "john@example.com",
       name: "John",
       nickname: "john",
-      email: "john@example.com",
       password: "plain-pass",
       role: UserRole.USER,
     };
@@ -161,12 +161,12 @@ describe("UsersService", () => {
 
       expect(hash).toHaveBeenCalledWith("plain-pass", 8);
       expect(crud.createOne).toHaveBeenCalledWith({
+        disabled: false,
+        email: "john@example.com",
         name: "John",
         nickname: "john",
-        email: "john@example.com",
-        role: UserRole.USER,
         password: "hashed-password",
-        disabled: false,
+        role: UserRole.USER,
       });
       expect(skillsValidator.assertSkillsEnabled).not.toHaveBeenCalled();
     });
@@ -181,12 +181,12 @@ describe("UsersService", () => {
         skillId,
       ]);
       expect(crud.createOne).toHaveBeenCalledWith({
+        disabled: false,
+        email: "john@example.com",
         name: "John",
         nickname: "john",
-        email: "john@example.com",
-        role: UserRole.USER,
         password: "hashed-password",
-        disabled: false,
+        role: UserRole.USER,
         skillIds: [skillId],
       });
     });
@@ -195,46 +195,46 @@ describe("UsersService", () => {
   describe("createMany", () => {
     const createInputs = [
       {
+        email: "alice@example.com",
         name: "Alice",
         nickname: "alice",
-        email: "alice@example.com",
         password: "pass1",
         role: UserRole.USER,
       },
       {
+        email: "bob@example.com",
         name: "Bob",
         nickname: "bob",
-        email: "bob@example.com",
         password: "pass2",
         role: UserRole.USER,
       },
     ];
 
     it("hashes each password before delegating to crud", async () => {
-      crud.createMany.mockResolvedValue({ succeeded: 2, failed: 0 });
+      crud.createMany.mockResolvedValue({ failed: 0, succeeded: 2 });
 
       await expect(service.createMany(ctx, createInputs)).resolves.toEqual({
-        succeeded: 2,
         failed: 0,
+        succeeded: 2,
       });
 
       expect(hash).toHaveBeenCalledTimes(2);
       expect(crud.createMany).toHaveBeenCalledWith([
         {
+          disabled: false,
+          email: "alice@example.com",
           name: "Alice",
           nickname: "alice",
-          email: "alice@example.com",
-          role: UserRole.USER,
           password: "hashed-password",
-          disabled: false,
+          role: UserRole.USER,
         },
         {
+          disabled: false,
+          email: "bob@example.com",
           name: "Bob",
           nickname: "bob",
-          email: "bob@example.com",
-          role: UserRole.USER,
           password: "hashed-password",
-          disabled: false,
+          role: UserRole.USER,
         },
       ]);
     });
@@ -295,11 +295,11 @@ describe("UsersService", () => {
   describe("removeMany", () => {
     it("emits user.deleted for each user before deleteManyById", async () => {
       crud.findManyById.mockResolvedValue([fakeUser]);
-      crud.deleteManyById.mockResolvedValue({ succeeded: 1, failed: 0 });
+      crud.deleteManyById.mockResolvedValue({ failed: 0, succeeded: 1 });
 
       await expect(service.removeMany([validId])).resolves.toEqual({
-        succeeded: 1,
         failed: 0,
+        succeeded: 1,
       });
 
       expect(eventEmitter.emitAsync).toHaveBeenCalledWith(

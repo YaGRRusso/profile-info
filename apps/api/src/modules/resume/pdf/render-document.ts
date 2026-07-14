@@ -32,11 +32,11 @@ export function createResumePdfOptions(
   document: ResumeDocumentData
 ): PDFKit.PDFDocumentOptions {
   return {
-    size: "A4",
-    margin: 50,
     info: {
-      Title: `${document.header.name} - CV`,
       Author: document.header.name,
+      Title: `${document.header.name} - CV`,
     },
+    margin: 50,
+    size: "A4",
   };
 }

@@ -86,7 +86,9 @@ export function useFindManyEducations(
   options?: { enabled?: boolean }
 ) {
   return useInfiniteQuery({
-    queryKey: ["findManyEducations", variables],
+    getNextPageParam:
+      paginatedNextPageParam<FindManyEducationsQuery>("findManyEducations"),
+    initialPageParam: 0,
     queryFn: ({ pageParam }) =>
       execute(
         findManyEducations,
@@ -96,9 +98,7 @@ export function useFindManyEducations(
           variables
         )
       ),
-    initialPageParam: 0,
-    getNextPageParam:
-      paginatedNextPageParam<FindManyEducationsQuery>("findManyEducations"),
+    queryKey: ["findManyEducations", variables],
     select: paginatedSelect<FindManyEducationsQuery>("findManyEducations"),
     ...options,
   });

@@ -11,37 +11,37 @@ import { UserModel } from "@/modules/users/schemas/user.schema";
 
 @Schema({ _id: false })
 export class CourseMessagesModel {
-  @Prop({ type: String, required: true })
+  @Prop({ required: true, type: String })
   title: string;
 
-  @Prop({ type: String, required: true })
+  @Prop({ required: true, type: String })
   description: string;
 }
 
 @Schema({ timestamps: true })
 export class CourseModel extends BaseModel {
-  @Prop({ type: Number, required: true, default: 0 })
+  @Prop({ default: 0, required: true, type: Number })
   relevance: number;
 
   @Prop({ type: String })
   slug?: string;
 
   @Prop({
-    type: mongoose.Schema.Types.ObjectId,
+    index: true,
     ref: UserModel.name,
     required: true,
-    index: true,
+    type: mongoose.Schema.Types.ObjectId,
   })
   ownerId: mongoose.Types.ObjectId | string;
 
-  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: OrganizationModel.name })
+  @Prop({ ref: OrganizationModel.name, type: mongoose.Schema.Types.ObjectId })
   organizationId?: (mongoose.Types.ObjectId | string) | string;
 
   @Prop({
-    type: String,
-    required: true,
     enum: ["COMPLETE", "INCOMPLETE", "IN_PROGRESS"],
     index: true,
+    required: true,
+    type: String,
   })
   status: string;
 
@@ -55,17 +55,17 @@ export class CourseModel extends BaseModel {
   hours?: number;
 
   @Prop({
-    type: [createTranslationModel(CourseMessagesModel)],
     required: true,
+    type: [createTranslationModel(CourseMessagesModel)],
   })
   i18n: TranslationModel<CourseMessagesModel>[];
 
   @Prop({
-    type: [{ type: mongoose.Schema.Types.ObjectId, ref: SkillModel.name }],
+    type: [{ ref: SkillModel.name, type: mongoose.Schema.Types.ObjectId }],
   })
   skillIds?: ((mongoose.Types.ObjectId | string) | string)[];
 }
 
 export type CourseDocument = HydratedDocument<CourseModel>;
 export const CourseSchema = SchemaFactory.createForClass(CourseModel);
-CourseSchema.index({ ownerId: 1, slug: 1 }, { unique: true, sparse: true });
+CourseSchema.index({ ownerId: 1, slug: 1 }, { sparse: true, unique: true });

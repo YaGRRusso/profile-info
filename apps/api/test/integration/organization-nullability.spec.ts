@@ -64,7 +64,7 @@ describe("Organization nullability (integration)", () => {
 
   beforeAll(async () => {
     const testApp = await createTestApp();
-    app = testApp.app;
+    ({ app } = testApp);
     await clearTestDatabase(testApp.module);
 
     const usersService = testApp.module.get(UsersService);
@@ -73,9 +73,9 @@ describe("Organization nullability (integration)", () => {
     experienceModel = testApp.module.get(getModelToken(ExperienceModel.name));
 
     const user = await usersService.createOne(testSuperAdminContext(), {
+      email: "owner@profile.info",
       name: "Owner",
       nickname: "owner",
-      email: "owner@profile.info",
       password: "owner.123",
       role: UserRole.USER,
     });
@@ -94,47 +94,47 @@ describe("Organization nullability (integration)", () => {
     userToken = signIn.data?.signIn ?? "";
 
     await courseModel.create({
-      ownerId,
-      slug: "course-without-org",
-      status: CourseStatus.COMPLETE,
-      relevance: 0,
       i18n: [
         {
           locale: "en",
-          messages: { title: "Course", description: "No organization" },
+          messages: { description: "No organization", title: "Course" },
         },
       ],
+      ownerId,
+      relevance: 0,
+      slug: "course-without-org",
+      status: CourseStatus.COMPLETE,
     });
 
     await educationModel.create({
-      ownerId,
-      slug: "education-without-org",
-      level: EducationLevel.BACHELOR,
-      status: EducationStatus.COMPLETE,
-      relevance: 0,
       i18n: [
         {
           locale: "en",
-          messages: { title: "Education", description: "No organization" },
+          messages: { description: "No organization", title: "Education" },
         },
       ],
+      level: EducationLevel.BACHELOR,
+      ownerId,
+      relevance: 0,
+      slug: "education-without-org",
+      status: EducationStatus.COMPLETE,
     });
 
     await experienceModel.create({
-      ownerId,
-      slug: "experience-without-org",
       category: ExperienceCategory.FULL_TIME,
+      ownerId,
       relevance: 0,
       roles: [
         {
           i18n: [
             {
               locale: "en",
-              messages: { title: "Role", description: "No organization" },
+              messages: { description: "No organization", title: "Role" },
             },
           ],
         },
       ],
+      slug: "experience-without-org",
     });
   });
 

@@ -10,12 +10,12 @@ const ctx = testAuthContext();
 const skillId = "507f1f77bcf86cd799439013";
 
 const disabledSkill = {
-  id: skillId,
-  slug: "legacy-skill",
-  i18n: [{ locale: "en", messages: { title: "Legacy Skill" } }],
   category: "Programming",
   disabled: true,
+  i18n: [{ locale: "en", messages: { title: "Legacy Skill" } }],
+  id: skillId,
   partition: CatalogPartition.GLOBAL,
+  slug: "legacy-skill",
 };
 
 describe("SkillsLoaderService", () => {

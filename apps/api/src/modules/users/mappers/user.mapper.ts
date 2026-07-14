@@ -44,18 +44,18 @@ export class UserMapper
   toDomain(model: UserModel): UserEntityRecord {
     return {
       ...toBaseEntityFields(model),
+      address: model.address,
       avatar: model.avatar,
+      birth: model.birth,
+      disabled: model.disabled ?? false,
+      email: model.email,
+      i18n: toTranslationEntityList(model.i18n),
       name: model.name,
       nickname: model.nickname,
       phone: model.phone,
-      email: model.email,
-      birth: model.birth,
-      address: model.address,
-      i18n: toTranslationEntityList(model.i18n),
       role: model.role,
-      disabled: model.disabled ?? false,
-      urls: toUrlEntityList(model.urls),
       skillIds: toIdStrings(model.skillIds),
+      urls: toUrlEntityList(model.urls),
     };
   }
 

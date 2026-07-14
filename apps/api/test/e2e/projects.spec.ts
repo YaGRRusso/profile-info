@@ -52,17 +52,17 @@ const REMOVE_ONE_PROJECT = `
 
 function buildProjectInput(slug: string) {
   return {
-    slug,
-    relevance: 1,
     i18n: [
       {
         locale: "en",
         messages: {
-          title: "Portfolio App",
           description: "A full-stack portfolio project",
+          title: "Portfolio App",
         },
       },
     ],
+    relevance: 1,
+    slug,
   };
 }
 
@@ -75,31 +75,31 @@ describe("Projects tenant isolation (e2e)", () => {
 
   beforeAll(async () => {
     const testApp = await createTestApp();
-    app = testApp.app;
+    ({ app } = testApp);
     await clearTestDatabase(testApp.module);
 
     usersService = testApp.module.get(UsersService);
 
     await usersService.createOne(testSuperAdminContext(), {
+      email: "joao@profile.info",
       name: "João",
       nickname: "joao",
-      email: "joao@profile.info",
       password: "123123",
       role: UserRole.USER,
     });
 
     await usersService.createOne(testSuperAdminContext(), {
+      email: "maria@profile.info",
       name: "Maria",
       nickname: "maria",
-      email: "maria@profile.info",
       password: "123123",
       role: UserRole.USER,
     });
 
     await usersService.createOne(testSuperAdminContext(), {
+      email: "admin@profile.info",
       name: "Admin",
       nickname: "admin",
-      email: "admin@profile.info",
       password: "123123",
       role: UserRole.SUPER_ADMIN,
     });
@@ -139,10 +139,10 @@ describe("Projects tenant isolation (e2e)", () => {
       createOneProject: { id: string; slug: string };
     }>(app, {
       query: CREATE_ONE_PROJECT,
+      token: userAToken,
       variables: {
         createProjectInput: buildProjectInput("alice-portfolio"),
       },
-      token: userAToken,
     });
 
     expect(response.errors).toBeUndefined();
@@ -152,13 +152,13 @@ describe("Projects tenant isolation (e2e)", () => {
   it("should reject create with invalid skillIds", async () => {
     const response = await graphqlRequest(app, {
       query: CREATE_ONE_PROJECT,
+      token: userAToken,
       variables: {
         createProjectInput: {
           ...buildProjectInput("invalid-skills-project"),
           skillIds: [INVALID_OBJECT_ID],
         },
       },
-      token: userAToken,
     });
 
     expect(response.errors?.length).toBeGreaterThan(0);
@@ -168,13 +168,13 @@ describe("Projects tenant isolation (e2e)", () => {
   it("should reject create with unknown skillIds", async () => {
     const response = await graphqlRequest(app, {
       query: CREATE_ONE_PROJECT,
+      token: userAToken,
       variables: {
         createProjectInput: {
           ...buildProjectInput("unknown-skills-project"),
           skillIds: [UNKNOWN_CATALOG_ID],
         },
       },
-      token: userAToken,
     });
 
     expect(response.errors?.length).toBeGreaterThan(0);
@@ -210,8 +210,8 @@ describe("Projects tenant isolation (e2e)", () => {
 
     const response = await graphqlRequest(app, {
       query: FIND_ONE_PROJECT_BY_ID,
-      variables: { projectId },
       token: userBToken,
+      variables: { projectId },
     });
 
     expect(response.errors?.[0]?.message).toContain("Not Found");
@@ -231,8 +231,8 @@ describe("Projects tenant isolation (e2e)", () => {
 
     const response = await graphqlRequest(app, {
       query: REMOVE_ONE_PROJECT,
-      variables: { projectId },
       token: userBToken,
+      variables: { projectId },
     });
 
     expect(response.errors?.[0]?.message).toContain("Not Removed");
@@ -253,8 +253,8 @@ describe("Projects tenant isolation (e2e)", () => {
       findOneProjectById: { id: string; slug: string };
     }>(app, {
       query: FIND_ONE_PROJECT_BY_ID,
-      variables: { projectId: project!.id },
       token: adminToken,
+      variables: { projectId: project!.id },
     });
 
     expect(response.errors).toBeUndefined();
@@ -266,10 +266,10 @@ describe("Projects tenant isolation (e2e)", () => {
       createOneProject: { id: string; slug: string };
     }>(app, {
       query: CREATE_ONE_PROJECT,
+      token: userBToken,
       variables: {
         createProjectInput: buildProjectInput("alice-portfolio"),
       },
-      token: userBToken,
     });
 
     expect(response.errors).toBeUndefined();

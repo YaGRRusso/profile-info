@@ -51,7 +51,7 @@ describe("Catalog batch and edge cases (e2e)", () => {
 
   beforeAll(async () => {
     const testApp = await createTestApp();
-    app = testApp.app;
+    ({ app } = testApp);
     await clearTestDatabase(testApp.module);
 
     const usersService = testApp.module.get(UsersService);
@@ -61,26 +61,26 @@ describe("Catalog batch and edge cases (e2e)", () => {
     );
 
     await usersService.createOne(testSuperAdminContext(), {
+      email: "admin@profile.info",
       name: "Admin",
       nickname: "admin",
-      email: "admin@profile.info",
       password: "123123",
       role: UserRole.SUPER_ADMIN,
     });
 
     const userA = await usersService.createOne(testSuperAdminContext(), {
+      email: "user-a@profile.info",
       name: "User A",
       nickname: "user-a",
-      email: "user-a@profile.info",
       password: "user-a.123",
       role: UserRole.USER,
     });
     userAId = userA.id;
 
     const userB = await usersService.createOne(testSuperAdminContext(), {
+      email: "user-b@profile.info",
       name: "User B",
       nickname: "user-b",
-      email: "user-b@profile.info",
       password: "user-b.123",
       role: UserRole.USER,
     });
@@ -89,18 +89,18 @@ describe("Catalog batch and edge cases (e2e)", () => {
     userAToken = await signIn(app, "user-a@profile.info", "user-a.123");
 
     const globalSkill = await skillsService.createOne(testSuperAdminContext(), {
-      slug: "batch-global-skill",
-      i18n: skillI18n("Batch Global"),
       category: "Programming",
+      i18n: skillI18n("Batch Global"),
+      slug: "batch-global-skill",
     });
     globalSkillId = globalSkill.id;
 
     const userALocalSkill = await skillsService.createOne(
       testAuthContext({ id: userAId }),
       {
-        slug: "batch-user-a-local",
-        i18n: skillI18n("User A Local Batch"),
         category: "Programming",
+        i18n: skillI18n("User A Local Batch"),
+        slug: "batch-user-a-local",
       }
     );
     userALocalSkillId = userALocalSkill.id;
@@ -108,9 +108,9 @@ describe("Catalog batch and edge cases (e2e)", () => {
     const userBLocalSkill = await skillsService.createOne(
       testAuthContext({ id: userBId }),
       {
-        slug: "batch-user-b-local",
-        i18n: skillI18n("User B Local Batch"),
         category: "Programming",
+        i18n: skillI18n("User B Local Batch"),
+        slug: "batch-user-b-local",
       }
     );
     userBLocalSkillId = userBLocalSkill.id;
@@ -120,9 +120,9 @@ describe("Catalog batch and edge cases (e2e)", () => {
 
     await apiTokenModel.create({
       _id: queryTokenId,
-      ownerId: userAId,
-      name: "User A query",
       hashedSecret: await hash(queryTokenSecret, 8),
+      name: "User A query",
+      ownerId: userAId,
       permissions: [ApiTokenPermission.QUERY],
     });
 
@@ -146,16 +146,16 @@ describe("Catalog batch and edge cases (e2e)", () => {
             }
           }
         `,
+        token: userAToken,
         variables: {
           skillIds: [userALocalSkillId, globalSkillId],
         },
-        token: userAToken,
       });
 
       expect(response.errors).toBeUndefined();
       expect(response.data?.disableManySkills).toEqual({
-        succeeded: 1,
         failed: 1,
+        succeeded: 1,
       });
 
       await skillsService.enableOne(
@@ -174,8 +174,8 @@ describe("Catalog batch and edge cases (e2e)", () => {
             }
           }
         `,
-        variables: { skillIds: [globalSkillId] },
         token: userAToken,
+        variables: { skillIds: [globalSkillId] },
       });
 
       expect(response.errors?.[0]?.message).toMatch(MUTATION_BLOCKED_MESSAGE);
@@ -199,17 +199,17 @@ describe("Catalog batch and edge cases (e2e)", () => {
             }
           }
         `,
+        token: userAToken,
         variables: {
           skillIds: [userALocalSkillId, globalSkillId],
           updateSkillInput: { category: "Batch Updated" },
         },
-        token: userAToken,
       });
 
       expect(response.errors).toBeUndefined();
       expect(response.data?.updateManySkills).toEqual({
-        succeeded: 1,
         failed: 1,
+        succeeded: 1,
       });
 
       const localSkill = await skillsService.findOneById(
@@ -229,8 +229,8 @@ describe("Catalog batch and edge cases (e2e)", () => {
             }
           }
         `,
-        variables: { skillIds: [globalSkillId, userBLocalSkillId] },
         token: userAToken,
+        variables: { skillIds: [globalSkillId, userBLocalSkillId] },
       });
 
       expect(response.errors?.[0]?.message).toMatch(MUTATION_BLOCKED_MESSAGE);
@@ -252,14 +252,14 @@ describe("Catalog batch and edge cases (e2e)", () => {
             }
           }
         `,
+        token: await signIn(app, "admin@profile.info", "123123"),
         variables: {
           createSkillInput: {
-            slug: sharedSlug,
-            i18n: skillI18n("Shared Slug Global"),
             category: "Programming",
+            i18n: skillI18n("Shared Slug Global"),
+            slug: sharedSlug,
           },
         },
-        token: await signIn(app, "admin@profile.info", "123123"),
       });
 
       expect(globalResponse.errors).toBeUndefined();
@@ -278,14 +278,14 @@ describe("Catalog batch and edge cases (e2e)", () => {
             }
           }
         `,
+        token: userAToken,
         variables: {
           createSkillInput: {
-            slug: sharedSlug,
-            i18n: skillI18n("Shared Slug Local"),
             category: "Programming",
+            i18n: skillI18n("Shared Slug Local"),
+            slug: sharedSlug,
           },
         },
-        token: userAToken,
       });
 
       expect(localResponse.errors).toBeUndefined();
@@ -304,14 +304,14 @@ describe("Catalog batch and edge cases (e2e)", () => {
             }
           }
         `,
+        token: userAToken,
         variables: {
           createSkillInput: {
-            slug: "batch-user-a-local",
-            i18n: skillI18n("Duplicate Local"),
             category: "Programming",
+            i18n: skillI18n("Duplicate Local"),
+            slug: "batch-user-a-local",
           },
         },
-        token: userAToken,
       });
 
       expect(response.errors?.[0]?.message).toBeDefined();
@@ -326,6 +326,7 @@ describe("Catalog batch and edge cases (e2e)", () => {
           nodes: Array<{ slug: string; partition: CatalogPartition }>;
         };
       }>(app, {
+        apiKey: queryApiToken,
         query: `
           query FindManySkills {
             findManySkills {
@@ -334,7 +335,6 @@ describe("Catalog batch and edge cases (e2e)", () => {
             }
           }
         `,
-        apiKey: queryApiToken,
       });
 
       expect(response.errors).toBeUndefined();
@@ -350,13 +350,13 @@ describe("Catalog batch and edge cases (e2e)", () => {
       const response = await graphqlRequest<{
         findManySkillById: Array<{ id: string }>;
       }>(app, {
+        apiKey: queryApiToken,
         query: `
           query FindManySkillById($skillIds: [ID!]!) {
             findManySkillById(skillIds: $skillIds) { id }
           }
         `,
         variables: { skillIds: [userBLocalSkillId] },
-        apiKey: queryApiToken,
       });
 
       expect(response.errors).toBeUndefined();

@@ -24,9 +24,9 @@ export function renderCertifications(
           : formatHours(certification.hours);
 
       return {
-        title: certification.title,
-        meta: [certification.organization, hoursLabel],
         description: certification.description,
+        meta: [certification.organization, hoursLabel],
+        title: certification.title,
       };
     }),
   });

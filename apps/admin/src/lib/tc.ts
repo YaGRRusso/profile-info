@@ -10,6 +10,5 @@ export const tc = async <Result>(
   } catch (error) {
     console.error(error);
     fallback?.(error);
-    return;
   }
 };

@@ -51,8 +51,8 @@ export class OrganizationsRepository {
   countOwnedLocalActive(ctx: AuthContext): Promise<number> {
     return this.catalogStats(ctx).count({
       ...NOT_DISABLED,
-      partition: CatalogPartition.LOCAL,
       ownerId: ctx.id,
+      partition: CatalogPartition.LOCAL,
     });
   }
 

@@ -82,15 +82,14 @@ const removeManyApiTokens = graphql(`
 
 export function useCreateOneApiToken() {
   return useMutation({
-    mutationKey: ["createOneApiToken"],
     mutationFn: (createApiTokenInput: CreateApiTokenInput) =>
       execute(createOneApiToken, { createApiTokenInput }),
+    mutationKey: ["createOneApiToken"],
   });
 }
 
 export function useUpdateOneApiToken() {
   return useMutation({
-    mutationKey: ["updateOneApiToken"],
     mutationFn: ({
       apiTokenId,
       updateApiTokenInput,
@@ -98,12 +97,12 @@ export function useUpdateOneApiToken() {
       apiTokenId: string;
       updateApiTokenInput: UpdateApiTokenInput;
     }) => execute(updateOneApiToken, { apiTokenId, updateApiTokenInput }),
+    mutationKey: ["updateOneApiToken"],
   });
 }
 
 export function useUpdateManyApiTokens() {
   return useMutation({
-    mutationKey: ["updateManyApiTokens"],
     mutationFn: ({
       apiTokenIds,
       updateApiTokenInput,
@@ -111,21 +110,22 @@ export function useUpdateManyApiTokens() {
       apiTokenIds: string[];
       updateApiTokenInput: UpdateApiTokenInput;
     }) => execute(updateManyApiTokens, { apiTokenIds, updateApiTokenInput }),
+    mutationKey: ["updateManyApiTokens"],
   });
 }
 
 export function useRemoveOneApiToken() {
   return useMutation({
-    mutationKey: ["removeOneApiToken"],
     mutationFn: (apiTokenId: string) =>
       execute(removeOneApiToken, { apiTokenId }),
+    mutationKey: ["removeOneApiToken"],
   });
 }
 
 export function useRemoveManyApiTokens() {
   return useMutation({
-    mutationKey: ["removeManyApiTokens"],
     mutationFn: (apiTokenIds: string[]) =>
       execute(removeManyApiTokens, { apiTokenIds }),
+    mutationKey: ["removeManyApiTokens"],
   });
 }

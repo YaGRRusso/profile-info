@@ -150,6 +150,7 @@ interface NestedPrivateEntitiesData {
 
 const crossTenantFindOneCases = [
   {
+    dataKey: "findOneExperienceById",
     entity: "experience",
     query: `
       query FindOneExperienceById($experienceId: ID!) {
@@ -163,9 +164,9 @@ const crossTenantFindOneCases = [
       }
     `,
     variableName: "experienceId",
-    dataKey: "findOneExperienceById",
   },
   {
+    dataKey: "findOneCourseById",
     entity: "course",
     query: `
       query FindOneCourseById($courseId: ID!) {
@@ -179,9 +180,9 @@ const crossTenantFindOneCases = [
       }
     `,
     variableName: "courseId",
-    dataKey: "findOneCourseById",
   },
   {
+    dataKey: "findOneEducationById",
     entity: "education",
     query: `
       query FindOneEducationById($educationId: ID!) {
@@ -195,9 +196,9 @@ const crossTenantFindOneCases = [
       }
     `,
     variableName: "educationId",
-    dataKey: "findOneEducationById",
   },
   {
+    dataKey: "findOneProjectById",
     entity: "project",
     query: `
       query FindOneProjectById($projectId: ID!) {
@@ -210,12 +211,12 @@ const crossTenantFindOneCases = [
       }
     `,
     variableName: "projectId",
-    dataKey: "findOneProjectById",
   },
 ] as const;
 
 const crossTenantFindManyByIdCases = [
   {
+    dataKey: "findManyExperienceById",
     entity: "experience",
     query: `
       query FindManyExperienceById($experienceIds: [ID!]!) {
@@ -229,9 +230,9 @@ const crossTenantFindManyByIdCases = [
       }
     `,
     variableName: "experienceIds",
-    dataKey: "findManyExperienceById",
   },
   {
+    dataKey: "findManyCourseById",
     entity: "course",
     query: `
       query FindManyCourseById($courseIds: [ID!]!) {
@@ -245,9 +246,9 @@ const crossTenantFindManyByIdCases = [
       }
     `,
     variableName: "courseIds",
-    dataKey: "findManyCourseById",
   },
   {
+    dataKey: "findManyEducationById",
     entity: "education",
     query: `
       query FindManyEducationById($educationIds: [ID!]!) {
@@ -261,9 +262,9 @@ const crossTenantFindManyByIdCases = [
       }
     `,
     variableName: "educationIds",
-    dataKey: "findManyEducationById",
   },
   {
+    dataKey: "findManyProjectById",
     entity: "project",
     query: `
       query FindManyProjectById($projectIds: [ID!]!) {
@@ -276,7 +277,6 @@ const crossTenantFindManyByIdCases = [
       }
     `,
     variableName: "projectIds",
-    dataKey: "findManyProjectById",
   },
 ] as const;
 
@@ -303,7 +303,7 @@ describe("Cross-tenant DataLoader isolation (e2e)", () => {
 
   beforeAll(async () => {
     const testApp = await createTestApp();
-    app = testApp.app;
+    ({ app } = testApp);
     await clearTestDatabase(testApp.module);
 
     const usersService = testApp.module.get(UsersService);
@@ -315,25 +315,25 @@ describe("Cross-tenant DataLoader isolation (e2e)", () => {
     const projectsService = testApp.module.get(ProjectsService);
 
     await usersService.createOne(testSuperAdminContext(), {
+      email: "admin@profile.info",
       name: "Admin",
       nickname: "admin",
-      email: "admin@profile.info",
       password: "123123",
       role: UserRole.SUPER_ADMIN,
     });
 
     const joao = await usersService.createOne(testSuperAdminContext(), {
+      email: "joao@profile.info",
       name: "João",
       nickname: "joao",
-      email: "joao@profile.info",
       password: "123123",
       role: UserRole.USER,
     });
 
     const bob = await usersService.createOne(testSuperAdminContext(), {
+      email: "maria@profile.info",
       name: "Maria",
       nickname: "maria",
-      email: "maria@profile.info",
       password: "123123",
       role: UserRole.USER,
     });
@@ -342,23 +342,23 @@ describe("Cross-tenant DataLoader isolation (e2e)", () => {
     const organization = await organizationsService.createOne(
       testSuperAdminContext(),
       {
-        slug: "shared-org",
-        name: "Shared Org",
-        website: "https://shared.example",
-        logo: "https://shared.example/logo.png",
         category: OrganizationCategory.COMPANY,
         i18n: [
           { locale: "en", messages: { description: "Shared organization" } },
         ],
+        logo: "https://shared.example/logo.png",
+        name: "Shared Org",
+        slug: "shared-org",
+        website: "https://shared.example",
       }
     );
     organizationId = organization.id;
     organizationName = organization.name;
 
     const skill = await skillsService.createOne(testSuperAdminContext(), {
-      slug: "shared-skill",
-      i18n: skillI18n("Shared Skill"),
       category: "Programming",
+      i18n: skillI18n("Shared Skill"),
+      slug: "shared-skill",
     });
     skillId = skill.id;
     skillSlug = skill.slug!;
@@ -370,7 +370,7 @@ describe("Cross-tenant DataLoader isolation (e2e)", () => {
       i18n: [
         {
           locale: "en",
-          messages: { title: "Engineer", description: "Built APIs" },
+          messages: { description: "Built APIs", title: "Engineer" },
         },
       ],
       skillIds: [skillId],
@@ -378,16 +378,16 @@ describe("Cross-tenant DataLoader isolation (e2e)", () => {
 
     const [aliceExperience, bobExperience] = await Promise.all([
       experiencesService.createOne(joaoCtx, {
-        slug: "shared-exp",
-        organizationId,
         category: ExperienceCategory.FULL_TIME,
+        organizationId,
         roles: [rolePayload],
+        slug: "shared-exp",
       }),
       experiencesService.createOne(bobCtx, {
-        slug: "shared-exp",
-        organizationId,
         category: ExperienceCategory.FULL_TIME,
+        organizationId,
         roles: [rolePayload],
+        slug: "shared-exp",
       }),
     ]);
 
@@ -396,8 +396,8 @@ describe("Cross-tenant DataLoader isolation (e2e)", () => {
         {
           locale: "en",
           messages: {
-            title: "Shared title",
             description: "Shared description",
+            title: "Shared title",
           },
         },
       ],
@@ -405,63 +405,63 @@ describe("Cross-tenant DataLoader isolation (e2e)", () => {
 
     const [aliceCourse, bobCourse] = await Promise.all([
       coursesService.createOne(joaoCtx, {
-        slug: "shared-course",
         organizationId,
-        status: CourseStatus.COMPLETE,
         skillIds: [skillId],
+        slug: "shared-course",
+        status: CourseStatus.COMPLETE,
         ...localizedContent,
       }),
       coursesService.createOne(bobCtx, {
-        slug: "shared-course",
         organizationId,
-        status: CourseStatus.COMPLETE,
         skillIds: [skillId],
+        slug: "shared-course",
+        status: CourseStatus.COMPLETE,
         ...localizedContent,
       }),
     ]);
 
     const [aliceEducation, bobEducation] = await Promise.all([
       educationsService.createOne(joaoCtx, {
-        slug: "shared-education",
-        organizationId,
         level: EducationLevel.BACHELOR,
-        status: EducationStatus.COMPLETE,
+        organizationId,
         skillIds: [skillId],
+        slug: "shared-education",
+        status: EducationStatus.COMPLETE,
         ...localizedContent,
       }),
       educationsService.createOne(bobCtx, {
-        slug: "shared-education",
-        organizationId,
         level: EducationLevel.BACHELOR,
-        status: EducationStatus.COMPLETE,
+        organizationId,
         skillIds: [skillId],
+        slug: "shared-education",
+        status: EducationStatus.COMPLETE,
         ...localizedContent,
       }),
     ]);
 
     const [aliceProject, bobProject] = await Promise.all([
       projectsService.createOne(joaoCtx, {
-        slug: "shared-project",
         skillIds: [skillId],
+        slug: "shared-project",
         ...localizedContent,
       }),
       projectsService.createOne(bobCtx, {
-        slug: "shared-project",
         skillIds: [skillId],
+        slug: "shared-project",
         ...localizedContent,
       }),
     ]);
 
     aliceEntityIds = {
-      experienceId: aliceExperience.id,
       courseId: aliceCourse.id,
       educationId: aliceEducation.id,
+      experienceId: aliceExperience.id,
       projectId: aliceProject.id,
     };
     bobEntityIds = {
-      experienceId: bobExperience.id,
       courseId: bobCourse.id,
       educationId: bobEducation.id,
+      experienceId: bobExperience.id,
       projectId: bobProject.id,
     };
 
@@ -489,7 +489,7 @@ describe("Cross-tenant DataLoader isolation (e2e)", () => {
     });
 
     expect(response.errors).toBeUndefined();
-    const data = response.data;
+    const { data } = response;
     expect(data).toBeDefined();
 
     for (const collection of [
@@ -537,8 +537,8 @@ describe("Cross-tenant DataLoader isolation (e2e)", () => {
 
     const response = await graphqlRequest(app, {
       query,
-      variables: { [variableName]: entityId },
       token: userBToken,
+      variables: { [variableName]: entityId },
     });
 
     expect(response.errors?.[0]?.message).toContain("Not Found");
@@ -564,8 +564,8 @@ describe("Cross-tenant DataLoader isolation (e2e)", () => {
       >
     >(app, {
       query,
-      variables: { [variableName]: [aliceId, bobId] },
       token: userBToken,
+      variables: { [variableName]: [aliceId, bobId] },
     });
 
     expect(response.errors).toBeUndefined();

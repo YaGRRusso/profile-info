@@ -46,8 +46,8 @@ export function useGetMe(
   options?: Omit<UseQueryOptions<GetMeQuery>, "queryKey" | "queryFn">
 ) {
   return useQuery({
-    queryKey: ["getMe"],
     queryFn: () => execute(getMe),
+    queryKey: ["getMe"],
     ...options,
   });
 }

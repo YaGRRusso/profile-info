@@ -6,46 +6,46 @@ describe("selectResumeSkillGroups", () => {
     const groups = selectResumeSkillGroups(
       [
         {
-          id: "1",
-          slug: "nestjs",
           category: "BACKEND",
           i18n: [{ locale: "en", messages: { title: "NestJS" } }],
+          id: "1",
+          slug: "nestjs",
         },
         {
-          id: "2",
-          slug: "express",
           category: "BACKEND",
           i18n: [{ locale: "en", messages: { title: "Express" } }],
+          id: "2",
+          slug: "express",
         },
         {
-          id: "3",
-          slug: "fastify",
           category: "BACKEND",
           i18n: [{ locale: "en", messages: { title: "Fastify" } }],
+          id: "3",
+          slug: "fastify",
         },
         {
-          id: "4",
-          slug: "koa",
           category: "BACKEND",
           i18n: [{ locale: "en", messages: { title: "Koa" } }],
+          id: "4",
+          slug: "koa",
         },
         {
-          id: "5",
-          slug: "hapi",
           category: "BACKEND",
           i18n: [{ locale: "en", messages: { title: "Hapi" } }],
+          id: "5",
+          slug: "hapi",
         },
         {
-          id: "6",
-          slug: "react",
           category: "FRONTEND",
           i18n: [{ locale: "en", messages: { title: "React" } }],
+          id: "6",
+          slug: "react",
         },
         {
-          id: "7",
-          slug: "vue",
           category: "FRONTEND",
           i18n: [{ locale: "en", messages: { title: "Vue" } }],
+          id: "7",
+          slug: "vue",
         },
       ] as never,
       Locale.EN
@@ -67,10 +67,10 @@ describe("selectResumeSkillGroups", () => {
     const groups = selectResumeSkillGroups(
       [
         {
-          id: "1",
-          slug: "typescript",
           category: "LANGUAGE",
           i18n: [{ locale: "en", messages: { title: "TypeScript" } }],
+          id: "1",
+          slug: "typescript",
         },
       ] as never,
       Locale.EN
@@ -84,8 +84,6 @@ describe("selectResumeSkillGroups", () => {
     const groups = selectResumeSkillGroups(
       [
         {
-          id: "1",
-          slug: "customer-service",
           category: "Soft Skills",
           i18n: [
             { locale: Locale.EN, messages: { title: "Customer Service" } },
@@ -94,6 +92,8 @@ describe("selectResumeSkillGroups", () => {
               messages: { title: "Atendimento ao Cliente" },
             },
           ],
+          id: "1",
+          slug: "customer-service",
         },
       ] as never,
       Locale.PT
@@ -108,10 +108,10 @@ describe("selectResumeSkillGroups", () => {
     const groups = selectResumeSkillGroups(
       [
         {
-          id: "1",
-          slug: "legacy-skill",
           category: "OTHER",
           i18n: [],
+          id: "1",
+          slug: "legacy-skill",
         },
       ] as never,
       Locale.EN
@@ -124,25 +124,25 @@ describe("selectResumeSkillGroups", () => {
     const groups = selectResumeSkillGroups(
       [
         {
-          id: "1",
-          slug: "nestjs",
           category: "BACKEND",
           i18n: [{ locale: "en", messages: { title: "NestJS" } }],
+          id: "1",
+          slug: "nestjs",
         },
         {
+          i18n: [{ locale: "pt", messages: { title: "Oratória" } }],
           id: "2",
           slug: "oratoria",
-          i18n: [{ locale: "pt", messages: { title: "Oratória" } }],
         },
         {
+          i18n: [{ locale: "pt", messages: { title: "Exemplo" } }],
           id: "3",
           slug: "exemplo",
-          i18n: [{ locale: "pt", messages: { title: "Exemplo" } }],
         },
         {
+          i18n: [{ locale: "pt", messages: { title: "Abc" } }],
           id: "4",
           slug: "abc",
-          i18n: [{ locale: "pt", messages: { title: "Abc" } }],
         },
       ] as never,
       Locale.PT

@@ -10,24 +10,24 @@ describe("ApiTokenMapper", () => {
 
   it("maps persistence fields to the domain entity", () => {
     const model = {
-      id: "507f1f77bcf86cd799439011",
       createdAt: new Date("2024-01-01"),
-      updatedAt: new Date("2024-01-02"),
-      ownerId,
-      name: "CI token",
-      hashedSecret: "hashed",
-      permissions: [ApiTokenPermission.QUERY],
       expiresAt: new Date("2025-01-01"),
+      hashedSecret: "hashed",
+      id: "507f1f77bcf86cd799439011",
+      name: "CI token",
+      ownerId,
+      permissions: [ApiTokenPermission.QUERY],
+      updatedAt: new Date("2024-01-02"),
     } as ApiTokenModel;
 
     expect(mapper.toDomain(model)).toEqual({
-      id: "507f1f77bcf86cd799439011",
       createdAt: model.createdAt,
-      updatedAt: model.updatedAt,
-      ownerId,
-      name: "CI token",
-      permissions: [ApiTokenPermission.QUERY],
       expiresAt: model.expiresAt,
+      id: "507f1f77bcf86cd799439011",
+      name: "CI token",
+      ownerId,
+      permissions: [ApiTokenPermission.QUERY],
+      updatedAt: model.updatedAt,
     });
   });
 
@@ -36,18 +36,18 @@ describe("ApiTokenMapper", () => {
 
     expect(
       mapper.toPersistenceForCreate({
+        expiresAt,
+        hashedSecret: "hashed",
         id: "507f1f77bcf86cd799439011",
         name: "CI token",
-        hashedSecret: "hashed",
         permissions: [ApiTokenPermission.QUERY],
-        expiresAt,
       } as CreateApiTokenInput & { id: string; hashedSecret: string })
     ).toEqual({
       _id: new mongoose.Types.ObjectId("507f1f77bcf86cd799439011"),
-      name: "CI token",
-      hashedSecret: "hashed",
-      permissions: [ApiTokenPermission.QUERY],
       expiresAt,
+      hashedSecret: "hashed",
+      name: "CI token",
+      permissions: [ApiTokenPermission.QUERY],
     });
   });
 

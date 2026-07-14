@@ -16,9 +16,9 @@ import { omitIfEmpty } from "@/lib/form-input";
 import { CommonFormProps } from "./common";
 
 const userSchema = z.object({
+  email: z.email(FormError.invalidFormat),
   name: z.string().min(1, FormError.requiredField),
   nickname: z.string().min(1, FormError.requiredField),
-  email: z.email(FormError.invalidFormat),
   password: z.union([z.literal(""), z.string().min(8, FormError.minLength)]),
   role: z.enum(UserRole, FormError.requiredField),
 });
@@ -34,9 +34,9 @@ const ROLE_OPTIONS = Object.values(UserRole).map((role) => ({
 
 export function userToForm(user: UserRow): Partial<UserSchema> {
   return {
+    email: user.email,
     name: user.name,
     nickname: user.nickname,
-    email: user.email,
     password: "",
     role: user.role,
   };
@@ -44,9 +44,9 @@ export function userToForm(user: UserRow): Partial<UserSchema> {
 
 export function userToCreateInput(data: UserSchema): CreateUserInput {
   return {
+    email: data.email,
     name: data.name,
     nickname: data.nickname,
-    email: data.email,
     password: data.password,
     role: data.role,
   };
@@ -54,9 +54,9 @@ export function userToCreateInput(data: UserSchema): CreateUserInput {
 
 export function userToUpdateInput(data: UserSchema): UpdateUserInput {
   return {
+    email: data.email,
     name: data.name,
     nickname: data.nickname,
-    email: data.email,
     password: omitIfEmpty(data.password),
     role: data.role,
   };
@@ -75,9 +75,9 @@ export function UserForm({
 
   const form = useForm({
     defaultValues: {
+      email: "",
       name: "",
       nickname: "",
-      email: "",
       password: "",
       role: UserRole.User,
       ...defaultValues,

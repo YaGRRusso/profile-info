@@ -73,7 +73,7 @@ const queryParser = parseAsShape(z.string())
   .withOptions({ ...persistentOptions, limitUrlUpdates: debouncedUrlUpdates });
 
 const sortParser = parseAsShape(
-  z.array(z.object({ id: z.string(), desc: z.boolean() }))
+  z.array(z.object({ desc: z.boolean(), id: z.string() }))
 )
   .withDefault([])
   .withOptions(persistentOptions);
@@ -84,14 +84,14 @@ const createdAtParser = parseAsShape(z.string()).withOptions(persistentOptions);
 const updatedAtParser = parseAsShape(z.string()).withOptions(persistentOptions);
 
 const CATEGORY_LABELS: Array<{ value: OrganizationCategory; label: string }> = [
-  { value: OrganizationCategory.Company, label: "Company" },
-  { value: OrganizationCategory.School, label: "School" },
-  { value: OrganizationCategory.Other, label: "Other" },
+  { label: "Company", value: OrganizationCategory.Company },
+  { label: "School", value: OrganizationCategory.School },
+  { label: "Other", value: OrganizationCategory.Other },
 ];
 
 const PARTITION_LABELS: Array<{ value: CatalogPartition; label: string }> = [
-  { value: CatalogPartition.Global, label: "Global" },
-  { value: CatalogPartition.Local, label: "Local" },
+  { label: "Global", value: CatalogPartition.Global },
+  { label: "Local", value: CatalogPartition.Local },
 ];
 
 const RESTRICTED_COLUMNS: RestrictedColumns = {
@@ -115,16 +115,6 @@ const getColumns = (
   opts: { isSuperAdmin: boolean }
 ) => [
   columnHelper.display({
-    id: "select",
-    enableHiding: false,
-    header: ({ table }) => (
-      <input
-        checked={table.getIsAllRowsSelected()}
-        className="checkbox checkbox-sm"
-        onChange={table.getToggleAllRowsSelectedHandler()}
-        type="checkbox"
-      />
-    ),
     cell: ({ row }) => (
       <input
         checked={row.getIsSelected()}
@@ -134,14 +124,24 @@ const getColumns = (
         type="checkbox"
       />
     ),
+    enableHiding: false,
+    header: ({ table }) => (
+      <input
+        checked={table.getIsAllRowsSelected()}
+        className="checkbox checkbox-sm"
+        onChange={table.getToggleAllRowsSelectedHandler()}
+        type="checkbox"
+      />
+    ),
+    id: "select",
   }),
   columnHelper.accessor("id", {
-    header: "ID",
-    enableGlobalFilter: false,
-    enableSorting: false,
     cell: (data) => (
       <span className="font-mono text-xs">{data.getValue()}</span>
     ),
+    enableGlobalFilter: false,
+    enableSorting: false,
+    header: "ID",
   }),
   columnHelper.accessor("slug", {
     header: "Slug",
@@ -150,21 +150,16 @@ const getColumns = (
     header: "Name",
   }),
   columnHelper.accessor("category", {
-    header: "Category",
-    enableColumnFilter: true,
-    enableSorting: false,
-    enableGlobalFilter: false,
-    filterFn: "equals",
     cell: (data) => (
       <span className="badge badge-soft badge-sm">{data.getValue()}</span>
     ),
+    enableColumnFilter: true,
+    enableGlobalFilter: false,
+    enableSorting: false,
+    filterFn: "equals",
+    header: "Category",
   }),
   columnHelper.accessor("partition", {
-    header: "Partition",
-    enableColumnFilter: true,
-    enableSorting: false,
-    enableGlobalFilter: false,
-    filterFn: "equals",
     cell: (data) => (
       <span
         className={cn(
@@ -177,11 +172,13 @@ const getColumns = (
         {data.getValue() === CatalogPartition.Global ? "Global" : "Local"}
       </span>
     ),
-  }),
-  columnHelper.accessor("disabled", {
-    header: "Status",
+    enableColumnFilter: true,
     enableGlobalFilter: false,
     enableSorting: false,
+    filterFn: "equals",
+    header: "Partition",
+  }),
+  columnHelper.accessor("disabled", {
     cell: (data) => (
       <span
         className={cn(
@@ -192,10 +189,11 @@ const getColumns = (
         {data.getValue() ? "Disabled" : "Active"}
       </span>
     ),
+    enableGlobalFilter: false,
+    enableSorting: false,
+    header: "Status",
   }),
   columnHelper.accessor("website", {
-    header: "Website",
-    enableGlobalFilter: false,
     cell: (data) => {
       const url = data.getValue();
       if (!url) return <EmptyValue />;
@@ -205,47 +203,47 @@ const getColumns = (
         </a>
       );
     },
+    enableGlobalFilter: false,
+    header: "Website",
   }),
   columnHelper.accessor("logo", {
-    header: "Logo",
-    enableGlobalFilter: false,
-    enableSorting: false,
     cell: (data) => {
       const url = data.getValue();
       if (!url) return <EmptyValue />;
       return <Link href={url} />;
     },
-  }),
-  columnHelper.accessor((row) => row.owner?.nickname ?? "", {
-    id: "owner",
-    header: "Owner",
     enableGlobalFilter: false,
     enableSorting: false,
+    header: "Logo",
+  }),
+  columnHelper.accessor((row) => row.owner?.nickname ?? "", {
     cell: (data) => {
       const value = data.getValue();
       if (isEmptyValue(value)) return <EmptyValue />;
       return <span className="badge badge-soft badge-sm">{value}</span>;
     },
+    enableGlobalFilter: false,
+    enableSorting: false,
+    header: "Owner",
+    id: "owner",
   }),
   columnHelper.accessor("createdAt", {
-    header: "Created",
+    cell: ({ getValue }) => new Date(getValue()).toLocaleDateString(),
     enableColumnFilter: true,
     enableGlobalFilter: false,
-    sortingFn: "datetime",
     filterFn: dateRangeFilter,
-    cell: ({ getValue }) => new Date(getValue()).toLocaleDateString(),
+    header: "Created",
+    sortingFn: "datetime",
   }),
   columnHelper.accessor("updatedAt", {
-    header: "Updated",
+    cell: ({ getValue }) => new Date(getValue()).toLocaleDateString(),
     enableColumnFilter: true,
     enableGlobalFilter: false,
-    sortingFn: "datetime",
     filterFn: dateRangeFilter,
-    cell: ({ getValue }) => new Date(getValue()).toLocaleDateString(),
+    header: "Updated",
+    sortingFn: "datetime",
   }),
   columnHelper.display({
-    id: "actions",
-    enableHiding: false,
     cell: ({ row }) => {
       const isGlobal = row.original.partition === CatalogPartition.Global;
       const readOnly = isCatalogRowMutationReadOnly(
@@ -319,6 +317,8 @@ const getColumns = (
         <div className="flex items-center justify-end gap-1">{actions}</div>
       );
     },
+    enableHiding: false,
+    id: "actions",
   }),
 ];
 
@@ -382,26 +382,26 @@ export function OrganizationsTable({
       {
         id: "category",
         label: "Category",
-        state: category,
         setState: setCategory,
+        state: category,
       },
       {
         id: "partition",
         label: "Partition",
-        state: partition,
         setState: setPartition,
+        state: partition,
       },
       {
         id: "createdAt",
         label: "Created",
-        state: createdAt,
         setState: setCreatedAt,
+        state: createdAt,
       },
       {
         id: "updatedAt",
         label: "Updated",
-        state: updatedAt,
         setState: setUpdatedAt,
+        state: updatedAt,
       },
     ]);
 
@@ -412,31 +412,31 @@ export function OrganizationsTable({
   };
 
   const table = useReactTable({
-    data,
     columns: getColumns(onEdit, onDisable, onEnable, onRemove, onView, {
       isSuperAdmin,
     }),
+    data,
     getCoreRowModel: getCoreRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
-    getSortedRowModel: getSortedRowModel(),
+    getFacetedMinMaxValues: getFacetedMinMaxValues(),
     getFacetedRowModel: getFacetedRowModel(),
     getFacetedUniqueValues: getFacetedUniqueValues(),
-    getFacetedMinMaxValues: getFacetedMinMaxValues(),
+    getFilteredRowModel: getFilteredRowModel(),
     getRowId: (row) => row.id,
+    getSortedRowModel: getSortedRowModel(),
+    onColumnVisibilityChange: setColumnVisibility,
+    onRowSelectionChange: setRowSelection,
+    onSortingChange: handleSortingChange,
     state: {
-      globalFilter: searchQuery,
-      sorting: sort,
       columnFilters,
-      rowSelection,
       columnVisibility: getRestrictedVisibility(
         columnVisibility,
         RESTRICTED_COLUMNS,
         userRole
       ),
+      globalFilter: searchQuery,
+      rowSelection,
+      sorting: sort,
     },
-    onSortingChange: handleSortingChange,
-    onRowSelectionChange: setRowSelection,
-    onColumnVisibilityChange: setColumnVisibility,
   });
 
   const selected = data.filter((organization) => rowSelection[organization.id]);

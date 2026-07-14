@@ -62,8 +62,8 @@ export const CHART_TOOLTIP_PROPS = {
 } as const;
 
 export const CHART_AXIS_PROPS = {
-  tick: { fill: "var(--color-base-content)", fontSize: 12, opacity: 0.7 },
   axisLine: { stroke: "var(--color-base-300)" },
+  tick: { fill: "var(--color-base-content)", fontSize: 12, opacity: 0.7 },
   tickLine: false,
 } as const;
 

@@ -65,15 +65,14 @@ const removeManyProjects = graphql(`
 
 export function useCreateOneProject() {
   return useMutation({
-    mutationKey: ["createOneProject"],
     mutationFn: (createProjectInput: CreateProjectInput) =>
       execute(createOneProject, { createProjectInput }),
+    mutationKey: ["createOneProject"],
   });
 }
 
 export function useUpdateOneProject() {
   return useMutation({
-    mutationKey: ["updateOneProject"],
     mutationFn: ({
       projectId,
       updateProjectInput,
@@ -81,12 +80,12 @@ export function useUpdateOneProject() {
       projectId: string;
       updateProjectInput: UpdateProjectInput;
     }) => execute(updateOneProject, { projectId, updateProjectInput }),
+    mutationKey: ["updateOneProject"],
   });
 }
 
 export function useUpdateManyProjects() {
   return useMutation({
-    mutationKey: ["updateManyProjects"],
     mutationFn: ({
       projectIds,
       updateProjectInput,
@@ -94,20 +93,21 @@ export function useUpdateManyProjects() {
       projectIds: string[];
       updateProjectInput: UpdateProjectInput;
     }) => execute(updateManyProjects, { projectIds, updateProjectInput }),
+    mutationKey: ["updateManyProjects"],
   });
 }
 
 export function useRemoveOneProject() {
   return useMutation({
-    mutationKey: ["removeOneProject"],
     mutationFn: (projectId: string) => execute(removeOneProject, { projectId }),
+    mutationKey: ["removeOneProject"],
   });
 }
 
 export function useRemoveManyProjects() {
   return useMutation({
-    mutationKey: ["removeManyProjects"],
     mutationFn: (projectIds: string[]) =>
       execute(removeManyProjects, { projectIds }),
+    mutationKey: ["removeManyProjects"],
   });
 }

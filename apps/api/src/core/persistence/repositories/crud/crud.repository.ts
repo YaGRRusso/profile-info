@@ -137,7 +137,7 @@ export class CrudRepository<
       this.model.countDocuments(scopedFilter).exec(),
     ]);
 
-    return mapPage({ nodes: documents, found }, (document) =>
+    return mapPage({ found, nodes: documents }, (document) =>
       this.mapper.toDomain(document)
     );
   }
@@ -180,7 +180,7 @@ export class CrudRepository<
   }
 
   async createMany(createInputs: TCreate[]) {
-    if (createInputs.length === 0) return { succeeded: 0, failed: 0 };
+    if (createInputs.length === 0) return { failed: 0, succeeded: 0 };
 
     const payloads = createInputs.map((input) => {
       const mapped = this.mapper.toPersistenceForCreate(input);
@@ -192,8 +192,8 @@ export class CrudRepository<
 
     return assertBatchSucceeded(
       {
-        succeeded: documents.length,
         failed: createInputs.length - documents.length,
+        succeeded: documents.length,
       },
       new BadRequestException(PERSISTENCE_NOT_CREATED)
     );
@@ -239,7 +239,7 @@ export class CrudRepository<
       .exec();
 
     return assertBatchSucceeded(
-      { succeeded: result.matchedCount, failed: 0 },
+      { failed: 0, succeeded: result.matchedCount },
       new NotFoundException(PERSISTENCE_NOT_UPDATED)
     );
   }
@@ -265,7 +265,7 @@ export class CrudRepository<
 
   async updateManyById(ids: string[], updateInput: TUpdate) {
     assertValidObjectIds(ids);
-    if (ids.length === 0) return { succeeded: 0, failed: 0 };
+    if (ids.length === 0) return { failed: 0, succeeded: 0 };
 
     const resolvedFilter = { _id: { $in: ids } } as QueryFilter<TModel>;
     const scopedFilter = this.applyMutateFilter(resolvedFilter);
@@ -280,12 +280,12 @@ export class CrudRepository<
       .exec();
 
     const batch = assertBatchSucceeded(
-      { succeeded: result.matchedCount, failed: 0 },
+      { failed: 0, succeeded: result.matchedCount },
       new NotFoundException(PERSISTENCE_NOT_UPDATED)
     );
     return {
-      succeeded: batch.succeeded,
       failed: ids.length - batch.succeeded,
+      succeeded: batch.succeeded,
     };
   }
 
@@ -307,7 +307,7 @@ export class CrudRepository<
 
     const result = await this.model.deleteMany(scopedFilter).exec();
     return assertBatchSucceeded(
-      { succeeded: result.deletedCount, failed: 0 },
+      { failed: 0, succeeded: result.deletedCount },
       new NotFoundException(PERSISTENCE_NOT_REMOVED)
     );
   }
@@ -324,7 +324,7 @@ export class CrudRepository<
 
   async deleteManyById(ids: string[]) {
     assertValidObjectIds(ids);
-    if (ids.length === 0) return { succeeded: 0, failed: 0 };
+    if (ids.length === 0) return { failed: 0, succeeded: 0 };
 
     const resolvedFilter = { _id: { $in: ids } } as QueryFilter<TModel>;
     const scopedFilter = this.applyMutateFilter(resolvedFilter);
@@ -332,12 +332,12 @@ export class CrudRepository<
     const result = await this.model.deleteMany(scopedFilter).exec();
 
     const batch = assertBatchSucceeded(
-      { succeeded: result.deletedCount, failed: 0 },
+      { failed: 0, succeeded: result.deletedCount },
       new NotFoundException(PERSISTENCE_NOT_REMOVED)
     );
     return {
-      succeeded: batch.succeeded,
       failed: ids.length - batch.succeeded,
+      succeeded: batch.succeeded,
     };
   }
 }

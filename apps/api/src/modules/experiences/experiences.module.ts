@@ -17,6 +17,7 @@ import { OnSkillDeletedListener } from "./listeners/on-skill-deleted.listener";
 import { OnUserDeletedListener } from "./listeners/on-user-deleted.listener";
 
 @Module({
+  exports: [ExperiencesService],
   imports: [
     OrganizationsModule,
     SkillsModule,
@@ -33,6 +34,5 @@ import { OnUserDeletedListener } from "./listeners/on-user-deleted.listener";
     OnOrganizationDeletedListener,
     OnUserDeletedListener,
   ],
-  exports: [ExperiencesService],
 })
 export class ExperiencesModule {}

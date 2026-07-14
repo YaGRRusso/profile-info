@@ -66,7 +66,7 @@ const queryParser = parseAsShape(z.string())
   .withOptions({ ...persistentOptions, limitUrlUpdates: debouncedUrlUpdates });
 
 const sortParser = parseAsShape(
-  z.array(z.object({ id: z.string(), desc: z.boolean() }))
+  z.array(z.object({ desc: z.boolean(), id: z.string() }))
 )
   .withDefault([])
   .withOptions(persistentOptions);
@@ -77,8 +77,8 @@ const updatedAtParser = parseAsShape(z.string()).withOptions(persistentOptions);
 
 const relevanceParser = parseAsShape(
   z.object({
-    min: z.number().optional(),
     max: z.number().optional(),
+    min: z.number().optional(),
   })
 ).withOptions({
   ...persistentOptions,
@@ -86,10 +86,10 @@ const relevanceParser = parseAsShape(
 });
 
 const CATEGORY_LABELS: Array<{ value: ExperienceCategory; label: string }> = [
-  { value: ExperienceCategory.FullTime, label: "Full Time" },
-  { value: ExperienceCategory.PartTime, label: "Part Time" },
-  { value: ExperienceCategory.Freelance, label: "Freelance" },
-  { value: ExperienceCategory.Volunteer, label: "Volunteer" },
+  { label: "Full Time", value: ExperienceCategory.FullTime },
+  { label: "Part Time", value: ExperienceCategory.PartTime },
+  { label: "Freelance", value: ExperienceCategory.Freelance },
+  { label: "Volunteer", value: ExperienceCategory.Volunteer },
 ];
 
 const RESTRICTED_COLUMNS: RestrictedColumns = {
@@ -111,16 +111,6 @@ const getColumns = (
   onView: (experience: ExperienceRow) => void
 ) => [
   columnHelper.display({
-    id: "select",
-    enableHiding: false,
-    header: ({ table }) => (
-      <input
-        checked={table.getIsAllRowsSelected()}
-        className="checkbox checkbox-sm"
-        onChange={table.getToggleAllRowsSelectedHandler()}
-        type="checkbox"
-      />
-    ),
     cell: ({ row }) => (
       <input
         checked={row.getIsSelected()}
@@ -130,14 +120,24 @@ const getColumns = (
         type="checkbox"
       />
     ),
+    enableHiding: false,
+    header: ({ table }) => (
+      <input
+        checked={table.getIsAllRowsSelected()}
+        className="checkbox checkbox-sm"
+        onChange={table.getToggleAllRowsSelectedHandler()}
+        type="checkbox"
+      />
+    ),
+    id: "select",
   }),
   columnHelper.accessor("id", {
-    header: "ID",
-    enableGlobalFilter: false,
-    enableSorting: false,
     cell: (data) => (
       <span className="font-mono text-xs">{data.getValue()}</span>
     ),
+    enableGlobalFilter: false,
+    enableSorting: false,
+    header: "ID",
   }),
   columnHelper.accessor("slug", {
     header: "Slug",
@@ -148,46 +148,46 @@ const getColumns = (
       return role ? i18nLabel({ i18n: role.i18n }, locale) : "";
     },
     {
-      id: `title-${locale}`,
-      header: "Title",
       cell: (data) => {
         const value = data.getValue();
         if (isEmptyValue(value)) return <EmptyValue />;
         return value;
       },
+      header: "Title",
+      id: `title-${locale}`,
     }
   ),
   columnHelper.accessor("relevance", {
-    header: "Relevance",
+    cell: (data) => (
+      <span className="badge badge-soft badge-sm">{data.getValue()}</span>
+    ),
     enableColumnFilter: true,
     enableGlobalFilter: false,
     filterFn: numberRangeFilter,
-    cell: (data) => (
-      <span className="badge badge-soft badge-sm">{data.getValue()}</span>
-    ),
+    header: "Relevance",
   }),
   columnHelper.accessor((row) => row.organization?.name ?? "", {
-    id: "organization",
-    header: "Organization",
     cell: (data) => <BadgeList values={[data.getValue()]} />,
+    header: "Organization",
+    id: "organization",
   }),
   columnHelper.accessor("category", {
-    header: "Category",
-    enableColumnFilter: true,
-    enableSorting: false,
-    enableGlobalFilter: false,
-    filterFn: "equals",
     cell: (data) => (
       <span className="badge badge-soft badge-sm">{data.getValue()}</span>
     ),
+    enableColumnFilter: true,
+    enableGlobalFilter: false,
+    enableSorting: false,
+    filterFn: "equals",
+    header: "Category",
   }),
   columnHelper.accessor((row) => row.roles?.length ?? 0, {
-    id: "roles",
-    header: "Roles",
-    enableGlobalFilter: false,
     cell: (data) => (
       <span className="badge badge-soft badge-sm">{data.getValue()}</span>
     ),
+    enableGlobalFilter: false,
+    header: "Roles",
+    id: "roles",
   }),
   columnHelper.accessor(
     (row) =>
@@ -195,53 +195,51 @@ const getColumns = (
         (role) => role.skills?.map((s) => i18nLabel(s, locale)) ?? []
       ) ?? [],
     {
-      id: `skills-${locale}`,
-      header: "Skills",
+      cell: (data) => <BadgeList values={data.getValue()} />,
       enableGlobalFilter: false,
       enableSorting: false,
-      cell: (data) => <BadgeList values={data.getValue()} />,
+      header: "Skills",
+      id: `skills-${locale}`,
     }
   ),
   columnHelper.accessor(
     (row) => row.roles?.flatMap((role) => role.i18n.map((e) => e.locale)) ?? [],
     {
-      id: "languages",
-      header: "Languages",
+      cell: (data) => <BadgeList values={data.getValue()} />,
       enableGlobalFilter: false,
       enableSorting: false,
-      cell: (data) => <BadgeList values={data.getValue()} />,
+      header: "Languages",
+      id: "languages",
     }
   ),
   columnHelper.accessor((row) => row.owner?.nickname ?? "", {
-    id: "owner",
-    header: "Owner",
-    enableGlobalFilter: false,
-    enableSorting: false,
     cell: (data) => {
       const value = data.getValue();
       if (isEmptyValue(value)) return <EmptyValue />;
       return <span className="badge badge-soft badge-sm">{value}</span>;
     },
+    enableGlobalFilter: false,
+    enableSorting: false,
+    header: "Owner",
+    id: "owner",
   }),
   columnHelper.accessor("createdAt", {
-    header: "Created",
+    cell: ({ getValue }) => new Date(getValue()).toLocaleDateString(),
     enableColumnFilter: true,
     enableGlobalFilter: false,
-    sortingFn: "datetime",
     filterFn: dateRangeFilter,
-    cell: ({ getValue }) => new Date(getValue()).toLocaleDateString(),
+    header: "Created",
+    sortingFn: "datetime",
   }),
   columnHelper.accessor("updatedAt", {
-    header: "Updated",
+    cell: ({ getValue }) => new Date(getValue()).toLocaleDateString(),
     enableColumnFilter: true,
     enableGlobalFilter: false,
-    sortingFn: "datetime",
     filterFn: dateRangeFilter,
-    cell: ({ getValue }) => new Date(getValue()).toLocaleDateString(),
+    header: "Updated",
+    sortingFn: "datetime",
   }),
   columnHelper.display({
-    id: "actions",
-    enableHiding: false,
     cell: ({ row }) => (
       <div className="flex items-center justify-end gap-1">
         <button
@@ -267,6 +265,8 @@ const getColumns = (
         </button>
       </div>
     ),
+    enableHiding: false,
+    id: "actions",
   }),
 ];
 
@@ -331,26 +331,26 @@ export function ExperiencesTable({
       {
         id: "category",
         label: "Category",
-        state: category,
         setState: setCategory,
+        state: category,
       },
       {
         id: "createdAt",
         label: "Created",
-        state: createdAt,
         setState: setCreatedAt,
+        state: createdAt,
       },
       {
         id: "updatedAt",
         label: "Updated",
-        state: updatedAt,
         setState: setUpdatedAt,
+        state: updatedAt,
       },
       {
         id: "relevance",
         label: "Relevance",
-        state: stableRelevance,
         setState: setRelevance,
+        state: stableRelevance,
       },
     ]);
 
@@ -366,29 +366,29 @@ export function ExperiencesTable({
   );
 
   const table = useReactTable({
-    data,
     columns,
+    data,
     getCoreRowModel: getCoreRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
-    getSortedRowModel: getSortedRowModel(),
+    getFacetedMinMaxValues: getFacetedMinMaxValues(),
     getFacetedRowModel: getFacetedRowModel(),
     getFacetedUniqueValues: getFacetedUniqueValues(),
-    getFacetedMinMaxValues: getFacetedMinMaxValues(),
+    getFilteredRowModel: getFilteredRowModel(),
     getRowId: (row) => row.id,
+    getSortedRowModel: getSortedRowModel(),
+    onColumnVisibilityChange: setColumnVisibility,
+    onRowSelectionChange: setRowSelection,
+    onSortingChange: handleSortingChange,
     state: {
-      globalFilter: searchQuery,
-      sorting: sort,
       columnFilters,
-      rowSelection,
       columnVisibility: getRestrictedVisibility(
         columnVisibility,
         RESTRICTED_COLUMNS,
         userRole
       ),
+      globalFilter: searchQuery,
+      rowSelection,
+      sorting: sort,
     },
-    onSortingChange: handleSortingChange,
-    onRowSelectionChange: setRowSelection,
-    onColumnVisibilityChange: setColumnVisibility,
   });
 
   const selected = data.filter((experience) => rowSelection[experience.id]);

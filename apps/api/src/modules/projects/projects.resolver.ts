@@ -43,8 +43,8 @@ export class ProjectsResolver {
   findOneProject(
     @Auth() ctx: AuthContext,
     @Args("projectFilters", {
-      type: () => FilterProjectInput,
       nullable: true,
+      type: () => FilterProjectInput,
     })
     projectFilters?: FilterProjectInput
   ) {
@@ -63,26 +63,26 @@ export class ProjectsResolver {
   findManyProjects(
     @Auth() ctx: AuthContext,
     @Args("projectFilters", {
-      type: () => FilterProjectInput,
       nullable: true,
+      type: () => FilterProjectInput,
     })
     projectFilters?: FilterProjectInput,
     @Args("projectPagination", {
-      type: () => PaginationInput,
       nullable: true,
+      type: () => PaginationInput,
     })
     projectPagination?: PaginationInput,
     @Args("projectSort", {
-      type: () => SortProjectInput,
       nullable: true,
+      type: () => SortProjectInput,
     })
     projectSort?: SortProjectInput
   ) {
     return this.projectsService.findMany(ctx, {
       filters: projectFilters,
-      sort: projectSort,
       limit: projectPagination?.limit,
       skip: projectPagination?.skip,
+      sort: projectSort,
     });
   }
 

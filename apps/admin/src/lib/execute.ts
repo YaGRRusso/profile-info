@@ -14,8 +14,8 @@ export async function execute<Result, Variables>(
   }
 
   const headers: Record<string, string> = {
-    "Content-Type": "application/json",
     Accept: "application/graphql-response+json",
+    "Content-Type": "application/json",
   };
 
   const hadToken = Boolean(token);
@@ -23,12 +23,12 @@ export async function execute<Result, Variables>(
 
   const response = await tc(
     fetch(import.meta.env.VITE_API_URL, {
-      headers,
-      method: "POST",
       body: JSON.stringify({
         query: query.toString(),
         variables,
       }),
+      headers,
+      method: "POST",
     })
   );
 

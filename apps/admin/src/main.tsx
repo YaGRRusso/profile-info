@@ -21,26 +21,26 @@ function notifyQueryError(error: Error) {
 }
 
 const queryClient = new QueryClient({
-  queryCache: new QueryCache({
-    onError: (error) => notifyQueryError(error),
-  }),
-  mutationCache: new MutationCache({
-    onError: (error) => notifyQueryError(error),
-  }),
   defaultOptions: {
-    queries: {
-      staleTime: Number.POSITIVE_INFINITY,
-      refetchOnWindowFocus: false,
+    mutations: {
       retryDelay: 1000 * 60,
+    },
+    queries: {
+      refetchOnWindowFocus: false,
       retry: (failureCount, error) => {
         if (error instanceof GqlClientError) return false;
         return failureCount < 3;
       },
-    },
-    mutations: {
       retryDelay: 1000 * 60,
+      staleTime: Number.POSITIVE_INFINITY,
     },
   },
+  mutationCache: new MutationCache({
+    onError: (error) => notifyQueryError(error),
+  }),
+  queryCache: new QueryCache({
+    onError: (error) => notifyQueryError(error),
+  }),
 });
 
 useAuthStore.subscribe((state, prev) => {
@@ -48,10 +48,10 @@ useAuthStore.subscribe((state, prev) => {
 });
 
 const router = createRouter({
-  routeTree,
   basepath: import.meta.env.BASE_URL,
-  scrollRestoration: true,
   context: { queryClient },
+  routeTree,
+  scrollRestoration: true,
 });
 
 router.subscribe("onResolved", () => {

@@ -25,30 +25,30 @@ function firstGraphqlErrorMessage(
 
 function buildOrganizationInput(slug: string, name: string) {
   return {
-    slug,
-    name,
-    website: `https://${slug}.example`,
-    logo: `https://${slug}.example/logo.png`,
     category: OrganizationCategory.COMPANY,
     i18n: organizationI18n(`${name} description`),
+    logo: `https://${slug}.example/logo.png`,
+    name,
+    slug,
+    website: `https://${slug}.example`,
   };
 }
 
 function buildCourseInput(slug: string, organizationId: string) {
   return {
-    slug,
-    organizationId,
-    status: "COMPLETE",
-    relevance: 1,
     i18n: [
       {
         locale: "en",
         messages: {
-          title: "Course title",
           description: "Course description",
+          title: "Course title",
         },
       },
     ],
+    organizationId,
+    relevance: 1,
+    slug,
+    status: "COMPLETE",
   };
 }
 
@@ -82,33 +82,33 @@ describe("Organizations catalog scope (e2e)", () => {
 
   beforeAll(async () => {
     const testApp = await createTestApp();
-    app = testApp.app;
+    ({ app } = testApp);
     await clearTestDatabase(testApp.module);
 
     const usersService = testApp.module.get(UsersService);
     organizationsService = testApp.module.get(OrganizationsService);
 
     await usersService.createOne(testSuperAdminContext(), {
+      email: "admin@profile.info",
       name: "Admin",
       nickname: "admin",
-      email: "admin@profile.info",
       password: "123123",
       role: UserRole.SUPER_ADMIN,
     });
 
     const userA = await usersService.createOne(testSuperAdminContext(), {
+      email: "user-a@profile.info",
       name: "User A",
       nickname: "user-a",
-      email: "user-a@profile.info",
       password: "user-a.123",
       role: UserRole.USER,
     });
     userAId = userA.id;
 
     const userB = await usersService.createOne(testSuperAdminContext(), {
+      email: "user-b@profile.info",
       name: "User B",
       nickname: "user-b",
-      email: "user-b@profile.info",
       password: "user-b.123",
       role: UserRole.USER,
     });
@@ -147,13 +147,13 @@ describe("Organizations catalog scope (e2e)", () => {
           }
         }
       `,
+      token: userAToken,
       variables: {
         createOrganizationInput: buildOrganizationInput(
           "user-a-local-org",
           "User A Local"
         ),
       },
-      token: userAToken,
     });
 
     expect(response.errors).toBeUndefined();
@@ -170,8 +170,8 @@ describe("Organizations catalog scope (e2e)", () => {
           disableOneOrganization(organizationId: $organizationId) { id }
         }
       `,
-      variables: { organizationId: globalOrganizationId },
       token: userAToken,
+      variables: { organizationId: globalOrganizationId },
     });
     expect(firstGraphqlErrorMessage(disableResponse.errors)).toMatch(
       MUTATION_BLOCKED_MESSAGE
@@ -185,11 +185,11 @@ describe("Organizations catalog scope (e2e)", () => {
           }
         }
       `,
+      token: userAToken,
       variables: {
         organizationId: globalOrganizationId,
         updateOrganizationInput: { slug: "hijacked-global" },
       },
-      token: userAToken,
     });
     expect(firstGraphqlErrorMessage(updateResponse.errors)).toMatch(
       MUTATION_BLOCKED_MESSAGE
@@ -201,8 +201,8 @@ describe("Organizations catalog scope (e2e)", () => {
           removeOneOrganization(organizationId: $organizationId) { id }
         }
       `,
-      variables: { organizationId: globalOrganizationId },
       token: userAToken,
+      variables: { organizationId: globalOrganizationId },
     });
     expect(firstGraphqlErrorMessage(removeResponse.errors)).toMatch(
       MUTATION_BLOCKED_MESSAGE
@@ -216,8 +216,8 @@ describe("Organizations catalog scope (e2e)", () => {
           findOneOrganizationById(organizationId: $organizationId) { id slug }
         }
       `,
-      variables: { organizationId: userBLocalOrganizationId },
       token: userAToken,
+      variables: { organizationId: userBLocalOrganizationId },
     });
     expect(findOneById.errors?.[0]?.message).toContain("Not Found");
 
@@ -229,8 +229,8 @@ describe("Organizations catalog scope (e2e)", () => {
           findManyOrganizationById(organizationIds: $organizationIds) { id slug }
         }
       `,
-      variables: { organizationIds: [userBLocalOrganizationId] },
       token: userAToken,
+      variables: { organizationIds: [userBLocalOrganizationId] },
     });
     expect(findManyById.errors).toBeUndefined();
     expect(findManyById.data?.findManyOrganizationById).toEqual([]);
@@ -246,13 +246,13 @@ describe("Organizations catalog scope (e2e)", () => {
           }
         }
       `,
+      token: userAToken,
       variables: {
         organizationFilters: {
-          slug: userBLocalSlug,
           partition: CatalogPartition.LOCAL,
+          slug: userBLocalSlug,
         },
       },
-      token: userAToken,
     });
     expect(findManyOrganizations.errors).toBeUndefined();
     expect(findManyOrganizations.data?.findManyOrganizations.found).toBe(0);
@@ -291,8 +291,8 @@ describe("Organizations catalog scope (e2e)", () => {
           disableOneOrganization(organizationId: $organizationId) { id }
         }
       `,
-      variables: { organizationId: userBLocalOrganizationId },
       token: adminToken,
+      variables: { organizationId: userBLocalOrganizationId },
     });
 
     expect(firstGraphqlErrorMessage(response.errors)).toMatch(
@@ -317,13 +317,13 @@ describe("Organizations catalog scope (e2e)", () => {
           }
         }
       `,
+      token: adminToken,
       variables: {
         createOrganizationInput: buildOrganizationInput(
           "admin-global-org",
           "Admin Global"
         ),
       },
-      token: adminToken,
     });
 
     expect(createResponse.errors).toBeUndefined();
@@ -343,11 +343,11 @@ describe("Organizations catalog scope (e2e)", () => {
           }
         }
       `,
+      token: adminToken,
       variables: {
         organizationId,
         updateOrganizationInput: { slug: "admin-global-renamed" },
       },
-      token: adminToken,
     });
     expect(updateResponse.errors).toBeUndefined();
     expect(updateResponse.data?.updateOneOrganization.slug).toBe(
@@ -362,8 +362,8 @@ describe("Organizations catalog scope (e2e)", () => {
           disableOneOrganization(organizationId: $organizationId) { id }
         }
       `,
-      variables: { organizationId },
       token: adminToken,
+      variables: { organizationId },
     });
     expect(disableResponse.errors).toBeUndefined();
     expect(disableResponse.data?.disableOneOrganization.id).toBe(
@@ -392,8 +392,8 @@ describe("Organizations catalog scope (e2e)", () => {
           }
         }
       `,
-      variables: { organizationFilters: { slug: "scope-disabled-org" } },
       token: userAToken,
+      variables: { organizationFilters: { slug: "scope-disabled-org" } },
     });
     expect(browseResponse.errors).toBeUndefined();
     expect(browseResponse.data?.findManyOrganizations.nodes).toHaveLength(1);
@@ -412,8 +412,8 @@ describe("Organizations catalog scope (e2e)", () => {
           }
         }
       `,
-      variables: { organizationFilters: { slug: "scope-disabled-org" } },
       token: userAToken,
+      variables: { organizationFilters: { slug: "scope-disabled-org" } },
     });
     expect(activeResponse.errors).toBeUndefined();
     expect(activeResponse.data?.findManyActiveOrganizations.found).toBe(0);
@@ -437,13 +437,13 @@ describe("Organizations catalog scope (e2e)", () => {
           createOneCourse(createCourseInput: $createCourseInput) { id }
         }
       `,
+      token: userAToken,
       variables: {
         createCourseInput: buildCourseInput(
           "attach-disabled-org-course",
           disabledOrganization.id
         ),
       },
-      token: userAToken,
     });
 
     expect(response.errors?.[0]?.message).toContain(PERSISTENCE_NOT_FOUND);
@@ -463,14 +463,14 @@ describe("Organizations catalog scope (e2e)", () => {
           }
         }
       `,
+      token: userBToken,
       variables: {
         organizationFilters: {
-          partition: CatalogPartition.LOCAL,
           ownerId: userAId,
+          partition: CatalogPartition.LOCAL,
           slug: "user-a-local-org",
         },
       },
-      token: userBToken,
     });
 
     expect(response.errors).toBeUndefined();

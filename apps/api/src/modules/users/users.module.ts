@@ -10,6 +10,7 @@ import { UsersLoaderService } from "./users-loader.service";
 import { UsersValidatorService } from "./users-validator.service";
 
 @Module({
+  exports: [UsersService, UsersLoaderService, UsersValidatorService],
   imports: [
     MongooseModule.forFeature([{ name: UserModel.name, schema: UserSchema }]),
     SkillsModule,
@@ -22,6 +23,5 @@ import { UsersValidatorService } from "./users-validator.service";
     UsersValidatorService,
     OnSkillDeletedListener,
   ],
-  exports: [UsersService, UsersLoaderService, UsersValidatorService],
 })
 export class UsersModule {}

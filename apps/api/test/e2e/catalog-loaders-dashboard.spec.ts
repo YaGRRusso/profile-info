@@ -77,7 +77,7 @@ describe("Catalog loaders and dashboard counts (e2e)", () => {
 
   beforeAll(async () => {
     const testApp = await createTestApp();
-    app = testApp.app;
+    ({ app } = testApp);
     await clearTestDatabase(testApp.module);
 
     const usersService = testApp.module.get(UsersService);
@@ -86,26 +86,26 @@ describe("Catalog loaders and dashboard counts (e2e)", () => {
     experiencesService = testApp.module.get(ExperiencesService);
 
     await usersService.createOne(testSuperAdminContext(), {
+      email: "admin@profile.info",
       name: "Admin",
       nickname: "admin",
-      email: "admin@profile.info",
       password: "123123",
       role: UserRole.SUPER_ADMIN,
     });
 
     const userA = await usersService.createOne(testSuperAdminContext(), {
+      email: "user-a@profile.info",
       name: "User A",
       nickname: "user-a",
-      email: "user-a@profile.info",
       password: "user-a.123",
       role: UserRole.USER,
     });
     userAId = userA.id;
 
     const userB = await usersService.createOne(testSuperAdminContext(), {
+      email: "user-b@profile.info",
       name: "User B",
       nickname: "user-b",
-      email: "user-b@profile.info",
       password: "user-b.123",
       role: UserRole.USER,
     });
@@ -114,56 +114,56 @@ describe("Catalog loaders and dashboard counts (e2e)", () => {
     const adminToken = await signIn(app, "admin@profile.info", "123123");
 
     await skillsService.createOne(testSuperAdminContext(), {
-      slug: "loader-global-active",
-      i18n: skillI18n("Loader Global Active"),
       category: "Programming",
+      i18n: skillI18n("Loader Global Active"),
+      slug: "loader-global-active",
     });
 
     const disabledGlobal = await skillsService.createOne(
       testSuperAdminContext(),
       {
-        slug: "loader-global-disabled",
-        i18n: skillI18n("Loader Global Disabled"),
         category: "Programming",
+        i18n: skillI18n("Loader Global Disabled"),
+        slug: "loader-global-disabled",
       }
     );
     disabledGlobalSkillId = disabledGlobal.id;
     await skillsService.disableOne(testSuperAdminContext(), disabledGlobal.id);
 
     await skillsService.createOne(testAuthContext({ id: userAId }), {
-      slug: "loader-user-a-local",
-      i18n: skillI18n("Loader User A Local"),
       category: "Programming",
+      i18n: skillI18n("Loader User A Local"),
+      slug: "loader-user-a-local",
     });
 
     const userBLocalSkill = await skillsService.createOne(
       testAuthContext({ id: userB.id }),
       {
-        slug: "loader-user-b-local",
-        i18n: skillI18n("Loader User B Local"),
         category: "Programming",
+        i18n: skillI18n("Loader User B Local"),
+        slug: "loader-user-b-local",
       }
     );
     userBLocalSkillId = userBLocalSkill.id;
 
     await organizationsService.createOne(testSuperAdminContext(), {
-      slug: "loader-global-org",
-      name: "Loader Global Org",
-      website: "https://loader-global.example",
-      logo: "https://loader-global.example/logo.png",
       category: OrganizationCategory.COMPANY,
       i18n: organizationI18n("Global org"),
+      logo: "https://loader-global.example/logo.png",
+      name: "Loader Global Org",
+      slug: "loader-global-org",
+      website: "https://loader-global.example",
     });
 
     const localOrg = await organizationsService.createOne(
       testAuthContext({ id: userAId }),
       {
-        slug: "loader-user-a-local-org",
-        name: "User A Local Org",
-        website: "https://user-a-local.example",
-        logo: "https://user-a-local.example/logo.png",
         category: OrganizationCategory.COMPANY,
         i18n: organizationI18n("Local org"),
+        logo: "https://user-a-local.example/logo.png",
+        name: "User A Local Org",
+        slug: "loader-user-a-local-org",
+        website: "https://user-a-local.example",
       }
     );
     localOrgName = localOrg.name;
@@ -171,31 +171,31 @@ describe("Catalog loaders and dashboard counts (e2e)", () => {
     const skillOnExperience = await skillsService.createOne(
       testSuperAdminContext(),
       {
-        slug: "loader-disabled-on-experience",
-        i18n: skillI18n("Disabled On Experience"),
         category: "Programming",
+        i18n: skillI18n("Disabled On Experience"),
+        slug: "loader-disabled-on-experience",
       }
     );
 
     const userACtx = testAuthContext({ id: userAId });
     const experience = await experiencesService.createOne(userACtx, {
-      slug: "loader-local-org-experience",
-      organizationId: localOrg.id,
       category: ExperienceCategory.FREELANCE,
+      organizationId: localOrg.id,
       roles: [
         {
           i18n: [
             {
               locale: "en",
               messages: {
-                title: "Freelancer",
                 description: "Local org work",
+                title: "Freelancer",
               },
             },
           ],
           skillIds: [skillOnExperience.id],
         },
       ],
+      slug: "loader-local-org-experience",
     });
     experienceWithLocalOrgId = experience.id;
 
@@ -220,8 +220,8 @@ describe("Catalog loaders and dashboard counts (e2e)", () => {
       };
     }>(app, {
       query: EXPERIENCE_WITH_CATALOG,
-      variables: { experienceId: experienceWithLocalOrgId },
       token: userAToken,
+      variables: { experienceId: experienceWithLocalOrgId },
     });
 
     expect(response.errors).toBeUndefined();
@@ -232,8 +232,8 @@ describe("Catalog loaders and dashboard counts (e2e)", () => {
     expect(response.data?.findOneExperienceById.skills).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
-          slug: "loader-disabled-on-experience",
           disabled: true,
+          slug: "loader-disabled-on-experience",
         }),
       ])
     );
@@ -248,8 +248,8 @@ describe("Catalog loaders and dashboard counts (e2e)", () => {
           findManySkillById(skillIds: $skillIds) { id }
         }
       `,
-      variables: { skillIds: [userBLocalSkillId] },
       token: userAToken,
+      variables: { skillIds: [userBLocalSkillId] },
     });
 
     expect(response.errors).toBeUndefined();
@@ -291,8 +291,8 @@ describe("Catalog loaders and dashboard counts (e2e)", () => {
           findOneActiveSkill(skillFilters: $skillFilters) { id }
         }
       `,
-      variables: { skillFilters: { slug: "loader-global-disabled" } },
       token: userAToken,
+      variables: { skillFilters: { slug: "loader-global-disabled" } },
     });
 
     expect(response.errors?.[0]?.message).toContain("Not Found");

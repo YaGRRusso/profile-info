@@ -10,13 +10,13 @@ const ctx = testAuthContext();
 const organizationId = "507f1f77bcf86cd799439013";
 
 const disabledOrganization = {
+  category: "COMPANY",
+  disabled: true,
+  i18n: [],
   id: organizationId,
   name: "Legacy Org",
-  slug: "legacy-org",
-  category: "COMPANY",
-  i18n: [],
-  disabled: true,
   partition: CatalogPartition.GLOBAL,
+  slug: "legacy-org",
 };
 
 describe("OrganizationsLoaderService", () => {

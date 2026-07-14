@@ -17,12 +17,12 @@ const ctx = testAuthContext();
 const validId = "507f1f77bcf86cd799439013";
 
 const fakeEntity = {
-  id: validId,
-  slug: "typescript",
-  i18n: [{ locale: "en", messages: { title: "TypeScript" } }],
   category: "Programming",
   disabled: false,
+  i18n: [{ locale: "en", messages: { title: "TypeScript" } }],
+  id: validId,
   partition: CatalogPartition.GLOBAL,
+  slug: "typescript",
 };
 
 describe("SkillsService", () => {
@@ -47,8 +47,8 @@ describe("SkillsService", () => {
       catalogCrud: jest.fn().mockReturnValue(crud),
       catalogStats: jest.fn().mockReturnValue(stats),
       countActive: jest.fn().mockResolvedValue(2),
-      countOwnedLocalActive: jest.fn().mockResolvedValue(1),
       countByField: jest.fn().mockResolvedValue([]),
+      countOwnedLocalActive: jest.fn().mockResolvedValue(1),
       findRecentlyUpdatedActive: jest.fn(),
     };
 
@@ -150,7 +150,7 @@ describe("SkillsService", () => {
         service.findOneActive(ctx, { filters: { slug: "typescript" } })
       ).resolves.toEqual(fakeEntity);
       expect(crud.findOne).toHaveBeenCalledWith({
-        filters: { slug: "typescript", disabled: false },
+        filters: { disabled: false, slug: "typescript" },
       });
     });
 
@@ -158,11 +158,11 @@ describe("SkillsService", () => {
       crud.findOne.mockResolvedValue(fakeEntity);
 
       await service.findOneActive(ctx, {
-        filters: { slug: "typescript", disabled: true },
+        filters: { disabled: true, slug: "typescript" },
       });
 
       expect(crud.findOne).toHaveBeenCalledWith({
-        filters: { slug: "typescript", disabled: false },
+        filters: { disabled: false, slug: "typescript" },
       });
     });
   });
@@ -193,9 +193,9 @@ describe("SkillsService", () => {
   describe("createOne", () => {
     it("delegates to crud", async () => {
       const createInput = {
-        slug: "typescript",
-        i18n: [{ locale: "en", messages: { title: "TypeScript" } }],
         category: "Programming",
+        i18n: [{ locale: "en", messages: { title: "TypeScript" } }],
+        slug: "typescript",
       };
       crud.createOne.mockResolvedValue(fakeEntity);
 
@@ -237,11 +237,11 @@ describe("SkillsService", () => {
   describe("removeMany", () => {
     it("emits skill.deleted for each skill before deleteManyById", async () => {
       crud.findManyById.mockResolvedValue([fakeEntity]);
-      crud.deleteManyById.mockResolvedValue({ succeeded: 1, failed: 0 });
+      crud.deleteManyById.mockResolvedValue({ failed: 0, succeeded: 1 });
 
       await expect(service.removeMany(ctx, [validId])).resolves.toEqual({
-        succeeded: 1,
         failed: 0,
+        succeeded: 1,
       });
 
       expect(eventEmitter.emitAsync).toHaveBeenCalledWith(

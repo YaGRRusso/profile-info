@@ -15,9 +15,9 @@ import { nullIfEmpty } from "@/lib/form-input";
 import { CommonFormProps } from "./common";
 
 const apiTokenSchema = z.object({
+  expiresAt: z.string(),
   name: z.string().min(1, FormError.requiredField),
   permissions: z.array(z.enum(ApiTokenPermission)).min(1, FormError.minCount),
-  expiresAt: z.string(),
 });
 
 export type ApiTokenSchema = z.infer<typeof apiTokenSchema>;
@@ -33,17 +33,17 @@ const PERMISSION_OPTIONS = Object.values(ApiTokenPermission).map(
 
 export function apiTokenToInput(data: ApiTokenSchema): CreateApiTokenInput {
   return {
+    expiresAt: nullIfEmpty(toIsoDate(data.expiresAt)),
     name: data.name,
     permissions: data.permissions,
-    expiresAt: nullIfEmpty(toIsoDate(data.expiresAt)),
   };
 }
 
 export function apiTokenToForm(apiToken: ApiTokenRow): Partial<ApiTokenSchema> {
   return {
+    expiresAt: toDateInput(apiToken.expiresAt),
     name: apiToken.name,
     permissions: apiToken.permissions,
-    expiresAt: toDateInput(apiToken.expiresAt),
   };
 }
 
@@ -60,9 +60,9 @@ export function ApiTokenForm({
 
   const form = useForm({
     defaultValues: {
+      expiresAt: "",
       name: "",
       permissions: [] as ApiTokenPermission[],
-      expiresAt: "",
       ...defaultValues,
     },
     onSubmit: ({ value }) => onSubmit?.(value),

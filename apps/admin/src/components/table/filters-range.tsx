@@ -20,8 +20,8 @@ export function FiltersRange({
   function handleUpdate(bound: "min" | "max", raw: string) {
     const parsed = raw === "" ? undefined : Number(raw);
     const next = {
-      min: bound === "min" ? parsed : value?.min,
       max: bound === "max" ? parsed : value?.max,
+      min: bound === "min" ? parsed : value?.min,
     };
     onChange(next.min === undefined && next.max === undefined ? null : next);
   }

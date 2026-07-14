@@ -56,20 +56,20 @@ const REMOVE_ONE_EDUCATION = `
 
 function buildEducationInput(slug: string, organizationId: string) {
   return {
-    slug,
-    organizationId,
-    level: EducationLevel.BACHELOR,
-    status: EducationStatus.COMPLETE,
-    relevance: 1,
     i18n: [
       {
         locale: "en",
         messages: {
-          title: "Bachelor of Science",
           description: "Computer Science",
+          title: "Bachelor of Science",
         },
       },
     ],
+    level: EducationLevel.BACHELOR,
+    organizationId,
+    relevance: 1,
+    slug,
+    status: EducationStatus.COMPLETE,
   };
 }
 
@@ -84,32 +84,32 @@ describe("Educations tenant isolation (e2e)", () => {
 
   beforeAll(async () => {
     const testApp = await createTestApp();
-    app = testApp.app;
+    ({ app } = testApp);
     await clearTestDatabase(testApp.module);
 
     usersService = testApp.module.get(UsersService);
     organizationsService = testApp.module.get(OrganizationsService);
 
     await usersService.createOne(testSuperAdminContext(), {
+      email: "joao@profile.info",
       name: "João",
       nickname: "joao",
-      email: "joao@profile.info",
       password: "123123",
       role: UserRole.USER,
     });
 
     await usersService.createOne(testSuperAdminContext(), {
+      email: "maria@profile.info",
       name: "Maria",
       nickname: "maria",
-      email: "maria@profile.info",
       password: "123123",
       role: UserRole.USER,
     });
 
     await usersService.createOne(testSuperAdminContext(), {
+      email: "admin@profile.info",
       name: "Admin",
       nickname: "admin",
-      email: "admin@profile.info",
       password: "123123",
       role: UserRole.SUPER_ADMIN,
     });
@@ -117,12 +117,12 @@ describe("Educations tenant isolation (e2e)", () => {
     const organization = await organizationsService.createOne(
       testSuperAdminContext(),
       {
-        slug: "education-org",
-        name: "Education Org",
-        website: "https://education.example",
-        logo: "https://education.example/logo.png",
         category: OrganizationCategory.COMPANY,
         i18n: [{ locale: "en", messages: { description: "Org" } }],
+        logo: "https://education.example/logo.png",
+        name: "Education Org",
+        slug: "education-org",
+        website: "https://education.example",
       }
     );
     organizationId = organization.id;
@@ -162,13 +162,13 @@ describe("Educations tenant isolation (e2e)", () => {
       createOneEducation: { id: string; slug: string };
     }>(app, {
       query: CREATE_ONE_EDUCATION,
+      token: userAToken,
       variables: {
         createEducationInput: buildEducationInput(
           "alice-bachelor",
           organizationId
         ),
       },
-      token: userAToken,
     });
 
     expect(response.errors).toBeUndefined();
@@ -178,13 +178,13 @@ describe("Educations tenant isolation (e2e)", () => {
   it("should reject create with an invalid organizationId", async () => {
     const response = await graphqlRequest(app, {
       query: CREATE_ONE_EDUCATION,
+      token: userAToken,
       variables: {
         createEducationInput: buildEducationInput(
           "invalid-org-education",
           INVALID_OBJECT_ID
         ),
       },
-      token: userAToken,
     });
 
     expect(response.errors?.length).toBeGreaterThan(0);
@@ -194,13 +194,13 @@ describe("Educations tenant isolation (e2e)", () => {
   it("should reject create with invalid skillIds", async () => {
     const response = await graphqlRequest(app, {
       query: CREATE_ONE_EDUCATION,
+      token: userAToken,
       variables: {
         createEducationInput: {
           ...buildEducationInput("invalid-skills-education", organizationId),
           skillIds: [INVALID_OBJECT_ID],
         },
       },
-      token: userAToken,
     });
 
     expect(response.errors?.length).toBeGreaterThan(0);
@@ -210,13 +210,13 @@ describe("Educations tenant isolation (e2e)", () => {
   it("should reject create with unknown organizationId", async () => {
     const response = await graphqlRequest(app, {
       query: CREATE_ONE_EDUCATION,
+      token: userAToken,
       variables: {
         createEducationInput: buildEducationInput(
           "unknown-org-education",
           UNKNOWN_CATALOG_ID
         ),
       },
-      token: userAToken,
     });
 
     expect(response.errors?.length).toBeGreaterThan(0);
@@ -227,13 +227,13 @@ describe("Educations tenant isolation (e2e)", () => {
   it("should reject create with unknown skillIds", async () => {
     const response = await graphqlRequest(app, {
       query: CREATE_ONE_EDUCATION,
+      token: userAToken,
       variables: {
         createEducationInput: {
           ...buildEducationInput("unknown-skills-education", organizationId),
           skillIds: [UNKNOWN_CATALOG_ID],
         },
       },
-      token: userAToken,
     });
 
     expect(response.errors?.length).toBeGreaterThan(0);
@@ -269,8 +269,8 @@ describe("Educations tenant isolation (e2e)", () => {
 
     const response = await graphqlRequest(app, {
       query: FIND_ONE_EDUCATION_BY_ID,
-      variables: { educationId },
       token: userBToken,
+      variables: { educationId },
     });
 
     expect(response.errors?.[0]?.message).toContain("Not Found");
@@ -290,8 +290,8 @@ describe("Educations tenant isolation (e2e)", () => {
 
     const response = await graphqlRequest(app, {
       query: REMOVE_ONE_EDUCATION,
-      variables: { educationId },
       token: userBToken,
+      variables: { educationId },
     });
 
     expect(response.errors?.[0]?.message).toContain("Not Removed");
@@ -312,8 +312,8 @@ describe("Educations tenant isolation (e2e)", () => {
       findOneEducationById: { id: string; slug: string };
     }>(app, {
       query: FIND_ONE_EDUCATION_BY_ID,
-      variables: { educationId: education!.id },
       token: adminToken,
+      variables: { educationId: education!.id },
     });
 
     expect(response.errors).toBeUndefined();
@@ -325,13 +325,13 @@ describe("Educations tenant isolation (e2e)", () => {
       createOneEducation: { id: string; slug: string };
     }>(app, {
       query: CREATE_ONE_EDUCATION,
+      token: userBToken,
       variables: {
         createEducationInput: buildEducationInput(
           "alice-bachelor",
           organizationId
         ),
       },
-      token: userBToken,
     });
 
     expect(response.errors).toBeUndefined();

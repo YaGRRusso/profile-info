@@ -43,8 +43,8 @@ export class SkillsResolver {
   findOneSkill(
     @Auth() ctx: AuthContext,
     @Args("skillFilters", {
-      type: () => FilterSkillInput,
       nullable: true,
+      type: () => FilterSkillInput,
     })
     skillFilters?: FilterSkillInput
   ) {
@@ -55,8 +55,8 @@ export class SkillsResolver {
   findOneActiveSkill(
     @Auth() ctx: AuthContext,
     @Args("skillFilters", {
-      type: () => FilterSkillInput,
       nullable: true,
+      type: () => FilterSkillInput,
     })
     skillFilters?: FilterSkillInput
   ) {
@@ -75,26 +75,26 @@ export class SkillsResolver {
   findManySkills(
     @Auth() ctx: AuthContext,
     @Args("skillFilters", {
-      type: () => FilterSkillInput,
       nullable: true,
+      type: () => FilterSkillInput,
     })
     skillFilters?: FilterSkillInput,
     @Args("skillPagination", {
-      type: () => PaginationInput,
       nullable: true,
+      type: () => PaginationInput,
     })
     skillPagination?: PaginationInput,
     @Args("skillSort", {
-      type: () => SortSkillInput,
       nullable: true,
+      type: () => SortSkillInput,
     })
     skillSort?: SortSkillInput
   ) {
     return this.skillsService.findMany(ctx, {
       filters: skillFilters,
-      sort: skillSort,
       limit: skillPagination?.limit,
       skip: skillPagination?.skip,
+      sort: skillSort,
     });
   }
 
@@ -102,26 +102,26 @@ export class SkillsResolver {
   findManyActiveSkills(
     @Auth() ctx: AuthContext,
     @Args("skillFilters", {
-      type: () => FilterSkillInput,
       nullable: true,
+      type: () => FilterSkillInput,
     })
     skillFilters?: FilterSkillInput,
     @Args("skillPagination", {
-      type: () => PaginationInput,
       nullable: true,
+      type: () => PaginationInput,
     })
     skillPagination?: PaginationInput,
     @Args("skillSort", {
-      type: () => SortSkillInput,
       nullable: true,
+      type: () => SortSkillInput,
     })
     skillSort?: SortSkillInput
   ) {
     return this.skillsService.findManyActive(ctx, {
       filters: skillFilters,
-      sort: skillSort,
       limit: skillPagination?.limit,
       skip: skillPagination?.skip,
+      sort: skillSort,
     });
   }
 

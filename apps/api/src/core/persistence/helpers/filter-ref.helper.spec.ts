@@ -23,7 +23,7 @@ describe("withObjectIdRefs", () => {
   it("should convert single and array ObjectId refs", () => {
     const filter = withObjectIdRefs<TestFilter, TestModel>(
       { organizationId, skillIds, slug: "bootcamp" },
-      { single: ["organizationId"], array: ["skillIds"] }
+      { array: ["skillIds"], single: ["organizationId"] }
     );
 
     expect(filter.organizationId).toEqual(
@@ -38,7 +38,7 @@ describe("withObjectIdRefs", () => {
   it("should leave non-string ref values unchanged", () => {
     const filter = withObjectIdRefs<TestFilter, TestModel>(
       { slug: "bootcamp" },
-      { single: ["organizationId"], array: ["skillIds"] }
+      { array: ["skillIds"], single: ["organizationId"] }
     );
 
     expect(filter).toEqual({ slug: "bootcamp" });

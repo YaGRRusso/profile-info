@@ -8,8 +8,8 @@ export function createPassThroughMapper<TModel>(): CrudMapperInterface<
   return {
     toDomain: (doc) => doc,
     toPersistenceForCreate: (entity) => entity,
-    toPersistenceForUpdate: (entity) => entity,
     toPersistenceForFilter: (entity) => entity as QueryFilter<TModel>,
     toPersistenceForSort: (entity) => entity as Record<keyof TModel, SortOrder>,
+    toPersistenceForUpdate: (entity) => entity,
   };
 }

@@ -7,23 +7,23 @@ import { UserModel } from "@/modules/users/schemas/user.schema";
 @Schema({ timestamps: true })
 export class ApiTokenModel extends BaseModel {
   @Prop({
-    type: mongoose.Schema.Types.ObjectId,
+    index: true,
     ref: UserModel.name,
     required: true,
-    index: true,
+    type: mongoose.Schema.Types.ObjectId,
   })
   ownerId: mongoose.Types.ObjectId | string;
 
-  @Prop({ type: String, required: true })
+  @Prop({ required: true, type: String })
   name: string;
 
-  @Prop({ type: String, required: true, select: false })
+  @Prop({ required: true, select: false, type: String })
   hashedSecret: string;
 
   @Prop({
-    type: [String],
-    required: true,
     enum: ["QUERY", "MUTATE"],
+    required: true,
+    type: [String],
   })
   permissions: ApiTokenPermission[];
 

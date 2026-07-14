@@ -32,9 +32,9 @@ export function renderExperiences(
     title,
     ...entryBlockSectionHandlers<ExperienceRoleEntry>(
       ({ experience, role }) => ({
-        title: role.title,
-        meta: [experience.organization, role.period],
         description: role.description,
+        meta: [experience.organization, role.period],
+        title: role.title,
       })
     ),
   });

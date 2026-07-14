@@ -50,7 +50,7 @@ export function renderSection<T>(
   if (!options.items.length) return;
 
   const itemGap = options.itemGap ?? "md";
-  const firstItem = options.items[0];
+  const [firstItem] = options.items;
 
   if (firstItem !== undefined) {
     ensureSectionStartFits(ctx, options.title, firstItem, options.measureItem);

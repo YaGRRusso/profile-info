@@ -46,22 +46,22 @@ function buildOrganizations(
     const name = organizationName(globalIndex);
 
     return {
-      partition,
-      ownerId,
-      disabled: globalIndex % 19 === 0,
-      name,
-      slug: slugFor(name, globalIndex),
       category: faker.helpers.arrayElement(ORGANIZATION_CATEGORIES),
-      website: optionalForIndex(globalIndex, () => faker.internet.url()),
-      logo: optionalForIndex(globalIndex + 1, () =>
-        faker.image.urlPicsumPhotos({ width: 96, height: 96 })
-      ),
+      disabled: globalIndex % 19 === 0,
       i18n: SEED_LOCALES.map((locale) => ({
         locale,
         messages: {
           description: loremSentences(pickTextSize(globalIndex), locale),
         },
       })),
+      logo: optionalForIndex(globalIndex + 1, () =>
+        faker.image.urlPicsumPhotos({ height: 96, width: 96 })
+      ),
+      name,
+      ownerId,
+      partition,
+      slug: slugFor(name, globalIndex),
+      website: optionalForIndex(globalIndex, () => faker.internet.url()),
     };
   });
 }

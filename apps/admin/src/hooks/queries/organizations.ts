@@ -112,7 +112,10 @@ export function useFindManyOrganizations(
   options?: { enabled?: boolean }
 ) {
   return useInfiniteQuery({
-    queryKey: ["findManyOrganizations", variables],
+    getNextPageParam: paginatedNextPageParam<FindManyOrganizationsQuery>(
+      "findManyOrganizations"
+    ),
+    initialPageParam: 0,
     queryFn: ({ pageParam }) =>
       execute(
         findManyOrganizations,
@@ -122,10 +125,7 @@ export function useFindManyOrganizations(
           variables
         )
       ),
-    initialPageParam: 0,
-    getNextPageParam: paginatedNextPageParam<FindManyOrganizationsQuery>(
-      "findManyOrganizations"
-    ),
+    queryKey: ["findManyOrganizations", variables],
     select: paginatedSelect<FindManyOrganizationsQuery>(
       "findManyOrganizations"
     ),
@@ -141,7 +141,10 @@ export function useFindManyActiveOrganizations(
   options?: { enabled?: boolean }
 ) {
   return useInfiniteQuery({
-    queryKey: ["findManyActiveOrganizations", variables],
+    getNextPageParam: paginatedNextPageParam<FindManyActiveOrganizationsQuery>(
+      "findManyActiveOrganizations"
+    ),
+    initialPageParam: 0,
     queryFn: ({ pageParam }) =>
       execute(
         findManyActiveOrganizations,
@@ -151,10 +154,7 @@ export function useFindManyActiveOrganizations(
           variables
         )
       ),
-    initialPageParam: 0,
-    getNextPageParam: paginatedNextPageParam<FindManyActiveOrganizationsQuery>(
-      "findManyActiveOrganizations"
-    ),
+    queryKey: ["findManyActiveOrganizations", variables],
     select: paginatedSelect<FindManyActiveOrganizationsQuery>(
       "findManyActiveOrganizations"
     ),

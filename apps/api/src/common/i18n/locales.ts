@@ -1,7 +1,7 @@
 export const Locale = {
   EN: "en",
-  PT: "pt",
   ES: "es",
+  PT: "pt",
 } as const;
 
 export type LocaleCode = (typeof Locale)[keyof typeof Locale];

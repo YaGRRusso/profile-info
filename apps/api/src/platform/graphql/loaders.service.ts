@@ -15,8 +15,8 @@ export class LoadersService {
 
   createLoaders(req: AppRequest): AppLoaders {
     return {
-      batchSkills: this.skillsLoaderService.createLoader(req),
       batchOrganizations: this.organizationsLoaderService.createLoader(req),
+      batchSkills: this.skillsLoaderService.createLoader(req),
       batchUsers: this.usersLoaderService.createLoader(),
     };
   }

@@ -26,7 +26,7 @@ export class GqlAuthorizationGuard implements CanActivate {
   canActivate(context: ExecutionContext): boolean {
     if (shouldSkipGraphqlGuard(context, this.reflector)) return true;
 
-    const user = getGraphqlRequest(context).user;
+    const { user } = getGraphqlRequest(context);
     if (!user) return true;
 
     if (
@@ -37,8 +37,8 @@ export class GqlAuthorizationGuard implements CanActivate {
     }
 
     if (isApiToken(user)) {
-      const operation =
-        GqlExecutionContext.create(context).getInfo().operation.operation;
+      const { operation } =
+        GqlExecutionContext.create(context).getInfo().operation;
       const required =
         operation === "mutation"
           ? ApiTokenPermission.MUTATE

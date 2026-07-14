@@ -102,7 +102,9 @@ export function useFindManySkills(
   options?: { enabled?: boolean }
 ) {
   return useInfiniteQuery({
-    queryKey: ["findManySkills", variables],
+    getNextPageParam:
+      paginatedNextPageParam<FindManySkillsQuery>("findManySkills"),
+    initialPageParam: 0,
     queryFn: ({ pageParam }) =>
       execute(
         findManySkills,
@@ -112,9 +114,7 @@ export function useFindManySkills(
           variables
         )
       ),
-    initialPageParam: 0,
-    getNextPageParam:
-      paginatedNextPageParam<FindManySkillsQuery>("findManySkills"),
+    queryKey: ["findManySkills", variables],
     select: paginatedSelect<FindManySkillsQuery>("findManySkills"),
     ...options,
   });
@@ -125,7 +125,10 @@ export function useFindManyActiveSkills(
   options?: { enabled?: boolean }
 ) {
   return useInfiniteQuery({
-    queryKey: ["findManyActiveSkills", variables],
+    getNextPageParam: paginatedNextPageParam<FindManyActiveSkillsQuery>(
+      "findManyActiveSkills"
+    ),
+    initialPageParam: 0,
     queryFn: ({ pageParam }) =>
       execute(
         findManyActiveSkills,
@@ -135,10 +138,7 @@ export function useFindManyActiveSkills(
           variables
         )
       ),
-    initialPageParam: 0,
-    getNextPageParam: paginatedNextPageParam<FindManyActiveSkillsQuery>(
-      "findManyActiveSkills"
-    ),
+    queryKey: ["findManyActiveSkills", variables],
     select: paginatedSelect<FindManyActiveSkillsQuery>("findManyActiveSkills"),
     ...options,
   });

@@ -18,7 +18,7 @@ describe("SkillsValidatorService", () => {
     skillsService = {
       findManyActiveById: jest
         .fn()
-        .mockResolvedValue([{ id: skillId, disabled: false }]),
+        .mockResolvedValue([{ disabled: false, id: skillId }]),
     };
 
     const module: TestingModule = await Test.createTestingModule({

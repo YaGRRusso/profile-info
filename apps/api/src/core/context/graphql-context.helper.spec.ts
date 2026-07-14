@@ -54,8 +54,8 @@ describe("getGraphqlContext", () => {
 
   it("returns the GraphQL context for graphql execution contexts", () => {
     const context = {
-      getType: () => "graphql",
       getContext: () => graphqlContext,
+      getType: () => "graphql",
     } as unknown as ExecutionContext;
 
     expect(getGraphqlContext(context)).toBe(graphqlContext);
@@ -83,13 +83,13 @@ describe("getGraphqlRequest", () => {
 
   it("returns req from the GraphQL context", () => {
     const context = {
-      getType: () => "graphql",
       getContext: () =>
         ({
           loaders: {} as GraphqlContext["loaders"],
           req,
           res: {},
         }) satisfies GraphqlContext,
+      getType: () => "graphql",
     } as unknown as ExecutionContext;
 
     expect(getGraphqlRequest(context)).toBe(req);

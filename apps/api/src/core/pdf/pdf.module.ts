@@ -2,7 +2,7 @@ import { Module } from "@nestjs/common";
 import { PdfRenderService } from "./pdf-render.service";
 
 @Module({
-  providers: [PdfRenderService],
   exports: [PdfRenderService],
+  providers: [PdfRenderService],
 })
 export class PdfModule {}

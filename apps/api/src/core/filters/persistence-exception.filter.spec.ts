@@ -91,8 +91,8 @@ describe("PersistenceExceptionFilter", () => {
       error.addError(
         "name",
         new MongooseError.ValidatorError({
-          path: "name",
           message: "Path `name` is required.",
+          path: "name",
         })
       );
 

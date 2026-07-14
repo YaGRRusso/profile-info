@@ -18,54 +18,54 @@ export const DEFAULT_PDF_THEME = {
   spacing: PDF_SPACING,
   textStyles: {
     body: {
+      color: colors.body,
       font: "Helvetica",
       size: 9.5,
-      color: colors.body,
     },
     bodySmall: {
+      color: colors.body,
       font: "Helvetica",
       size: 9,
-      color: colors.body,
     },
     display: {
+      color: colors.accent,
       font: "Helvetica-Bold",
       size: 24,
-      color: colors.accent,
     },
     heading: {
+      color: colors.text,
       font: "Helvetica-Bold",
       size: 10.5,
-      color: colors.text,
     },
     label: {
+      color: colors.accentSoft,
       font: "Helvetica-Bold",
       size: 9,
-      color: colors.accentSoft,
     },
     link: {
+      color: colors.link,
       font: "Helvetica",
       size: 9,
-      color: colors.link,
     },
     meta: {
+      color: colors.muted,
       font: "Helvetica",
       size: 9,
-      color: colors.muted,
     },
     sectionTitle: {
+      color: colors.accent,
       font: "Helvetica-Bold",
       size: 11,
-      color: colors.accent,
     },
     separator: {
+      color: colors.muted,
       font: "Helvetica",
       size: 9,
-      color: colors.muted,
     },
     subtitle: {
+      color: colors.muted,
       font: "Helvetica",
       size: 12,
-      color: colors.muted,
     },
   },
 } as const satisfies PdfTheme;

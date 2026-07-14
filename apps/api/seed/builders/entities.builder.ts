@@ -37,22 +37,22 @@ export function buildCoursesForPersona(
     const globalIndex = seedOffset + index;
 
     return {
-      ownerId,
-      slug: slugFor(faker.company.catchPhrase(), globalIndex),
-      organizationId: optionalForIndex(globalIndex, () =>
-        faker.helpers.arrayElement(organizationIds)
-      ),
-      status: faker.helpers.arrayElement(STATUSES),
-      relevance: relevance(),
       hours: optionalForIndex(globalIndex + 1, () =>
-        faker.number.int({ min: 8, max: 400 })
+        faker.number.int({ max: 400, min: 8 })
       ),
-      url: optionalForIndex(globalIndex + 2, () => faker.internet.url()),
+      i18n: bilingualTitleDescription(globalIndex),
       image: optionalForIndex(globalIndex + 3, () =>
         faker.image.urlPicsumPhotos()
       ),
+      organizationId: optionalForIndex(globalIndex, () =>
+        faker.helpers.arrayElement(organizationIds)
+      ),
+      ownerId,
+      relevance: relevance(),
       skillIds: pickSkillIds(skillIds, globalIndex),
-      i18n: bilingualTitleDescription(globalIndex),
+      slug: slugFor(faker.company.catchPhrase(), globalIndex),
+      status: faker.helpers.arrayElement(STATUSES),
+      url: optionalForIndex(globalIndex + 2, () => faker.internet.url()),
     } satisfies Partial<CourseModel>;
   });
 }
@@ -68,21 +68,21 @@ export function buildEducationsForPersona(
     const globalIndex = seedOffset + index;
 
     return {
-      ownerId,
-      slug: slugFor(faker.company.catchPhrase(), globalIndex),
-      organizationId: optionalForIndex(globalIndex, () =>
-        faker.helpers.arrayElement(organizationIds)
-      ),
-      level: faker.helpers.arrayElement(EDUCATION_LEVELS),
-      status: faker.helpers.arrayElement(STATUSES),
-      relevance: relevance(),
-      skillIds: pickSkillIds(skillIds, globalIndex),
-      period: optionalForIndex(globalIndex + 1, period),
-      url: optionalForIndex(globalIndex + 2, () => faker.internet.url()),
+      i18n: bilingualTitleDescription(globalIndex),
       image: optionalForIndex(globalIndex + 3, () =>
         faker.image.urlPicsumPhotos()
       ),
-      i18n: bilingualTitleDescription(globalIndex),
+      level: faker.helpers.arrayElement(EDUCATION_LEVELS),
+      organizationId: optionalForIndex(globalIndex, () =>
+        faker.helpers.arrayElement(organizationIds)
+      ),
+      ownerId,
+      period: optionalForIndex(globalIndex + 1, period),
+      relevance: relevance(),
+      skillIds: pickSkillIds(skillIds, globalIndex),
+      slug: slugFor(faker.company.catchPhrase(), globalIndex),
+      status: faker.helpers.arrayElement(STATUSES),
+      url: optionalForIndex(globalIndex + 2, () => faker.internet.url()),
     } satisfies Partial<EducationModel>;
   });
 }
@@ -97,18 +97,18 @@ export function buildProjectsForPersona(
     const globalIndex = seedOffset + index;
 
     return {
-      ownerId,
-      slug: slugFor(faker.commerce.productName(), globalIndex),
-      relevance: relevance(),
+      i18n: bilingualTitleDescription(globalIndex),
       images: arrayBySize(pickArraySize(globalIndex), () => faker.image.url()),
+      ownerId,
+      relevance: relevance(),
       skillIds: pickSkillIds(skillIds, globalIndex),
+      slug: slugFor(faker.commerce.productName(), globalIndex),
       urls: optionalForIndex(globalIndex, () =>
         arrayBySize(pickArraySize(globalIndex + 1), () => ({
           title: faker.helpers.arrayElement(URL_TYPES),
           value: faker.internet.url(),
         }))
       ),
-      i18n: bilingualTitleDescription(globalIndex),
     } satisfies Partial<ProjectModel>;
   });
 }
@@ -122,21 +122,21 @@ export function buildExperiencesForPersona(
 ) {
   return buildMany(counts.experiences, (index) => {
     const globalIndex = seedOffset + index;
-    const roleCount = faker.number.int({ min: 1, max: 4 });
+    const roleCount = faker.number.int({ max: 4, min: 1 });
 
     return {
-      ownerId,
-      slug: slugFor(faker.person.jobTitle(), globalIndex),
+      category: faker.helpers.arrayElement(EXPERIENCE_CATEGORIES),
       organizationId: optionalForIndex(globalIndex, () =>
         faker.helpers.arrayElement(organizationIds)
       ),
-      category: faker.helpers.arrayElement(EXPERIENCE_CATEGORIES),
+      ownerId,
       relevance: relevance(),
       roles: buildMany(roleCount, (roleIndex) => ({
+        i18n: bilingualTitleDescription(globalIndex + roleIndex),
         period: optionalForIndex(globalIndex + roleIndex, period),
         skillIds: pickSkillIds(skillIds, globalIndex + roleIndex),
-        i18n: bilingualTitleDescription(globalIndex + roleIndex),
       })),
+      slug: slugFor(faker.person.jobTitle(), globalIndex),
     } satisfies Partial<ExperienceModel>;
   });
 }

@@ -8,6 +8,7 @@ import { OnUserDeletedListener } from "./listeners/on-user-deleted.listener";
 import { ApiTokenModel, ApiTokenSchema } from "./schemas/api-token.schema";
 
 @Module({
+  exports: [ApiTokensService],
   imports: [
     UsersModule,
     MongooseModule.forFeature([
@@ -20,6 +21,5 @@ import { ApiTokenModel, ApiTokenSchema } from "./schemas/api-token.schema";
     ApiTokensService,
     OnUserDeletedListener,
   ],
-  exports: [ApiTokensService],
 })
 export class ApiTokensModule {}

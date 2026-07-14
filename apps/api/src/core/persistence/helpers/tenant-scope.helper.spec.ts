@@ -11,7 +11,7 @@ import {
 
 describe("toQueryForRead", () => {
   const userId = new mongoose.Types.ObjectId().toHexString();
-  const tenant = { userId, crossTenant: false };
+  const tenant = { crossTenant: false, userId };
 
   it("should add string ownerId for tenant users", () => {
     expect(toQueryForRead(tenant)).toEqual({ ownerId: userId });
@@ -19,25 +19,25 @@ describe("toQueryForRead", () => {
 
   it("should merge extra filters for tenant users", () => {
     expect(toQueryForRead(tenant, { status: "COMPLETE" })).toEqual({
-      status: "COMPLETE",
       ownerId: userId,
+      status: "COMPLETE",
     });
   });
 
   it("should not add ownerId for cross-tenant access", () => {
     expect(
-      toQueryForRead({ userId, crossTenant: true }, { status: "COMPLETE" })
+      toQueryForRead({ crossTenant: true, userId }, { status: "COMPLETE" })
     ).toEqual({ status: "COMPLETE" });
   });
 
   it("should return an empty filter for cross-tenant access without extras", () => {
-    expect(toQueryForRead({ userId, crossTenant: true })).toEqual({});
+    expect(toQueryForRead({ crossTenant: true, userId })).toEqual({});
   });
 });
 
 describe("toQueryForMutate", () => {
   const userId = new mongoose.Types.ObjectId().toHexString();
-  const tenant = { userId, crossTenant: false };
+  const tenant = { crossTenant: false, userId };
 
   it("should delegate to toQueryForRead", () => {
     const filter = { status: "COMPLETE" };
@@ -49,7 +49,7 @@ describe("toQueryForMutate", () => {
 
 describe("toQueryForAggregate", () => {
   const userId = new mongoose.Types.ObjectId().toHexString();
-  const tenant = { userId, crossTenant: false };
+  const tenant = { crossTenant: false, userId };
 
   it("should add ObjectId ownerId for tenant users", () => {
     expect(toQueryForAggregate(tenant)).toEqual({
@@ -59,27 +59,27 @@ describe("toQueryForAggregate", () => {
 
   it("should merge extra filters for tenant users", () => {
     expect(toQueryForAggregate(tenant, { status: "COMPLETE" })).toEqual({
-      status: "COMPLETE",
       ownerId: toObjectId(userId),
+      status: "COMPLETE",
     });
   });
 
   it("should not add ownerId for cross-tenant access", () => {
     expect(
-      toQueryForAggregate({ userId, crossTenant: true }, { slug: "x" })
+      toQueryForAggregate({ crossTenant: true, userId }, { slug: "x" })
     ).toEqual({ slug: "x" });
   });
 
   it("should reject invalid userId", () => {
     expect(() =>
-      toQueryForAggregate({ userId: "invalid", crossTenant: false })
+      toQueryForAggregate({ crossTenant: false, userId: "invalid" })
     ).toThrow(BadRequestException);
   });
 });
 
 describe("toDocumentForCreate", () => {
   const userId = new mongoose.Types.ObjectId().toHexString();
-  const tenant = { userId, crossTenant: false };
+  const tenant = { crossTenant: false, userId };
 
   it("should inject ownerId and ignore input ownerId", () => {
     expect(
@@ -93,7 +93,7 @@ describe("toDocumentForCreate", () => {
   it("should reject invalid userId", () => {
     expect(() =>
       toDocumentForCreate(
-        { userId: "invalid", crossTenant: false },
+        { crossTenant: false, userId: "invalid" },
         { name: "Test" }
       )
     ).toThrow(BadRequestException);
@@ -102,7 +102,7 @@ describe("toDocumentForCreate", () => {
 
 describe("toDocumentForUpdate", () => {
   const userId = new mongoose.Types.ObjectId().toHexString();
-  const tenant = { userId, crossTenant: false };
+  const tenant = { crossTenant: false, userId };
 
   it("should return payloads unchanged", () => {
     expect(toDocumentForUpdate(tenant, { $set: { name: "Test" } })).toEqual({

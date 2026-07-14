@@ -37,23 +37,23 @@ export class CourseMapper
   toDomain(model: CourseModel): CourseEntityRecord {
     return {
       ...toBaseEntityFields(model),
-      relevance: model.relevance,
-      slug: model.slug,
-      status: model.status as CourseStatus,
-      url: model.url,
-      image: model.image,
       hours: model.hours,
-      ownerId: toIdString(model.ownerId) ?? "",
-      organizationId: toIdString(model.organizationId),
-      skillIds: toIdStrings(model.skillIds),
       i18n:
         toTranslationEntityList(model.i18n)?.map((entry) => ({
           locale: entry.locale,
           messages: {
-            title: entry.messages.title,
             description: entry.messages.description,
+            title: entry.messages.title,
           },
         })) ?? [],
+      image: model.image,
+      organizationId: toIdString(model.organizationId),
+      ownerId: toIdString(model.ownerId) ?? "",
+      relevance: model.relevance,
+      skillIds: toIdStrings(model.skillIds),
+      slug: model.slug,
+      status: model.status as CourseStatus,
+      url: model.url,
     };
   }
 

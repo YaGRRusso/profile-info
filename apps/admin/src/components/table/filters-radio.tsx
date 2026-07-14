@@ -1,7 +1,7 @@
 export const DATE_FILTER_OPTIONS = [
-  { value: "", label: "Any date" },
-  { value: "week", label: "Last 7 days" },
-  { value: "month", label: "This month" },
+  { label: "Any date", value: "" },
+  { label: "Last 7 days", value: "week" },
+  { label: "This month", value: "month" },
 ] as const;
 
 export interface FiltersRadioOption {

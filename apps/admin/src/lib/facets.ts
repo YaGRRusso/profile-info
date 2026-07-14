@@ -17,11 +17,11 @@ export function getUniqueFacets<T = string>(
 ): UniqueFacets<T>[] {
   const mapper = new Map(labels?.map(({ value, label }) => [value, label]));
   return [...map].map(([value, count]) => ({
-    value: value as T,
+    count,
     label:
       mapper.get(value as T) ??
       (isEmptyValue(value) ? EMPTY_MARKER : String(value)),
-    count,
+    value: value as T,
   }));
 }
 
@@ -29,7 +29,7 @@ export function getMinMaxFacets<T = number>(
   result: readonly [any, any] | undefined
 ): MinMaxFacets<T> {
   return {
-    min: result?.[0] as T | undefined,
     max: result?.[1] as T | undefined,
+    min: result?.[0] as T | undefined,
   };
 }

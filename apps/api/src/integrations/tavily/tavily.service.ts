@@ -34,7 +34,7 @@ export class TavilyService extends WebContentProvider {
     try {
       return await this.client.search(query, options);
     } catch (error) {
-      throw new Error(error);
+      throw new Error("Tavily search failed", { cause: error });
     }
   }
 
@@ -45,7 +45,7 @@ export class TavilyService extends WebContentProvider {
     try {
       return await this.client.crawl(url, options);
     } catch (error) {
-      throw new Error(error);
+      throw new Error("Tavily crawl failed", { cause: error });
     }
   }
 
@@ -62,7 +62,7 @@ export class TavilyService extends WebContentProvider {
       const response = await this.client.extract(urls, tavilyOptions);
       return mapTavilyExtractResponse(response);
     } catch (error) {
-      throw new Error(error);
+      throw new Error("Tavily extract failed", { cause: error });
     }
   }
 }
@@ -73,8 +73,8 @@ function mapTavilyExtractResponse(
   if (!response.results?.length) return [];
 
   return response.results.map((result) => ({
-    url: result.url,
-    title: result.title ?? undefined,
     rawContent: result.rawContent,
+    title: result.title ?? undefined,
+    url: result.url,
   }));
 }

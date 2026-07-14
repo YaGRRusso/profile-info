@@ -38,8 +38,8 @@ function toExperienceRoleRecord(
       toTranslationEntityList(model.i18n)?.map((entry) => ({
         locale: entry.locale,
         messages: {
-          title: entry.messages.title,
           description: entry.messages.description,
+          title: entry.messages.title,
         },
       })) ?? [],
     period: model.period ? toDateRangeEntity(model.period) : undefined,
@@ -70,12 +70,12 @@ export class ExperienceMapper
   toDomain(model: ExperienceModel): ExperienceEntityRecord {
     return {
       ...toBaseEntityFields(model),
-      relevance: model.relevance,
-      slug: model.slug,
-      ownerId: toIdString(model.ownerId) ?? "",
-      organizationId: toIdString(model.organizationId),
       category: model.category as ExperienceCategory,
+      organizationId: toIdString(model.organizationId),
+      ownerId: toIdString(model.ownerId) ?? "",
+      relevance: model.relevance,
       roles: model.roles.map(toExperienceRoleRecord),
+      slug: model.slug,
     };
   }
 

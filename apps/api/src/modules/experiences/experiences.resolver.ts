@@ -46,8 +46,8 @@ export class ExperiencesResolver {
   findOneExperience(
     @Auth() ctx: AuthContext,
     @Args("experienceFilters", {
-      type: () => FilterExperienceInput,
       nullable: true,
+      type: () => FilterExperienceInput,
     })
     experienceFilters?: FilterExperienceInput
   ) {
@@ -68,26 +68,26 @@ export class ExperiencesResolver {
   findManyExperiences(
     @Auth() ctx: AuthContext,
     @Args("experienceFilters", {
-      type: () => FilterExperienceInput,
       nullable: true,
+      type: () => FilterExperienceInput,
     })
     experienceFilters?: FilterExperienceInput,
     @Args("experiencePagination", {
-      type: () => PaginationInput,
       nullable: true,
+      type: () => PaginationInput,
     })
     experiencePagination?: PaginationInput,
     @Args("experienceSort", {
-      type: () => SortExperienceInput,
       nullable: true,
+      type: () => SortExperienceInput,
     })
     experienceSort?: SortExperienceInput
   ) {
     return this.experiencesService.findMany(ctx, {
       filters: experienceFilters,
-      sort: experienceSort,
       limit: experiencePagination?.limit,
       skip: experiencePagination?.skip,
+      sort: experienceSort,
     });
   }
 

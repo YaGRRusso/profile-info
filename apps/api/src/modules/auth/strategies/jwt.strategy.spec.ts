@@ -11,19 +11,19 @@ import { JwtStrategy } from "./jwt.strategy";
 const userId = "507f1f77bcf86cd799439011";
 
 const mockUser = {
+  disabled: false,
+  email: "alice@example.com",
+  i18n: [],
   id: userId,
   name: "Alice",
   nickname: "alice",
-  email: "alice@example.com",
   role: UserRole.USER,
-  disabled: false,
-  i18n: [],
   urls: [],
 };
 
 const mockPayload = {
-  sub: userId,
   role: UserRole.USER,
+  sub: userId,
 };
 
 const mockUsersService: Partial<jest.Mocked<UsersService>> = {

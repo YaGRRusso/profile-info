@@ -10,26 +10,26 @@ import { UserModel } from "@/modules/users/schemas/user.schema";
 
 @Schema({ _id: false })
 export class SkillMessagesModel {
-  @Prop({ type: String, required: true })
+  @Prop({ required: true, type: String })
   title: string;
 }
 
 @Schema({ timestamps: true })
 export class SkillModel extends BaseModel {
-  @Prop({ type: Boolean, required: true, default: false, index: true })
+  @Prop({ default: false, index: true, required: true, type: Boolean })
   disabled: boolean;
 
   @Prop({
-    type: String,
-    required: true,
-    enum: CatalogPartition,
     default: CatalogPartition.GLOBAL,
+    enum: CatalogPartition,
+    required: true,
+    type: String,
   })
   partition: CatalogPartition;
 
   @Prop({
-    type: mongoose.Schema.Types.ObjectId,
     ref: UserModel.name,
+    type: mongoose.Schema.Types.ObjectId,
   })
   ownerId?: mongoose.Types.ObjectId | string;
 
@@ -40,8 +40,8 @@ export class SkillModel extends BaseModel {
   category?: string;
 
   @Prop({
-    type: [createTranslationModel(SkillMessagesModel)],
     required: true,
+    type: [createTranslationModel(SkillMessagesModel)],
   })
   i18n: TranslationModel<SkillMessagesModel>[];
 }
@@ -49,6 +49,6 @@ export class SkillModel extends BaseModel {
 export const SkillSchema = SchemaFactory.createForClass(SkillModel);
 
 SkillSchema.index(
-  { partition: 1, ownerId: 1, slug: 1 },
-  { unique: true, sparse: true }
+  { ownerId: 1, partition: 1, slug: 1 },
+  { sparse: true, unique: true }
 );

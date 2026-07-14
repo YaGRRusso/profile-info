@@ -169,19 +169,19 @@ function RouteComponent() {
       <PageTitle
         actions={[
           {
+            className: "btn-ghost btn-square",
+            disabled: findManyApiTokens.isFetching,
             icon: (
               <ArrowsClockwiseIcon
                 className={cn(findManyApiTokens.isFetching && "animate-spin")}
               />
             ),
-            className: "btn-ghost btn-square",
             onClick: () => findManyApiTokens.refetch(),
-            disabled: findManyApiTokens.isFetching,
           },
           {
+            className: "btn-soft",
             icon: <PlusIcon />,
             label: tPage("apiTokens.newButton"),
-            className: "btn-soft",
             onClick: () => setFormValues({ state: "CREATING" }),
           },
         ]}
@@ -211,14 +211,14 @@ function RouteComponent() {
       <Modal
         actions={[
           {
-            label: tAction("close"),
             className: "btn-ghost",
+            label: tAction("close"),
             onClick: () => setCreatedToken(undefined),
           },
           {
-            label: tAction("copyToken"),
             className: "btn-soft btn-primary",
             icon: <CopyIcon />,
+            label: tAction("copyToken"),
             onClick: () => copyCreatedToken(),
           },
         ]}
@@ -269,8 +269,8 @@ function RouteComponent() {
       <Modal
         actions={[
           {
-            label: tAction("close"),
             className: "btn-ghost",
+            label: tAction("close"),
             onClick: () => setFormValues(undefined),
           },
         ]}
@@ -290,15 +290,15 @@ function RouteComponent() {
       <Modal
         actions={[
           {
-            label: tAction("cancel"),
             className: "btn-ghost",
+            label: tAction("cancel"),
             onClick: () => setFormValues(undefined),
           },
           {
-            label: tAction("confirm"),
             className: "btn-soft btn-error",
             disabled:
               removeOneApiToken.isPending || removeManyApiTokens.isPending,
+            label: tAction("confirm"),
             onClick: () => handleDelete(),
           },
         ]}
@@ -341,39 +341,39 @@ function RouteComponent() {
             data={findManyApiTokens.data?.nodes ?? []}
             onDelete={(token) =>
               setFormValues({
-                state: "DELETING",
                 customValues: [token],
+                state: "DELETING",
               })
             }
             onEdit={(token) =>
               setFormValues({
+                customValues: [token],
                 defaultValues: apiTokenToForm(token),
                 state: "UPDATING",
-                customValues: [token],
               })
             }
             onMultiDelete={(tokens) =>
               setFormValues({
-                state: "MULTI_DELETING",
                 customValues: tokens,
+                state: "MULTI_DELETING",
               })
             }
             onMultiEdit={(tokens) =>
               setFormValues({
-                state: "MULTI_UPDATING",
                 customValues: tokens,
+                state: "MULTI_UPDATING",
               })
             }
             onMultiView={(tokens) =>
               setFormValues({
-                state: "MULTI_READING",
                 customValues: tokens,
+                state: "MULTI_READING",
               })
             }
             onView={(token) =>
               setFormValues({
-                state: "READING",
                 customValues: [token],
+                state: "READING",
               })
             }
           />

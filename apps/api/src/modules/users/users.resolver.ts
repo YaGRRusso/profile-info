@@ -42,8 +42,8 @@ export class UsersResolver {
   @Query(() => UserEntity)
   findOneUser(
     @Args("userFilters", {
-      type: () => FilterUserInput,
       nullable: true,
+      type: () => FilterUserInput,
     })
     userFilters?: FilterUserInput
   ) {
@@ -59,26 +59,26 @@ export class UsersResolver {
   @Query(() => PaginatedUserEntity)
   findManyUsers(
     @Args("userFilters", {
-      type: () => FilterUserInput,
       nullable: true,
+      type: () => FilterUserInput,
     })
     userFilters?: FilterUserInput,
     @Args("userPagination", {
-      type: () => PaginationInput,
       nullable: true,
+      type: () => PaginationInput,
     })
     userPagination?: PaginationInput,
     @Args("userSort", {
-      type: () => SortUserInput,
       nullable: true,
+      type: () => SortUserInput,
     })
     userSort?: SortUserInput
   ) {
     return this.usersService.findMany({
       filters: userFilters,
-      sort: userSort,
       limit: userPagination?.limit,
       skip: userPagination?.skip,
+      sort: userSort,
     });
   }
 

@@ -1,9 +1,9 @@
 export const DomainEvents = {
-  skill: {
-    deleted: "skill.deleted",
-  },
   organization: {
     deleted: "organization.deleted",
+  },
+  skill: {
+    deleted: "skill.deleted",
   },
   user: {
     deleted: "user.deleted",

@@ -17,11 +17,11 @@ export function renderHeader(
   ctx.text("display", header.name);
 
   ctx.accentBar({
-    fromX: headerLeft,
-    y: ctx.document.y + 4,
-    length: 72,
     color: colors.accentSoft,
+    fromX: headerLeft,
+    length: 72,
     width: 2,
+    y: ctx.document.y + 4,
   });
 
   ctx.gap("lg");

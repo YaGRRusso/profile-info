@@ -61,12 +61,12 @@ function RouteComponent() {
                     );
                     toast.success(tAlert("profileUpdateSuccess"));
                     setUser({
-                      id: updated.updateMe.id,
+                      avatar: updated.updateMe.avatar,
                       email: updated.updateMe.email,
+                      id: updated.updateMe.id,
                       name: updated.updateMe.name,
                       nickname: updated.updateMe.nickname,
                       role: updated.updateMe.role,
-                      avatar: updated.updateMe.avatar,
                     });
                     setFormKey((key) => key + 1);
                   }}

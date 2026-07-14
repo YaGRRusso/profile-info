@@ -20,27 +20,27 @@ const secret = "secret-value-32-chars-min!!";
 const apiKey = `pi_${tokenId}_${secret}`;
 
 const mockUser = {
+  disabled: false,
+  email: "alice@example.com",
+  i18n: [],
   id: ownerId,
   name: "Alice",
   nickname: "alice",
-  email: "alice@example.com",
   role: UserRole.USER,
-  disabled: false,
-  i18n: [],
   urls: [],
 };
 
 const mockTokenRecord = {
-  id: tokenId,
-  ownerId,
-  name: "dev-token",
   hashedSecret: "hashed-secret",
+  id: tokenId,
+  name: "dev-token",
+  ownerId,
   permissions: [ApiTokenPermission.QUERY],
 };
 
 const mockApiTokensService: Partial<jest.Mocked<ApiTokensService>> = {
-  parseApiToken: jest.fn(),
   findOneByIdWithHashedSecret: jest.fn(),
+  parseApiToken: jest.fn(),
 };
 
 const mockUsersService: Partial<jest.Mocked<UsersService>> = {
@@ -53,8 +53,8 @@ const mockUsersValidator: Partial<jest.Mocked<UsersValidatorService>> = {
 
 function mockValidTokenLookup() {
   (mockApiTokensService.parseApiToken as jest.Mock).mockReturnValue({
-    tokenId,
     secret,
+    tokenId,
   });
   (
     mockApiTokensService.findOneByIdWithHashedSecret as jest.Mock
@@ -121,8 +121,8 @@ describe("ApiTokenStrategy", () => {
 
     it("throws UnauthorizedException when findOneByIdWithHashedSecret resolves with a falsy token", async () => {
       (mockApiTokensService.parseApiToken as jest.Mock).mockReturnValue({
-        tokenId,
         secret,
+        tokenId,
       });
       (
         mockApiTokensService.findOneByIdWithHashedSecret as jest.Mock
@@ -135,8 +135,8 @@ describe("ApiTokenStrategy", () => {
 
     it("propagates NotFoundException when findOneByIdWithHashedSecret rejects (repository behavior)", async () => {
       (mockApiTokensService.parseApiToken as jest.Mock).mockReturnValue({
-        tokenId,
         secret,
+        tokenId,
       });
       (
         mockApiTokensService.findOneByIdWithHashedSecret as jest.Mock
@@ -152,8 +152,8 @@ describe("ApiTokenStrategy", () => {
 
     it("throws UnauthorizedException when the token is expired", async () => {
       (mockApiTokensService.parseApiToken as jest.Mock).mockReturnValue({
-        tokenId,
         secret,
+        tokenId,
       });
       (
         mockApiTokensService.findOneByIdWithHashedSecret as jest.Mock
@@ -169,8 +169,8 @@ describe("ApiTokenStrategy", () => {
 
     it("throws UnauthorizedException when the secret does not match", async () => {
       (mockApiTokensService.parseApiToken as jest.Mock).mockReturnValue({
-        tokenId,
         secret,
+        tokenId,
       });
       (
         mockApiTokensService.findOneByIdWithHashedSecret as jest.Mock

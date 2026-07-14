@@ -15,8 +15,8 @@ import { FormError } from "@/lib/form-errors";
 import { CommonFormProps } from "./common";
 
 const courseMultiSchema = z.object({
-  status: z.enum(CourseStatus),
   relevance: z.number().min(1, FormError.minValue),
+  status: z.enum(CourseStatus),
 });
 
 export type CourseMultiSchema = z.infer<typeof courseMultiSchema>;
@@ -42,8 +42,8 @@ export function CourseMultiForm({
 
   const form = useForm({
     defaultValues: {
-      status: CourseStatus.Complete,
       relevance: 1,
+      status: CourseStatus.Complete,
     },
     onSubmit: ({ value }) => {
       const updateCourseInput: UpdateCourseInput = {};

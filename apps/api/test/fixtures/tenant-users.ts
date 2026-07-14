@@ -14,16 +14,18 @@ export async function createTenantUsers(
   usersService: UsersService,
   keys: readonly PersonaKey[] = DEFAULT_TENANT_KEYS
 ) {
-  for (const key of keys) {
-    const persona = PERSONAS[key];
-    await usersService.createOne(testSuperAdminContext(), {
-      name: persona.name,
-      nickname: persona.nickname,
-      email: persona.email,
-      password: DEV_PASSWORD,
-      role: persona.role ?? UserRole.USER,
-    });
-  }
+  await Promise.all(
+    keys.map(async (key) => {
+      const persona = PERSONAS[key];
+      await usersService.createOne(testSuperAdminContext(), {
+        email: persona.email,
+        name: persona.name,
+        nickname: persona.nickname,
+        password: DEV_PASSWORD,
+        role: persona.role ?? UserRole.USER,
+      });
+    })
+  );
 }
 
 export { DEFAULT_TENANT_KEYS };

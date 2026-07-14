@@ -8,9 +8,9 @@ import { FormError } from "@/lib/form-errors";
 import { CommonFormProps } from "./common";
 
 const signUpSchema = z.object({
+  email: z.email(FormError.invalidFormat),
   name: z.string().min(1, FormError.requiredField),
   nickname: z.string().min(1, FormError.requiredField),
-  email: z.email(FormError.invalidFormat),
   password: z
     .string()
     .min(1, FormError.requiredField)
@@ -31,9 +31,9 @@ export function SignUpForm({
 
   const form = useForm({
     defaultValues: {
+      email: "",
       name: "",
       nickname: "",
-      email: "",
       password: "",
       ...defaultValues,
     },

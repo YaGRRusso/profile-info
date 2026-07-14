@@ -10,9 +10,9 @@ export function testAuthContext(
   overrides: Partial<SessionAuthContext> = {}
 ): SessionAuthContext {
   return {
+    credentialKind: CredentialKind.SESSION,
     id: "507f1f77bcf86cd799439011",
     role: UserRole.USER,
-    credentialKind: CredentialKind.SESSION,
     ...overrides,
   };
 }
@@ -28,10 +28,10 @@ export function testApiTokenAuthContext(
   overrides: Partial<Omit<ApiTokenAuthContext, "permissions">> = {}
 ): ApiTokenAuthContext {
   return {
-    id: "507f1f77bcf86cd799439011",
-    role: UserRole.USER,
     credentialKind: CredentialKind.API_TOKEN,
+    id: "507f1f77bcf86cd799439011",
     permissions,
+    role: UserRole.USER,
     ...overrides,
   };
 }

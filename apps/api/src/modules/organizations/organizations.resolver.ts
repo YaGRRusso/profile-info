@@ -43,8 +43,8 @@ export class OrganizationsResolver {
   findOneOrganization(
     @Auth() ctx: AuthContext,
     @Args("organizationFilters", {
-      type: () => FilterOrganizationInput,
       nullable: true,
+      type: () => FilterOrganizationInput,
     })
     organizationFilters?: FilterOrganizationInput
   ) {
@@ -57,8 +57,8 @@ export class OrganizationsResolver {
   findOneActiveOrganization(
     @Auth() ctx: AuthContext,
     @Args("organizationFilters", {
-      type: () => FilterOrganizationInput,
       nullable: true,
+      type: () => FilterOrganizationInput,
     })
     organizationFilters?: FilterOrganizationInput
   ) {
@@ -79,26 +79,26 @@ export class OrganizationsResolver {
   findManyOrganizations(
     @Auth() ctx: AuthContext,
     @Args("organizationFilters", {
-      type: () => FilterOrganizationInput,
       nullable: true,
+      type: () => FilterOrganizationInput,
     })
     organizationFilters?: FilterOrganizationInput,
     @Args("organizationPagination", {
-      type: () => PaginationInput,
       nullable: true,
+      type: () => PaginationInput,
     })
     organizationPagination?: PaginationInput,
     @Args("organizationSort", {
-      type: () => SortOrganizationInput,
       nullable: true,
+      type: () => SortOrganizationInput,
     })
     organizationSort?: SortOrganizationInput
   ) {
     return this.organizationsService.findMany(ctx, {
       filters: organizationFilters,
-      sort: organizationSort,
       limit: organizationPagination?.limit,
       skip: organizationPagination?.skip,
+      sort: organizationSort,
     });
   }
 
@@ -106,26 +106,26 @@ export class OrganizationsResolver {
   findManyActiveOrganizations(
     @Auth() ctx: AuthContext,
     @Args("organizationFilters", {
-      type: () => FilterOrganizationInput,
       nullable: true,
+      type: () => FilterOrganizationInput,
     })
     organizationFilters?: FilterOrganizationInput,
     @Args("organizationPagination", {
-      type: () => PaginationInput,
       nullable: true,
+      type: () => PaginationInput,
     })
     organizationPagination?: PaginationInput,
     @Args("organizationSort", {
-      type: () => SortOrganizationInput,
       nullable: true,
+      type: () => SortOrganizationInput,
     })
     organizationSort?: SortOrganizationInput
   ) {
     return this.organizationsService.findManyActive(ctx, {
       filters: organizationFilters,
-      sort: organizationSort,
       limit: organizationPagination?.limit,
       skip: organizationPagination?.skip,
+      sort: organizationSort,
     });
   }
 

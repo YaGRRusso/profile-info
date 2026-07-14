@@ -51,7 +51,9 @@ export function useFindManyUsers(
   options?: { enabled?: boolean }
 ) {
   return useInfiniteQuery({
-    queryKey: ["findManyUsers", variables],
+    getNextPageParam:
+      paginatedNextPageParam<FindManyUsersQuery>("findManyUsers"),
+    initialPageParam: 0,
     queryFn: ({ pageParam }) =>
       execute(
         findManyUsers,
@@ -61,9 +63,7 @@ export function useFindManyUsers(
           variables
         )
       ),
-    initialPageParam: 0,
-    getNextPageParam:
-      paginatedNextPageParam<FindManyUsersQuery>("findManyUsers"),
+    queryKey: ["findManyUsers", variables],
     select: paginatedSelect<FindManyUsersQuery>("findManyUsers"),
     ...options,
   });

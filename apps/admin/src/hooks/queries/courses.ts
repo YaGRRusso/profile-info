@@ -82,7 +82,9 @@ export function useFindManyCourses(
   options?: { enabled?: boolean }
 ) {
   return useInfiniteQuery({
-    queryKey: ["findManyCourses", variables],
+    getNextPageParam:
+      paginatedNextPageParam<FindManyCoursesQuery>("findManyCourses"),
+    initialPageParam: 0,
     queryFn: ({ pageParam }) =>
       execute(
         findManyCourses,
@@ -92,9 +94,7 @@ export function useFindManyCourses(
           variables
         )
       ),
-    initialPageParam: 0,
-    getNextPageParam:
-      paginatedNextPageParam<FindManyCoursesQuery>("findManyCourses"),
+    queryKey: ["findManyCourses", variables],
     select: paginatedSelect<FindManyCoursesQuery>("findManyCourses"),
     ...options,
   });

@@ -7,7 +7,7 @@ export type PdfRenderCallback = (document: PDFKit.PDFDocument) => void;
 export class PdfRenderService {
   render(
     draw: PdfRenderCallback,
-    options: PDFKit.PDFDocumentOptions = { size: "A4", margin: 50 }
+    options: PDFKit.PDFDocumentOptions = { margin: 50, size: "A4" }
   ): Promise<Buffer> {
     return new Promise((resolve, reject) => {
       const pdf = new PDFDocument(options);

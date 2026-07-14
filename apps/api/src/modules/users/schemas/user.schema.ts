@@ -22,19 +22,19 @@ export class UserModel extends BaseModel {
   @Prop({ type: String })
   avatar?: string;
 
-  @Prop({ type: String, required: true })
+  @Prop({ required: true, type: String })
   name: string;
 
-  @Prop({ type: String, required: true, unique: true })
+  @Prop({ required: true, type: String, unique: true })
   nickname: string;
 
   @Prop({ type: String })
   phone?: string;
 
-  @Prop({ type: String, required: true, unique: true })
+  @Prop({ required: true, type: String, unique: true })
   email: string;
 
-  @Prop({ type: String, required: true, select: false })
+  @Prop({ required: true, select: false, type: String })
   password: string;
 
   @Prop({ type: Date })
@@ -46,17 +46,17 @@ export class UserModel extends BaseModel {
   @Prop({ type: [createTranslationModel(UserMessagesModel)] })
   i18n?: TranslationModel<UserMessagesModel>[];
 
-  @Prop({ type: Boolean, required: true, default: false, index: true })
+  @Prop({ default: false, index: true, required: true, type: Boolean })
   disabled: boolean;
 
-  @Prop({ type: String, enum: UserRole, default: UserRole.USER })
+  @Prop({ default: UserRole.USER, enum: UserRole, type: String })
   role?: UserRole;
 
   @Prop({ type: [{ type: SchemaFactory.createForClass(UrlModel) }] })
   urls?: UrlModel[];
 
   @Prop({
-    type: [{ type: mongoose.Schema.Types.ObjectId, ref: "SkillModel" }],
+    type: [{ ref: "SkillModel", type: mongoose.Schema.Types.ObjectId }],
   })
   skillIds?: (mongoose.Types.ObjectId | string)[];
 }

@@ -18,7 +18,7 @@ describe("OrganizationsValidatorService", () => {
     organizationsService = {
       findManyActiveById: jest
         .fn()
-        .mockResolvedValue([{ id: organizationId, disabled: false }]),
+        .mockResolvedValue([{ disabled: false, id: organizationId }]),
     };
 
     const module: TestingModule = await Test.createTestingModule({

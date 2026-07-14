@@ -90,8 +90,8 @@ function RouteComponent() {
     if (formValues?.state === "UPDATING") {
       updateOneUser.mutate(
         {
-          userId: selectedUserIds[0],
           updateUserInput: userToUpdateInput(data),
+          userId: selectedUserIds[0],
         },
         { onSuccess: () => onSuccess("updated") }
       );
@@ -175,19 +175,19 @@ function RouteComponent() {
       <PageTitle
         actions={[
           {
+            className: "btn-ghost btn-square",
+            disabled: findManyUsers.isFetching,
             icon: (
               <ArrowsClockwiseIcon
                 className={cn(findManyUsers.isFetching && "animate-spin")}
               />
             ),
-            className: "btn-ghost btn-square",
             onClick: () => findManyUsers.refetch(),
-            disabled: findManyUsers.isFetching,
           },
           {
+            className: "btn-soft",
             icon: <PlusIcon />,
             label: tPage("users.newButton"),
-            className: "btn-soft",
             onClick: () => setFormValues({ state: "CREATING" }),
           },
         ]}
@@ -225,7 +225,7 @@ function RouteComponent() {
           onCancel={closeForm}
           onSubmit={(updateUserInput) =>
             updateManyUsers.mutate(
-              { userIds: selectedUserIds, updateUserInput },
+              { updateUserInput, userIds: selectedUserIds },
               {
                 onSuccess: (data) => {
                   closeForm();
@@ -244,8 +244,8 @@ function RouteComponent() {
       <Modal
         actions={[
           {
-            label: tAction("close"),
             className: "btn-ghost",
+            label: tAction("close"),
             onClick: closeForm,
           },
         ]}
@@ -264,14 +264,14 @@ function RouteComponent() {
       <Modal
         actions={[
           {
-            label: tAction("cancel"),
             className: "btn-ghost",
+            label: tAction("cancel"),
             onClick: closeForm,
           },
           {
-            label: tAction("confirm"),
             className: "btn-soft btn-success",
             disabled: enableOneUser.isPending || enableManyUsers.isPending,
+            label: tAction("confirm"),
             onClick: () => handleLifecycle("enable"),
           },
         ]}
@@ -288,14 +288,14 @@ function RouteComponent() {
       <Modal
         actions={[
           {
-            label: tAction("cancel"),
             className: "btn-ghost",
+            label: tAction("cancel"),
             onClick: closeForm,
           },
           {
-            label: tAction("confirm"),
             className: "btn-soft btn-error",
             disabled: disableOneUser.isPending || disableManyUsers.isPending,
+            label: tAction("confirm"),
             onClick: () => handleLifecycle("disable"),
           },
         ]}
@@ -312,14 +312,14 @@ function RouteComponent() {
       <Modal
         actions={[
           {
-            label: tAction("cancel"),
             className: "btn-ghost",
+            label: tAction("cancel"),
             onClick: closeForm,
           },
           {
-            label: tAction("confirm"),
             className: "btn-soft btn-error",
             disabled: removeOneUser.isPending || removeManyUsers.isPending,
+            label: tAction("confirm"),
             onClick: () => handleLifecycle("remove"),
           },
         ]}
@@ -352,38 +352,38 @@ function RouteComponent() {
           <UsersTable
             data={findManyUsers.data?.nodes ?? []}
             onDisable={(user) =>
-              setFormValues({ state: "DISABLING", customValues: [user] })
+              setFormValues({ customValues: [user], state: "DISABLING" })
             }
             onEdit={(user) =>
               setFormValues({
-                state: "UPDATING",
-                defaultValues: userToForm(user),
                 customValues: [user],
+                defaultValues: userToForm(user),
+                state: "UPDATING",
               })
             }
             onEnable={(user) =>
-              setFormValues({ state: "ENABLING", customValues: [user] })
+              setFormValues({ customValues: [user], state: "ENABLING" })
             }
             onMultiDisable={(users) =>
-              setFormValues({ state: "MULTI_DISABLING", customValues: users })
+              setFormValues({ customValues: users, state: "MULTI_DISABLING" })
             }
             onMultiEdit={(users) =>
-              setFormValues({ state: "MULTI_UPDATING", customValues: users })
+              setFormValues({ customValues: users, state: "MULTI_UPDATING" })
             }
             onMultiEnable={(users) =>
-              setFormValues({ state: "MULTI_ENABLING", customValues: users })
+              setFormValues({ customValues: users, state: "MULTI_ENABLING" })
             }
             onMultiRemove={(users) =>
-              setFormValues({ state: "MULTI_DELETING", customValues: users })
+              setFormValues({ customValues: users, state: "MULTI_DELETING" })
             }
             onMultiView={(users) =>
-              setFormValues({ state: "MULTI_READING", customValues: users })
+              setFormValues({ customValues: users, state: "MULTI_READING" })
             }
             onRemove={(user) =>
-              setFormValues({ state: "DELETING", customValues: [user] })
+              setFormValues({ customValues: [user], state: "DELETING" })
             }
             onView={(user) =>
-              setFormValues({ state: "READING", customValues: [user] })
+              setFormValues({ customValues: [user], state: "READING" })
             }
           />
         </DataState.Content>

@@ -141,7 +141,7 @@ describe("My feature (e2e)", () => {
 
   beforeAll(async () => {
     const testApp = await createTestApp();
-    app = testApp.app;
+    ({ app } = testApp);
     await clearTestDatabase(testApp.module); // optional: empty DB for this suite
     // seed data, obtain tokens, …
   });

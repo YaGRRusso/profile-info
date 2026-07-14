@@ -7,17 +7,17 @@ import {
 export function validationConfig(app: INestApplication) {
   app.useGlobalPipes(
     new ValidationPipe({
-      whitelist: true,
-      transform: true,
-      stopAtFirstError: true,
       exceptionFactory: (errors) => {
-        const first = errors[0];
+        const [first] = errors;
         const constraints = first.constraints
           ? Object.values(first.constraints)
           : ["Validation failed"];
 
         return new BadRequestException(constraints[0]);
       },
+      stopAtFirstError: true,
+      transform: true,
+      whitelist: true,
     })
   );
 }

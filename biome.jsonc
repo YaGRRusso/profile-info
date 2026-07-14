@@ -41,7 +41,8 @@
       "suspicious": {
         "noExplicitAny": "warn",
         "noArrayIndexKey": "off",
-        "noUnnecessaryConditions": "off"
+        "noUnnecessaryConditions": "off",
+        "noShadow": "off"
       },
       "performance": {
         "noJsxPropsBind": "off"

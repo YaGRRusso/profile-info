@@ -55,9 +55,8 @@ const REMOVE_ONE_EXPERIENCE = `
 
 function buildExperienceInput(slug: string, organizationId: string) {
   return {
-    slug,
-    organizationId,
     category: ExperienceCategory.FULL_TIME,
+    organizationId,
     relevance: 1,
     roles: [
       {
@@ -65,13 +64,14 @@ function buildExperienceInput(slug: string, organizationId: string) {
           {
             locale: "en",
             messages: {
-              title: "Engineer",
               description: "Built APIs",
+              title: "Engineer",
             },
           },
         ],
       },
     ],
+    slug,
   };
 }
 
@@ -86,32 +86,32 @@ describe("Experiences tenant isolation (e2e)", () => {
 
   beforeAll(async () => {
     const testApp = await createTestApp();
-    app = testApp.app;
+    ({ app } = testApp);
     await clearTestDatabase(testApp.module);
 
     usersService = testApp.module.get(UsersService);
     organizationsService = testApp.module.get(OrganizationsService);
 
     await usersService.createOne(testSuperAdminContext(), {
+      email: "joao@profile.info",
       name: "João",
       nickname: "joao",
-      email: "joao@profile.info",
       password: "123123",
       role: UserRole.USER,
     });
 
     await usersService.createOne(testSuperAdminContext(), {
+      email: "maria@profile.info",
       name: "Maria",
       nickname: "maria",
-      email: "maria@profile.info",
       password: "123123",
       role: UserRole.USER,
     });
 
     await usersService.createOne(testSuperAdminContext(), {
+      email: "admin@profile.info",
       name: "Admin",
       nickname: "admin",
-      email: "admin@profile.info",
       password: "123123",
       role: UserRole.SUPER_ADMIN,
     });
@@ -119,12 +119,12 @@ describe("Experiences tenant isolation (e2e)", () => {
     const organization = await organizationsService.createOne(
       testSuperAdminContext(),
       {
-        slug: "experience-org",
-        name: "Experience Org",
-        website: "https://experience.example",
-        logo: "https://experience.example/logo.png",
         category: OrganizationCategory.COMPANY,
         i18n: [{ locale: "en", messages: { description: "Org" } }],
+        logo: "https://experience.example/logo.png",
+        name: "Experience Org",
+        slug: "experience-org",
+        website: "https://experience.example",
       }
     );
     organizationId = organization.id;
@@ -164,13 +164,13 @@ describe("Experiences tenant isolation (e2e)", () => {
       createOneExperience: { id: string; slug: string };
     }>(app, {
       query: CREATE_ONE_EXPERIENCE,
+      token: userAToken,
       variables: {
         createExperienceInput: buildExperienceInput(
           "alice-engineer",
           organizationId
         ),
       },
-      token: userAToken,
     });
 
     expect(response.errors).toBeUndefined();
@@ -180,13 +180,13 @@ describe("Experiences tenant isolation (e2e)", () => {
   it("should reject create with an invalid organizationId", async () => {
     const response = await graphqlRequest(app, {
       query: CREATE_ONE_EXPERIENCE,
+      token: userAToken,
       variables: {
         createExperienceInput: buildExperienceInput(
           "invalid-org-experience",
           INVALID_OBJECT_ID
         ),
       },
-      token: userAToken,
     });
 
     expect(response.errors?.length).toBeGreaterThan(0);
@@ -196,6 +196,7 @@ describe("Experiences tenant isolation (e2e)", () => {
   it("should reject create with invalid skillIds in roles", async () => {
     const response = await graphqlRequest(app, {
       query: CREATE_ONE_EXPERIENCE,
+      token: userAToken,
       variables: {
         createExperienceInput: {
           ...buildExperienceInput("invalid-skills-experience", organizationId),
@@ -205,8 +206,8 @@ describe("Experiences tenant isolation (e2e)", () => {
                 {
                   locale: "en",
                   messages: {
-                    title: "Engineer",
                     description: "Built APIs",
+                    title: "Engineer",
                   },
                 },
               ],
@@ -215,7 +216,6 @@ describe("Experiences tenant isolation (e2e)", () => {
           ],
         },
       },
-      token: userAToken,
     });
 
     expect(response.errors?.length).toBeGreaterThan(0);
@@ -225,13 +225,13 @@ describe("Experiences tenant isolation (e2e)", () => {
   it("should reject create with unknown organizationId", async () => {
     const response = await graphqlRequest(app, {
       query: CREATE_ONE_EXPERIENCE,
+      token: userAToken,
       variables: {
         createExperienceInput: buildExperienceInput(
           "unknown-org-experience",
           UNKNOWN_CATALOG_ID
         ),
       },
-      token: userAToken,
     });
 
     expect(response.errors?.length).toBeGreaterThan(0);
@@ -242,6 +242,7 @@ describe("Experiences tenant isolation (e2e)", () => {
   it("should reject create with unknown skillIds in roles", async () => {
     const response = await graphqlRequest(app, {
       query: CREATE_ONE_EXPERIENCE,
+      token: userAToken,
       variables: {
         createExperienceInput: {
           ...buildExperienceInput("unknown-skills-experience", organizationId),
@@ -251,8 +252,8 @@ describe("Experiences tenant isolation (e2e)", () => {
                 {
                   locale: "en",
                   messages: {
-                    title: "Engineer",
                     description: "Built APIs",
+                    title: "Engineer",
                   },
                 },
               ],
@@ -261,7 +262,6 @@ describe("Experiences tenant isolation (e2e)", () => {
           ],
         },
       },
-      token: userAToken,
     });
 
     expect(response.errors?.length).toBeGreaterThan(0);
@@ -298,8 +298,8 @@ describe("Experiences tenant isolation (e2e)", () => {
 
     const response = await graphqlRequest(app, {
       query: FIND_ONE_EXPERIENCE_BY_ID,
-      variables: { experienceId },
       token: userBToken,
+      variables: { experienceId },
     });
 
     expect(response.errors?.[0]?.message).toContain("Not Found");
@@ -320,8 +320,8 @@ describe("Experiences tenant isolation (e2e)", () => {
 
     const response = await graphqlRequest(app, {
       query: REMOVE_ONE_EXPERIENCE,
-      variables: { experienceId },
       token: userBToken,
+      variables: { experienceId },
     });
 
     expect(response.errors?.[0]?.message).toContain("Not Removed");
@@ -342,8 +342,8 @@ describe("Experiences tenant isolation (e2e)", () => {
       findOneExperienceById: { id: string; slug: string };
     }>(app, {
       query: FIND_ONE_EXPERIENCE_BY_ID,
-      variables: { experienceId: experience!.id },
       token: adminToken,
+      variables: { experienceId: experience!.id },
     });
 
     expect(response.errors).toBeUndefined();
@@ -355,13 +355,13 @@ describe("Experiences tenant isolation (e2e)", () => {
       createOneExperience: { id: string; slug: string };
     }>(app, {
       query: CREATE_ONE_EXPERIENCE,
+      token: userBToken,
       variables: {
         createExperienceInput: buildExperienceInput(
           "alice-engineer",
           organizationId
         ),
       },
-      token: userBToken,
     });
 
     expect(response.errors).toBeUndefined();

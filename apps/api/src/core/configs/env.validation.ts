@@ -3,16 +3,15 @@ import { parseCommaSeparatedList } from "@/common/helpers/parse-comma-separated-
 
 export const envSchema = z.object({
   DATABASE_URL: z.string().min(1),
-  JWT_SECRET: z.string().min(1),
-  HOST: z.string().default("0.0.0.0"),
-  PORT: z.coerce.number().default(8080),
-  NODE_ENV: z
-    .enum(["development", "production", "test"])
-    .default("development"),
+  GITHUB_API_KEY: z.string().min(1),
   GRAPHQL_INTROSPECTION: z
     .enum(["true", "false"])
     .transform((value) => value === "true"),
-  OPENROUTER_API_KEY: z.string().min(1),
+  HOST: z.string().default("0.0.0.0"),
+  JWT_SECRET: z.string().min(1),
+  NODE_ENV: z
+    .enum(["development", "production", "test"])
+    .default("development"),
   OPENROUTER_AI_MODELS: z
     .string()
     .min(1)
@@ -20,7 +19,8 @@ export const envSchema = z.object({
     .refine((models) => models.length > 0, {
       message: "At least one model is required",
     }),
-  GITHUB_API_KEY: z.string().min(1),
+  OPENROUTER_API_KEY: z.string().min(1),
+  PORT: z.coerce.number().default(8080),
   TAVILY_API_KEY: z.string().min(1),
 });
 

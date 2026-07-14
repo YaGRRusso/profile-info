@@ -11,6 +11,11 @@ import { OrganizationsLoaderService } from "./organizations-loader.service";
 import { OrganizationsValidatorService } from "./organizations-validator.service";
 
 @Module({
+  exports: [
+    OrganizationsService,
+    OrganizationsLoaderService,
+    OrganizationsValidatorService,
+  ],
   imports: [
     MongooseModule.forFeature([
       { name: OrganizationModel.name, schema: OrganizationSchema },
@@ -19,11 +24,6 @@ import { OrganizationsValidatorService } from "./organizations-validator.service
   providers: [
     OrganizationsRepository,
     OrganizationsResolver,
-    OrganizationsService,
-    OrganizationsLoaderService,
-    OrganizationsValidatorService,
-  ],
-  exports: [
     OrganizationsService,
     OrganizationsLoaderService,
     OrganizationsValidatorService,

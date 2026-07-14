@@ -8,8 +8,8 @@ export default defineConfig({
   base: process.env.VITE_BASE_PATH ?? "/",
   plugins: [
     tanstackRouter({
-      target: "react",
       autoCodeSplitting: true,
+      target: "react",
     }),
     react(),
     tailwindcss(),

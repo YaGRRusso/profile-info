@@ -40,7 +40,7 @@ const dashboard = graphql(`
 
 export function useDashboard() {
   return useQuery({
-    queryKey: ["dashboard"],
     queryFn: () => execute(dashboard),
+    queryKey: ["dashboard"],
   });
 }

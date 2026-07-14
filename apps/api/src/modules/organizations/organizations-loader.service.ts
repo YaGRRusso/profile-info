@@ -23,7 +23,7 @@ export class OrganizationsLoaderService {
         const map = keyBy(list, (item) => item.id);
         return ids.map((id) => map[id] ?? null);
       },
-      { name: "batchOrganizations", maxBatchSize: 100 }
+      { maxBatchSize: 100, name: "batchOrganizations" }
     );
   }
 }

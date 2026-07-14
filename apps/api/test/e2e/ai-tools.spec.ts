@@ -28,12 +28,12 @@ const mockChatResult = {
   messages: [
     {
       finishReason: "stop",
-      message: { role: "assistant", content: "Olá" },
+      message: { content: "Olá", role: "assistant" },
     },
   ],
   usage: {
-    promptTokens: 1,
     completionTokens: 1,
+    promptTokens: 1,
     totalTokens: 2,
   },
 };
@@ -45,7 +45,7 @@ async function createAiToolsTestApp(): Promise<{
   const module = await Test.createTestingModule({
     imports: [
       TestAppModule,
-      ThrottlerModule.forRoot([{ ttl: 60_000, limit: 100 }]),
+      ThrottlerModule.forRoot([{ limit: 100, ttl: 60_000 }]),
       AiToolsModule,
     ],
   })
@@ -69,23 +69,23 @@ describe("Ai tools (e2e)", () => {
 
   beforeAll(async () => {
     const testApp = await createAiToolsTestApp();
-    app = testApp.app;
+    ({ app } = testApp);
     await clearTestDatabase(testApp.module);
 
     const usersService = testApp.module.get(UsersService);
 
     await usersService.createOne(testSuperAdminContext(), {
+      email: "admin@profile.info",
       name: "Admin",
       nickname: "admin",
-      email: "admin@profile.info",
       password: "123123",
       role: UserRole.SUPER_ADMIN,
     });
 
     await usersService.createOne(testSuperAdminContext(), {
+      email: "joao@profile.info",
       name: "João",
       nickname: "joao",
-      email: "joao@profile.info",
       password: "123123",
       role: UserRole.USER,
     });
@@ -126,10 +126,10 @@ describe("Ai tools (e2e)", () => {
       translate: { messages: Array<{ message: { content: string } }> };
     }>(app, {
       query: TRANSLATE_MUTATION,
+      token: userToken,
       variables: {
         translateInput: { raw: "Hello", targetLanguage: "pt" },
       },
-      token: userToken,
     });
 
     expect(response.errors).toBeUndefined();
@@ -141,10 +141,10 @@ describe("Ai tools (e2e)", () => {
       translate: { messages: Array<{ message: { content: string } }> };
     }>(app, {
       query: TRANSLATE_MUTATION,
+      token: adminToken,
       variables: {
         translateInput: { raw: "Hello", targetLanguage: "pt" },
       },
-      token: adminToken,
     });
 
     expect(response.errors).toBeUndefined();

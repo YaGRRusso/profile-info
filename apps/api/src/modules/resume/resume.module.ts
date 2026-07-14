@@ -11,6 +11,7 @@ import { ResumeController } from "./resume.controller";
 import { ResumeService } from "./resume.service";
 
 @Module({
+  controllers: [ResumeController],
   imports: [
     PdfModule,
     UsersModule,
@@ -21,7 +22,6 @@ import { ResumeService } from "./resume.service";
     ProjectsModule,
     OrganizationsModule,
   ],
-  controllers: [ResumeController],
   providers: [ResumeService],
 })
 export class ResumeModule {}

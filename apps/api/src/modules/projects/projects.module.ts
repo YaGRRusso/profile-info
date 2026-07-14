@@ -12,6 +12,7 @@ import { ProjectsResolver } from "./projects.resolver";
 import { ProjectsService } from "./projects.service";
 
 @Module({
+  exports: [ProjectsService],
   imports: [
     SkillsModule,
     MongooseModule.forFeature([
@@ -25,6 +26,5 @@ import { ProjectsService } from "./projects.service";
     OnSkillDeletedListener,
     OnUserDeletedListener,
   ],
-  exports: [ProjectsService],
 })
 export class ProjectsModule {}

@@ -17,8 +17,8 @@ import { CommonFormProps } from "./common";
 
 const educationMultiSchema = z.object({
   level: z.enum(EducationLevel),
-  status: z.enum(EducationStatus),
   relevance: z.number().min(1, FormError.minValue),
+  status: z.enum(EducationStatus),
 });
 
 export type EducationMultiSchema = z.infer<typeof educationMultiSchema>;
@@ -51,8 +51,8 @@ export function EducationMultiForm({
   const form = useForm({
     defaultValues: {
       level: EducationLevel.Bachelor,
-      status: EducationStatus.Complete,
       relevance: 1,
+      status: EducationStatus.Complete,
     },
     onSubmit: ({ value }) => {
       const updateEducationInput: UpdateEducationInput = {};

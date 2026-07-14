@@ -43,8 +43,8 @@ export function toSessionAuthContext(
 ): SessionAuthContext {
   return {
     ...user,
-    role: user.role ?? UserRole.USER,
     credentialKind: CredentialKind.SESSION,
+    role: user.role ?? UserRole.USER,
   };
 }
 
@@ -54,18 +54,18 @@ export function toApiTokenAuthContext(
 ): ApiTokenAuthContext {
   return {
     ...user,
-    role: user.role ?? UserRole.USER,
     credentialKind: CredentialKind.API_TOKEN,
     permissions,
+    role: user.role ?? UserRole.USER,
   };
 }
 
 export function toTenantScope(ctx: AuthContext): TenantScope {
-  return { userId: ctx.id, crossTenant: isSuperAdmin(ctx) };
+  return { crossTenant: isSuperAdmin(ctx), userId: ctx.id };
 }
 
 export function toCatalogScope(ctx: AuthContext): CatalogScope {
-  return { userId: ctx.id, crossCatalog: isSuperAdmin(ctx) };
+  return { crossCatalog: isSuperAdmin(ctx), userId: ctx.id };
 }
 
 export function tenantPersistenceScope(ctx: AuthContext): PersistenceScope {

@@ -8,16 +8,9 @@ describe("OrganizationMapper", () => {
 
   it("maps persistence fields to the domain entity", () => {
     const model = {
-      id: "507f1f77bcf86cd799439011",
-      createdAt: new Date("2024-01-01"),
-      updatedAt: new Date("2024-01-02"),
       category: OrganizationCategory.COMPANY,
-      name: "Google",
-      slug: "google",
-      website: "https://www.google.com",
-      logo: "https://example.com/logo.png",
+      createdAt: new Date("2024-01-01"),
       disabled: false,
-      partition: CatalogPartition.GLOBAL,
       i18n: [
         {
           locale: "en",
@@ -32,20 +25,19 @@ describe("OrganizationMapper", () => {
           },
         },
       ],
+      id: "507f1f77bcf86cd799439011",
+      logo: "https://example.com/logo.png",
+      name: "Google",
+      partition: CatalogPartition.GLOBAL,
+      slug: "google",
+      updatedAt: new Date("2024-01-02"),
+      website: "https://www.google.com",
     } as OrganizationModel;
 
     expect(mapper.toDomain(model)).toEqual({
-      id: "507f1f77bcf86cd799439011",
-      createdAt: model.createdAt,
-      updatedAt: model.updatedAt,
       category: OrganizationCategory.COMPANY,
-      name: "Google",
-      slug: "google",
-      website: "https://www.google.com",
-      logo: "https://example.com/logo.png",
+      createdAt: model.createdAt,
       disabled: false,
-      partition: CatalogPartition.GLOBAL,
-      ownerId: "",
       i18n: [
         {
           locale: "en",
@@ -60,6 +52,14 @@ describe("OrganizationMapper", () => {
           },
         },
       ],
+      id: "507f1f77bcf86cd799439011",
+      logo: "https://example.com/logo.png",
+      name: "Google",
+      ownerId: "",
+      partition: CatalogPartition.GLOBAL,
+      slug: "google",
+      updatedAt: model.updatedAt,
+      website: "https://www.google.com",
     });
   });
 

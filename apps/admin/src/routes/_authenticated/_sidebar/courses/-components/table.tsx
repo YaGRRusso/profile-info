@@ -67,7 +67,7 @@ const queryParser = parseAsShape(z.string())
   .withOptions({ ...persistentOptions, limitUrlUpdates: debouncedUrlUpdates });
 
 const sortParser = parseAsShape(
-  z.array(z.object({ id: z.string(), desc: z.boolean() }))
+  z.array(z.object({ desc: z.boolean(), id: z.string() }))
 )
   .withDefault([])
   .withOptions(persistentOptions);
@@ -78,8 +78,8 @@ const updatedAtParser = parseAsShape(z.string()).withOptions(persistentOptions);
 
 const relevanceParser = parseAsShape(
   z.object({
-    min: z.number().optional(),
     max: z.number().optional(),
+    min: z.number().optional(),
   })
 ).withOptions({
   ...persistentOptions,
@@ -87,9 +87,9 @@ const relevanceParser = parseAsShape(
 });
 
 const STATUS_LABELS: { value: CourseStatus; label: string }[] = [
-  { value: CourseStatus.Complete, label: "Complete" },
-  { value: CourseStatus.Incomplete, label: "Incomplete" },
-  { value: CourseStatus.InProgress, label: "In Progress" },
+  { label: "Complete", value: CourseStatus.Complete },
+  { label: "Incomplete", value: CourseStatus.Incomplete },
+  { label: "In Progress", value: CourseStatus.InProgress },
 ];
 
 const RESTRICTED_COLUMNS: RestrictedColumns = {
@@ -111,16 +111,6 @@ const getColumns = (
   onView: (course: CourseRow) => void
 ) => [
   columnHelper.display({
-    id: "select",
-    enableHiding: false,
-    header: ({ table }) => (
-      <input
-        checked={table.getIsAllRowsSelected()}
-        className="checkbox checkbox-sm"
-        onChange={table.getToggleAllRowsSelectedHandler()}
-        type="checkbox"
-      />
-    ),
     cell: ({ row }) => (
       <input
         checked={row.getIsSelected()}
@@ -130,125 +120,133 @@ const getColumns = (
         type="checkbox"
       />
     ),
+    enableHiding: false,
+    header: ({ table }) => (
+      <input
+        checked={table.getIsAllRowsSelected()}
+        className="checkbox checkbox-sm"
+        onChange={table.getToggleAllRowsSelectedHandler()}
+        type="checkbox"
+      />
+    ),
+    id: "select",
   }),
   columnHelper.accessor("id", {
-    header: "ID",
-    enableGlobalFilter: false,
-    enableSorting: false,
     cell: (data) => (
       <span className="font-mono text-xs">{data.getValue()}</span>
     ),
+    enableGlobalFilter: false,
+    enableSorting: false,
+    header: "ID",
   }),
   columnHelper.accessor("slug", {
     header: "Slug",
   }),
   columnHelper.accessor((row) => i18nLabel(row, locale), {
-    id: `title-${locale}`,
-    header: "Title",
     cell: (data) => {
       const value = data.getValue();
       if (isEmptyValue(value)) return <EmptyValue />;
       return value;
     },
+    header: "Title",
+    id: `title-${locale}`,
   }),
   columnHelper.accessor("relevance", {
-    header: "Relevance",
+    cell: (data) => (
+      <span className="badge badge-soft badge-sm">{data.getValue()}</span>
+    ),
     enableColumnFilter: true,
     enableGlobalFilter: false,
     filterFn: numberRangeFilter,
-    cell: (data) => (
-      <span className="badge badge-soft badge-sm">{data.getValue()}</span>
-    ),
+    header: "Relevance",
   }),
   columnHelper.accessor("status", {
-    header: "Status",
-    enableColumnFilter: true,
-    enableSorting: false,
-    enableGlobalFilter: false,
-    filterFn: "equals",
     cell: (data) => (
       <span className="badge badge-soft badge-sm">{data.getValue()}</span>
     ),
+    enableColumnFilter: true,
+    enableGlobalFilter: false,
+    enableSorting: false,
+    filterFn: "equals",
+    header: "Status",
   }),
   columnHelper.accessor((row) => row.organization?.name ?? "", {
-    id: "organization",
-    header: "Organization",
     cell: (data) => <BadgeList values={[data.getValue()]} />,
+    header: "Organization",
+    id: "organization",
   }),
   columnHelper.accessor("hours", {
-    header: "Hours",
-    enableGlobalFilter: false,
     cell: (data) => {
       const value = data.getValue();
       if (isEmptyValue(value)) return <EmptyValue />;
       return value;
     },
+    enableGlobalFilter: false,
+    header: "Hours",
   }),
   columnHelper.accessor(
     (row) => row.skills?.map((skill) => i18nLabel(skill, locale)) ?? [],
     {
-      id: `skills-${locale}`,
-      header: "Skills",
+      cell: (data) => <BadgeList values={data.getValue()} />,
       enableGlobalFilter: false,
       enableSorting: false,
-      cell: (data) => <BadgeList values={data.getValue()} />,
+      header: "Skills",
+      id: `skills-${locale}`,
     }
   ),
   columnHelper.accessor((row) => row.i18n.map((entry) => entry.locale), {
-    id: "languages",
-    header: "Languages",
+    cell: (data) => <BadgeList values={data.getValue()} />,
     enableGlobalFilter: false,
     enableSorting: false,
-    cell: (data) => <BadgeList values={data.getValue()} />,
+    header: "Languages",
+    id: "languages",
   }),
   columnHelper.accessor("url", {
-    header: "URL",
-    enableGlobalFilter: false,
-    enableSorting: false,
     cell: (data) => {
       const url = data.getValue();
       return <Link href={url} />;
     },
+    enableGlobalFilter: false,
+    enableSorting: false,
+    header: "URL",
   }),
   columnHelper.accessor("image", {
-    header: "Image",
-    enableGlobalFilter: false,
-    enableSorting: false,
     cell: (data) => {
       const url = data.getValue();
       return <Link href={url} />;
     },
-  }),
-  columnHelper.accessor((row) => row.owner?.nickname ?? "", {
-    id: "owner",
-    header: "Owner",
     enableGlobalFilter: false,
     enableSorting: false,
+    header: "Image",
+  }),
+  columnHelper.accessor((row) => row.owner?.nickname ?? "", {
     cell: (data) => {
       const value = data.getValue();
       if (isEmptyValue(value)) return <EmptyValue />;
       return <span className="badge badge-soft badge-sm">{value}</span>;
     },
+    enableGlobalFilter: false,
+    enableSorting: false,
+    header: "Owner",
+    id: "owner",
   }),
   columnHelper.accessor("createdAt", {
-    header: "Created",
+    cell: ({ getValue }) => new Date(getValue()).toLocaleDateString(),
     enableColumnFilter: true,
     enableGlobalFilter: false,
-    sortingFn: "datetime",
     filterFn: dateRangeFilter,
-    cell: ({ getValue }) => new Date(getValue()).toLocaleDateString(),
+    header: "Created",
+    sortingFn: "datetime",
   }),
   columnHelper.accessor("updatedAt", {
-    header: "Updated",
+    cell: ({ getValue }) => new Date(getValue()).toLocaleDateString(),
     enableColumnFilter: true,
     enableGlobalFilter: false,
-    sortingFn: "datetime",
     filterFn: dateRangeFilter,
-    cell: ({ getValue }) => new Date(getValue()).toLocaleDateString(),
+    header: "Updated",
+    sortingFn: "datetime",
   }),
   columnHelper.display({
-    id: "actions",
-    enableHiding: false,
     cell: ({ row }) => (
       <div className="flex items-center justify-end gap-1">
         <button
@@ -274,6 +272,8 @@ const getColumns = (
         </button>
       </div>
     ),
+    enableHiding: false,
+    id: "actions",
   }),
 ];
 
@@ -335,24 +335,24 @@ export function CoursesTable({
 
   const { filters: activeFilters, clearAll: clearAllFilters } =
     useActiveFilters([
-      { id: "status", label: "Status", state: status, setState: setStatus },
+      { id: "status", label: "Status", setState: setStatus, state: status },
       {
         id: "createdAt",
         label: "Created",
-        state: createdAt,
         setState: setCreatedAt,
+        state: createdAt,
       },
       {
         id: "updatedAt",
         label: "Updated",
-        state: updatedAt,
         setState: setUpdatedAt,
+        state: updatedAt,
       },
       {
         id: "relevance",
         label: "Relevance",
-        state: stableRelevance,
         setState: setRelevance,
+        state: stableRelevance,
       },
     ]);
 
@@ -368,29 +368,29 @@ export function CoursesTable({
   );
 
   const table = useReactTable({
-    data,
     columns,
+    data,
     getCoreRowModel: getCoreRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
-    getSortedRowModel: getSortedRowModel(),
+    getFacetedMinMaxValues: getFacetedMinMaxValues(),
     getFacetedRowModel: getFacetedRowModel(),
     getFacetedUniqueValues: getFacetedUniqueValues(),
-    getFacetedMinMaxValues: getFacetedMinMaxValues(),
+    getFilteredRowModel: getFilteredRowModel(),
     getRowId: (row) => row.id,
+    getSortedRowModel: getSortedRowModel(),
+    onColumnVisibilityChange: setColumnVisibility,
+    onRowSelectionChange: setRowSelection,
+    onSortingChange: handleSortingChange,
     state: {
-      globalFilter: searchQuery,
-      sorting: sort,
       columnFilters,
-      rowSelection,
       columnVisibility: getRestrictedVisibility(
         columnVisibility,
         RESTRICTED_COLUMNS,
         userRole
       ),
+      globalFilter: searchQuery,
+      rowSelection,
+      sorting: sort,
     },
-    onSortingChange: handleSortingChange,
-    onRowSelectionChange: setRowSelection,
-    onColumnVisibilityChange: setColumnVisibility,
   });
 
   const selected = data.filter((course) => rowSelection[course.id]);

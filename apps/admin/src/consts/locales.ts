@@ -10,7 +10,7 @@ export interface Locale {
 }
 
 export const LOCALES = [
-  { value: LocaleEnum.ENGLISH, label: "English" },
-  { value: LocaleEnum.PORTUGUESE, label: "Português" },
+  { label: "English", value: LocaleEnum.ENGLISH },
+  { label: "Português", value: LocaleEnum.PORTUGUESE },
   // { value: LocaleEnum.SPANISH, label: "Español" },
 ] as const satisfies Locale[];

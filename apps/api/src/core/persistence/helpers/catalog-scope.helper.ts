@@ -19,7 +19,7 @@ export function toQueryForRead<T>(
   return assign({}, filter ?? {}, {
     $or: [
       { partition: CatalogPartition.GLOBAL },
-      { partition: CatalogPartition.LOCAL, ownerId: scope.userId },
+      { ownerId: scope.userId, partition: CatalogPartition.LOCAL },
     ],
   });
 }
@@ -34,8 +34,8 @@ export function toQueryForMutate<T>(
 
   assertValidObjectId(scope.userId);
   return assign({}, filter ?? {}, {
-    partition: CatalogPartition.LOCAL,
     ownerId: scope.userId,
+    partition: CatalogPartition.LOCAL,
   });
 }
 
@@ -51,8 +51,8 @@ export function toQueryForAggregate<T>(
     $or: [
       { partition: CatalogPartition.GLOBAL },
       {
-        partition: CatalogPartition.LOCAL,
         ownerId: toObjectId(scope.userId),
+        partition: CatalogPartition.LOCAL,
       },
     ],
   });
@@ -64,10 +64,10 @@ export function toDocumentForCreate<T>(
 ): AnyKeys<T> {
   assertValidObjectId(scope.userId);
   return assign(omit(payload, immutableCatalogFields), {
+    ownerId: scope.userId,
     partition: scope.crossCatalog
       ? CatalogPartition.GLOBAL
       : CatalogPartition.LOCAL,
-    ownerId: scope.userId,
   });
 }
 
@@ -94,14 +94,14 @@ export function toDocumentForUpdate<T>(
 
 export function catalogScope(scope: CatalogScope): PersistenceScope {
   return {
-    query: {
-      forRead: (filter) => toQueryForRead(scope, filter),
-      forMutate: (filter) => toQueryForMutate(scope, filter),
-      forAggregate: (filter) => toQueryForAggregate(scope, filter),
-    },
     document: {
       forCreate: (payload) => toDocumentForCreate(scope, payload),
       forUpdate: (payload) => toDocumentForUpdate(scope, payload),
+    },
+    query: {
+      forAggregate: (filter) => toQueryForAggregate(scope, filter),
+      forMutate: (filter) => toQueryForMutate(scope, filter),
+      forRead: (filter) => toQueryForRead(scope, filter),
     },
   };
 }

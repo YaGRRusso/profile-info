@@ -11,69 +11,69 @@ describe("CourseMapper", () => {
 
   it("maps persistence fields to the domain entity", () => {
     const model = {
-      id: "507f1f77bcf86cd799439011",
       createdAt: new Date("2024-01-01"),
-      updatedAt: new Date("2024-01-02"),
-      relevance: 5,
-      slug: "typescript-fundamentals",
-      ownerId,
-      organizationId,
-      status: CourseStatus.COMPLETE,
-      url: "https://example.com",
-      image: "https://example.com/image.png",
       hours: 10,
-      skillIds: [skillId],
       i18n: [
         {
           locale: "en",
           messages: {
-            title: "TypeScript",
             description: "Fundamentals",
+            title: "TypeScript",
           },
         },
       ],
+      id: "507f1f77bcf86cd799439011",
+      image: "https://example.com/image.png",
+      organizationId,
+      ownerId,
+      relevance: 5,
+      skillIds: [skillId],
+      slug: "typescript-fundamentals",
+      status: CourseStatus.COMPLETE,
+      updatedAt: new Date("2024-01-02"),
+      url: "https://example.com",
     } as CourseModel;
 
     expect(mapper.toDomain(model)).toEqual({
-      id: "507f1f77bcf86cd799439011",
       createdAt: model.createdAt,
-      updatedAt: model.updatedAt,
-      relevance: 5,
-      slug: "typescript-fundamentals",
-      ownerId,
-      organizationId,
-      status: CourseStatus.COMPLETE,
-      url: "https://example.com",
-      image: "https://example.com/image.png",
       hours: 10,
-      skillIds: [skillId],
       i18n: [
         {
           locale: "en",
           messages: {
-            title: "TypeScript",
             description: "Fundamentals",
+            title: "TypeScript",
           },
         },
       ],
+      id: "507f1f77bcf86cd799439011",
+      image: "https://example.com/image.png",
+      organizationId,
+      ownerId,
+      relevance: 5,
+      skillIds: [skillId],
+      slug: "typescript-fundamentals",
+      status: CourseStatus.COMPLETE,
+      updatedAt: model.updatedAt,
+      url: "https://example.com",
     });
   });
 
   it("omits organizationId when the persistence record has no organization", () => {
     const model = {
-      id: "507f1f77bcf86cd799439011",
       createdAt: new Date("2024-01-01"),
-      updatedAt: new Date("2024-01-02"),
-      relevance: 0,
-      slug: "self-paced",
-      ownerId,
-      status: CourseStatus.IN_PROGRESS,
       i18n: [
         {
           locale: "en",
-          messages: { title: "Self-paced", description: "No org" },
+          messages: { description: "No org", title: "Self-paced" },
         },
       ],
+      id: "507f1f77bcf86cd799439011",
+      ownerId,
+      relevance: 0,
+      slug: "self-paced",
+      status: CourseStatus.IN_PROGRESS,
+      updatedAt: new Date("2024-01-02"),
     } as CourseModel;
 
     expect(mapper.toDomain(model).organizationId).toBeUndefined();
@@ -82,48 +82,48 @@ describe("CourseMapper", () => {
   it("maps create input to a persistence payload", () => {
     expect(
       mapper.toPersistenceForCreate({
-        slug: "typescript-fundamentals",
-        organizationId,
-        status: CourseStatus.COMPLETE,
         i18n: [
           {
             locale: "en",
             messages: {
-              title: "TypeScript",
               description: "Fundamentals",
+              title: "TypeScript",
             },
           },
         ],
+        organizationId,
         skillIds: [skillId],
+        slug: "typescript-fundamentals",
+        status: CourseStatus.COMPLETE,
       })
     ).toEqual({
-      slug: "typescript-fundamentals",
-      organizationId: new mongoose.Types.ObjectId(organizationId),
-      status: CourseStatus.COMPLETE,
       i18n: [
         {
           locale: "en",
           messages: {
-            title: "TypeScript",
             description: "Fundamentals",
+            title: "TypeScript",
           },
         },
       ],
+      organizationId: new mongoose.Types.ObjectId(organizationId),
       skillIds: [new mongoose.Types.ObjectId(skillId)],
+      slug: "typescript-fundamentals",
+      status: CourseStatus.COMPLETE,
     });
   });
 
   it("maps filter input to a persistence query", () => {
     expect(
       mapper.toPersistenceForFilter({
-        slug: "typescript-fundamentals",
         organizationId,
         skillIds: [skillId],
+        slug: "typescript-fundamentals",
       })
     ).toEqual({
-      slug: "typescript-fundamentals",
       organizationId: new mongoose.Types.ObjectId(organizationId),
       skillIds: [new mongoose.Types.ObjectId(skillId)],
+      slug: "typescript-fundamentals",
     });
   });
 

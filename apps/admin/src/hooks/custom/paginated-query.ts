@@ -36,7 +36,7 @@ export function withPagination<TVariables extends Record<string, unknown>>(
 ): TVariables {
   return {
     ...variables,
-    [paginationKey]: { skip: pageParam, limit: PAGINATED_PAGE_SIZE },
+    [paginationKey]: { limit: PAGINATED_PAGE_SIZE, skip: pageParam },
   } as TVariables;
 }
 

@@ -48,7 +48,7 @@ describe("noopScope", () => {
 
 describe("tenantScope", () => {
   const userId = new mongoose.Types.ObjectId().toHexString();
-  const tenant = { userId, crossTenant: false };
+  const tenant = { crossTenant: false, userId };
   const scope = tenantScope(tenant);
 
   it("should delegate query.forRead to toQueryForRead", () => {
@@ -59,7 +59,7 @@ describe("tenantScope", () => {
   });
 
   it("should bypass ownerId on query.forRead for cross-tenant access", () => {
-    const crossScope = tenantScope({ userId, crossTenant: true });
+    const crossScope = tenantScope({ crossTenant: true, userId });
     expect(crossScope.query.forRead({ status: "COMPLETE" })).toEqual({
       status: "COMPLETE",
     });
@@ -97,7 +97,7 @@ describe("tenantScope", () => {
 
 describe("catalogScope", () => {
   const userId = new mongoose.Types.ObjectId().toHexString();
-  const catalog = { userId, crossCatalog: false };
+  const catalog = { crossCatalog: false, userId };
   const scope = catalogScope(catalog);
 
   it("should delegate query.forRead to toQueryForRead", () => {
@@ -124,21 +124,21 @@ describe("catalogScope", () => {
   it("should set LOCAL partition and ownerId on document.forCreate", () => {
     expect(
       scope.document.forCreate({
-        slug: "my-skill",
-        partition: CatalogPartition.GLOBAL,
         ownerId: "ignored",
+        partition: CatalogPartition.GLOBAL,
+        slug: "my-skill",
       } as never)
     ).toEqual({
-      slug: "my-skill",
-      partition: CatalogPartition.LOCAL,
       ownerId: userId,
+      partition: CatalogPartition.LOCAL,
+      slug: "my-skill",
     });
   });
 
   it("should strip immutable fields on document.forUpdate", () => {
     expect(
       scope.document.forUpdate({
-        $set: { slug: "renamed", partition: CatalogPartition.GLOBAL },
+        $set: { partition: CatalogPartition.GLOBAL, slug: "renamed" },
       })
     ).toEqual({ $set: { slug: "renamed" } });
   });
