@@ -1,9 +1,20 @@
-import { Args, ID, Mutation, Query, Resolver } from "@nestjs/graphql";
+import {
+  Args,
+  Context,
+  ID,
+  Mutation,
+  Parent,
+  Query,
+  ResolveField,
+  Resolver,
+} from "@nestjs/graphql";
 import type { AuthContext } from "@/core/context/auth-context.interface";
+import type { GraphqlContext } from "@/core/context/graphql-context.interface";
 import { SessionOnly } from "@/core/decorators/session-only.decorator";
 import { BatchEntity } from "@/core/entities/batch.entity";
 import { PaginationInput } from "@/core/inputs/pagination.input";
 import { Auth } from "@/modules/auth/decorators/auth-context.decorator";
+import { UserEntity } from "@/modules/users/entities/user.entity";
 import { ApiTokensService } from "./api-tokens.service";
 import { CreateApiTokenInput } from "./dto/create-api-token.input";
 import { FilterApiTokenInput } from "./dto/filter-api-token.input";
@@ -11,6 +22,7 @@ import { SortApiTokenInput } from "./dto/sort-api-token.input";
 import { UpdateApiTokenInput } from "./dto/update-api-token.input";
 import {
   ApiTokenEntity,
+  type ApiTokenEntityRecord,
   NewApiTokenEntity,
   PaginatedApiTokenEntity,
 } from "./entities/api-token.entity";
@@ -34,8 +46,8 @@ export class ApiTokensResolver {
   findOneApiToken(
     @Auth() ctx: AuthContext,
     @Args("apiTokenFilters", {
-      type: () => FilterApiTokenInput,
       nullable: true,
+      type: () => FilterApiTokenInput,
     })
     apiTokenFilters?: FilterApiTokenInput
   ) {
@@ -54,26 +66,26 @@ export class ApiTokensResolver {
   findManyApiTokens(
     @Auth() ctx: AuthContext,
     @Args("apiTokenFilters", {
-      type: () => FilterApiTokenInput,
       nullable: true,
+      type: () => FilterApiTokenInput,
     })
     apiTokenFilters?: FilterApiTokenInput,
     @Args("apiTokenPagination", {
-      type: () => PaginationInput,
       nullable: true,
+      type: () => PaginationInput,
     })
     apiTokenPagination?: PaginationInput,
     @Args("apiTokenSort", {
-      type: () => SortApiTokenInput,
       nullable: true,
+      type: () => SortApiTokenInput,
     })
     apiTokenSort?: SortApiTokenInput
   ) {
     return this.apiTokensService.findMany(ctx, {
       filters: apiTokenFilters,
-      sort: apiTokenSort,
       limit: apiTokenPagination?.limit,
       skip: apiTokenPagination?.skip,
+      sort: apiTokenSort,
     });
   }
 
@@ -130,5 +142,14 @@ export class ApiTokensResolver {
     @Args("apiTokenIds", { type: () => [ID] }) apiTokenIds: string[]
   ) {
     return this.apiTokensService.removeMany(ctx, apiTokenIds);
+  }
+
+  @ResolveField(() => UserEntity)
+  owner(
+    @Parent() apiToken: ApiTokenEntityRecord,
+    @Context() ctx: GraphqlContext
+  ) {
+    if (!apiToken?.ownerId) return null;
+    return ctx.loaders.batchUsers.load(apiToken.ownerId);
   }
 }

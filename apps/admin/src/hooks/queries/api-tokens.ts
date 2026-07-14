@@ -31,6 +31,15 @@ const findManyApiTokens = graphql(`
       nodes {
         id
         ownerId
+        owner {
+          id
+          nickname
+          name
+          role
+          email
+          phone
+          avatar
+        }
         name
         permissions
         expiresAt
@@ -49,7 +58,9 @@ export function useFindManyApiTokens(
   options?: { enabled?: boolean }
 ) {
   return useInfiniteQuery({
-    queryKey: ["findManyApiTokens", variables],
+    getNextPageParam:
+      paginatedNextPageParam<FindManyApiTokensQuery>("findManyApiTokens"),
+    initialPageParam: 0,
     queryFn: ({ pageParam }) =>
       execute(
         findManyApiTokens,
@@ -59,9 +70,7 @@ export function useFindManyApiTokens(
           variables
         )
       ),
-    initialPageParam: 0,
-    getNextPageParam:
-      paginatedNextPageParam<FindManyApiTokensQuery>("findManyApiTokens"),
+    queryKey: ["findManyApiTokens", variables],
     select: paginatedSelect<FindManyApiTokensQuery>("findManyApiTokens"),
     ...options,
   });

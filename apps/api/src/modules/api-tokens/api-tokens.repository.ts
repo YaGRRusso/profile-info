@@ -9,7 +9,7 @@ import { CrudRepository } from "@/core/persistence/repositories/crud/crud.reposi
 import { FilterApiTokenInput } from "./dto/filter-api-token.input";
 import { SortApiTokenInput } from "./dto/sort-api-token.input";
 import { UpdateApiTokenInput } from "./dto/update-api-token.input";
-import type { ApiTokenEntity } from "./entities/api-token.entity";
+import type { ApiTokenEntityRecord } from "./entities/api-token.entity";
 import { ApiTokenWithHashedEntity } from "./entities/api-token-with-hashed.entity";
 import {
   type ApiTokenCreateRecord,
@@ -22,7 +22,7 @@ export class ApiTokensRepository {
   private readonly mapper = new ApiTokenMapper();
   readonly crud: CrudRepository<
     ApiTokenModel,
-    ApiTokenEntity,
+    ApiTokenEntityRecord,
     ApiTokenCreateRecord,
     UpdateApiTokenInput,
     FilterApiTokenInput,
@@ -53,8 +53,8 @@ export class ApiTokensRepository {
 
     return {
       ...this.mapper.toDomain(document),
-      ownerId: String(document.ownerId),
       hashedSecret: String(document.hashedSecret),
+      ownerId: String(document.ownerId),
     };
   }
 

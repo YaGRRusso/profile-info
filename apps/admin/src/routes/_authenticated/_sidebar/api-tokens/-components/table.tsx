@@ -29,6 +29,7 @@ import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { z } from "zod";
 import { BadgeList } from "@/components/display/badge-list";
+import { EmptyValue } from "@/components/display/empty-value";
 import { BatchButton, BatchToolbar } from "@/components/table/batch-buttons";
 import { FiltersButton } from "@/components/table/filters-button";
 import {
@@ -37,15 +38,22 @@ import {
 } from "@/components/table/filters-radio";
 import { FiltersSelect } from "@/components/table/filters-select";
 import { VisibilityButton } from "@/components/table/visibility-button";
-import { ApiTokenPermission } from "@/generated/graphql/graphql";
+import { ApiTokenPermission, UserRole } from "@/generated/graphql/graphql";
 import { useActiveFilters } from "@/hooks/custom/use-active-filters";
 import { usePersistedState } from "@/hooks/custom/use-persisted-state";
 import type { ApiTokenRow } from "@/hooks/queries/api-tokens";
 import { cn } from "@/lib/cn";
+import { isEmptyValue } from "@/lib/empty-value";
 import { getUniqueFacets } from "@/lib/facets";
 import { parseAsShape } from "@/lib/parsers";
-import { DEFAULT_META_COLUMN_VISIBILITY } from "@/lib/table-columns";
+import {
+  canSeeColumn,
+  DEFAULT_META_COLUMN_VISIBILITY,
+  getRestrictedVisibility,
+  type RestrictedColumns,
+} from "@/lib/table-columns";
 import { dateRangeFilter } from "@/lib/table-filters";
+import { useAuthStore } from "@/stores/auth";
 
 const debouncedUrlUpdates = { method: "debounce" as const, timeMs: 500 };
 const persistentOptions = { clearOnDefault: true, history: "push" as const };
@@ -55,7 +63,7 @@ const queryParser = parseAsShape(z.string())
   .withOptions({ ...persistentOptions, limitUrlUpdates: debouncedUrlUpdates });
 
 const sortParser = parseAsShape(
-  z.array(z.object({ id: z.string(), desc: z.boolean() }))
+  z.array(z.object({ desc: z.boolean(), id: z.string() }))
 )
   .withDefault([])
   .withOptions(persistentOptions);
@@ -69,18 +77,22 @@ const updatedAtParser = parseAsShape(z.string()).withOptions(persistentOptions);
 const expiresAtParser = parseAsShape(z.string()).withOptions(persistentOptions);
 
 const PERMISSION_LABELS: Array<{ value: ApiTokenPermission; label: string }> = [
-  { value: ApiTokenPermission.Query, label: "QUERY" },
-  { value: ApiTokenPermission.Mutate, label: "MUTATE" },
+  { label: "QUERY", value: ApiTokenPermission.Query },
+  { label: "MUTATE", value: ApiTokenPermission.Mutate },
 ];
 
 const STATUS_LABELS: Array<{
   value: "active" | "expired" | "no-expiry";
   label: string;
 }> = [
-  { value: "active", label: "Active" },
-  { value: "expired", label: "Expired" },
-  { value: "no-expiry", label: "No expiry" },
+  { label: "Active", value: "active" },
+  { label: "Expired", value: "expired" },
+  { label: "No expiry", value: "no-expiry" },
 ];
+
+const RESTRICTED_COLUMNS: RestrictedColumns = {
+  [UserRole.SuperAdmin]: ["owner"],
+};
 
 export function isApiTokenExpired(expiresAt?: string | null): boolean {
   if (!expiresAt) return false;
@@ -142,16 +154,6 @@ const getColumns = (
   onView: (token: ApiTokenRow) => void
 ) => [
   columnHelper.display({
-    id: "select",
-    enableHiding: false,
-    header: ({ table }) => (
-      <input
-        checked={table.getIsAllRowsSelected()}
-        className="checkbox checkbox-sm"
-        onChange={table.getToggleAllRowsSelectedHandler()}
-        type="checkbox"
-      />
-    ),
     cell: ({ row }) => (
       <input
         checked={row.getIsSelected()}
@@ -161,81 +163,100 @@ const getColumns = (
         type="checkbox"
       />
     ),
+    enableHiding: false,
+    header: ({ table }) => (
+      <input
+        checked={table.getIsAllRowsSelected()}
+        className="checkbox checkbox-sm"
+        onChange={table.getToggleAllRowsSelectedHandler()}
+        type="checkbox"
+      />
+    ),
+    id: "select",
   }),
   columnHelper.accessor("id", {
-    header: "ID",
-    enableGlobalFilter: false,
-    enableSorting: false,
     cell: (data) => (
       <span className="font-mono text-xs">{data.getValue()}</span>
     ),
+    enableGlobalFilter: false,
+    enableSorting: false,
+    header: "ID",
   }),
   columnHelper.accessor("name", {
     header: "Name",
   }),
   columnHelper.accessor((row) => tokenStatus(row.expiresAt), {
-    id: "status",
-    header: "Status",
-    enableColumnFilter: true,
-    enableSorting: false,
-    enableGlobalFilter: false,
-    filterFn: "equals",
     cell: (data) => (
       <span className="badge badge-soft badge-sm">{data.getValue()}</span>
     ),
+    enableColumnFilter: true,
+    enableGlobalFilter: false,
+    enableSorting: false,
+    filterFn: "equals",
+    header: "Status",
+    id: "status",
   }),
   columnHelper.accessor("permissions", {
-    header: "Permissions",
+    cell: (data) => (
+      <BadgeList
+        values={data.getValue().map((permission) => permission.toString())}
+      />
+    ),
     enableColumnFilter: true,
-    enableSorting: false,
     enableGlobalFilter: false,
+    enableSorting: false,
     filterFn: (row, _columnId, filterValue) => {
       if (!filterValue) return true;
       return row.original.permissions.includes(
         filterValue as ApiTokenPermission
       );
     },
-    cell: (data) => (
-      <BadgeList
-        values={data.getValue().map((permission) => permission.toString())}
-      />
-    ),
+    header: "Permissions",
+  }),
+  columnHelper.accessor((row) => row.owner?.nickname ?? "", {
+    cell: (data) => {
+      const value = data.getValue();
+      if (isEmptyValue(value)) return <EmptyValue />;
+      return <span className="badge badge-soft badge-sm">{value}</span>;
+    },
+    enableGlobalFilter: false,
+    enableSorting: false,
+    header: "Owner",
+    id: "owner",
   }),
   columnHelper.accessor("expiresAt", {
-    header: "Expires",
+    cell: ({ getValue }) => {
+      const value = getValue();
+      return value ? new Date(value).toLocaleDateString() : "Never";
+    },
     enableColumnFilter: true,
     enableGlobalFilter: false,
-    sortingFn: "datetime",
     filterFn: (row, columnId, filterValue) => {
       const expiresAt = row.getValue<string | null | undefined>(columnId);
       if (!filterValue) return true;
       if (!expiresAt) return false;
       return dateRangeFilter(row, columnId, filterValue);
     },
-    cell: ({ getValue }) => {
-      const value = getValue();
-      return value ? new Date(value).toLocaleDateString() : "Never";
-    },
+    header: "Expires",
+    sortingFn: "datetime",
   }),
   columnHelper.accessor("createdAt", {
-    header: "Created",
+    cell: ({ getValue }) => new Date(getValue()).toLocaleDateString(),
     enableColumnFilter: true,
     enableGlobalFilter: false,
-    sortingFn: "datetime",
     filterFn: dateRangeFilter,
-    cell: ({ getValue }) => new Date(getValue()).toLocaleDateString(),
+    header: "Created",
+    sortingFn: "datetime",
   }),
   columnHelper.accessor("updatedAt", {
-    header: "Updated",
+    cell: ({ getValue }) => new Date(getValue()).toLocaleDateString(),
     enableColumnFilter: true,
     enableGlobalFilter: false,
-    sortingFn: "datetime",
     filterFn: dateRangeFilter,
-    cell: ({ getValue }) => new Date(getValue()).toLocaleDateString(),
+    header: "Updated",
+    sortingFn: "datetime",
   }),
   columnHelper.display({
-    id: "actions",
-    enableHiding: false,
     cell: ({ row }) => (
       <div className="flex items-center justify-end gap-1">
         <button
@@ -261,6 +282,8 @@ const getColumns = (
         </button>
       </div>
     ),
+    enableHiding: false,
+    id: "actions",
   }),
 ];
 
@@ -285,6 +308,7 @@ export function ApiTokensTable({
 }: ApiTokensTableProps) {
   const { t: tAction } = useTranslation("actions");
   const { t: tTable } = useTranslation("tables");
+  const userRole = useAuthStore((state) => state.user?.role);
   const [searchQuery, setSearchQuery] = useQueryState("query", queryParser);
   const [sort, setSort] = useQueryState("sort", sortParser);
   const [permission, setPermission] = useQueryState(
@@ -319,32 +343,32 @@ export function ApiTokensTable({
       {
         id: "permission",
         label: "Permission",
-        state: permission,
         setState: setPermission,
+        state: permission,
       },
       {
         id: "status",
         label: "Status",
-        state: status,
         setState: setStatus,
+        state: status,
       },
       {
         id: "createdAt",
         label: "Created",
-        state: createdAt,
         setState: setCreatedAt,
+        state: createdAt,
       },
       {
         id: "updatedAt",
         label: "Updated",
-        state: updatedAt,
         setState: setUpdatedAt,
+        state: updatedAt,
       },
       {
         id: "expiresAt",
         label: "Expires",
-        state: expiresAt,
         setState: setExpiresAt,
+        state: expiresAt,
       },
     ]);
 
@@ -355,25 +379,29 @@ export function ApiTokensTable({
   };
 
   const table = useReactTable({
-    data,
     columns: getColumns(onEdit, onDelete, onView),
+    data,
     getCoreRowModel: getCoreRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
-    getSortedRowModel: getSortedRowModel(),
+    getFacetedMinMaxValues: getFacetedMinMaxValues(),
     getFacetedRowModel: getFacetedRowModel(),
     getFacetedUniqueValues: getFacetedUniqueValues(),
-    getFacetedMinMaxValues: getFacetedMinMaxValues(),
+    getFilteredRowModel: getFilteredRowModel(),
     getRowId: (row) => row.id,
-    state: {
-      globalFilter: searchQuery,
-      sorting: sort,
-      columnFilters,
-      rowSelection,
-      columnVisibility,
-    },
-    onSortingChange: handleSortingChange,
-    onRowSelectionChange: setRowSelection,
+    getSortedRowModel: getSortedRowModel(),
     onColumnVisibilityChange: setColumnVisibility,
+    onRowSelectionChange: setRowSelection,
+    onSortingChange: handleSortingChange,
+    state: {
+      columnFilters,
+      columnVisibility: getRestrictedVisibility(
+        columnVisibility,
+        RESTRICTED_COLUMNS,
+        userRole
+      ),
+      globalFilter: searchQuery,
+      rowSelection,
+      sorting: sort,
+    },
   });
 
   const tokensForPermissionFacets = useMemo(
@@ -419,20 +447,20 @@ export function ApiTokensTable({
     <div className="flex flex-col gap-4">
       <BatchToolbar>
         <BatchButton
-          disabled={!selected?.length}
+          disabled={!selected.length}
           icon={<PencilIcon />}
           label={tAction("updateSelected", { count: selected.length })}
           onClick={() => onMultiEdit(selected)}
         />
         <BatchButton
-          disabled={!selected?.length}
+          disabled={!selected.length}
           icon={<EyeIcon />}
           label={tAction("viewSelected", { count: selected.length })}
           onClick={() => onMultiView(selected)}
         />
         <BatchButton
           className="btn-error"
-          disabled={!selected?.length}
+          disabled={!selected.length}
           icon={<TrashSimpleIcon />}
           label={tAction("removeSelected", { count: selected.length })}
           onClick={() => onMultiDelete(selected)}
@@ -493,7 +521,13 @@ export function ApiTokensTable({
             />
           </FiltersButton>
 
-          <VisibilityButton columns={table.getAllColumns()} />
+          <VisibilityButton
+            columns={table
+              .getAllColumns()
+              .filter((col) =>
+                canSeeColumn(RESTRICTED_COLUMNS, col.id, userRole)
+              )}
+          />
         </div>
       </div>
 

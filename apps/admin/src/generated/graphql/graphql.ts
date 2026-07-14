@@ -929,7 +929,7 @@ export type FindManyApiTokensQueryVariables = Exact<{
 }>;
 
 
-export type FindManyApiTokensQuery = { findManyApiTokens: { found: number, nodes: Array<{ id: string, ownerId: string, name: string, permissions: Array<ApiTokenPermission>, expiresAt: string | null, createdAt: string, updatedAt: string }> } };
+export type FindManyApiTokensQuery = { findManyApiTokens: { found: number, nodes: Array<{ id: string, ownerId: string, name: string, permissions: Array<ApiTokenPermission>, expiresAt: string | null, createdAt: string, updatedAt: string, owner: { id: string, nickname: string, name: string, role: UserRole, email: string, phone: string | null, avatar: string | null } }> } };
 
 export type GetMeQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -1606,6 +1606,15 @@ export const FindManyApiTokensDocument = new TypedDocumentString(`
     nodes {
       id
       ownerId
+      owner {
+        id
+        nickname
+        name
+        role
+        email
+        phone
+        avatar
+      }
       name
       permissions
       expiresAt

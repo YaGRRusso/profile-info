@@ -14,7 +14,10 @@ import { CreateApiTokenInput } from "./dto/create-api-token.input";
 import { FilterApiTokenInput } from "./dto/filter-api-token.input";
 import { SortApiTokenInput } from "./dto/sort-api-token.input";
 import { UpdateApiTokenInput } from "./dto/update-api-token.input";
-import { ApiTokenEntity, NewApiTokenEntity } from "./entities/api-token.entity";
+import {
+  ApiTokenEntityRecord,
+  NewApiTokenEntity,
+} from "./entities/api-token.entity";
 import { ApiTokenWithHashedEntity } from "./entities/api-token-with-hashed.entity";
 import type { ApiTokenCreateRecord } from "./mappers/api-token.mapper";
 
@@ -26,18 +29,21 @@ export class ApiTokensService {
     return this.repository.findOneByIdWithHashedSecret(id);
   }
 
-  findOneById(ctx: AuthContext, id: string): Promise<ApiTokenEntity> {
+  findOneById(ctx: AuthContext, id: string): Promise<ApiTokenEntityRecord> {
     return this.repository.tenantCrud(ctx).findOneById(id);
   }
 
-  findManyById(ctx: AuthContext, ids: string[]): Promise<ApiTokenEntity[]> {
+  findManyById(
+    ctx: AuthContext,
+    ids: string[]
+  ): Promise<ApiTokenEntityRecord[]> {
     return this.repository.tenantCrud(ctx).findManyById(ids);
   }
 
   findOne(
     ctx: AuthContext,
     { filters }: { filters?: FilterApiTokenInput } = {}
-  ): Promise<ApiTokenEntity> {
+  ): Promise<ApiTokenEntityRecord> {
     return this.repository.tenantCrud(ctx).findOne({ filters });
   }
 
@@ -54,12 +60,12 @@ export class ApiTokensService {
       skip?: number;
       limit?: number;
     } = {}
-  ): Promise<MultiPaged<ApiTokenEntity>> {
+  ): Promise<MultiPaged<ApiTokenEntityRecord>> {
     return this.repository.tenantCrud(ctx).findMany({
       filters,
-      sort,
-      skip,
       limit,
+      skip,
+      sort,
     });
   }
 
@@ -71,22 +77,22 @@ export class ApiTokensService {
 
     const createInput: ApiTokenCreateRecord = {
       ...input,
-      id: tokenId,
       hashedSecret: await hash(secret, 8),
+      id: tokenId,
     };
 
     const apiToken = await this.repository
       .tenantCrud(ctx)
       .createOne(createInput);
 
-    return { token: plaintext, apiToken };
+    return { apiToken, token: plaintext };
   }
 
   updateOne(
     ctx: AuthContext,
     id: string,
     updateInput: UpdateApiTokenInput
-  ): Promise<ApiTokenEntity> {
+  ): Promise<ApiTokenEntityRecord> {
     return this.repository.tenantCrud(ctx).updateOneById(id, updateInput);
   }
 
@@ -98,7 +104,7 @@ export class ApiTokensService {
     return this.repository.tenantCrud(ctx).updateManyById(ids, updateInput);
   }
 
-  removeOne(ctx: AuthContext, id: string): Promise<ApiTokenEntity> {
+  removeOne(ctx: AuthContext, id: string): Promise<ApiTokenEntityRecord> {
     return this.repository.tenantCrud(ctx).deleteOneById(id);
   }
 
@@ -128,7 +134,7 @@ export class ApiTokensService {
     const secret = payload.slice(separatorIndex + 1);
     if (!TOKEN_ID_PATTERN.test(tokenId) || secret.length < 16) return null;
 
-    return { tokenId, secret };
+    return { secret, tokenId };
   }
 
   private emitApiToken(): {
@@ -139,6 +145,6 @@ export class ApiTokensService {
     const tokenId = new mongoose.Types.ObjectId().toHexString();
     const secret = randomBytes(32).toString("base64url");
     const plaintext = this.stringifyApiToken(tokenId, secret);
-    return { plaintext, tokenId, secret };
+    return { plaintext, secret, tokenId };
   }
 }

@@ -16,7 +16,7 @@ import { CreateApiTokenInput } from "../dto/create-api-token.input";
 import { FilterApiTokenInput } from "../dto/filter-api-token.input";
 import { SortApiTokenInput } from "../dto/sort-api-token.input";
 import { UpdateApiTokenInput } from "../dto/update-api-token.input";
-import type { ApiTokenEntity } from "../entities/api-token.entity";
+import type { ApiTokenEntityRecord } from "../entities/api-token.entity";
 import type { ApiTokenModel } from "../schemas/api-token.schema";
 
 export type ApiTokenCreateRecord = CreateApiTokenInput & {
@@ -27,7 +27,7 @@ export type ApiTokenCreateRecord = CreateApiTokenInput & {
 export class ApiTokenMapper
   implements
     CrudMapperInterface<
-      ApiTokenEntity,
+      ApiTokenEntityRecord,
       ApiTokenModel,
       ApiTokenCreateRecord,
       UpdateApiTokenInput,
@@ -35,23 +35,23 @@ export class ApiTokenMapper
       SortApiTokenInput
     >
 {
-  toDomain(model: ApiTokenModel): ApiTokenEntity {
+  toDomain(model: ApiTokenModel): ApiTokenEntityRecord {
     return {
       ...toBaseEntityFields(model),
-      ownerId: toIdString(model.ownerId) ?? "",
-      name: model.name,
-      permissions: model.permissions,
       expiresAt: model.expiresAt,
+      name: model.name,
+      ownerId: toIdString(model.ownerId) ?? "",
+      permissions: model.permissions,
     };
   }
 
   toPersistenceForCreate(entity: ApiTokenCreateRecord): AnyKeys<ApiTokenModel> {
     return {
       _id: toObjectId(entity.id),
-      name: entity.name,
-      hashedSecret: entity.hashedSecret,
-      permissions: entity.permissions,
       expiresAt: entity.expiresAt,
+      hashedSecret: entity.hashedSecret,
+      name: entity.name,
+      permissions: entity.permissions,
     };
   }
 

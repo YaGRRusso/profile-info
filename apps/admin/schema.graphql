@@ -13,6 +13,7 @@ type ApiTokenEntity {
   expiresAt: DateTime
   id: ID!
   name: String!
+  owner: UserEntity!
   ownerId: String!
   permissions: [ApiTokenPermission!]!
   updatedAt: DateTime!
