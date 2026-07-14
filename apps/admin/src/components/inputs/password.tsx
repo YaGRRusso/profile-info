@@ -31,7 +31,12 @@ export function PasswordInput({
 
   return (
     <fieldset className="fieldset">
-      <InputLegend label={label} optional={optional} tooltip={tooltip} />
+      <InputLegend
+        ai={ai}
+        label={label}
+        optional={optional}
+        tooltip={tooltip}
+      />
       <AuraField disabled={!ai}>
         <label
           className={cn("input w-full", error && "input-error", className)}

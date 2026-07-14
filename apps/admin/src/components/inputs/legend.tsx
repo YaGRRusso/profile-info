@@ -1,16 +1,18 @@
-import { QuestionIcon } from "@phosphor-icons/react";
+import { QuestionIcon, SparkleIcon } from "@phosphor-icons/react";
 import { type ComponentProps } from "react";
 import { useTranslation } from "react-i18next";
 import { cn } from "@/lib/cn";
 import { FormTooltip } from "./tooltip";
 
 export interface InputLegendProps extends ComponentProps<"legend"> {
+  ai?: boolean;
   label?: string;
   optional?: boolean;
   tooltip?: string;
 }
 
 export function InputLegend({
+  ai,
   className,
   label,
   tooltip,
@@ -38,6 +40,11 @@ export function InputLegend({
       {tooltip && (
         <FormTooltip content={tooltip}>
           <QuestionIcon />
+        </FormTooltip>
+      )}
+      {ai && (
+        <FormTooltip content={tForm("labels.ai.tooltip")}>
+          <SparkleIcon />
         </FormTooltip>
       )}
     </legend>

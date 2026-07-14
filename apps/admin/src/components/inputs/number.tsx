@@ -28,7 +28,12 @@ export function NumberInput({
 }: NumberInputProps) {
   return (
     <fieldset className="fieldset">
-      <InputLegend label={label} optional={optional} tooltip={tooltip} />
+      <InputLegend
+        ai={ai}
+        label={label}
+        optional={optional}
+        tooltip={tooltip}
+      />
       <AuraField disabled={!ai}>
         <input
           className={cn("input w-full", error && "input-error", className)}

@@ -76,7 +76,12 @@ export function MultiSelectInput({
 
   return (
     <fieldset className="fieldset" disabled={disabled}>
-      <InputLegend label={label} optional={optional} tooltip={tooltip} />
+      <InputLegend
+        ai={ai}
+        label={label}
+        optional={optional}
+        tooltip={tooltip}
+      />
       <div className="relative w-full" ref={containerRef}>
         <AuraField disabled={!ai}>
           <label

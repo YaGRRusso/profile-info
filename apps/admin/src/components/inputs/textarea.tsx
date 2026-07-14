@@ -43,7 +43,12 @@ export function TextareaInput({
 
   return (
     <fieldset className="fieldset">
-      <InputLegend label={label} optional={optional} tooltip={tooltip} />
+      <InputLegend
+        ai={ai}
+        label={label}
+        optional={optional}
+        tooltip={tooltip}
+      />
       <AuraField disabled={!ai}>
         <label
           className={cn(
