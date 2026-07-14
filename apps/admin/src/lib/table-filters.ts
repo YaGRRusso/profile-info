@@ -1,4 +1,5 @@
 import type { Row } from "@tanstack/react-table";
+import { isNil } from "lodash";
 
 /**
  * Keeps rows whose numeric column value falls within an optional [min, max]
@@ -10,7 +11,7 @@ export function numberRangeFilter<TData>(
   value: unknown
 ): boolean {
   const rowValue = row.getValue<number | null>(columnId);
-  if (rowValue === null || rowValue === undefined) return false;
+  if (isNil(rowValue)) return false;
   const [min, max] = value as [number | undefined, number | undefined];
   if (min !== undefined && rowValue < min) return false;
   if (max !== undefined && rowValue > max) return false;

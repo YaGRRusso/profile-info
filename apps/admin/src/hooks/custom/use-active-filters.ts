@@ -1,3 +1,4 @@
+import { isNil } from "lodash";
 import { useMemo } from "react";
 import { useStableValue } from "@/hooks/custom/use-stable-value";
 
@@ -20,7 +21,7 @@ interface FilterPreview {
 }
 
 function isEmpty(value: unknown): boolean {
-  return value === null || value === undefined || value === "";
+  return isNil(value) || value === "";
 }
 
 function isPlainObject(value: unknown): value is Record<string, unknown> {

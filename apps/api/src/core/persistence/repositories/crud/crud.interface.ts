@@ -11,11 +11,13 @@ export interface CrudMapperInterface<
   TFilter extends object = Partial<TEntity>,
   TSort extends object = Partial<TEntity>,
 > {
-  toDomain(raw: TModel): TEntity;
-  toPersistenceForCreate(entity: TCreate): AnyKeys<TModel>;
-  toPersistenceForFilter(entity: Partial<TFilter>): QueryFilter<TModel>;
-  toPersistenceForSort(entity: Partial<TSort>): Record<keyof TModel, SortOrder>;
-  toPersistenceForUpdate(entity: TUpdate): UpdateQuery<TModel>;
+  toDomain: (raw: TModel) => TEntity;
+  toPersistenceForCreate: (entity: TCreate) => AnyKeys<TModel>;
+  toPersistenceForFilter: (entity: Partial<TFilter>) => QueryFilter<TModel>;
+  toPersistenceForSort: (
+    entity: Partial<TSort>
+  ) => Record<keyof TModel, SortOrder>;
+  toPersistenceForUpdate: (entity: TUpdate) => UpdateQuery<TModel>;
 }
 
 export interface CrudRepositoryInterface<
@@ -26,20 +28,22 @@ export interface CrudRepositoryInterface<
   TFilter extends object = Partial<TEntity>,
   TSort extends object = Partial<TEntity>,
 > {
-  createMany(createInputs: TCreate[]): Promise<BatchCount>;
-  createOne(createInput: TCreate): Promise<TEntity>;
+  createMany: (createInputs: TCreate[]) => Promise<BatchCount>;
+  createOne: (createInput: TCreate) => Promise<TEntity>;
 
-  deleteMany(filter: TFilter): Promise<BatchCount>;
-  deleteManyById(ids: string[]): Promise<BatchCount>;
-  deleteOne(query: FindOneQuery<TFilter>): Promise<TEntity>;
-  deleteOneById(id: string): Promise<TEntity>;
+  deleteMany: (filter: TFilter) => Promise<BatchCount>;
+  deleteManyById: (ids: string[]) => Promise<BatchCount>;
+  deleteOne: (query: FindOneQuery<TFilter>) => Promise<TEntity>;
+  deleteOneById: (id: string) => Promise<TEntity>;
 
-  findMany(query: FindManyQuery<TFilter, TSort>): Promise<MultiPaged<TEntity>>;
-  findManyById(ids: string[]): Promise<TEntity[]>;
-  findOne(query: FindOneQuery<TFilter>): Promise<TEntity>;
-  findOneById(id: string): Promise<TEntity>;
+  findMany: (
+    query: FindManyQuery<TFilter, TSort>
+  ) => Promise<MultiPaged<TEntity>>;
+  findManyById: (ids: string[]) => Promise<TEntity[]>;
+  findOne: (query: FindOneQuery<TFilter>) => Promise<TEntity>;
+  findOneById: (id: string) => Promise<TEntity>;
 
-  global(): CrudRepositoryInterface<
+  global: () => CrudRepositoryInterface<
     TModel,
     TEntity,
     TCreate,
@@ -47,19 +51,26 @@ export interface CrudRepositoryInterface<
     TFilter,
     TSort
   >;
-  scoped(
+  scoped: (
     scope: PersistenceScope
-  ): CrudRepositoryInterface<TModel, TEntity, TCreate, TUpdate, TFilter, TSort>;
+  ) => CrudRepositoryInterface<
+    TModel,
+    TEntity,
+    TCreate,
+    TUpdate,
+    TFilter,
+    TSort
+  >;
 
-  updateMany(
+  updateMany: (
     filter: TFilter,
     updateInput: TUpdate,
     options?: { arrayFilters?: Record<string, unknown>[] }
-  ): Promise<BatchCount>;
-  updateManyById(ids: string[], updateInput: TUpdate): Promise<BatchCount>;
-  updateOne(
+  ) => Promise<BatchCount>;
+  updateManyById: (ids: string[], updateInput: TUpdate) => Promise<BatchCount>;
+  updateOne: (
     query: FindOneQuery<TFilter>,
     updateInput: TUpdate
-  ): Promise<TEntity>;
-  updateOneById(id: string, updateInput: TUpdate): Promise<TEntity>;
+  ) => Promise<TEntity>;
+  updateOneById: (id: string, updateInput: TUpdate) => Promise<TEntity>;
 }

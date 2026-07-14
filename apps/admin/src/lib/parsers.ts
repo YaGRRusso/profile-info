@@ -1,3 +1,4 @@
+import { isNil } from "lodash";
 import {
   createMultiParser,
   createParser,
@@ -60,10 +61,7 @@ function parsePrimitive(
 
 function serializeObjectFields(objectValue: Record<string, unknown>): string {
   return Object.entries(objectValue)
-    .filter(
-      ([, fieldValue]) =>
-        fieldValue !== undefined && fieldValue !== null && fieldValue !== ""
-    )
+    .filter(([, fieldValue]) => !isNil(fieldValue) && fieldValue !== "")
     .map(
       ([fieldKey, fieldValue]) =>
         `${fieldKey}:${encodeURIComponent(String(fieldValue))}`

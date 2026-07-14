@@ -1,5 +1,5 @@
 import { DeepKeys, DeepValue, useForm } from "@tanstack/react-form";
-import lodash from "lodash";
+import { startCase } from "lodash";
 import { useCallback, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { toast } from "react-toastify";
@@ -210,7 +210,7 @@ export function OrganizationForm({
         listeners={{
           onChange: ({ value }) => {
             if (!isNameEdited) {
-              form.setFieldValue("name", lodash.startCase(value));
+              form.setFieldValue("name", startCase(value));
             }
           },
         }}

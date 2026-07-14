@@ -1,4 +1,4 @@
-import lodash from "lodash";
+import { get, isNil, keyBy } from "lodash";
 
 type NullableList<T> = T[] | null | undefined;
 
@@ -7,7 +7,7 @@ const indexCollectionByKey = <T extends Record<string, unknown>>(
   lookupKey: keyof T
 ): Record<string | number, T> => {
   if (!Array.isArray(items)) return {};
-  return lodash.keyBy(items, (item) => String(item[lookupKey]));
+  return keyBy(items, (item) => String(item[lookupKey]));
 };
 
 interface FindLabelArgs<T> {
@@ -25,7 +25,7 @@ export const findLabelById = <T extends Record<string, unknown>>({
   labelKey,
   fallbackValue = "",
 }: FindLabelArgs<T>): string => {
-  if (targetValue === null || targetValue === undefined) {
+  if (isNil(targetValue)) {
     return fallbackValue;
   }
 
@@ -34,7 +34,7 @@ export const findLabelById = <T extends Record<string, unknown>>({
 
   if (!matchedItem) return fallbackValue;
 
-  return String(lodash.get(matchedItem, labelKey, fallbackValue));
+  return String(get(matchedItem, labelKey, fallbackValue));
 };
 
 interface FindLabelsArgs<T> extends Omit<FindLabelArgs<T>, "targetValue"> {
@@ -53,12 +53,12 @@ export const findLabelsByIds = <T extends Record<string, unknown>>({
   const indexedItems = indexCollectionByKey(items, lookupKey);
 
   return targetValues.map((value) => {
-    if (value === null || value === undefined) return fallbackValue;
+    if (isNil(value)) return fallbackValue;
 
     const matchedItem = indexedItems[String(value)];
 
     if (!matchedItem) return fallbackValue;
 
-    return String(lodash.get(matchedItem, labelKey, fallbackValue));
+    return String(get(matchedItem, labelKey, fallbackValue));
   });
 };

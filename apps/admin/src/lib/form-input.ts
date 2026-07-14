@@ -1,3 +1,5 @@
+import { isNil } from "lodash";
+
 /**
  * Omits empty strings from GraphQL variables (field unchanged on partial update).
  * Use only when an empty value does not mean "clear" — e.g. password is never
@@ -9,7 +11,7 @@ export function omitIfEmpty(value: string): string | undefined {
 
 /** Cleared optional form value → `null` so updates persist the empty state. */
 export function nullIfEmpty<T>(value: T): T | null {
-  if (value == null || value === "") return null;
+  if (isNil(value) || value === "") return null;
   if (Array.isArray(value) && value.length === 0) return null;
   if (value === 0) return null;
   return value;
