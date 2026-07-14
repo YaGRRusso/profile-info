@@ -63,9 +63,9 @@ export class CoursesService {
   ): Promise<MultiPaged<CourseEntityRecord>> {
     return this.repository.tenantCrud(ctx).findMany({
       filters,
-      sort,
-      skip,
       limit,
+      skip,
+      sort,
     });
   }
 
@@ -121,6 +121,10 @@ export class CoursesService {
     return this.repository.tenantStats(ctx).count();
   }
 
+  countByOwners(ownerIds: string[]): Promise<FieldCount[]> {
+    return this.repository.countByOwners(ownerIds);
+  }
+
   countByField(ctx: AuthContext, field: string): Promise<FieldCount[]> {
     return this.repository.tenantStats(ctx).countByField(field);
   }
@@ -133,8 +137,8 @@ export class CoursesService {
       .tenantStats(ctx)
       .findRecentlyUpdated(limit, "slug i18n updatedAt");
     return rows.map((row) => ({
-      slug: row.slug as string | undefined,
       i18n: (row.i18n as RecentActivityRecord["i18n"]) ?? [],
+      slug: row.slug as string | undefined,
       updatedAt: row.updatedAt,
     }));
   }

@@ -32,6 +32,7 @@ describe("EducationsService", () => {
     detachSkill: jest.Mock;
     purgeByOrganization: jest.Mock;
     purgeByOwner: jest.Mock;
+    countByOwners: jest.Mock;
   };
 
   beforeEach(async () => {
@@ -39,11 +40,12 @@ describe("EducationsService", () => {
     crud = createMockCrud();
     stats = createMockStats();
     repository = {
-      tenantCrud: jest.fn().mockReturnValue(crud),
-      tenantStats: jest.fn().mockReturnValue(stats),
+      countByOwners: jest.fn(),
       detachSkill: jest.fn(),
       purgeByOrganization: jest.fn(),
       purgeByOwner: jest.fn(),
+      tenantCrud: jest.fn().mockReturnValue(crud),
+      tenantStats: jest.fn().mockReturnValue(stats),
     };
 
     const module: TestingModule = await Test.createTestingModule({
@@ -87,19 +89,19 @@ describe("EducationsService", () => {
 
   describe("createOne", () => {
     const createInput = {
-      slug: "bachelor-cs",
-      organizationId,
-      level: EducationLevel.BACHELOR,
-      status: EducationStatus.COMPLETE,
       i18n: [
         {
           locale: "en",
           messages: {
-            title: "Computer Science",
             description: "Bachelor degree",
+            title: "Computer Science",
           },
         },
       ],
+      level: EducationLevel.BACHELOR,
+      organizationId,
+      slug: "bachelor-cs",
+      status: EducationStatus.COMPLETE,
     };
 
     it("delegates to scoped crud", async () => {
@@ -139,11 +141,11 @@ describe("EducationsService", () => {
 
   describe("removeMany", () => {
     it("delegates to scoped crud", async () => {
-      crud.deleteManyById.mockResolvedValue({ succeeded: 1, failed: 0 });
+      crud.deleteManyById.mockResolvedValue({ failed: 0, succeeded: 1 });
 
       await expect(service.removeMany(ctx, [validId])).resolves.toEqual({
-        succeeded: 1,
         failed: 0,
+        succeeded: 1,
       });
       expect(repository.tenantCrud).toHaveBeenCalledWith(ctx);
       expect(crud.deleteManyById).toHaveBeenCalledWith([validId]);

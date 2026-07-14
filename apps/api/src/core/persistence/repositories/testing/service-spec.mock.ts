@@ -10,12 +10,12 @@ export function createMockCrud() {
     findManyById: jest.fn(),
     findOne: jest.fn(),
     findOneById: jest.fn(),
+    global: jest.fn(),
+    scoped: jest.fn(),
     updateMany: jest.fn(),
     updateManyById: jest.fn(),
     updateOne: jest.fn(),
     updateOneById: jest.fn(),
-    scoped: jest.fn(),
-    global: jest.fn(),
   };
 
   mock.scoped.mockReturnValue(mock);
@@ -28,9 +28,10 @@ export function createMockStats() {
   const mock = {
     count: jest.fn(),
     countByField: jest.fn(),
+    countByOwnerIds: jest.fn(),
     findRecentlyUpdated: jest.fn(),
-    scoped: jest.fn(),
     global: jest.fn(),
+    scoped: jest.fn(),
   };
 
   mock.scoped.mockReturnValue(mock);

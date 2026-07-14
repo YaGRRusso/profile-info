@@ -18,8 +18,8 @@ const ctx = testAuthContext({ id: ownerId });
 const fakeEntity = {
   id: validId,
   ownerId,
-  slug: "software-engineer",
   roles: [],
+  slug: "software-engineer",
 };
 
 describe("ExperiencesService", () => {
@@ -32,6 +32,7 @@ describe("ExperiencesService", () => {
     detachSkill: jest.Mock;
     purgeByOrganization: jest.Mock;
     purgeByOwner: jest.Mock;
+    countByOwners: jest.Mock;
   };
 
   beforeEach(async () => {
@@ -39,11 +40,12 @@ describe("ExperiencesService", () => {
     crud = createMockCrud();
     stats = createMockStats();
     repository = {
-      tenantCrud: jest.fn().mockReturnValue(crud),
-      tenantStats: jest.fn().mockReturnValue(stats),
+      countByOwners: jest.fn(),
       detachSkill: jest.fn(),
       purgeByOrganization: jest.fn(),
       purgeByOwner: jest.fn(),
+      tenantCrud: jest.fn().mockReturnValue(crud),
+      tenantStats: jest.fn().mockReturnValue(stats),
     };
 
     const module: TestingModule = await Test.createTestingModule({
@@ -87,22 +89,22 @@ describe("ExperiencesService", () => {
 
   describe("createOne", () => {
     const createInput = {
-      slug: "software-engineer",
-      organizationId,
       category: ExperienceCategory.FULL_TIME,
+      organizationId,
       roles: [
         {
           i18n: [
             {
               locale: "en",
               messages: {
-                title: "Software Engineer",
                 description: "Backend development",
+                title: "Software Engineer",
               },
             },
           ],
         },
       ],
+      slug: "software-engineer",
     };
 
     it("delegates to scoped crud", async () => {
@@ -142,11 +144,11 @@ describe("ExperiencesService", () => {
 
   describe("removeMany", () => {
     it("delegates to scoped crud", async () => {
-      crud.deleteManyById.mockResolvedValue({ succeeded: 1, failed: 0 });
+      crud.deleteManyById.mockResolvedValue({ failed: 0, succeeded: 1 });
 
       await expect(service.removeMany(ctx, [validId])).resolves.toEqual({
-        succeeded: 1,
         failed: 0,
+        succeeded: 1,
       });
       expect(repository.tenantCrud).toHaveBeenCalledWith(ctx);
       expect(crud.deleteManyById).toHaveBeenCalledWith([validId]);
@@ -173,6 +175,16 @@ describe("ExperiencesService", () => {
     it("delegates to repository helper", async () => {
       await service.purgeByOwner(ownerId);
       expect(repository.purgeByOwner).toHaveBeenCalledWith(ownerId);
+    });
+  });
+
+  describe("countByOwners", () => {
+    it("delegates to repository.countByOwners", async () => {
+      const rows = [{ label: ownerId, value: 2 }];
+      repository.countByOwners.mockResolvedValue(rows);
+
+      await expect(service.countByOwners([ownerId])).resolves.toBe(rows);
+      expect(repository.countByOwners).toHaveBeenCalledWith([ownerId]);
     });
   });
 });

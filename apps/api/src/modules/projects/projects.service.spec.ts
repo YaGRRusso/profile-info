@@ -27,6 +27,7 @@ describe("ProjectsService", () => {
     tenantStats: jest.Mock;
     detachSkill: jest.Mock;
     purgeByOwner: jest.Mock;
+    countByOwners: jest.Mock;
   };
 
   beforeEach(async () => {
@@ -34,10 +35,11 @@ describe("ProjectsService", () => {
     crud = createMockCrud();
     stats = createMockStats();
     repository = {
-      tenantCrud: jest.fn().mockReturnValue(crud),
-      tenantStats: jest.fn().mockReturnValue(stats),
+      countByOwners: jest.fn(),
       detachSkill: jest.fn(),
       purgeByOwner: jest.fn(),
+      tenantCrud: jest.fn().mockReturnValue(crud),
+      tenantStats: jest.fn().mockReturnValue(stats),
     };
 
     const module: TestingModule = await Test.createTestingModule({
@@ -74,16 +76,16 @@ describe("ProjectsService", () => {
 
   describe("createOne", () => {
     const createInput = {
-      slug: "portfolio-app",
       i18n: [
         {
           locale: "en",
           messages: {
-            title: "Portfolio",
             description: "My portfolio app",
+            title: "Portfolio",
           },
         },
       ],
+      slug: "portfolio-app",
     };
 
     it("delegates to scoped crud", async () => {
@@ -123,11 +125,11 @@ describe("ProjectsService", () => {
 
   describe("removeMany", () => {
     it("delegates to scoped crud", async () => {
-      crud.deleteManyById.mockResolvedValue({ succeeded: 1, failed: 0 });
+      crud.deleteManyById.mockResolvedValue({ failed: 0, succeeded: 1 });
 
       await expect(service.removeMany(ctx, [validId])).resolves.toEqual({
-        succeeded: 1,
         failed: 0,
+        succeeded: 1,
       });
       expect(repository.tenantCrud).toHaveBeenCalledWith(ctx);
       expect(crud.deleteManyById).toHaveBeenCalledWith([validId]);

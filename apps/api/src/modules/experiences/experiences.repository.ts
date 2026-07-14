@@ -59,4 +59,8 @@ export class ExperiencesRepository {
   async purgeByOwner(ownerId: string): Promise<void> {
     await this.model.deleteMany({ ownerId }).exec();
   }
+
+  countByOwners(ownerIds: string[]) {
+    return this.stats.global().countByOwnerIds(ownerIds);
+  }
 }

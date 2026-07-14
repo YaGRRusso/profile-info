@@ -2,6 +2,7 @@ import { Injectable } from "@nestjs/common";
 import type { AuthContext } from "@/core/context/auth-context.interface";
 import { BatchEntity } from "@/core/entities/batch.entity";
 import type {
+  FieldCount,
   MultiPaged,
   RecentActivityRecord,
 } from "@/core/persistence/types/output.type";
@@ -65,9 +66,9 @@ export class EducationsService {
   ): Promise<MultiPaged<EducationEntityRecord>> {
     return this.repository.tenantCrud(ctx).findMany({
       filters,
-      sort,
-      skip,
       limit,
+      skip,
+      sort,
     });
   }
 
@@ -121,6 +122,10 @@ export class EducationsService {
     return this.repository.tenantStats(ctx).count();
   }
 
+  countByOwners(ownerIds: string[]): Promise<FieldCount[]> {
+    return this.repository.countByOwners(ownerIds);
+  }
+
   async findRecentActivity(
     ctx: AuthContext,
     limit: number
@@ -129,8 +134,8 @@ export class EducationsService {
       .tenantStats(ctx)
       .findRecentlyUpdated(limit, "slug i18n updatedAt");
     return rows.map((row) => ({
-      slug: row.slug as string | undefined,
       i18n: (row.i18n as RecentActivityRecord["i18n"]) ?? [],
+      slug: row.slug as string | undefined,
       updatedAt: row.updatedAt,
     }));
   }

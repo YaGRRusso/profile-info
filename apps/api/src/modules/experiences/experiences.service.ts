@@ -66,9 +66,9 @@ export class ExperiencesService {
   ): Promise<MultiPaged<ExperienceEntityRecord>> {
     return this.repository.tenantCrud(ctx).findMany({
       filters,
-      sort,
-      skip,
       limit,
+      skip,
+      sort,
     });
   }
 
@@ -122,6 +122,10 @@ export class ExperiencesService {
     return this.repository.tenantStats(ctx).count();
   }
 
+  countByOwners(ownerIds: string[]): Promise<FieldCount[]> {
+    return this.repository.countByOwners(ownerIds);
+  }
+
   countByField(ctx: AuthContext, field: string): Promise<FieldCount[]> {
     return this.repository.tenantStats(ctx).countByField(field);
   }
@@ -140,8 +144,8 @@ export class ExperiencesService {
         | undefined;
 
       return {
-        slug: row.slug as string | undefined,
         i18n: roles?.[0]?.i18n ?? [],
+        slug: row.slug as string | undefined,
         updatedAt: row.updatedAt,
       };
     });
