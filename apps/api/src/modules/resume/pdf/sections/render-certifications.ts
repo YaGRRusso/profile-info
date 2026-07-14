@@ -1,3 +1,4 @@
+import { isNil } from "lodash";
 import {
   entryBlockSectionHandlers,
   renderSection,
@@ -18,10 +19,9 @@ export function renderCertifications(
     items: document.certifications,
     title,
     ...entryBlockSectionHandlers<ResumeCertification>((certification) => {
-      const hoursLabel =
-        certification.hours === undefined
-          ? undefined
-          : formatHours(certification.hours);
+      const hoursLabel = isNil(certification.hours)
+        ? undefined
+        : formatHours(certification.hours);
 
       return {
         description: certification.description,

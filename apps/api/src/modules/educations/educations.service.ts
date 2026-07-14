@@ -1,4 +1,5 @@
 import { Injectable } from "@nestjs/common";
+import { isNil } from "lodash";
 import type { AuthContext } from "@/core/context/auth-context.interface";
 import { BatchEntity } from "@/core/entities/batch.entity";
 import type {
@@ -176,7 +177,7 @@ export class EducationsService {
       ...new Set(
         inputs
           .map((item) => item.organizationId)
-          .filter((id): id is string => id !== undefined)
+          .filter((id): id is string => !isNil(id))
       ),
     ];
     const skillIds = [

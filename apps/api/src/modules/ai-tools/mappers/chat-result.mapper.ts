@@ -1,3 +1,4 @@
+import { isNil } from "lodash";
 import type { IntegrationChatResult } from "@/integrations/open-router/ai-chat.provider";
 import { AiEntity } from "../entities/ai-response.entity";
 import { ChatRole } from "../enums/chat-role.enum";
@@ -24,7 +25,7 @@ function mapChatRole(role: string): ChatRole {
 }
 
 function mapFinishReason(finishReason: string | null): ChatFinishReason | null {
-  if (finishReason === null) return null;
+  if (isNil(finishReason)) return null;
   return CHAT_FINISH_REASON_BY_VALUE[finishReason] ?? null;
 }
 

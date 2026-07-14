@@ -11,3 +11,9 @@ export function isEmptyValue(value: unknown): boolean {
   }
   return false;
 }
+
+export function isNonEmptyString(
+  value: string | null | undefined
+): value is string {
+  return !isNil(value) && value !== "";
+}

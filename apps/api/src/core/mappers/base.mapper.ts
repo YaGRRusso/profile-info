@@ -1,3 +1,4 @@
+import { isNil } from "lodash";
 import mongoose from "mongoose";
 import {
   assertValidObjectId,
@@ -19,7 +20,7 @@ export function toBaseEntityFields(
 export function toIdString(
   value: string | { toString: () => string } | undefined
 ): string | undefined {
-  if (value === undefined) return;
+  if (isNil(value)) return;
   return String(value);
 }
 
@@ -40,8 +41,7 @@ export function toObjectId(
 export function toObjectIds(
   values: string[] | null | undefined
 ): mongoose.Types.ObjectId[] | null | undefined {
-  if (values === undefined) return;
-  if (values === null) return null;
+  if (isNil(values)) return values;
   assertValidObjectIds(values);
   return values.map((value) => new mongoose.Types.ObjectId(value));
 }

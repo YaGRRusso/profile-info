@@ -1,4 +1,4 @@
-import { keyBy } from "lodash";
+import { isNil, keyBy } from "lodash";
 import type { SkillEntityRecord } from "@/modules/skills/entities/skill.entity";
 
 export function orderSkillsByIds(
@@ -8,5 +8,5 @@ export function orderSkillsByIds(
   const map = keyBy(skills, (skill) => skill.id);
   return skillIds
     .map((id) => map[id])
-    .filter((skill): skill is SkillEntityRecord => skill !== null);
+    .filter((skill): skill is SkillEntityRecord => !isNil(skill));
 }

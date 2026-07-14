@@ -34,6 +34,7 @@ import {
 } from "@/hooks/mutations/skills";
 import { type SkillRow, useFindManySkills } from "@/hooks/queries/skills";
 import { cn } from "@/lib/cn";
+import { isNonEmptyString } from "@/lib/empty-value";
 import { i18nLabel } from "@/lib/i18n";
 import { pageHelp } from "@/lib/page-help";
 import { SkillsTable } from "./-components/table";
@@ -272,7 +273,7 @@ function RouteComponent() {
           onSubmit={handleSubmit}
           slugsList={findManySkills.data?.nodes
             .map((skill) => skill.slug)
-            .filter((slug): slug is string => slug !== null && slug !== "")}
+            .filter(isNonEmptyString)}
           state={formValues?.state}
         />
       </Modal>

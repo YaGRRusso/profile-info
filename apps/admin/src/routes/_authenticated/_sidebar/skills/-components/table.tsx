@@ -442,7 +442,7 @@ export function SkillsTable({
   const categoryFacets = getUniqueFacets(
     table.getColumn("category")!.getFacetedUniqueValues()
   )
-    .filter(({ value }) => value !== null && value !== "")
+    .filter(({ value }) => !isEmptyValue(value))
     .map(({ value, label, count }) => ({
       count,
       label: label || EMPTY_MARKER,

@@ -33,6 +33,7 @@ import {
   useFindManyExperiences,
 } from "@/hooks/queries/experiences";
 import { cn } from "@/lib/cn";
+import { isNonEmptyString } from "@/lib/empty-value";
 import { pageHelp } from "@/lib/page-help";
 import { ExperiencesTable } from "./-components/table";
 
@@ -195,7 +196,7 @@ function RouteComponent() {
           onSubmit={handleSubmit}
           slugsList={findManyExperiences.data?.nodes
             .map((experience) => experience.slug)
-            .filter((slug): slug is string => slug !== null && slug !== "")}
+            .filter(isNonEmptyString)}
           state={formValues?.state}
         />
       </Modal>

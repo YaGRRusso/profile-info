@@ -30,6 +30,7 @@ import {
 } from "@/hooks/mutations/projects";
 import { type ProjectRow, useFindManyProjects } from "@/hooks/queries/projects";
 import { cn } from "@/lib/cn";
+import { isNonEmptyString } from "@/lib/empty-value";
 import { pageHelp } from "@/lib/page-help";
 import { ProjectsTable } from "./-components/table";
 
@@ -188,7 +189,7 @@ function RouteComponent() {
           onSubmit={handleSubmit}
           slugsList={findManyProjects.data?.nodes
             .map((project) => project.slug)
-            .filter((slug): slug is string => slug !== null && slug !== "")}
+            .filter(isNonEmptyString)}
           state={formValues?.state}
         />
       </Modal>

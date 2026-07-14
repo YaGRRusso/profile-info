@@ -30,6 +30,7 @@ import {
 } from "@/hooks/mutations/courses";
 import { type CourseRow, useFindManyCourses } from "@/hooks/queries/courses";
 import { cn } from "@/lib/cn";
+import { isNonEmptyString } from "@/lib/empty-value";
 import { pageHelp } from "@/lib/page-help";
 import { CoursesTable } from "./-components/table";
 
@@ -188,7 +189,7 @@ function RouteComponent() {
           onSubmit={handleSubmit}
           slugsList={findManyCourses.data?.nodes
             .map((course) => course.slug)
-            .filter((slug): slug is string => slug !== null && slug !== "")}
+            .filter(isNonEmptyString)}
           state={formValues?.state}
         />
       </Modal>

@@ -37,6 +37,7 @@ import {
   useFindManyOrganizations,
 } from "@/hooks/queries/organizations";
 import { cn } from "@/lib/cn";
+import { isNonEmptyString } from "@/lib/empty-value";
 import { pageHelp } from "@/lib/page-help";
 import { OrganizationsTable } from "./-components/table";
 
@@ -280,7 +281,7 @@ function RouteComponent() {
           onSubmit={handleSubmit}
           slugsList={findManyOrganizations.data?.nodes
             .map((organization) => organization.slug)
-            .filter((slug): slug is string => slug !== null && slug !== "")}
+            .filter(isNonEmptyString)}
           state={formValues?.state}
         />
       </Modal>

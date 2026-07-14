@@ -1,4 +1,4 @@
-import { compact } from "lodash";
+import { compact, isNil } from "lodash";
 
 import type { DetailInput } from "../dto/detail.input";
 
@@ -8,7 +8,7 @@ export interface PromptLine {
 }
 
 function formatLine({ key, value }: PromptLine): string | undefined {
-  if (value === undefined || value === "") return;
+  if (isNil(value) || value === "") return;
   if (Array.isArray(value) && value.length === 0) return;
 
   const text = Array.isArray(value) ? value.join(", ") : value;
