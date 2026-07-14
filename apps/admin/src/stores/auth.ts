@@ -30,3 +30,17 @@ export const useAuthStore = create<AuthStore>()(
     { name: "auth", storage: createJSONStorage(() => localStorage) }
   )
 );
+
+/** Resolves once the persisted auth store has rehydrated from storage. */
+export function waitForAuthHydration(): Promise<void> {
+  if (useAuthStore.persist.hasHydrated()) {
+    return Promise.resolve();
+  }
+
+  return new Promise((resolve) => {
+    const unsub = useAuthStore.persist.onFinishHydration(() => {
+      unsub();
+      resolve();
+    });
+  });
+}

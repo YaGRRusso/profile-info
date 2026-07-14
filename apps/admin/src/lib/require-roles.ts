@@ -1,7 +1,6 @@
 import { notFound } from "@tanstack/react-router";
 import { UserRole } from "@/generated/graphql/graphql";
-import { waitForAuthHydration } from "@/hooks/custom/use-auth-hydrated";
-import { useAuthStore } from "@/stores/auth";
+import { useAuthStore, waitForAuthHydration } from "@/stores/auth";
 
 export function requireRoles(...allowedRoles: UserRole[]) {
   return async () => {
