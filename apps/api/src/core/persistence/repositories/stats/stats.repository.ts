@@ -64,11 +64,11 @@ export class StatsRepository<TModel>
       { $sort: { value: -1 } }
     );
 
-    const rows = await this.model.aggregate<{ _id: string; value: number }>(
+    const rows = await this.model.aggregate<{ _id: unknown; value: number }>(
       pipeline
     );
 
-    return rows.map((row) => ({ label: row._id, value: row.value }));
+    return rows.map((row) => ({ label: String(row._id), value: row.value }));
   }
 
   async findRecentlyUpdated(

@@ -10,12 +10,12 @@ interface TestModel extends BaseModel {
 
 function mockQueryChain(returnValue: unknown) {
   const chain = {
-    sort: jest.fn(),
-    skip: jest.fn(),
+    exec: jest.fn().mockResolvedValue(returnValue),
+    lean: jest.fn(),
     limit: jest.fn(),
     select: jest.fn(),
-    lean: jest.fn(),
-    exec: jest.fn().mockResolvedValue(returnValue),
+    skip: jest.fn(),
+    sort: jest.fn(),
   };
 
   chain.sort.mockReturnValue(chain);
@@ -36,14 +36,14 @@ describe("StatsRepository", () => {
   };
 
   const ownerId = new mongoose.Types.ObjectId().toHexString();
-  const tenant = { userId: ownerId, crossTenant: false };
+  const tenant = { crossTenant: false, userId: ownerId };
 
   beforeEach(() => {
     jest.clearAllMocks();
 
     model = {
-      countDocuments: jest.fn(),
       aggregate: jest.fn(),
+      countDocuments: jest.fn(),
       find: jest.fn(),
     };
 
@@ -81,6 +81,15 @@ describe("StatsRepository", () => {
       expect(model.aggregate).toHaveBeenCalledWith([
         { $group: { _id: "$name", value: { $sum: 1 } } },
         { $sort: { value: -1 } },
+      ]);
+    });
+
+    it("should stringify ObjectId group keys", async () => {
+      const id = new mongoose.Types.ObjectId();
+      model.aggregate.mockResolvedValue([{ _id: id, value: 2 }]);
+
+      await expect(repository.countByField("ownerId")).resolves.toEqual([
+        { label: id.toHexString(), value: 2 },
       ]);
     });
 
@@ -163,7 +172,7 @@ describe("StatsRepository", () => {
 
         await expect(
           repository
-            .scoped(tenantScope({ userId: ownerId, crossTenant: true }))
+            .scoped(tenantScope({ crossTenant: true, userId: ownerId }))
             .count({
               name: "TypeScript",
             })
@@ -212,7 +221,7 @@ describe("StatsRepository", () => {
 
         await expect(
           repository
-            .scoped(tenantScope({ userId: ownerId, crossTenant: true }))
+            .scoped(tenantScope({ crossTenant: true, userId: ownerId }))
             .countByField("category")
         ).resolves.toEqual([{ label: "FULL_TIME", value: 2 }]);
 
