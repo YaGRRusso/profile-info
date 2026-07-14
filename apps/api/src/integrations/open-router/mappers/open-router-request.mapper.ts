@@ -6,11 +6,11 @@ export function openRouterRequestMapper(
   model: string
 ): ChatRequest & { stream?: false } {
   return {
-    model,
     messages: request.messages.map((message) => ({
-      role: message.role,
       content: message.content,
+      role: message.role,
     })) as ChatRequest["messages"],
+    model,
     stream: false,
   };
 }

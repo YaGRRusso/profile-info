@@ -7,7 +7,7 @@ import {
   type IntegrationChatRequest,
   type IntegrationChatResult,
 } from "./ai-chat.provider";
-import { isRetryableOpenRouterError } from "./helpers/is-retryable-open-router-error.helper";
+import { isOpenRouterAuthError } from "./helpers/is-open-router-auth-error.helper";
 import { openRouterRequestMapper } from "./mappers/open-router-request.mapper";
 import { openRouterResultMapper } from "./mappers/open-router-result.mapper";
 
@@ -29,6 +29,7 @@ export class OpenRouterService extends AiChatProvider {
   async chat(request: IntegrationChatRequest): Promise<IntegrationChatResult> {
     for (const [index, model] of this.models.entries()) {
       try {
+        // biome-ignore lint/performance/noAwaitInLoops: model fallback chain must be sequential
         const result = await this.complete(request, model);
 
         if (index > 0)
@@ -36,8 +37,8 @@ export class OpenRouterService extends AiChatProvider {
 
         return result;
       } catch (error) {
-        const canRetry =
-          index < this.models.length - 1 && isRetryableOpenRouterError(error);
+        const hasNext = index < this.models.length - 1;
+        const canRetry = hasNext && !isOpenRouterAuthError(error);
 
         if (!canRetry) {
           throw error;

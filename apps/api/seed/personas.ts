@@ -42,7 +42,17 @@ export interface PersonaDefinition {
   role: UserRole;
 }
 
-/** Declaration order is the QA matrix order (see seed/README.md). */
+/** Declaration order is the QA matrix order (see seed/README.md). Independent of
+ * `PERSONAS` key order so formatters that sort object keys cannot reshuffle the matrix. */
+export const PERSONA_KEYS: PersonaKey[] = [
+  "empty",
+  "joao",
+  "maria",
+  "full",
+  "pending",
+  "admin",
+];
+
 export const PERSONAS: Record<PersonaKey, PersonaDefinition> = {
   admin: {
     email: "admin@profile.info",
@@ -106,5 +116,3 @@ export const PERSONAS: Record<PersonaKey, PersonaDefinition> = {
     role: UserRole.USER,
   },
 };
-
-export const PERSONA_KEYS = Object.keys(PERSONAS) as PersonaKey[];

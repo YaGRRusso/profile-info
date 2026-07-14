@@ -10,6 +10,7 @@ describe("seed personas", () => {
       "pending",
       "admin",
     ]);
+    expect([...PERSONA_KEYS].sort()).toEqual(Object.keys(PERSONAS).sort());
   });
 
   it("uses short and long display names independent of email", () => {

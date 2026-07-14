@@ -8,17 +8,17 @@ export function openRouterResultMapper(
     messages: result.choices.map((choice) => ({
       finishReason: choice.finishReason ?? null,
       message: {
-        role: choice.message.role,
         content: choice.message.content,
         reasoning: choice.message.reasoning,
         refusal: choice.message.refusal,
+        role: choice.message.role,
       },
     })),
     usage: {
       completionTokens: result?.usage?.completionTokens,
+      cost: result?.usage?.cost,
       promptTokens: result?.usage?.promptTokens,
       totalTokens: result?.usage?.totalTokens,
-      cost: result?.usage?.cost,
     },
   };
 }

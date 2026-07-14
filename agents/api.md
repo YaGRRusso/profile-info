@@ -168,7 +168,7 @@ Loaded via `--env-file .env.development` / `.env.production` and `ConfigModule`.
 - `JWT_SECRET` (required): JWT signing secret.
 - `HOST` (optional, default `0.0.0.0`), `PORT` (optional, default `8080`).
 - `GRAPHQL_INTROSPECTION` (required, `true` | `false`): Apollo Sandbox schema introspection. Set `true` in development; `false` in production unless you explicitly want the public schema explorer.
-- `OPENROUTER_API_KEY`, `OPENROUTER_AI_MODELS`, `GITHUB_API_KEY`, `TAVILY_API_KEY` (required for the `ai-tools` module): read via `ConfigService`. `OPENROUTER_AI_MODELS` is a comma-separated list of model ids, tried in order; when one fails with a retryable error (503, overload, timeout, etc.), `OpenRouterService` tries the next.
+- `OPENROUTER_API_KEY`, `OPENROUTER_AI_MODELS`, `GITHUB_API_KEY`, `TAVILY_API_KEY` (required for the `ai-tools` module): read via `ConfigService`. `OPENROUTER_AI_MODELS` is a comma-separated list of model ids, tried in order; on any failure (unavailable, paid-only, rate limit, token budget, timeout, etc.) `OpenRouterService` tries the next model and only throws after the last one fails. Exception: OpenRouter **401 / auth** errors stop immediately (same API key; another model cannot recover).
 
 ## Scripts / commands
 
