@@ -72,6 +72,72 @@
   }
 }
 
+@utility text-rainbow {
+  --text-gradient: linear-gradient(
+    to right in oklch longer hue,
+    oklch(80% 0.15 0deg),
+    oklch(80% 0.15 360deg)
+  );
+  color: transparent;
+  background-image: var(--text-gradient);
+  background-clip: text;
+}
+
+@utility text-ai {
+  --text-gradient: linear-gradient(
+    to right in oklch,
+    oklch(0.65 0.24 295),
+    oklch(0.7 0.22 350),
+    oklch(0.72 0.16 230)
+  );
+  color: transparent;
+  background-image: var(--text-gradient);
+  background-clip: text;
+}
+
+@utility text-compose {
+  --text-gradient: linear-gradient(
+    to right,
+    var(--color-primary),
+    var(--color-secondary)
+  );
+  color: transparent;
+  background-image: var(--text-gradient);
+  background-clip: text;
+}
+
+/* daisyUI `aura` style modifier — same idea as `aura-rainbow` / `aura-gold`. */
+@utility aura-compose {
+  background-image: repeating-conic-gradient(
+    from var(--aura-angle),
+    color-mix(in oklch, var(--color-primary) 80%, transparent),
+    color-mix(in oklch, var(--color-secondary) 80%, transparent),
+    color-mix(in oklch, var(--color-primary) 80%, transparent),
+    color-mix(in oklch, var(--color-secondary) 80%, transparent),
+    color-mix(in oklch, var(--color-primary) 80%, transparent) 50%
+  );
+}
+
+@utility aura-opaque {
+  &::before,
+  &::after {
+    display: none;
+  }
+}
+
+@utility text-animated {
+  background-position: 0% 50%;
+  background-size: 200% 100%;
+  animation: text-gradient-shift var(--tw-duration, 4s) ease-in-out infinite
+    alternate;
+
+  @media (prefers-reduced-motion: reduce) {
+    background-position: 0% 50%;
+    background-size: 100% 100%;
+    animation: none;
+  }
+}
+
 @utility form {
   display: flex;
   flex-direction: column;
@@ -137,6 +203,15 @@
     to {
       opacity: 1;
       transform: translateY(0);
+    }
+  }
+
+  @keyframes text-gradient-shift {
+    from {
+      background-position: 0% 50%;
+    }
+    to {
+      background-position: 100% 50%;
     }
   }
 }

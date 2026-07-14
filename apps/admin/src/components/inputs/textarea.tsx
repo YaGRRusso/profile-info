@@ -71,7 +71,7 @@ export function TextareaInput({
         <div className="ml-auto flex items-center gap-1">
           {onTranslate && (
             <button
-              className="btn btn-xs group btn-ghost"
+              className="btn btn-xs group"
               disabled={
                 disabled ||
                 !value ||
@@ -82,14 +82,14 @@ export function TextareaInput({
               type="button"
             >
               <TranslateIcon className="text-primary group-disabled:text-base-content/20" />
-              <span className="bg-linear-to-r from-primary to-secondary bg-clip-text text-transparent group-disabled:from-base-content/20 group-disabled:to-base-content/20">
+              <span className="text-animated text-compose group-disabled:bg-none group-disabled:text-base-content/20">
                 {tForm("ai.translate")}
               </span>
             </button>
           )}
           {onOptimize && (
             <button
-              className="btn btn-xs group btn-ghost"
+              className="btn btn-xs group"
               disabled={
                 disabled ||
                 !value ||
@@ -100,7 +100,7 @@ export function TextareaInput({
               type="button"
             >
               <SparkleIcon className="text-primary group-disabled:text-base-content/20" />
-              <span className="bg-linear-to-r from-primary to-secondary bg-clip-text text-transparent group-disabled:from-base-content/20 group-disabled:to-base-content/20">
+              <span className="text-animated text-compose group-disabled:bg-none group-disabled:text-base-content/20">
                 {tForm("ai.optimize")}
               </span>
             </button>
