@@ -40,7 +40,8 @@
       },
       "suspicious": {
         "noExplicitAny": "warn",
-        "noArrayIndexKey": "off"
+        "noArrayIndexKey": "off",
+        "noUnnecessaryConditions": "off"
       },
       "performance": {
         "noJsxPropsBind": "off"

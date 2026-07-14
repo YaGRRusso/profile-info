@@ -235,19 +235,19 @@ function RouteComponent() {
       <PageTitle
         actions={[
           {
+            className: "btn-ghost btn-square",
+            disabled: findManySkills.isFetching,
             icon: (
               <ArrowsClockwiseIcon
                 className={cn(findManySkills.isFetching && "animate-spin")}
               />
             ),
-            className: "btn-ghost btn-square",
             onClick: () => findManySkills.refetch(),
-            disabled: findManySkills.isFetching,
           },
           {
+            className: "btn-soft",
             icon: <PlusIcon />,
             label: tPage("skills.newButton"),
-            className: "btn-soft",
             onClick: () => setFormValues({ state: "CREATING" }),
           },
         ]}
@@ -270,9 +270,9 @@ function RouteComponent() {
           isLoading={createOneSkill.isPending || updateOneSkill.isPending}
           onCancel={() => setFormValues(undefined)}
           onSubmit={handleSubmit}
-          // slugsList={findManySkills.data?.nodes
-          //   .map((skill) => skill.slug)
-          //   .filter((slug): slug is string => slug != null && slug !== "")}
+          slugsList={findManySkills.data?.nodes
+            .map((skill) => skill.slug)
+            .filter((slug): slug is string => slug !== null && slug !== "")}
           state={formValues?.state}
         />
       </Modal>
@@ -312,8 +312,8 @@ function RouteComponent() {
       <Modal
         actions={[
           {
-            label: tAction("close"),
             className: "btn-ghost",
+            label: tAction("close"),
             onClick: () => setFormValues(undefined),
           },
         ]}
@@ -333,14 +333,14 @@ function RouteComponent() {
       <Modal
         actions={[
           {
-            label: tAction("cancel"),
             className: "btn-ghost",
+            label: tAction("cancel"),
             onClick: () => setFormValues(undefined),
           },
           {
-            label: tAction("confirm"),
             className: "btn-soft btn-error",
             disabled: disableOneSkill.isPending || disableManySkills.isPending,
+            label: tAction("confirm"),
             onClick: () => handleDisable(),
           },
         ]}
@@ -364,14 +364,14 @@ function RouteComponent() {
       <Modal
         actions={[
           {
-            label: tAction("cancel"),
             className: "btn-ghost",
+            label: tAction("cancel"),
             onClick: () => setFormValues(undefined),
           },
           {
-            label: tAction("confirm"),
             className: "btn-soft btn-success",
             disabled: enableOneSkill.isPending || enableManySkills.isPending,
+            label: tAction("confirm"),
             onClick: () => handleEnable(),
           },
         ]}
@@ -395,14 +395,14 @@ function RouteComponent() {
       <Modal
         actions={[
           {
-            label: tAction("cancel"),
             className: "btn-ghost",
+            label: tAction("cancel"),
             onClick: () => setFormValues(undefined),
           },
           {
-            label: tAction("confirm"),
             className: "btn-soft btn-error",
             disabled: removeOneSkill.isPending || removeManySkills.isPending,
+            label: tAction("confirm"),
             onClick: () => handleDelete(),
           },
         ]}
@@ -445,63 +445,63 @@ function RouteComponent() {
             data={findManySkills.data?.nodes ?? []}
             onDisable={(skill) =>
               setFormValues({
-                state: "DISABLING",
                 customValues: [skill],
+                state: "DISABLING",
               })
             }
             onEdit={(skill) =>
               setFormValues({
+                customValues: [skill],
                 defaultValues: skillToForm(skill),
                 state: "UPDATING",
-                customValues: [skill],
               })
             }
             onEnable={(skill) =>
               setFormValues({
-                state: "ENABLING",
                 customValues: [skill],
+                state: "ENABLING",
               })
             }
             onMultiDisable={(skills) =>
               setFormValues({
-                state: "MULTI_DISABLING",
                 customValues: skills,
+                state: "MULTI_DISABLING",
               })
             }
             onMultiEdit={(skills) =>
               setFormValues({
-                state: "MULTI_UPDATING",
                 customValues: skills,
+                state: "MULTI_UPDATING",
               })
             }
             onMultiEnable={(skills) =>
               setFormValues({
-                state: "MULTI_ENABLING",
                 customValues: skills,
+                state: "MULTI_ENABLING",
               })
             }
             onMultiRemove={(skills) =>
               setFormValues({
-                state: "MULTI_DELETING",
                 customValues: skills,
+                state: "MULTI_DELETING",
               })
             }
             onMultiView={(skills) =>
               setFormValues({
-                state: "MULTI_READING",
                 customValues: skills,
+                state: "MULTI_READING",
               })
             }
             onRemove={(skill) =>
               setFormValues({
-                state: "DELETING",
                 customValues: [skill],
+                state: "DELETING",
               })
             }
             onView={(skill) =>
               setFormValues({
-                state: "READING",
                 customValues: [skill],
+                state: "READING",
               })
             }
           />

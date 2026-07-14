@@ -27,29 +27,30 @@ import { FormError } from "@/lib/form-errors";
 import { nullIfEmpty } from "@/lib/form-input";
 import { hasUniqueLocales } from "@/lib/form-validation";
 import { createEmptyI18n, i18nLabel, i18nLabelsByIds } from "@/lib/i18n";
+import { isSlugTaken } from "@/lib/slug";
 import { CommonFormProps } from "./common";
 
 const projectSchema = z.object({
-  slug: z.string().regex(SLUG_REGEX, FormError.invalidFormat).or(z.literal("")),
+  i18n: z
+    .array(
+      z.object({
+        description: z.string().min(1, FormError.requiredField),
+        locale: z.string().min(1, FormError.requiredField),
+        title: z.string().min(1, FormError.requiredField),
+      })
+    )
+    .min(1, FormError.requiredGroup)
+    .refine(hasUniqueLocales, { message: FormError.uniqueField }),
+  images: z.array(z.url(FormError.invalidFormat)),
   relevance: z.number().min(1, FormError.minValue),
   skillIds: z.array(z.string()),
-  images: z.array(z.url(FormError.invalidFormat)),
+  slug: z.string().regex(SLUG_REGEX, FormError.invalidFormat).or(z.literal("")),
   urls: z.array(
     z.object({
       title: z.string().min(1, FormError.requiredField),
       value: z.url(FormError.invalidFormat),
     })
   ),
-  i18n: z
-    .array(
-      z.object({
-        locale: z.string().min(1, FormError.requiredField),
-        title: z.string().min(1, FormError.requiredField),
-        description: z.string().min(1, FormError.requiredField),
-      })
-    )
-    .min(1, FormError.requiredGroup)
-    .refine(hasUniqueLocales, { message: FormError.uniqueField }),
 });
 
 export type ProjectSchema = z.infer<typeof projectSchema>;
@@ -60,35 +61,35 @@ export interface ProjectFormProps extends CommonFormProps<ProjectSchema> {
 
 export function projectToInput(data: ProjectSchema): CreateProjectInput {
   return {
-    slug: nullIfEmpty(data.slug),
-    relevance: data.relevance,
-    skillIds: nullIfEmpty(data.skillIds),
-    images: nullIfEmpty(data.images),
-    urls: nullIfEmpty(data.urls),
     i18n: data.i18n.map((translation) => ({
       locale: translation.locale,
       messages: {
-        title: translation.title,
         description: translation.description,
+        title: translation.title,
       },
     })),
+    images: nullIfEmpty(data.images),
+    relevance: data.relevance,
+    skillIds: nullIfEmpty(data.skillIds),
+    slug: nullIfEmpty(data.slug),
+    urls: nullIfEmpty(data.urls),
   };
 }
 
 export function projectToForm(project: ProjectRow): Partial<ProjectSchema> {
   return {
-    slug: project.slug ?? "",
+    i18n: project.i18n.map((translation) => ({
+      description: translation.messages.description,
+      locale: translation.locale,
+      title: translation.messages.title,
+    })),
+    images: project.images ?? [],
     relevance: project.relevance,
     skillIds: (project.skills ?? []).map((skill) => skill.id),
-    images: project.images ?? [],
+    slug: project.slug ?? "",
     urls: (project.urls ?? []).map((url) => ({
       title: url.title,
       value: url.value,
-    })),
-    i18n: project.i18n.map((translation) => ({
-      locale: translation.locale,
-      title: translation.messages.title,
-      description: translation.messages.description,
     })),
   };
 }
@@ -99,6 +100,7 @@ export function ProjectForm({
   defaultValues,
   isDisabled,
   isLoading,
+  slugsList,
   state,
 }: ProjectFormProps) {
   const { t: tForm } = useTranslation("forms");
@@ -113,9 +115,9 @@ export function ProjectForm({
   const skillOptions = useMemo(
     () =>
       (findManySkills.data?.nodes ?? []).map((skill) => ({
+        disabled: skill.disabled,
         label: i18nLabel(skill, locale),
         value: skill.id,
-        disabled: skill.disabled,
       })),
     [locale, findManySkills.data?.nodes]
   );
@@ -125,12 +127,12 @@ export function ProjectForm({
 
   const form = useForm({
     defaultValues: {
-      slug: "",
+      i18n: createEmptyI18n({ description: "", title: "" }),
+      images: [] as string[],
       relevance: 1,
       skillIds: [] as string[],
-      images: [] as string[],
+      slug: "",
       urls: [] as { title: string; value: string }[],
-      i18n: createEmptyI18n({ title: "", description: "" }),
       ...defaultValues,
     },
     onSubmit: ({ value }) => onSubmit?.(value),
@@ -158,7 +160,7 @@ export function ProjectForm({
       if (!skills.length)
         return toast.error(tValidation("minCount", { value: 1 }));
 
-      const title = fieldGroup.title;
+      const { title } = fieldGroup;
       if (!title) return toast.error(tValidation("requiredField"));
       details.push({ key: "Title", value: [title] });
 
@@ -169,10 +171,10 @@ export function ProjectForm({
       if (urls) details.push({ key: "URLs", value: urls });
 
       const summarized = await atsSummarize.mutateAsync({
-        raw,
-        type,
-        skills,
         details,
+        raw,
+        skills,
+        type,
       });
 
       form.setFieldValue(
@@ -230,7 +232,6 @@ export function ProjectForm({
         form.handleSubmit();
       }}
     >
-      {/* TODO: slug field hidden temporarily
       <Field
         name="slug"
         validators={{
@@ -254,7 +255,6 @@ export function ProjectForm({
           />
         )}
       </Field>
-      */}
       <Field name="relevance">
         {(field) => (
           <RangeInput
@@ -373,7 +373,7 @@ export function ProjectForm({
             error={fieldError(arrayField.state.meta)}
             label={tForm("fields.translation.label")}
             onAdd={() =>
-              arrayField.pushValue({ locale: "", title: "", description: "" })
+              arrayField.pushValue({ description: "", locale: "", title: "" })
             }
             onRemove={(index) => arrayField.removeValue(index)}
             values={arrayField.state.value}

@@ -239,6 +239,8 @@ function RouteComponent() {
       <PageTitle
         actions={[
           {
+            className: "btn-ghost btn-square",
+            disabled: findManyOrganizations.isFetching,
             icon: (
               <ArrowsClockwiseIcon
                 className={cn(
@@ -246,14 +248,12 @@ function RouteComponent() {
                 )}
               />
             ),
-            className: "btn-ghost btn-square",
             onClick: () => findManyOrganizations.refetch(),
-            disabled: findManyOrganizations.isFetching,
           },
           {
+            className: "btn-soft",
             icon: <PlusIcon />,
             label: tPage("organizations.newButton"),
-            className: "btn-soft",
             onClick: () => setFormValues({ state: "CREATING" }),
           },
         ]}
@@ -278,9 +278,9 @@ function RouteComponent() {
           }
           onCancel={() => setFormValues(undefined)}
           onSubmit={handleSubmit}
-          // slugsList={findManyOrganizations.data?.nodes
-          //   .map((organization) => organization.slug)
-          //   .filter((slug): slug is string => slug != null && slug !== "")}
+          slugsList={findManyOrganizations.data?.nodes
+            .map((organization) => organization.slug)
+            .filter((slug): slug is string => slug !== null && slug !== "")}
           state={formValues?.state}
         />
       </Modal>
@@ -323,8 +323,8 @@ function RouteComponent() {
       <Modal
         actions={[
           {
-            label: tAction("close"),
             className: "btn-ghost",
+            label: tAction("close"),
             onClick: () => setFormValues(undefined),
           },
         ]}
@@ -344,16 +344,16 @@ function RouteComponent() {
       <Modal
         actions={[
           {
-            label: tAction("cancel"),
             className: "btn-ghost",
+            label: tAction("cancel"),
             onClick: () => setFormValues(undefined),
           },
           {
-            label: tAction("confirm"),
             className: "btn-soft btn-error",
             disabled:
               disableOneOrganization.isPending ||
               disableManyOrganizations.isPending,
+            label: tAction("confirm"),
             onClick: () => handleDisable(),
           },
         ]}
@@ -377,16 +377,16 @@ function RouteComponent() {
       <Modal
         actions={[
           {
-            label: tAction("cancel"),
             className: "btn-ghost",
+            label: tAction("cancel"),
             onClick: () => setFormValues(undefined),
           },
           {
-            label: tAction("confirm"),
             className: "btn-soft btn-success",
             disabled:
               enableOneOrganization.isPending ||
               enableManyOrganizations.isPending,
+            label: tAction("confirm"),
             onClick: () => handleEnable(),
           },
         ]}
@@ -410,16 +410,16 @@ function RouteComponent() {
       <Modal
         actions={[
           {
-            label: tAction("cancel"),
             className: "btn-ghost",
+            label: tAction("cancel"),
             onClick: () => setFormValues(undefined),
           },
           {
-            label: tAction("confirm"),
             className: "btn-soft btn-error",
             disabled:
               removeOneOrganization.isPending ||
               removeManyOrganizations.isPending,
+            label: tAction("confirm"),
             onClick: () => handleDelete(),
           },
         ]}
@@ -462,63 +462,63 @@ function RouteComponent() {
             data={findManyOrganizations.data?.nodes ?? []}
             onDisable={(organization) =>
               setFormValues({
-                state: "DISABLING",
                 customValues: [organization],
+                state: "DISABLING",
               })
             }
             onEdit={(organization) =>
               setFormValues({
+                customValues: [organization],
                 defaultValues: organizationToForm(organization),
                 state: "UPDATING",
-                customValues: [organization],
               })
             }
             onEnable={(organization) =>
               setFormValues({
-                state: "ENABLING",
                 customValues: [organization],
+                state: "ENABLING",
               })
             }
             onMultiDisable={(organizations) =>
               setFormValues({
-                state: "MULTI_DISABLING",
                 customValues: organizations,
+                state: "MULTI_DISABLING",
               })
             }
             onMultiEdit={(organizations) =>
               setFormValues({
-                state: "MULTI_UPDATING",
                 customValues: organizations,
+                state: "MULTI_UPDATING",
               })
             }
             onMultiEnable={(organizations) =>
               setFormValues({
-                state: "MULTI_ENABLING",
                 customValues: organizations,
+                state: "MULTI_ENABLING",
               })
             }
             onMultiRemove={(organizations) =>
               setFormValues({
-                state: "MULTI_DELETING",
                 customValues: organizations,
+                state: "MULTI_DELETING",
               })
             }
             onMultiView={(organizations) =>
               setFormValues({
-                state: "MULTI_READING",
                 customValues: organizations,
+                state: "MULTI_READING",
               })
             }
             onRemove={(organization) =>
               setFormValues({
-                state: "DELETING",
                 customValues: [organization],
+                state: "DELETING",
               })
             }
             onView={(organization) =>
               setFormValues({
-                state: "READING",
                 customValues: [organization],
+                state: "READING",
               })
             }
           />

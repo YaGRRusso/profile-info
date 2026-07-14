@@ -35,27 +35,28 @@ import {
   i18nLabelsByIds,
   pickTranslation,
 } from "@/lib/i18n";
+import { isSlugTaken } from "@/lib/slug";
 import { CommonFormProps } from "./common";
 
 const courseSchema = z.object({
-  slug: z.string().regex(SLUG_REGEX, FormError.invalidFormat).or(z.literal("")),
-  organizationId: z.string().min(1, FormError.requiredField),
-  status: z.enum(CourseStatus, FormError.requiredField),
-  relevance: z.number().min(1, FormError.minValue),
-  url: z.url(FormError.invalidFormat).or(z.literal("")),
-  image: z.url(FormError.invalidFormat).or(z.literal("")),
   hours: z.number(),
-  skillIds: z.array(z.string()),
   i18n: z
     .array(
       z.object({
+        description: z.string().min(1, FormError.requiredField),
         locale: z.string().min(1, FormError.requiredField),
         title: z.string().min(1, FormError.requiredField),
-        description: z.string().min(1, FormError.requiredField),
       })
     )
     .min(1, FormError.requiredGroup)
     .refine(hasUniqueLocales, { message: FormError.uniqueField }),
+  image: z.url(FormError.invalidFormat).or(z.literal("")),
+  organizationId: z.string().min(1, FormError.requiredField),
+  relevance: z.number().min(1, FormError.minValue),
+  skillIds: z.array(z.string()),
+  slug: z.string().regex(SLUG_REGEX, FormError.invalidFormat).or(z.literal("")),
+  status: z.enum(CourseStatus, FormError.requiredField),
+  url: z.url(FormError.invalidFormat).or(z.literal("")),
 });
 
 export type CourseSchema = z.infer<typeof courseSchema>;
@@ -66,39 +67,39 @@ export interface CourseFormProps extends CommonFormProps<CourseSchema> {
 
 export function courseToInput(data: CourseSchema): CreateCourseInput {
   return {
-    slug: nullIfEmpty(data.slug),
-    organizationId: data.organizationId,
-    status: data.status,
-    relevance: data.relevance,
-    url: nullIfEmpty(data.url),
-    image: nullIfEmpty(data.image),
     hours: nullIfEmpty(data.hours),
-    skillIds: nullIfEmpty(data.skillIds),
     i18n: data.i18n.map((translation) => ({
       locale: translation.locale,
       messages: {
-        title: translation.title,
         description: translation.description,
+        title: translation.title,
       },
     })),
+    image: nullIfEmpty(data.image),
+    organizationId: data.organizationId,
+    relevance: data.relevance,
+    skillIds: nullIfEmpty(data.skillIds),
+    slug: nullIfEmpty(data.slug),
+    status: data.status,
+    url: nullIfEmpty(data.url),
   };
 }
 
 export function courseToForm(course: CourseRow): Partial<CourseSchema> {
   return {
-    slug: course.slug ?? "",
-    organizationId: course.organization?.id ?? "",
-    status: course.status,
-    relevance: course.relevance,
-    url: course.url ?? "",
-    image: course.image ?? "",
     hours: course.hours ?? 0,
-    skillIds: (course.skills ?? []).map((skill) => skill.id),
     i18n: course.i18n.map((translation) => ({
+      description: translation.messages.description,
       locale: translation.locale,
       title: translation.messages.title,
-      description: translation.messages.description,
     })),
+    image: course.image ?? "",
+    organizationId: course.organization?.id ?? "",
+    relevance: course.relevance,
+    skillIds: (course.skills ?? []).map((skill) => skill.id),
+    slug: course.slug ?? "",
+    status: course.status,
+    url: course.url ?? "",
   };
 }
 
@@ -113,6 +114,7 @@ export function CourseForm({
   defaultValues,
   isDisabled,
   isLoading,
+  slugsList,
   state,
 }: CourseFormProps) {
   const { t: tForm } = useTranslation("forms");
@@ -130,9 +132,9 @@ export function CourseForm({
   const skillOptions = useMemo(
     () =>
       (findManySkills.data?.nodes ?? []).map((skill) => ({
+        disabled: skill.disabled,
         label: i18nLabel(skill, locale),
         value: skill.id,
-        disabled: skill.disabled,
       })),
     [locale, findManySkills.data?.nodes]
   );
@@ -140,9 +142,9 @@ export function CourseForm({
   const organizationOptions = useMemo(
     () =>
       (findManyOrganizations.data?.nodes ?? []).map((organization) => ({
+        disabled: organization.disabled,
         label: organization.name,
         value: organization.id,
-        disabled: organization.disabled,
       })),
     [findManyOrganizations.data?.nodes]
   );
@@ -152,15 +154,15 @@ export function CourseForm({
 
   const form = useForm({
     defaultValues: {
-      slug: "",
-      organizationId: "",
-      status: CourseStatus.Complete,
-      relevance: 1,
-      url: "",
-      image: "",
       hours: 0,
+      i18n: createEmptyI18n({ description: "", title: "" }),
+      image: "",
+      organizationId: "",
+      relevance: 1,
       skillIds: [] as string[],
-      i18n: createEmptyI18n({ title: "", description: "" }),
+      slug: "",
+      status: CourseStatus.Complete,
+      url: "",
       ...defaultValues,
     },
     onSubmit: ({ value }) => onSubmit?.(value),
@@ -188,7 +190,7 @@ export function CourseForm({
       if (!skills.length)
         return toast.error(tValidation("minCount", { value: 1 }));
 
-      const title = fieldGroup.title;
+      const { title } = fieldGroup;
       if (!title) return toast.error(tValidation("requiredField"));
       details.push({ key: "Title", value: [title] });
 
@@ -225,10 +227,10 @@ export function CourseForm({
       if (url) details.push({ key: "URLs", value: [url] });
 
       const summarized = await atsSummarize.mutateAsync({
-        raw,
-        type,
-        skills,
         details,
+        raw,
+        skills,
+        type,
       });
 
       form.setFieldValue(
@@ -287,7 +289,6 @@ export function CourseForm({
         form.handleSubmit();
       }}
     >
-      {/* TODO: slug field hidden temporarily
       <Field
         name="slug"
         validators={{
@@ -311,7 +312,6 @@ export function CourseForm({
           />
         )}
       </Field>
-      */}
       <Field name="organizationId">
         {(field) => (
           <SelectInput
@@ -427,7 +427,7 @@ export function CourseForm({
             error={fieldError(arrayField.state.meta)}
             label={tForm("fields.translation.label")}
             onAdd={() =>
-              arrayField.pushValue({ locale: "", title: "", description: "" })
+              arrayField.pushValue({ description: "", locale: "", title: "" })
             }
             onRemove={(index) => arrayField.removeValue(index)}
             values={arrayField.state.value}

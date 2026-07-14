@@ -151,19 +151,19 @@ function RouteComponent() {
       <PageTitle
         actions={[
           {
+            className: "btn-ghost btn-square",
+            disabled: findManyProjects.isFetching,
             icon: (
               <ArrowsClockwiseIcon
                 className={cn(findManyProjects.isFetching && "animate-spin")}
               />
             ),
-            className: "btn-ghost btn-square",
             onClick: () => findManyProjects.refetch(),
-            disabled: findManyProjects.isFetching,
           },
           {
+            className: "btn-soft",
             icon: <PlusIcon />,
             label: tPage("projects.newButton"),
-            className: "btn-soft",
             onClick: () => setFormValues({ state: "CREATING" }),
           },
         ]}
@@ -186,9 +186,9 @@ function RouteComponent() {
           isLoading={createOneProject.isPending || updateOneProject.isPending}
           onCancel={() => setFormValues(undefined)}
           onSubmit={handleSubmit}
-          // slugsList={findManyProjects.data?.nodes
-          //   .map((project) => project.slug)
-          //   .filter((slug): slug is string => slug != null && slug !== "")}
+          slugsList={findManyProjects.data?.nodes
+            .map((project) => project.slug)
+            .filter((slug): slug is string => slug !== null && slug !== "")}
           state={formValues?.state}
         />
       </Modal>
@@ -228,8 +228,8 @@ function RouteComponent() {
       <Modal
         actions={[
           {
-            label: tAction("close"),
             className: "btn-ghost",
+            label: tAction("close"),
             onClick: () => setFormValues(undefined),
           },
         ]}
@@ -249,15 +249,15 @@ function RouteComponent() {
       <Modal
         actions={[
           {
-            label: tAction("cancel"),
             className: "btn-ghost",
+            label: tAction("cancel"),
             onClick: () => setFormValues(undefined),
           },
           {
-            label: tAction("confirm"),
             className: "btn-soft btn-error",
             disabled:
               removeOneProject.isPending || removeManyProjects.isPending,
+            label: tAction("confirm"),
             onClick: () => handleDelete(),
           },
         ]}
@@ -300,39 +300,39 @@ function RouteComponent() {
             data={findManyProjects.data?.nodes ?? []}
             onDelete={(project) =>
               setFormValues({
-                state: "DELETING",
                 customValues: [project],
+                state: "DELETING",
               })
             }
             onEdit={(project) =>
               setFormValues({
+                customValues: [project],
                 defaultValues: projectToForm(project),
                 state: "UPDATING",
-                customValues: [project],
               })
             }
             onMultiDelete={(projects) =>
               setFormValues({
-                state: "MULTI_DELETING",
                 customValues: projects,
+                state: "MULTI_DELETING",
               })
             }
             onMultiEdit={(projects) =>
               setFormValues({
-                state: "MULTI_UPDATING",
                 customValues: projects,
+                state: "MULTI_UPDATING",
               })
             }
             onMultiView={(projects) =>
               setFormValues({
-                state: "MULTI_READING",
                 customValues: projects,
+                state: "MULTI_READING",
               })
             }
             onView={(project) =>
               setFormValues({
-                state: "READING",
                 customValues: [project],
+                state: "READING",
               })
             }
           />

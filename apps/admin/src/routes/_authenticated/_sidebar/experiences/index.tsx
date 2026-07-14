@@ -156,19 +156,19 @@ function RouteComponent() {
       <PageTitle
         actions={[
           {
+            className: "btn-ghost btn-square",
+            disabled: findManyExperiences.isFetching,
             icon: (
               <ArrowsClockwiseIcon
                 className={cn(findManyExperiences.isFetching && "animate-spin")}
               />
             ),
-            className: "btn-ghost btn-square",
             onClick: () => findManyExperiences.refetch(),
-            disabled: findManyExperiences.isFetching,
           },
           {
+            className: "btn-soft",
             icon: <PlusIcon />,
             label: tPage("experiences.newButton"),
-            className: "btn-soft",
             onClick: () => setFormValues({ state: "CREATING" }),
           },
         ]}
@@ -193,9 +193,9 @@ function RouteComponent() {
           }
           onCancel={() => setFormValues(undefined)}
           onSubmit={handleSubmit}
-          // slugsList={findManyExperiences.data?.nodes
-          //   .map((experience) => experience.slug)
-          //   .filter((slug): slug is string => slug != null && slug !== "")}
+          slugsList={findManyExperiences.data?.nodes
+            .map((experience) => experience.slug)
+            .filter((slug): slug is string => slug !== null && slug !== "")}
           state={formValues?.state}
         />
       </Modal>
@@ -235,8 +235,8 @@ function RouteComponent() {
       <Modal
         actions={[
           {
-            label: tAction("close"),
             className: "btn-ghost",
+            label: tAction("close"),
             onClick: () => setFormValues(undefined),
           },
         ]}
@@ -256,15 +256,15 @@ function RouteComponent() {
       <Modal
         actions={[
           {
-            label: tAction("cancel"),
             className: "btn-ghost",
+            label: tAction("cancel"),
             onClick: () => setFormValues(undefined),
           },
           {
-            label: tAction("confirm"),
             className: "btn-soft btn-error",
             disabled:
               removeOneExperience.isPending || removeManyExperiences.isPending,
+            label: tAction("confirm"),
             onClick: () => handleDelete(),
           },
         ]}
@@ -307,39 +307,39 @@ function RouteComponent() {
             data={findManyExperiences.data?.nodes ?? []}
             onDelete={(experience) =>
               setFormValues({
-                state: "DELETING",
                 customValues: [experience],
+                state: "DELETING",
               })
             }
             onEdit={(experience) =>
               setFormValues({
+                customValues: [experience],
                 defaultValues: experienceToForm(experience),
                 state: "UPDATING",
-                customValues: [experience],
               })
             }
             onMultiDelete={(experiences) =>
               setFormValues({
-                state: "MULTI_DELETING",
                 customValues: experiences,
+                state: "MULTI_DELETING",
               })
             }
             onMultiEdit={(experiences) =>
               setFormValues({
-                state: "MULTI_UPDATING",
                 customValues: experiences,
+                state: "MULTI_UPDATING",
               })
             }
             onMultiView={(experiences) =>
               setFormValues({
-                state: "MULTI_READING",
                 customValues: experiences,
+                state: "MULTI_READING",
               })
             }
             onView={(experience) =>
               setFormValues({
-                state: "READING",
                 customValues: [experience],
+                state: "READING",
               })
             }
           />

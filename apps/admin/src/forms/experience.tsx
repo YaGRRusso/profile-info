@@ -36,23 +36,23 @@ import {
   i18nLabelsByIds,
   pickTranslation,
 } from "@/lib/i18n";
+import { isSlugTaken } from "@/lib/slug";
 import { CommonFormProps } from "./common";
 
 const roleI18nSchema = z
   .array(
     z.object({
+      description: z.string().min(1, FormError.requiredField),
       locale: z.string().min(1, FormError.requiredField),
       title: z.string().min(1, FormError.requiredField),
-      description: z.string().min(1, FormError.requiredField),
     })
   )
   .min(1, FormError.requiredGroup)
   .refine(hasUniqueLocales, { message: FormError.uniqueField });
 
 const experienceSchema = z.object({
-  slug: z.string().regex(SLUG_REGEX, FormError.invalidFormat).or(z.literal("")),
-  organizationId: z.string().min(1, FormError.requiredField),
   category: z.enum(ExperienceCategory, FormError.requiredField),
+  organizationId: z.string().min(1, FormError.requiredField),
   relevance: z.number().min(1, FormError.minValue),
   roles: z
     .array(
@@ -68,6 +68,7 @@ const experienceSchema = z.object({
       })
     )
     .min(1, FormError.requiredGroup),
+  slug: z.string().regex(SLUG_REGEX, FormError.invalidFormat).or(z.literal("")),
 });
 
 export type ExperienceSchema = z.infer<typeof experienceSchema>;
@@ -80,16 +81,15 @@ export function experienceToInput(
   data: ExperienceSchema
 ): CreateExperienceInput {
   return {
-    slug: nullIfEmpty(data.slug),
-    organizationId: data.organizationId,
     category: data.category,
+    organizationId: data.organizationId,
     relevance: data.relevance,
     roles: data.roles.map((role) => ({
       i18n: role.i18n.map((translation) => ({
         locale: translation.locale,
         messages: {
-          title: translation.title,
           description: translation.description,
+          title: translation.title,
         },
       })),
       period:
@@ -101,6 +101,7 @@ export function experienceToInput(
             },
       skillIds: nullIfEmpty(role.skillIds),
     })),
+    slug: nullIfEmpty(data.slug),
   };
 }
 
@@ -108,15 +109,14 @@ export function experienceToForm(
   experience: ExperienceRow
 ): Partial<ExperienceSchema> {
   return {
-    slug: experience.slug ?? "",
-    organizationId: experience.organization?.id ?? "",
     category: experience.category,
+    organizationId: experience.organization?.id ?? "",
     relevance: experience.relevance,
     roles: (experience.roles ?? []).map((role) => ({
       i18n: role.i18n.map((translation) => ({
+        description: translation.messages.description,
         locale: translation.locale,
         title: translation.messages.title,
-        description: translation.messages.description,
       })),
       period: {
         from: toDateInput(role.period?.from),
@@ -124,6 +124,7 @@ export function experienceToForm(
       },
       skillIds: (role.skills ?? []).map((skill) => skill.id),
     })),
+    slug: experience.slug ?? "",
   };
 }
 
@@ -134,7 +135,7 @@ const CATEGORY_OPTIONS = Object.values(ExperienceCategory).map((category) => ({
 
 function emptyRole() {
   return {
-    i18n: createEmptyI18n({ title: "", description: "" }),
+    i18n: createEmptyI18n({ description: "", title: "" }),
     period: { from: "", to: "" },
     skillIds: [] as string[],
   };
@@ -146,6 +147,7 @@ export function ExperienceForm({
   defaultValues,
   isDisabled,
   isLoading,
+  slugsList,
   state,
 }: ExperienceFormProps) {
   const { t: tForm } = useTranslation("forms");
@@ -163,9 +165,9 @@ export function ExperienceForm({
   const skillOptions = useMemo(
     () =>
       (findManySkills.data?.nodes ?? []).map((skill) => ({
+        disabled: skill.disabled,
         label: i18nLabel(skill, locale),
         value: skill.id,
-        disabled: skill.disabled,
       })),
     [locale, findManySkills.data?.nodes]
   );
@@ -173,9 +175,9 @@ export function ExperienceForm({
   const organizationOptions = useMemo(
     () =>
       (findManyOrganizations.data?.nodes ?? []).map((organization) => ({
+        disabled: organization.disabled,
         label: organization.name,
         value: organization.id,
-        disabled: organization.disabled,
       })),
     [findManyOrganizations.data?.nodes]
   );
@@ -185,11 +187,11 @@ export function ExperienceForm({
 
   const form = useForm({
     defaultValues: {
-      slug: "",
-      organizationId: "",
       category: ExperienceCategory.FullTime,
+      organizationId: "",
       relevance: 1,
       roles: [emptyRole()],
+      slug: "",
       ...defaultValues,
     },
     onSubmit: ({ value }) => onSubmit?.(value),
@@ -218,11 +220,11 @@ export function ExperienceForm({
       if (!skills.length)
         return toast.error(tValidation("minCount", { value: 1 }));
 
-      const title = fieldGroup.title;
+      const { title } = fieldGroup;
       if (!title) return toast.error(tValidation("requiredField"));
       details.push({ key: "Title", value: [title] });
 
-      const period = fieldParent.period;
+      const { period } = fieldParent;
       if (!period.from && !period.to)
         return toast.error(tValidation("requiredField"));
       details.push({
@@ -259,10 +261,10 @@ export function ExperienceForm({
       if (language) details.push({ key: "Language", value: [language] });
 
       const summarized = await atsSummarize.mutateAsync({
-        raw,
-        type,
-        skills,
         details,
+        raw,
+        skills,
+        type,
       });
 
       form.setFieldValue(
@@ -321,7 +323,6 @@ export function ExperienceForm({
         form.handleSubmit();
       }}
     >
-      {/* TODO: slug field hidden temporarily
       <Field
         name="slug"
         validators={{
@@ -345,7 +346,6 @@ export function ExperienceForm({
           />
         )}
       </Field>
-      */}
       <Field name="organizationId">
         {(field) => (
           <SelectInput
@@ -453,9 +453,9 @@ export function ExperienceForm({
                       label={tForm("fields.translation.label")}
                       onAdd={() =>
                         i18nField.pushValue({
+                          description: "",
                           locale: "",
                           title: "",
-                          description: "",
                         })
                       }
                       onRemove={(index) => i18nField.removeValue(index)}

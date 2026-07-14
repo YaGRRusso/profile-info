@@ -32,30 +32,30 @@ import { useSystemMessagesStore } from "@/stores/system-messages";
 import { CommonFormProps } from "./common";
 
 const profileSchema = z.object({
-  name: z.string().min(1, FormError.requiredField),
-  nickname: z.string().min(1, FormError.requiredField),
-  email: z.email(FormError.invalidFormat),
-  phone: z.string(),
+  address: z.string(),
   avatar: z.union([z.literal(""), z.url(FormError.invalidFormat)]),
   birth: z.union([z.literal(""), z.string()]),
-  address: z.string(),
+  email: z.email(FormError.invalidFormat),
   i18n: z
     .array(
       z.object({
+        description: z.string(),
         locale: z.string().min(1, FormError.requiredField),
         title: z.string(),
-        description: z.string(),
       })
     )
     .refine(hasUniqueLocales, { message: FormError.uniqueField }),
+  name: z.string().min(1, FormError.requiredField),
+  nickname: z.string().min(1, FormError.requiredField),
+  password: z.union([z.literal(""), z.string().min(8, FormError.minLength)]),
+  phone: z.string(),
+  skillIds: z.array(z.string()),
   urls: z.array(
     z.object({
       title: z.string().min(1, FormError.requiredField),
       value: z.url(FormError.invalidFormat),
     })
   ),
-  skillIds: z.array(z.string()),
-  password: z.union([z.literal(""), z.string().min(8, FormError.minLength)]),
 });
 
 export type ProfileSchema = z.infer<typeof profileSchema>;
@@ -69,28 +69,28 @@ type GetMeUser = GetMeQuery["getMe"];
 
 export function profileToForm(user: GetMeUser): Partial<ProfileSchema> {
   return {
-    name: user.name,
-    nickname: user.nickname,
-    email: user.email,
-    phone: user.phone ?? "",
+    address: user.address ?? "",
     avatar: user.avatar ?? "",
     birth: toDateInput(user.birth),
-    address: user.address ?? "",
+    email: user.email,
     i18n: user.i18n?.length
       ? user.i18n.map((translation) => ({
+          description: translation.messages.description ?? "",
           locale: translation.locale,
           title: translation.messages.title ?? "",
-          description: translation.messages.description ?? "",
         }))
-      : createEmptyI18n({ title: "", description: "" }),
+      : createEmptyI18n({ description: "", title: "" }),
+    name: user.name,
+    nickname: user.nickname,
+    password: "",
+    phone: user.phone ?? "",
+    skillIds: user.skillIds?.length
+      ? [...user.skillIds]
+      : (user.skills ?? []).map((skill) => skill.id),
     urls: (user.urls ?? []).map((url) => ({
       title: url.title,
       value: url.value,
     })),
-    skillIds: user.skillIds?.length
-      ? [...user.skillIds]
-      : (user.skills ?? []).map((skill) => skill.id),
-    password: "",
   };
 }
 
@@ -103,23 +103,23 @@ export function profileToInput(data: ProfileSchema): UpdateMeInput {
     .map((translation) => ({
       locale: translation.locale,
       messages: {
-        title: nullIfEmpty(translation.title),
         description: nullIfEmpty(translation.description),
+        title: nullIfEmpty(translation.title),
       },
     }));
 
   return {
-    name: data.name,
-    nickname: data.nickname,
-    email: data.email,
-    phone: nullIfEmpty(data.phone),
+    address: nullIfEmpty(data.address),
     avatar: nullIfEmpty(data.avatar),
     birth: nullIfEmpty(toIsoDate(data.birth)),
-    address: nullIfEmpty(data.address),
+    email: data.email,
     i18n: nullIfEmpty(i18n),
-    urls: nullIfEmpty(data.urls),
-    skillIds: nullIfEmpty(data.skillIds),
+    name: data.name,
+    nickname: data.nickname,
     password: omitIfEmpty(data.password),
+    phone: nullIfEmpty(data.phone),
+    skillIds: nullIfEmpty(data.skillIds),
+    urls: nullIfEmpty(data.urls),
   };
 }
 
@@ -145,35 +145,28 @@ export function ProfileForm({
   const skillOptions = useMemo(
     () =>
       (findManySkills.data?.nodes ?? []).map((skill) => ({
+        disabled: skill.disabled,
         label: i18nLabel(skill, locale),
         value: skill.id,
-        disabled: skill.disabled,
       })),
     [locale, findManySkills.data?.nodes]
   );
 
   const form = useForm({
     defaultValues: {
-      name: "",
-      nickname: "",
-      email: "",
-      phone: "",
+      address: "",
       avatar: "",
       birth: "",
-      address: "",
-      i18n: createEmptyI18n({ title: "", description: "" }),
-      urls: [] as ProfileSchema["urls"],
-      skillIds: [] as string[],
+      email: "",
+      i18n: createEmptyI18n({ description: "", title: "" }),
+      name: "",
+      nickname: "",
       password: "",
+      phone: "",
+      skillIds: [] as string[],
+      urls: [] as ProfileSchema["urls"],
       ...defaultValues,
     },
-    onSubmit: ({ value }) => {
-      onSubmit?.(value);
-      useSystemMessagesStore
-        .getState()
-        .clearMessage(PROFILE_UNSAVED_MESSAGE_ID);
-    },
-    validators: { onChange: profileSchema },
     listeners: {
       onChange: ({ formApi }) => {
         const { setMessage, clearMessage } = useSystemMessagesStore.getState();
@@ -189,6 +182,13 @@ export function ProfileForm({
         }
       },
     },
+    onSubmit: ({ value }) => {
+      onSubmit?.(value);
+      useSystemMessagesStore
+        .getState()
+        .clearMessage(PROFILE_UNSAVED_MESSAGE_ID);
+    },
+    validators: { onChange: profileSchema },
   });
 
   useEffect(
@@ -225,17 +225,17 @@ export function ProfileForm({
       const name = form.getFieldValue("name");
       if (name) details.push({ key: "Name", value: [name] });
 
-      const title = fieldGroup.title;
+      const { title } = fieldGroup;
       if (title) details.push({ key: "Title", value: [title] });
 
       const language = fieldGroup.locale;
       if (language) details.push({ key: "Language", value: [language] });
 
       const summarized = await atsSummarize.mutateAsync({
-        raw,
-        type,
-        skills,
         details,
+        raw,
+        skills,
+        type,
       });
 
       form.setFieldValue(
@@ -367,9 +367,9 @@ export function ProfileForm({
                 label={tForm("fields.translation.label")}
                 onAdd={() =>
                   arrayField.pushValue({
+                    description: "",
                     locale: "",
                     title: "",
-                    description: "",
                   })
                 }
                 onRemove={(index) => arrayField.removeValue(index)}
@@ -608,8 +608,8 @@ export function ProfileForm({
         <Subscribe
           selector={(state) => ({
             canSubmit: state.canSubmit,
-            isSubmitting: state.isSubmitting,
             isDirty: state.isDirty,
+            isSubmitting: state.isSubmitting,
           })}
         >
           {({ canSubmit, isSubmitting, isDirty }) => (

@@ -14,10 +14,10 @@ import { FormError } from "@/lib/form-errors";
 import { nullIfEmpty } from "@/lib/form-input";
 import { hasUniqueLocales } from "@/lib/form-validation";
 import { createEmptyI18n } from "@/lib/i18n";
+import { isSlugTaken } from "@/lib/slug";
 import { CommonFormProps } from "./common";
 
 const skillSchema = z.object({
-  slug: z.string().regex(SLUG_REGEX, FormError.invalidFormat).or(z.literal("")),
   category: z.string(),
   i18n: z
     .array(
@@ -28,6 +28,7 @@ const skillSchema = z.object({
     )
     .min(1, FormError.requiredGroup)
     .refine(hasUniqueLocales, { message: FormError.uniqueField }),
+  slug: z.string().regex(SLUG_REGEX, FormError.invalidFormat).or(z.literal("")),
 });
 
 export type SkillSchema = z.infer<typeof skillSchema>;
@@ -38,23 +39,23 @@ export interface SkillFormProps extends CommonFormProps<SkillSchema> {
 
 export function skillToInput(data: SkillSchema): CreateSkillInput {
   return {
-    slug: nullIfEmpty(data.slug),
     category: nullIfEmpty(data.category),
     i18n: data.i18n.map((translation) => ({
       locale: translation.locale,
       messages: { title: translation.title },
     })),
+    slug: nullIfEmpty(data.slug),
   };
 }
 
 export function skillToForm(skill: SkillRow): Partial<SkillSchema> {
   return {
-    slug: skill.slug ?? "",
     category: skill.category ?? "",
     i18n: skill.i18n.map((translation) => ({
       locale: translation.locale,
       title: translation.messages.title,
     })),
+    slug: skill.slug ?? "",
   };
 }
 
@@ -64,6 +65,7 @@ export function SkillForm({
   defaultValues,
   isDisabled,
   isLoading,
+  slugsList,
   state,
 }: SkillFormProps) {
   const { t: tForm } = useTranslation("forms");
@@ -71,9 +73,9 @@ export function SkillForm({
 
   const form = useForm({
     defaultValues: {
-      slug: "",
       category: "",
       i18n: createEmptyI18n({ title: "" }),
+      slug: "",
       ...defaultValues,
     },
     onSubmit: ({ value }) => onSubmit?.(value),
@@ -91,7 +93,6 @@ export function SkillForm({
         form.handleSubmit();
       }}
     >
-      {/* TODO: slug field hidden temporarily
       <Field
         name="slug"
         validators={{
@@ -115,7 +116,6 @@ export function SkillForm({
           />
         )}
       </Field>
-      */}
 
       <Field name="category">
         {(field) => (

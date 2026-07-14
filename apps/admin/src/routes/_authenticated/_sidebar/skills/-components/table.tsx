@@ -70,7 +70,7 @@ const queryParser = parseAsShape(z.string())
   .withOptions({ ...persistentOptions, limitUrlUpdates: debouncedUrlUpdates });
 
 const sortParser = parseAsShape(
-  z.array(z.object({ id: z.string(), desc: z.boolean() }))
+  z.array(z.object({ desc: z.boolean(), id: z.string() }))
 )
   .withDefault([])
   .withOptions(persistentOptions);
@@ -81,8 +81,8 @@ const createdAtParser = parseAsShape(z.string()).withOptions(persistentOptions);
 const updatedAtParser = parseAsShape(z.string()).withOptions(persistentOptions);
 
 const PARTITION_LABELS: Array<{ value: CatalogPartition; label: string }> = [
-  { value: CatalogPartition.Global, label: "Global" },
-  { value: CatalogPartition.Local, label: "Local" },
+  { label: "Global", value: CatalogPartition.Global },
+  { label: "Local", value: CatalogPartition.Local },
 ];
 
 const RESTRICTED_COLUMNS: RestrictedColumns = {
@@ -107,16 +107,6 @@ const getColumns = (
   opts: { isSuperAdmin: boolean }
 ) => [
   columnHelper.display({
-    id: "select",
-    enableHiding: false,
-    header: ({ table }) => (
-      <input
-        checked={table.getIsAllRowsSelected()}
-        className="checkbox checkbox-sm"
-        onChange={table.getToggleAllRowsSelectedHandler()}
-        type="checkbox"
-      />
-    ),
     cell: ({ row }) => (
       <input
         checked={row.getIsSelected()}
@@ -126,45 +116,50 @@ const getColumns = (
         type="checkbox"
       />
     ),
+    enableHiding: false,
+    header: ({ table }) => (
+      <input
+        checked={table.getIsAllRowsSelected()}
+        className="checkbox checkbox-sm"
+        onChange={table.getToggleAllRowsSelectedHandler()}
+        type="checkbox"
+      />
+    ),
+    id: "select",
   }),
   columnHelper.accessor("id", {
-    header: "ID",
-    enableGlobalFilter: false,
-    enableSorting: false,
     cell: (data) => (
       <span className="font-mono text-xs">{data.getValue()}</span>
     ),
+    enableGlobalFilter: false,
+    enableSorting: false,
+    header: "ID",
   }),
   columnHelper.accessor("slug", {
     header: "Slug",
   }),
   columnHelper.accessor((row) => i18nLabel(row, locale), {
-    id: `title-${locale}`,
-    header: "Title",
     cell: (data) => {
       const value = data.getValue();
       if (isEmptyValue(value)) return <EmptyValue />;
       return value;
     },
+    header: "Title",
+    id: `title-${locale}`,
   }),
   columnHelper.accessor("category", {
-    header: "Category",
-    enableColumnFilter: true,
-    enableSorting: false,
-    enableGlobalFilter: false,
-    filterFn: "equals",
     cell: (data) => {
       const value = data.getValue();
       if (!value) return <EmptyValue />;
       return <BadgeList values={[value]} />;
     },
+    enableColumnFilter: true,
+    enableGlobalFilter: false,
+    enableSorting: false,
+    filterFn: "equals",
+    header: "Category",
   }),
   columnHelper.accessor("partition", {
-    header: "Partition",
-    enableColumnFilter: true,
-    enableSorting: false,
-    enableGlobalFilter: false,
-    filterFn: "equals",
     cell: (data) => (
       <span
         className={cn(
@@ -177,11 +172,13 @@ const getColumns = (
         {data.getValue() === CatalogPartition.Global ? "Global" : "Local"}
       </span>
     ),
-  }),
-  columnHelper.accessor("disabled", {
-    header: "Status",
+    enableColumnFilter: true,
     enableGlobalFilter: false,
     enableSorting: false,
+    filterFn: "equals",
+    header: "Partition",
+  }),
+  columnHelper.accessor("disabled", {
     cell: (data) => (
       <span
         className={cn(
@@ -192,44 +189,45 @@ const getColumns = (
         {data.getValue() ? "Disabled" : "Active"}
       </span>
     ),
+    enableGlobalFilter: false,
+    enableSorting: false,
+    header: "Status",
   }),
   columnHelper.accessor((row) => row.i18n.map((entry) => entry.locale), {
-    id: "languages",
-    header: "Languages",
+    cell: (data) => <BadgeList values={data.getValue()} />,
     enableGlobalFilter: false,
     enableSorting: false,
-    cell: (data) => <BadgeList values={data.getValue()} />,
+    header: "Languages",
+    id: "languages",
   }),
   columnHelper.accessor((row) => row.owner?.nickname ?? "", {
-    id: "owner",
-    header: "Owner",
-    enableGlobalFilter: false,
-    enableSorting: false,
     cell: (data) => {
       const value = data.getValue();
       if (isEmptyValue(value)) return <EmptyValue />;
       return <span className="badge badge-soft badge-sm">{value}</span>;
     },
+    enableGlobalFilter: false,
+    enableSorting: false,
+    header: "Owner",
+    id: "owner",
   }),
   columnHelper.accessor("createdAt", {
-    header: "Created",
+    cell: ({ getValue }) => new Date(getValue()).toLocaleDateString(),
     enableColumnFilter: true,
     enableGlobalFilter: false,
-    sortingFn: "datetime",
     filterFn: dateRangeFilter,
-    cell: ({ getValue }) => new Date(getValue()).toLocaleDateString(),
+    header: "Created",
+    sortingFn: "datetime",
   }),
   columnHelper.accessor("updatedAt", {
-    header: "Updated",
+    cell: ({ getValue }) => new Date(getValue()).toLocaleDateString(),
     enableColumnFilter: true,
     enableGlobalFilter: false,
-    sortingFn: "datetime",
     filterFn: dateRangeFilter,
-    cell: ({ getValue }) => new Date(getValue()).toLocaleDateString(),
+    header: "Updated",
+    sortingFn: "datetime",
   }),
   columnHelper.display({
-    id: "actions",
-    enableHiding: false,
     cell: ({ row }) => {
       const isGlobal = row.original.partition === CatalogPartition.Global;
       const readOnly = isCatalogRowMutationReadOnly(
@@ -303,6 +301,8 @@ const getColumns = (
         <div className="flex items-center justify-end gap-1">{actions}</div>
       );
     },
+    enableHiding: false,
+    id: "actions",
   }),
 ];
 
@@ -368,26 +368,26 @@ export function SkillsTable({
       {
         id: "category",
         label: "Category",
-        state: category,
         setState: setCategory,
+        state: category,
       },
       {
         id: "partition",
         label: "Partition",
-        state: partition,
         setState: setPartition,
+        state: partition,
       },
       {
         id: "createdAt",
         label: "Created",
-        state: createdAt,
         setState: setCreatedAt,
+        state: createdAt,
       },
       {
         id: "updatedAt",
         label: "Updated",
-        state: updatedAt,
         setState: setUpdatedAt,
+        state: updatedAt,
       },
     ]);
 
@@ -406,31 +406,31 @@ export function SkillsTable({
   // getFacetedMinMaxValues - use to get a [min, max] for a column (e.g. for setting min and max values on a range slider filter)
 
   const table = useReactTable({
-    data,
     columns: getColumns(locale, onEdit, onDisable, onEnable, onRemove, onView, {
       isSuperAdmin,
     }),
+    data,
     getCoreRowModel: getCoreRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
-    getSortedRowModel: getSortedRowModel(),
+    getFacetedMinMaxValues: getFacetedMinMaxValues(),
     getFacetedRowModel: getFacetedRowModel(),
     getFacetedUniqueValues: getFacetedUniqueValues(),
-    getFacetedMinMaxValues: getFacetedMinMaxValues(),
+    getFilteredRowModel: getFilteredRowModel(),
     getRowId: (row) => row.id,
+    getSortedRowModel: getSortedRowModel(),
+    onColumnVisibilityChange: setColumnVisibility,
+    onRowSelectionChange: setRowSelection,
+    onSortingChange: handleSortingChange,
     state: {
-      globalFilter: searchQuery,
-      sorting: sort,
       columnFilters,
-      rowSelection,
       columnVisibility: getRestrictedVisibility(
         columnVisibility,
         RESTRICTED_COLUMNS,
         userRole
       ),
+      globalFilter: searchQuery,
+      rowSelection,
+      sorting: sort,
     },
-    onSortingChange: handleSortingChange,
-    onRowSelectionChange: setRowSelection,
-    onColumnVisibilityChange: setColumnVisibility,
   });
 
   const selected = data.filter((skill) => rowSelection[skill.id]);
@@ -442,11 +442,11 @@ export function SkillsTable({
   const categoryFacets = getUniqueFacets(
     table.getColumn("category")!.getFacetedUniqueValues()
   )
-    .filter(({ value }) => value != null && value !== "")
+    .filter(({ value }) => value !== null && value !== "")
     .map(({ value, label, count }) => ({
-      value: String(value),
-      label: label || EMPTY_MARKER,
       count,
+      label: label || EMPTY_MARKER,
+      value: String(value),
     }));
 
   const partitionFacets = getUniqueFacets(

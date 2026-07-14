@@ -1,5 +1,5 @@
 import { DeepKeys, DeepValue, useForm } from "@tanstack/react-form";
-// import lodash from "lodash";
+import lodash from "lodash";
 import { useCallback, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { toast } from "react-toastify";
@@ -25,23 +25,24 @@ import { FormError } from "@/lib/form-errors";
 import { nullIfEmpty } from "@/lib/form-input";
 import { hasUniqueLocales } from "@/lib/form-validation";
 import { createEmptyI18n } from "@/lib/i18n";
+import { isSlugTaken } from "@/lib/slug";
 import { CommonFormProps } from "./common";
 
 const organizationSchema = z.object({
-  slug: z.string().regex(SLUG_REGEX, FormError.invalidFormat).or(z.literal("")),
-  name: z.string().min(1, FormError.requiredField),
   category: z.enum(OrganizationCategory, FormError.requiredField),
-  logo: z.union([z.url(FormError.invalidFormat), z.literal("")]),
-  website: z.union([z.url(FormError.invalidFormat), z.literal("")]),
   i18n: z
     .array(
       z.object({
-        locale: z.string().min(1, FormError.requiredField),
         description: z.string().min(1, FormError.requiredField),
+        locale: z.string().min(1, FormError.requiredField),
       })
     )
     .min(1, FormError.requiredGroup)
     .refine(hasUniqueLocales, { message: FormError.uniqueField }),
+  logo: z.union([z.url(FormError.invalidFormat), z.literal("")]),
+  name: z.string().min(1, FormError.requiredField),
+  slug: z.string().regex(SLUG_REGEX, FormError.invalidFormat).or(z.literal("")),
+  website: z.union([z.url(FormError.invalidFormat), z.literal("")]),
 });
 
 export type OrganizationSchema = z.infer<typeof organizationSchema>;
@@ -55,17 +56,17 @@ export function organizationToInput(
   data: OrganizationSchema
 ): CreateOrganizationInput {
   return {
-    name: data.name,
-    slug: nullIfEmpty(data.slug),
     category: data.category,
-    logo: nullIfEmpty(data.logo),
-    website: nullIfEmpty(data.website),
     i18n: data.i18n.map((translation) => ({
       locale: translation.locale,
       messages: {
         description: translation.description,
       },
     })),
+    logo: nullIfEmpty(data.logo),
+    name: data.name,
+    slug: nullIfEmpty(data.slug),
+    website: nullIfEmpty(data.website),
   };
 }
 
@@ -73,15 +74,15 @@ export function organizationToForm(
   organization: OrganizationRow
 ): Partial<OrganizationSchema> {
   return {
+    category: organization.category,
+    i18n: organization.i18n.map((translation) => ({
+      description: translation.messages.description,
+      locale: translation.locale,
+    })),
+    logo: organization.logo ?? "",
     name: organization.name,
     slug: organization.slug ?? "",
-    category: organization.category,
-    logo: organization.logo ?? "",
     website: organization.website ?? "",
-    i18n: organization.i18n.map((translation) => ({
-      locale: translation.locale,
-      description: translation.messages.description,
-    })),
   };
 }
 
@@ -98,25 +99,26 @@ export function OrganizationForm({
   defaultValues,
   isDisabled,
   isLoading,
+  slugsList,
   state,
 }: OrganizationFormProps) {
   const { t: tForm } = useTranslation("forms");
   const { t: tValidation } = useTranslation("validation");
   const { t: tAction } = useTranslation("actions");
 
-  const [, setIsNameEdited] = useState(!!defaultValues?.name);
+  const [isNameEdited, setIsNameEdited] = useState(!!defaultValues?.name);
 
   const summarize = useSummarize();
   const translate = useTranslate();
 
   const form = useForm({
     defaultValues: {
+      category: OrganizationCategory.Company,
+      i18n: createEmptyI18n({ description: "" }),
+      logo: "",
       name: "",
       slug: "",
-      category: OrganizationCategory.Company,
-      logo: "",
       website: "",
-      i18n: createEmptyI18n({ description: "" }),
       ...defaultValues,
     },
     onSubmit: ({ value }) => onSubmit?.(value),
@@ -150,9 +152,9 @@ export function OrganizationForm({
       if (language) details.push({ key: "Language", value: [language] });
 
       const summarized = await summarize.mutateAsync({
+        details,
         raw,
         type,
-        details,
       });
 
       form.setFieldValue(
@@ -204,7 +206,6 @@ export function OrganizationForm({
         form.handleSubmit();
       }}
     >
-      {/* TODO: slug field hidden temporarily
       <Field
         listeners={{
           onChange: ({ value }) => {
@@ -235,7 +236,6 @@ export function OrganizationForm({
           />
         )}
       </Field>
-      */}
       <Field name="name">
         {(field) => (
           <TextInput
@@ -307,7 +307,7 @@ export function OrganizationForm({
           <FieldArray
             error={fieldError(arrayField.state.meta)}
             label={tForm("fields.translation.label")}
-            onAdd={() => arrayField.pushValue({ locale: "", description: "" })}
+            onAdd={() => arrayField.pushValue({ description: "", locale: "" })}
             onRemove={(index) => arrayField.removeValue(index)}
             values={arrayField.state.value}
           >

@@ -37,32 +37,33 @@ import {
   i18nLabelsByIds,
   pickTranslation,
 } from "@/lib/i18n";
+import { isSlugTaken } from "@/lib/slug";
 import { CommonFormProps } from "./common";
 
 const educationSchema = z.object({
-  slug: z.string().regex(SLUG_REGEX, FormError.invalidFormat).or(z.literal("")),
-  organizationId: z.string().min(1, FormError.requiredField),
-  level: z.enum(EducationLevel, FormError.requiredField),
-  status: z.enum(EducationStatus, FormError.requiredField),
-  relevance: z.number().min(1, FormError.minValue),
-  url: z.url(FormError.invalidFormat).or(z.literal("")),
-  image: z.url(FormError.invalidFormat).or(z.literal("")),
-  skillIds: z.array(z.string()),
   i18n: z
     .array(
       z.object({
+        description: z.string().min(1, FormError.requiredField),
         locale: z.string().min(1, FormError.requiredField),
         title: z.string().min(1, FormError.requiredField),
-        description: z.string().min(1, FormError.requiredField),
       })
     )
     .min(1, FormError.requiredGroup)
     .refine(hasUniqueLocales, { message: FormError.uniqueField }),
+  image: z.url(FormError.invalidFormat).or(z.literal("")),
+  level: z.enum(EducationLevel, FormError.requiredField),
+  organizationId: z.string().min(1, FormError.requiredField),
   period: z
     .object({ from: z.string(), to: z.string() })
     .refine((range) => !(range.from && range.to) || range.from <= range.to, {
       message: FormError.invalidRange,
     }),
+  relevance: z.number().min(1, FormError.minValue),
+  skillIds: z.array(z.string()),
+  slug: z.string().regex(SLUG_REGEX, FormError.invalidFormat).or(z.literal("")),
+  status: z.enum(EducationStatus, FormError.requiredField),
+  url: z.url(FormError.invalidFormat).or(z.literal("")),
 });
 
 export type EducationSchema = z.infer<typeof educationSchema>;
@@ -73,14 +74,16 @@ export interface EducationFormProps extends CommonFormProps<EducationSchema> {
 
 export function educationToInput(data: EducationSchema): CreateEducationInput {
   return {
-    slug: nullIfEmpty(data.slug),
-    organizationId: data.organizationId,
-    level: data.level,
-    status: data.status,
-    relevance: data.relevance,
-    url: nullIfEmpty(data.url),
+    i18n: data.i18n.map((translation) => ({
+      locale: translation.locale,
+      messages: {
+        description: translation.description,
+        title: translation.title,
+      },
+    })),
     image: nullIfEmpty(data.image),
-    skillIds: nullIfEmpty(data.skillIds),
+    level: data.level,
+    organizationId: data.organizationId,
     period:
       !data.period.from && !data.period.to
         ? null
@@ -88,13 +91,11 @@ export function educationToInput(data: EducationSchema): CreateEducationInput {
             from: nullIfEmpty(toIsoDate(data.period.from)),
             to: nullIfEmpty(toIsoDate(data.period.to)),
           },
-    i18n: data.i18n.map((translation) => ({
-      locale: translation.locale,
-      messages: {
-        title: translation.title,
-        description: translation.description,
-      },
-    })),
+    relevance: data.relevance,
+    skillIds: nullIfEmpty(data.skillIds),
+    slug: nullIfEmpty(data.slug),
+    status: data.status,
+    url: nullIfEmpty(data.url),
   };
 }
 
@@ -102,23 +103,23 @@ export function educationToForm(
   education: EducationRow
 ): Partial<EducationSchema> {
   return {
-    slug: education.slug ?? "",
-    organizationId: education.organization?.id ?? "",
-    level: education.level,
-    status: education.status,
-    relevance: education.relevance,
-    url: education.url ?? "",
+    i18n: education.i18n.map((translation) => ({
+      description: translation.messages.description,
+      locale: translation.locale,
+      title: translation.messages.title,
+    })),
     image: education.image ?? "",
-    skillIds: (education.skills ?? []).map((skill) => skill.id),
+    level: education.level,
+    organizationId: education.organization?.id ?? "",
     period: {
       from: toDateInput(education.period?.from),
       to: toDateInput(education.period?.to),
     },
-    i18n: education.i18n.map((translation) => ({
-      locale: translation.locale,
-      title: translation.messages.title,
-      description: translation.messages.description,
-    })),
+    relevance: education.relevance,
+    skillIds: (education.skills ?? []).map((skill) => skill.id),
+    slug: education.slug ?? "",
+    status: education.status,
+    url: education.url ?? "",
   };
 }
 
@@ -138,6 +139,7 @@ export function EducationForm({
   defaultValues,
   isDisabled,
   isLoading,
+  slugsList,
   state,
 }: EducationFormProps) {
   const { t: tForm } = useTranslation("forms");
@@ -155,9 +157,9 @@ export function EducationForm({
   const skillOptions = useMemo(
     () =>
       (findManySkills.data?.nodes ?? []).map((skill) => ({
+        disabled: skill.disabled,
         label: i18nLabel(skill, locale),
         value: skill.id,
-        disabled: skill.disabled,
       })),
     [locale, findManySkills.data?.nodes]
   );
@@ -165,9 +167,9 @@ export function EducationForm({
   const organizationOptions = useMemo(
     () =>
       (findManyOrganizations.data?.nodes ?? []).map((organization) => ({
+        disabled: organization.disabled,
         label: organization.name,
         value: organization.id,
-        disabled: organization.disabled,
       })),
     [findManyOrganizations.data?.nodes]
   );
@@ -177,16 +179,16 @@ export function EducationForm({
 
   const form = useForm({
     defaultValues: {
-      slug: "",
-      organizationId: "",
-      level: EducationLevel.Bachelor,
-      status: EducationStatus.Complete,
-      relevance: 1,
-      url: "",
+      i18n: createEmptyI18n({ description: "", title: "" }),
       image: "",
-      skillIds: [] as string[],
+      level: EducationLevel.Bachelor,
+      organizationId: "",
       period: { from: "", to: "" },
-      i18n: createEmptyI18n({ title: "", description: "" }),
+      relevance: 1,
+      skillIds: [] as string[],
+      slug: "",
+      status: EducationStatus.Complete,
+      url: "",
       ...defaultValues,
     },
     onSubmit: ({ value }) => onSubmit?.(value),
@@ -214,7 +216,7 @@ export function EducationForm({
       if (!skills.length)
         return toast.error(tValidation("minCount", { value: 1 }));
 
-      const title = fieldGroup.title;
+      const { title } = fieldGroup;
       if (!title) return toast.error(tValidation("requiredField"));
       details.push({ key: "Title", value: [title] });
 
@@ -259,10 +261,10 @@ export function EducationForm({
       if (url) details.push({ key: "URLs", value: [url] });
 
       const summarized = await atsSummarize.mutateAsync({
-        raw,
-        type,
-        skills,
         details,
+        raw,
+        skills,
+        type,
       });
 
       form.setFieldValue(
@@ -321,7 +323,6 @@ export function EducationForm({
         form.handleSubmit();
       }}
     >
-      {/* TODO: slug field hidden temporarily
       <Field
         name="slug"
         validators={{
@@ -345,7 +346,6 @@ export function EducationForm({
           />
         )}
       </Field>
-      */}
       <Field name="organizationId">
         {(field) => (
           <SelectInput
@@ -472,7 +472,7 @@ export function EducationForm({
             error={fieldError(arrayField.state.meta)}
             label={tForm("fields.translation.label")}
             onAdd={() =>
-              arrayField.pushValue({ locale: "", title: "", description: "" })
+              arrayField.pushValue({ description: "", locale: "", title: "" })
             }
             onRemove={(index) => arrayField.removeValue(index)}
             values={arrayField.state.value}

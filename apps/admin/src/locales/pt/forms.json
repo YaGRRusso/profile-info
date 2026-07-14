@@ -11,8 +11,8 @@
   },
   "fields": {
     "slug": {
-      "label": "Slug",
-      "placeholder": "ex.: meu-slug",
+      "label": "Identificador Único",
+      "placeholder": "ex.: meu-identificador",
       "tooltip": "Código curto sem espaços. Serve para o sistema achar este item."
     },
     "email": {

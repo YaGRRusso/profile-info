@@ -151,19 +151,19 @@ function RouteComponent() {
       <PageTitle
         actions={[
           {
+            className: "btn-ghost btn-square",
+            disabled: findManyCourses.isFetching,
             icon: (
               <ArrowsClockwiseIcon
                 className={cn(findManyCourses.isFetching && "animate-spin")}
               />
             ),
-            className: "btn-ghost btn-square",
             onClick: () => findManyCourses.refetch(),
-            disabled: findManyCourses.isFetching,
           },
           {
+            className: "btn-soft",
             icon: <PlusIcon />,
             label: tPage("courses.newButton"),
-            className: "btn-soft",
             onClick: () => setFormValues({ state: "CREATING" }),
           },
         ]}
@@ -186,9 +186,9 @@ function RouteComponent() {
           isLoading={createOneCourse.isPending || updateOneCourse.isPending}
           onCancel={() => setFormValues(undefined)}
           onSubmit={handleSubmit}
-          // slugsList={findManyCourses.data?.nodes
-          //   .map((course) => course.slug)
-          //   .filter((slug): slug is string => slug != null && slug !== "")}
+          slugsList={findManyCourses.data?.nodes
+            .map((course) => course.slug)
+            .filter((slug): slug is string => slug !== null && slug !== "")}
           state={formValues?.state}
         />
       </Modal>
@@ -228,8 +228,8 @@ function RouteComponent() {
       <Modal
         actions={[
           {
-            label: tAction("close"),
             className: "btn-ghost",
+            label: tAction("close"),
             onClick: () => setFormValues(undefined),
           },
         ]}
@@ -249,14 +249,14 @@ function RouteComponent() {
       <Modal
         actions={[
           {
-            label: tAction("cancel"),
             className: "btn-ghost",
+            label: tAction("cancel"),
             onClick: () => setFormValues(undefined),
           },
           {
-            label: tAction("confirm"),
             className: "btn-soft btn-error",
             disabled: removeOneCourse.isPending || removeManyCourses.isPending,
+            label: tAction("confirm"),
             onClick: () => handleDelete(),
           },
         ]}
@@ -299,39 +299,39 @@ function RouteComponent() {
             data={findManyCourses.data?.nodes ?? []}
             onDelete={(course) =>
               setFormValues({
-                state: "DELETING",
                 customValues: [course],
+                state: "DELETING",
               })
             }
             onEdit={(course) =>
               setFormValues({
+                customValues: [course],
                 defaultValues: courseToForm(course),
                 state: "UPDATING",
-                customValues: [course],
               })
             }
             onMultiDelete={(courses) =>
               setFormValues({
-                state: "MULTI_DELETING",
                 customValues: courses,
+                state: "MULTI_DELETING",
               })
             }
             onMultiEdit={(courses) =>
               setFormValues({
-                state: "MULTI_UPDATING",
                 customValues: courses,
+                state: "MULTI_UPDATING",
               })
             }
             onMultiView={(courses) =>
               setFormValues({
-                state: "MULTI_READING",
                 customValues: courses,
+                state: "MULTI_READING",
               })
             }
             onView={(course) =>
               setFormValues({
-                state: "READING",
                 customValues: [course],
+                state: "READING",
               })
             }
           />

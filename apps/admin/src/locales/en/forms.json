@@ -11,8 +11,8 @@
   },
   "fields": {
     "slug": {
-      "label": "Slug",
-      "placeholder": "e.g. my-slug",
+      "label": "Unique Identifier",
+      "placeholder": "e.g. my-identifier",
       "tooltip": "Short code with no spaces. The system uses it to find this item."
     },
     "email": {
