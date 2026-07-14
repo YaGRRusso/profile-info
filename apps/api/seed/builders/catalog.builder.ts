@@ -1,3 +1,4 @@
+import { uniq } from "lodash";
 import type { LocaleCode } from "@/common/i18n/locales";
 import { CatalogPartition } from "@/core/enums/catalog-partition.enum";
 import type { SkillModel } from "@/modules/skills/schemas/skill.schema";
@@ -92,7 +93,7 @@ export function pickProfileSkillIds(
     ...categorized.slice(0, count),
   ];
 
-  return [...new Set(picked)].slice(0, count);
+  return uniq(picked).slice(0, count);
 }
 
 export function pickSkillIds(

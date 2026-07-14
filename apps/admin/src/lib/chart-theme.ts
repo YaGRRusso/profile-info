@@ -1,3 +1,5 @@
+import { compact } from "lodash";
+
 const FALLBACK_CHART_COLORS = [
   "#ff595e",
   "#1982c4",
@@ -24,9 +26,9 @@ export function getChartColors(count = 6): string[] {
   }
 
   const styles = getComputedStyle(document.documentElement);
-  const colors = CHART_COLOR_VARS.map((variable) =>
-    styles.getPropertyValue(variable).trim()
-  ).filter(Boolean);
+  const colors = compact(
+    CHART_COLOR_VARS.map((variable) => styles.getPropertyValue(variable).trim())
+  );
 
   if (colors.length === 0) {
     return FALLBACK_CHART_COLORS.slice(0, count);

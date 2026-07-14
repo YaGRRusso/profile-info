@@ -1,3 +1,4 @@
+import { compact } from "lodash";
 import type { GetMeQuery } from "@/generated/graphql/graphql";
 
 export type ProfileUser = GetMeQuery["getMe"];
@@ -54,7 +55,7 @@ export function computeAccountCompleteness(
   user?: ProfileUser | null
 ): number {
   const done = accountStepResults(totals, user);
-  const completed = done.filter(Boolean).length;
+  const completed = compact(done).length;
 
   return Math.round((completed / done.length) * 100);
 }

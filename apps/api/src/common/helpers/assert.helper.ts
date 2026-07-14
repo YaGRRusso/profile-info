@@ -1,4 +1,5 @@
 import { BadRequestException } from "@nestjs/common";
+import { uniq } from "lodash";
 
 export const REFERENCES_NOT_FOUND = "Referenced resource not found";
 
@@ -20,7 +21,7 @@ export async function assertReferencesResolved(
 ): Promise<void> {
   if (!requestedIds?.length) return;
 
-  const uniqueIds = [...new Set(requestedIds)];
+  const uniqueIds = uniq(requestedIds);
   const found = await findById(uniqueIds);
   assertReferencesExist(
     uniqueIds,

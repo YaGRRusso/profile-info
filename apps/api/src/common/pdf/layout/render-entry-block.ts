@@ -1,3 +1,4 @@
+import { compact } from "lodash";
 import type { PdfContext } from "../pdf-context";
 import type { PdfSpacingKey } from "../pdf-spacing";
 import type { PdfTextStyleKey } from "../pdf-theme.type";
@@ -46,7 +47,7 @@ function measureEntryHeaderHeight(
   const titleStyle = options.titleStyle ?? "heading";
   let height = measureTitleHeight(ctx, options.title, titleStyle, options.url);
 
-  const meta = options.meta?.filter(Boolean).join(" · ");
+  const meta = options.meta ? compact(options.meta).join(" · ") : undefined;
 
   if (meta) {
     height += ctx.measureGapHeight("xs", titleStyle);

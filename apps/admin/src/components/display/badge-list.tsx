@@ -1,3 +1,4 @@
+import { compact, uniq } from "lodash";
 import { EmptyValue } from "@/components/display/empty-value";
 import { isEmptyValue } from "@/lib/empty-value";
 
@@ -6,7 +7,7 @@ export interface BadgeListProps {
 }
 
 export function BadgeList({ values }: BadgeListProps) {
-  const unique = [...new Set(values.filter(Boolean))];
+  const unique = uniq(compact(values));
 
   if (isEmptyValue(unique)) {
     return <EmptyValue />;

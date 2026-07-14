@@ -13,6 +13,7 @@ import {
   UserCircleIcon,
 } from "@phosphor-icons/react";
 import { Link } from "@tanstack/react-router";
+import { compact } from "lodash";
 import type { ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import { UserRole } from "@/generated/graphql/graphql";
@@ -132,7 +133,7 @@ export function FirstSteps({ totals, user }: FirstStepsProps) {
   }
 
   const done = accountStepResults(totals, user);
-  const completed = done.filter(Boolean).length;
+  const completed = compact(done).length;
   const allTrackableDone = completed === done.length;
 
   const steps = [

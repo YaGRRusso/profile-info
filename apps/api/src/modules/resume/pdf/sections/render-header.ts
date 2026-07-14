@@ -1,3 +1,4 @@
+import { compact } from "lodash";
 import { renderLabeledLinks } from "@/common/pdf/layout/render-labeled-links";
 import type { PdfContext } from "@/common/pdf/pdf-context";
 import {
@@ -31,7 +32,7 @@ export function renderHeader(
     ctx.gap("lg");
   }
 
-  const contactParts = [header.email, header.phone].filter(Boolean);
+  const contactParts = compact([header.email, header.phone]);
 
   if (contactParts.length) {
     ctx.text("bodySmall", contactParts.join(" · "));

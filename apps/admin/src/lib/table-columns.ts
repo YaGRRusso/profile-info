@@ -1,5 +1,5 @@
 import { VisibilityState } from "@tanstack/react-table";
-import { isNil } from "lodash";
+import { isNil, uniq } from "lodash";
 import { UserRole } from "@/generated/graphql/graphql";
 
 export const DEFAULT_META_COLUMN_VISIBILITY: VisibilityState = {
@@ -33,7 +33,7 @@ export function getRestrictedVisibility(
   role?: string | null
 ) {
   const hidden = Object.fromEntries(
-    [...new Set(Object.values(restricted).flat())]
+    uniq(Object.values(restricted).flat())
       .filter((id) => !canSeeColumn(restricted, id, role))
       .map((id) => [id, false])
   );

@@ -1,4 +1,4 @@
-import { isNil } from "lodash";
+import { compact, isEqual, isNil } from "lodash";
 import {
   createMultiParser,
   createParser,
@@ -93,10 +93,6 @@ function parseObjectFields(
   return Object.keys(result).length ? result : null;
 }
 
-function deepEqual<Value>(current: Value, next: Value): boolean {
-  return JSON.stringify(current) === JSON.stringify(next);
-}
-
 function validate(schema: z.ZodType, value: unknown): boolean {
   return schema.safeParse(value).success;
 }
@@ -121,7 +117,7 @@ function buildObjectParser(
   objectShape: ObjectShape
 ): SingleParserBuilder<PrimitiveObject> {
   return createParser<PrimitiveObject>({
-    eq: deepEqual,
+    eq: isEqual,
     parse: (rawString) => {
       const parsedObject = parseObjectFields(rawString, objectShape);
       if (!parsedObject) return null;
@@ -136,7 +132,7 @@ function buildPrimitiveArrayParser(
   itemPrimitiveType: string
 ): MultiParserBuilder<PrimitiveValue[]> {
   return createMultiParser<PrimitiveValue[]>({
-    eq: deepEqual,
+    eq: isEqual,
     parse: (rawValues) => {
       const decodedItems = rawValues
         .map((rawItem) => parsePrimitive(rawItem, itemPrimitiveType))
@@ -153,7 +149,7 @@ function buildObjectArrayParser(
   itemShape: ObjectShape
 ): MultiParserBuilder<PrimitiveObject[]> {
   return createMultiParser<PrimitiveObject[]>({
-    eq: deepEqual,
+    eq: isEqual,
     parse: (rawValues) => {
       const decodedItems = rawValues
         .map((rawItem) => parseObjectFields(rawItem, itemShape))
@@ -161,8 +157,7 @@ function buildObjectArrayParser(
       if (!decodedItems.length) return null;
       return validate(schema, decodedItems) ? decodedItems : null;
     },
-    serialize: (objectArray) =>
-      objectArray.map(serializeObjectFields).filter(Boolean),
+    serialize: (objectArray) => compact(objectArray.map(serializeObjectFields)),
   });
 }
 

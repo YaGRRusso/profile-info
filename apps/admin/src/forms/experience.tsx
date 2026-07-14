@@ -1,4 +1,5 @@
 import { DeepKeys, DeepValue, useForm } from "@tanstack/react-form";
+import { compact } from "lodash";
 import { useCallback, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { toast } from "react-toastify";
@@ -229,10 +230,10 @@ export function ExperienceForm({
         return toast.error(tValidation("requiredField"));
       details.push({
         key: "Period",
-        value: [
+        value: compact([
           period.from ? `from ${period.from}` : "",
           period.to ? `to ${period.to}` : "",
-        ].filter(Boolean),
+        ]),
       });
 
       const category = form.getFieldValue("category");

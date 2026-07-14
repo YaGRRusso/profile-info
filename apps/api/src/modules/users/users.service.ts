@@ -1,6 +1,7 @@
 import { ForbiddenException, Injectable } from "@nestjs/common";
 import { EventEmitter2 } from "@nestjs/event-emitter";
 import { hash } from "bcryptjs";
+import { uniq } from "lodash";
 import type { AuthContext } from "@/core/context/auth-context.interface";
 import { BatchEntity } from "@/core/entities/batch.entity";
 import { UserRole } from "@/core/enums/user-role.enum";
@@ -91,9 +92,9 @@ export class UsersService {
     ctx: AuthContext,
     createUserInputs: CreateUserInput[]
   ): Promise<BatchEntity> {
-    const skillIds = [
-      ...new Set(createUserInputs.flatMap((item) => item.skillIds ?? [])),
-    ];
+    const skillIds = uniq(
+      createUserInputs.flatMap((item) => item.skillIds ?? [])
+    );
     await this.assertSkillsExist(ctx, skillIds);
 
     const inputs: UserCreateRecord[] = await Promise.all(

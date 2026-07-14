@@ -1,4 +1,5 @@
 import { Injectable } from "@nestjs/common";
+import { uniq } from "lodash";
 import type { AuthContext } from "@/core/context/auth-context.interface";
 import { BatchEntity } from "@/core/entities/batch.entity";
 import type {
@@ -158,9 +159,7 @@ export class ProjectsService {
     ctx: AuthContext,
     inputs: ProjectCatalogRefs[]
   ): Promise<void> {
-    const skillIds = [
-      ...new Set(inputs.flatMap((item) => item.skillIds ?? [])),
-    ];
+    const skillIds = uniq(inputs.flatMap((item) => item.skillIds ?? []));
 
     if (skillIds.length > 0) {
       await this.skillsValidator.assertSkillsEnabled(ctx, skillIds);

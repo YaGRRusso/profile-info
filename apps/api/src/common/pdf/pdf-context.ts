@@ -1,3 +1,4 @@
+import { compact } from "lodash";
 import { DEFAULT_PDF_THEME } from "./default-pdf-theme";
 import type { PdfSpacingKey } from "./pdf-spacing";
 import type { PdfTextStyle } from "./pdf-text-style.type";
@@ -23,7 +24,7 @@ export class PdfContext {
     parts: Array<string | undefined>,
     styleKey: PdfTextStyleKey = "meta"
   ): this {
-    const meta = parts.filter(Boolean).join(" · ");
+    const meta = compact(parts).join(" · ");
     if (!meta) return this;
 
     return this.text(styleKey, meta);

@@ -1,6 +1,5 @@
+import { compact } from "lodash";
+
 export function parseCommaSeparatedList(value: string): string[] {
-  return value
-    .split(",")
-    .map((item) => item.trim())
-    .filter(Boolean);
+  return compact(value.split(",").map((item) => item.trim()));
 }

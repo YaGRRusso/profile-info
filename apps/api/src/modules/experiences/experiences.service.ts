@@ -1,5 +1,5 @@
 import { Injectable } from "@nestjs/common";
-import { isNil } from "lodash";
+import { isNil, uniq } from "lodash";
 import type { AuthContext } from "@/core/context/auth-context.interface";
 import { BatchEntity } from "@/core/entities/batch.entity";
 import type {
@@ -189,16 +189,14 @@ export class ExperiencesService {
     ctx: AuthContext,
     inputs: ExperienceCatalogRefs[]
   ): Promise<void> {
-    const organizationIds = [
-      ...new Set(
-        inputs
-          .map((item) => item.organizationId)
-          .filter((id): id is string => !isNil(id))
-      ),
-    ];
-    const skillIds = [
-      ...new Set(inputs.flatMap((item) => this.collectSkillIds(item.roles))),
-    ];
+    const organizationIds = uniq(
+      inputs
+        .map((item) => item.organizationId)
+        .filter((id): id is string => !isNil(id))
+    );
+    const skillIds = uniq(
+      inputs.flatMap((item) => this.collectSkillIds(item.roles))
+    );
 
     if (organizationIds.length > 0) {
       await this.organizationsValidator.assertOrganizationsEnabled(

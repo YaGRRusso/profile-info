@@ -1,4 +1,6 @@
+import { uniq } from "lodash";
+
 export function hasUniqueLocales(items: { locale: string }[]): boolean {
   const locales = items.map((item) => item.locale);
-  return new Set(locales).size === locales.length;
+  return uniq(locales).length === locales.length;
 }

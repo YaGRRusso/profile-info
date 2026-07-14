@@ -1,4 +1,4 @@
-import { isNil } from "lodash";
+import { isNil, isPlainObject } from "lodash";
 import { useMemo } from "react";
 import { useStableValue } from "@/hooks/custom/use-stable-value";
 
@@ -22,15 +22,6 @@ interface FilterPreview {
 
 function isEmpty(value: unknown): boolean {
   return isNil(value) || value === "";
-}
-
-function isPlainObject(value: unknown): value is Record<string, unknown> {
-  return (
-    typeof value === "object" &&
-    value !== null &&
-    !Array.isArray(value) &&
-    Object.getPrototypeOf(value) === Object.prototype
-  );
 }
 
 function nonEmptyEntries(
@@ -88,7 +79,9 @@ function previewsFromArray(items: unknown[]): FilterPreview[] {
 function previewsFromValue(value: unknown): FilterPreview[] {
   if (isEmpty(value)) return [];
   if (Array.isArray(value)) return previewsFromArray(value);
-  if (isPlainObject(value)) return previewsFromObject(value);
+  if (isPlainObject(value))
+    return previewsFromObject(value as Record<string, unknown>);
+
   return [{ display: String(value), valueAfterClear: null }];
 }
 

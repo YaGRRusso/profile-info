@@ -1,4 +1,5 @@
 import type { AnyFieldMeta } from "@tanstack/react-form";
+import { compact } from "lodash";
 import i18n from "@/i18n";
 
 function errorMessage(error: unknown): string | undefined {
@@ -30,9 +31,7 @@ export function fieldError(meta: AnyFieldMeta): string | undefined {
   if (!meta.isTouched || !meta.errors.length) return;
 
   return (
-    meta.errors
-      .map((error) => resolveError(error))
-      .filter(Boolean)
-      .join(", ") || undefined
+    compact(meta.errors.map((error) => resolveError(error))).join(", ") ||
+    undefined
   );
 }

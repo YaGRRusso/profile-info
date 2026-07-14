@@ -1,6 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { Octokit } from "@octokit/rest";
+import { compact } from "lodash";
 import type { Env } from "@/core/configs/env.validation";
 import {
   type RepositoryData,
@@ -27,7 +28,7 @@ export class GithubService extends RepositoryMetadataProvider {
       throw new Error("Should be a GitHub repository URL");
     }
 
-    const parts = url.pathname.split("/").filter(Boolean);
+    const parts = compact(url.pathname.split("/"));
     if (parts.length < 2) {
       throw new Error(
         "Invalid GitHub repository URL. Expected format: https://github.com/owner/repository"
