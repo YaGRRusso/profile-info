@@ -2,9 +2,11 @@ import { CaretDownIcon, XIcon } from "@phosphor-icons/react";
 import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { cn } from "@/lib/cn";
+import { AuraField } from "./aura-field";
 import { InputLegend } from "./legend";
 
 export interface MultiSelectInputProps {
+  ai?: boolean;
   className?: string;
   disabled?: boolean;
   error?: string;
@@ -20,6 +22,7 @@ export interface MultiSelectInputProps {
 }
 
 export function MultiSelectInput({
+  ai,
   className,
   disabled,
   error,
@@ -75,22 +78,24 @@ export function MultiSelectInput({
     <fieldset className="fieldset" disabled={disabled}>
       <InputLegend label={label} optional={optional} tooltip={tooltip} />
       <div className="relative w-full" ref={containerRef}>
-        <label
-          className={cn("input w-full", error && "input-error", className)}
-        >
-          <input
-            onChange={(event) => setSearch(event.target.value)}
-            onFocus={() => setIsOpen(true)}
-            placeholder={
-              value.length
-                ? tForm("multiSelect.selected", { count: value.length })
-                : placeholder
-            }
-            type="text"
-            value={search}
-          />
-          <CaretDownIcon />
-        </label>
+        <AuraField disabled={!ai}>
+          <label
+            className={cn("input w-full", error && "input-error", className)}
+          >
+            <input
+              onChange={(event) => setSearch(event.target.value)}
+              onFocus={() => setIsOpen(true)}
+              placeholder={
+                value.length
+                  ? tForm("multiSelect.selected", { count: value.length })
+                  : placeholder
+              }
+              type="text"
+              value={search}
+            />
+            <CaretDownIcon />
+          </label>
+        </AuraField>
         {isOpen && (
           <div className="absolute top-full left-0 z-20 mt-1 flex max-h-64 w-full flex-col gap-2 overflow-auto rounded-box bg-base-200 p-2 shadow">
             <ul className="flex flex-col">

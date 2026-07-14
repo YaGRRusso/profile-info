@@ -1,6 +1,7 @@
 import { useCallback, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { cn } from "@/lib/cn";
+import { AuraField } from "./aura-field";
 import { InputLegend } from "./legend";
 
 export interface DateRangeValue {
@@ -9,6 +10,7 @@ export interface DateRangeValue {
 }
 
 export interface DateRangeInputProps {
+  ai?: boolean;
   className?: string;
   disabled?: boolean;
   error?: string;
@@ -20,6 +22,7 @@ export interface DateRangeInputProps {
 }
 
 export function DateRangeInput({
+  ai,
   className,
   disabled,
   error,
@@ -50,24 +53,28 @@ export function DateRangeInput({
       <InputLegend label={label} optional={optional} tooltip={tooltip} />
       <div className="flex flex-col gap-2">
         <div className="flex flex-wrap items-center gap-2">
-          <input
-            className={cn("input flex-1", error && "input-error", className)}
-            disabled={disabled}
-            onChange={(event) =>
-              handleChange({ from: event.target.value, current })
-            }
-            type="date"
-            value={value?.from ?? ""}
-          />
-          <input
-            className={cn("input flex-1", error && "input-error", className)}
-            disabled={disabled || current}
-            onChange={(event) =>
-              handleChange({ to: event.target.value, current })
-            }
-            type="date"
-            value={value?.to ?? ""}
-          />
+          <AuraField className="min-w-0 flex-1" disabled={!ai}>
+            <input
+              className={cn("input w-full", error && "input-error", className)}
+              disabled={disabled}
+              onChange={(event) =>
+                handleChange({ current, from: event.target.value })
+              }
+              type="date"
+              value={value?.from ?? ""}
+            />
+          </AuraField>
+          <AuraField className="min-w-0 flex-1" disabled={!ai}>
+            <input
+              className={cn("input w-full", error && "input-error", className)}
+              disabled={disabled || current}
+              onChange={(event) =>
+                handleChange({ current, to: event.target.value })
+              }
+              type="date"
+              value={value?.to ?? ""}
+            />
+          </AuraField>
         </div>
         <label className="label cursor-pointer justify-end">
           {tForm("dateRange.current")}

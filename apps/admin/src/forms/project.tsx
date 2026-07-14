@@ -348,6 +348,7 @@ export function ProjectForm({
                 <Field name={`urls[${index}].value`}>
                   {(field) => (
                     <TextInput
+                      ai
                       error={fieldError(field.state.meta)}
                       name={field.name}
                       onChange={field.handleChange}

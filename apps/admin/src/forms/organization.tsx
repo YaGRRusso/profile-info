@@ -285,6 +285,7 @@ export function OrganizationForm({
       <Field name="website">
         {(field) => (
           <TextInput
+            ai
             error={fieldError(field.state.meta)}
             label={tForm("fields.website.label")}
             name={field.name}

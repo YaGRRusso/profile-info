@@ -1,10 +1,12 @@
 import { EyeIcon, EyeSlashIcon } from "@phosphor-icons/react";
 import { type ComponentProps, useState } from "react";
 import { cn } from "@/lib/cn";
+import { AuraField } from "./aura-field";
 import { InputLegend } from "./legend";
 
 export interface PasswordInputProps
   extends Omit<ComponentProps<"input">, "onChange" | "value"> {
+  ai?: boolean;
   error?: string;
   label?: string;
   onChange?: (value: string) => void;
@@ -22,6 +24,7 @@ export function PasswordInput({
   optional,
   tooltip,
   value,
+  ai,
   ...props
 }: PasswordInputProps) {
   const [isShowing, setIsShowing] = useState(false);
@@ -29,26 +32,30 @@ export function PasswordInput({
   return (
     <fieldset className="fieldset">
       <InputLegend label={label} optional={optional} tooltip={tooltip} />
-      <label className={cn("input w-full", error && "input-error", className)}>
-        <input
-          onChange={(event) => onChange?.(event.target.value)}
-          placeholder={placeholder}
-          type={isShowing ? "text" : "password"}
-          value={value}
-          {...props}
-        />
-        <button
-          className="btn btn-ghost btn-square btn-sm -mr-2 text-base"
-          onClick={() => setIsShowing((prev) => !prev)}
-          type="button"
+      <AuraField disabled={!ai}>
+        <label
+          className={cn("input w-full", error && "input-error", className)}
         >
-          {isShowing ? (
-            <EyeSlashIcon className="opacity-md" />
-          ) : (
-            <EyeIcon className="opacity-md" />
-          )}
-        </button>
-      </label>
+          <input
+            onChange={(event) => onChange?.(event.target.value)}
+            placeholder={placeholder}
+            type={isShowing ? "text" : "password"}
+            value={value}
+            {...props}
+          />
+          <button
+            className="btn btn-ghost btn-square btn-sm -mr-2 text-base"
+            onClick={() => setIsShowing((prev) => !prev)}
+            type="button"
+          >
+            {isShowing ? (
+              <EyeSlashIcon className="opacity-md" />
+            ) : (
+              <EyeIcon className="opacity-md" />
+            )}
+          </button>
+        </label>
+      </AuraField>
       {error && <p className="label text-error">{error}</p>}
     </fieldset>
   );

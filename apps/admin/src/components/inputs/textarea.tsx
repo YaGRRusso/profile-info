@@ -8,10 +8,12 @@ import { ComponentProps } from "react";
 import { useTranslation } from "react-i18next";
 import { RawSizeEnum } from "@/consts/raw-size";
 import { cn } from "@/lib/cn";
+import { AuraField } from "./aura-field";
 import { InputLegend } from "./legend";
 
 export interface TextareaInputProps
   extends Omit<ComponentProps<"textarea">, "onChange" | "value"> {
+  ai?: boolean;
   error?: string;
   label?: string;
   onChange?: (value: string) => void;
@@ -34,6 +36,7 @@ export function TextareaInput({
   tooltip,
   disabled,
   value,
+  ai,
   ...props
 }: TextareaInputProps) {
   const { t: tForm } = useTranslation("forms");
@@ -41,31 +44,33 @@ export function TextareaInput({
   return (
     <fieldset className="fieldset">
       <InputLegend label={label} optional={optional} tooltip={tooltip} />
-      <label
-        className={cn(
-          "textarea flex w-full cursor-text flex-col gap-2",
-          error && "textarea-error"
-        )}
-      >
-        <textarea
-          className={cn("max-h-96 min-h-24 resize-y", className)}
-          disabled={disabled}
-          onChange={(event) => onChange?.(event.target.value)}
-          placeholder={placeholder}
-          value={value}
-          {...props}
-        />
-        <span
+      <AuraField disabled={!ai}>
+        <label
           className={cn(
-            "pointer-events-none flex items-center self-end text-xs opacity-md",
-            value?.length === props.maxLength && "text-error"
+            "textarea flex w-full cursor-text flex-col gap-2",
+            error && "textarea-error"
           )}
         >
-          {value?.length ?? 0}
-          <LineVerticalIcon />
-          {props.maxLength ? props.maxLength : <InfinityIcon weight="bold" />}
-        </span>
-      </label>
+          <textarea
+            className={cn("max-h-96 min-h-24 resize-y", className)}
+            disabled={disabled}
+            onChange={(event) => onChange?.(event.target.value)}
+            placeholder={placeholder}
+            value={value}
+            {...props}
+          />
+          <span
+            className={cn(
+              "pointer-events-none flex items-center self-end text-xs opacity-md",
+              value?.length === props.maxLength && "text-error"
+            )}
+          >
+            {value?.length ?? 0}
+            <LineVerticalIcon />
+            {props.maxLength ? props.maxLength : <InfinityIcon weight="bold" />}
+          </span>
+        </label>
+      </AuraField>
       <div className="scrollbar-thin flex items-center justify-between gap-x-4 overflow-x-auto">
         {error && <p className="label text-error">{error}</p>}
         <div className="ml-auto flex items-center gap-1">
