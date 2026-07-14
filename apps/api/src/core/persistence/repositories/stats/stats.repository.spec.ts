@@ -106,6 +106,39 @@ describe("StatsRepository", () => {
     });
   });
 
+  describe("countByOwnerIds", () => {
+    it("returns empty without aggregating when ownerIds is empty", async () => {
+      await expect(repository.countByOwnerIds([])).resolves.toEqual([]);
+      expect(model.aggregate).not.toHaveBeenCalled();
+    });
+
+    it("aggregates by ownerId with ObjectId $in match", async () => {
+      const otherOwnerId = new mongoose.Types.ObjectId().toHexString();
+      model.aggregate.mockResolvedValue([
+        { _id: new mongoose.Types.ObjectId(ownerId), value: 4 },
+      ]);
+
+      await expect(
+        repository.countByOwnerIds([ownerId, otherOwnerId])
+      ).resolves.toEqual([{ label: ownerId, value: 4 }]);
+
+      expect(model.aggregate).toHaveBeenCalledWith([
+        {
+          $match: {
+            ownerId: {
+              $in: [
+                new mongoose.Types.ObjectId(ownerId),
+                new mongoose.Types.ObjectId(otherOwnerId),
+              ],
+            },
+          },
+        },
+        { $group: { _id: "$ownerId", value: { $sum: 1 } } },
+        { $sort: { value: -1 } },
+      ]);
+    });
+  });
+
   describe("findRecentlyUpdated", () => {
     it("should query with sort, limit, projection, and lean", async () => {
       const updatedAt = new Date("2026-01-01T00:00:00.000Z");

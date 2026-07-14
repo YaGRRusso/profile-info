@@ -1,5 +1,6 @@
 import type { Model, PipelineStage, QueryFilter, SortOrder } from "mongoose";
 import { clearObject } from "@/common/helpers/object.helper";
+import { toObjectId } from "@/core/mappers/base.mapper";
 import { noopScope } from "../../helpers/persistence-scope.helper";
 import type { RecentUpdateRow } from "../../types/output.type";
 import type { PersistenceScope } from "../../types/scope.type";
@@ -69,6 +70,16 @@ export class StatsRepository<TModel>
     );
 
     return rows.map((row) => ({ label: String(row._id), value: row.value }));
+  }
+
+  countByOwnerIds(ownerIds: string[]) {
+    if (ownerIds.length === 0) {
+      return Promise.resolve([]);
+    }
+
+    return this.countByField("ownerId", {
+      ownerId: { $in: ownerIds.map((id) => toObjectId(id)) },
+    } as QueryFilter<TModel>);
   }
 
   async findRecentlyUpdated(

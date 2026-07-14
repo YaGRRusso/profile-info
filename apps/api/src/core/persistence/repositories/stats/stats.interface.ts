@@ -3,17 +3,18 @@ import type { FieldCount, RecentUpdateRow } from "../../types/output.type";
 import type { PersistenceScope } from "../../types/scope.type";
 
 export interface StatsRepositoryInterface<TModel> {
-  count(filters?: QueryFilter<TModel>): Promise<number>;
-  countByField(
+  count: (filters?: QueryFilter<TModel>) => Promise<number>;
+  countByField: (
     field: string,
     match?: QueryFilter<TModel>
-  ): Promise<FieldCount[]>;
-  findRecentlyUpdated(
+  ) => Promise<FieldCount[]>;
+  countByOwnerIds: (ownerIds: string[]) => Promise<FieldCount[]>;
+  findRecentlyUpdated: (
     limit: number,
     projection: string,
     filters?: QueryFilter<TModel>
-  ): Promise<RecentUpdateRow[]>;
+  ) => Promise<RecentUpdateRow[]>;
 
-  global(): StatsRepositoryInterface<TModel>;
-  scoped(scope: PersistenceScope): StatsRepositoryInterface<TModel>;
+  global: () => StatsRepositoryInterface<TModel>;
+  scoped: (scope: PersistenceScope) => StatsRepositoryInterface<TModel>;
 }
