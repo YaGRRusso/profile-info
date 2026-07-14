@@ -3,12 +3,12 @@ import { useSignIn } from "@/hooks/mutations/auth";
 import { useAuthStore } from "@/stores/auth";
 
 const PERSONAS = [
-  { label: "Admin", email: "admin@profile.info" },
-  { label: "Full", email: "full@profile.info" },
-  { label: "Empty", email: "empty@profile.info" },
-  { label: "Lite", email: "lite@profile.info" },
-  { label: "João", email: "joao@profile.info" },
-  { label: "Maria", email: "maria@profile.info" },
+  { email: "admin@profile.info", label: "Admin" },
+  { email: "pending@profile.info", label: "Pending" },
+  { email: "full@profile.info", label: "Full" },
+  { email: "empty@profile.info", label: "Empty" },
+  { email: "joao@profile.info", label: "João" },
+  { email: "maria@profile.info", label: "Maria" },
 ] as const;
 
 const DEV_PASSWORD = "123123";

@@ -15,6 +15,7 @@ import {
 import { Link } from "@tanstack/react-router";
 import type { ReactNode } from "react";
 import { useTranslation } from "react-i18next";
+import { UserRole } from "@/generated/graphql/graphql";
 import { cn } from "@/lib/cn";
 import {
   type AccountTotals,
@@ -125,6 +126,11 @@ function FirstStepRow({
 
 export function FirstSteps({ totals, user }: FirstStepsProps) {
   const { t: tDashboard } = useTranslation("dashboard");
+
+  if (user?.role === UserRole.SuperAdmin) {
+    return null;
+  }
+
   const done = accountStepResults(totals, user);
   const completed = done.filter(Boolean).length;
   const allTrackableDone = completed === done.length;

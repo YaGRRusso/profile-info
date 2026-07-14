@@ -16,7 +16,7 @@ export function LocaleSwitch({ className, ...props }: LocaleSwitchProps) {
   return (
     <select
       aria-label={tSystem("language")}
-      className={cn("select select-sm max-w-64", className)}
+      className={cn("select select-sm", className)}
       onChange={(event) => i18n.changeLanguage(event.target.value)}
       value={value}
       {...props}

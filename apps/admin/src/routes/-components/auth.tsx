@@ -25,7 +25,7 @@ export function Auth() {
           </div>
         </div>
       </div>
-      <div className="flex w-full max-w-3xl items-center justify-between gap-2 max-sm:justify-center">
+      <div className="flex w-full max-w-3xl items-center justify-between gap-2">
         <LocaleSwitch />
         <ThemeSwitch />
       </div>
