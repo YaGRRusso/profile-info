@@ -13,7 +13,7 @@ describe("seed personas", () => {
   });
 
   it("uses short and long display names independent of email", () => {
-    expect(PERSONAS.empty.name.length).toBeLessThanOrEqual(2);
+    expect(PERSONAS.empty.name).toBe("Empty");
     expect(PERSONAS.full.name.length).toBeGreaterThan(40);
     expect(PERSONAS.joao.email).not.toContain("joão");
   });

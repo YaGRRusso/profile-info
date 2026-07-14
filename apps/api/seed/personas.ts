@@ -42,6 +42,7 @@ export interface PersonaDefinition {
   role: UserRole;
 }
 
+/** Declaration order is the QA matrix order (see seed/README.md). */
 export const PERSONAS: Record<PersonaKey, PersonaDefinition> = {
   admin: {
     email: "admin@profile.info",
