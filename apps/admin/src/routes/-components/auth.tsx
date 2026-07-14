@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { LocaleSwitch } from "@/components/display/locale-switch";
 import { ThemeSwitch } from "@/components/display/theme-switch";
+import { AuthBrandPanel } from "./auth-brand-panel";
 import { SignIn } from "./sign-in";
 import { SignUp } from "./sign-up";
 
@@ -12,17 +13,9 @@ export function Auth() {
   return (
     <main className="container flex h-screen flex-col items-center justify-center gap-4">
       <div className="flex w-full max-w-3xl flex-wrap rounded bg-base-200">
-        <div className="min-w-32 flex-1 max-sm:hidden">
-          <img
-            alt="illustration"
-            className="h-full w-full rounded object-cover"
-            height={320}
-            src="https://picsum.photos/320"
-            width={320}
-          />
-        </div>
-        <div className="flex flex-1 flex-col p-12 max-sm:p-4">
-          <div className="flex flex-1 flex-col justify-center gap-10">
+        <AuthBrandPanel className="min-h-80 flex-1 rounded-l" />
+        <div className="flex min-w-64 flex-2 flex-col p-12 max-sm:p-4">
+          <div className="flex flex-col justify-center gap-8">
             {mode === "signIn" && (
               <SignIn onSwitchToSignUp={() => setMode("signUp")} />
             )}
@@ -32,7 +25,7 @@ export function Auth() {
           </div>
         </div>
       </div>
-      <div className="flex w-full max-w-3xl items-center justify-end gap-2 max-sm:justify-center">
+      <div className="flex w-full max-w-3xl items-center justify-between gap-2 max-sm:justify-center">
         <LocaleSwitch />
         <ThemeSwitch />
       </div>

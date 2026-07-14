@@ -14,7 +14,7 @@ export function SignUp({ onSwitchToSignIn }: SignUpProps) {
 
   return (
     <>
-      <div className="flex flex-col">
+      <div className="flex flex-col gap-2">
         <h1 className="font-semibold text-5xl max-sm:text-3xl">
           {tAuth("signUpTitle")}
         </h1>
