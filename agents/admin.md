@@ -94,4 +94,5 @@ Keep `components/`, `hooks/custom/`, and `lib/` domain-agnostic. Table toolbar c
 - Do not add ad-hoc 401 handling in hooks.
 - `dev` backgrounds codegen; first start may race — run `build` once if types missing.
 - GitHub Pages: deploy copies `index.html` to `404.html`; `VITE_BASE_PATH` must match Pages subpath.
+- Social share tags in `index.html`: `description`, `og:type` / `og:url` / `og:title` / `og:description` / `og:image`, `twitter:card`. Absolute URLs for Pages. Image: `public/og-image.jpg` (1200×630). Instagram does not unfurl links the same way.
 - No test framework configured in this package.
