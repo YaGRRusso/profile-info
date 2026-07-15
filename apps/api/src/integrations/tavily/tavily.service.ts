@@ -7,8 +7,8 @@ import {
   tavily,
 } from "@tavily/core";
 import type { Env } from "@/core/configs/env.validation";
-import { tavilyExtractResultMapper } from "./mappers/tavily-extract-result.mapper";
-import { tavilySearchResultMapper } from "./mappers/tavily-search-result.mapper";
+import { mapTavilyExtractResponse } from "./mappers/tavily-extract-result.mapper";
+import { mapTavilySearchResponse } from "./mappers/tavily-search-result.mapper";
 import {
   type WebContentExtractOptions,
   WebContentProvider,
@@ -16,16 +16,15 @@ import {
 } from "./web-content.provider";
 import {
   type WebSearchOptions,
+  WebSearchProvider,
   type WebSearchResult,
 } from "./web-search.provider";
 
 @Injectable()
-export class TavilyService extends WebContentProvider {
+export class TavilyService implements WebContentProvider, WebSearchProvider {
   private readonly client: TavilyClient;
 
   constructor(config: ConfigService<Env, true>) {
-    super();
-
     this.client = tavily({ apiKey: config.getOrThrow("TAVILY_API_KEY") });
   }
 
@@ -42,7 +41,7 @@ export class TavilyService extends WebContentProvider {
 
     try {
       const response = await this.client.search(query, tavilyOptions);
-      return tavilySearchResultMapper(response);
+      return mapTavilySearchResponse(response);
     } catch (error) {
       throw new Error("Tavily search failed", { cause: error });
     }
@@ -60,7 +59,7 @@ export class TavilyService extends WebContentProvider {
 
     try {
       const response = await this.client.extract(urls, tavilyOptions);
-      return tavilyExtractResultMapper(response);
+      return mapTavilyExtractResponse(response);
     } catch (error) {
       throw new Error("Tavily extract failed", { cause: error });
     }

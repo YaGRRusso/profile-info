@@ -4,21 +4,24 @@ Deferred API and admin work, ordered by criticality, then value, then effort.
 
 ## Current focus
 
-1. **ADR 004 phases 5–6** — Summarize webpage / websearch GraphQL (and admin) entry points.
-   See `apps/api/docs/adr/004-generic-tavily-context.md`.
-2. **Better prompts** — Refine AI tools quality, cost, and locale (see High Priority below).
+1. **Better prompts** — Refine AI tools quality, cost, and locale (see High Priority below).
+2. **Admin contextMode coverage** — Optional: wire `WebSearch` / `PageExtract` on more
+   forms where names or URLs would ground ATS summarize (experience / profile today send
+   plain details only). See ADR 004.
 
 ## High Priority
 
 ### Generic Tavily AI context (ADR 004)
 
 Shipped: Tavily ports, GitHub removed, `ContextService` + `ChatService`
-(AiToolsService orchestrates module collaborators only).
+(AiToolsService orchestrates module collaborators only). Tavily enrich is **context for
+summarizing user `raw`** — not a second summarize of extract/search output.
 
 Still open:
 
-- **Summarize webpage / websearch** — first-class service (and GraphQL) entry points; admin wiring as needed (ADR 004 phases 5–6).
-- **Docs polish** — keep ADR 004 aligned after mutations land (phase 7).
+- **Admin contextMode coverage** — experience / profile (and similar) may still omit
+  `contextMode`; product choice, not a missing API path.
+- **Docs sync** — keep ADR 004 aligned when behavior changes.
 
 ### Better Prompts
 
@@ -71,4 +74,3 @@ These items were deferred; scope and security behave as documented and tested.
 - **Resume label** — "Certifications" section label vs `Course` entity naming.
 - **Skill form AI** — Translate/AI on skill descriptions (organization form already has it).
 - **Skill category i18n** — `category` is a free string today; translate per locale if needed.
-- **More URL extractors** — AI resource detail: GitHub only; add more providers when needed.

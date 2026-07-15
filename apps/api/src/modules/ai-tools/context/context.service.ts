@@ -15,7 +15,6 @@ const PAGE_EXTRACT_INSTRUCTIONS =
 
 interface ContextTask {
   mode: ContextMode;
-  type: ResourceType;
   value: string;
 }
 
@@ -38,14 +37,14 @@ export class ContextService {
         return detail.value
           .map((value) => value.trim())
           .filter(Boolean)
-          .map((value) => ({ mode, type, value }));
+          .map((value) => ({ mode, value }));
       }),
-      (task) => `${task.mode}:${task.type}:${task.value}`
+      (task) => `${task.mode}:${task.value}`
     );
 
     if (tasks.length === 0) return Promise.resolve([]);
 
-    return this.runParallelTasks(tasks);
+    return this.runParallelTasks(tasks, type);
   }
 
   async enrichPageExtract(url: string): Promise<DetailInput[]> {
@@ -60,7 +59,7 @@ export class ContextService {
 
   async enrichWebSearch(
     query: string,
-    type: ResourceType
+    type?: ResourceType
   ): Promise<DetailInput[]> {
     if (!query.trim()) return [];
 
@@ -70,19 +69,25 @@ export class ContextService {
     return results.flatMap(mapWebSearchResultToDetails);
   }
 
-  private runSingleTask(task: ContextTask): Promise<DetailInput[]> {
+  private runSingleTask(
+    task: ContextTask,
+    type: ResourceType
+  ): Promise<DetailInput[]> {
     switch (task.mode) {
       case ContextMode.PAGE_EXTRACT:
         return this.enrichPageExtract(task.value);
       case ContextMode.WEB_SEARCH:
-        return this.enrichWebSearch(task.value, task.type);
+        return this.enrichWebSearch(task.value, type);
       default:
         return Promise.resolve([]);
     }
   }
 
-  private runParallelTasks(tasks: ContextTask[]): Promise<DetailInput[]> {
-    return orchestrate(tasks, (task) => this.runSingleTask(task), {
+  private runParallelTasks(
+    tasks: ContextTask[],
+    type: ResourceType
+  ): Promise<DetailInput[]> {
+    return orchestrate(tasks, (task) => this.runSingleTask(task, type), {
       concurrency: 5,
       timeoutMs: 30_000,
     });

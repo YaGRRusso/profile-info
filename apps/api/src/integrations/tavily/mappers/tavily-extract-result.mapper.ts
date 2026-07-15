@@ -1,7 +1,7 @@
 import type { TavilyExtractResponse } from "@tavily/core";
 import type { WebContentResult } from "../web-content.provider";
 
-export function tavilyExtractResultMapper(
+export function mapTavilyExtractResponse(
   response: TavilyExtractResponse
 ): WebContentResult[] {
   if (!response.results?.length) return [];

@@ -1,7 +1,7 @@
 import type { TavilySearchResponse } from "@tavily/core";
 import type { WebSearchResult } from "../web-search.provider";
 
-export function tavilySearchResultMapper(
+export function mapTavilySearchResponse(
   response: TavilySearchResponse
 ): WebSearchResult[] {
   if (!response.results?.length) return [];
