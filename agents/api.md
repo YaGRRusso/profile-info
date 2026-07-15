@@ -56,7 +56,7 @@ Full diagram and field detail: `apps/api/docs/ER_MODEL.md`.
 
 `common/` (pure TS, no NestJS/Mongoose/GraphQL imports):
 
-- `helpers/`: `object.helper.ts` (`clearObject`), `object-id.helper.ts` (`assertValidObjectId`, `assertValidObjectIds`), `assert.helper.ts` (`assertReferencesExist`, `assertReferencesResolved`, `REFERENCES_NOT_FOUND`), `daterange.helper.ts` (`sortDateRange`), `pick-translation.helper.ts` (`pickTranslation`), `format-period.helper.ts` (`formatPeriod`), `breakpoint.helper.ts`, `url.helper.ts` (`isUrl`, `isHttpUrl`).
+- `helpers/`: `object.helper.ts` (`clearObject`), `object-id.helper.ts` (`assertValidObjectId`, `assertValidObjectIds`), `assert.helper.ts` (`assertReferencesExist`, `assertReferencesResolved`, `REFERENCES_NOT_FOUND`), `daterange.helper.ts` (`sortDateRange`), `pick-translation.helper.ts` (`pickTranslation`), `format-period.helper.ts` (`formatPeriod`), `breakpoint.helper.ts`, `url.helper.ts` (`isWebpageUrl` via `mime-types`).
 - `i18n/locales.ts`: `Locale`, `SUPPORTED_CONTENT_LOCALES`, `normalizeLocale` — app-owned copy (resume PDF, future errors). Entity `i18n[].locale` is a free string (`@IsString` + `@IsNotEmpty` only).
 - `pdf/`: domain-agnostic PDFKit layer — `PdfContext`, `DEFAULT_PDF_THEME`, `PDF_SPACING` scale (`xs`–`block`), layout primitives in `layout/` (`renderSection`, `renderEntryBlock`, `renderLabeledLinks`). `renderEntryBlock` and `renderSection` measure content height and call `ensureBlockFits` so section titles and entry headers are not orphaned at page breaks; long descriptions and multi-entry sections still flow across pages.
 - `execution/orchestrator.helper.ts`: `orchestrate(...)`, a concurrency-limited + timeout task runner (plain function, used by `ai-tools`).

@@ -1,28 +1,21 @@
-import { isHttpUrl, isUrl } from "./url.helper";
+import { isWebpageUrl } from "./url.helper";
 
 describe("url.helper", () => {
-  describe("isUrl", () => {
-    it("accepts absolute URLs with any protocol", () => {
-      expect(isUrl("https://example.com")).toBe(true);
-      expect(isUrl("http://example.com/path")).toBe(true);
-      expect(isUrl("ftp://files.example.com")).toBe(true);
-      expect(isUrl("mailto:a@b.com")).toBe(true);
+  describe("isWebpageUrl", () => {
+    it("accepts extensionless http(s) pages and html", () => {
+      expect(isWebpageUrl("https://example.com")).toBe(true);
+      expect(isWebpageUrl("https://example.com/about")).toBe(true);
+      expect(isWebpageUrl("https://example.com/index.html")).toBe(true);
+      expect(isWebpageUrl("http://example.com/page.php")).toBe(true);
     });
 
-    it("rejects non-URLs", () => {
-      expect(isUrl("not a url")).toBe(false);
-      expect(isUrl("example.com")).toBe(false);
-      expect(isUrl("")).toBe(false);
-    });
-  });
-
-  describe("isHttpUrl", () => {
-    it("accepts only http and https", () => {
-      expect(isHttpUrl("https://example.com")).toBe(true);
-      expect(isHttpUrl("http://example.com")).toBe(true);
-      expect(isHttpUrl("ftp://files.example.com")).toBe(false);
-      expect(isHttpUrl("mailto:a@b.com")).toBe(false);
-      expect(isHttpUrl("Acme Corp")).toBe(false);
+    it("rejects non-http URLs and non-websites", () => {
+      expect(isWebpageUrl("ftp://example.com/page.html")).toBe(false);
+      expect(isWebpageUrl("Acme Corp")).toBe(false);
+      expect(isWebpageUrl("https://example.com/data.json")).toBe(false);
+      expect(isWebpageUrl("https://example.com/logo.png")).toBe(false);
+      expect(isWebpageUrl("https://example.com/doc.pdf")).toBe(false);
+      expect(isWebpageUrl("https://example.com/app.js")).toBe(false);
     });
   });
 });

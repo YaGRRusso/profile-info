@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { uniqBy } from "lodash";
 import { orchestrate } from "@/common/execution/orchestrator.helper";
-import { isHttpUrl } from "@/common/helpers/url.helper";
+import { isWebpageUrl } from "@/common/helpers/url.helper";
 import { WebContentProvider } from "@/integrations/tavily/web-content.provider";
 import { WebSearchProvider } from "@/integrations/tavily/web-search.provider";
 import type { DetailInput } from "../dto/detail.input";
@@ -48,7 +48,7 @@ export class ContextService {
   }
 
   async enrichPageExtract(url: string): Promise<DetailInput[]> {
-    if (!isHttpUrl(url)) return [];
+    if (!isWebpageUrl(url)) return [];
 
     const results = await this.webContentProvider.extract([url], {
       instructions: PAGE_EXTRACT_INSTRUCTIONS,
