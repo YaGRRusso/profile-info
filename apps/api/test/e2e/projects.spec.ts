@@ -3,6 +3,7 @@ import { testSuperAdminContext } from "@test/fixtures/auth-context";
 import { App } from "supertest/types";
 import { UserRole } from "@/core/enums/user-role.enum";
 import { UsersService } from "@/modules/users/users.service";
+import { assertDefined } from "../support/assert-defined";
 import {
   INVALID_OBJECT_ID,
   REFERENCES_NOT_FOUND,
@@ -248,17 +249,18 @@ describe("Projects tenant isolation (e2e)", () => {
 
     const project = aliceProjects.data?.findManyProjects.nodes[0];
     expect(project).toBeDefined();
+    assertDefined(project);
 
     const response = await graphqlRequest<{
       findOneProjectById: { id: string; slug: string };
     }>(app, {
       query: FIND_ONE_PROJECT_BY_ID,
       token: adminToken,
-      variables: { projectId: project!.id },
+      variables: { projectId: project.id },
     });
 
     expect(response.errors).toBeUndefined();
-    expect(response.data?.findOneProjectById.slug).toBe(project!.slug);
+    expect(response.data?.findOneProjectById.slug).toBe(project.slug);
   });
 
   it("should allow the same slug for different tenants", async () => {

@@ -7,6 +7,7 @@ import { EducationStatus } from "@/modules/educations/enums/status.enum";
 import { OrganizationCategory } from "@/modules/organizations/enums/category.enum";
 import { OrganizationsService } from "@/modules/organizations/organizations.service";
 import { UsersService } from "@/modules/users/users.service";
+import { assertDefined } from "../support/assert-defined";
 import {
   INVALID_OBJECT_ID,
   REFERENCES_NOT_FOUND,
@@ -307,17 +308,18 @@ describe("Educations tenant isolation (e2e)", () => {
 
     const education = aliceEducations.data?.findManyEducations.nodes[0];
     expect(education).toBeDefined();
+    assertDefined(education);
 
     const response = await graphqlRequest<{
       findOneEducationById: { id: string; slug: string };
     }>(app, {
       query: FIND_ONE_EDUCATION_BY_ID,
       token: adminToken,
-      variables: { educationId: education!.id },
+      variables: { educationId: education.id },
     });
 
     expect(response.errors).toBeUndefined();
-    expect(response.data?.findOneEducationById.slug).toBe(education!.slug);
+    expect(response.data?.findOneEducationById.slug).toBe(education.slug);
   });
 
   it("should allow the same slug for different tenants", async () => {

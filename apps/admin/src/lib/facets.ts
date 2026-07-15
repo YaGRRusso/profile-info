@@ -12,9 +12,11 @@ export interface MinMaxFacets<T> {
 }
 
 export function getUniqueFacets<T = string>(
-  map: Map<any, number>,
+  map: Map<any, number> | undefined,
   labels?: Array<{ value: T; label: string }>
 ): UniqueFacets<T>[] {
+  if (!map) return [];
+
   const mapper = new Map(labels?.map(({ value, label }) => [value, label]));
   return [...map].map(([value, count]) => ({
     count,

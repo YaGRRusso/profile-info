@@ -26,11 +26,11 @@ const TEXT_SIZES: TextSize[] = ["small", "medium", "large"];
 const ARRAY_SIZES: ArraySize[] = ["empty", "short", "medium", "large"];
 
 export function pickTextSize(index: number): TextSize {
-  return TEXT_SIZES[index % TEXT_SIZES.length]!;
+  return TEXT_SIZES.at(index % TEXT_SIZES.length) ?? "small";
 }
 
 export function pickArraySize(index: number): ArraySize {
-  return ARRAY_SIZES[index % ARRAY_SIZES.length]!;
+  return ARRAY_SIZES.at(index % ARRAY_SIZES.length) ?? "empty";
 }
 
 /** Even indices include the value; odd indices omit it (~50% coverage). */

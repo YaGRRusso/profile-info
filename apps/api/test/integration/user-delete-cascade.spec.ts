@@ -29,7 +29,7 @@ import { clearTestDatabase } from "../support/clear-test-database";
 import { createTestApp } from "../support/create-test-app";
 
 describe("User delete cascade (integration)", () => {
-  let app: INestApplication<App> | undefined;
+  let app: INestApplication<App>;
   let usersService: UsersService;
   let courseModel: Model<CourseModel>;
   let educationModel: Model<EducationModel>;
@@ -51,16 +51,16 @@ describe("User delete cascade (integration)", () => {
   });
 
   afterAll(async () => {
-    await app?.close();
+    await app.close();
   });
 
   it("should cascade private entities and API tokens without leaving orphans", async () => {
-    const organizationsService = app!.get(OrganizationsService);
-    const coursesService = app!.get(CoursesService);
-    const educationsService = app!.get(EducationsService);
-    const experiencesService = app!.get(ExperiencesService);
-    const projectsService = app!.get(ProjectsService);
-    const apiTokensService = app!.get(ApiTokensService);
+    const organizationsService = app.get(OrganizationsService);
+    const coursesService = app.get(CoursesService);
+    const educationsService = app.get(EducationsService);
+    const experiencesService = app.get(ExperiencesService);
+    const projectsService = app.get(ProjectsService);
+    const apiTokensService = app.get(ApiTokensService);
 
     const organization = await organizationsService.createOne(
       testSuperAdminContext(),

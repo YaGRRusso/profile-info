@@ -18,7 +18,7 @@ import { organizationI18n } from "../support/organization-i18n";
 import { skillI18n } from "../support/skill-i18n";
 
 describe("Catalog LOCAL delete cascade (integration)", () => {
-  let app: INestApplication<App> | undefined;
+  let app: INestApplication<App>;
   let skillsService: SkillsService;
   let organizationsService: OrganizationsService;
   let coursesService: CoursesService;
@@ -34,11 +34,11 @@ describe("Catalog LOCAL delete cascade (integration)", () => {
   });
 
   afterAll(async () => {
-    await app?.close();
+    await app.close();
   });
 
   it("should detach a deleted LOCAL skill owned by the caller", async () => {
-    const usersService = app!.get(UsersService);
+    const usersService = app.get(UsersService);
     const owner = await usersService.createOne(testSuperAdminContext(), {
       email: "local-skill-owner@profile.info",
       name: "Local Skill Owner",
@@ -94,7 +94,7 @@ describe("Catalog LOCAL delete cascade (integration)", () => {
   });
 
   it("should purge courses when the caller deletes their own LOCAL organization", async () => {
-    const usersService = app!.get(UsersService);
+    const usersService = app.get(UsersService);
     const owner = await usersService.createOne(testSuperAdminContext(), {
       email: "local-org-owner@profile.info",
       name: "Local Org Owner",

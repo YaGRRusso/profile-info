@@ -446,12 +446,12 @@ export function OrganizationsTable({
   );
 
   const categoryFacets = getUniqueFacets(
-    table.getColumn("category")!.getFacetedUniqueValues(),
+    table.getColumn("category")?.getFacetedUniqueValues(),
     CATEGORY_LABELS
   );
 
   const partitionFacets = getUniqueFacets(
-    table.getColumn("partition")!.getFacetedUniqueValues(),
+    table.getColumn("partition")?.getFacetedUniqueValues(),
     PARTITION_LABELS
   );
 

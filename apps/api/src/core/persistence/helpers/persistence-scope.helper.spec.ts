@@ -1,3 +1,4 @@
+import { assertDefined } from "@test/support/assert-defined";
 import mongoose from "mongoose";
 import { CatalogPartition } from "@/core/enums/catalog-partition.enum";
 import {
@@ -30,7 +31,9 @@ describe("noopScope", () => {
   });
 
   it("should return filters unchanged on query.forAggregate", () => {
-    expect(scope.query.forAggregate!({ slug: "x" })).toEqual({ slug: "x" });
+    const { forAggregate } = scope.query;
+    assertDefined(forAggregate);
+    expect(forAggregate({ slug: "x" })).toEqual({ slug: "x" });
   });
 
   it("should return payloads unchanged on document.forCreate", () => {
@@ -74,7 +77,9 @@ describe("tenantScope", () => {
 
   it("should delegate query.forAggregate to toQueryForAggregate", () => {
     const filter = { status: "COMPLETE" };
-    expect(scope.query.forAggregate!(filter)).toEqual(
+    const { forAggregate } = scope.query;
+    assertDefined(forAggregate);
+    expect(forAggregate(filter)).toEqual(
       tenantToQueryForAggregate(tenant, filter)
     );
   });
@@ -116,7 +121,9 @@ describe("catalogScope", () => {
 
   it("should delegate query.forAggregate to toQueryForAggregate", () => {
     const filter = { disabled: false };
-    expect(scope.query.forAggregate!(filter)).toEqual(
+    const { forAggregate } = scope.query;
+    assertDefined(forAggregate);
+    expect(forAggregate(filter)).toEqual(
       catalogToQueryForAggregate(catalog, filter)
     );
   });

@@ -396,7 +396,7 @@ export function CoursesTable({
   const selected = data.filter((course) => rowSelection[course.id]);
 
   const statusFacets = getUniqueFacets(
-    table.getColumn("status")!.getFacetedUniqueValues(),
+    table.getColumn("status")?.getFacetedUniqueValues(),
     STATUS_LABELS
   );
   const relevanceFacets = getMinMaxFacets(

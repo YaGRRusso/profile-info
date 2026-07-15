@@ -394,7 +394,7 @@ export function ExperiencesTable({
   const selected = data.filter((experience) => rowSelection[experience.id]);
 
   const categoryFacets = getUniqueFacets(
-    table.getColumn("category")!.getFacetedUniqueValues(),
+    table.getColumn("category")?.getFacetedUniqueValues(),
     CATEGORY_LABELS
   );
   const relevanceFacets = getMinMaxFacets(

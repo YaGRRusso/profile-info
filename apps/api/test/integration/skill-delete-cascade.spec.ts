@@ -17,7 +17,7 @@ import { createTestApp } from "../support/create-test-app";
 import { skillI18n } from "../support/skill-i18n";
 
 describe("Skill delete cascade (integration)", () => {
-  let app: INestApplication<App> | undefined;
+  let app: INestApplication<App>;
   let skillsService: SkillsService;
   let coursesService: CoursesService;
   let organizationsService: OrganizationsService;
@@ -33,11 +33,11 @@ describe("Skill delete cascade (integration)", () => {
   });
 
   afterAll(async () => {
-    await app?.close();
+    await app.close();
   });
 
   it("should detach a deleted skill from courses", async () => {
-    const usersService = app!.get(UsersService);
+    const usersService = app.get(UsersService);
     const owner = await usersService.createOne(testSuperAdminContext(), {
       email: "owner@profile.info",
       name: "Owner",
@@ -98,7 +98,7 @@ describe("Skill delete cascade (integration)", () => {
   });
 
   it("should detach a deleted skill from user profile skillIds", async () => {
-    const usersService = app!.get(UsersService);
+    const usersService = app.get(UsersService);
 
     const skill = await skillsService.createOne(testSuperAdminContext(), {
       category: "Healthcare",

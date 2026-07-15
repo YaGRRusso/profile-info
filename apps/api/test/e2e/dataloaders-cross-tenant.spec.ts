@@ -17,6 +17,7 @@ import { OrganizationsService } from "@/modules/organizations/organizations.serv
 import { ProjectsService } from "@/modules/projects/projects.service";
 import { SkillsService } from "@/modules/skills/skills.service";
 import { UsersService } from "@/modules/users/users.service";
+import { assertDefined } from "../support/assert-defined";
 import { clearTestDatabase } from "../support/clear-test-database";
 import { createTestApp } from "../support/create-test-app";
 import { graphqlRequest } from "../support/graphql-request";
@@ -361,7 +362,8 @@ describe("Cross-tenant DataLoader isolation (e2e)", () => {
       slug: "shared-skill",
     });
     skillId = skill.id;
-    skillSlug = skill.slug!;
+    assertDefined(skill.slug);
+    skillSlug = skill.slug;
 
     const joaoCtx = testAuthContext({ id: joao.id });
     const bobCtx = testAuthContext({ id: bob.id });
@@ -490,13 +492,13 @@ describe("Cross-tenant DataLoader isolation (e2e)", () => {
 
     expect(response.errors).toBeUndefined();
     const { data } = response;
-    expect(data).toBeDefined();
+    assertDefined(data);
 
     for (const collection of [
-      data!.experiences,
-      data!.courses,
-      data!.educations,
-      data!.projects,
+      data.experiences,
+      data.courses,
+      data.educations,
+      data.projects,
     ]) {
       expect(collection.found).toBe(1);
       expect(collection.nodes).toHaveLength(1);
@@ -507,19 +509,19 @@ describe("Cross-tenant DataLoader isolation (e2e)", () => {
       ]);
     }
 
-    expect(data!.experiences.nodes[0]?.organization).toEqual({
+    expect(data.experiences.nodes[0]?.organization).toEqual({
       id: organizationId,
       name: organizationName,
     });
-    expect(data!.courses.nodes[0]?.organization).toEqual({
+    expect(data.courses.nodes[0]?.organization).toEqual({
       id: organizationId,
       name: organizationName,
     });
-    expect(data!.educations.nodes[0]?.organization).toEqual({
+    expect(data.educations.nodes[0]?.organization).toEqual({
       id: organizationId,
       name: organizationName,
     });
-    expect(data!.experiences.nodes[0]?.roles[0]?.skills).toEqual([
+    expect(data.experiences.nodes[0]?.roles[0]?.skills).toEqual([
       { id: skillId, slug: skillSlug },
     ]);
   });

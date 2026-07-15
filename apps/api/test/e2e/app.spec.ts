@@ -4,7 +4,7 @@ import { App } from "supertest/types";
 import { createTestApp } from "../support/create-test-app";
 
 describe("AppController (e2e)", () => {
-  let app: INestApplication<App> | undefined;
+  let app: INestApplication<App>;
 
   beforeAll(async () => {
     const testApp = await createTestApp();
@@ -12,9 +12,9 @@ describe("AppController (e2e)", () => {
   });
 
   afterAll(async () => {
-    await app?.close();
+    await app.close();
   });
 
   it("/ (GET)", () =>
-    request(app!.getHttpServer()).get("/").expect(200).expect("Hello World!"));
+    request(app.getHttpServer()).get("/").expect(200).expect("Hello World!"));
 });

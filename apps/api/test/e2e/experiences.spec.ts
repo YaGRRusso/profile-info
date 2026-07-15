@@ -6,6 +6,7 @@ import { ExperienceCategory } from "@/modules/experiences/enums/category.enum";
 import { OrganizationCategory } from "@/modules/organizations/enums/category.enum";
 import { OrganizationsService } from "@/modules/organizations/organizations.service";
 import { UsersService } from "@/modules/users/users.service";
+import { assertDefined } from "../support/assert-defined";
 import {
   INVALID_OBJECT_ID,
   REFERENCES_NOT_FOUND,
@@ -337,17 +338,18 @@ describe("Experiences tenant isolation (e2e)", () => {
 
     const experience = aliceExperiences.data?.findManyExperiences.nodes[0];
     expect(experience).toBeDefined();
+    assertDefined(experience);
 
     const response = await graphqlRequest<{
       findOneExperienceById: { id: string; slug: string };
     }>(app, {
       query: FIND_ONE_EXPERIENCE_BY_ID,
       token: adminToken,
-      variables: { experienceId: experience!.id },
+      variables: { experienceId: experience.id },
     });
 
     expect(response.errors).toBeUndefined();
-    expect(response.data?.findOneExperienceById.slug).toBe(experience!.slug);
+    expect(response.data?.findOneExperienceById.slug).toBe(experience.slug);
   });
 
   it("should allow the same slug for different tenants", async () => {

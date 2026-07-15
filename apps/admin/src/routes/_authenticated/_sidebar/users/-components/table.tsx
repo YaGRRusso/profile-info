@@ -329,11 +329,11 @@ export function UsersTable(props: UsersTableProps) {
     (user) => user.role === UserRole.SuperAdmin
   );
   const roleFacets = getUniqueFacets(
-    table.getColumn("role")!.getFacetedUniqueValues(),
+    table.getColumn("role")?.getFacetedUniqueValues(),
     ROLE_OPTIONS
   );
   const statusFacets = getUniqueFacets(
-    table.getColumn("disabled")!.getFacetedUniqueValues(),
+    table.getColumn("disabled")?.getFacetedUniqueValues(),
     STATUS_OPTIONS
   );
 

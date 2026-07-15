@@ -429,11 +429,11 @@ export function EducationsTable({
   const selected = data.filter((education) => rowSelection[education.id]);
 
   const levelFacets = getUniqueFacets(
-    table.getColumn("level")!.getFacetedUniqueValues(),
+    table.getColumn("level")?.getFacetedUniqueValues(),
     LEVEL_LABELS
   );
   const statusFacets = getUniqueFacets(
-    table.getColumn("status")!.getFacetedUniqueValues(),
+    table.getColumn("status")?.getFacetedUniqueValues(),
     STATUS_LABELS
   );
   const relevanceFacets = getMinMaxFacets(

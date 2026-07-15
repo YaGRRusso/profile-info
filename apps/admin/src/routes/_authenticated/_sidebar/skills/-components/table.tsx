@@ -440,7 +440,7 @@ export function SkillsTable({
   );
 
   const categoryFacets = getUniqueFacets(
-    table.getColumn("category")!.getFacetedUniqueValues()
+    table.getColumn("category")?.getFacetedUniqueValues()
   )
     .filter(({ value }) => !isEmptyValue(value))
     .map(({ value, label, count }) => ({
@@ -450,7 +450,7 @@ export function SkillsTable({
     }));
 
   const partitionFacets = getUniqueFacets(
-    table.getColumn("partition")!.getFacetedUniqueValues(),
+    table.getColumn("partition")?.getFacetedUniqueValues(),
     PARTITION_LABELS
   );
 
