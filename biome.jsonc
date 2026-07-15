@@ -31,8 +31,7 @@
         "useImportType": "off",
         "useBlockStatements": "off",
         "noParameterProperties": "off",
-        "noEnum": "off",
-        "noNonNullAssertion": "off"
+        "noEnum": "off"
       },
       "complexity": {
         "useSimplifiedLogicExpression": "off",
