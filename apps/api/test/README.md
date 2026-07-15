@@ -167,7 +167,7 @@ describe("My feature (e2e)", () => {
 
 Tests import `TestAppModule`, not `AppModule`:
 
-- **No `AiToolsModule`** — avoids real external API keys and keeps GraphQL schema stable for tests.
+- **No `AiToolsModule`** — avoids real external API keys and keeps GraphQL schema stable for tests. `AppCacheModule` is included so isolated e2e setups (e.g. `ai-tools.spec.ts`) can import `AiToolsModule` and resolve `OrchestratorService`.
 - **GraphQL schema in memory** — when `NODE_ENV=test`, `autoSchemaFile: true` so tests never overwrite committed `src/schema.gql`.
 - Same Mongoose, auth, and domain modules as production otherwise.
 
