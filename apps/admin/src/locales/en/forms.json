@@ -41,7 +41,7 @@
     },
     "link": {
       "label": "Link",
-      "tooltip": "Named URL readers can open from the CV or profile."
+      "tooltip": "Named URL readers can open from the CV or profile. Only the first link is used for AI web extract."
     },
     "linkTitle": {
       "label": "Title",
@@ -51,7 +51,7 @@
     "linkUrl": {
       "label": "URL",
       "placeholder": "e.g. https://example.com",
-      "tooltip": "Full address. Must start with https:// or http://."
+      "tooltip": "Full address. Must start with https:// or http://. Only the first link in the list gets AI web lookup."
     },
     "image": {
       "label": "Image",

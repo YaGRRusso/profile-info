@@ -41,7 +41,7 @@
     },
     "link": {
       "label": "Link",
-      "tooltip": "URL com nome legível que o leitor pode abrir no currículo ou no perfil."
+      "tooltip": "URL com nome legível que o leitor pode abrir no currículo ou no perfil. Só o primeiro link é usado na extração web da IA."
     },
     "linkTitle": {
       "label": "Título",
@@ -51,7 +51,7 @@
     "linkUrl": {
       "label": "URL",
       "placeholder": "ex.: https://exemplo.com",
-      "tooltip": "Endereço completo. Deve começar com https:// ou http://."
+      "tooltip": "Endereço completo. Deve começar com https:// ou http://. Só o primeiro link da lista recebe busca web da IA."
     },
     "image": {
       "label": "Imagem",

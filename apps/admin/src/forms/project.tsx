@@ -23,6 +23,10 @@ import { useQueryAllPages } from "@/hooks/custom/use-query-all-pages";
 import { useAtsSummarize, useTranslate } from "@/hooks/mutations/ai";
 import type { ProjectRow } from "@/hooks/queries/projects";
 import { useFindManySkills } from "@/hooks/queries/skills";
+import {
+  arrayContextDetails,
+  isContextArrayIndex,
+} from "@/lib/ai-array-context";
 import { fieldError } from "@/lib/field-error";
 import { FormError } from "@/lib/form-errors";
 import { nullIfEmpty } from "@/lib/form-input";
@@ -169,12 +173,13 @@ export function ProjectForm({
       if (language) details.push({ key: "Language", value: [language] });
 
       const urls = form.getFieldValue("urls")?.map((url) => url.value) ?? [];
-      if (urls.length)
-        details.push({
+      details.push(
+        ...arrayContextDetails({
           contextMode: ContextMode.PageExtract,
           key: "URLs",
-          value: urls,
-        });
+          values: urls,
+        })
+      );
 
       const summarized = await atsSummarize.mutateAsync({
         details,
@@ -362,7 +367,7 @@ export function ProjectForm({
                 <Field name={`urls[${index}].value`}>
                   {(field) => (
                     <TextInput
-                      ai
+                      ai={isContextArrayIndex(index)}
                       error={fieldError(field.state.meta)}
                       label={tForm("fields.linkUrl.label")}
                       name={field.name}
