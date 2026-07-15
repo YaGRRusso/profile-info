@@ -42,7 +42,7 @@ platform        ← transport composition (GraphQL wiring, DataLoader aggregatio
 | **`modules/auth/`** | JWT strategies, `signIn`, `getMe`. `GqlAuthenticationGuard` + `GqlAuthorizationGuard`. | Security cross-cut; uses `UsersService.findOneByEmailWithPassword`. |
 | **`modules/dashboard/`** | Read-only stats; imports other modules' **services** (not Mongoose models). | Aggregation without bypassing service boundaries. |
 | **`modules/resume/`** | Aggregates a user's profile data and renders a PDF via `GET /resume.pdf?userId=&locale=`. Uses `pdfkit`; imports feature services like dashboard. | CV export for admin and external portfolio clients. |
-| **`modules/ai-tools/`** | AI use-cases (summarize, translate, ATS). Owns `AiEntity`, enums, and mappers. | Converts `IntegrationChatResult` → GraphQL; orchestrates `*ExtractorService` before calling `AiChatProvider`. |
+| **`modules/ai-tools/`** | AI use-cases (summarize, translate, ATS). Owns `AiEntity`, enums, and mappers. | `AiToolsService` orchestrates `ChatService` + `ContextService`; ports stay behind those collaborators. |
 
 ### Request flow (typical)
 
@@ -80,9 +80,8 @@ The threat model is intentional, not accidental:
 ### AI flow
 
 ```
-Resolver → AiToolsService → AiChatProvider.chat()  [loose integration DTO]
-                         → mapChatResultToEntity()  [strong GraphQL types]
-                         ↘ ResourceDetailService → WebpageResourceExtractorService → WebContentProvider (Tavily)
+Resolver → AiToolsService → ChatService → AiChatProvider  [→ AiEntity]
+                         ↘ ContextService → WebContentProvider / WebSearchProvider (Tavily)
 ```
 
 ### Who imports whom
@@ -120,7 +119,8 @@ src/
     ├── organizations/
     ├── users/                # UsersLoaderService (batchUsers)
     ├── ai-tools/
-    │   ├── resource-detail/  # Orchestrator + *ExtractorService per source
+    │   ├── chat/             # ChatService → AiChatProvider
+    │   ├── context/          # ContextService → Tavily ports (ADR 004)
     │   ├── prompts/
     │   └── ...
     └── ...

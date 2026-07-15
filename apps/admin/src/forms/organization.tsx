@@ -13,6 +13,7 @@ import { LOCALES } from "@/consts/locales";
 import { RawSizeEnum } from "@/consts/raw-size";
 import { SLUG_REGEX } from "@/consts/regex";
 import {
+  ContextMode,
   CreateOrganizationInput,
   DetailInput,
   OrganizationCategory,
@@ -140,13 +141,23 @@ export function OrganizationForm({
         return toast.error(tValidation("minLength", { value: 64 }));
 
       const name = form.getFieldValue("name");
-      if (name) details.push({ key: "Name", value: [name] });
+      if (name)
+        details.push({
+          contextMode: ContextMode.WebSearch,
+          key: "Name",
+          value: [name],
+        });
 
       const category = form.getFieldValue("category");
       if (category) details.push({ key: "Category", value: [category] });
 
       const website = form.getFieldValue("website");
-      if (website) details.push({ key: "Website", value: [website] });
+      if (website)
+        details.push({
+          contextMode: ContextMode.PageExtract,
+          key: "Website",
+          value: [website],
+        });
 
       const language = fieldGroup.locale;
       if (language) details.push({ key: "Language", value: [language] });

@@ -37,6 +37,11 @@ export enum ChatRole {
   User = 'USER'
 }
 
+export enum ContextMode {
+  PageExtract = 'PAGE_EXTRACT',
+  WebSearch = 'WEB_SEARCH'
+}
+
 export enum CourseStatus {
   Complete = 'COMPLETE',
   Incomplete = 'INCOMPLETE',
@@ -210,6 +215,7 @@ export type DateRangeInput = {
 };
 
 export type DetailInput = {
+  contextMode?: ContextMode | null | undefined;
   key: string;
   value: Array<string>;
 };

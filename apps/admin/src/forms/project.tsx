@@ -14,6 +14,7 @@ import { LOCALES } from "@/consts/locales";
 import { RawSizeEnum } from "@/consts/raw-size";
 import { SLUG_REGEX } from "@/consts/regex";
 import {
+  ContextMode,
   type CreateProjectInput,
   DetailInput,
   ResourceType,
@@ -168,7 +169,12 @@ export function ProjectForm({
       if (language) details.push({ key: "Language", value: [language] });
 
       const urls = form.getFieldValue("urls")?.map((url) => url.value) ?? [];
-      if (urls) details.push({ key: "URLs", value: urls });
+      if (urls.length)
+        details.push({
+          contextMode: ContextMode.PageExtract,
+          key: "URLs",
+          value: urls,
+        });
 
       const summarized = await atsSummarize.mutateAsync({
         details,

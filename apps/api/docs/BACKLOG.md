@@ -4,7 +4,7 @@ Deferred API and admin work, ordered by criticality, then value, then effort.
 
 ## Current focus
 
-1. **ADR 004 phases 4–5** — Summarize webpage / websearch GraphQL (and admin) entry points.
+1. **ADR 004 phases 5–6** — Summarize webpage / websearch GraphQL (and admin) entry points.
    See `apps/api/docs/adr/004-generic-tavily-context.md`.
 2. **Better prompts** — Refine AI tools quality, cost, and locale (see High Priority below).
 
@@ -12,13 +12,13 @@ Deferred API and admin work, ordered by criticality, then value, then effort.
 
 ### Generic Tavily AI context (ADR 004)
 
-Phases 2–3 shipped: `WebSearchProvider` + Tavily search mapping; GitHub integration removed;
-generic `WebpageResourceExtractorService` for HTTP(S) URL details.
+Shipped: Tavily ports, GitHub removed, `ContextService` + `ChatService`
+(AiToolsService orchestrates module collaborators only).
 
 Still open:
 
-- **Summarize webpage / websearch** — first-class service (and GraphQL) entry points; admin wiring as needed (ADR 004 phases 4–5).
-- **Docs polish** — keep ADR 004 aligned after mutations land (phase 6).
+- **Summarize webpage / websearch** — first-class service (and GraphQL) entry points; admin wiring as needed (ADR 004 phases 5–6).
+- **Docs polish** — keep ADR 004 aligned after mutations land (phase 7).
 
 ### Better Prompts
 

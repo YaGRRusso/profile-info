@@ -1,0 +1,79 @@
+import { Injectable } from "@nestjs/common";
+import { uniqBy } from "lodash";
+import { orchestrate } from "@/common/execution/orchestrator.helper";
+import { isHttpUrl } from "@/common/helpers/url.helper";
+import { WebContentProvider } from "@/integrations/tavily/web-content.provider";
+import { WebSearchProvider } from "@/integrations/tavily/web-search.provider";
+import type { DetailInput } from "../dto/detail.input";
+import { ContextMode } from "../enums/context-mode";
+import { mapWebContentResultToDetails } from "../mappers/web-content-result.mapper";
+import { mapWebSearchResultToDetails } from "../mappers/web-search-result.mapper";
+
+const PAGE_EXTRACT_INSTRUCTIONS =
+  "Identify the main objective of this page and its target audience, extract the key information and main topics. Write a summary of the information presented on the page. Ignore forms and loading issues, focus on the real content.";
+
+interface ContextTask {
+  mode: ContextMode;
+  value: string;
+}
+
+@Injectable()
+export class ContextService {
+  constructor(
+    private readonly webContentProvider: WebContentProvider,
+    private readonly webSearchProvider: WebSearchProvider
+  ) {}
+
+  enrichFromDetails(details: DetailInput[]): Promise<DetailInput[]> {
+    const tasks = uniqBy(
+      details.flatMap((detail): ContextTask[] => {
+        const { contextMode: mode } = detail;
+        if (!mode) return [];
+
+        return detail.value
+          .map((value) => value.trim())
+          .filter(Boolean)
+          .map((value) => ({ mode, value }));
+      }),
+      (task) => `${task.mode}:${task.value}`
+    );
+
+    if (tasks.length === 0) return Promise.resolve([]);
+
+    return this.runParallelTasks(tasks);
+  }
+
+  async enrichPageExtract(url: string): Promise<DetailInput[]> {
+    if (!isHttpUrl(url)) return [];
+
+    const results = await this.webContentProvider.extract([url], {
+      instructions: PAGE_EXTRACT_INSTRUCTIONS,
+    });
+
+    return results.flatMap(mapWebContentResultToDetails);
+  }
+
+  async enrichWebSearch(query: string): Promise<DetailInput[]> {
+    const results = await this.webSearchProvider.search(query);
+    return results.flatMap(mapWebSearchResultToDetails);
+  }
+
+  private runSingleTask(task: ContextTask): Promise<DetailInput[]> {
+    switch (task.mode) {
+      case ContextMode.PAGE_EXTRACT:
+        return this.enrichPageExtract(task.value);
+      case ContextMode.WEB_SEARCH:
+        return this.enrichWebSearch(task.value);
+      default: {
+        return Promise.resolve([]);
+      }
+    }
+  }
+
+  private runParallelTasks(tasks: ContextTask[]): Promise<DetailInput[]> {
+    return orchestrate(tasks, (task) => this.runSingleTask(task), {
+      concurrency: 5,
+      timeoutMs: 30_000,
+    });
+  }
+}

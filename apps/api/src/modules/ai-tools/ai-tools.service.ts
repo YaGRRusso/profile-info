@@ -1,5 +1,6 @@
 import { Injectable } from "@nestjs/common";
-import { AiChatProvider } from "@/integrations/open-router/ai-chat.provider";
+import { ChatService } from "./chat/chat.service";
+import { ContextService } from "./context/context.service";
 import { AtsSummarizeInput } from "./dto/ats-summarize.input";
 import { SummarizeInput } from "./dto/summarize.input";
 import { TranslateInput } from "./dto/translate.input";
@@ -8,7 +9,6 @@ import {
   createAtsSummarizeLengthBudget,
   createAtsSummarizeTypeRules,
 } from "./helpers/ats-context.helper";
-import { mapChatResultToEntity } from "./mappers/chat-result.mapper";
 import {
   ATS_SUMMARIZE_SYSTEM_PROMPT,
   createAtsSummarizeContextPrompt,
@@ -21,13 +21,12 @@ import {
   createTranslateContextPrompt,
   TRANSLATE_SYSTEM_PROMPT,
 } from "./prompts/translate.prompt";
-import { ResourceDetailService } from "./resource-detail/resource-detail.service";
 
 @Injectable()
 export class AiToolsService {
   constructor(
-    private readonly aiChatProvider: AiChatProvider,
-    private readonly resourceDetailService: ResourceDetailService
+    private readonly chatService: ChatService,
+    private readonly contextService: ContextService
   ) {}
 
   async atsSummarize({
@@ -37,13 +36,13 @@ export class AiToolsService {
     details,
   }: AtsSummarizeInput): Promise<AiEntity> {
     const extractedDetails = details
-      ? await this.resourceDetailService.getResourceDetails(details, type)
+      ? await this.contextService.enrichFromDetails(details)
       : [];
 
     const lengthBudget = createAtsSummarizeLengthBudget(type);
     const typeRules = createAtsSummarizeTypeRules(type);
 
-    const result = await this.aiChatProvider.chat({
+    return this.chatService.chat({
       messages: [
         { content: ATS_SUMMARIZE_SYSTEM_PROMPT, role: "system" },
         {
@@ -62,16 +61,14 @@ export class AiToolsService {
         },
       ],
     });
-
-    return mapChatResultToEntity(result);
   }
 
   async summarize({ raw, type, details }: SummarizeInput): Promise<AiEntity> {
     const extractedDetails = details
-      ? await this.resourceDetailService.getResourceDetails(details, type)
+      ? await this.contextService.enrichFromDetails(details)
       : [];
 
-    const result = await this.aiChatProvider.chat({
+    return this.chatService.chat({
       messages: [
         { content: SUMMARIZE_SYSTEM_PROMPT, role: "system" },
         {
@@ -85,16 +82,14 @@ export class AiToolsService {
         },
       ],
     });
-
-    return mapChatResultToEntity(result);
   }
 
-  async translate({
+  translate({
     raw,
     targetLanguage,
     sourceLanguage,
   }: TranslateInput): Promise<AiEntity> {
-    const result = await this.aiChatProvider.chat({
+    return this.chatService.chat({
       messages: [
         { content: TRANSLATE_SYSTEM_PROMPT, role: "system" },
         {
@@ -106,7 +101,5 @@ export class AiToolsService {
         },
       ],
     });
-
-    return mapChatResultToEntity(result);
   }
 }

@@ -15,6 +15,7 @@ import { LOCALES } from "@/consts/locales";
 import { RawSizeEnum } from "@/consts/raw-size";
 import { SLUG_REGEX } from "@/consts/regex";
 import {
+  ContextMode,
   type CreateEducationInput,
   DetailInput,
   EducationLevel,
@@ -258,7 +259,12 @@ export function EducationForm({
       if (language) details.push({ key: "Language", value: [language] });
 
       const url = form.getFieldValue("url");
-      if (url) details.push({ key: "URLs", value: [url] });
+      if (url)
+        details.push({
+          contextMode: ContextMode.PageExtract,
+          key: "URLs",
+          value: [url],
+        });
 
       const summarized = await atsSummarize.mutateAsync({
         details,
