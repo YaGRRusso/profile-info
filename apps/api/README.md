@@ -36,8 +36,7 @@ platform        ← transport composition (GraphQL wiring, DataLoader aggregatio
 | **`common/`** | Framework-agnostic utilities (`clearObject`, `assertValidObjectId`, `orchestrate`). | Reusable logic without Nest/Mongoose/GraphQL coupling. |
 | **`core/`** | Cross-cutting infra: configs, validation decorators, shared inputs/entities, `domain-events`, `AuthContext`, `UserRole`. | Domain/service contracts — not GraphQL transport. |
 | **`integrations/open-router/`** | OpenRouter adapter + AI port (`ai-chat.provider.ts`). Binds `AiChatProvider` → `OpenRouterService`; mappers translate SDK ↔ loose DTO. | SDK and port live together; `ai-tools` owns strong GraphQL types. |
-| **`integrations/github/`** | GitHub adapter for repository metadata (`RepositoryMetadataProvider`). | Same port pattern as Tavily/OpenRouter. |
-| **`integrations/tavily/`** | Tavily adapter for web content extraction (`WebContentProvider`). | Used by resource-detail extractors. |
+| **`integrations/tavily/`** | Tavily adapter: `WebContentProvider` (page extract) + `WebSearchProvider` (query search). | AI context enrichment (ADR 004). |
 | **`modules/`** | Business domains. Each CRUD entity = resolver + service + schema + entity + dto. | Where profile rules and GraphQL operations live. |
 | **`platform/graphql/`** | GraphQL transport: `GraphqlModule`, `LoadersService`, loader registry augmentation. | Apollo wiring and per-request context. |
 | **`modules/auth/`** | JWT strategies, `signIn`, `getMe`. `GqlAuthenticationGuard` + `GqlAuthorizationGuard`. | Security cross-cut; uses `UsersService.findOneByEmailWithPassword`. |
@@ -83,7 +82,7 @@ The threat model is intentional, not accidental:
 ```
 Resolver → AiToolsService → AiChatProvider.chat()  [loose integration DTO]
                          → mapChatResultToEntity()  [strong GraphQL types]
-                         ↘ ResourceDetailService → *ExtractorService → Github / Tavily ports
+                         ↘ ResourceDetailService → WebpageResourceExtractorService → WebContentProvider (Tavily)
 ```
 
 ### Who imports whom
@@ -110,8 +109,7 @@ src/
 │   └── persistence/          # CrudRepository, StatsRepository, CrudMapperInterface, scoped()
 ├── integrations/
 │   ├── open-router/          # AI port + OpenRouter adapter
-│   ├── github/
-│   └── tavily/
+│   └── tavily/               # WebContentProvider + WebSearchProvider (ADR 004)
 ├── platform/
 │   └── graphql/              # GraphqlModule, LoadersService, loader registry
 └── modules/

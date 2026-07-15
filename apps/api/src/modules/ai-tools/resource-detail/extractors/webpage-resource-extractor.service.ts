@@ -1,18 +1,38 @@
 import { Injectable } from "@nestjs/common";
 import { WebContentProvider } from "@/integrations/tavily/web-content.provider";
 import type { DetailInput } from "../../dto/detail.input";
-import { ResourceType } from "../../enums/resource-type";
 import type { ResourceExtractor } from "../resource-extractor.interface";
 
+const URL_DETAIL_KEYS = [
+  "website",
+  "websites",
+  "url",
+  "urls",
+  "link",
+  "links",
+  "reference",
+  "references",
+  "page",
+  "pages",
+  "document",
+  "documents",
+  "resource",
+  "resources",
+] as const;
+
 @Injectable()
-export class WebSearchResourceExtractorService implements ResourceExtractor {
-  readonly supportedTypes = [ResourceType.ORGANIZATION];
-  readonly supportedKeys = ["website", "url", "link"];
+export class WebpageResourceExtractorService implements ResourceExtractor {
+  readonly supportedKeys = [...URL_DETAIL_KEYS];
 
   constructor(private readonly webContentProvider: WebContentProvider) {}
 
-  accepts(): boolean {
-    return true;
+  accepts(value: string): boolean {
+    try {
+      const url = new URL(value.trim());
+      return url.protocol === "http:" || url.protocol === "https:";
+    } catch {
+      return false;
+    }
   }
 
   async extract(url: string): Promise<DetailInput[]> {

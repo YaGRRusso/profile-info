@@ -39,7 +39,6 @@
     "@nestjs/platform-express": "^11.1.28",
     "@nestjs/terminus": "^11.1.1",
     "@nestjs/throttler": "^6.5.0",
-    "@octokit/rest": "^22.0.1",
     "@openrouter/sdk": "^0.13.48",
     "@tavily/core": "^0.7.6",
     "@types/lodash": "^4.17.24",

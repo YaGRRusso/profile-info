@@ -3,7 +3,6 @@ import { parseCommaSeparatedList } from "@/common/helpers/parse-comma-separated-
 
 export const envSchema = z.object({
   DATABASE_URL: z.string().min(1),
-  GITHUB_API_KEY: z.string().min(1),
   GRAPHQL_INTROSPECTION: z
     .enum(["true", "false"])
     .transform((value) => value === "true"),

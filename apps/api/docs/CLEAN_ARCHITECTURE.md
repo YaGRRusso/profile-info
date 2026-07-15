@@ -38,7 +38,7 @@ src/
 │   └── schemas/        Mongoose sub-schemas reutilizáveis
 │                       Regra: NÃO importa de modules/ nem integrations/.
 │
-├── integrations/    ← Adapters para serviços externos (OpenRouter, GitHub, Tavily).
+├── integrations/    ← Adapters para serviços externos (OpenRouter, Tavily).
 │                       Cada um tem: Port (abstract class) + Adapter (service).
 │                       Regra: NÃO importa de modules/.
 │

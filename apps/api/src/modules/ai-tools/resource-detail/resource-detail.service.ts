@@ -2,8 +2,7 @@ import { Injectable } from "@nestjs/common";
 import { orchestrate } from "@/common/execution/orchestrator.helper";
 import type { DetailInput } from "../dto/detail.input";
 import type { ResourceType } from "../enums/resource-type";
-import { GithubResourceExtractorService } from "./extractors/github-resource-extractor.service";
-import { WebSearchResourceExtractorService } from "./extractors/web-search-resource-extractor.service";
+import { WebpageResourceExtractorService } from "./extractors/webpage-resource-extractor.service";
 import type { ResourceExtractor } from "./resource-extractor.interface";
 
 @Injectable()
@@ -11,13 +10,9 @@ export class ResourceDetailService {
   private readonly extractors: ResourceExtractor[];
 
   constructor(
-    githubResourceExtractorService: GithubResourceExtractorService,
-    webSearchResourceExtractorService: WebSearchResourceExtractorService
+    webpageResourceExtractorService: WebpageResourceExtractorService
   ) {
-    this.extractors = [
-      githubResourceExtractorService,
-      webSearchResourceExtractorService,
-    ];
+    this.extractors = [webpageResourceExtractorService];
   }
 
   async getResourceDetails(
@@ -31,10 +26,10 @@ export class ResourceDetailService {
 
       const matchedExtractors = this.extractors.filter((extractor) => {
         const matchedKey = extractor.supportedKeys.includes(key);
-        if (!type) return matchedKey;
+        if (!matchedKey) return false;
+        if (!type || !extractor.supportedTypes) return true;
 
-        const matchedType = extractor.supportedTypes?.includes(type);
-        return matchedKey && matchedType;
+        return extractor.supportedTypes.includes(type);
       });
 
       if (matchedExtractors.length === 0) continue;

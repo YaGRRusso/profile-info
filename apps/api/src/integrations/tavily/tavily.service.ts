@@ -2,20 +2,22 @@ import { Injectable } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import {
   TavilyClient,
-  TavilyCrawlOptions,
-  TavilyCrawlResponse,
   TavilyExtractOptions,
-  TavilyExtractResponse,
   TavilySearchOptions,
-  TavilySearchResponse,
   tavily,
 } from "@tavily/core";
 import type { Env } from "@/core/configs/env.validation";
+import { tavilyExtractResultMapper } from "./mappers/tavily-extract-result.mapper";
+import { tavilySearchResultMapper } from "./mappers/tavily-search-result.mapper";
 import {
   type WebContentExtractOptions,
   WebContentProvider,
   type WebContentResult,
 } from "./web-content.provider";
+import {
+  type WebSearchOptions,
+  type WebSearchResult,
+} from "./web-search.provider";
 
 @Injectable()
 export class TavilyService extends WebContentProvider {
@@ -29,23 +31,17 @@ export class TavilyService extends WebContentProvider {
 
   async search(
     query: string,
-    options?: TavilySearchOptions
-  ): Promise<TavilySearchResponse> {
+    options?: WebSearchOptions
+  ): Promise<WebSearchResult[]> {
+    const tavilyOptions: TavilySearchOptions | undefined = options?.maxResults
+      ? { maxResults: options.maxResults }
+      : undefined;
+
     try {
-      return await this.client.search(query, options);
+      const response = await this.client.search(query, tavilyOptions);
+      return tavilySearchResultMapper(response);
     } catch (error) {
       throw new Error("Tavily search failed", { cause: error });
-    }
-  }
-
-  async crawl(
-    url: string,
-    options?: TavilyCrawlOptions
-  ): Promise<TavilyCrawlResponse> {
-    try {
-      return await this.client.crawl(url, options);
-    } catch (error) {
-      throw new Error("Tavily crawl failed", { cause: error });
     }
   }
 
@@ -60,21 +56,9 @@ export class TavilyService extends WebContentProvider {
 
     try {
       const response = await this.client.extract(urls, tavilyOptions);
-      return mapTavilyExtractResponse(response);
+      return tavilyExtractResultMapper(response);
     } catch (error) {
       throw new Error("Tavily extract failed", { cause: error });
     }
   }
-}
-
-function mapTavilyExtractResponse(
-  response: TavilyExtractResponse
-): WebContentResult[] {
-  if (!response.results?.length) return [];
-
-  return response.results.map((result) => ({
-    rawContent: result.rawContent,
-    title: result.title ?? undefined,
-    url: result.url,
-  }));
 }
