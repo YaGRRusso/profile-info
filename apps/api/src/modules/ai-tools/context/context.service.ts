@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { compact, groupBy, uniqBy, words } from "lodash";
-import { orchestrate } from "@/common/execution/orchestrator.helper";
 import { isWebpageUrl } from "@/common/helpers/url.helper";
+import { OrchestratorService } from "@/core/execution/orchestrator.service";
 import { WebContentProvider } from "@/integrations/tavily/web-content.provider";
 import { WebSearchProvider } from "@/integrations/tavily/web-search.provider";
 import type { DetailInput } from "../dto/detail.input";
@@ -27,7 +27,8 @@ interface ContextTask {
 export class ContextService {
   constructor(
     private readonly webContentProvider: WebContentProvider,
-    private readonly webSearchProvider: WebSearchProvider
+    private readonly webSearchProvider: WebSearchProvider,
+    private readonly orchestrator: OrchestratorService
   ) {}
 
   async enrichFromDetails(
@@ -37,11 +38,16 @@ export class ContextService {
     const tasksByMode = groupBy(this.collectTasks(details), "mode");
 
     for (const mode of CONTEXT_FALLBACK_ORDER) {
-      const modeTasks = tasksByMode[mode] ?? [];
-      if (modeTasks.length === 0) continue;
+      const tasks = tasksByMode[mode] ?? [];
+      if (tasks.length === 0) continue;
 
       // biome-ignore lint/performance/noAwaitInLoops: fallback chain must not run later modes in parallel
-      const results = await this.runParallelTasks(modeTasks, type);
+      const results = await this.orchestrator.run(
+        tasks,
+        (task) => this.runTask(task, type),
+        { cacheKey: (task) => `context:${task.mode}:${task.value}:${type}` }
+      );
+
       if (results.length > 0) return results;
     }
 
@@ -54,7 +60,6 @@ export class ContextService {
     const results = await this.webContentProvider.extract([url], {
       instructions: PAGE_EXTRACT_INSTRUCTIONS,
     });
-
     return results.flatMap(mapWebContentResultToDetails);
   }
 
@@ -95,7 +100,7 @@ export class ContextService {
     return 5;
   }
 
-  private runSingleTask(
+  private runTask(
     task: ContextTask,
     type: ResourceType
   ): Promise<DetailInput[]> {
@@ -107,16 +112,5 @@ export class ContextService {
       default:
         return Promise.resolve([]);
     }
-  }
-
-  private runParallelTasks(
-    tasks: ContextTask[],
-    type: ResourceType
-  ): Promise<DetailInput[]> {
-    return orchestrate(tasks, (task) => this.runSingleTask(task, type), {
-      cacheKey: (task) => `ai-context:${task.mode}:${task.value}:${type}`,
-      concurrency: 5,
-      timeoutMs: 30_000,
-    });
   }
 }

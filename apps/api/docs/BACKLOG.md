@@ -18,9 +18,9 @@ Search `maxResults` scales down as the query has more words.
 
 Still open / later:
 
-- **Redis (or shared) cache for Tavily extract/search** — in-memory TTL via
-  `orchestrate({ cacheKey })` is enough for single-process / spam Optimize.
-  Redis later when multiple API instances need a shared store.
+- **Redis (or shared) cache for Tavily extract/search** — Nest `AppCacheModule`
+  + `OrchestratorService.run({ cacheKey })` already caches in-process (TTL + LRU).
+  Swap `AppCacheModule` stores to Redis when multiple API instances need a shared store.
 - **Opt-in “Include web info” on Optimize** — product UX later; avoid extra form chrome for now.
 - **Admin contextMode coverage** — experience / profile may still omit `contextMode`.
 - **Docs sync** — keep ADR 004 aligned when behavior changes.

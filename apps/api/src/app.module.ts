@@ -6,6 +6,7 @@ import { MongooseModule } from "@nestjs/mongoose";
 import { ThrottlerModule } from "@nestjs/throttler";
 import { AppController } from "./app.controller";
 import { AppService } from "./app.service";
+import { AppCacheModule } from "./core/cache/app-cache.module";
 import { type Env, validateEnv } from "./core/configs/env.validation";
 import { PersistenceExceptionFilter } from "./core/filters/persistence-exception.filter";
 import { HealthModule } from "./core/health/health.module";
@@ -31,6 +32,7 @@ import { GraphqlModule } from "./platform/graphql/graphql.module";
       isGlobal: true,
       validate: validateEnv,
     }),
+    AppCacheModule,
     ThrottlerModule.forRoot([{ limit: 10, ttl: 60_000 }]),
     MongooseModule.forRootAsync({
       imports: [ConfigModule],

@@ -33,8 +33,8 @@ platform        ← transport composition (GraphQL wiring, DataLoader aggregatio
 
 | Folder | What it is | Why it exists |
 |--------|------------|---------------|
-| **`common/`** | Framework-agnostic utilities (`clearObject`, `assertValidObjectId`, `orchestrate`). | Reusable logic without Nest/Mongoose/GraphQL coupling. |
-| **`core/`** | Cross-cutting infra: configs, validation decorators, shared inputs/entities, `domain-events`, `AuthContext`, `UserRole`. | Domain/service contracts — not GraphQL transport. |
+| **`common/`** | Framework-agnostic utilities (`clearObject`, `assertValidObjectId`, …). | Reusable logic without Nest/Mongoose/GraphQL coupling. |
+| **`core/`** | Cross-cutting infra: configs, Nest `CacheModule` (`AppCacheModule`), `OrchestratorService`, validation decorators, shared inputs/entities, `domain-events`, `AuthContext`, `UserRole`. | Domain/service contracts — not GraphQL transport. |
 | **`integrations/open-router/`** | OpenRouter adapter + AI port (`ai-chat.provider.ts`). Binds `AiChatProvider` → `OpenRouterService`; mappers translate SDK ↔ loose DTO. | SDK and port live together; `ai-tools` owns strong GraphQL types. |
 | **`integrations/tavily/`** | Tavily adapter: `WebContentProvider` (page extract) + `WebSearchProvider` (query search). | AI context enrichment (ADR 004). |
 | **`modules/`** | Business domains. Each CRUD entity = resolver + service + schema + entity + dto. | Where profile rules and GraphQL operations live. |
