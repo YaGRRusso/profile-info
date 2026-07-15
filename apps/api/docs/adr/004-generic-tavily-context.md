@@ -90,10 +90,10 @@ AiToolsService does not.
 
 - GitHub integration removed (`GITHUB_API_KEY` gone).
 - `ContextService.enrichFromDetails(details, type)` — only details with `contextMode`
-  set. `ResourceType` is appended to the web-search query
-  (e.g. `"Apple organization"`). `PAGE_EXTRACT` → `enrichPageExtract` /
-  `WebContentProvider`; `WEB_SEARCH` → `enrichWebSearch` / `WebSearchProvider`.
-  Add future strategies as enum members + switch cases.
+  set. Modes run in `CONTEXT_FALLBACK_ORDER` (page extract, then web search); the first
+  mode that returns details wins. Search query appends `ResourceType`; private
+  `maxResultsForQuery` lowers hit count as the query has more words. Add a mode to the
+  enum, `runSingleTask`, and the fallback order.
 - `ChatService.chat` — `AiChatProvider` → `AiEntity` (mapper owned here).
 - Frontend-facing name stays transport-agnostic: `contextMode` on `DetailInput`.
 

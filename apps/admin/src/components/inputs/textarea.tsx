@@ -42,6 +42,9 @@ export function TextareaInput({
 }: TextareaInputProps) {
   const { t: tForm } = useTranslation("forms");
 
+  const aiDisabled =
+    disabled || !!error || !hasLength(value, { min: RawSizeEnum.XSMALL });
+
   return (
     <fieldset className="fieldset">
       <InputLegend
@@ -83,11 +86,7 @@ export function TextareaInput({
           {onTranslate && (
             <button
               className="btn btn-xs group"
-              disabled={
-                disabled ||
-                !!error ||
-                !hasLength(value, { min: RawSizeEnum.XSMALL })
-              }
+              disabled={aiDisabled}
               onClick={onTranslate}
               type="button"
             >
@@ -100,11 +99,7 @@ export function TextareaInput({
           {onOptimize && (
             <button
               className="btn btn-xs group"
-              disabled={
-                disabled ||
-                !!error ||
-                !hasLength(value, { min: RawSizeEnum.XSMALL })
-              }
+              disabled={aiDisabled}
               onClick={onOptimize}
               type="button"
             >

@@ -5,9 +5,6 @@ Deferred API and admin work, ordered by criticality, then value, then effort.
 ## Current focus
 
 1. **Better prompts** — Refine AI tools quality, cost, and locale (see High Priority below).
-2. **Admin contextMode coverage** — Optional: wire `WebSearch` / `PageExtract` on more
-   forms where names or URLs would ground ATS summarize (experience / profile today send
-   plain details only). See ADR 004.
 
 ## High Priority
 
@@ -16,11 +13,15 @@ Deferred API and admin work, ordered by criticality, then value, then effort.
 Shipped: Tavily ports, GitHub removed, `ContextService` + `ChatService`
 (AiToolsService orchestrates module collaborators only). Tavily enrich is **context for
 summarizing user `raw`** — not a second summarize of extract/search output.
+Page extract runs before web search; search runs only when extract returned no details.
+Search `maxResults` scales down as the query has more words.
 
-Still open:
+Still open / later:
 
-- **Admin contextMode coverage** — experience / profile (and similar) may still omit
-  `contextMode`; product choice, not a missing API path.
+- **Redis (or shared) cache for Tavily extract/search** — cheap duplicate Optimize clicks;
+  easy locally, denser in production. Defer until needed.
+- **Opt-in “Include web info” on Optimize** — product UX later; avoid extra form chrome for now.
+- **Admin contextMode coverage** — experience / profile may still omit `contextMode`.
 - **Docs sync** — keep ADR 004 aligned when behavior changes.
 
 ### Better Prompts

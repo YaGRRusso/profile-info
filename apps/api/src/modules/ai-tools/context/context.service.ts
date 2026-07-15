@@ -1,5 +1,5 @@
 import { Injectable } from "@nestjs/common";
-import { uniqBy } from "lodash";
+import { compact, groupBy, uniqBy, words } from "lodash";
 import { orchestrate } from "@/common/execution/orchestrator.helper";
 import { isWebpageUrl } from "@/common/helpers/url.helper";
 import { WebContentProvider } from "@/integrations/tavily/web-content.provider";
@@ -13,6 +13,11 @@ import { mapWebSearchResultToDetails } from "../mappers/web-search-result.mapper
 const PAGE_EXTRACT_INSTRUCTIONS =
   "Identify the main objective of this page and its target audience, extract the key information and main topics. Write a summary of the information presented on the page. Ignore forms and loading issues, focus on the real content.";
 
+const CONTEXT_FALLBACK_ORDER = [
+  ContextMode.PAGE_EXTRACT,
+  ContextMode.WEB_SEARCH,
+] as const;
+
 interface ContextTask {
   mode: ContextMode;
   value: string;
@@ -25,26 +30,22 @@ export class ContextService {
     private readonly webSearchProvider: WebSearchProvider
   ) {}
 
-  enrichFromDetails(
+  async enrichFromDetails(
     details: DetailInput[],
     type: ResourceType
   ): Promise<DetailInput[]> {
-    const tasks = uniqBy(
-      details.flatMap((detail): ContextTask[] => {
-        const { contextMode: mode } = detail;
-        if (!mode) return [];
+    const tasksByMode = groupBy(this.collectTasks(details), "mode");
 
-        return detail.value
-          .map((value) => value.trim())
-          .filter(Boolean)
-          .map((value) => ({ mode, value }));
-      }),
-      (task) => `${task.mode}:${task.value}`
-    );
+    for (const mode of CONTEXT_FALLBACK_ORDER) {
+      const modeTasks = tasksByMode[mode] ?? [];
+      if (modeTasks.length === 0) continue;
 
-    if (tasks.length === 0) return Promise.resolve([]);
+      // biome-ignore lint/performance/noAwaitInLoops: fallback chain must not run later modes in parallel
+      const results = await this.runParallelTasks(modeTasks, type);
+      if (results.length > 0) return results;
+    }
 
-    return this.runParallelTasks(tasks, type);
+    return [];
   }
 
   async enrichPageExtract(url: string): Promise<DetailInput[]> {
@@ -63,10 +64,35 @@ export class ContextService {
   ): Promise<DetailInput[]> {
     if (!query.trim()) return [];
 
-    const results = await this.webSearchProvider.search(
-      [query.trim(), type].filter(Boolean).join(" ")
-    );
+    const searchQuery = compact([query.trim(), type]).join(" ");
+    const results = await this.webSearchProvider.search(searchQuery, {
+      maxResults: this.maxResultsForQuery(searchQuery),
+    });
     return results.flatMap(mapWebSearchResultToDetails);
+  }
+
+  private collectTasks(details: DetailInput[]): ContextTask[] {
+    return uniqBy(
+      details.flatMap((detail): ContextTask[] => {
+        const { contextMode: mode } = detail;
+        if (!mode) return [];
+
+        return compact(detail.value.map((value) => value.trim())).map(
+          (value) => ({ mode, value })
+        );
+      }),
+      (task) => `${task.mode}:${task.value}`
+    );
+  }
+
+  private maxResultsForQuery(query: string): number {
+    const count = words(query).length;
+    if (count >= 5) return 1;
+    if (count >= 4) return 2;
+    if (count >= 3) return 3;
+    if (count >= 2) return 4;
+    if (count >= 1) return 5;
+    return 5;
   }
 
   private runSingleTask(

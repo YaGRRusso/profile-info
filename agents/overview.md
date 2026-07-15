@@ -105,6 +105,7 @@ See **NestJS GraphQL resolver hot-reload** in `agents/api.md` for a concrete exa
   Configured in root `package.json` `lint-staged`.
 - Types: `tsconfig.base.json` sets `strictNullChecks: true` (not full `strict`). The API package loosens `noImplicitAny` and `strictBindCallApply` to `false`.
 - Naming: files and folders are kebab-case; suffixes signal role (`*.resolver.ts`, `*.service.ts`, `*.schema.ts`, `*.entity.ts`, `*.input.ts`).
+- **Prefer lodash:** both apps depend on lodash. For generic array/object/string plumbing (`compact`, `uniqBy`, `groupBy`, `words`, …), use lodash instead of hand-rolled helpers or mini-utilities. Domain rules stay in feature code. Cursor: local `.cursor/rules/prefer-lodash.mdc`.
 - **No barrel files:** do not add `index.ts` (or similar) modules that re-export siblings (`export * from`, `export { … } from`). Import from the concrete file path instead — barrels widen the module graph and pull in unused code. Exceptions: framework entry points (e.g. `seed/index.ts` CLI), and generated output (e.g. GraphQL codegen).
 - Code artifacts (names, comments, files) are written in English even though project discussion may be in Portuguese.
 - Testing: API uses Jest — unit tests in `src/**/*.spec.ts`; e2e/integration in `test/**/*.spec.ts` (`npm run test` vs `npm run test:e2e`). The admin has no test setup yet.
