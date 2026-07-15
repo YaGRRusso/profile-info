@@ -7,7 +7,7 @@ const TTL_MS = 10 * 60 * 1000; // 10 minutes
 
 /**
  * Global Nest cache (TTL + LRU) + OrchestratorService.
- * Swap `stores` for Redis later without changing callers.
+ * Process-local today; Redis store swap is BACKLOG.
  */
 @Global()
 @Module({

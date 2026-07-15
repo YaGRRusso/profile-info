@@ -8,22 +8,34 @@ Deferred API and admin work, ordered by criticality, then value, then effort.
 
 ## High Priority
 
-### Generic Tavily AI context (ADR 004)
+### Generic Tavily AI context (ADR 004) — closed
 
-Shipped: Tavily ports, GitHub removed, `ContextService` + `ChatService`
-(AiToolsService orchestrates module collaborators only). Tavily enrich is **context for
-summarizing user `raw`** — not a second summarize of extract/search output.
-Page extract runs before web search; search runs only when extract returned no details.
-Search `maxResults` scales down as the query has more words.
+Shipped (see `apps/api/docs/adr/004-generic-tavily-context.md`):
 
-Still open / later:
+- Tavily ports only (GitHub removed); `ContextService` + `ChatService`; extract-then-search
+  fallback; query-word `maxResults`; Nest in-memory cache via `AppCacheModule` +
+  `OrchestratorService.run({ cacheKey })`.
+- Admin: org name search + website extract; course/education URL extract; project URLs via
+  `arrayContextDetails` (first URL only for `PageExtract` / AI aura).
+- Admin UX: Optimize min raw length, textarea `maxLength`, disable Optimize when text
+  unchanged vs last send; AI field tooltips.
 
-- **Redis (or shared) cache for Tavily extract/search** — Nest `AppCacheModule`
-  + `OrchestratorService.run({ cacheKey })` already caches in-process (TTL + LRU).
-  Swap `AppCacheModule` stores to Redis when multiple API instances need a shared store.
-- **Opt-in “Include web info” on Optimize** — product UX later; avoid extra form chrome for now.
-- **Admin contextMode coverage** — experience / profile may still omit `contextMode`.
-- **Docs sync** — keep ADR 004 aligned when behavior changes.
+Deferred (not blocking ADR 004 closure):
+
+- **Redis (or shared) cache** — swap `AppCacheModule` `stores` when multiple API instances
+  need a shared Tavily result store. In-process TTL + LRU is enough for single-instance /
+  spam Optimize today.
+- **Opt-in “Include web info” on Optimize** — product toggle so Optimize does not always
+  call Tavily when `contextMode` details are present.
+- **Experience / profile `contextMode`** — wire AI web context on experience and profile
+  Optimize where it adds value (none today).
+- **Array AI context beyond project URLs** — reuse `arrayContextDetails` /
+  `isAiContextArrayIndex` when other forms gain multi-value extract targets (e.g. image
+  URLs).
+- **Context preview / pick which details to send** — UI to inspect or checkbox web
+  context before Optimize (discussed; not built).
+- **OpenRouter response cache** — cache identical chat completions separately from Tavily
+  (discussed; not built).
 
 ### Better Prompts
 

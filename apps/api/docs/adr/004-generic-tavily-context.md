@@ -122,7 +122,23 @@ Throttle (ADR 003) continues to apply to all AI mutations.
 - Collaborators: `modules/ai-tools/context/context.service.ts`,
   `modules/ai-tools/chat/chat.service.ts`
 - Orchestration: `modules/ai-tools/ai-tools.service.ts`
+- Process-local Tavily result cache: `core/cache/app-cache.module.ts`,
+  `core/execution/orchestrator.service.ts` (`run({ cacheKey })`)
+- Admin array AI context (first item only): `apps/admin/src/lib/ai-array-context.ts`
 - Removed: `integrations/github/`, extractor registry, `WebContextService`
+
+## Cost / UX controls (shipped)
+
+- Extract-then-search fallback: run `PAGE_EXTRACT` first; `WEB_SEARCH` only when extract
+  returned no details.
+- Search `maxResults` scales down as the query has more words.
+- Nest `AppCacheModule` (TTL + LRU in-memory) + `OrchestratorService` single-flight so
+  repeat Optimize for the same URL/query skips Tavily in one process.
+- Admin project links: only the **first** non-empty URL gets `PageExtract` / AI aura
+  (`arrayContextDetails` / `isAiContextArrayIndex`); other URLs are plain details.
+
+Deferred product and infra items: `apps/api/docs/BACKLOG.md` (Redis cache, opt-in web
+toggle, experience/profile `contextMode`, array context on more entities, etc.).
 
 ## Implementation phases
 
@@ -135,4 +151,6 @@ Throttle (ADR 003) continues to apply to all AI mutations.
    output is context for `summarize` / `atsSummarize` of user `raw`, not a product to
    re-summarize. Optional later only if UX needs a dedicated URL/query box that still
    feeds the same raw-summarize path.
-6. **Docs sync** — keep this ADR aligned with code (ongoing).
+6. **Cost controls + cache + admin first-URL array context** — shipped (see above).
+7. **Docs sync** — this ADR aligned with code as of 2026-07-15; further changes update
+   ADR + `BACKLOG.md` together.
