@@ -40,7 +40,7 @@ export function ApiTokenMultiForm({
 
   const form = useForm({
     defaultValues: {
-      permissions: [] as ApiTokenPermission[],
+      permissions: Array.of<ApiTokenPermission>(),
     },
     onSubmit: ({ value }) => {
       const updateApiTokenInput: UpdateApiTokenInput = {};
@@ -75,9 +75,7 @@ export function ApiTokenMultiForm({
             disabled={!changePermissions}
             error={fieldError(field.state.meta)}
             label={tForm("fields.permissions.label")}
-            onChange={(value) =>
-              field.handleChange(value as ApiTokenPermission[])
-            }
+            onChange={field.handleChange}
             options={PERMISSION_OPTIONS}
             placeholder={tForm("fields.permissions.placeholder")}
             tooltip={tForm("fields.permissions.tooltip")}

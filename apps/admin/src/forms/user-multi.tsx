@@ -59,7 +59,7 @@ export function UserMultiForm({
             error={fieldError(field.state.meta)}
             label={tForm("fields.userRole.label")}
             name={field.name}
-            onChange={(value) => field.handleChange(value as UserRole)}
+            onChange={field.handleChange}
             options={ROLE_OPTIONS}
             placeholder={tForm("fields.userRole.placeholder")}
             tooltip={tForm("fields.userRole.tooltip")}

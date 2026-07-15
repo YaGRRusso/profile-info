@@ -128,11 +128,11 @@ export function ProjectForm({
   const form = useForm({
     defaultValues: {
       i18n: createEmptyI18n({ description: "", title: "" }),
-      images: [] as string[],
+      images: Array.of<string>(),
       relevance: 1,
-      skillIds: [] as string[],
+      skillIds: Array.of<string>(),
       slug: "",
-      urls: [] as { title: string; value: string }[],
+      urls: Array.of<{ title: string; value: string }>(),
       ...defaultValues,
     },
     onSubmit: ({ value }) => onSubmit?.(value),

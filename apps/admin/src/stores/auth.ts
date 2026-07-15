@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
+import type { UserRole } from "@/generated/graphql/graphql";
 
 interface JwtUser {
   avatar?: string | null;
@@ -7,7 +8,7 @@ interface JwtUser {
   id: string;
   name: string;
   nickname: string;
-  role?: string | null;
+  role?: UserRole | null;
 }
 
 interface AuthStore {

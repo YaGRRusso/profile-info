@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next";
-import { LOCALES, LocaleEnum } from "@/consts/locales";
+import { LOCALES, type LocaleEnum } from "@/consts/locales";
 import { useDownloadResume } from "@/hooks/mutations/resume";
 
 export function DownloadCvControl() {

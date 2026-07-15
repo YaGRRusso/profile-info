@@ -68,7 +68,7 @@ const sortParser = parseAsShape(
   .withDefault([])
   .withOptions(persistentOptions);
 
-const permissionParser = parseAsShape(z.string()).withOptions(
+const permissionParser = parseAsShape(z.enum(ApiTokenPermission)).withOptions(
   persistentOptions
 );
 const statusParser = parseAsShape(z.string()).withOptions(persistentOptions);
@@ -206,9 +206,9 @@ const getColumns = (
     enableGlobalFilter: false,
     enableSorting: false,
     filterFn: (row, _columnId, filterValue) => {
-      if (!filterValue) return true;
-      return row.original.permissions.includes(
-        filterValue as ApiTokenPermission
+      if (typeof filterValue !== "string") return true;
+      return row.original.permissions.some(
+        (permission) => permission === filterValue
       );
     },
     header: "Permissions",
@@ -422,8 +422,7 @@ export function ApiTokensTable({
       data.filter(
         (token) =>
           matchesSearch(token, searchQuery ?? "") &&
-          (!permission ||
-            token.permissions.includes(permission as ApiTokenPermission)) &&
+          (!permission || token.permissions.includes(permission)) &&
           matchesDateColumnFilter(token.createdAt, createdAt) &&
           matchesDateColumnFilter(token.updatedAt, updatedAt) &&
           matchesDateColumnFilter(token.expiresAt, expiresAt)

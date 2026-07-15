@@ -14,3 +14,7 @@ export const LOCALES = [
   { label: "Português", value: LocaleEnum.PORTUGUESE },
   // { value: LocaleEnum.SPANISH, label: "Español" },
 ] as const satisfies Locale[];
+
+export function isLocaleEnum(value: string): value is LocaleEnum {
+  return Object.values(LocaleEnum).some((locale) => locale === value);
+}

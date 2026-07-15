@@ -1,17 +1,15 @@
-import { LocaleEnum } from "@/consts/locales";
+import { isLocaleEnum, LocaleEnum } from "@/consts/locales";
 import i18n from "@/i18n";
-
-const SUPPORTED_LOCALES = new Set<string>(Object.values(LocaleEnum));
 
 export function resolveActiveLocale(): LocaleEnum {
   const { language } = i18n;
-  if (SUPPORTED_LOCALES.has(language)) {
-    return language as LocaleEnum;
+  if (isLocaleEnum(language)) {
+    return language;
   }
 
   const [base] = language.split("-");
-  if (SUPPORTED_LOCALES.has(base)) {
-    return base as LocaleEnum;
+  if (base && isLocaleEnum(base)) {
+    return base;
   }
 
   return LocaleEnum.ENGLISH;

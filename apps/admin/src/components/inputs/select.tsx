@@ -3,20 +3,20 @@ import { cn } from "@/lib/cn";
 import { AuraField } from "./aura-field";
 import { InputLegend } from "./legend";
 
-export interface SelectInputProps
+export interface SelectInputProps<T extends string = string>
   extends Omit<ComponentProps<"select">, "onChange" | "value"> {
   ai?: boolean;
   error?: string;
   label?: string;
-  onChange?: (value: string) => void;
+  onChange?: (value: T) => void;
   optional?: boolean;
-  options: { disabled?: boolean; label: string; value: string }[];
+  options: { disabled?: boolean; label: string; value: T }[];
   placeholder?: string;
   tooltip?: string;
-  value?: string;
+  value?: T;
 }
 
-export function SelectInput({
+export function SelectInput<T extends string = string>({
   className,
   error,
   onChange,
@@ -28,7 +28,7 @@ export function SelectInput({
   value,
   ai,
   ...props
-}: SelectInputProps) {
+}: SelectInputProps<T>) {
   const selectedOption = options.find((option) => option.value === value);
 
   return (
@@ -47,7 +47,7 @@ export function SelectInput({
             selectedOption?.disabled && "select-error",
             className
           )}
-          onChange={(event) => onChange?.(event.target.value)}
+          onChange={(event) => onChange?.(event.target.value as T)}
           value={value ?? ""}
           {...props}
         >

@@ -1,29 +1,29 @@
-export interface FiltersSelectOption {
+export interface FiltersSelectOption<T extends string = string> {
   count: number;
   label: string;
-  value: string;
+  value: T;
 }
 
-export interface FiltersSelectProps {
+export interface FiltersSelectProps<T extends string = string> {
   allLabel: string;
   disabled?: boolean;
-  onChange: (value: string | null) => void;
-  options: FiltersSelectOption[];
-  value: string | null;
+  onChange: (value: T | null) => void;
+  options: FiltersSelectOption<T>[];
+  value: T | null;
 }
 
-export function FiltersSelect({
+export function FiltersSelect<T extends string = string>({
   allLabel,
   disabled,
   onChange,
   options,
   value,
-}: FiltersSelectProps) {
+}: FiltersSelectProps<T>) {
   return (
     <select
       className="select flex-1 bg-base-200"
       disabled={disabled ?? !options.length}
-      onChange={(event) => onChange(event.target.value || null)}
+      onChange={(event) => onChange(event.target.value as T | null)}
       value={value ?? ""}
     >
       <option value="">{allLabel}</option>

@@ -62,7 +62,7 @@ export function ApiTokenForm({
     defaultValues: {
       expiresAt: "",
       name: "",
-      permissions: [] as ApiTokenPermission[],
+      permissions: Array.of<ApiTokenPermission>(),
       ...defaultValues,
     },
     onSubmit: ({ value }) => onSubmit?.(value),
@@ -99,9 +99,7 @@ export function ApiTokenForm({
           <MultiSelectInput
             error={fieldError(field.state.meta)}
             label={tForm("fields.permissions.label")}
-            onChange={(value) =>
-              field.handleChange(value as ApiTokenPermission[])
-            }
+            onChange={field.handleChange}
             options={PERMISSION_OPTIONS}
             placeholder={tForm("fields.permissions.placeholder")}
             tooltip={tForm("fields.permissions.tooltip")}

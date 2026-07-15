@@ -79,8 +79,9 @@ function previewsFromArray(items: unknown[]): FilterPreview[] {
 function previewsFromValue(value: unknown): FilterPreview[] {
   if (isEmpty(value)) return [];
   if (Array.isArray(value)) return previewsFromArray(value);
-  if (isPlainObject(value))
+  if (isPlainObject(value)) {
     return previewsFromObject(value as Record<string, unknown>);
+  }
 
   return [{ display: String(value), valueAfterClear: null }];
 }

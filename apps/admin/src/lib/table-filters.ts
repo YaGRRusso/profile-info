@@ -1,6 +1,19 @@
 import type { Row } from "@tanstack/react-table";
 import { isNil } from "lodash";
 
+function parseNumberRange(value: unknown): {
+  max?: number;
+  min?: number;
+} | null {
+  if (!Array.isArray(value) || value.length !== 2) return null;
+
+  const [min, max] = value;
+  if (!(min === undefined || typeof min === "number")) return null;
+  if (!(max === undefined || typeof max === "number")) return null;
+
+  return { max, min };
+}
+
 /**
  * Keeps rows whose numeric column value falls within an optional [min, max]
  * range. Opt-in per column via `filterFn: numberRangeFilter`.
@@ -12,7 +25,11 @@ export function numberRangeFilter<TData>(
 ): boolean {
   const rowValue = row.getValue<number | null>(columnId);
   if (isNil(rowValue)) return false;
-  const [min, max] = value as [number | undefined, number | undefined];
+
+  const range = parseNumberRange(value);
+  if (!range) return true;
+
+  const { min, max } = range;
   if (min !== undefined && rowValue < min) return false;
   if (max !== undefined && rowValue > max) return false;
   return true;

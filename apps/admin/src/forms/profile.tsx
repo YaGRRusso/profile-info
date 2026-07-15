@@ -163,8 +163,8 @@ export function ProfileForm({
       nickname: "",
       password: "",
       phone: "",
-      skillIds: [] as string[],
-      urls: [] as ProfileSchema["urls"],
+      skillIds: Array.of<string>(),
+      urls: Array.of<ProfileSchema["urls"][number]>(),
       ...defaultValues,
     },
     listeners: {

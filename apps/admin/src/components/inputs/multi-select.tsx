@@ -5,23 +5,23 @@ import { cn } from "@/lib/cn";
 import { AuraField } from "./aura-field";
 import { InputLegend } from "./legend";
 
-export interface MultiSelectInputProps {
+export interface MultiSelectInputProps<T extends string = string> {
   ai?: boolean;
   className?: string;
   disabled?: boolean;
   error?: string;
   label?: string;
   maxSelected?: number;
-  onChange?: (value: string[]) => void;
+  onChange?: (value: T[]) => void;
   optional?: boolean;
-  options: { disabled?: boolean; label: string; value: string }[];
+  options: { disabled?: boolean; label: string; value: T }[];
   placeholder?: string;
   showSelected?: boolean;
   tooltip?: string;
-  value?: string[];
+  value?: T[];
 }
 
-export function MultiSelectInput({
+export function MultiSelectInput<T extends string = string>({
   ai,
   className,
   disabled,
@@ -35,7 +35,7 @@ export function MultiSelectInput({
   value = [],
   maxSelected = 50,
   showSelected = true,
-}: MultiSelectInputProps) {
+}: MultiSelectInputProps<T>) {
   const { t: tAction } = useTranslation("actions");
   const { t: tForm } = useTranslation("forms");
   const containerRef = useRef<HTMLDivElement>(null);
@@ -47,7 +47,10 @@ export function MultiSelectInput({
     if (!isOpen) return;
 
     function handleClickOutside(event: MouseEvent) {
-      if (!containerRef.current?.contains(event.target as Node)) {
+      if (
+        event.target instanceof Node &&
+        !containerRef.current?.contains(event.target)
+      ) {
         setIsOpen(false);
       }
     }
@@ -63,7 +66,7 @@ export function MultiSelectInput({
     option.label.toLowerCase().includes(search.toLowerCase())
   );
 
-  function toggle(optionValue: string) {
+  function toggle(optionValue: T) {
     const option = options.find((candidate) => candidate.value === optionValue);
     if (option?.disabled && !value.includes(optionValue)) return;
 

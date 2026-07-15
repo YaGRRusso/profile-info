@@ -138,7 +138,7 @@ function emptyRole() {
   return {
     i18n: createEmptyI18n({ description: "", title: "" }),
     period: { from: "", to: "" },
-    skillIds: [] as string[],
+    skillIds: Array.of<string>(),
   };
 }
 
@@ -368,9 +368,7 @@ export function ExperienceForm({
             error={fieldError(field.state.meta)}
             label={tForm("fields.experienceCategory.label")}
             name={field.name}
-            onChange={(value) =>
-              field.handleChange(value as ExperienceCategory)
-            }
+            onChange={field.handleChange}
             options={CATEGORY_OPTIONS}
             placeholder={tForm("fields.experienceCategory.placeholder")}
             tooltip={tForm("fields.experienceCategory.tooltip")}

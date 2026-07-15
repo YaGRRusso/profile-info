@@ -14,14 +14,11 @@ export type RestrictedColumns = Partial<Record<UserRole, string[]>>;
 export function canSeeColumn(
   restricted: RestrictedColumns,
   columnId: string,
-  role?: string | null
+  role?: UserRole | null
 ) {
   for (const cols of Object.values(restricted)) {
     if (cols?.includes(columnId)) {
-      return (
-        !isNil(role) &&
-        restricted[role as UserRole]?.includes(columnId) === true
-      );
+      return !isNil(role) && restricted[role]?.includes(columnId) === true;
     }
   }
   return true;
@@ -30,7 +27,7 @@ export function canSeeColumn(
 export function getRestrictedVisibility(
   visibility: VisibilityState,
   restricted: RestrictedColumns,
-  role?: string | null
+  role?: UserRole | null
 ) {
   const hidden = Object.fromEntries(
     uniq(Object.values(restricted).flat())

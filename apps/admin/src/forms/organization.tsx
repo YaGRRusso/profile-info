@@ -258,9 +258,7 @@ export function OrganizationForm({
             error={fieldError(field.state.meta)}
             label={tForm("fields.organizationCategory.label")}
             name={field.name}
-            onChange={(value) =>
-              field.handleChange(value as OrganizationCategory)
-            }
+            onChange={field.handleChange}
             options={CATEGORY_OPTIONS}
             placeholder={tForm("fields.organizationCategory.placeholder")}
             tooltip={tForm("fields.organizationCategory.tooltip")}

@@ -1,7 +1,7 @@
 import { createInstance, type i18n as I18n } from "i18next";
 import LanguageDetector from "i18next-browser-languagedetector";
 import { initReactI18next } from "react-i18next";
-import { LocaleEnum } from "@/consts/locales";
+import { isLocaleEnum, LocaleEnum } from "@/consts/locales";
 import { i18nNamespaces, i18nResources } from "@/i18n/resources";
 import { syncDayjsLocale } from "@/lib/dayjs";
 
@@ -25,9 +25,11 @@ i18n
   });
 
 i18n.on("languageChanged", (locale) => {
-  syncDayjsLocale(locale as LocaleEnum);
+  syncDayjsLocale(isLocaleEnum(locale) ? locale : LocaleEnum.ENGLISH);
 });
 
-syncDayjsLocale(i18n.language as LocaleEnum);
+syncDayjsLocale(
+  isLocaleEnum(i18n.language) ? i18n.language : LocaleEnum.ENGLISH
+);
 
 export default i18n;

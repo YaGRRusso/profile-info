@@ -7,7 +7,7 @@ export function requireRoles(...allowedRoles: UserRole[]) {
   return async () => {
     await waitForAuthHydration();
     const role = useAuthStore.getState().user?.role;
-    if (isNil(role) || !allowedRoles.includes(role as UserRole)) {
+    if (isNil(role) || !allowedRoles.includes(role)) {
       throw notFound();
     }
   };

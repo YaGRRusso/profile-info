@@ -79,7 +79,7 @@ export function CourseMultiForm({
             error={fieldError(field.state.meta)}
             label={tForm("fields.status.label")}
             name={field.name}
-            onChange={(value) => field.handleChange(value as CourseStatus)}
+            onChange={field.handleChange}
             options={STATUS_OPTIONS}
             placeholder={tForm("fields.status.placeholder")}
             tooltip={tForm("fields.status.tooltip")}

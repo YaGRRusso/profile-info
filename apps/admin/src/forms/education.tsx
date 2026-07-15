@@ -185,7 +185,7 @@ export function EducationForm({
       organizationId: "",
       period: { from: "", to: "" },
       relevance: 1,
-      skillIds: [] as string[],
+      skillIds: Array.of<string>(),
       slug: "",
       status: EducationStatus.Complete,
       url: "",
@@ -367,7 +367,7 @@ export function EducationForm({
             error={fieldError(field.state.meta)}
             label={tForm("fields.level.label")}
             name={field.name}
-            onChange={(value) => field.handleChange(value as EducationLevel)}
+            onChange={field.handleChange}
             options={LEVEL_OPTIONS}
             placeholder={tForm("fields.level.placeholder")}
             tooltip={tForm("fields.level.tooltip")}
@@ -381,7 +381,7 @@ export function EducationForm({
             error={fieldError(field.state.meta)}
             label={tForm("fields.status.label")}
             name={field.name}
-            onChange={(value) => field.handleChange(value as EducationStatus)}
+            onChange={field.handleChange}
             options={STATUS_OPTIONS}
             placeholder={tForm("fields.status.placeholder")}
             tooltip={tForm("fields.status.tooltip")}
