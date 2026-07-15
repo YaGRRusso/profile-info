@@ -6,6 +6,7 @@ import { WebContentProvider } from "@/integrations/tavily/web-content.provider";
 import { WebSearchProvider } from "@/integrations/tavily/web-search.provider";
 import type { DetailInput } from "../dto/detail.input";
 import { ContextMode } from "../enums/context-mode";
+import { ResourceType } from "../enums/resource-type";
 import { mapWebContentResultToDetails } from "../mappers/web-content-result.mapper";
 import { mapWebSearchResultToDetails } from "../mappers/web-search-result.mapper";
 
@@ -14,6 +15,7 @@ const PAGE_EXTRACT_INSTRUCTIONS =
 
 interface ContextTask {
   mode: ContextMode;
+  type: ResourceType;
   value: string;
 }
 
@@ -24,7 +26,10 @@ export class ContextService {
     private readonly webSearchProvider: WebSearchProvider
   ) {}
 
-  enrichFromDetails(details: DetailInput[]): Promise<DetailInput[]> {
+  enrichFromDetails(
+    details: DetailInput[],
+    type: ResourceType
+  ): Promise<DetailInput[]> {
     const tasks = uniqBy(
       details.flatMap((detail): ContextTask[] => {
         const { contextMode: mode } = detail;
@@ -33,9 +38,9 @@ export class ContextService {
         return detail.value
           .map((value) => value.trim())
           .filter(Boolean)
-          .map((value) => ({ mode, value }));
+          .map((value) => ({ mode, type, value }));
       }),
-      (task) => `${task.mode}:${task.value}`
+      (task) => `${task.mode}:${task.type}:${task.value}`
     );
 
     if (tasks.length === 0) return Promise.resolve([]);
@@ -53,8 +58,15 @@ export class ContextService {
     return results.flatMap(mapWebContentResultToDetails);
   }
 
-  async enrichWebSearch(query: string): Promise<DetailInput[]> {
-    const results = await this.webSearchProvider.search(query);
+  async enrichWebSearch(
+    query: string,
+    type: ResourceType
+  ): Promise<DetailInput[]> {
+    if (!query.trim()) return [];
+
+    const results = await this.webSearchProvider.search(
+      [query.trim(), type].filter(Boolean).join(" ")
+    );
     return results.flatMap(mapWebSearchResultToDetails);
   }
 
@@ -63,10 +75,9 @@ export class ContextService {
       case ContextMode.PAGE_EXTRACT:
         return this.enrichPageExtract(task.value);
       case ContextMode.WEB_SEARCH:
-        return this.enrichWebSearch(task.value);
-      default: {
+        return this.enrichWebSearch(task.value, task.type);
+      default:
         return Promise.resolve([]);
-      }
     }
   }
 

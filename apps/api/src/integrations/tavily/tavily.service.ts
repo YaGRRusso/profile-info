@@ -33,9 +33,12 @@ export class TavilyService extends WebContentProvider {
     query: string,
     options?: WebSearchOptions
   ): Promise<WebSearchResult[]> {
-    const tavilyOptions: TavilySearchOptions | undefined = options?.maxResults
-      ? { maxResults: options.maxResults }
-      : undefined;
+    const tavilyOptions: TavilySearchOptions = {
+      includeImageDescriptions: false,
+      includeImages: false,
+      maxResults: options?.maxResults ?? 5,
+      searchDepth: "basic",
+    };
 
     try {
       const response = await this.client.search(query, tavilyOptions);
@@ -49,10 +52,11 @@ export class TavilyService extends WebContentProvider {
     urls: string[],
     options?: WebContentExtractOptions
   ): Promise<WebContentResult[]> {
-    const tavilyOptions: TavilyExtractOptions | undefined =
-      options?.instructions
-        ? { instructions: options.instructions }
-        : undefined;
+    const tavilyOptions: TavilyExtractOptions = {
+      extractDepth: "basic",
+      includeImages: false,
+      instructions: options?.instructions,
+    };
 
     try {
       const response = await this.client.extract(urls, tavilyOptions);

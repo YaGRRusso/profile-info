@@ -36,7 +36,7 @@ export class AiToolsService {
     details,
   }: AtsSummarizeInput): Promise<AiEntity> {
     const extractedDetails = details
-      ? await this.contextService.enrichFromDetails(details)
+      ? await this.contextService.enrichFromDetails(details, type)
       : [];
 
     const lengthBudget = createAtsSummarizeLengthBudget(type);
@@ -65,7 +65,7 @@ export class AiToolsService {
 
   async summarize({ raw, type, details }: SummarizeInput): Promise<AiEntity> {
     const extractedDetails = details
-      ? await this.contextService.enrichFromDetails(details)
+      ? await this.contextService.enrichFromDetails(details, type)
       : [];
 
     return this.chatService.chat({
