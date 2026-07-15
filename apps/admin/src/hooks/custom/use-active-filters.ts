@@ -11,7 +11,8 @@ export interface ActiveFilter {
 export interface FilterEntry<Value = unknown> {
   id: string;
   label?: string;
-  setState: (next: Value | null) => void;
+  // biome-ignore lint/style/useConsistentMethodSignatures: bivariant for nuqs setters
+  setState(next: Value | null): void;
   state: Value;
 }
 
