@@ -122,11 +122,14 @@ describe("Catalog reads (e2e)", () => {
     ["findManySkills", FIND_MANY_SKILLS],
     ["findManyOrganizations", FIND_MANY_ORGANIZATIONS],
     ["findManyUsers", FIND_MANY_USERS],
-  ])("should return UNAUTHENTICATED for %s without a token", async (_, query) => {
-    const response = await graphqlRequest(app, { query });
+  ])(
+    "should return UNAUTHENTICATED for %s without a token",
+    async (_, query) => {
+      const response = await graphqlRequest(app, { query });
 
-    expect(response.errors?.[0]?.extensions?.code).toBe("UNAUTHENTICATED");
-  });
+      expect(response.errors?.[0]?.extensions?.code).toBe("UNAUTHENTICATED");
+    }
+  );
 
   it("should allow authenticated USER to read catalog lists", async () => {
     const [skills, organizations] = await Promise.all([

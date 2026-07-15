@@ -526,54 +526,46 @@ describe("Cross-tenant DataLoader isolation (e2e)", () => {
     ]);
   });
 
-  it.each(
-    crossTenantFindOneCases
-  )("should not expose another tenant $entity via findOneById with nested catalog fields", async ({
-    query,
-    variableName,
-    dataKey,
-    entity,
-  }) => {
-    const entityId =
-      aliceEntityIds[`${entity}Id` as keyof typeof aliceEntityIds];
+  it.each(crossTenantFindOneCases)(
+    "should not expose another tenant $entity via findOneById with nested catalog fields",
+    async ({ query, variableName, dataKey, entity }) => {
+      const entityId =
+        aliceEntityIds[`${entity}Id` as keyof typeof aliceEntityIds];
 
-    const response = await graphqlRequest(app, {
-      query,
-      token: userBToken,
-      variables: { [variableName]: entityId },
-    });
+      const response = await graphqlRequest(app, {
+        query,
+        token: userBToken,
+        variables: { [variableName]: entityId },
+      });
 
-    expect(response.errors?.[0]?.message).toContain("Not Found");
-    expect(response.data?.[dataKey]).toBeUndefined();
-  });
+      expect(response.errors?.[0]?.message).toContain("Not Found");
+      expect(response.data?.[dataKey]).toBeUndefined();
+    }
+  );
 
-  it.each(
-    crossTenantFindManyByIdCases
-  )("should scope findManyById to the caller tenant when nested catalog fields are requested ($entity)", async ({
-    query,
-    variableName,
-    dataKey,
-    entity,
-  }) => {
-    const aliceId =
-      aliceEntityIds[`${entity}Id` as keyof typeof aliceEntityIds];
-    const bobId = bobEntityIds[`${entity}Id` as keyof typeof bobEntityIds];
+  it.each(crossTenantFindManyByIdCases)(
+    "should scope findManyById to the caller tenant when nested catalog fields are requested ($entity)",
+    async ({ query, variableName, dataKey, entity }) => {
+      const aliceId =
+        aliceEntityIds[`${entity}Id` as keyof typeof aliceEntityIds];
+      const bobId = bobEntityIds[`${entity}Id` as keyof typeof bobEntityIds];
 
-    const response = await graphqlRequest<
-      Record<
-        string,
-        Array<{ id: string; slug: string; owner: { email: string } }>
-      >
-    >(app, {
-      query,
-      token: userBToken,
-      variables: { [variableName]: [aliceId, bobId] },
-    });
+      const response = await graphqlRequest<
+        Record<
+          string,
+          Array<{ id: string; slug: string; owner: { email: string } }>
+        >
+      >(app, {
+        query,
+        token: userBToken,
+        variables: { [variableName]: [aliceId, bobId] },
+      });
 
-    expect(response.errors).toBeUndefined();
-    const nodes = response.data?.[dataKey];
-    expect(nodes).toHaveLength(1);
-    expect(nodes?.[0]?.id).toBe(bobId);
-    expect(nodes?.[0]?.owner.email).toBe("maria@profile.info");
-  });
+      expect(response.errors).toBeUndefined();
+      const nodes = response.data?.[dataKey];
+      expect(nodes).toHaveLength(1);
+      expect(nodes?.[0]?.id).toBe(bobId);
+      expect(nodes?.[0]?.owner.email).toBe("maria@profile.info");
+    }
+  );
 });
