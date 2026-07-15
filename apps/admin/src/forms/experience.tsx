@@ -31,6 +31,7 @@ import { fieldError } from "@/lib/field-error";
 import { FormError } from "@/lib/form-errors";
 import { nullIfEmpty } from "@/lib/form-input";
 import { hasUniqueLocales } from "@/lib/form-validation";
+import { hasLength } from "@/lib/has-length";
 import {
   createEmptyI18n,
   i18nLabel,
@@ -211,52 +212,47 @@ export function ExperienceForm({
       const raw = fieldValue as string;
       const type = ResourceType.Experience;
 
-      if (raw.trim().length <= RawSizeEnum.XSMALL)
-        return toast.error(tValidation("minLength", { value: 32 }));
+      if (!hasLength(raw, { min: RawSizeEnum.XSMALL }))
+        return toast.error(
+          tValidation("minLength", { value: RawSizeEnum.XSMALL })
+        );
 
       const skills = i18nLabelsByIds(
         findManySkills.data?.nodes,
         fieldParent.skillIds
       );
-      if (!skills.length)
-        return toast.error(tValidation("minCount", { value: 1 }));
 
       const { title } = fieldGroup;
-      if (!title) return toast.error(tValidation("requiredField"));
-      details.push({ key: "Title", value: [title] });
+      if (title) details.push({ key: "Title", value: [title] });
 
       const { period } = fieldParent;
-      if (!period.from && !period.to)
-        return toast.error(tValidation("requiredField"));
-      details.push({
-        key: "Period",
-        value: compact([
-          period.from ? `from ${period.from}` : "",
-          period.to ? `to ${period.to}` : "",
-        ]),
-      });
+      const periodValue = compact([
+        period.from ? `from ${period.from}` : "",
+        period.to ? `to ${period.to}` : "",
+      ]);
+      if (periodValue.length)
+        details.push({ key: "Period", value: periodValue });
 
       const category = form.getFieldValue("category");
-      if (!category) return toast.error(tValidation("requiredField"));
-      details.push({ key: "Category", value: [category] });
+      if (category) details.push({ key: "Category", value: [category] });
 
       const organization = findManyOrganizations.data?.nodes.find(
         (org) => org.id === form.getFieldValue("organizationId")
       );
-      if (!organization) return toast.error(tValidation("requiredField"));
 
-      const organizationName = organization.name;
-      details.push({ key: "Organization Name", value: [organizationName] });
+      if (organization) {
+        details.push({ key: "Organization Name", value: [organization.name] });
 
-      const organizationDescription = pickTranslation(
-        organization.i18n,
-        fieldGroup.locale
-      )?.messages.description;
-      if (organizationDescription)
-        details.push({
-          key: "Organization Description",
-          value: [organizationDescription],
-        });
+        const organizationDescription = pickTranslation(
+          organization.i18n,
+          fieldGroup.locale
+        )?.messages.description;
+        if (organizationDescription)
+          details.push({
+            key: "Organization Description",
+            value: [organizationDescription],
+          });
+      }
 
       const language = fieldGroup.locale;
       if (language) details.push({ key: "Language", value: [language] });
@@ -294,8 +290,10 @@ export function ExperienceForm({
     ) => {
       const raw = fieldValue as string;
 
-      if (raw.trim().length <= RawSizeEnum.XSMALL)
-        return toast.error(tValidation("minLength", { value: 32 }));
+      if (!hasLength(raw, { min: RawSizeEnum.XSMALL }))
+        return toast.error(
+          tValidation("minLength", { value: RawSizeEnum.XSMALL })
+        );
 
       const translated = await translate.mutateAsync({
         raw,

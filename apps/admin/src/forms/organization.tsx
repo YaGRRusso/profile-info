@@ -25,6 +25,7 @@ import { fieldError } from "@/lib/field-error";
 import { FormError } from "@/lib/form-errors";
 import { nullIfEmpty } from "@/lib/form-input";
 import { hasUniqueLocales } from "@/lib/form-validation";
+import { hasLength } from "@/lib/has-length";
 import { createEmptyI18n } from "@/lib/i18n";
 import { isSlugTaken } from "@/lib/slug";
 import { CommonFormProps } from "./common";
@@ -137,8 +138,10 @@ export function OrganizationForm({
       const raw = fieldValue as string;
       const type = ResourceType.Organization;
 
-      if (raw.trim().length <= RawSizeEnum.XSMALL)
-        return toast.error(tValidation("minLength", { value: 64 }));
+      if (!hasLength(raw, { min: RawSizeEnum.XSMALL }))
+        return toast.error(
+          tValidation("minLength", { value: RawSizeEnum.XSMALL })
+        );
 
       const name = form.getFieldValue("name");
       if (name)
@@ -176,7 +179,7 @@ export function OrganizationForm({
         >
       );
     },
-    [summarize.mutateAsync, form.getFieldValue, form.setFieldValue, tValidation]
+    [form.getFieldValue, form.setFieldValue, summarize.mutateAsync, tValidation]
   );
 
   const handleTranslate = useCallback(
@@ -187,8 +190,10 @@ export function OrganizationForm({
     ) => {
       const raw = fieldValue as string;
 
-      if (raw.trim().length <= RawSizeEnum.XSMALL)
-        return toast.error(tValidation("minLength", { value: 64 }));
+      if (!hasLength(raw, { min: RawSizeEnum.XSMALL }))
+        return toast.error(
+          tValidation("minLength", { value: RawSizeEnum.XSMALL })
+        );
 
       const translated = await translate.mutateAsync({
         raw,

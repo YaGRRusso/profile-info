@@ -8,6 +8,7 @@ import { ComponentProps } from "react";
 import { useTranslation } from "react-i18next";
 import { RawSizeEnum } from "@/consts/raw-size";
 import { cn } from "@/lib/cn";
+import { hasLength } from "@/lib/has-length";
 import { AuraField } from "./aura-field";
 import { InputLegend } from "./legend";
 
@@ -84,9 +85,8 @@ export function TextareaInput({
               className="btn btn-xs group"
               disabled={
                 disabled ||
-                !value ||
                 !!error ||
-                value.trim().length <= RawSizeEnum.XSMALL
+                !hasLength(value, { min: RawSizeEnum.XSMALL })
               }
               onClick={onTranslate}
               type="button"
@@ -102,9 +102,8 @@ export function TextareaInput({
               className="btn btn-xs group"
               disabled={
                 disabled ||
-                !value ||
                 !!error ||
-                value.trim().length <= RawSizeEnum.XSMALL
+                !hasLength(value, { min: RawSizeEnum.XSMALL })
               }
               onClick={onOptimize}
               type="button"

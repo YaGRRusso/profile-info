@@ -30,6 +30,7 @@ import { fieldError } from "@/lib/field-error";
 import { FormError } from "@/lib/form-errors";
 import { nullIfEmpty } from "@/lib/form-input";
 import { hasUniqueLocales } from "@/lib/form-validation";
+import { hasLength } from "@/lib/has-length";
 import {
   createEmptyI18n,
   i18nLabel,
@@ -181,45 +182,43 @@ export function CourseForm({
       const raw = fieldValue as string;
       const type = ResourceType.Course;
 
-      if (raw.trim().length <= RawSizeEnum.XSMALL)
-        return toast.error(tValidation("minLength", { value: 64 }));
+      if (!hasLength(raw, { min: RawSizeEnum.XSMALL }))
+        return toast.error(
+          tValidation("minLength", { value: RawSizeEnum.XSMALL })
+        );
 
       const skills = i18nLabelsByIds(
         findManySkills.data?.nodes,
         form.getFieldValue("skillIds")
       );
-      if (!skills.length)
-        return toast.error(tValidation("minCount", { value: 1 }));
 
       const { title } = fieldGroup;
-      if (!title) return toast.error(tValidation("requiredField"));
-      details.push({ key: "Title", value: [title] });
+      if (title) details.push({ key: "Title", value: [title] });
 
       const duration = form.getFieldValue("hours");
-      if (!duration) return toast.error(tValidation("requiredField"));
-      details.push({ key: "Hours", value: [`${duration} hours`] });
+      if (duration)
+        details.push({ key: "Hours", value: [`${duration} hours`] });
 
       const status = form.getFieldValue("status");
-      if (!status) return toast.error(tValidation("requiredField"));
-      details.push({ key: "Status", value: [status] });
+      if (status) details.push({ key: "Status", value: [status] });
 
       const organization = findManyOrganizations.data?.nodes.find(
         (org) => org.id === form.getFieldValue("organizationId")
       );
-      if (!organization) return toast.error(tValidation("requiredField"));
 
-      const organizationName = organization.name;
-      details.push({ key: "Organization Name", value: [organizationName] });
+      if (organization) {
+        details.push({ key: "Organization Name", value: [organization.name] });
 
-      const organizationDescription = pickTranslation(
-        organization.i18n,
-        fieldGroup.locale
-      )?.messages.description;
-      if (organizationDescription)
-        details.push({
-          key: "Organization Description",
-          value: [organizationDescription],
-        });
+        const organizationDescription = pickTranslation(
+          organization.i18n,
+          fieldGroup.locale
+        )?.messages.description;
+        if (organizationDescription)
+          details.push({
+            key: "Organization Description",
+            value: [organizationDescription],
+          });
+      }
 
       const language = fieldGroup.locale;
       if (language) details.push({ key: "Language", value: [language] });
@@ -265,8 +264,10 @@ export function CourseForm({
     ) => {
       const raw = fieldValue as string;
 
-      if (raw.trim().length <= RawSizeEnum.XSMALL)
-        return toast.error(tValidation("minLength", { value: 64 }));
+      if (!hasLength(raw, { min: RawSizeEnum.XSMALL }))
+        return toast.error(
+          tValidation("minLength", { value: RawSizeEnum.XSMALL })
+        );
 
       const translated = await translate.mutateAsync({
         raw,
