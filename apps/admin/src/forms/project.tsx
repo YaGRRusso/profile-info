@@ -307,6 +307,7 @@ export function ProjectForm({
             label={tForm("fields.image.label")}
             onAdd={() => arrayField.pushValue("")}
             onRemove={(index) => arrayField.removeValue(index)}
+            tooltip={tForm("fields.image.tooltip")}
             values={arrayField.state.value}
           >
             {(index) => (
@@ -314,9 +315,11 @@ export function ProjectForm({
                 {(field) => (
                   <TextInput
                     error={fieldError(field.state.meta)}
+                    label={tForm("fields.image.label")}
                     name={field.name}
                     onChange={field.handleChange}
                     placeholder={tForm("fields.image.placeholder")}
+                    tooltip={tForm("fields.image.tooltip")}
                     value={field.state.value}
                   />
                 )}
@@ -338,6 +341,7 @@ export function ProjectForm({
             label={tForm("fields.link.label")}
             onAdd={() => arrayField.pushValue({ title: "", value: "" })}
             onRemove={(index) => arrayField.removeValue(index)}
+            tooltip={tForm("fields.link.tooltip")}
             values={arrayField.state.value}
           >
             {(index) => (
@@ -346,9 +350,11 @@ export function ProjectForm({
                   {(field) => (
                     <TextInput
                       error={fieldError(field.state.meta)}
+                      label={tForm("fields.linkTitle.label")}
                       name={field.name}
                       onChange={field.handleChange}
                       placeholder={tForm("fields.linkTitle.placeholder")}
+                      tooltip={tForm("fields.linkTitle.tooltip")}
                       value={field.state.value}
                     />
                   )}
@@ -358,9 +364,11 @@ export function ProjectForm({
                     <TextInput
                       ai
                       error={fieldError(field.state.meta)}
+                      label={tForm("fields.linkUrl.label")}
                       name={field.name}
                       onChange={field.handleChange}
                       placeholder={tForm("fields.linkUrl.placeholder")}
+                      tooltip={tForm("fields.linkUrl.tooltip")}
                       value={field.state.value}
                     />
                   )}
@@ -385,6 +393,7 @@ export function ProjectForm({
               arrayField.pushValue({ description: "", locale: "", title: "" })
             }
             onRemove={(index) => arrayField.removeValue(index)}
+            tooltip={tForm("fields.translation.tooltip")}
             values={arrayField.state.value}
           >
             {(index) => (

@@ -2,213 +2,217 @@
   "labels": {
     "optional": {
       "label": "Opcional",
-      "tooltip": "Este campo é opcional."
+      "tooltip": "Você pode deixar em branco."
     },
     "ai": {
       "label": "Contexto da IA",
-      "tooltip": "Este campo extrai informações do contexto externo para IA."
+      "tooltip": "Na otimização, a IA busca na web com este valor e usa o que encontrar para melhorar o texto."
     }
   },
   "fields": {
     "slug": {
       "label": "Identificador Único",
       "placeholder": "ex.: meu-identificador",
-      "tooltip": "Código curto sem espaços. Serve para o sistema achar este item."
+      "tooltip": "ID estável deste item. Use só letras minúsculas, números e hífens — sem espaços."
     },
     "email": {
       "label": "E-mail",
       "placeholder": "ex.: voce@exemplo.com",
-      "tooltip": "E-mail usado para entrar na conta."
+      "tooltip": "Endereço usado para entrar na conta."
     },
     "password": {
       "label": "Senha",
       "placeholder": "ex.: abc#123",
-      "tooltip": "Senha usada para entrar na conta."
+      "tooltip": "Segredo usado para entrar na conta."
     },
     "locale": {
       "label": "Idioma",
       "placeholder": "Escolha um...",
-      "tooltip": "Idioma em que este texto aparece no currículo."
+      "tooltip": "Versão de idioma deste texto no currículo."
     },
     "description": {
       "label": "Descrição",
       "placeholder": "Escreva uma breve descrição...",
-      "tooltip": "Texto explicativo que aparece no currículo."
+      "tooltip": "Texto principal deste item no currículo."
     },
     "translation": {
       "label": "Tradução",
-      "tooltip": "O mesmo conteúdo em outro idioma."
+      "tooltip": "Outra versão de idioma deste conteúdo. Cada idioma só pode aparecer uma vez."
     },
     "link": {
       "label": "Link",
-      "tooltip": "Endereço na web com um nome fácil de entender."
+      "tooltip": "URL com nome legível que o leitor pode abrir no currículo ou no perfil."
     },
     "linkTitle": {
-      "placeholder": "ex.: Site, Portfólio, Demo"
+      "label": "Título",
+      "placeholder": "ex.: Site, Portfólio, Demo",
+      "tooltip": "Rótulo visível do link (não é a URL)."
     },
     "linkUrl": {
-      "placeholder": "ex.: https://exemplo.com"
+      "label": "URL",
+      "placeholder": "ex.: https://exemplo.com",
+      "tooltip": "Endereço completo. Deve começar com https:// ou http://."
     },
     "image": {
       "label": "Imagem",
       "placeholder": "ex.: https://exemplo.com",
-      "tooltip": "Imagem que acompanha este item no perfil ou no currículo."
+      "tooltip": "URL da imagem exibida com este item."
     },
     "skills": {
       "label": "Habilidades",
       "placeholder": "Digite para buscar...",
-      "tooltip": "Habilidades que este item demonstra."
+      "tooltip": "Habilidades demonstradas por este item. Escolha no catálogo."
     },
     "profileSkills": {
       "label": "Habilidades",
       "placeholder": "Digite para buscar...",
-      "tooltip": "Habilidades em destaque, na ordem do currículo."
+      "tooltip": "Habilidades listadas no currículo. A ordem daqui é a ordem no currículo."
     },
     "relevance": {
       "label": "Relevância",
-      "tooltip": "Quanto destaque este item terá no currículo."
+      "tooltip": "Prioridade no currículo. Valores maiores aparecem antes e pesam mais."
     },
     "period": {
       "label": "Período",
-      "tooltip": "Quando começou e quando terminou."
+      "tooltip": "Datas de início e fim. Deixe o fim vazio se ainda estiver em andamento."
     },
     "hours": {
       "label": "Horas",
       "placeholder": "ex.: 24",
-      "tooltip": "Quantas horas durou o curso ou treinamento."
+      "tooltip": "Duração total do curso ou treinamento, em horas."
     },
     "url": {
       "label": "URL",
       "placeholder": "ex.: https://exemplo.com",
-      "tooltip": "Página na web ligada a este item."
+      "tooltip": "Página principal deste item (certificado, página do curso e similares)."
     },
     "organization": {
       "label": "Organização",
       "placeholder": "Escolha um...",
-      "tooltip": "Empresa ou escola ligada a este item."
+      "tooltip": "Empresa, escola ou instituição ligada a este item."
     },
     "level": {
       "label": "Nível",
       "placeholder": "Escolha um...",
-      "tooltip": "Nível do estudo — médio, técnico, superior e afins."
+      "tooltip": "Nível de escolaridade (médio, técnico, graduação e similares)."
     },
     "status": {
       "label": "Status",
       "placeholder": "Escolha um...",
-      "tooltip": "Se está em andamento, concluído ou em outra situação."
+      "tooltip": "Situação atual: em andamento, concluído ou outra opção."
     },
     "role": {
       "label": "Função",
-      "tooltip": "Cargo que você exerceu neste emprego."
+      "tooltip": "Um cargo neste empregador. Você pode adicionar mais de um."
     },
     "userRole": {
       "label": "Papel da conta",
       "placeholder": "Escolha um...",
-      "tooltip": "Controla o acesso administrativo desta conta."
+      "tooltip": "Nível de acesso admin desta conta (usuário ou super admin)."
     },
     "permissions": {
       "label": "Permissões",
       "placeholder": "Escolha um ou mais...",
-      "tooltip": "Se o token só lê dados ou também pode alterá-los."
+      "tooltip": "O que este token de API pode fazer: só ler, ou também criar e atualizar dados."
     },
     "expiresAt": {
       "label": "Expira em",
-      "tooltip": "Até quando este token continua válido."
+      "tooltip": "Data a partir da qual este token deixa de funcionar."
     },
     "logo": {
       "label": "Logo",
       "placeholder": "ex.: https://exemplo.com",
-      "tooltip": "Logo da empresa ou escola."
+      "tooltip": "URL do logo da organização."
     },
     "website": {
       "label": "Site",
       "placeholder": "ex.: https://exemplo.com",
-      "tooltip": "Site oficial desta empresa ou escola."
+      "tooltip": "Site oficial desta organização. Usado na busca web da IA ao otimizar."
     },
     "nickname": {
       "label": "Apelido",
       "placeholder": "ex.: joaosilva",
-      "tooltip": "Como você quer aparecer no perfil, em formato curto."
+      "tooltip": "Identificador curto público no perfil."
     },
     "birthDate": {
       "label": "Data de nascimento",
       "placeholder": "AAAA-MM-DD",
-      "tooltip": "Sua data de nascimento no perfil."
+      "tooltip": "Data de nascimento salva no perfil."
     },
     "avatarUrl": {
       "label": "Foto de perfil",
       "placeholder": "ex.: https://exemplo.com",
-      "tooltip": "Foto que aparece no seu perfil."
+      "tooltip": "URL da foto de perfil."
     },
     "phone": {
       "label": "Telefone",
       "placeholder": "ex.: 11 99999-9999",
-      "tooltip": "Telefone para contato."
+      "tooltip": "Telefone de contato."
     },
     "address": {
       "label": "Endereço",
       "placeholder": "ex.: Rua, Cidade, Estado, País",
-      "tooltip": "Onde você mora ou atua."
+      "tooltip": "Localização mostrada no perfil (cidade, região, país)."
     },
     "newPassword": {
       "label": "Nova senha",
       "placeholder": "ex.: abc#123",
-      "tooltip": "Nova senha para entrar na conta."
+      "tooltip": "Substitui a senha atual de acesso."
     },
     "profileName": {
       "label": "Nome",
       "placeholder": "ex.: João Silva",
-      "tooltip": "Seu nome no perfil e no currículo."
+      "tooltip": "Nome completo no perfil e no currículo."
     },
     "organizationName": {
       "label": "Nome",
       "placeholder": "ex.: Empresa XYZ",
-      "tooltip": "Como a empresa ou escola se chama."
+      "tooltip": "Nome da empresa ou escola. Usado na busca web da IA ao otimizar."
     },
     "apiTokenName": {
       "label": "Nome",
       "placeholder": "ex.: Token do Pipeline",
-      "tooltip": "Nome para reconhecer este token na lista."
+      "tooltip": "Rótulo que identifica este token na lista."
     },
     "skillCategory": {
       "label": "Categoria",
       "placeholder": "ex.: Soft Skills, Saúde, Escritório",
-      "tooltip": "Grupo que junta habilidades parecidas no currículo."
+      "tooltip": "Nome do grupo de habilidades parecidas no currículo."
     },
     "organizationCategory": {
       "label": "Categoria",
       "placeholder": "Escolha um...",
-      "tooltip": "Se é empresa, escola ou outro tipo."
+      "tooltip": "Tipo de organização: empresa, escola ou outro."
     },
     "experienceCategory": {
       "label": "Categoria",
       "placeholder": "Escolha um...",
-      "tooltip": "Formato do trabalho — CLT, freela, estágio e afins."
+      "tooltip": "Tipo de vínculo: CLT, freela, estágio e similares."
     },
     "skillTitle": {
       "label": "Título",
       "placeholder": "ex.: Atendimento, Excel, Liderança",
-      "tooltip": "Como a habilidade aparece no currículo."
+      "tooltip": "Nome da habilidade como aparece no currículo."
     },
     "profileTitle": {
       "label": "Título",
       "placeholder": "ex.: Gerente de Loja, Enfermeiro",
-      "tooltip": "Cargo ou frase curta no topo do currículo."
+      "tooltip": "Headline abaixo do seu nome no currículo."
     },
     "experienceTitle": {
       "label": "Título",
       "placeholder": "ex.: Líder de Equipe, Vendedor",
-      "tooltip": "Nome do cargo nesta função."
+      "tooltip": "Cargo desta função no currículo."
     },
     "educationTitle": {
       "label": "Título",
       "placeholder": "ex.: Administração, Enfermagem",
-      "tooltip": "Nome do curso ou diploma."
+      "tooltip": "Nome do curso ou diploma no currículo."
     },
     "courseTitle": {
       "label": "Título",
       "placeholder": "ex.: Segurança Alimentar, Primeiros Socorros",
-      "tooltip": "Nome do curso, treinamento ou certificado."
+      "tooltip": "Nome do curso ou certificado no currículo."
     },
     "projectTitle": {
       "label": "Título",
@@ -219,24 +223,24 @@
   "sections": {
     "translations": {
       "label": "Traduções",
-      "tooltip": "Título e descrição em outros idiomas."
+      "tooltip": "Título e descrição localizados. Adicione um bloco por idioma."
     },
     "images": {
       "label": "Imagens",
-      "tooltip": "Fotos que mostram este projeto."
+      "tooltip": "URLs extras de imagem deste projeto."
     },
     "links": {
       "label": "Links",
-      "tooltip": "Sites e endereços ligados a este projeto."
+      "tooltip": "Sites relacionados (demo, repositório, case e similares)."
     },
     "roles": {
       "title": {
         "label": "Funções",
-        "tooltip": "Cargos que você ocupou neste emprego."
+        "tooltip": "Cargos neste empregador, na ordem do currículo."
       },
       "translations": {
         "label": "Traduções",
-        "tooltip": "Título e descrição de cada cargo em outros idiomas."
+        "tooltip": "Título e descrição localizados desta função."
       }
     },
     "personal": "Pessoal",
@@ -247,27 +251,27 @@
   "batch": {
     "changeCategory": {
       "label": "Alterar categoria",
-      "tooltip": "Nova categoria para os selecionados."
+      "tooltip": "Aplica esta categoria a todos os itens selecionados."
     },
     "changeLevel": {
       "label": "Alterar nível",
-      "tooltip": "Novo nível para as formações selecionadas."
+      "tooltip": "Aplica este nível a todas as formações selecionadas."
     },
     "changeStatus": {
       "label": "Alterar status",
-      "tooltip": "Nova situação para os selecionados."
+      "tooltip": "Aplica este status a todos os itens selecionados."
     },
     "changeRelevance": {
       "label": "Alterar relevância",
-      "tooltip": "Novo destaque no currículo para os selecionados."
+      "tooltip": "Aplica esta relevância a todos os itens selecionados."
     },
     "changePermissions": {
       "label": "Alterar permissões",
-      "tooltip": "Novas permissões para os tokens selecionados."
+      "tooltip": "Aplica estas permissões a todos os tokens selecionados."
     },
     "changeRole": {
       "label": "Alterar papel da conta",
-      "tooltip": "Novo papel administrativo para as contas selecionadas."
+      "tooltip": "Aplica este papel a todos os usuários selecionados."
     }
   },
   "ai": {

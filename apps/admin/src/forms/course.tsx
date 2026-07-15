@@ -351,6 +351,7 @@ export function CourseForm({
       <Field name="url">
         {(field) => (
           <TextInput
+            ai
             error={fieldError(field.state.meta)}
             label={tForm("fields.url.label")}
             name={field.name}
@@ -437,6 +438,7 @@ export function CourseForm({
               arrayField.pushValue({ description: "", locale: "", title: "" })
             }
             onRemove={(index) => arrayField.removeValue(index)}
+            tooltip={tForm("fields.translation.tooltip")}
             values={arrayField.state.value}
           >
             {(index) => (

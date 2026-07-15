@@ -144,6 +144,7 @@ export function SkillForm({
             label={tForm("fields.translation.label")}
             onAdd={() => arrayField.pushValue({ locale: "", title: "" })}
             onRemove={(index) => arrayField.removeValue(index)}
+            tooltip={tForm("fields.translation.tooltip")}
             values={arrayField.state.value}
           >
             {(index) => (

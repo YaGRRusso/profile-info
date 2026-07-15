@@ -2,6 +2,7 @@ import {
   ArrowDownIcon,
   ArrowUpIcon,
   PlusIcon,
+  QuestionIcon,
   TrashSimpleIcon,
   WarningIcon,
 } from "@phosphor-icons/react";
@@ -9,6 +10,7 @@ import { type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import { cn } from "@/lib/cn";
 import { Alert } from "../display/alert";
+import { FormTooltip } from "./tooltip";
 
 export interface FieldArrayProps {
   children: (index: number) => ReactNode;
@@ -19,6 +21,7 @@ export interface FieldArrayProps {
   onMoveUp?: (index: number) => void;
   onRemove: (index: number) => void;
   sublevel?: boolean;
+  tooltip?: string;
   values: unknown[];
 }
 
@@ -31,6 +34,7 @@ export function FieldArray({
   onMoveUp,
   onMoveDown,
   sublevel,
+  tooltip,
   values,
 }: FieldArrayProps) {
   const { t: tForm } = useTranslation("forms");
@@ -55,8 +59,13 @@ export function FieldArray({
             key={index}
           >
             <div className="flex items-center justify-between">
-              <span className="font-semibold">
+              <span className="flex items-center gap-1 font-semibold">
                 {[itemLabel, index + 1].join(" ")}
+                {tooltip && (
+                  <FormTooltip content={tooltip}>
+                    <QuestionIcon className="size-4 opacity-70" />
+                  </FormTooltip>
+                )}
               </span>
               <div className="flex gap-1">
                 {onMoveUp && (

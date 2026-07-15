@@ -406,6 +406,7 @@ export function ExperienceForm({
             onMoveDown={(index) => rolesField.swapValues(index, index + 1)}
             onMoveUp={(index) => rolesField.swapValues(index, index - 1)}
             onRemove={(index) => rolesField.removeValue(index)}
+            tooltip={tForm("fields.role.tooltip")}
             values={rolesField.state.value}
           >
             {(roleIndex) => (
@@ -457,6 +458,7 @@ export function ExperienceForm({
                       }
                       onRemove={(index) => i18nField.removeValue(index)}
                       sublevel
+                      tooltip={tForm("fields.translation.tooltip")}
                       values={i18nField.state.value}
                     >
                       {(i18nIndex) => (

@@ -255,6 +255,7 @@ export function OrganizationForm({
       <Field name="name">
         {(field) => (
           <TextInput
+            ai
             error={fieldError(field.state.meta)}
             label={tForm("fields.organizationName.label")}
             name={field.name}
@@ -324,6 +325,7 @@ export function OrganizationForm({
             label={tForm("fields.translation.label")}
             onAdd={() => arrayField.pushValue({ description: "", locale: "" })}
             onRemove={(index) => arrayField.removeValue(index)}
+            tooltip={tForm("fields.translation.tooltip")}
             values={arrayField.state.value}
           >
             {(index) => (

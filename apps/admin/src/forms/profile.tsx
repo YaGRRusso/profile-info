@@ -376,6 +376,7 @@ export function ProfileForm({
                 }
                 onRemove={(index) => arrayField.removeValue(index)}
                 sublevel
+                tooltip={tForm("fields.translation.tooltip")}
                 values={arrayField.state.value}
               >
                 {(index) => (
@@ -560,6 +561,7 @@ export function ProfileForm({
               onAdd={() => arrayField.pushValue({ title: "", value: "" })}
               onRemove={(index) => arrayField.removeValue(index)}
               sublevel
+              tooltip={tForm("fields.link.tooltip")}
               values={arrayField.state.value}
             >
               {(index) => (
@@ -568,9 +570,11 @@ export function ProfileForm({
                     {(field) => (
                       <TextInput
                         error={fieldError(field.state.meta)}
+                        label={tForm("fields.linkTitle.label")}
                         name={field.name}
                         onChange={field.handleChange}
                         placeholder={tForm("fields.linkTitle.placeholder")}
+                        tooltip={tForm("fields.linkTitle.tooltip")}
                         value={field.state.value}
                       />
                     )}
@@ -579,9 +583,11 @@ export function ProfileForm({
                     {(field) => (
                       <TextInput
                         error={fieldError(field.state.meta)}
+                        label={tForm("fields.linkUrl.label")}
                         name={field.name}
                         onChange={field.handleChange}
                         placeholder={tForm("fields.linkUrl.placeholder")}
+                        tooltip={tForm("fields.linkUrl.tooltip")}
                         value={field.state.value}
                       />
                     )}
