@@ -1,6 +1,11 @@
 import pLimit from "p-limit";
+import { TtlMemoryCache } from "@/common/cache/ttl-memory-cache";
 
-interface OrchestratorOptions {
+const DEFAULT_CACHE_TTL_MS = 10 * 60 * 1000; // 10 minutes
+const cache = new TtlMemoryCache<unknown>(DEFAULT_CACHE_TTL_MS);
+
+interface OrchestratorOptions<T> {
+  cacheKey?: (item: T) => string;
   concurrency?: number;
   timeoutMs?: number;
 }
@@ -8,18 +13,28 @@ interface OrchestratorOptions {
 export async function orchestrate<T, R>(
   items: T[],
   taskFn: (item: T) => Promise<R[]>,
-  options: OrchestratorOptions = {}
+  options: OrchestratorOptions<T> = {}
 ): Promise<R[]> {
-  const { concurrency = 5, timeoutMs = 30_000 } = options;
+  const { cacheKey, concurrency = 5, timeoutMs = 30_000 } = options;
   const limit = pLimit(concurrency);
 
   const promises = items.map((item) =>
     limit(async () => {
       try {
+        if (cacheKey) {
+          const key = cacheKey(item);
+          const hit = cache.get(key);
+          if (Array.isArray(hit)) return hit;
+
+          const result = await taskFn(item);
+          cache.set(key, result);
+          return result;
+        }
+
         return await taskFn(item);
       } catch (error) {
         console.error("[Orchestrator] Failed Process:", error);
-        return [] as R[];
+        return [];
       }
     })
   );

@@ -114,6 +114,7 @@ export class ContextService {
     type: ResourceType
   ): Promise<DetailInput[]> {
     return orchestrate(tasks, (task) => this.runSingleTask(task, type), {
+      cacheKey: (task) => `ai-context:${task.mode}:${task.value}:${type}`,
       concurrency: 5,
       timeoutMs: 30_000,
     });
