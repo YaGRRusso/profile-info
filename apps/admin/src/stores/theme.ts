@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 
-type Theme = "dracula" | "light";
+type Theme = "dark" | "light";
 
 interface ThemeStore {
   setTheme: (theme: Theme) => void;
@@ -12,7 +12,7 @@ export const useThemeStore = create<ThemeStore>()(
   persist(
     (set) => ({
       setTheme: (theme) => set({ theme }),
-      theme: "dracula",
+      theme: "dark",
     }),
     { name: "theme", storage: createJSONStorage(() => localStorage) }
   )

@@ -3,7 +3,7 @@
   logs: false;
   themes:
     light --default,
-    dracula --prefersdark;
+    dark --prefersdark;
 }
 
 @layer base {

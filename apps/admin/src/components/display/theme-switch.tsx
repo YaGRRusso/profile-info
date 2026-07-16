@@ -7,7 +7,7 @@ interface ThemeSwitchProps extends ComponentProps<"label"> {}
 
 export function ThemeSwitch({ className, ...props }: ThemeSwitchProps) {
   const { theme, setTheme } = useThemeStore();
-  const isDark = theme === "dracula";
+  const isDark = theme === "dark";
 
   useEffect(() => {
     document.documentElement.dataset.theme = theme;
@@ -23,9 +23,7 @@ export function ThemeSwitch({ className, ...props }: ThemeSwitchProps) {
     >
       <input
         checked={isDark}
-        onChange={(event) =>
-          setTheme(event.target.checked ? "dracula" : "light")
-        }
+        onChange={(event) => setTheme(event.target.checked ? "dark" : "light")}
         type="checkbox"
       />
       <SunIcon aria-hidden className="size-full p-1" />

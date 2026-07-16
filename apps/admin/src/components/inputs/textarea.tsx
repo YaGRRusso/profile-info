@@ -82,10 +82,10 @@ export function TextareaInput({
       </AuraField>
       <div className="scrollbar-thin flex items-center justify-between gap-x-4 overflow-x-auto">
         {error && <p className="label text-error">{error}</p>}
-        <div className="ml-auto flex items-center gap-1">
+        <div className="ml-auto flex items-center gap-2">
           {onTranslate && (
             <button
-              className="btn btn-xs group"
+              className="btn btn-ghost btn-xs group"
               disabled={aiDisabled}
               onClick={onTranslate}
               type="button"
@@ -98,7 +98,7 @@ export function TextareaInput({
           )}
           {onOptimize && (
             <button
-              className="btn btn-xs group"
+              className="btn btn-ghost btn-xs group"
               disabled={aiDisabled}
               onClick={onOptimize}
               type="button"

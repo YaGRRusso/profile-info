@@ -11,11 +11,11 @@ export function Auth() {
   const [mode, setMode] = useState<AuthMode>("signIn");
 
   return (
-    <main className="container flex h-screen flex-col items-center justify-center gap-4">
-      <div className="flex w-full max-w-2xl flex-wrap rounded bg-base-200">
-        <AuthBrandPanel className="min-h-80 flex-1 rounded-l" />
-        <div className="flex min-w-64 flex-2 flex-col p-12 max-sm:p-4">
-          <div className="flex flex-col justify-center gap-8">
+    <main className="container flex min-h-dvh flex-col justify-center gap-4 py-8 sm:py-16">
+      <div className="grid w-full overflow-hidden rounded-lg bg-base-200 lg:grid-cols-2">
+        <AuthBrandPanel className="order-2 lg:order-1" />
+        <div className="order-1 flex min-w-0 flex-col justify-center p-5 sm:p-8 lg:order-2 lg:p-10">
+          <div className="mx-auto flex w-full flex-col justify-center gap-8">
             {mode === "signIn" && (
               <SignIn onSwitchToSignUp={() => setMode("signUp")} />
             )}
@@ -25,7 +25,7 @@ export function Auth() {
           </div>
         </div>
       </div>
-      <div className="flex w-full max-w-2xl items-center justify-between gap-2">
+      <div className="flex w-full items-center justify-between gap-2">
         <LocaleSwitch />
         <ThemeSwitch />
       </div>

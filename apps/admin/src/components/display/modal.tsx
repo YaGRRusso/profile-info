@@ -37,7 +37,7 @@ export function Modal({
         )}
         {...props}
       >
-        <div className="modal-box flex max-w-xl flex-col overflow-hidden p-0">
+        <div className="modal-box flex max-w-3xl flex-col overflow-hidden p-0">
           <button
             className="btn btn-sm btn-circle btn-ghost absolute top-2 right-2"
             onClick={onClose}
