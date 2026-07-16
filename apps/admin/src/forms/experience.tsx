@@ -2,7 +2,7 @@ import { DeepKeys, DeepValue, useForm } from "@tanstack/react-form";
 import { compact } from "lodash";
 import { useCallback, useMemo } from "react";
 import { useTranslation } from "react-i18next";
-import { toast } from "react-toastify";
+import { toast } from "sonner";
 import z from "zod";
 import { DateRangeInput } from "@/components/inputs/date-range";
 import { FormDivider } from "@/components/inputs/divider";

@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { toast } from "react-toastify";
+import { toast } from "sonner";
 import { DataState } from "@/components/display/data-state";
 import { PageTitle } from "@/components/display/page-title";
 import { ProfileForm, profileToForm, profileToInput } from "@/forms/profile";

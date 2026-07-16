@@ -24,7 +24,7 @@ provides CRUD screens for the profile data. It deploys to GitHub Pages.
 
 ```
 src/
-├── main.tsx                  # Entry: QueryClient, RouterProvider, ToastContainer.
+├── main.tsx                  # Entry: QueryClient, RouterProvider, Sonner Toaster.
 ├── routeTree.gen.ts          # Generated route tree (do not edit by hand).
 ├── routes/                   # File-based routes (TanStack Router).
 │   ├── __root.tsx            # Root layout; NuqsAdapter; error/not-found boundaries.

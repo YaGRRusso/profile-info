@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next";
-import { toast } from "react-toastify";
+import { toast } from "sonner";
 import { SignUpForm } from "@/forms/sign-up";
 import { useSignUp } from "@/hooks/mutations/auth";
 

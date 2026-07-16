@@ -1,7 +1,7 @@
 import { DeepKeys, DeepValue, useForm } from "@tanstack/react-form";
 import { useCallback, useMemo } from "react";
 import { useTranslation } from "react-i18next";
-import { toast } from "react-toastify";
+import { toast } from "sonner";
 import z from "zod";
 import { FormDivider } from "@/components/inputs/divider";
 import { FieldArray } from "@/components/inputs/field-array";

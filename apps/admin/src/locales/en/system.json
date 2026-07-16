@@ -2,5 +2,5 @@
   "profileUnsaved": "You have unsaved changes",
   "language": "Language",
   "slowRequestTitle": "This is taking a bit longer!",
-  "slowRequestDescription": "The server may be starting up after a period of inactivity..."
+  "slowRequestDescription": "The server may be starting up after a period of inactivity. Keep waiting."
 }

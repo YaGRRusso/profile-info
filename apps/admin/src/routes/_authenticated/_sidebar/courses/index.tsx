@@ -6,7 +6,7 @@ import {
 import { createFileRoute } from "@tanstack/react-router";
 import { useCallback, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { toast } from "react-toastify";
+import { toast } from "sonner";
 import { Alert } from "@/components/display/alert";
 import { DataState } from "@/components/display/data-state";
 import { Json } from "@/components/display/json";

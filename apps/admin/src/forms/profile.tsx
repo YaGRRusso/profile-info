@@ -1,7 +1,7 @@
 import { DeepKeys, DeepValue, useForm } from "@tanstack/react-form";
 import { useCallback, useEffect, useMemo } from "react";
 import { useTranslation } from "react-i18next";
-import { toast } from "react-toastify";
+import { toast } from "sonner";
 import z from "zod";
 import { FormDivider } from "@/components/inputs/divider";
 import { DraggableList } from "@/components/inputs/draggable-list";

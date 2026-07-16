@@ -19,7 +19,7 @@ Entry point `src/main.tsx`:
 - `SlowRequestWatcher`: `useIsFetching` + `useIsMutating`; after 8s pending → sticky warning toast (`system.slowRequest*`), dismissed when traffic clears.
 - Auth store subscription: token set → null clears `queryClient`.
 - Router from `routeTree.gen.ts` with `basepath: import.meta.env.BASE_URL`.
-- `QueryClientProvider` > `ToastContainer` + `SlowRequestWatcher` + `RouterProvider`.
+- `QueryClientProvider` > Sonner `Toaster` + `SlowRequestWatcher` + `RouterProvider`.
 
 Data flow: GraphQL hooks call `execute()` from `src/lib/execute.ts` (POST to `VITE_API_URL`). REST/binary endpoints use `apiRequest()` from `src/lib/api.ts` (`getApiOrigin()` strips the `/graphql` suffix from `VITE_API_URL`). JWT is attached on both when present; GraphQL `UNAUTHENTICATED` clears auth via `execute` + store subscription.
 
@@ -48,6 +48,7 @@ Rich forms map flat Zod schemas to nested GraphQL shapes (`i18n`, `organizationI
 - **i18next**: `src/i18n/index.ts`; namespaces in `src/locales/<locale>/`. Prefixed aliases (`tPage`, `tAction`, `tForm`, `tNav`, `tTable`, …). Explicit literal keys per call site; generic keys (e.g. `charts.count`, `fieldArray.emptyTitle`) live inside the shared component — not passed as props. See ADR 002.
 - **Recharts**: shared chart styling in `src/lib/chart-theme.ts` (theme colors, tooltips, axis props).
 - **nuqs**: URL state via `NuqsAdapter` in `__root.tsx`.
+- **sonner**: toasts (`toast` from `sonner`; `Toaster` in `components/display/toaster.tsx` styled with DaisyUI tokens).
 
 ## Module / directory breakdown
 
