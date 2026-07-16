@@ -2,18 +2,22 @@ import { useIsFetching, useIsMutating } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
+import { useStagedProgress } from "@/hooks/custom/use-staged-progress";
 
-export const SLOW_REQUEST_MS = 1;
+export const SLOW_REQUEST_MS = 10_000;
 const SLOW_REQUEST_TOAST_ID = "slow-request";
 
 function SlowRequestToastDescription({ text }: { text: string }) {
+  const progress = useStagedProgress(true);
+
   return (
     <div className="flex flex-col gap-2">
       <span>{text}</span>
-      {/* No value → DaisyUI indeterminate animation; never implies a finish time */}
       <progress
         aria-label={text}
         className="progress progress-warning w-full"
+        max={100}
+        value={progress}
       />
     </div>
   );
@@ -36,7 +40,7 @@ export function SlowRequestWatcher() {
 
   useEffect(() => {
     if (!isSlow) {
-      // toast.dismiss(SLOW_REQUEST_TOAST_ID);
+      toast.dismiss(SLOW_REQUEST_TOAST_ID);
       return;
     }
 
