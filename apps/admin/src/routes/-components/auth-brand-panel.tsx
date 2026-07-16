@@ -1,9 +1,12 @@
 import {
   BrowserIcon,
+  CaretDownIcon,
+  CaretUpIcon,
   FilePdfIcon,
   SparkleIcon,
   StackIcon,
 } from "@phosphor-icons/react";
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { cn } from "@/lib/cn";
 
@@ -33,6 +36,8 @@ export interface AuthBrandPanelProps {
 export function AuthBrandPanel({ className }: AuthBrandPanelProps) {
   const { t: tAuth } = useTranslation("auth");
 
+  const [isDetailsVisible, setIsDetailsVisible] = useState(false);
+
   const features = [
     {
       description: tAuth("marketing.features.profile.description"),
@@ -59,7 +64,7 @@ export function AuthBrandPanel({ className }: AuthBrandPanelProps) {
   return (
     <section
       className={cn(
-        "relative isolate overflow-hidden bg-base-content bg-linear-to-br from-primary via-primary to-secondary p-5 text-primary-content sm:p-6 lg:p-10",
+        "relative isolate overflow-hidden bg-linear-to-br from-primary/80 via-primary/80 to-secondary/80 p-6 text-primary-content sm:p-8 lg:p-10",
         className
       )}
     >
@@ -74,19 +79,36 @@ export function AuthBrandPanel({ className }: AuthBrandPanelProps) {
           </p>
         </div>
 
-        <div className="grid w-full gap-2 sm:grid-cols-2">
+        <div className="grid w-full grid-cols-1 gap-2 sm:grid-cols-2">
           {features.map(({ description, Icon, title }) => (
             <article
-              className="flex items-center gap-2 rounded border border-base-content/20 bg-base-200/10 p-3 backdrop-blur-sm sm:block"
+              className="flex flex-col items-center gap-2 rounded border border-base-content/20 bg-base-200/10 p-4 backdrop-blur-sm"
               key={title}
             >
-              <Icon className="shrink-0 sm:mb-2" size={22} weight="duotone" />
-              <h3 className="font-semibold text-sm sm:text-base">{title}</h3>
-              <p className="hidden text-sm opacity-lg sm:block">
+              <div className="flex w-full gap-2 sm:flex-col">
+                <Icon className="shrink-0" size={22} weight="duotone" />
+                <h3 className="font-semibold text-sm sm:text-base">{title}</h3>
+              </div>
+              <p
+                className={cn(
+                  "text-sm opacity-lg",
+                  isDetailsVisible && "max-sm:hidden"
+                )}
+              >
                 {description}
               </p>
             </article>
           ))}
+          <button
+            className="btn btn-ghost btn-sm col-span-full border-none shadow-none hover:bg-base-content/10 hover:text-base-content sm:hidden"
+            onClick={() => setIsDetailsVisible(!isDetailsVisible)}
+            type="button"
+          >
+            {isDetailsVisible
+              ? tAuth("marketing.showDetails")
+              : tAuth("marketing.hideDetails")}
+            {isDetailsVisible ? <CaretDownIcon /> : <CaretUpIcon />}
+          </button>
         </div>
       </div>
     </section>

@@ -14,7 +14,7 @@ export function Auth() {
     <main className="container flex min-h-dvh flex-col justify-center gap-4 py-8 sm:py-16">
       <div className="grid w-full overflow-hidden rounded-lg bg-base-200 lg:grid-cols-2">
         <AuthBrandPanel className="order-2 lg:order-1" />
-        <div className="order-1 flex min-w-0 flex-col justify-center p-5 sm:p-8 lg:order-2 lg:p-10">
+        <div className="order-1 flex min-w-0 flex-col justify-center p-6 sm:p-8 lg:order-2 lg:p-10">
           <div className="mx-auto flex w-full flex-col justify-center gap-8">
             {mode === "signIn" && (
               <SignIn onSwitchToSignUp={() => setMode("signUp")} />
