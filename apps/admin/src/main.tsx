@@ -8,6 +8,7 @@ import { createRouter, RouterProvider } from "@tanstack/react-router";
 import { StrictMode } from "react";
 import ReactDOM from "react-dom/client";
 import { ToastContainer, toast } from "react-toastify";
+import { SlowRequestWatcher } from "@/components/display/slow-request-watcher";
 import { GqlClientError } from "@/lib/gql";
 import { useAuthStore } from "@/stores/auth";
 import { useSystemMessagesStore } from "@/stores/system-messages";
@@ -74,6 +75,7 @@ if (!rootElement.innerHTML) {
     <StrictMode>
       <QueryClientProvider client={queryClient}>
         <ToastContainer autoClose={3000} />
+        <SlowRequestWatcher />
         <RouterProvider router={router} />
       </QueryClientProvider>
     </StrictMode>

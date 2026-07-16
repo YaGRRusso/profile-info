@@ -4,6 +4,7 @@ import { Test, TestingModule } from "@nestjs/testing";
 import { CredentialKind } from "@/core/enums/credential-kind.enum";
 import { UserRole } from "@/core/enums/user-role.enum";
 import { PERSISTENCE_NOT_FOUND } from "@/core/persistence/persistence.messages";
+import { USER_ACCOUNT_DISABLED } from "@/modules/users/users.messages";
 import { UsersService } from "@/modules/users/users.service";
 import { UsersValidatorService } from "@/modules/users/users-validator.service";
 import { JwtStrategy } from "./jwt.strategy";
@@ -82,7 +83,7 @@ describe("JwtStrategy", () => {
       });
       (mockUsersValidator.assertUserEnabled as jest.Mock).mockImplementation(
         () => {
-          throw new UnauthorizedException();
+          throw new UnauthorizedException(USER_ACCOUNT_DISABLED);
         }
       );
 

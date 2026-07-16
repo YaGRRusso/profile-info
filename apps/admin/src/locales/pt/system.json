@@ -1,4 +1,6 @@
 {
   "profileUnsaved": "Você tem alterações não salvas",
-  "language": "Idioma"
+  "language": "Idioma",
+  "slowRequestTitle": "Está demorando um pouco!",
+  "slowRequestDescription": "O servidor pode estar iniciando após um período de inatividade. Continue aguardando um pouco mais."
 }

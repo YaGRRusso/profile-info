@@ -3,6 +3,7 @@ import { JwtService } from "@nestjs/jwt";
 import { Test, TestingModule } from "@nestjs/testing";
 import { compare } from "bcryptjs";
 import { UserRole } from "@/core/enums/user-role.enum";
+import { USER_ACCOUNT_DISABLED } from "@/modules/users/users.messages";
 import { UsersService } from "@/modules/users/users.service";
 import { UsersValidatorService } from "@/modules/users/users-validator.service";
 import { AuthService } from "./auth.service";
@@ -94,7 +95,7 @@ describe("AuthService", () => {
       (compare as jest.Mock).mockResolvedValue(true);
       (mockUsersValidator.assertUserEnabled as jest.Mock).mockImplementation(
         () => {
-          throw new UnauthorizedException();
+          throw new UnauthorizedException(USER_ACCOUNT_DISABLED);
         }
       );
 

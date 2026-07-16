@@ -16,15 +16,16 @@ The admin dashboard for profile-info: a React 19 + Vite SPA that authenticates a
 Entry point `src/main.tsx`:
 
 - `QueryClient` with `QueryCache.onError` and `MutationCache.onError` → `toast.error`; queries: `staleTime: Infinity` (refetch only via `refetch()` / `invalidateQueries()`), `refetchOnWindowFocus: false`, `retryDelay: 60s`, no retry on `GqlClientError`.
+- `SlowRequestWatcher`: `useIsFetching` + `useIsMutating`; after 8s pending → sticky warning toast (`system.slowRequest*`), dismissed when traffic clears.
 - Auth store subscription: token set → null clears `queryClient`.
 - Router from `routeTree.gen.ts` with `basepath: import.meta.env.BASE_URL`.
-- `QueryClientProvider` > `ToastContainer` + `RouterProvider`.
+- `QueryClientProvider` > `ToastContainer` + `SlowRequestWatcher` + `RouterProvider`.
 
 Data flow: GraphQL hooks call `execute()` from `src/lib/execute.ts` (POST to `VITE_API_URL`). REST/binary endpoints use `apiRequest()` from `src/lib/api.ts` (`getApiOrigin()` strips the `/graphql` suffix from `VITE_API_URL`). JWT is attached on both when present; GraphQL `UNAUTHENTICATED` clears auth via `execute` + store subscription.
 
 Routing:
 
-- `_authenticated.tsx`: protected layout; `beforeLoad` awaits `waitForAuthHydration()` (`stores/auth.ts`), then `useGetMe()` when a token exists. Child routes mount only after session is valid — queries do not gate auth themselves. Unauthenticated → `Auth` shell (`-components/auth.tsx`), which toggles `SignIn` (`SignInForm` + `useSignIn`) and `SignUp` (`SignUpForm` + `useSignUp`) and includes shared `ThemeSwitch` / `LocaleSwitch` (`components/display/`, also used in the sidebar). Public GraphQL `register` (admin hook `useSignUp`) creates a disabled `USER` until a `SUPER_ADMIN` sets `disabled: false` via `updateOneUser`. Dev-only quick login (`DevQuickLogin` inside `SignIn`, `import.meta.env.DEV`) signs in as seed personas with password `123123` (includes `Pending`, which fails sign-in by design for approval-queue QA).
+- `_authenticated.tsx`: protected layout; `beforeLoad` awaits `waitForAuthHydration()` (`stores/auth.ts`), then `useGetMe()` when a token exists. Child routes mount only after session is valid — queries do not gate auth themselves. Unauthenticated → `Auth` shell (`-components/auth.tsx`), which toggles `SignIn` (`SignInForm` + `useSignIn`) and `SignUp` (`SignUpForm` + `useSignUp`) and includes shared `ThemeSwitch` / `LocaleSwitch` (`components/display/`, also used in the sidebar). Public GraphQL `register` (admin hook `useSignUp`) creates a disabled `USER` until a `SUPER_ADMIN` sets `disabled: false` via `updateOneUser`. Disabled-account sign-in fails with API message `USER_ACCOUNT_DISABLED` (shown as-is via global error toasts). `SlowRequestWatcher` in `main.tsx` watches all TanStack Query fetches/mutations and toasts a cold-start warning after 8s (`system.slowRequest*`). Dev-only quick login (`DevQuickLogin` inside `SignIn`, `import.meta.env.DEV`) signs in as seed personas with password `123123` (includes `Pending`, which fails sign-in by design for approval-queue QA).
 - `index.tsx`: dashboard via `useDashboard()` (stats + recharts).
 - `_authenticated/_sidebar/settings/`: profile form + `DownloadCvControl` in page header.
 - `_authenticated/_sidebar/`: CRUD pages per entity with `-components/table.tsx`.

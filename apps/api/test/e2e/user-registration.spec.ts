@@ -2,6 +2,7 @@ import { INestApplication } from "@nestjs/common";
 import { testSuperAdminContext } from "@test/fixtures/auth-context";
 import { App } from "supertest/types";
 import { UserRole } from "@/core/enums/user-role.enum";
+import { USER_ACCOUNT_DISABLED } from "@/modules/users/users.messages";
 import { UsersService } from "@/modules/users/users.service";
 import { clearTestDatabase } from "../support/clear-test-database";
 import { createTestApp } from "../support/create-test-app";
@@ -110,6 +111,7 @@ describe("User registration (e2e)", () => {
 
     expect(response.data?.signIn).toBeUndefined();
     expect(response.errors?.[0]?.extensions?.code).toBe("UNAUTHENTICATED");
+    expect(response.errors?.[0]?.message).toBe(USER_ACCOUNT_DISABLED);
   });
 
   it("allows sign-in after a super admin enables the user", async () => {
