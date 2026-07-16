@@ -92,7 +92,7 @@ export function AuthBrandPanel({ className }: AuthBrandPanelProps) {
               <p
                 className={cn(
                   "text-sm opacity-lg",
-                  isDetailsVisible && "max-sm:hidden"
+                  !isDetailsVisible && "max-sm:hidden"
                 )}
               >
                 {description}
@@ -105,9 +105,9 @@ export function AuthBrandPanel({ className }: AuthBrandPanelProps) {
             type="button"
           >
             {isDetailsVisible
-              ? tAuth("marketing.showDetails")
-              : tAuth("marketing.hideDetails")}
-            {isDetailsVisible ? <CaretDownIcon /> : <CaretUpIcon />}
+              ? tAuth("marketing.hideDetails")
+              : tAuth("marketing.showDetails")}
+            {isDetailsVisible ? <CaretUpIcon /> : <CaretDownIcon />}
           </button>
         </div>
       </div>
