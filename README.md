@@ -4,6 +4,34 @@ Backend and admin panel for managing a personal professional profile: skills, wo
 
 This is an npm workspaces monorepo (`apps/*`).
 
+## Why Profile Info
+
+- **Portfolio-ready backend:** Use the GraphQL API as the data source for your
+  own portfolio, website, app, or automation. Update your profile once and let
+  every connected experience use the same information.
+- **Complete professional profile:** Manage contact details, summaries, skills,
+  work experiences, roles, education, courses, certificates, organizations, and
+  projects in one structured place.
+- **AI-assisted writing:** Generate and refine professional summaries and
+  descriptions that communicate your experience and impact more clearly.
+- **Context-aware AI:** Enrich AI requests with content extracted from relevant
+  web pages or web search, giving generated text more useful context.
+- **Multilingual content:** Maintain profile information in multiple languages
+  and prepare the same professional story for different markets.
+- **Resume generation:** Export an up-to-date PDF resume directly from your
+  profile, with localized labels and content ordered by relevance.
+- **Secure integrations:** Create revocable API credentials with read-only or
+  read-and-write permissions for portfolios, scripts, and external tools.
+- **Connected career data:** Reuse skills and organizations across experiences,
+  education, courses, and projects instead of duplicating information.
+- **Profile insights:** Track completeness, statistics, charts, first steps, and
+  recent activity from the dashboard.
+- **Multi-user administration:** Support independent user data, role-based
+  access, registration approval, and secure tenant isolation.
+- **Modern admin experience:** Work with responsive forms, powerful tables,
+  batch actions, filtering, sorting, light and dark themes, and localized
+  English and Portuguese interfaces.
+
 ## Packages
 
 ### API (`@profile-info/api`) [Read Docs](./apps/api/README.md)

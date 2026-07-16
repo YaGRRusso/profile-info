@@ -1,8 +1,8 @@
 import {
+  BrowserIcon,
   FilePdfIcon,
   SparkleIcon,
   StackIcon,
-  TranslateIcon,
 } from "@phosphor-icons/react";
 import { useTranslation } from "react-i18next";
 import { cn } from "@/lib/cn";
@@ -35,19 +35,19 @@ export function AuthBrandPanel({ className }: AuthBrandPanelProps) {
 
   const features = [
     {
-      description: tAuth("marketing.features.organize.description"),
+      description: tAuth("marketing.features.profile.description"),
       Icon: StackIcon,
-      title: tAuth("marketing.features.organize.title"),
+      title: tAuth("marketing.features.profile.title"),
     },
     {
-      description: tAuth("marketing.features.optimize.description"),
+      description: tAuth("marketing.features.ai.description"),
       Icon: SparkleIcon,
-      title: tAuth("marketing.features.optimize.title"),
+      title: tAuth("marketing.features.ai.title"),
     },
     {
-      description: tAuth("marketing.features.translate.description"),
-      Icon: TranslateIcon,
-      title: tAuth("marketing.features.translate.title"),
+      description: tAuth("marketing.features.portfolio.description"),
+      Icon: BrowserIcon,
+      title: tAuth("marketing.features.portfolio.title"),
     },
     {
       description: tAuth("marketing.features.resume.description"),
