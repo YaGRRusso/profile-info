@@ -16,7 +16,7 @@ The admin dashboard for profile-info: a React 19 + Vite SPA that authenticates a
 Entry point `src/main.tsx`:
 
 - `QueryClient` with `QueryCache.onError` and `MutationCache.onError` → `toast.error`; queries: `staleTime: Infinity` (refetch only via `refetch()` / `invalidateQueries()`), `refetchOnWindowFocus: false`, `retryDelay: 60s`, no retry on `GqlClientError`.
-- `SlowRequestWatcher`: `useIsFetching` + `useIsMutating`; after 8s pending → sticky warning toast (`system.slowRequest*`), dismissed when traffic clears.
+- `SlowRequestWatcher`: `useIsFetching` + `useIsMutating`; after 5s pending → sticky warning toast (`system.slowRequest*`) with DaisyUI indeterminate progress, dismissed when traffic clears.
 - Auth store subscription: token set → null clears `queryClient`.
 - Router from `routeTree.gen.ts` with `basepath: import.meta.env.BASE_URL`.
 - `QueryClientProvider` > Sonner `Toaster` + `SlowRequestWatcher` + `RouterProvider`.
@@ -25,7 +25,7 @@ Data flow: GraphQL hooks call `execute()` from `src/lib/execute.ts` (POST to `VI
 
 Routing:
 
-- `_authenticated.tsx`: protected layout; `beforeLoad` awaits `waitForAuthHydration()` (`stores/auth.ts`), then `useGetMe()` when a token exists. Child routes mount only after session is valid — queries do not gate auth themselves. Unauthenticated → `Auth` shell (`-components/auth.tsx`), which toggles `SignIn` (`SignInForm` + `useSignIn`) and `SignUp` (`SignUpForm` + `useSignUp`) and includes shared `ThemeSwitch` / `LocaleSwitch` (`components/display/`, also used in the sidebar). Public GraphQL `register` (admin hook `useSignUp`) creates a disabled `USER` until a `SUPER_ADMIN` sets `disabled: false` via `updateOneUser`. Disabled-account sign-in fails with API message `USER_ACCOUNT_DISABLED` (shown as-is via global error toasts). `SlowRequestWatcher` in `main.tsx` watches all TanStack Query fetches/mutations and toasts a cold-start warning after 8s (`system.slowRequest*`). Dev-only quick login (`DevQuickLogin` inside `SignIn`, `import.meta.env.DEV`) signs in as seed personas with password `123123` (includes `Pending`, which fails sign-in by design for approval-queue QA).
+- `_authenticated.tsx`: protected layout; `beforeLoad` awaits `waitForAuthHydration()` (`stores/auth.ts`), then `useGetMe()` when a token exists. Child routes mount only after session is valid — queries do not gate auth themselves. Unauthenticated → `Auth` shell (`-components/auth.tsx`), which toggles `SignIn` (`SignInForm` + `useSignIn`) and `SignUp` (`SignUpForm` + `useSignUp`) and includes shared `ThemeSwitch` / `LocaleSwitch` (`components/display/`, also used in the sidebar). Public GraphQL `register` (admin hook `useSignUp`) creates a disabled `USER` until a `SUPER_ADMIN` sets `disabled: false` via `updateOneUser`. Disabled-account sign-in fails with API message `USER_ACCOUNT_DISABLED` (shown as-is via global error toasts). `SlowRequestWatcher` in `main.tsx` watches all TanStack Query fetches/mutations and toasts a cold-start warning after 5s (`system.slowRequest*`) with indeterminate progress. Dev-only quick login (`DevQuickLogin` inside `SignIn`, `import.meta.env.DEV`) signs in as seed personas with password `123123` (includes `Pending`, which fails sign-in by design for approval-queue QA).
 - `index.tsx`: dashboard via `useDashboard()` (stats + recharts).
 - `_authenticated/_sidebar/settings/`: profile form + `DownloadCvControl` in page header.
 - `_authenticated/_sidebar/`: CRUD pages per entity with `-components/table.tsx`.
@@ -97,5 +97,6 @@ Keep `components/`, `hooks/custom/`, and `lib/` domain-agnostic. Table toolbar c
 - `dev` backgrounds codegen; first start may race — run `build` once if types missing.
 - GitHub Pages: deploy copies `index.html` to `404.html`; `VITE_BASE_PATH` must match Pages subpath.
 - Social share tags in `index.html`: `description`, full Open Graph (`og:title` / `description` / `url` / `site_name` / `locale` / `image` + width/height/alt / `type`), and Twitter (`twitter:card=summary_large_image`, title, description, image). Absolute URLs for Pages. Image: `public/og.png` (1200×630). Instagram does not unfurl links the same way.
-- Auth shell (`routes/-components/auth.tsx`) composes `AuthBrandPanel` with `SignIn` / `SignUp`.
+- Auth shell (`routes/-components/auth.tsx`) composes the localized, feature-led
+  `AuthBrandPanel` marketing surface with the focused `SignIn` / `SignUp` form.
 - No test framework configured in this package.
