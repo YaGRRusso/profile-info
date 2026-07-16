@@ -45,14 +45,14 @@ export function AuthBrandPanel({ className }: AuthBrandPanelProps) {
       title: tAuth("marketing.features.ai.title"),
     },
     {
-      description: tAuth("marketing.features.portfolio.description"),
-      Icon: BrowserIcon,
-      title: tAuth("marketing.features.portfolio.title"),
-    },
-    {
       description: tAuth("marketing.features.resume.description"),
       Icon: FilePdfIcon,
       title: tAuth("marketing.features.resume.title"),
+    },
+    {
+      description: tAuth("marketing.features.api.description"),
+      Icon: BrowserIcon,
+      title: tAuth("marketing.features.api.title"),
     },
   ];
 
@@ -77,16 +77,14 @@ export function AuthBrandPanel({ className }: AuthBrandPanelProps) {
         <div className="grid w-full gap-2 sm:grid-cols-2">
           {features.map(({ description, Icon, title }) => (
             <article
-              className="flex items-center gap-2 rounded border border-black/10 bg-black/10 p-3 backdrop-blur-sm sm:block"
+              className="flex items-center gap-2 rounded border border-base-content/20 bg-base-200/10 p-3 backdrop-blur-sm sm:block"
               key={title}
             >
               <Icon className="shrink-0 sm:mb-2" size={22} weight="duotone" />
-              <div>
-                <h3 className="font-semibold text-sm sm:text-base">{title}</h3>
-                <p className="mt-1 hidden text-sm opacity-lg sm:block">
-                  {description}
-                </p>
-              </div>
+              <h3 className="font-semibold text-sm sm:text-base">{title}</h3>
+              <p className="hidden text-sm opacity-lg sm:block">
+                {description}
+              </p>
             </article>
           ))}
         </div>
