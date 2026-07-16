@@ -16,7 +16,7 @@ The admin dashboard for profile-info: a React 19 + Vite SPA that authenticates a
 Entry point `src/main.tsx`:
 
 - `QueryClient` with `QueryCache.onError` and `MutationCache.onError` → `toast.error`; queries: `staleTime: Infinity` (refetch only via `refetch()` / `invalidateQueries()`), `refetchOnWindowFocus: false`, `retryDelay: 60s`, no retry on `GqlClientError`.
-- `SlowRequestWatcher`: `useIsFetching` + `useIsMutating`; after 5s pending → sticky warning toast (`system.slowRequest*`) with staged fake progress (`useStagedProgress`), dismissed when traffic clears.
+- `SlowRequestWatcher`: `useIsFetching` + `useIsMutating` (skips ops with `meta.ignoreSlowRequest`, e.g. AI mutations); after threshold pending → sticky warning toast (`system.slowRequest*`) with staged fake progress (`useStagedProgress`), dismissed when traffic clears.
 - Auth store subscription: token set → null clears `queryClient`.
 - Router from `routeTree.gen.ts` with `basepath: import.meta.env.BASE_URL`.
 - `QueryClientProvider` > Sonner `Toaster` + `SlowRequestWatcher` + `RouterProvider`.

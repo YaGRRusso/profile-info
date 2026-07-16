@@ -4,6 +4,7 @@ import z from "zod";
 import { PasswordInput } from "@/components/inputs/password";
 import { SelectInput } from "@/components/inputs/select";
 import { TextInput } from "@/components/inputs/text";
+import { SLUG_REGEX } from "@/consts/regex";
 import {
   type CreateUserInput,
   type UpdateUserInput,
@@ -18,7 +19,10 @@ import { CommonFormProps } from "./common";
 const userSchema = z.object({
   email: z.email(FormError.invalidFormat),
   name: z.string().min(1, FormError.requiredField),
-  nickname: z.string().min(1, FormError.requiredField),
+  nickname: z
+    .string()
+    .regex(SLUG_REGEX, FormError.invalidFormat)
+    .or(z.literal("")),
   password: z.union([z.literal(""), z.string().min(8, FormError.minLength)]),
   role: z.enum(UserRole, FormError.requiredField),
 });

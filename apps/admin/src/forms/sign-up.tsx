@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import z from "zod";
 import { PasswordInput } from "@/components/inputs/password";
 import { TextInput } from "@/components/inputs/text";
+import { SLUG_REGEX } from "@/consts/regex";
 import { fieldError } from "@/lib/field-error";
 import { FormError } from "@/lib/form-errors";
 import { CommonFormProps } from "./common";
@@ -10,7 +11,10 @@ import { CommonFormProps } from "./common";
 const signUpSchema = z.object({
   email: z.email(FormError.invalidFormat),
   name: z.string().min(1, FormError.requiredField),
-  nickname: z.string().min(1, FormError.requiredField),
+  nickname: z
+    .string()
+    .regex(SLUG_REGEX, FormError.invalidFormat)
+    .or(z.literal("")),
   password: z
     .string()
     .min(1, FormError.requiredField)

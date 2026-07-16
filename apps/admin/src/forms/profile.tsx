@@ -13,6 +13,7 @@ import { TextInput } from "@/components/inputs/text";
 import { TextareaInput } from "@/components/inputs/textarea";
 import { LOCALES } from "@/consts/locales";
 import { RawSizeEnum } from "@/consts/raw-size";
+import { SLUG_REGEX } from "@/consts/regex";
 import type { GetMeQuery } from "@/generated/graphql/graphql";
 import {
   DetailInput,
@@ -47,7 +48,10 @@ const profileSchema = z.object({
     )
     .refine(hasUniqueLocales, { message: FormError.uniqueField }),
   name: z.string().min(1, FormError.requiredField),
-  nickname: z.string().min(1, FormError.requiredField),
+  nickname: z
+    .string()
+    .regex(SLUG_REGEX, FormError.invalidFormat)
+    .or(z.literal("")),
   password: z.union([z.literal(""), z.string().min(8, FormError.minLength)]),
   phone: z.string(),
   skillIds: z.array(z.string()),

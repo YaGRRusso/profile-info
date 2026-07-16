@@ -7,6 +7,10 @@ import { useStagedProgress } from "@/hooks/custom/use-staged-progress";
 export const SLOW_REQUEST_MS = 10_000;
 const SLOW_REQUEST_TOAST_ID = "slow-request";
 
+function countsTowardSlowRequest(meta: Record<string, unknown> | undefined) {
+  return meta?.ignoreSlowRequest !== true;
+}
+
 function SlowRequestToastDescription({ text }: { text: string }) {
   const progress = useStagedProgress(true);
 
@@ -25,7 +29,13 @@ function SlowRequestToastDescription({ text }: { text: string }) {
 
 export function SlowRequestWatcher() {
   const { t: tSystem } = useTranslation("system");
-  const isPending = useIsFetching() + useIsMutating() > 0;
+  const fetching = useIsFetching({
+    predicate: (query) => countsTowardSlowRequest(query.meta),
+  });
+  const mutating = useIsMutating({
+    predicate: (mutation) => countsTowardSlowRequest(mutation.meta),
+  });
+  const isPending = fetching + mutating > 0;
   const [isSlow, setIsSlow] = useState(false);
 
   useEffect(() => {
