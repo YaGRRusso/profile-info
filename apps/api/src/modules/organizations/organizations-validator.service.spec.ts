@@ -1,7 +1,7 @@
 import { BadRequestException, NotFoundException } from "@nestjs/common";
 import { Test, TestingModule } from "@nestjs/testing";
 import { testAuthContext } from "@test/fixtures/auth-context";
-import { REFERENCES_NOT_FOUND } from "@/common/helpers/assert.helper";
+import { COMMON_REFERENCES_NOT_FOUND } from "@/core/errors/common.messages";
 import { PERSISTENCE_NOT_FOUND } from "@/core/persistence/persistence.messages";
 import { OrganizationsService } from "./organizations.service";
 import { OrganizationsValidatorService } from "./organizations-validator.service";
@@ -54,7 +54,7 @@ describe("OrganizationsValidatorService", () => {
 
       await expect(
         validator.assertOrganizationsEnabled(ctx, [missingId])
-      ).rejects.toThrow(new BadRequestException(REFERENCES_NOT_FOUND));
+      ).rejects.toThrow(new BadRequestException(COMMON_REFERENCES_NOT_FOUND));
     });
 
     it("rejects when any organization is disabled", async () => {

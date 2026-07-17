@@ -1,7 +1,7 @@
 import { BadRequestException, NotFoundException } from "@nestjs/common";
 import { Test, TestingModule } from "@nestjs/testing";
 import { testAuthContext } from "@test/fixtures/auth-context";
-import { REFERENCES_NOT_FOUND } from "@/common/helpers/assert.helper";
+import { COMMON_REFERENCES_NOT_FOUND } from "@/core/errors/common.messages";
 import { PERSISTENCE_NOT_FOUND } from "@/core/persistence/persistence.messages";
 import { SkillsService } from "./skills.service";
 import { SkillsValidatorService } from "./skills-validator.service";
@@ -53,7 +53,7 @@ describe("SkillsValidatorService", () => {
 
       await expect(
         validator.assertSkillsEnabled(ctx, [missingId])
-      ).rejects.toThrow(new BadRequestException(REFERENCES_NOT_FOUND));
+      ).rejects.toThrow(new BadRequestException(COMMON_REFERENCES_NOT_FOUND));
     });
 
     it("rejects when any skill is disabled", async () => {

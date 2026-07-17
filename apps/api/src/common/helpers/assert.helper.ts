@@ -1,7 +1,6 @@
 import { BadRequestException } from "@nestjs/common";
 import { uniq } from "lodash";
-
-export const REFERENCES_NOT_FOUND = "Referenced resource not found";
+import { COMMON_REFERENCES_NOT_FOUND } from "@/core/errors/common.messages";
 
 export function assertReferencesExist(
   requestedIds: string[],
@@ -12,7 +11,7 @@ export function assertReferencesExist(
   const foundSet = new Set([...foundIds].map(String));
   const missing = requestedIds.some((id) => !foundSet.has(id));
 
-  if (missing) throw new BadRequestException(REFERENCES_NOT_FOUND);
+  if (missing) throw new BadRequestException(COMMON_REFERENCES_NOT_FOUND);
 }
 
 export async function assertReferencesResolved(

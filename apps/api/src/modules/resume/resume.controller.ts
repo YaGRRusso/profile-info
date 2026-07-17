@@ -2,7 +2,6 @@ import {
   BadRequestException,
   Controller,
   Get,
-  Header,
   Query,
   StreamableFile,
 } from "@nestjs/common";
@@ -26,7 +25,6 @@ export class ResumeController {
 
   @Get("resume.pdf")
   @Public()
-  @Header("Content-Type", "application/pdf")
   async download(
     @Query("userId") userId: string | undefined,
     @Query("locale") localeQuery?: string
@@ -43,6 +41,7 @@ export class ResumeController {
 
     return new StreamableFile(buffer, {
       disposition: 'attachment; filename="resume.pdf"',
+      type: "application/pdf",
     });
   }
 }

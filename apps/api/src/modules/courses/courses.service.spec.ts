@@ -1,7 +1,7 @@
 import { BadRequestException } from "@nestjs/common";
 import { Test, TestingModule } from "@nestjs/testing";
 import { testAuthContext } from "@test/fixtures/auth-context";
-import { REFERENCES_NOT_FOUND } from "@/common/helpers/assert.helper";
+import { COMMON_REFERENCES_NOT_FOUND } from "@/core/errors/common.messages";
 import {
   createMockCrud,
   createMockStats,
@@ -123,11 +123,11 @@ describe("CoursesService", () => {
 
     it("rejects missing organization reference", async () => {
       organizationsValidator.assertOrganizationEnabled.mockRejectedValue(
-        new BadRequestException(REFERENCES_NOT_FOUND)
+        new BadRequestException(COMMON_REFERENCES_NOT_FOUND)
       );
 
       await expect(service.createOne(ctx, createInput)).rejects.toThrow(
-        new BadRequestException(REFERENCES_NOT_FOUND)
+        new BadRequestException(COMMON_REFERENCES_NOT_FOUND)
       );
       expect(crud.createOne).not.toHaveBeenCalled();
     });
