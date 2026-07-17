@@ -13,7 +13,7 @@ import {
   paginatedSelect,
   withPagination,
 } from "@/hooks/custom/paginated-query";
-import { execute } from "@/lib/execute";
+import { request } from "@/service/graphql";
 
 export type OrganizationRow =
   FindManyOrganizationsQuery["findManyOrganizations"]["nodes"][number];
@@ -117,7 +117,7 @@ export function useFindManyOrganizations(
     ),
     initialPageParam: 0,
     queryFn: ({ pageParam }) =>
-      execute(
+      request(
         findManyOrganizations,
         withPagination<FindManyOrganizationsQueryVariables>(
           "organizationPagination",
@@ -146,7 +146,7 @@ export function useFindManyActiveOrganizations(
     ),
     initialPageParam: 0,
     queryFn: ({ pageParam }) =>
-      execute(
+      request(
         findManyActiveOrganizations,
         withPagination<FindManyActiveOrganizationsQueryVariables>(
           "organizationPagination",

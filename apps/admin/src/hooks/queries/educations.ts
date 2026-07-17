@@ -11,7 +11,7 @@ import {
   paginatedSelect,
   withPagination,
 } from "@/hooks/custom/paginated-query";
-import { execute } from "@/lib/execute";
+import { request } from "@/service/graphql";
 
 export type EducationRow =
   FindManyEducationsQuery["findManyEducations"]["nodes"][number];
@@ -90,7 +90,7 @@ export function useFindManyEducations(
       paginatedNextPageParam<FindManyEducationsQuery>("findManyEducations"),
     initialPageParam: 0,
     queryFn: ({ pageParam }) =>
-      execute(
+      request(
         findManyEducations,
         withPagination<FindManyEducationsQueryVariables>(
           "educationPagination",

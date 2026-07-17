@@ -11,7 +11,7 @@ import {
   paginatedSelect,
   withPagination,
 } from "@/hooks/custom/paginated-query";
-import { execute } from "@/lib/execute";
+import { request } from "@/service/graphql";
 
 export type ExperienceRow =
   FindManyExperiencesQuery["findManyExperiences"]["nodes"][number];
@@ -90,7 +90,7 @@ export function useFindManyExperiences(
     ),
     initialPageParam: 0,
     queryFn: ({ pageParam }) =>
-      execute(
+      request(
         findManyExperiences,
         withPagination<FindManyExperiencesQueryVariables>(
           "experiencePagination",

@@ -11,7 +11,7 @@ import {
   paginatedSelect,
   withPagination,
 } from "@/hooks/custom/paginated-query";
-import { execute } from "@/lib/execute";
+import { request } from "@/service/graphql";
 
 export type UserRow = FindManyUsersQuery["findManyUsers"]["nodes"][number];
 
@@ -55,7 +55,7 @@ export function useFindManyUsers(
       paginatedNextPageParam<FindManyUsersQuery>("findManyUsers"),
     initialPageParam: 0,
     queryFn: ({ pageParam }) =>
-      execute(
+      request(
         findManyUsers,
         withPagination<FindManyUsersQueryVariables>(
           "userPagination",

@@ -5,7 +5,7 @@ import type {
   UpdateMeInput,
   UpdateUserInput,
 } from "@/generated/graphql/graphql";
-import { execute } from "@/lib/execute";
+import { request } from "@/service/graphql";
 
 const updateMe = graphql(`
   mutation UpdateMe($updateMeInput: UpdateMeInput!) {
@@ -94,7 +94,7 @@ export function useUpdateMe() {
 
   return useMutation({
     mutationFn: (updateMeInput: UpdateMeInput) =>
-      execute(updateMe, { updateMeInput }),
+      request(updateMe, { updateMeInput }),
     mutationKey: ["updateMe"],
     onSuccess: () => {
       queryClient.invalidateQueries({
@@ -108,7 +108,7 @@ export function useCreateOneUser() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (createUserInput: CreateUserInput) =>
-      execute(createOneUser, { createUserInput }),
+      request(createOneUser, { createUserInput }),
     mutationKey: ["createOneUser"],
     onSuccess: () => invalidateUserQueries(queryClient),
   });
@@ -118,7 +118,7 @@ export function useCreateManyUsers() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (createUserInputs: CreateUserInput[]) =>
-      execute(createManyUsers, { createUserInputs }),
+      request(createManyUsers, { createUserInputs }),
     mutationKey: ["createManyUsers"],
     onSuccess: () => invalidateUserQueries(queryClient),
   });
@@ -133,7 +133,7 @@ export function useUpdateOneUser() {
     }: {
       userId: string;
       updateUserInput: UpdateUserInput;
-    }) => execute(updateOneUser, { updateUserInput, userId }),
+    }) => request(updateOneUser, { updateUserInput, userId }),
     mutationKey: ["updateOneUser"],
     onSuccess: () => invalidateUserQueries(queryClient),
   });
@@ -148,7 +148,7 @@ export function useUpdateManyUsers() {
     }: {
       userIds: string[];
       updateUserInput: UpdateUserInput;
-    }) => execute(updateManyUsers, { updateUserInput, userIds }),
+    }) => request(updateManyUsers, { updateUserInput, userIds }),
     mutationKey: ["updateManyUsers"],
     onSuccess: () => invalidateUserQueries(queryClient),
   });
@@ -157,7 +157,7 @@ export function useUpdateManyUsers() {
 export function useRemoveOneUser() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (userId: string) => execute(removeOneUser, { userId }),
+    mutationFn: (userId: string) => request(removeOneUser, { userId }),
     mutationKey: ["removeOneUser"],
     onSuccess: () => invalidateUserQueries(queryClient),
   });
@@ -166,7 +166,7 @@ export function useRemoveOneUser() {
 export function useRemoveManyUsers() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (userIds: string[]) => execute(removeManyUsers, { userIds }),
+    mutationFn: (userIds: string[]) => request(removeManyUsers, { userIds }),
     mutationKey: ["removeManyUsers"],
     onSuccess: () => invalidateUserQueries(queryClient),
   });

@@ -10,7 +10,7 @@ import ReactDOM from "react-dom/client";
 import { toast } from "sonner";
 import { SlowRequestWatcher } from "@/components/display/slow-request-watcher";
 import { Toaster } from "@/components/display/toaster";
-import { GqlClientError } from "@/lib/gql";
+import { BackendError } from "@/service/backend";
 import { useAuthStore } from "@/stores/auth";
 import { useSystemMessagesStore } from "@/stores/system-messages";
 import { routeTree } from "./routeTree.gen";
@@ -30,7 +30,7 @@ const queryClient = new QueryClient({
     queries: {
       refetchOnWindowFocus: false,
       retry: (failureCount, error) => {
-        if (error instanceof GqlClientError) return false;
+        if (error instanceof BackendError) return false;
         return failureCount < 3;
       },
       retryDelay: 1000 * 60,

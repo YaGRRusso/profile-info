@@ -4,7 +4,7 @@ import type {
   CreateProjectInput,
   UpdateProjectInput,
 } from "@/generated/graphql/graphql";
-import { execute } from "@/lib/execute";
+import { request } from "@/service/graphql";
 
 const createOneProject = graphql(`
   mutation CreateOneProject($createProjectInput: CreateProjectInput!) {
@@ -66,7 +66,7 @@ const removeManyProjects = graphql(`
 export function useCreateOneProject() {
   return useMutation({
     mutationFn: (createProjectInput: CreateProjectInput) =>
-      execute(createOneProject, { createProjectInput }),
+      request(createOneProject, { createProjectInput }),
     mutationKey: ["createOneProject"],
   });
 }
@@ -79,7 +79,7 @@ export function useUpdateOneProject() {
     }: {
       projectId: string;
       updateProjectInput: UpdateProjectInput;
-    }) => execute(updateOneProject, { projectId, updateProjectInput }),
+    }) => request(updateOneProject, { projectId, updateProjectInput }),
     mutationKey: ["updateOneProject"],
   });
 }
@@ -92,14 +92,14 @@ export function useUpdateManyProjects() {
     }: {
       projectIds: string[];
       updateProjectInput: UpdateProjectInput;
-    }) => execute(updateManyProjects, { projectIds, updateProjectInput }),
+    }) => request(updateManyProjects, { projectIds, updateProjectInput }),
     mutationKey: ["updateManyProjects"],
   });
 }
 
 export function useRemoveOneProject() {
   return useMutation({
-    mutationFn: (projectId: string) => execute(removeOneProject, { projectId }),
+    mutationFn: (projectId: string) => request(removeOneProject, { projectId }),
     mutationKey: ["removeOneProject"],
   });
 }
@@ -107,7 +107,7 @@ export function useRemoveOneProject() {
 export function useRemoveManyProjects() {
   return useMutation({
     mutationFn: (projectIds: string[]) =>
-      execute(removeManyProjects, { projectIds }),
+      request(removeManyProjects, { projectIds }),
     mutationKey: ["removeManyProjects"],
   });
 }

@@ -168,7 +168,7 @@ GET /resume.pdf?userId=<id>&locale=en|pt|es
 
 Returns `application/pdf` with `Content-Disposition: attachment; filename="resume.pdf"`. Required `userId` query (Mongo ObjectId). Optional `locale` (defaults to `en`; invalid values fall back to `en`). Section labels come from `resume.labels.ts`; content uses `pickTranslation` for entity i18n. Aggregates the requested user's profile data (top items by `relevance`, completed educations/courses only). Private entities are owner-scoped to `userId` even when the profile owner is `SUPER_ADMIN`.
 
-The admin dashboard downloads this endpoint directly (base URL derived from `VITE_API_URL` by stripping `/graphql`).
+The admin dashboard downloads this endpoint directly (`VITE_API_URL` + path via `@/service/rest`).
 
 ## Testing
 

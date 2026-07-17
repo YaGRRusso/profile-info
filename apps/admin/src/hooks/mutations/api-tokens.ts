@@ -4,7 +4,7 @@ import type {
   CreateApiTokenInput,
   UpdateApiTokenInput,
 } from "@/generated/graphql/graphql";
-import { execute } from "@/lib/execute";
+import { request } from "@/service/graphql";
 
 const createOneApiToken = graphql(`
   mutation CreateOneApiToken($createApiTokenInput: CreateApiTokenInput!) {
@@ -83,7 +83,7 @@ const removeManyApiTokens = graphql(`
 export function useCreateOneApiToken() {
   return useMutation({
     mutationFn: (createApiTokenInput: CreateApiTokenInput) =>
-      execute(createOneApiToken, { createApiTokenInput }),
+      request(createOneApiToken, { createApiTokenInput }),
     mutationKey: ["createOneApiToken"],
   });
 }
@@ -96,7 +96,7 @@ export function useUpdateOneApiToken() {
     }: {
       apiTokenId: string;
       updateApiTokenInput: UpdateApiTokenInput;
-    }) => execute(updateOneApiToken, { apiTokenId, updateApiTokenInput }),
+    }) => request(updateOneApiToken, { apiTokenId, updateApiTokenInput }),
     mutationKey: ["updateOneApiToken"],
   });
 }
@@ -109,7 +109,7 @@ export function useUpdateManyApiTokens() {
     }: {
       apiTokenIds: string[];
       updateApiTokenInput: UpdateApiTokenInput;
-    }) => execute(updateManyApiTokens, { apiTokenIds, updateApiTokenInput }),
+    }) => request(updateManyApiTokens, { apiTokenIds, updateApiTokenInput }),
     mutationKey: ["updateManyApiTokens"],
   });
 }
@@ -117,7 +117,7 @@ export function useUpdateManyApiTokens() {
 export function useRemoveOneApiToken() {
   return useMutation({
     mutationFn: (apiTokenId: string) =>
-      execute(removeOneApiToken, { apiTokenId }),
+      request(removeOneApiToken, { apiTokenId }),
     mutationKey: ["removeOneApiToken"],
   });
 }
@@ -125,7 +125,7 @@ export function useRemoveOneApiToken() {
 export function useRemoveManyApiTokens() {
   return useMutation({
     mutationFn: (apiTokenIds: string[]) =>
-      execute(removeManyApiTokens, { apiTokenIds }),
+      request(removeManyApiTokens, { apiTokenIds }),
     mutationKey: ["removeManyApiTokens"],
   });
 }

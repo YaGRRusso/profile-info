@@ -5,7 +5,7 @@ import {
   SummarizeInput,
   TranslateInput,
 } from "@/generated/graphql/graphql";
-import { execute } from "@/lib/execute";
+import { request } from "@/service/graphql";
 
 const atsSummarize = graphql(`
   mutation AtsSummarize($atsSummarizeInput: AtsSummarizeInput!) {
@@ -33,7 +33,7 @@ export function useAtsSummarize() {
   return useMutation({
     meta: { ignoreSlowRequest: true },
     mutationFn: (atsSummarizeInput: AtsSummarizeInput) =>
-      execute(atsSummarize, { atsSummarizeInput }),
+      request(atsSummarize, { atsSummarizeInput }),
     mutationKey: ["atsSummarize"],
   });
 }
@@ -64,7 +64,7 @@ export function useSummarize() {
   return useMutation({
     meta: { ignoreSlowRequest: true },
     mutationFn: (summarizeInput: SummarizeInput) =>
-      execute(summarize, { summarizeInput }),
+      request(summarize, { summarizeInput }),
     mutationKey: ["summarize"],
   });
 }
@@ -95,7 +95,7 @@ export function useTranslate() {
   return useMutation({
     meta: { ignoreSlowRequest: true },
     mutationFn: (translateInput: TranslateInput) =>
-      execute(translate, { translateInput }),
+      request(translate, { translateInput }),
     mutationKey: ["translate"],
   });
 }

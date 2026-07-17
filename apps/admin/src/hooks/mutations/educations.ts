@@ -4,7 +4,7 @@ import type {
   CreateEducationInput,
   UpdateEducationInput,
 } from "@/generated/graphql/graphql";
-import { execute } from "@/lib/execute";
+import { request } from "@/service/graphql";
 
 const createOneEducation = graphql(`
   mutation CreateOneEducation($createEducationInput: CreateEducationInput!) {
@@ -66,7 +66,7 @@ const removeManyEducations = graphql(`
 export function useCreateOneEducation() {
   return useMutation({
     mutationFn: (createEducationInput: CreateEducationInput) =>
-      execute(createOneEducation, { createEducationInput }),
+      request(createOneEducation, { createEducationInput }),
     mutationKey: ["createOneEducation"],
   });
 }
@@ -79,7 +79,7 @@ export function useUpdateOneEducation() {
     }: {
       educationId: string;
       updateEducationInput: UpdateEducationInput;
-    }) => execute(updateOneEducation, { educationId, updateEducationInput }),
+    }) => request(updateOneEducation, { educationId, updateEducationInput }),
     mutationKey: ["updateOneEducation"],
   });
 }
@@ -92,7 +92,11 @@ export function useUpdateManyEducations() {
     }: {
       educationIds: string[];
       updateEducationInput: UpdateEducationInput;
-    }) => execute(updateManyEducations, { educationIds, updateEducationInput }),
+    }) =>
+      request(updateManyEducations, {
+        educationIds,
+        updateEducationInput,
+      }),
     mutationKey: ["updateManyEducations"],
   });
 }
@@ -100,7 +104,7 @@ export function useUpdateManyEducations() {
 export function useRemoveOneEducation() {
   return useMutation({
     mutationFn: (educationId: string) =>
-      execute(removeOneEducation, { educationId }),
+      request(removeOneEducation, { educationId }),
     mutationKey: ["removeOneEducation"],
   });
 }
@@ -108,7 +112,7 @@ export function useRemoveOneEducation() {
 export function useRemoveManyEducations() {
   return useMutation({
     mutationFn: (educationIds: string[]) =>
-      execute(removeManyEducations, { educationIds }),
+      request(removeManyEducations, { educationIds }),
     mutationKey: ["removeManyEducations"],
   });
 }

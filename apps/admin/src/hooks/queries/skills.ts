@@ -13,7 +13,7 @@ import {
   paginatedSelect,
   withPagination,
 } from "@/hooks/custom/paginated-query";
-import { execute } from "@/lib/execute";
+import { request } from "@/service/graphql";
 
 export type SkillRow = FindManySkillsQuery["findManySkills"]["nodes"][number];
 
@@ -106,7 +106,7 @@ export function useFindManySkills(
       paginatedNextPageParam<FindManySkillsQuery>("findManySkills"),
     initialPageParam: 0,
     queryFn: ({ pageParam }) =>
-      execute(
+      request(
         findManySkills,
         withPagination<FindManySkillsQueryVariables>(
           "skillPagination",
@@ -130,7 +130,7 @@ export function useFindManyActiveSkills(
     ),
     initialPageParam: 0,
     queryFn: ({ pageParam }) =>
-      execute(
+      request(
         findManyActiveSkills,
         withPagination<FindManyActiveSkillsQueryVariables>(
           "skillPagination",

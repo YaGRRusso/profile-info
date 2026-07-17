@@ -49,7 +49,8 @@ src/
 │   ├── display/              # Generic display components (modal, alert, data-state).
 │   ├── inputs/               # Generic input components (text, password, select, …).
 │   └── table/                # Shared table toolbar chrome.
-├── lib/                      # execute (GraphQL), api (REST), i18n helpers, form helpers.
+├── lib/                      # Domain-agnostic helpers (i18n, forms, cn, …).
+├── service/                  # Backend transports — each exports `request` (graphql, rest, backend).
 ├── i18n/                     # i18next init (see ADR 002).
 ├── locales/                  # en + pt JSON namespaces.
 ├── stores/                   # Zustand: auth, theme (persisted); system-messages.

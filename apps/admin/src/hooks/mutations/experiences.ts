@@ -4,7 +4,7 @@ import type {
   CreateExperienceInput,
   UpdateExperienceInput,
 } from "@/generated/graphql/graphql";
-import { execute } from "@/lib/execute";
+import { request } from "@/service/graphql";
 
 const createOneExperience = graphql(`
   mutation CreateOneExperience($createExperienceInput: CreateExperienceInput!) {
@@ -66,7 +66,7 @@ const removeManyExperiences = graphql(`
 export function useCreateOneExperience() {
   return useMutation({
     mutationFn: (createExperienceInput: CreateExperienceInput) =>
-      execute(createOneExperience, { createExperienceInput }),
+      request(createOneExperience, { createExperienceInput }),
     mutationKey: ["createOneExperience"],
   });
 }
@@ -79,7 +79,11 @@ export function useUpdateOneExperience() {
     }: {
       experienceId: string;
       updateExperienceInput: UpdateExperienceInput;
-    }) => execute(updateOneExperience, { experienceId, updateExperienceInput }),
+    }) =>
+      request(updateOneExperience, {
+        experienceId,
+        updateExperienceInput,
+      }),
     mutationKey: ["updateOneExperience"],
   });
 }
@@ -93,7 +97,7 @@ export function useUpdateManyExperiences() {
       experienceIds: string[];
       updateExperienceInput: UpdateExperienceInput;
     }) =>
-      execute(updateManyExperiences, {
+      request(updateManyExperiences, {
         experienceIds,
         updateExperienceInput,
       }),
@@ -104,7 +108,7 @@ export function useUpdateManyExperiences() {
 export function useRemoveOneExperience() {
   return useMutation({
     mutationFn: (experienceId: string) =>
-      execute(removeOneExperience, { experienceId }),
+      request(removeOneExperience, { experienceId }),
     mutationKey: ["removeOneExperience"],
   });
 }
@@ -112,7 +116,7 @@ export function useRemoveOneExperience() {
 export function useRemoveManyExperiences() {
   return useMutation({
     mutationFn: (experienceIds: string[]) =>
-      execute(removeManyExperiences, { experienceIds }),
+      request(removeManyExperiences, { experienceIds }),
     mutationKey: ["removeManyExperiences"],
   });
 }

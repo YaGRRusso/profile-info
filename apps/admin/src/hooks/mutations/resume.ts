@@ -1,12 +1,12 @@
 import { useMutation } from "@tanstack/react-query";
 import type { LocaleEnum } from "@/consts/locales";
-import { apiRequest } from "@/lib/api";
 import { downloadBlob } from "@/lib/download-blob";
+import { request } from "@/service/rest";
 import { useAuthStore } from "@/stores/auth";
 
 export async function fetchResumePdf(locale: LocaleEnum, userId: string) {
   const params = new URLSearchParams({ locale, userId });
-  const response = await apiRequest(`/resume.pdf?${params}`);
+  const response = await request(`/resume.pdf?${params}`);
   return response.blob();
 }
 

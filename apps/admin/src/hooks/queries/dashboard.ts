@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { graphql } from "@/generated/graphql";
-import { execute } from "@/lib/execute";
+import { request } from "@/service/graphql";
 
 const dashboard = graphql(`
   query Dashboard {
@@ -40,7 +40,7 @@ const dashboard = graphql(`
 
 export function useDashboard() {
   return useQuery({
-    queryFn: () => execute(dashboard),
+    queryFn: () => request(dashboard),
     queryKey: ["dashboard"],
   });
 }

@@ -21,11 +21,11 @@ Entry point `src/main.tsx`:
 - Router from `routeTree.gen.ts` with `basepath: import.meta.env.BASE_URL`.
 - `QueryClientProvider` > Sonner `Toaster` + `SlowRequestWatcher` + `RouterProvider`.
 
-Data flow: GraphQL hooks call `execute()` from `src/lib/execute.ts` (POST to `VITE_API_URL`). REST/binary endpoints use `apiRequest()` from `src/lib/api.ts` (`getApiOrigin()` strips the `/graphql` suffix from `VITE_API_URL`). JWT is attached on both when present; GraphQL `UNAUTHENTICATED` clears auth via `execute` + store subscription.
+Data flow: backend transports live under `src/service/` with one shared pattern. `VITE_API_URL` is the API **origin only**. Both protocols export `request` and share the same failure path (`failRequest` → `BackendError` with the **server message**). GraphQL unwraps `{ data, errors }` then calls `failRequest`; REST checks `!ok`, reads Nest `{ message }`, then calls `failRequest`. `UNAUTHENTICATED` / HTTP 401 clears auth inside `failRequest`. Toast only shows `error.message` — never map codes on the client. Localized copy is owned by the API (`Accept-Language` + error catalogs).
 
 Routing:
 
-- `_authenticated.tsx`: protected layout; `beforeLoad` awaits `waitForAuthHydration()` (`stores/auth.ts`), then `useGetMe()` when a token exists. Child routes mount only after session is valid — queries do not gate auth themselves. Unauthenticated → `Auth` shell (`-components/auth.tsx`), which toggles `SignIn` (`SignInForm` + `useSignIn`) and `SignUp` (`SignUpForm` + `useSignUp`) and includes shared `ThemeSwitch` / `LocaleSwitch` (`components/display/`, also used in the sidebar). Public GraphQL `register` (admin hook `useSignUp`) creates a disabled `USER` until a `SUPER_ADMIN` sets `disabled: false` via `updateOneUser`. Disabled-account sign-in fails with API message `USER_ACCOUNT_DISABLED` (shown as-is via global error toasts). `SlowRequestWatcher` in `main.tsx` watches all TanStack Query fetches/mutations and toasts a cold-start warning after 5s (`system.slowRequest*`) with staged fake progress. Dev-only quick login (`DevQuickLogin` inside `SignIn`, `import.meta.env.DEV`) signs in as seed personas with password `123123` (includes `Pending`, which fails sign-in by design for approval-queue QA).
+- `_authenticated.tsx`: protected layout; `beforeLoad` awaits `waitForAuthHydration()` (`stores/auth.ts`), then `useGetMe()` when a token exists. Child routes mount only after session is valid — queries do not gate auth themselves. Unauthenticated → `Auth` shell (`-components/auth.tsx`), which toggles `SignIn` (`SignInForm` + `useSignIn`) and `SignUp` (`SignUpForm` + `useSignUp`) and includes shared `ThemeSwitch` / `LocaleSwitch` (`components/display/`, also used in the sidebar). Public GraphQL `register` (admin hook `useSignUp`) creates a disabled `USER` until a `SUPER_ADMIN` sets `disabled: false` via `updateOneUser`. Disabled-account sign-in fails with a localized API message for `USER_ACCOUNT_DISABLED` (shown as-is via global error toasts). `SlowRequestWatcher` in `main.tsx` watches all TanStack Query fetches/mutations and toasts a cold-start warning after 5s (`system.slowRequest*`) with staged fake progress. Dev-only quick login (`DevQuickLogin` inside `SignIn`, `import.meta.env.DEV`) signs in as seed personas with password `123123` (includes `Pending`, which fails sign-in by design for approval-queue QA).
 - `index.tsx`: dashboard via `useDashboard()` (stats + recharts).
 - `_authenticated/_sidebar/settings/`: profile form + `DownloadCvControl` in page header.
 - `_authenticated/_sidebar/`: CRUD pages per entity with `-components/table.tsx`.
@@ -40,7 +40,7 @@ Rich forms map flat Zod schemas to nested GraphQL shapes (`i18n`, `organizationI
 - **TanStack Router**: `src/routes/`, generated `routeTree.gen.ts`.
 - **TanStack Query**: hooks in `src/hooks/`.
 - **GraphQL Codegen**: `codegen.ts` → `src/generated/graphql/` from `../api/src/schema.gql`.
-- **GraphQL client**: `src/lib/execute.ts` (GraphQL POST). **REST client**: `src/lib/api.ts` (`getApiOrigin`, `apiRequest`). Binary saves use `src/lib/download-blob.ts` (`downloadBlob`).
+- **GraphQL client**: `src/service/graphql.ts` (`request`). **REST client**: `src/service/rest.ts` (`request`). Shared base: `src/service/backend.ts`. Binary saves use `src/lib/download-blob.ts` (`downloadBlob`).
 - **Zustand**: `stores/auth.ts`, `stores/theme.ts` (persisted); `stores/system-messages.ts` (ephemeral header alerts via `setMessage` / `clearMessage` / `clearAllMessages` on every navigation — `router.subscribe('onResolved')` in `main.tsx`).
 - **TanStack Form + Zod**: `src/forms/`.
 - **Tailwind v4 + DaisyUI**: `src/styles/globals.css`.
@@ -52,7 +52,8 @@ Rich forms map flat Zod schemas to nested GraphQL shapes (`i18n`, `organizationI
 
 ## Module / directory breakdown
 
-- `src/lib/execute.ts`: GraphQL transport. `src/lib/api.ts`: REST transport (`getApiOrigin`, `apiRequest`). Other helpers: `gql.ts`, `tc.ts`, `cn.ts`, `parsers.ts`, `field-error.ts`, `form-errors.ts`, `form-validation.ts`, `form-input.ts` (`omitIfEmpty` / `nullIfEmpty` in `*ToInput` mappers), `ai-array-context.ts` (`isAiContextArrayIndex` / `arrayContextDetails` — only the first item in an AI context array gets `contextMode` / aura), `chart-theme.ts`, `dayjs.ts`, `i18n.ts` (entity `pickTranslation` / `i18nLabel`), etc.
+- `src/service/`: backend transports — **one pattern**. `backend.ts` (`getApiBaseUrl`, `backendHeaders`, `BackendError`, `failRequest`, `readErrorMessage`); each protocol file exports `request` (`graphql.ts` → `{base}/graphql` + envelope unwrap; `rest.ts` → `{base}{path}` + Response). Both fail through `failRequest` only. Do not name the GraphQL transport `graphql` (collides with the codegen tag).
+- `src/lib/`: domain-agnostic helpers — `gql.ts`, `tc.ts`, `cn.ts`, `parsers.ts`, `field-error.ts`, `form-errors.ts`, `form-validation.ts`, `form-input.ts` (`omitIfEmpty` / `nullIfEmpty` in `*ToInput` mappers), `ai-array-context.ts` (`isAiContextArrayIndex` / `arrayContextDetails` — only the first item in an AI context array gets `contextMode` / aura), `chart-theme.ts`, `dayjs.ts`, `i18n.ts` (entity `pickTranslation` / `i18nLabel`), etc.
 - `src/hooks/queries/` and `mutations/`: one file per entity; `graphql` tag must use static string literals (no interpolated fragments). Paginated list hooks use `hooks/custom/paginated-query.ts` helpers inside `useInfiniteQuery` — each helper receives an explicit key (`withPagination`: variables pagination key; `paginatedNextPageParam` / `paginatedSelect`: response field name).
 - `src/generated/graphql/`: codegen output — regenerate, do not edit.
 - `src/forms/`: entity forms + `*ToInput`/`*ToForm` mappers co-located.
@@ -65,9 +66,9 @@ Adding a GraphQL operation:
 
 1. Define operation with `graphql` tag in `hooks/queries/` or `hooks/mutations/`.
 2. Regenerate via `npm run dev` (watch) or `npm run build`; once: `npx graphql-codegen --config codegen.ts`.
-3. Wrap in `useQuery` / `useInfiniteQuery` / `useMutation` calling `execute`. Follow `useFindManySkills` for infinite pagination.
+3. Wrap in `useQuery` / `useInfiniteQuery` / `useMutation` calling `request` from `@/service/graphql`. Follow `useFindManySkills` for infinite pagination.
 
-REST reads (e.g. resume PDF): `hooks/mutations/resume.ts` — `fetchResumePdf(locale, userId)` via `apiRequest`, user-triggered download via `useDownloadResume` (`useMutation`; `userId` from auth store).
+REST reads (e.g. resume PDF): `hooks/mutations/resume.ts` — `fetchResumePdf(locale, userId)` via `request` from `@/service/rest`, user-triggered download via `useDownloadResume` (`useMutation`; `userId` from auth store).
 
 Adding a form: copy `src/forms/skill.tsx` (Zod + TanStack Form + generic inputs).
 
@@ -77,7 +78,7 @@ Keep `components/`, `hooks/custom/`, and `lib/` domain-agnostic. Table toolbar c
 
 ## Environment variables
 
-- `VITE_API_URL` (required): GraphQL endpoint; baked in at build time.
+- `VITE_API_URL` (required): API origin only (e.g. `http://localhost:8080`) — no `/graphql` suffix; baked in at build time.
 - `VITE_BASE_PATH` (optional): Vite `base` / router `basepath`; CI sets GitHub Pages subpath.
 
 ## Scripts / commands

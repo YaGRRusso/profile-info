@@ -11,7 +11,7 @@ import {
   paginatedSelect,
   withPagination,
 } from "@/hooks/custom/paginated-query";
-import { execute } from "@/lib/execute";
+import { request } from "@/service/graphql";
 
 export type ProjectRow =
   FindManyProjectsQuery["findManyProjects"]["nodes"][number];
@@ -82,7 +82,7 @@ export function useFindManyProjects(
       paginatedNextPageParam<FindManyProjectsQuery>("findManyProjects"),
     initialPageParam: 0,
     queryFn: ({ pageParam }) =>
-      execute(
+      request(
         findManyProjects,
         withPagination<FindManyProjectsQueryVariables>(
           "projectPagination",

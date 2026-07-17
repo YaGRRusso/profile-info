@@ -44,7 +44,7 @@ React 19 + Vite single-page admin dashboard that signs in against the API and ma
 
 ## How the packages relate
 
-The admin is a client of the API. It talks to the API over GraphQL at the URL in `VITE_API_URL`. The API is code-first, so it generates its schema to `apps/api/src/schema.gql`, and the admin runs GraphQL Codegen against that local file to produce typed operations. Because the schema is a file on disk, codegen does not need the API running. Authentication flows one way: the admin calls the `signIn` mutation, stores the returned JWT, and sends it as a Bearer token on every request.
+The admin is a client of the API. `VITE_API_URL` is the API origin; GraphQL goes to `{VITE_API_URL}/graphql` and REST paths hang off the same base. The API is code-first, so it generates its schema to `apps/api/src/schema.gql`, and the admin runs GraphQL Codegen against that local file to produce typed operations. Because the schema is a file on disk, codegen does not need the API running. Authentication flows one way: the admin calls the `signIn` mutation, stores the returned JWT, and sends it as a Bearer token on every request.
 
 ## AI context
 

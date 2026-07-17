@@ -4,7 +4,7 @@ import type {
   RegisterUserInput,
   SignInInput,
 } from "@/generated/graphql/graphql";
-import { execute } from "@/lib/execute";
+import { request } from "@/service/graphql";
 
 const signIn = graphql(`
   mutation SignIn($signInInput: SignInInput!) {
@@ -24,7 +24,7 @@ const signUp = graphql(`
 
 export function useSignIn() {
   return useMutation({
-    mutationFn: (signInInput: SignInInput) => execute(signIn, { signInInput }),
+    mutationFn: (signInInput: SignInInput) => request(signIn, { signInInput }),
     mutationKey: ["signIn"],
   });
 }
@@ -32,7 +32,7 @@ export function useSignIn() {
 export function useSignUp() {
   return useMutation({
     mutationFn: (registerInput: RegisterUserInput) =>
-      execute(signUp, { registerInput }),
+      request(signUp, { registerInput }),
     mutationKey: ["signUp"],
   });
 }

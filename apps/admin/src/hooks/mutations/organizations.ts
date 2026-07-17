@@ -8,7 +8,7 @@ import type {
   CreateOrganizationInput,
   UpdateOrganizationInput,
 } from "@/generated/graphql/graphql";
-import { execute } from "@/lib/execute";
+import { request } from "@/service/graphql";
 
 const createOneOrganization = graphql(`
   mutation CreateOneOrganization(
@@ -115,7 +115,7 @@ export function useCreateOneOrganization() {
 
   return useMutation({
     mutationFn: (createOrganizationInput: CreateOrganizationInput) =>
-      execute(createOneOrganization, { createOrganizationInput }),
+      request(createOneOrganization, { createOrganizationInput }),
     mutationKey: ["createOneOrganization"],
     onSuccess: () => invalidateOrganizationQueries(queryClient),
   });
@@ -132,7 +132,7 @@ export function useUpdateOneOrganization() {
       organizationId: string;
       updateOrganizationInput: UpdateOrganizationInput;
     }) =>
-      execute(updateOneOrganization, {
+      request(updateOneOrganization, {
         organizationId,
         updateOrganizationInput,
       }),
@@ -152,7 +152,7 @@ export function useUpdateManyOrganizations() {
       organizationIds: string[];
       updateOrganizationInput: UpdateOrganizationInput;
     }) =>
-      execute(updateManyOrganizations, {
+      request(updateManyOrganizations, {
         organizationIds,
         updateOrganizationInput,
       }),
@@ -166,7 +166,7 @@ export function useDisableOneOrganization() {
 
   return useMutation({
     mutationFn: (organizationId: string) =>
-      execute(disableOneOrganization, { organizationId }),
+      request(disableOneOrganization, { organizationId }),
     mutationKey: ["disableOneOrganization"],
     onSuccess: () => invalidateOrganizationQueries(queryClient),
   });
@@ -177,7 +177,7 @@ export function useDisableManyOrganizations() {
 
   return useMutation({
     mutationFn: (organizationIds: string[]) =>
-      execute(disableManyOrganizations, { organizationIds }),
+      request(disableManyOrganizations, { organizationIds }),
     mutationKey: ["disableManyOrganizations"],
     onSuccess: () => invalidateOrganizationQueries(queryClient),
   });
@@ -188,7 +188,7 @@ export function useEnableOneOrganization() {
 
   return useMutation({
     mutationFn: (organizationId: string) =>
-      execute(enableOneOrganization, { organizationId }),
+      request(enableOneOrganization, { organizationId }),
     mutationKey: ["enableOneOrganization"],
     onSuccess: () => invalidateOrganizationQueries(queryClient),
   });
@@ -199,7 +199,7 @@ export function useEnableManyOrganizations() {
 
   return useMutation({
     mutationFn: (organizationIds: string[]) =>
-      execute(enableManyOrganizations, { organizationIds }),
+      request(enableManyOrganizations, { organizationIds }),
     mutationKey: ["enableManyOrganizations"],
     onSuccess: () => invalidateOrganizationQueries(queryClient),
   });
@@ -210,7 +210,7 @@ export function useRemoveOneOrganization() {
 
   return useMutation({
     mutationFn: (organizationId: string) =>
-      execute(removeOneOrganization, { organizationId }),
+      request(removeOneOrganization, { organizationId }),
     mutationKey: ["removeOneOrganization"],
     onSuccess: () => invalidateOrganizationQueries(queryClient),
   });
@@ -221,7 +221,7 @@ export function useRemoveManyOrganizations() {
 
   return useMutation({
     mutationFn: (organizationIds: string[]) =>
-      execute(removeManyOrganizations, { organizationIds }),
+      request(removeManyOrganizations, { organizationIds }),
     mutationKey: ["removeManyOrganizations"],
     onSuccess: () => invalidateOrganizationQueries(queryClient),
   });

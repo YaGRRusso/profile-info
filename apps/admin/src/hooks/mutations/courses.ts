@@ -4,7 +4,7 @@ import type {
   CreateCourseInput,
   UpdateCourseInput,
 } from "@/generated/graphql/graphql";
-import { execute } from "@/lib/execute";
+import { request } from "@/service/graphql";
 
 const createOneCourse = graphql(`
   mutation CreateOneCourse($createCourseInput: CreateCourseInput!) {
@@ -63,7 +63,7 @@ const removeManyCourses = graphql(`
 export function useCreateOneCourse() {
   return useMutation({
     mutationFn: (createCourseInput: CreateCourseInput) =>
-      execute(createOneCourse, { createCourseInput }),
+      request(createOneCourse, { createCourseInput }),
     mutationKey: ["createOneCourse"],
   });
 }
@@ -76,7 +76,7 @@ export function useUpdateOneCourse() {
     }: {
       courseId: string;
       updateCourseInput: UpdateCourseInput;
-    }) => execute(updateOneCourse, { courseId, updateCourseInput }),
+    }) => request(updateOneCourse, { courseId, updateCourseInput }),
     mutationKey: ["updateOneCourse"],
   });
 }
@@ -89,14 +89,14 @@ export function useUpdateManyCourses() {
     }: {
       courseIds: string[];
       updateCourseInput: UpdateCourseInput;
-    }) => execute(updateManyCourses, { courseIds, updateCourseInput }),
+    }) => request(updateManyCourses, { courseIds, updateCourseInput }),
     mutationKey: ["updateManyCourses"],
   });
 }
 
 export function useRemoveOneCourse() {
   return useMutation({
-    mutationFn: (courseId: string) => execute(removeOneCourse, { courseId }),
+    mutationFn: (courseId: string) => request(removeOneCourse, { courseId }),
     mutationKey: ["removeOneCourse"],
   });
 }
@@ -104,7 +104,7 @@ export function useRemoveOneCourse() {
 export function useRemoveManyCourses() {
   return useMutation({
     mutationFn: (courseIds: string[]) =>
-      execute(removeManyCourses, { courseIds }),
+      request(removeManyCourses, { courseIds }),
     mutationKey: ["removeManyCourses"],
   });
 }

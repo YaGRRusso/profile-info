@@ -41,7 +41,7 @@ End to end:
 1. The API boots from `apps/api/src/main.ts`, which creates the Nest app, applies a global `ValidationPipe` (`core/configs/validation.config.ts`), and starts the server (`core/configs/app.config.ts`, default `0.0.0.0:8080`, CORS allowing `localhost:*` and `https://yagrrusso.github.io`).
 2. `apps/api/src/app.module.ts` wires `ConfigModule` (global), `MongooseModule` (async, reads `DATABASE_URL`), and `GraphQLModule` with the Apollo driver in code-first mode. The schema is auto-generated to `apps/api/src/schema.gql`.
 3. The admin runs GraphQL Codegen (`apps/admin/codegen.ts`) against that `../api/src/schema.gql` file to generate typed documents in `apps/admin/src/generated/graphql/`. No running server is needed for codegen.
-4. At runtime the admin sends GraphQL over HTTP via `apps/admin/src/lib/execute.ts` to `VITE_API_URL`, attaching the JWT as a Bearer token.
+4. At runtime the admin sends GraphQL over HTTP via `apps/admin/src/service/graphql.ts` to `{VITE_API_URL}/graphql`, attaching the JWT as a Bearer token.
 
 The auth handshake: admin calls the `signIn(signInInput: SignInInput!): String!` mutation with email and password, receives a JWT string, stores it in a persisted Zustand store (`apps/admin/src/stores/auth.ts`, localStorage key `auth`), and sends it on every request. A GraphQL error with extension code `UNAUTHENTICATED` makes the admin clear auth and effectively log the user out.
 
@@ -115,7 +115,7 @@ See **NestJS GraphQL resolver hot-reload** in `agents/api.md` for a concrete exa
 The root has no env file of its own. Each app reads its own. Full per-app catalogs are in the scoped rules. Summary:
 
 - API: `DATABASE_URL`, `JWT_SECRET`, `HOST`, `PORT`, `GRAPHQL_INTROSPECTION`, plus `OPENROUTER_*` / `TAVILY_API_KEY` for `ai-tools`. Full catalog in `agents/api.md` and `apps/api/.env.example`. Loaded from `.env.development` / `.env.production` via Nest's `--env-file` flag.
-- Admin: `VITE_API_URL` (the GraphQL endpoint), and `VITE_BASE_PATH` (build-time, used by CI for the GitHub Pages subpath). Example in `apps/admin/.env.example`.
+- Admin: `VITE_API_URL` (API origin only, e.g. `http://localhost:8080` — transports append `/graphql` or REST paths), and `VITE_BASE_PATH` (build-time, used by CI for the GitHub Pages subpath). Example in `apps/admin/.env.example`.
 
 ## Scripts / commands
 

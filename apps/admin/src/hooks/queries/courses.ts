@@ -11,7 +11,7 @@ import {
   paginatedSelect,
   withPagination,
 } from "@/hooks/custom/paginated-query";
-import { execute } from "@/lib/execute";
+import { request } from "@/service/graphql";
 
 export type CourseRow =
   FindManyCoursesQuery["findManyCourses"]["nodes"][number];
@@ -86,7 +86,7 @@ export function useFindManyCourses(
       paginatedNextPageParam<FindManyCoursesQuery>("findManyCourses"),
     initialPageParam: 0,
     queryFn: ({ pageParam }) =>
-      execute(
+      request(
         findManyCourses,
         withPagination<FindManyCoursesQueryVariables>(
           "coursePagination",
