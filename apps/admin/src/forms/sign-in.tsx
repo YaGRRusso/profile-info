@@ -12,7 +12,7 @@ const signInSchema = z.object({
   password: z
     .string()
     .min(1, FormError.requiredField)
-    .min(6, FormError.minLength),
+    .min(8, FormError.minLength),
 });
 
 export type SignInSchema = z.infer<typeof signInSchema>;
