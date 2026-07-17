@@ -8,12 +8,8 @@ export type LocaleCode = (typeof Locale)[keyof typeof Locale];
 
 export const DEFAULT_LOCALE: LocaleCode = Locale.EN;
 
-/** App-owned locales (resume PDF, future API copy). Not a constraint on entity i18n. */
-export const SUPPORTED_CONTENT_LOCALES = [
-  Locale.EN,
-  Locale.PT,
-  Locale.ES,
-] as const;
+/** App-owned locales (resume PDF, API error messages). */
+export const LOCALES: readonly LocaleCode[] = Object.values(Locale);
 
 export const DEFAULT_TRANSLATION_FALLBACKS = [
   Locale.PT,
@@ -27,9 +23,22 @@ export const INTL_LOCALES: Record<LocaleCode, string> = {
   [Locale.ES]: "es-ES",
 };
 
+export function isLocaleCode(value: string): value is LocaleCode {
+  return LOCALES.some((locale) => locale === value);
+}
+
 export function normalizeLocale(input?: string): LocaleCode {
-  if (input && SUPPORTED_CONTENT_LOCALES.includes(input as LocaleCode)) {
-    return input as LocaleCode;
+  if (input && isLocaleCode(input)) return input;
+  return DEFAULT_LOCALE;
+}
+
+export function localeFromAcceptLanguage(header?: string): LocaleCode {
+  if (!header) return DEFAULT_LOCALE;
+
+  for (const part of header.split(",")) {
+    const tag = part.split(";")[0]?.trim().toLowerCase() ?? "";
+    const primary = tag.split("-")[0] ?? tag;
+    if (isLocaleCode(primary)) return primary;
   }
 
   return DEFAULT_LOCALE;

@@ -6,15 +6,19 @@ export async function request<Result, Variables>(
   query: TypedDocumentString<Result, Variables>,
   ...[variables]: Variables extends Record<string, never> ? [] : [Variables]
 ): Promise<Result> {
-  const response = await fetch(new URL("/graphql", getApiBaseUrl()), {
+  const baseUrl = getApiBaseUrl();
+  const url = new URL("/graphql", baseUrl);
+  const headers = backendHeaders({
+    Accept: "application/graphql-response+json",
+    "Content-Type": "application/json",
+  });
+
+  const response = await fetch(url, {
     body: JSON.stringify({
       query: query.toString(),
       variables,
     }),
-    headers: backendHeaders({
-      Accept: "application/graphql-response+json",
-      "Content-Type": "application/json",
-    }),
+    headers,
     method: "POST",
   });
 

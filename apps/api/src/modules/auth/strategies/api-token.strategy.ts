@@ -2,6 +2,7 @@ import { Injectable, UnauthorizedException } from "@nestjs/common";
 import { PassportStrategy } from "@nestjs/passport";
 import { compare } from "bcryptjs";
 import { HeaderAPIKeyStrategy } from "passport-headerapikey";
+import { AUTH_UNAUTHORIZED } from "@/core/auth/auth.messages";
 import { toApiTokenAuthContext } from "@/core/context/auth-context.helper";
 import type { ApiTokenAuthContext } from "@/core/context/auth-context.interface";
 import { ApiTokensService } from "@/modules/api-tokens/api-tokens.service";
@@ -27,29 +28,29 @@ export class ApiTokenStrategy extends PassportStrategy(
   async validate(apiKey: string): Promise<ApiTokenAuthContext> {
     const parsed = this.apiTokensService.parseApiToken(apiKey);
     if (!parsed) {
-      throw new UnauthorizedException();
+      throw new UnauthorizedException(AUTH_UNAUTHORIZED);
     }
 
     const token = await this.apiTokensService.findOneByIdWithHashedSecret(
       parsed.tokenId
     );
     if (!token) {
-      throw new UnauthorizedException();
+      throw new UnauthorizedException(AUTH_UNAUTHORIZED);
     }
 
     const isExpired =
       token.expiresAt && token.expiresAt.getTime() <= Date.now();
     if (isExpired) {
-      throw new UnauthorizedException();
+      throw new UnauthorizedException(AUTH_UNAUTHORIZED);
     }
 
     const secretMatches = await compare(parsed.secret, token.hashedSecret);
     if (!secretMatches) {
-      throw new UnauthorizedException();
+      throw new UnauthorizedException(AUTH_UNAUTHORIZED);
     }
 
     const user = await this.usersService.findOneById(token.ownerId);
-    if (!user) throw new UnauthorizedException();
+    if (!user) throw new UnauthorizedException(AUTH_UNAUTHORIZED);
 
     this.usersValidator.assertUserEnabled(user);
 

@@ -1,6 +1,7 @@
 import { Injectable, UnauthorizedException } from "@nestjs/common";
 import DataLoader from "dataloader";
 import { keyBy } from "lodash";
+import { AUTH_UNAUTHORIZED } from "@/core/auth/auth.messages";
 import type { AppRequest } from "@/core/context/graphql-context.interface";
 import type { SkillEntityRecord } from "./entities/skill.entity";
 import { SkillsService } from "./skills.service";
@@ -14,7 +15,7 @@ export class SkillsLoaderService {
       async (ids) => {
         const ctx = req.user;
         if (!ctx) {
-          throw new UnauthorizedException();
+          throw new UnauthorizedException(AUTH_UNAUTHORIZED);
         }
 
         const list = await this.skillsService.findManyById(ctx, [...ids]);

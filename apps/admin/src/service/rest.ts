@@ -9,14 +9,19 @@ export async function request(
   path: string,
   init?: RequestInit
 ): Promise<Response> {
-  const response = await fetch(new URL(path, getApiBaseUrl()), {
+  const baseUrl = getApiBaseUrl();
+  const url = new URL(path, baseUrl);
+  const headers = backendHeaders(init?.headers);
+
+  const response = await fetch(url, {
     ...init,
-    headers: backendHeaders(init?.headers),
+    headers,
   });
 
   if (!response.ok) {
+    const message = await readErrorMessage(response);
     failRequest({
-      message: await readErrorMessage(response),
+      message,
       status: response.status,
     });
   }

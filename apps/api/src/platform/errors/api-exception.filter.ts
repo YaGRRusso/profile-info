@@ -14,17 +14,15 @@ import { mapPersistenceError } from "@/core/persistence/persistence-error.mapper
 @Catch()
 export class ApiExceptionFilter implements ExceptionFilter, GqlExceptionFilter {
   catch(exception: unknown, host: ArgumentsHost) {
-    const response = resolveApiError(exception, requestLanguage(host));
+    const acceptLanguage = requestLanguage(host);
+    const response = resolveApiError(exception, acceptLanguage);
 
     if (host.getType<"graphql">() === "graphql") {
       return new HttpException(response, response.statusCode);
     }
 
-    host
-      .switchToHttp()
-      .getResponse<Response>()
-      .status(response.statusCode)
-      .json(response);
+    const httpResponse = host.switchToHttp().getResponse<Response>();
+    httpResponse.status(response.statusCode).json(response);
   }
 }
 
@@ -33,11 +31,14 @@ export function resolveApiError(
   acceptLanguage?: string
 ): { message: string; statusCode: number } {
   const httpException = normalizeException(exception);
-  const response = httpException.getResponse();
-  const message = isErrorMessage(response) ? response : COMMON_UNEXPECTED;
+  const exceptionResponse = httpException.getResponse();
+  const message = isErrorMessage(exceptionResponse)
+    ? exceptionResponse
+    : COMMON_UNEXPECTED;
+  const localizedMessage = localizeError(message, acceptLanguage);
 
   return {
-    message: localizeError(message, acceptLanguage),
+    message: localizedMessage,
     statusCode: httpException.getStatus(),
   };
 }
@@ -45,10 +46,10 @@ export function resolveApiError(
 function normalizeException(exception: unknown): HttpException {
   if (exception instanceof HttpException) return exception;
 
-  return (
-    mapPersistenceError(exception) ??
-    new InternalServerErrorException(COMMON_UNEXPECTED)
-  );
+  const persistenceException = mapPersistenceError(exception);
+  if (persistenceException) return persistenceException;
+
+  return new InternalServerErrorException(COMMON_UNEXPECTED);
 }
 
 type RequestHeaders = Record<string, string | string[] | undefined>;

@@ -1,30 +1,26 @@
-export interface ErrorMessage {
-  en: string;
-  es: string;
-  pt: string;
-}
+import {
+  LOCALES,
+  type LocaleCode,
+  localeFromAcceptLanguage,
+} from "@/common/i18n/locales";
+
+export type ErrorMessage = Record<LocaleCode, string>;
 
 export function isErrorMessage(value: unknown): value is ErrorMessage {
-  return (
-    typeof value === "object" &&
-    value !== null &&
-    "en" in value &&
-    typeof value.en === "string" &&
-    "es" in value &&
-    typeof value.es === "string" &&
-    "pt" in value &&
-    typeof value.pt === "string"
-  );
+  if (typeof value !== "object" || value === null) return false;
+
+  return LOCALES.every((locale) => {
+    if (!Object.hasOwn(value, locale)) return false;
+
+    const entry = Reflect.get(value, locale);
+    return typeof entry === "string";
+  });
 }
 
 export function localizeError(
   message: ErrorMessage,
   acceptLanguage?: string
 ): string {
-  const locale = acceptLanguage?.split(",")[0]?.split("-")[0];
-
-  if (locale === "pt") return message.pt;
-  if (locale === "es") return message.es;
-
-  return message.en;
+  const locale = localeFromAcceptLanguage(acceptLanguage);
+  return message[locale];
 }

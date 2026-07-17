@@ -14,14 +14,13 @@ export function getApiBaseUrl(): string {
 export function backendHeaders(init?: HeadersInit): Headers {
   const headers = new Headers(init);
   const { token } = useAuthStore.getState();
+  const locale = resolveActiveLocale();
 
   if (token && !headers.has("Authorization")) {
     headers.set("Authorization", `Bearer ${token}`);
   }
 
-  if (!headers.has("Accept-Language")) {
-    headers.set("Accept-Language", resolveActiveLocale());
-  }
+  headers.set("Accept-Language", locale);
 
   return headers;
 }
@@ -33,8 +32,10 @@ export interface RequestFailure {
 }
 
 export function failRequest(failure: RequestFailure): never {
-  if (isUnauthenticated(failure) && useAuthStore.getState().token) {
-    useAuthStore.getState().clearAuth();
+  const auth = useAuthStore.getState();
+
+  if (isUnauthenticated(failure) && auth.token) {
+    auth.clearAuth();
   }
 
   throw new Error(failure.message);
@@ -55,13 +56,13 @@ function messageFromUnknown(body: unknown): string | undefined {
 }
 
 export async function readErrorMessage(response: Response): Promise<string> {
-  try {
-    const json = await response.json();
-    const message = messageFromUnknown(json);
-    if (message) return message;
-  } catch {
-    /* non-JSON body */
-  }
+  const fallback = response.statusText || `failed to fetch: ${response.status}`;
 
-  return response.statusText || `failed to fetch: ${response.status}`;
+  try {
+    const body = await response.json();
+    const message = messageFromUnknown(body);
+    return message ?? fallback;
+  } catch {
+    return fallback;
+  }
 }

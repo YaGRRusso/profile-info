@@ -59,7 +59,7 @@ Full diagram and field detail: `apps/api/docs/ER_MODEL.md`.
 
 - `helpers/`: `object.helper.ts` (`clearObject`), `object-id.helper.ts` (`assertValidObjectId`, `assertValidObjectIds`), `assert.helper.ts` (`assertReferencesExist`, `assertReferencesResolved`, `REFERENCES_NOT_FOUND`), `daterange.helper.ts` (`sortDateRange`), `pick-translation.helper.ts` (`pickTranslation`), `format-period.helper.ts` (`formatPeriod`), `breakpoint.helper.ts`, `url.helper.ts` (`isWebpageUrl` via `mime-types`).
 - `pdf/`: domain-agnostic PDFKit layer — `PdfContext`, `DEFAULT_PDF_THEME`, `PDF_SPACING` scale (`xs`–`block`), layout primitives in `layout/` (`renderSection`, `renderEntryBlock`, `renderLabeledLinks`). `renderEntryBlock` and `renderSection` measure content height and call `ensureBlockFits` so section titles and entry headers are not orphaned at page breaks; long descriptions and multi-entry sections still flow across pages.
-- `i18n/locales.ts`: `Locale`, `SUPPORTED_CONTENT_LOCALES`, `normalizeLocale` — app-owned content locales. Entity `i18n[].locale` is a free string (`@IsString` + `@IsNotEmpty` only).
+- `i18n/locales.ts`: `Locale`, `LOCALES`, `normalizeLocale`, `localeFromAcceptLanguage` — app-owned content locales. Entity `i18n[].locale` is a free string (`@IsString` + `@IsNotEmpty` only).
 
 `common` holds only generic primitives — it does **not** own integration contracts. Each capability boundary owns its own port (see `integrations/`).
 
@@ -67,7 +67,7 @@ Full diagram and field detail: `apps/api/docs/ER_MODEL.md`.
 
 - `cache/app-cache.module.ts`: global Nest cache (`@nestjs/cache-manager` + `createKeyv` TTL/LRU) and exports `OrchestratorService`. Process-local today; swap `stores` for Redis later without changing callers.
 - `execution/orchestrator.service.ts`: `run` + optional `cacheKey` — concurrency-limited tasks, Nest `CACHE_MANAGER`, in-flight coalescing (stampede). Provided by `AppCacheModule`.
-- `errors/error-message.ts`: only the explicit `{ en, es, pt }` `ErrorMessage` contract, type guard, and localization helper. Shared copy belongs in `errors/common.messages.ts`, following the same `<owner>.messages.ts` convention as `auth.messages.ts`, `persistence.messages.ts`, `users.messages.ts`, and `resume.messages.ts`.
+- `errors/error-message.ts`: `ErrorMessage` is `Record<LocaleCode, string>`; localization uses `localeFromAcceptLanguage`. Shared copy belongs in `errors/common.messages.ts`, following the same `<owner>.messages.ts` convention as `auth.messages.ts`, `persistence.messages.ts`, `users.messages.ts`, and `resume.messages.ts`.
 - `persistence/`: generic MongoDB layer — `CrudRepository` + `CrudMapperInterface`, `StatsRepository`, `scoped(PersistenceScope)` / `global()` via `PersistenceScope` (`query` + `document` hooks). `persistence-error.mapper.ts` owns Mongo/Mongoose detection and maps recognized failures to Nest exceptions carrying persistence-owned `ErrorMessage`s. Core: `noopScope` in `persistence-scope.helper.ts`. Factories: `tenantScope` in `tenant-scope.helper.ts`, `catalogScope` in `catalog-scope.helper.ts`. Scope resolution at repository boundary: `tenantCrud(ctx)` / `tenantStats(ctx)` or `catalogCrud(ctx)` / `catalogStats(ctx)` inline via `tenantPersistenceScope` / `catalogPersistenceScope` from `auth-context.helper.ts`.
 - `events/`: `domain-events.ts` (event name constants), `skill-deleted.event.ts`, `organization-deleted.event.ts`, `user-deleted.event.ts` (neutral payload classes).
 - `enums/credential-kind.enum.ts`: shared `CredentialKind` enum (`SESSION`, `API_TOKEN`).
