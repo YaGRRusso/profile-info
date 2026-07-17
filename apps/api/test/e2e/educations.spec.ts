@@ -274,7 +274,7 @@ describe("Educations tenant isolation (e2e)", () => {
       variables: { educationId },
     });
 
-    expect(response.errors?.[0]?.message).toContain("Not Found");
+    expect(response.errors?.[0]?.message).toContain("Not found");
     expect(response.data?.findOneEducationById).toBeUndefined();
   });
 
@@ -295,7 +295,7 @@ describe("Educations tenant isolation (e2e)", () => {
       variables: { educationId },
     });
 
-    expect(response.errors?.[0]?.message).toContain("Not Removed");
+    expect(response.errors?.[0]?.message).toContain("Not removed");
   });
 
   it("should let SUPER_ADMIN read USER A education by explicit id", async () => {

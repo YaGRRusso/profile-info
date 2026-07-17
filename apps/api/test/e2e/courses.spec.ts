@@ -268,7 +268,7 @@ describe("Courses tenant isolation (e2e)", () => {
       variables: { courseId },
     });
 
-    expect(response.errors?.[0]?.message).toContain("Not Found");
+    expect(response.errors?.[0]?.message).toContain("Not found");
     expect(response.data?.findOneCourseById).toBeUndefined();
   });
 
@@ -289,7 +289,7 @@ describe("Courses tenant isolation (e2e)", () => {
       variables: { courseId },
     });
 
-    expect(response.errors?.[0]?.message).toContain("Not Removed");
+    expect(response.errors?.[0]?.message).toContain("Not removed");
   });
 
   it("should let SUPER_ADMIN read USER A course by explicit id", async () => {

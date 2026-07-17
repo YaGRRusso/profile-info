@@ -538,7 +538,7 @@ describe("Cross-tenant DataLoader isolation (e2e)", () => {
         variables: { [variableName]: entityId },
       });
 
-      expect(response.errors?.[0]?.message).toContain("Not Found");
+      expect(response.errors?.[0]?.message).toContain("Not found");
       expect(response.data?.[dataKey]).toBeUndefined();
     }
   );

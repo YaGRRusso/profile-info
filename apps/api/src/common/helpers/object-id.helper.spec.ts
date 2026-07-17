@@ -1,5 +1,6 @@
 import { BadRequestException } from "@nestjs/common";
 import mongoose from "mongoose";
+import { COMMON_INVALID_ID } from "@/core/errors/common.messages";
 import { assertValidObjectId, assertValidObjectIds } from "./object-id.helper";
 
 describe("object-id.helper", () => {
@@ -11,12 +12,16 @@ describe("object-id.helper", () => {
     });
 
     it("rejects an invalid ObjectId string", () => {
-      expect(() => assertValidObjectId("not-an-object-id")).toThrow(
-        BadRequestException
-      );
-      expect(() => assertValidObjectId("not-an-object-id")).toThrow(
-        "Invalid ID"
-      );
+      expect.assertions(2);
+
+      try {
+        assertValidObjectId("not-an-object-id");
+      } catch (error) {
+        expect(error).toBeInstanceOf(BadRequestException);
+        if (error instanceof BadRequestException) {
+          expect(error.getResponse()).toEqual(COMMON_INVALID_ID);
+        }
+      }
     });
   });
 

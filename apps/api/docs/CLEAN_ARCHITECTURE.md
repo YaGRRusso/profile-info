@@ -177,7 +177,7 @@ export class CoursesRepository {
 | **Mapper (CrudMapperInterface)** | `mappers/<entity>.mapper.ts` | Model ↔ domain record; DTOs → persistence; `withObjectIdRefs` em filters |
 | **Repository (DI)** | `CoursesRepository` — `crud` + `stats` + mapper | Tipado, injetável, mockável; tenant via `scoped()` |
 | **Domain Events** | `EventEmitter2` + listeners | Desacopla cascatas (skill deletada → projetos atualizam) sem import circular |
-| **Error Handling** | `PersistenceExceptionFilter` (`APP_FILTER`) | Converte erros de Mongo/Mongoose em 4xx/503 globalmente; `assertDuplicate` / `assertReferencesExist` em services só para mensagens específicas |
+| **Error Handling** | `PersistenceErrorMapper` + `ApiExceptionFilter` | Um filtro global; mappers de infraestrutura normalizam erros externos, e o filtro localiza ou aplica fallback |
 | **Port/Adapter** | `integrations/` (abstract class + impl) | Troca OpenRouter por outro LLM sem tocar nos modules |
 | **Modular Monolith** | Cada module é autocontido | Migrar para microservice = extrair o módulo inteiro |
 | **DataLoader** | Per-request batching em `platform/graphql/` | N+1 resolvido sem cache global |

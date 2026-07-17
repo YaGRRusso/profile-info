@@ -145,9 +145,6 @@ describe("ApiTokenStrategy", () => {
       await expect(strategy.validate(apiKey)).rejects.toThrow(
         NotFoundException
       );
-      await expect(strategy.validate(apiKey)).rejects.toThrow(
-        PERSISTENCE_NOT_FOUND
-      );
     });
 
     it("throws UnauthorizedException when the token is expired", async () => {
@@ -199,9 +196,6 @@ describe("ApiTokenStrategy", () => {
 
       await expect(strategy.validate(apiKey)).rejects.toThrow(
         NotFoundException
-      );
-      await expect(strategy.validate(apiKey)).rejects.toThrow(
-        PERSISTENCE_NOT_FOUND
       );
     });
   });

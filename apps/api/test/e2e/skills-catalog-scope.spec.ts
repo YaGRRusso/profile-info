@@ -14,7 +14,7 @@ import { createTestApp } from "../support/create-test-app";
 import { graphqlRequest } from "../support/graphql-request";
 import { skillI18n } from "../support/skill-i18n";
 
-const MUTATION_BLOCKED_MESSAGE = /Not (Found|Updated|Removed)/;
+const MUTATION_BLOCKED_MESSAGE = /Not (found|updated|removed)/;
 
 function firstGraphqlErrorMessage(
   errors: Array<{ message: string }> | undefined
@@ -195,7 +195,7 @@ describe("Skills catalog scope (e2e)", () => {
       token: userAToken,
       variables: { skillId: userBLocalSkillId },
     });
-    expect(findOneById.errors?.[0]?.message).toContain("Not Found");
+    expect(findOneById.errors?.[0]?.message).toContain("Not found");
 
     const findManyById = await graphqlRequest<{
       findManySkillById: Array<{ id: string; slug: string }>;
@@ -409,7 +409,7 @@ describe("Skills catalog scope (e2e)", () => {
       variables: { updateMeInput: { skillIds: [disabledSkill.id] } },
     });
 
-    expect(response.errors?.[0]?.message).toContain(PERSISTENCE_NOT_FOUND);
+    expect(response.errors?.[0]?.message).toContain(PERSISTENCE_NOT_FOUND.en);
   });
 
   it("9 — FilterSkillInput with another users ownerId and LOCAL does not leak", async () => {

@@ -303,7 +303,7 @@ describe("Experiences tenant isolation (e2e)", () => {
       variables: { experienceId },
     });
 
-    expect(response.errors?.[0]?.message).toContain("Not Found");
+    expect(response.errors?.[0]?.message).toContain("Not found");
     expect(response.data?.findOneExperienceById).toBeUndefined();
   });
 
@@ -325,7 +325,7 @@ describe("Experiences tenant isolation (e2e)", () => {
       variables: { experienceId },
     });
 
-    expect(response.errors?.[0]?.message).toContain("Not Removed");
+    expect(response.errors?.[0]?.message).toContain("Not removed");
   });
 
   it("should let SUPER_ADMIN read USER A experience by explicit id", async () => {

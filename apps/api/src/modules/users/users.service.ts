@@ -17,6 +17,7 @@ import { UpdateUserInput } from "./dto/update-user.input";
 import type { UserEntityRecord } from "./entities/user.entity";
 import type { UserWithPasswordEntity } from "./entities/user-with-password.entity";
 import type { UserCreateRecord, UserUpdateRecord } from "./mappers/user.mapper";
+import { USER_SUPER_ADMIN_NOT_DELETABLE } from "./users.messages";
 import { UsersRepository } from "./users.repository";
 
 @Injectable()
@@ -185,7 +186,7 @@ export class UsersService {
 
   private assertDeletable(user: UserEntityRecord): void {
     if (user.role === UserRole.SUPER_ADMIN) {
-      throw new ForbiddenException("SUPER_ADMIN users cannot be deleted");
+      throw new ForbiddenException(USER_SUPER_ADMIN_NOT_DELETABLE);
     }
   }
 

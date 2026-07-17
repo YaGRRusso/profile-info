@@ -10,11 +10,15 @@ describe("UsersValidatorService", () => {
   });
 
   it("rejects disabled users with a stable pending-approval message", () => {
-    expect(() => service.assertUserEnabled({ disabled: true })).toThrow(
-      UnauthorizedException
-    );
-    expect(() => service.assertUserEnabled({ disabled: true })).toThrow(
-      USER_ACCOUNT_DISABLED
-    );
+    expect.assertions(2);
+
+    try {
+      service.assertUserEnabled({ disabled: true });
+    } catch (error) {
+      expect(error).toBeInstanceOf(UnauthorizedException);
+      if (error instanceof UnauthorizedException) {
+        expect(error.getResponse()).toEqual(USER_ACCOUNT_DISABLED);
+      }
+    }
   });
 });

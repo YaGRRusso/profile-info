@@ -19,7 +19,7 @@ import { createTestApp } from "../support/create-test-app";
 import { graphqlRequest } from "../support/graphql-request";
 import { skillI18n } from "../support/skill-i18n";
 
-const MUTATION_BLOCKED_MESSAGE = /Not (Found|Updated|Removed)/;
+const MUTATION_BLOCKED_MESSAGE = /Not (found|updated|removed)/;
 
 async function signIn(
   app: INestApplication<App>,

@@ -15,7 +15,7 @@ import { createTestApp } from "../support/create-test-app";
 import { graphqlRequest } from "../support/graphql-request";
 import { organizationI18n } from "../support/organization-i18n";
 
-const MUTATION_BLOCKED_MESSAGE = /Not (Found|Updated|Removed)/;
+const MUTATION_BLOCKED_MESSAGE = /Not (found|updated|removed)/;
 
 function firstGraphqlErrorMessage(
   errors: Array<{ message: string }> | undefined
@@ -219,7 +219,7 @@ describe("Organizations catalog scope (e2e)", () => {
       token: userAToken,
       variables: { organizationId: userBLocalOrganizationId },
     });
-    expect(findOneById.errors?.[0]?.message).toContain("Not Found");
+    expect(findOneById.errors?.[0]?.message).toContain("Not found");
 
     const findManyById = await graphqlRequest<{
       findManyOrganizationById: Array<{ id: string; slug: string }>;
@@ -446,7 +446,7 @@ describe("Organizations catalog scope (e2e)", () => {
       },
     });
 
-    expect(response.errors?.[0]?.message).toContain(PERSISTENCE_NOT_FOUND);
+    expect(response.errors?.[0]?.message).toContain(PERSISTENCE_NOT_FOUND.en);
   });
 
   it("9 — FilterOrganizationInput with another users ownerId and LOCAL does not leak", async () => {

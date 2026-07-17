@@ -14,6 +14,7 @@ import {
   createResumePdfOptions,
   renderResumeDocument,
 } from "./pdf/render-document";
+import { RESUME_USER_ID_REQUIRED } from "./resume.messages";
 import { ResumeService } from "./resume.service";
 
 @Controller()
@@ -30,7 +31,7 @@ export class ResumeController {
     @Query("userId") userId: string | undefined,
     @Query("locale") localeQuery?: string
   ) {
-    if (!userId) throw new BadRequestException("userId is required");
+    if (!userId) throw new BadRequestException(RESUME_USER_ID_REQUIRED);
     assertValidObjectId(userId);
 
     const locale = normalizeLocale(localeQuery);

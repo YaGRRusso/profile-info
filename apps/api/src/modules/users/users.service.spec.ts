@@ -1,3 +1,4 @@
+import { ForbiddenException } from "@nestjs/common";
 import { EventEmitter2 } from "@nestjs/event-emitter";
 import { Test, TestingModule } from "@nestjs/testing";
 import { testSuperAdminContext } from "@test/fixtures/auth-context";
@@ -285,7 +286,7 @@ describe("UsersService", () => {
       });
 
       await expect(service.removeOne(validId)).rejects.toThrow(
-        "SUPER_ADMIN users cannot be deleted"
+        ForbiddenException
       );
       expect(eventEmitter.emitAsync).not.toHaveBeenCalled();
       expect(crud.deleteOneById).not.toHaveBeenCalled();
@@ -321,7 +322,7 @@ describe("UsersService", () => {
 
       await expect(
         service.removeMany([validId, "507f1f77bcf86cd799439014"])
-      ).rejects.toThrow("SUPER_ADMIN users cannot be deleted");
+      ).rejects.toThrow(ForbiddenException);
       expect(eventEmitter.emitAsync).not.toHaveBeenCalled();
       expect(crud.deleteManyById).not.toHaveBeenCalled();
     });

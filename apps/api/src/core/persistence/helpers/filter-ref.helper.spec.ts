@@ -1,3 +1,4 @@
+import { BadRequestException } from "@nestjs/common";
 import mongoose from "mongoose";
 import { withObjectIdRefs } from "./filter-ref.helper";
 
@@ -58,6 +59,6 @@ describe("withObjectIdRefs", () => {
         { organizationId: "not-an-object-id" },
         { single: ["organizationId"] }
       )
-    ).toThrow("Invalid ID");
+    ).toThrow(BadRequestException);
   });
 });

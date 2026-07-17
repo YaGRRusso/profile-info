@@ -8,7 +8,6 @@ import { AppController } from "./app.controller";
 import { AppService } from "./app.service";
 import { AppCacheModule } from "./core/cache/app-cache.module";
 import { type Env, validateEnv } from "./core/configs/env.validation";
-import { PersistenceExceptionFilter } from "./core/filters/persistence-exception.filter";
 import { HealthModule } from "./core/health/health.module";
 import { AiToolsModule } from "./modules/ai-tools/ai-tools.module";
 import { ApiTokensModule } from "./modules/api-tokens/api-tokens.module";
@@ -22,6 +21,7 @@ import { ProjectsModule } from "./modules/projects/projects.module";
 import { ResumeModule } from "./modules/resume/resume.module";
 import { SkillsModule } from "./modules/skills/skills.module";
 import { UsersModule } from "./modules/users/users.module";
+import { ApiExceptionFilter } from "./platform/errors/api-exception.filter";
 import { GraphqlModule } from "./platform/graphql/graphql.module";
 
 @Module({
@@ -60,7 +60,7 @@ import { GraphqlModule } from "./platform/graphql/graphql.module";
   ],
   providers: [
     AppService,
-    { provide: APP_FILTER, useClass: PersistenceExceptionFilter },
+    { provide: APP_FILTER, useClass: ApiExceptionFilter },
   ],
 })
 export class AppModule {}

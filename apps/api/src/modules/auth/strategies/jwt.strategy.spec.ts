@@ -108,9 +108,6 @@ describe("JwtStrategy", () => {
       await expect(strategy.validate(mockPayload)).rejects.toThrow(
         NotFoundException
       );
-      await expect(strategy.validate(mockPayload)).rejects.toThrow(
-        PERSISTENCE_NOT_FOUND
-      );
     });
   });
 });

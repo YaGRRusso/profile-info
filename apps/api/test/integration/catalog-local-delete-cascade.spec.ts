@@ -1,4 +1,4 @@
-import { INestApplication } from "@nestjs/common";
+import { INestApplication, NotFoundException } from "@nestjs/common";
 import {
   testAuthContext,
   testSuperAdminContext,
@@ -132,6 +132,6 @@ describe("Catalog LOCAL delete cascade (integration)", () => {
 
     await expect(
       coursesService.findOneById(ownerCtx, course.id)
-    ).rejects.toThrow("Not Found");
+    ).rejects.toThrow(NotFoundException);
   });
 });

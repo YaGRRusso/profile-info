@@ -295,6 +295,6 @@ describe("Catalog loaders and dashboard counts (e2e)", () => {
       variables: { skillFilters: { slug: "loader-global-disabled" } },
     });
 
-    expect(response.errors?.[0]?.message).toContain("Not Found");
+    expect(response.errors?.[0]?.message).toContain("Not found");
   });
 });

@@ -111,7 +111,7 @@ describe("User registration (e2e)", () => {
 
     expect(response.data?.signIn).toBeUndefined();
     expect(response.errors?.[0]?.extensions?.code).toBe("UNAUTHENTICATED");
-    expect(response.errors?.[0]?.message).toBe(USER_ACCOUNT_DISABLED);
+    expect(response.errors?.[0]?.message).toBe(USER_ACCOUNT_DISABLED.en);
   });
 
   it("allows sign-in after a super admin enables the user", async () => {
