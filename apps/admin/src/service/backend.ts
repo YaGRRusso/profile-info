@@ -26,30 +26,22 @@ export function backendHeaders(init?: HeadersInit): Headers {
   return headers;
 }
 
-export class BackendError extends Error {
-  readonly code?: string;
-  readonly status?: number;
-
-  constructor(message: string, options?: { code?: string; status?: number }) {
-    super(message);
-    this.name = "BackendError";
-    this.code = options?.code;
-    this.status = options?.status;
-  }
+export interface RequestFailure {
+  code?: string;
+  message: string;
+  status?: number;
 }
 
-export function failRequest(
-  message: string,
-  options?: { code?: string; status?: number }
-): never {
-  const unauthenticated =
-    options?.code === "UNAUTHENTICATED" || options?.status === 401;
-
-  if (unauthenticated && useAuthStore.getState().token) {
+export function failRequest(failure: RequestFailure): never {
+  if (isUnauthenticated(failure) && useAuthStore.getState().token) {
     useAuthStore.getState().clearAuth();
   }
 
-  throw new BackendError(message, options);
+  throw new Error(failure.message);
+}
+
+function isUnauthenticated(failure: RequestFailure): boolean {
+  return failure.code === "UNAUTHENTICATED" || failure.status === 401;
 }
 
 function messageFromUnknown(body: unknown): string | undefined {

@@ -22,19 +22,21 @@ export async function request<Result, Variables>(
 
   if (body.errors?.length) {
     const [first] = body.errors;
-    failRequest(first?.message ?? "an error occurred", {
+    failRequest({
       code: first?.extensions?.code,
+      message: first?.message ?? "an error occurred",
     });
   }
 
   if (!response.ok) {
-    failRequest(`failed to fetch: ${response.status} ${response.statusText}`, {
+    failRequest({
+      message: `failed to fetch: ${response.status} ${response.statusText}`,
       status: response.status,
     });
   }
 
   if (!body.data) {
-    failRequest("no data returned", { status: response.status });
+    failRequest({ message: "no data returned" });
   }
 
   return body.data;

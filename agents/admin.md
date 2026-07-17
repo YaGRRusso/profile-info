@@ -21,7 +21,7 @@ Entry point `src/main.tsx`:
 - Router from `routeTree.gen.ts` with `basepath: import.meta.env.BASE_URL`.
 - `QueryClientProvider` > Sonner `Toaster` + `SlowRequestWatcher` + `RouterProvider`.
 
-Data flow: backend transports live under `src/service/` with one shared pattern. `VITE_API_URL` is the API **origin only**. Both protocols export `request` and share the same failure path (`failRequest` → `BackendError` with the **server message**). GraphQL unwraps `{ data, errors }` then calls `failRequest`; REST checks `!ok`, reads Nest `{ message }`, then calls `failRequest`. `UNAUTHENTICATED` / HTTP 401 clears auth inside `failRequest`. Toast only shows `error.message` — never map codes on the client. Localized copy is owned by the API (`Accept-Language` + error catalogs).
+Data flow: backend transports live under `src/service/` with one shared pattern. `VITE_API_URL` is the API **origin only**. Both protocols export `request`, extract the message returned by the API, and pass a structured `RequestFailure` (`message`, optional `status` / `code`) to `failRequest`. Shared failure policy detects unauthenticated responses, clears auth, and throws a native `Error`. Toast only shows `error.message`; localization and fallback copy belong exclusively to the API.
 
 Routing:
 
@@ -52,7 +52,7 @@ Rich forms map flat Zod schemas to nested GraphQL shapes (`i18n`, `organizationI
 
 ## Module / directory breakdown
 
-- `src/service/`: backend transports — **one pattern**. `backend.ts` (`getApiBaseUrl`, `backendHeaders`, `BackendError`, `failRequest`, `readErrorMessage`); each protocol file exports `request` (`graphql.ts` → `{base}/graphql` + envelope unwrap; `rest.ts` → `{base}{path}` + Response). Both fail through `failRequest` only. Do not name the GraphQL transport `graphql` (collides with the codegen tag).
+- `src/service/`: backend transports — **one pattern**. `backend.ts` owns the base URL, shared headers, REST message extraction, and `failRequest`; each protocol file exports `request`. Both fail through `failRequest` and never map or translate backend errors.
 - `src/lib/`: domain-agnostic helpers — `gql.ts`, `tc.ts`, `cn.ts`, `parsers.ts`, `field-error.ts`, `form-errors.ts`, `form-validation.ts`, `form-input.ts` (`omitIfEmpty` / `nullIfEmpty` in `*ToInput` mappers), `ai-array-context.ts` (`isAiContextArrayIndex` / `arrayContextDetails` — only the first item in an AI context array gets `contextMode` / aura), `chart-theme.ts`, `dayjs.ts`, `i18n.ts` (entity `pickTranslation` / `i18nLabel`), etc.
 - `src/hooks/queries/` and `mutations/`: one file per entity; `graphql` tag must use static string literals (no interpolated fragments). Paginated list hooks use `hooks/custom/paginated-query.ts` helpers inside `useInfiniteQuery` — each helper receives an explicit key (`withPagination`: variables pagination key; `paginatedNextPageParam` / `paginatedSelect`: response field name).
 - `src/generated/graphql/`: codegen output — regenerate, do not edit.

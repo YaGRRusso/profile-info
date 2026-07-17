@@ -15,7 +15,8 @@ export async function request(
   });
 
   if (!response.ok) {
-    failRequest(await readErrorMessage(response), {
+    failRequest({
+      message: await readErrorMessage(response),
       status: response.status,
     });
   }
