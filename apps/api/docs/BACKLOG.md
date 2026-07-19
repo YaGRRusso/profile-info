@@ -55,7 +55,7 @@ Deferred API and admin work, ordered by **criticality**, then **effort** (ascend
 ### Large effort
 
 - **Collaborative catalog** — Users submit skill/org requests; `SUPER_ADMIN` moderates; local overrides per tenant.
-- **Admin panel multi-tenant** — Broader role-aware chrome beyond Users CRUD (API token management UX, super-admin tenant overview). Users list/CRUD for `SUPER_ADMIN` is shipped (`routes/.../users/`).
+- **Admin panel multi-tenant** — Broader role-aware chrome beyond Users CRUD (API token management UX). Users list/CRUD for `SUPER_ADMIN` is shipped (`routes/.../users/`), including per-user private entity counts (`ownedCounts`).
 
 ## Low Priority
 

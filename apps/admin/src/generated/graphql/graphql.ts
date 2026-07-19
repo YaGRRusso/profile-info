@@ -1026,7 +1026,7 @@ export type FindManyUsersQueryVariables = Exact<{
 }>;
 
 
-export type FindManyUsersQuery = { findManyUsers: { found: number, nodes: Array<{ id: string, name: string, nickname: string, email: string, avatar: string | null, phone: string | null, role: UserRole, disabled: boolean, createdAt: string, updatedAt: string }> } };
+export type FindManyUsersQuery = { findManyUsers: { found: number, nodes: Array<{ id: string, name: string, nickname: string, email: string, avatar: string | null, phone: string | null, role: UserRole, disabled: boolean, createdAt: string, updatedAt: string, ownedCounts: { experiences: number, educations: number, courses: number, projects: number } }> } };
 
 export class TypedDocumentString<TResult, TVariables>
   extends String
@@ -2080,6 +2080,12 @@ export const FindManyUsersDocument = new TypedDocumentString(`
       phone
       role
       disabled
+      ownedCounts {
+        experiences
+        educations
+        courses
+        projects
+      }
       createdAt
       updatedAt
     }

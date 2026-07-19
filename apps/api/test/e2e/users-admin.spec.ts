@@ -1,7 +1,23 @@
 import { INestApplication } from "@nestjs/common";
-import { testSuperAdminContext } from "@test/fixtures/auth-context";
+import {
+  testAuthContext,
+  testSuperAdminContext,
+} from "@test/fixtures/auth-context";
 import { App } from "supertest/types";
 import { UserRole } from "@/core/enums/user-role.enum";
+import { CoursesService } from "@/modules/courses/courses.service";
+import { CreateCourseInput } from "@/modules/courses/dto/create-course.input";
+import { CourseStatus } from "@/modules/courses/enums/status.enum";
+import { CreateEducationInput } from "@/modules/educations/dto/create-education.input";
+import { EducationsService } from "@/modules/educations/educations.service";
+import { EducationLevel } from "@/modules/educations/enums/level.enum";
+import { EducationStatus } from "@/modules/educations/enums/status.enum";
+import { CreateExperienceInput } from "@/modules/experiences/dto/create-experience.input";
+import { ExperienceCategory } from "@/modules/experiences/enums/category.enum";
+import { ExperiencesService } from "@/modules/experiences/experiences.service";
+import { OrganizationCategory } from "@/modules/organizations/enums/category.enum";
+import { OrganizationsService } from "@/modules/organizations/organizations.service";
+import { ProjectsService } from "@/modules/projects/projects.service";
 import { UsersService } from "@/modules/users/users.service";
 import { clearTestDatabase } from "../support/clear-test-database";
 import { createTestApp } from "../support/create-test-app";
@@ -60,6 +76,12 @@ const FIND_MANY_USERS = `
       nodes {
         id
         email
+        ownedCounts {
+          experiences
+          educations
+          courses
+          projects
+        }
       }
     }
   }
@@ -70,6 +92,17 @@ const FIND_ONE_USER_BY_ID = `
     findOneUserById(userId: $userId) {
       id
       email
+    }
+  }
+`;
+
+const FIND_ONE_USER_BY_ID_WITH_OWNED_COUNTS = `
+  query FindOneUserByIdWithOwnedCounts($userId: ID!) {
+    findOneUserById(userId: $userId) {
+      id
+      ownedCounts {
+        experiences
+      }
     }
   }
 `;
@@ -105,6 +138,88 @@ describe("Users admin (e2e)", () => {
       role: UserRole.USER,
     });
     userId = user.id;
+
+    const userCtx = testAuthContext({ id: user.id });
+    const organizationsService = testApp.module.get(OrganizationsService);
+    const experiencesService = testApp.module.get(ExperiencesService);
+    const educationsService = testApp.module.get(EducationsService);
+    const coursesService = testApp.module.get(CoursesService);
+    const projectsService = testApp.module.get(ProjectsService);
+
+    const organization = await organizationsService.createOne(
+      testSuperAdminContext(),
+      {
+        category: OrganizationCategory.COMPANY,
+        i18n: [{ locale: "en", messages: { description: "Org" } }],
+        logo: "https://users-admin.example/logo.png",
+        name: "Users Admin Org",
+        slug: "users-admin-org",
+      }
+    );
+    const organizationId = organization.id;
+
+    await experiencesService.createOne(userCtx, {
+      category: ExperienceCategory.FULL_TIME,
+      organizationId,
+      roles: [
+        {
+          i18n: [
+            {
+              locale: "en",
+              messages: { description: "Work", title: "Engineer" },
+            },
+          ],
+        },
+      ],
+      slug: "user-experience",
+    } as CreateExperienceInput);
+    await experiencesService.createOne(userCtx, {
+      category: ExperienceCategory.FREELANCE,
+      organizationId,
+      roles: [
+        {
+          i18n: [
+            {
+              locale: "en",
+              messages: { description: "Side", title: "Consultant" },
+            },
+          ],
+        },
+      ],
+      slug: "user-experience-freelance",
+    } as CreateExperienceInput);
+    await educationsService.createOne(userCtx, {
+      i18n: [
+        {
+          locale: "en",
+          messages: { description: "CS", title: "Degree" },
+        },
+      ],
+      level: EducationLevel.BACHELOR,
+      organizationId,
+      slug: "user-education",
+      status: EducationStatus.COMPLETE,
+    } as CreateEducationInput);
+    await coursesService.createOne(userCtx, {
+      i18n: [
+        {
+          locale: "en",
+          messages: { description: "Done", title: "Course" },
+        },
+      ],
+      organizationId,
+      slug: "user-course",
+      status: CourseStatus.COMPLETE,
+    } as CreateCourseInput);
+    await projectsService.createOne(userCtx, {
+      i18n: [
+        {
+          locale: "en",
+          messages: { description: "App", title: "Project" },
+        },
+      ],
+      slug: "user-project",
+    });
 
     const adminSignIn = await graphqlRequest<{ signIn: string }>(app, {
       query: SIGN_IN,
@@ -194,6 +309,56 @@ describe("Users admin (e2e)", () => {
       email: "admin@profile.info",
       id: adminId,
     });
+  });
+
+  it("lets SUPER_ADMIN read ownedCounts on findManyUsers", async () => {
+    const response = await graphqlRequest<{
+      findManyUsers: {
+        nodes: Array<{
+          id: string;
+          email: string;
+          ownedCounts: {
+            experiences: number;
+            educations: number;
+            courses: number;
+            projects: number;
+          };
+        }>;
+      };
+    }>(app, {
+      query: FIND_MANY_USERS,
+      token: adminToken,
+    });
+
+    expect(response.errors).toBeUndefined();
+    const row = response.data?.findManyUsers.nodes.find(
+      (node) => node.id === userId
+    );
+    expect(row?.ownedCounts).toEqual({
+      courses: 1,
+      educations: 1,
+      experiences: 2,
+      projects: 1,
+    });
+  });
+
+  it("forbids USER from ownedCounts on findOneUserById", async () => {
+    const response = await graphqlRequest<{
+      findOneUserById: { id: string; ownedCounts: unknown } | null;
+    }>(app, {
+      query: FIND_ONE_USER_BY_ID_WITH_OWNED_COUNTS,
+      token: userToken,
+      variables: { userId },
+    });
+
+    expect(response.errors?.[0]?.path).toEqual([
+      "findOneUserById",
+      "ownedCounts",
+    ]);
+    expect(response.errors?.[0]?.message).toBe("Insufficient permissions");
+    expect(response.errors?.[0]?.extensions?.code).toBe("FORBIDDEN");
+    // Non-null ownedCounts failure drops the parent from data.
+    expect(response.data?.findOneUserById).toBeUndefined();
   });
 
   it("lets SUPER_ADMIN createOneUser as enabled USER", async () => {

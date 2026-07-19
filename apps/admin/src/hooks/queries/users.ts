@@ -36,6 +36,12 @@ const findManyUsers = graphql(`
         phone
         role
         disabled
+        ownedCounts {
+          experiences
+          educations
+          courses
+          projects
+        }
         createdAt
         updatedAt
       }

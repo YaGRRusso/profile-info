@@ -5,6 +5,7 @@ import { UrlEntity } from "@/core/entities/url.entity";
 import { UserRole } from "@/core/enums/user-role.enum";
 import { createPaginatedModel } from "@/core/schemas/paginated.schema";
 import { SkillEntity } from "@/modules/skills/entities/skill.entity";
+import { UserOwnedCounts } from "./user-owned-counts.entity";
 
 @ObjectType()
 export class UserMessages {
@@ -67,8 +68,11 @@ export class UserEntity extends BaseEntity {
 
   @OptionalField(() => [SkillEntity])
   skills?: SkillEntity[];
+
+  @Field(() => UserOwnedCounts)
+  ownedCounts?: UserOwnedCounts;
 }
 
 export const PaginatedUserEntity = createPaginatedModel(UserEntity);
 
-export type UserEntityRecord = Omit<UserEntity, "skills">;
+export type UserEntityRecord = Omit<UserEntity, "skills" | "ownedCounts">;

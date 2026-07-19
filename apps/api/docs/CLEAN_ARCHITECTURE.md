@@ -50,7 +50,7 @@ src/
     ├── skills/         ← Módulo catálogo (ADR 001)
     ├── organizations/
     ├── experiences/
-    ├── users/          UsersLoaderService (batchUsers)
+    ├── users/          UsersLoaderService (batchUsers, batchUserOwnedCounts)
     ├── ai-tools/       Mutations AI + throttle (ADR 003)
     ├── ...
     └── dashboard/      Agregação read-only (consome services de outros módulos)

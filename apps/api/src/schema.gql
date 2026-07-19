@@ -938,6 +938,7 @@ type UserEntity {
   id: ID!
   name: String!
   nickname: String!
+  ownedCounts: UserOwnedCounts!
   phone: String
   role: UserRole!
   skillIds: [ID!]
@@ -949,6 +950,13 @@ type UserEntity {
 type UserMessages {
   description: String
   title: String
+}
+
+type UserOwnedCounts {
+  courses: Int!
+  educations: Int!
+  experiences: Int!
+  projects: Int!
 }
 
 enum UserRole {

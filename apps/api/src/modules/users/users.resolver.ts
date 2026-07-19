@@ -8,6 +8,8 @@ import {
   ResolveField,
   Resolver,
 } from "@nestjs/graphql";
+import { GraphQLError } from "graphql";
+import { AUTH_INSUFFICIENT_PERMISSIONS } from "@/core/auth/auth.messages";
 import type { AuthContext } from "@/core/context/auth-context.interface";
 import type { GraphqlContext } from "@/core/context/graphql-context.interface";
 import { Roles } from "@/core/decorators/roles.decorator";
@@ -25,6 +27,7 @@ import {
   UserEntity,
   type UserEntityRecord,
 } from "./entities/user.entity";
+import { UserOwnedCounts } from "./entities/user-owned-counts.entity";
 import { UsersService } from "./users.service";
 
 @Resolver(() => UserEntity)
@@ -143,5 +146,19 @@ export class UsersResolver {
     const ids = user.skillIds;
     if (!ids?.length) return [];
     return ctx.loaders.batchSkills.loadMany(ids);
+  }
+
+  @ResolveField(() => UserOwnedCounts)
+  ownedCounts(
+    @Auth() auth: AuthContext,
+    @Parent() user: UserEntityRecord,
+    @Context() ctx: GraphqlContext
+  ) {
+    if (auth.role !== UserRole.SUPER_ADMIN) {
+      throw new GraphQLError(AUTH_INSUFFICIENT_PERMISSIONS.en, {
+        extensions: { code: "FORBIDDEN" },
+      });
+    }
+    return ctx.loaders.batchUserOwnedCounts.load(user.id);
   }
 }

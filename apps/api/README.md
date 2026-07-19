@@ -117,7 +117,7 @@ src/
     ├── resume/               # PDF export (REST GET /resume.pdf)
     ├── skills/               # Catalog CRUD; exports SkillsLoaderService
     ├── organizations/
-    ├── users/                # UsersLoaderService (batchUsers)
+    ├── users/                # UsersLoaderService (batchUsers, batchUserOwnedCounts)
     ├── ai-tools/
     │   ├── chat/             # ChatService → AiChatProvider
     │   ├── context/          # ContextService → Tavily ports (ADR 004)

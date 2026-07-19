@@ -158,6 +158,26 @@ const getColumns = (
     filterFn: "equals",
     header: "Status",
   }),
+  columnHelper.accessor((row) => row.ownedCounts.experiences, {
+    enableGlobalFilter: false,
+    header: "Experiences",
+    id: "experiences",
+  }),
+  columnHelper.accessor((row) => row.ownedCounts.educations, {
+    enableGlobalFilter: false,
+    header: "Educations",
+    id: "educations",
+  }),
+  columnHelper.accessor((row) => row.ownedCounts.courses, {
+    enableGlobalFilter: false,
+    header: "Courses",
+    id: "courses",
+  }),
+  columnHelper.accessor((row) => row.ownedCounts.projects, {
+    enableGlobalFilter: false,
+    header: "Projects",
+    id: "projects",
+  }),
   columnHelper.accessor("createdAt", {
     cell: ({ getValue }) => new Date(getValue()).toLocaleDateString(),
     enableGlobalFilter: false,

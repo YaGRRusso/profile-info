@@ -17,6 +17,7 @@ export class LoadersService {
     return {
       batchOrganizations: this.organizationsLoaderService.createLoader(req),
       batchSkills: this.skillsLoaderService.createLoader(req),
+      batchUserOwnedCounts: this.usersLoaderService.createOwnedCountsLoader(),
       batchUsers: this.usersLoaderService.createLoader(),
     };
   }
