@@ -1,0 +1,4 @@
+{
+  "UNAUTHORIZED": "O provedor de IA rejeitou as credenciais da API",
+  "PROVIDER_FAILURE": "O provedor de IA falhou ao concluir a solicitação"
+}

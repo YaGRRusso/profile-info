@@ -1,0 +1,4 @@
+{
+  "UNAUTHORIZED": "AI provider rejected the API credentials",
+  "PROVIDER_FAILURE": "AI provider failed to complete the request"
+}

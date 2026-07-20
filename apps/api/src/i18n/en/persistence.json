@@ -1,0 +1,10 @@
+{
+  "NOT_FOUND": "Not found",
+  "NOT_CREATED": "Not created",
+  "NOT_UPDATED": "Not updated",
+  "NOT_REMOVED": "Not removed",
+  "DUPLICATE": "A record with this value already exists",
+  "INVALID": "Invalid value",
+  "VALIDATION": "Validation failed",
+  "UNAVAILABLE": "Database temporarily unavailable"
+}

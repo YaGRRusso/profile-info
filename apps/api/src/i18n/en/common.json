@@ -1,0 +1,5 @@
+{
+  "UNEXPECTED": "Something went wrong",
+  "INVALID_ID": "Invalid ID",
+  "REFERENCES_NOT_FOUND": "Referenced resource not found"
+}

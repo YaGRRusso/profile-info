@@ -1,0 +1,10 @@
+{
+  "NOT_FOUND": "No encontrado",
+  "NOT_CREATED": "No creado",
+  "NOT_UPDATED": "No actualizado",
+  "NOT_REMOVED": "No eliminado",
+  "DUPLICATE": "Ya existe un registro con este valor",
+  "INVALID": "Valor inválido",
+  "VALIDATION": "Validación fallida",
+  "UNAVAILABLE": "Base de datos temporalmente no disponible"
+}
