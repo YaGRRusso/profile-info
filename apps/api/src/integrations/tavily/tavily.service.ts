@@ -7,6 +7,7 @@ import {
   tavily,
 } from "@tavily/core";
 import type { Env } from "@/core/configs/env.validation";
+import { mapTavilyError } from "./mappers/tavily-error.mapper";
 import { mapTavilyExtractResponse } from "./mappers/tavily-extract-result.mapper";
 import { mapTavilySearchResponse } from "./mappers/tavily-search-result.mapper";
 import {
@@ -43,7 +44,7 @@ export class TavilyService implements WebContentProvider, WebSearchProvider {
       const response = await this.client.search(query, tavilyOptions);
       return mapTavilySearchResponse(response);
     } catch (error) {
-      throw new Error("Tavily search failed", { cause: error });
+      throw mapTavilyError(error);
     }
   }
 
@@ -61,7 +62,7 @@ export class TavilyService implements WebContentProvider, WebSearchProvider {
       const response = await this.client.extract(urls, tavilyOptions);
       return mapTavilyExtractResponse(response);
     } catch (error) {
-      throw new Error("Tavily extract failed", { cause: error });
+      throw mapTavilyError(error);
     }
   }
 }

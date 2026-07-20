@@ -1,5 +1,10 @@
+import { BadGatewayException, UnauthorizedException } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { Test, TestingModule } from "@nestjs/testing";
+import {
+  OPENROUTER_PROVIDER_FAILURE,
+  OPENROUTER_UNAUTHORIZED,
+} from "./open-router.messages";
 import { OpenRouterService } from "./open-router.service";
 
 const sendMock = jest.fn();
@@ -96,24 +101,45 @@ describe("OpenRouterService", () => {
   });
 
   it("does not try the next model on OpenRouter auth failures", async () => {
-    const authError = unauthorizedError();
-    sendMock.mockRejectedValueOnce(authError);
+    sendMock.mockRejectedValueOnce(unauthorizedError());
 
-    await expect(service.chat(chatRequest)).rejects.toBe(authError);
+    await expect(service.chat(chatRequest)).rejects.toMatchObject({
+      response: OPENROUTER_UNAUTHORIZED,
+    });
     expect(sendMock).toHaveBeenCalledTimes(1);
   });
 
-  it("walks the full chain and rethrows the last error when every model fails", async () => {
-    const lastError = new Error("final model unavailable");
+  it("maps auth failures to UnauthorizedException", async () => {
+    sendMock.mockRejectedValueOnce(unauthorizedError());
+
+    await expect(service.chat(chatRequest)).rejects.toBeInstanceOf(
+      UnauthorizedException
+    );
+  });
+
+  it("walks the full chain and maps the last error when every model fails", async () => {
     sendMock
       .mockRejectedValueOnce(new Error("rate limited"))
       .mockRejectedValueOnce(new Error("token budget exceeded"))
-      .mockRejectedValueOnce(lastError);
+      .mockRejectedValueOnce(new Error("final model unavailable"));
 
-    await expect(service.chat(chatRequest)).rejects.toThrow(lastError);
+    await expect(service.chat(chatRequest)).rejects.toMatchObject({
+      response: OPENROUTER_PROVIDER_FAILURE,
+    });
     expect(sendMock).toHaveBeenCalledTimes(3);
     expect(
       sendMock.mock.calls.map((call) => call[0].chatRequest.model)
     ).toEqual([...MODELS]);
+  });
+
+  it("maps exhausted model failures to BadGatewayException", async () => {
+    sendMock
+      .mockRejectedValueOnce(new Error("rate limited"))
+      .mockRejectedValueOnce(new Error("token budget exceeded"))
+      .mockRejectedValueOnce(new Error("final model unavailable"));
+
+    await expect(service.chat(chatRequest)).rejects.toBeInstanceOf(
+      BadGatewayException
+    );
   });
 });

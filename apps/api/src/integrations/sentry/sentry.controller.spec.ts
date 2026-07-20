@@ -1,16 +1,21 @@
 import { NotFoundException } from "@nestjs/common";
+import { ConfigService } from "@nestjs/config";
 import { Test } from "@nestjs/testing";
-import { ErrorMonitoringProvider } from "./error-monitoring.provider";
 import { SentryController } from "./sentry.controller";
 
 describe("SentryController", () => {
-  async function createController(enabled: boolean) {
+  async function createController(nodeEnv: string) {
     const module = await Test.createTestingModule({
       controllers: [SentryController],
       providers: [
         {
-          provide: ErrorMonitoringProvider,
-          useValue: { enabled },
+          provide: ConfigService,
+          useValue: {
+            getOrThrow: jest.fn((key: string) => {
+              if (key === "NODE_ENV") return nodeEnv;
+              throw new Error(`Unexpected config key: ${key}`);
+            }),
+          },
         },
       ],
     }).compile();
@@ -18,15 +23,15 @@ describe("SentryController", () => {
     return module.get(SentryController);
   }
 
-  it("returns 404 when Sentry is disabled", async () => {
-    const controller = await createController(false);
+  it("returns 404 when not in production", async () => {
+    const controller = await createController("development");
 
     expect(() => controller.smokeTest()).toThrow(NotFoundException);
   });
 
-  it("throws a smoke-test error when Sentry is enabled", async () => {
-    const controller = await createController(true);
+  it("throws a smoke-test error in production", async () => {
+    const controller = await createController("production");
 
-    expect(() => controller.smokeTest()).toThrow("Sentry smoke test");
+    expect(() => controller.smokeTest()).toThrow("Sentry Smoke Test");
   });
 });

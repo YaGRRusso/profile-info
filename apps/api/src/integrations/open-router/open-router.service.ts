@@ -8,6 +8,7 @@ import {
   type IntegrationChatResult,
 } from "./ai-chat.provider";
 import { isOpenRouterAuthError } from "./helpers/is-open-router-auth-error.helper";
+import { mapOpenRouterError } from "./mappers/open-router-error.mapper";
 import { openRouterRequestMapper } from "./mappers/open-router-request.mapper";
 import { openRouterResultMapper } from "./mappers/open-router-result.mapper";
 
@@ -41,7 +42,7 @@ export class OpenRouterService extends AiChatProvider {
         const canRetry = hasNext && !isOpenRouterAuthError(error);
 
         if (!canRetry) {
-          throw error;
+          throw mapOpenRouterError(error);
         }
 
         this.logger.warn(
@@ -51,7 +52,7 @@ export class OpenRouterService extends AiChatProvider {
       }
     }
 
-    throw new Error("No OpenRouter models configured");
+    throw mapOpenRouterError(new Error("No OpenRouter models configured"));
   }
 
   private async complete(
