@@ -4,7 +4,6 @@ Deferred API and admin work, ordered by **criticality**, then **effort** (ascend
 
 ## Priority
 
-- **Owner-scoped catalog loaders** — GraphQL `@ResolveField` loaders use caller `ctx` today. Resume PDF builds owner-scoped `ctx` directly. Implement owner-scoped loaders when cross-user reads need LOCAL refs (public portfolio, etc.).
 - **Error monitoring** — Integrate an error-monitoring service with structured context, environment and release metadata, alerting, and sensitive-data filtering.
 - **Email delivery integration** — Add a provider-neutral email port, provider adapter, templates, configuration, and delivery-failure handling.
 - **Event-driven user emails** — Publish explicit business events and send transactional emails from listeners (for example, registration and account-status changes), with each event's recipient, locale, and delivery policy defined as part of that use case.

@@ -45,7 +45,7 @@ import "./loaders.registry";
               skillsLoaderService,
               organizationsLoaderService,
               usersLoaderService
-            ).createLoaders(req),
+            ).createLoaders(),
             req,
             res,
           }),

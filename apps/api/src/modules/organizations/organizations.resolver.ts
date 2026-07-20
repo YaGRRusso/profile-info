@@ -230,7 +230,8 @@ export class OrganizationsResolver {
     @Parent() organization: OrganizationEntityRecord,
     @Context() ctx: GraphqlContext
   ) {
-    if (!organization?.ownerId) return null;
-    return ctx.loaders.batchUsers.load(organization.ownerId);
+    const { ownerId } = organization;
+    if (!ownerId) return null;
+    return ctx.loaders.batchUsers.load(ownerId);
   }
 }

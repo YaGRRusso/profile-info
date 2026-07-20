@@ -153,8 +153,9 @@ export class EducationsResolver {
 
   @ResolveField(() => UserEntity)
   owner(@Parent() education: EducationEntity, @Context() ctx: GraphqlContext) {
-    if (!education?.ownerId) return null;
-    return ctx.loaders.batchUsers.load(education.ownerId);
+    const { ownerId } = education;
+    if (!ownerId) return null;
+    return ctx.loaders.batchUsers.load(ownerId);
   }
 
   @ResolveField(() => OrganizationEntity, { nullable: true })
@@ -162,14 +163,15 @@ export class EducationsResolver {
     @Parent() education: EducationEntity,
     @Context() ctx: GraphqlContext
   ) {
-    if (!education?.organizationId) return null;
-    return ctx.loaders.batchOrganizations.load(education.organizationId);
+    const { ownerId, organizationId } = education;
+    if (!(organizationId && ownerId)) return null;
+    return ctx.loaders.batchOrganizations.forKey(ownerId).load(organizationId);
   }
 
   @ResolveField(() => [SkillEntity])
   skills(@Parent() education: EducationEntity, @Context() ctx: GraphqlContext) {
-    const ids = education.skillIds;
-    if (!ids) return [];
-    return ctx.loaders.batchSkills.loadMany(ids);
+    const { ownerId, skillIds } = education;
+    if (!(skillIds && ownerId)) return [];
+    return ctx.loaders.batchSkills.forKey(ownerId).loadMany(skillIds);
   }
 }

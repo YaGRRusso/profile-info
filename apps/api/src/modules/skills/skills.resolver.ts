@@ -215,7 +215,8 @@ export class SkillsResolver {
 
   @ResolveField(() => UserEntity)
   owner(@Parent() skill: SkillEntityRecord, @Context() ctx: GraphqlContext) {
-    if (!skill?.ownerId) return null;
-    return ctx.loaders.batchUsers.load(skill.ownerId);
+    const { ownerId } = skill;
+    if (!ownerId) return null;
+    return ctx.loaders.batchUsers.load(ownerId);
   }
 }

@@ -8,6 +8,7 @@ import {
   ResolveField,
   Resolver,
 } from "@nestjs/graphql";
+import { compact, keyBy, uniq } from "lodash";
 import { sortDateRange } from "@/common/helpers/daterange.helper";
 import type { AuthContext } from "@/core/context/auth-context.interface";
 import type { GraphqlContext } from "@/core/context/graphql-context.interface";
@@ -160,15 +161,32 @@ export class ExperiencesResolver {
     @Parent() experience: ExperienceEntity,
     @Context() ctx: GraphqlContext
   ) {
-    if (!experience?.ownerId) return null;
-    return ctx.loaders.batchUsers.load(experience.ownerId);
+    const { ownerId } = experience;
+    if (!ownerId) return null;
+    return ctx.loaders.batchUsers.load(ownerId);
   }
 
   @ResolveField(() => [ExperienceRole])
-  roles(@Parent() experience: ExperienceEntity) {
-    if (experience.roles) {
-      return sortDateRange([...experience.roles]);
-    }
+  async roles(
+    @Parent() experience: ExperienceEntity,
+    @Context() ctx: GraphqlContext
+  ) {
+    const { ownerId, roles } = experience;
+    if (!roles?.length) return roles;
+
+    const sortedRoles = sortDateRange([...roles]);
+    const skillIds = uniq(sortedRoles.flatMap((role) => role.skillIds ?? []));
+    if (!(ownerId && skillIds.length)) return sortedRoles;
+
+    const byId = keyBy(
+      compact(await ctx.loaders.batchSkills.forKey(ownerId).loadMany(skillIds)),
+      "id"
+    );
+
+    return sortedRoles.map((role) => ({
+      ...role,
+      skills: compact(role.skillIds?.map((id) => byId[id])),
+    }));
   }
 
   @ResolveField(() => OrganizationEntity, { nullable: true })
@@ -176,8 +194,9 @@ export class ExperiencesResolver {
     @Parent() experience: ExperienceEntity,
     @Context() ctx: GraphqlContext
   ) {
-    if (!experience?.organizationId) return null;
-    return ctx.loaders.batchOrganizations.load(experience.organizationId);
+    const { ownerId, organizationId } = experience;
+    if (!(organizationId && ownerId)) return null;
+    return ctx.loaders.batchOrganizations.forKey(ownerId).load(organizationId);
   }
 
   @ResolveField(() => [SkillEntity])
@@ -185,26 +204,12 @@ export class ExperiencesResolver {
     @Parent() experience: ExperienceEntity,
     @Context() ctx: GraphqlContext
   ) {
-    const ids = new Set<string>();
+    const { ownerId, roles } = experience;
+    if (!ownerId) return [];
 
-    for (const role of experience.roles) {
-      if (role.skillIds) {
-        for (const skillId of role.skillIds) {
-          ids.add(skillId);
-        }
-      }
-    }
+    const skillIds = uniq(roles.flatMap((role) => role.skillIds ?? []));
+    if (!skillIds.length) return [];
 
-    return ctx.loaders.batchSkills.loadMany(Array.from(ids));
-  }
-}
-
-@Resolver(() => ExperienceRole)
-export class ExperienceRoleResolver {
-  @ResolveField(() => [SkillEntity])
-  skills(@Parent() role: ExperienceRole, @Context() ctx: GraphqlContext) {
-    const ids = role.skillIds;
-    if (!ids) return [];
-    return ctx.loaders.batchSkills.loadMany(ids);
+    return ctx.loaders.batchSkills.forKey(ownerId).loadMany(skillIds);
   }
 }

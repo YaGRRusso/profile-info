@@ -127,7 +127,6 @@ describe("Catalog loaders and dashboard counts (e2e)", () => {
         slug: "loader-global-disabled",
       }
     );
-    disabledGlobalSkillId = disabledGlobal.id;
     await skillsService.disableOne(testSuperAdminContext(), disabledGlobal.id);
 
     await skillsService.createOne(testAuthContext({ id: userAId }), {
@@ -221,6 +220,35 @@ describe("Catalog loaders and dashboard counts (e2e)", () => {
     }>(app, {
       query: EXPERIENCE_WITH_CATALOG,
       token: userAToken,
+      variables: { experienceId: experienceWithLocalOrgId },
+    });
+
+    expect(response.errors).toBeUndefined();
+    expect(response.data?.findOneExperienceById.organization).toMatchObject({
+      name: localOrgName,
+      partition: CatalogPartition.LOCAL,
+    });
+    expect(response.data?.findOneExperienceById.skills).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          disabled: true,
+          slug: "loader-disabled-on-experience",
+        }),
+      ])
+    );
+  });
+
+  it("lets SUPER_ADMIN resolve USER LOCAL catalog refs via owner-scoped loaders", async () => {
+    const adminToken = await signIn(app, "admin@profile.info", "123123");
+
+    const response = await graphqlRequest<{
+      findOneExperienceById: {
+        organization: { name: string; partition: CatalogPartition };
+        skills: Array<{ slug: string; disabled: boolean }>;
+      };
+    }>(app, {
+      query: EXPERIENCE_WITH_CATALOG,
+      token: adminToken,
       variables: { experienceId: experienceWithLocalOrgId },
     });
 

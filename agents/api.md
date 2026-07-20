@@ -50,7 +50,7 @@ Full diagram and field detail: `apps/api/docs/ER_MODEL.md`.
 - **@nestjs/jwt + passport**: global 8h JWT in `modules/auth/`.
 - **@nestjs/event-emitter**: domain events on delete (see below).
 - **bcryptjs**: password hashing in `users/users.service.ts`.
-- **dataloader + lodash**: per-entity `*LoaderService` in feature modules (`skills`, `organizations`, `users`); `platform/graphql/loaders.service.ts` composes them per request (`batchSkills`, `batchOrganizations`, `batchUsers`).
+- **dataloader + lodash**: per-entity `*LoaderService` in feature modules (`skills`, `organizations`, `users`); `platform/graphql/loaders.service.ts` composes them per request (`batchSkills.forKey` / `batchOrganizations.forKey` for catalog resolve via `core/loaders/keyed-loader-cache.ts`, `batchUsers`).
 - **class-validator / class-transformer**: input validation via global `ValidationPipe`.
 
 ## Module / directory breakdown
@@ -121,7 +121,7 @@ Notable specifics:
 - `modules/users/users.service.ts`: hashes password on create; `findOneByEmailWithPassword` (with `select("+password")`) is auth-only and returns `null` when missing — public CRUD methods never load password. Password validation lives in `AuthService.validate` (missing user / bad password both → `UnauthorizedException`). Public `register` creates `USER` rows with `disabled: true`; `createOneUser` / `createManyUsers` create enabled accounts. `UsersValidatorService.assertUserEnabled` blocks `signIn`, JWT, and API-token auth for disabled users with `UnauthorizedException(USER_ACCOUNT_DISABLED)`; `users.messages.ts` owns the `{ en, es, pt }` copy and the global filter localizes it. `SUPER_ADMIN` enables via `updateOneUser { disabled: false }`. Filter-based user reads (`findOneUser`, `findManyUsers`) and user mutations require `SUPER_ADMIN`; `findOneUserById` / `findManyUserById` stay auth-only (resume uses the service `findOneById`, not GraphQL).
 - `modules/api-tokens/api-tokens.service.ts`: hashes secret on create; `findOneByIdWithHashedSecret` (with `select("+hashedSecret")`) is auth-only — public CRUD methods never load `hashedSecret`. Credential validation (parse, expiry, bcrypt compare) lives in `ApiTokenStrategy.validate`; `parseApiToken` is shared with create formatting.
 - `modules/experiences/experiences.resolver.ts`: `@ResolveField` for `organization`, `skills`, sorted `roles`.
-- `modules/skills/` and `modules/organizations/` export loader and validator services. **Catalog (ADR 001):** browse = caller `ctx` (`findMany*` / `findOne*` vs `*Active*`); resolve stored refs with disabled included; validate writes via `assert*Enabled`. Principles only — `apps/api/docs/adr/001-local-catalog.md`.
+- `modules/skills/` and `modules/organizations/` export loader and validator services. **Catalog (ADR 001):** browse = caller `ctx` (`findMany*` / `findOne*` vs `*Active*`); resolve stored refs via owner-scoped loaders (`forKey(parent.ownerId)`, disabled included); validate writes via `assert*Enabled`. Principles only — `apps/api/docs/adr/001-local-catalog.md`.
 - **Catalog** (`skills`, `organizations`): `partition` (`GLOBAL` | `LOCAL`); `ownerId` on every row (server-assigned on create). Unique `{ partition, ownerId, slug }`. **Skill:** slug + `i18n[].messages.title`. **Organization:** root `name` + `i18n[].messages.description`. `disable*` / `enable*` without domain events; `remove*` hard delete + cascade events. **Admin UI:** GLOBAL → enable/disable; LOCAL → remove (`catalog-mutation-access.ts`). E2e scope: `test/e2e/skills-catalog-scope.spec.ts`, `test/e2e/organizations-catalog-scope.spec.ts`, `test/e2e/catalog-batch-edge.spec.ts`, `test/e2e/catalog-loaders-dashboard.spec.ts`; integration: `test/integration/catalog-local-delete-cascade.spec.ts`, `test/integration/user-delete-local-catalog-purge.spec.ts`.
 
 ## Domain events (delete cascade)
@@ -191,7 +191,7 @@ Run from `apps/api/` or via root `api:*` aliases: `dev`, `prod`, `build`, `start
 - Regenerate `src/schema.gql` after type changes so admin codegen stays in sync. E2E/integration tests use in-memory schema (`autoSchemaFile: true` when `NODE_ENV=test`) so they never overwrite the committed file — `TestAppModule` omits `AiToolsModule` and would strip AI types if it wrote to disk.
 - New public GraphQL fields need `@Public()` or they 401.
 - Password is `select: false` and absent from `UserEntity`; never expose it in GraphQL.
-- DataLoaders today: skills, organizations, and users (`UsersLoaderService`: `batchUsers` for `owner` on ApiToken/private entities; `batchUserOwnedCounts` for `UserEntity.ownedCounts`, SUPER_ADMIN only).
+- DataLoaders today: skills and organizations are **owner-scoped** (`batchSkills.forKey` / `batchOrganizations.forKey` — forced `USER` session ctx for GLOBAL + that owner’s LOCAL); users (`UsersLoaderService`: `batchUsers` for `owner` on ApiToken/private entities; `batchUserOwnedCounts` for `UserEntity.ownedCounts`, SUPER_ADMIN only).
 - Private entity services expose `countByOwners` → `StatsRepository.countByOwnerIds` (global aggregate by `ownerId`). Consumed by `UsersLoaderService.createOwnedCountsLoader()` for the SUPER_ADMIN users list.
 - Startup log says "Playground" but `playground` is disabled; Apollo landing page is at `/graphql`. Introspection follows `GRAPHQL_INTROSPECTION` in env.
 - `app.controller.ts` exposes REST `GET /` for health/e2e smoke test.

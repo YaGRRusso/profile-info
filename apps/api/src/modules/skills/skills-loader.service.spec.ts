@@ -1,12 +1,11 @@
-import { UnauthorizedException } from "@nestjs/common";
 import { Test, TestingModule } from "@nestjs/testing";
-import { testAuthContext } from "@test/fixtures/auth-context";
-import type { AppRequest } from "@/core/context/graphql-context.interface";
 import { CatalogPartition } from "@/core/enums/catalog-partition.enum";
+import { CredentialKind } from "@/core/enums/credential-kind.enum";
+import { UserRole } from "@/core/enums/user-role.enum";
 import { SkillsService } from "./skills.service";
 import { SkillsLoaderService } from "./skills-loader.service";
 
-const ctx = testAuthContext();
+const ownerId = "507f1f77bcf86cd799439011";
 const skillId = "507f1f77bcf86cd799439013";
 
 const disabledSkill = {
@@ -37,19 +36,32 @@ describe("SkillsLoaderService", () => {
     loaderService = module.get(SkillsLoaderService);
   });
 
-  it("resolves disabled skills via findManyById for legacy portfolio queries", async () => {
-    const req = { user: ctx } as AppRequest;
-    const loader = loaderService.createLoader(req);
+  it("resolves via owner-scoped session ctx (forced USER)", async () => {
+    const loaders = loaderService.createLoader();
 
-    await expect(loader.load(skillId)).resolves.toEqual(disabledSkill);
-    expect(skillsService.findManyById).toHaveBeenCalledWith(ctx, [skillId]);
+    await expect(loaders.forKey(ownerId).load(skillId)).resolves.toEqual(
+      disabledSkill
+    );
+
+    expect(skillsService.findManyById).toHaveBeenCalledWith(
+      {
+        credentialKind: CredentialKind.SESSION,
+        id: ownerId,
+        role: UserRole.USER,
+      },
+      [skillId]
+    );
   });
 
-  it("throws when request is unauthenticated", async () => {
-    const req = {} as AppRequest;
-    const loader = loaderService.createLoader(req);
+  it("returns null for ids not returned by findManyById", async () => {
+    skillsService.findManyById.mockResolvedValue([]);
+    const loaders = loaderService.createLoader();
 
-    await expect(loader.load(skillId)).rejects.toThrow(UnauthorizedException);
-    expect(skillsService.findManyById).not.toHaveBeenCalled();
+    await expect(loaders.forKey(ownerId).load(skillId)).resolves.toBeNull();
+  });
+
+  it("reuses the same DataLoader instance per owner within a request", () => {
+    const loaders = loaderService.createLoader();
+    expect(loaders.forKey(ownerId)).toBe(loaders.forKey(ownerId));
   });
 });

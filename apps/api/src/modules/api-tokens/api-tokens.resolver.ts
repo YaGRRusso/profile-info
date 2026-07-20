@@ -149,7 +149,8 @@ export class ApiTokensResolver {
     @Parent() apiToken: ApiTokenEntityRecord,
     @Context() ctx: GraphqlContext
   ) {
-    if (!apiToken?.ownerId) return null;
-    return ctx.loaders.batchUsers.load(apiToken.ownerId);
+    const { ownerId } = apiToken;
+    if (!ownerId) return null;
+    return ctx.loaders.batchUsers.load(ownerId);
   }
 }

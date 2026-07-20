@@ -54,9 +54,10 @@ Name methods however fits the module; keep the **intent** clear in code and test
 | **Resolve** | entity owner (when LOCAL matters) | include | `skillIds` / `organizationId` on saved entities |
 | **Validate** | caller `ctx` | exclude | mutations via `*ValidatorService` |
 
-**Resolve (debt):** GraphQL loaders today use **caller** `ctx`, not `parent.ownerId`.
-Resume PDF builds owner-scoped `ctx` directly and does not use loaders. Implement
-owner-scoped loaders when cross-user GraphQL reads need LOCAL refs (public portfolio, etc.).
+**Resolve:** GraphQL catalog loaders use `parent.ownerId` via
+`batchSkills.forKey` / `batchOrganizations.forKey` (forced `USER` session ctx —
+GLOBAL + that owner’s LOCAL, including disabled). Resume PDF builds the same
+owner-scoped `ctx` directly and does not use loaders.
 
 **Validate:** `SkillsValidatorService` / `OrganizationsValidatorService` — active refs
 only before writes.
@@ -72,6 +73,8 @@ these filters.
 ## Where to look in code
 
 - Scope: `core/persistence/helpers/catalog-scope.helper.ts`
+- Owner-scoped catalog loaders: `core/loaders/keyed-loader-cache.ts`;
+  `SkillsLoaderService` / `OrganizationsLoaderService` (`forKey(ownerId)`)
 - Skills / orgs services, loaders, validators: `modules/skills/`, `modules/organizations/`
 - Admin: `findMany*` for tables and form pickers (disabled rows shown, not attachable)
 - Admin mutate UX: `lib/catalog-mutation-access.ts` — USER read-only on `GLOBAL`, SUPER_ADMIN
@@ -105,13 +108,13 @@ these filters.
 24. ~~Admin: USER sees GLOBAL lifecycle buttons disabled (`readOnly`)~~
 25. ~~Admin: SUPER_ADMIN sees LOCAL remove disabled (`readOnly`)~~
 26. ~~Admin: coluna Owner visível só para SUPER_ADMIN~~
-27. Melhoria: owner-scoped loaders para resolve (ver **Resolve (debt)** acima)
+27. ~~Melhoria: owner-scoped loaders para resolve (ver **Resolve** acima)~~
 28. ~~E2e: API token com role USER — mesmo escopo de catálogo que sessão JWT~~
 29. ~~E2e: resume com refs LOCAL no PDF público (ctx do dono)~~
 30. ~~E2e: slug duplicado GLOBAL + LOCAL do mesmo user~~
 31. Melhoria: batch mutations falham explicitamente se algum ID ficou fora do escopo (hoje: partial `succeeded`/`failed`)
 
-Melhorias acima (27, 31) estão no `BACKLOG.md` — não bloqueiam o escopo entregue.
+Melhorias acima (31) estão no `BACKLOG.md` — não bloqueiam o escopo entregue.
 
 E2e catalog scope (skills + organizations): `test/e2e/skills-catalog-scope.spec.ts`,
 `test/e2e/organizations-catalog-scope.spec.ts`.

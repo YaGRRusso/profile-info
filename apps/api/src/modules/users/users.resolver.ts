@@ -143,9 +143,9 @@ export class UsersResolver {
 
   @ResolveField(() => [SkillEntity])
   skills(@Parent() user: UserEntityRecord, @Context() ctx: GraphqlContext) {
-    const ids = user.skillIds;
-    if (!ids?.length) return [];
-    return ctx.loaders.batchSkills.loadMany(ids);
+    const { id, skillIds } = user;
+    if (!skillIds?.length) return [];
+    return ctx.loaders.batchSkills.forKey(id).loadMany(skillIds);
   }
 
   @ResolveField(() => UserOwnedCounts)

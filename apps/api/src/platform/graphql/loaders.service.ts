@@ -1,7 +1,4 @@
-import type {
-  AppLoaders,
-  AppRequest,
-} from "@/core/context/graphql-context.interface";
+import type { AppLoaders } from "@/core/context/graphql-context.interface";
 import { OrganizationsLoaderService } from "@/modules/organizations/organizations-loader.service";
 import { SkillsLoaderService } from "@/modules/skills/skills-loader.service";
 import { UsersLoaderService } from "@/modules/users/users-loader.service";
@@ -13,10 +10,10 @@ export class LoadersService {
     private readonly usersLoaderService: UsersLoaderService
   ) {}
 
-  createLoaders(req: AppRequest): AppLoaders {
+  createLoaders(): AppLoaders {
     return {
-      batchOrganizations: this.organizationsLoaderService.createLoader(req),
-      batchSkills: this.skillsLoaderService.createLoader(req),
+      batchOrganizations: this.organizationsLoaderService.createLoader(),
+      batchSkills: this.skillsLoaderService.createLoader(),
       batchUserOwnedCounts: this.usersLoaderService.createOwnedCountsLoader(),
       batchUsers: this.usersLoaderService.createLoader(),
     };

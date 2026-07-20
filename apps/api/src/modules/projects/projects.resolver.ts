@@ -144,14 +144,15 @@ export class ProjectsResolver {
 
   @ResolveField(() => UserEntity)
   owner(@Parent() project: ProjectEntity, @Context() ctx: GraphqlContext) {
-    if (!project?.ownerId) return null;
-    return ctx.loaders.batchUsers.load(project.ownerId);
+    const { ownerId } = project;
+    if (!ownerId) return null;
+    return ctx.loaders.batchUsers.load(ownerId);
   }
 
   @ResolveField(() => [SkillEntity])
   skills(@Parent() project: ProjectEntity, @Context() ctx: GraphqlContext) {
-    const ids = project.skillIds;
-    if (!ids) return [];
-    return ctx.loaders.batchSkills.loadMany(ids);
+    const { ownerId, skillIds } = project;
+    if (!(skillIds && ownerId)) return [];
+    return ctx.loaders.batchSkills.forKey(ownerId).loadMany(skillIds);
   }
 }

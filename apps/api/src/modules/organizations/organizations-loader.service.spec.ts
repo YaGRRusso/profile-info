@@ -1,12 +1,11 @@
-import { UnauthorizedException } from "@nestjs/common";
 import { Test, TestingModule } from "@nestjs/testing";
-import { testAuthContext } from "@test/fixtures/auth-context";
-import type { AppRequest } from "@/core/context/graphql-context.interface";
 import { CatalogPartition } from "@/core/enums/catalog-partition.enum";
+import { CredentialKind } from "@/core/enums/credential-kind.enum";
+import { UserRole } from "@/core/enums/user-role.enum";
 import { OrganizationsService } from "./organizations.service";
 import { OrganizationsLoaderService } from "./organizations-loader.service";
 
-const ctx = testAuthContext();
+const ownerId = "507f1f77bcf86cd799439011";
 const organizationId = "507f1f77bcf86cd799439013";
 
 const disabledOrganization = {
@@ -38,25 +37,34 @@ describe("OrganizationsLoaderService", () => {
     loaderService = module.get(OrganizationsLoaderService);
   });
 
-  it("resolves disabled organizations via findManyById for legacy portfolio queries", async () => {
-    const req = { user: ctx } as AppRequest;
-    const loader = loaderService.createLoader(req);
+  it("resolves via owner-scoped session ctx (forced USER)", async () => {
+    const loaders = loaderService.createLoader();
 
-    await expect(loader.load(organizationId)).resolves.toEqual(
+    await expect(loaders.forKey(ownerId).load(organizationId)).resolves.toEqual(
       disabledOrganization
     );
-    expect(organizationsService.findManyById).toHaveBeenCalledWith(ctx, [
-      organizationId,
-    ]);
+
+    expect(organizationsService.findManyById).toHaveBeenCalledWith(
+      {
+        credentialKind: CredentialKind.SESSION,
+        id: ownerId,
+        role: UserRole.USER,
+      },
+      [organizationId]
+    );
   });
 
-  it("throws when request is unauthenticated", async () => {
-    const req = {} as AppRequest;
-    const loader = loaderService.createLoader(req);
+  it("returns null for ids not returned by findManyById", async () => {
+    organizationsService.findManyById.mockResolvedValue([]);
+    const loaders = loaderService.createLoader();
 
-    await expect(loader.load(organizationId)).rejects.toThrow(
-      UnauthorizedException
-    );
-    expect(organizationsService.findManyById).not.toHaveBeenCalled();
+    await expect(
+      loaders.forKey(ownerId).load(organizationId)
+    ).resolves.toBeNull();
+  });
+
+  it("reuses the same DataLoader instance per owner within a request", () => {
+    const loaders = loaderService.createLoader();
+    expect(loaders.forKey(ownerId)).toBe(loaders.forKey(ownerId));
   });
 });
