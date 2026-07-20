@@ -224,6 +224,10 @@ export class OrganizationsService {
     }));
   }
 
+  async purgeLocalByOwner(ownerId: string): Promise<void> {
+    await this.repository.purgeLocalByOwner(ownerId);
+  }
+
   private withActiveFilter(
     filters?: FilterOrganizationInput
   ): FilterOrganizationInput {

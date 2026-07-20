@@ -153,8 +153,8 @@ set `ownerId` / `partition` from auth scope, not from client input.
 - **Embedded:** `urls[]` (`UrlEmbed`: `title`, `value`), `i18n[]` translations
 - **References:** `skillIds[]` → Skill (ordered; CV display priority)
 - **Delete:** `SUPER_ADMIN` accounts cannot be deleted. Deleting a `USER` emits
-  `user.deleted`, which hard-deletes all private entities and API tokens for that `ownerId`.
-  LOCAL catalog rows for that user are **not** purged today (see `BACKLOG.md`).
+  `user.deleted`, which hard-deletes all private entities, API tokens, and LOCAL
+  catalog rows (skills/organizations) for that `ownerId`. GLOBAL catalog is untouched.
 
 ### Skill (`skills`)
 
@@ -257,8 +257,10 @@ set `ownerId` / `partition` from auth scope, not from client input.
 - `organization.deleted` event: hard `deleteMany` on Course, Education, Experience tied
   to that organization **across all tenants** (`purgeByOrganization`) — intentional.
 - `user.deleted` event: hard `deleteMany` on Experience, Education, Course, Project,
-  and ApiToken with matching `ownerId` (`purgeByOwner`). **`SUPER_ADMIN` users cannot
-  be deleted.** LOCAL catalog rows for that user are not purged (see `BACKLOG.md`).
+  and ApiToken with matching `ownerId` (`purgeByOwner`); hard `deleteMany` on Skill
+  and Organization with matching `ownerId` and `partition: LOCAL` (`purgeLocalByOwner`).
+  **`SUPER_ADMIN` users cannot be deleted.** GLOBAL catalog rows are never purged by
+  this event.
 - Private entity updates never change `ownerId` — transfer ownership is delete + recreate
   if ever needed (not a product flow today).
 - No Mongoose `pre('deleteOne')` hooks; deletes go through services that emit events first.

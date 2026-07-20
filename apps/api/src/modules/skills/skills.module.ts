@@ -1,6 +1,7 @@
 import { Module } from "@nestjs/common";
 import { MongooseModule } from "@nestjs/mongoose";
 import { SkillModel, SkillSchema } from "@/modules/skills/schemas/skill.schema";
+import { OnUserDeletedListener } from "./listeners/on-user-deleted.listener";
 import { SkillsRepository } from "./skills.repository";
 import { SkillsResolver } from "./skills.resolver";
 import { SkillsService } from "./skills.service";
@@ -18,6 +19,7 @@ import { SkillsValidatorService } from "./skills-validator.service";
     SkillsService,
     SkillsLoaderService,
     SkillsValidatorService,
+    OnUserDeletedListener,
   ],
 })
 export class SkillsModule {}

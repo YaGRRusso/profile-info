@@ -28,12 +28,15 @@ export class OrganizationsRepository {
     SortOrganizationInput
   >;
   private readonly stats: StatsRepository<OrganizationModel>;
+  private readonly model: Model<OrganizationModel>;
 
   constructor(
-    @InjectModel(OrganizationModel.name) model: Model<OrganizationModel>
+    @InjectModel(OrganizationModel.name)
+    model: Model<OrganizationModel>
   ) {
     this.crud = new CrudRepository(model, new OrganizationMapper());
     this.stats = new StatsRepository(model);
+    this.model = model;
   }
 
   catalogCrud(ctx: AuthContext) {
@@ -70,5 +73,11 @@ export class OrganizationsRepository {
       projection,
       NOT_DISABLED
     );
+  }
+
+  async purgeLocalByOwner(ownerId: string): Promise<void> {
+    await this.model
+      .deleteMany({ ownerId, partition: CatalogPartition.LOCAL })
+      .exec();
   }
 }

@@ -38,6 +38,7 @@ describe("OrganizationsService", () => {
     countOwnedLocalActive: jest.Mock;
     countByField: jest.Mock;
     findRecentlyUpdatedActive: jest.Mock;
+    purgeLocalByOwner: jest.Mock;
   };
   let eventEmitter: jest.Mocked<Pick<EventEmitter2, "emitAsync">>;
 
@@ -52,6 +53,7 @@ describe("OrganizationsService", () => {
       countByField: jest.fn().mockResolvedValue([]),
       countOwnedLocalActive: jest.fn().mockResolvedValue(1),
       findRecentlyUpdatedActive: jest.fn(),
+      purgeLocalByOwner: jest.fn(),
     };
 
     const module: TestingModule = await Test.createTestingModule({
@@ -256,6 +258,14 @@ describe("OrganizationsService", () => {
         new OrganizationDeletedEvent(validId)
       );
       expect(crud.deleteManyById).toHaveBeenCalledWith([validId]);
+    });
+  });
+
+  describe("purgeLocalByOwner", () => {
+    it("delegates to repository.purgeLocalByOwner", async () => {
+      const ownerId = "507f1f77bcf86cd799439012";
+      await service.purgeLocalByOwner(ownerId);
+      expect(repository.purgeLocalByOwner).toHaveBeenCalledWith(ownerId);
     });
   });
 });

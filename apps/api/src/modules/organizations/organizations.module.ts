@@ -4,6 +4,7 @@ import {
   OrganizationModel,
   OrganizationSchema,
 } from "@/modules/organizations/schemas/organization.schema";
+import { OnUserDeletedListener } from "./listeners/on-user-deleted.listener";
 import { OrganizationsRepository } from "./organizations.repository";
 import { OrganizationsResolver } from "./organizations.resolver";
 import { OrganizationsService } from "./organizations.service";
@@ -27,6 +28,7 @@ import { OrganizationsValidatorService } from "./organizations-validator.service
     OrganizationsService,
     OrganizationsLoaderService,
     OrganizationsValidatorService,
+    OnUserDeletedListener,
   ],
 })
 export class OrganizationsModule {}

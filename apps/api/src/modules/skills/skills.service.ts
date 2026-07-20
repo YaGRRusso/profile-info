@@ -216,6 +216,10 @@ export class SkillsService {
     }));
   }
 
+  async purgeLocalByOwner(ownerId: string): Promise<void> {
+    await this.repository.purgeLocalByOwner(ownerId);
+  }
+
   private withActiveFilter(filters?: FilterSkillInput): FilterSkillInput {
     return { ...filters, disabled: false };
   }

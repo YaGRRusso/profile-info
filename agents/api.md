@@ -122,7 +122,7 @@ Notable specifics:
 - `modules/api-tokens/api-tokens.service.ts`: hashes secret on create; `findOneByIdWithHashedSecret` (with `select("+hashedSecret")`) is auth-only — public CRUD methods never load `hashedSecret`. Credential validation (parse, expiry, bcrypt compare) lives in `ApiTokenStrategy.validate`; `parseApiToken` is shared with create formatting.
 - `modules/experiences/experiences.resolver.ts`: `@ResolveField` for `organization`, `skills`, sorted `roles`.
 - `modules/skills/` and `modules/organizations/` export loader and validator services. **Catalog (ADR 001):** browse = caller `ctx` (`findMany*` / `findOne*` vs `*Active*`); resolve stored refs with disabled included; validate writes via `assert*Enabled`. Principles only — `apps/api/docs/adr/001-local-catalog.md`.
-- **Catalog** (`skills`, `organizations`): `partition` (`GLOBAL` | `LOCAL`); `ownerId` on every row (server-assigned on create). Unique `{ partition, ownerId, slug }`. **Skill:** slug + `i18n[].messages.title`. **Organization:** root `name` + `i18n[].messages.description`. `disable*` / `enable*` without domain events; `remove*` hard delete + cascade events. **Admin UI:** GLOBAL → enable/disable; LOCAL → remove (`catalog-mutation-access.ts`). E2e scope: `test/e2e/skills-catalog-scope.spec.ts`, `test/e2e/organizations-catalog-scope.spec.ts`, `test/e2e/catalog-batch-edge.spec.ts`, `test/e2e/catalog-loaders-dashboard.spec.ts`; integration: `test/integration/catalog-local-delete-cascade.spec.ts`.
+- **Catalog** (`skills`, `organizations`): `partition` (`GLOBAL` | `LOCAL`); `ownerId` on every row (server-assigned on create). Unique `{ partition, ownerId, slug }`. **Skill:** slug + `i18n[].messages.title`. **Organization:** root `name` + `i18n[].messages.description`. `disable*` / `enable*` without domain events; `remove*` hard delete + cascade events. **Admin UI:** GLOBAL → enable/disable; LOCAL → remove (`catalog-mutation-access.ts`). E2e scope: `test/e2e/skills-catalog-scope.spec.ts`, `test/e2e/organizations-catalog-scope.spec.ts`, `test/e2e/catalog-batch-edge.spec.ts`, `test/e2e/catalog-loaders-dashboard.spec.ts`; integration: `test/integration/catalog-local-delete-cascade.spec.ts`, `test/integration/user-delete-local-catalog-purge.spec.ts`.
 
 ## Domain events (delete cascade)
 
@@ -140,6 +140,7 @@ Listeners are thin (`@OnEvent` + delegate to a service method). All MongoDB writ
 - `organization.deleted` (`organizations` → `experiences`): hard `deleteMany` via `purgeByOrganization`
 - `user.deleted` (`users` → `experiences`, `educations`, `courses`, `projects`): hard `deleteMany` via `purgeByOwner`
 - `user.deleted` (`users` → `api-tokens`): hard `deleteMany` via `purgeByOwner`
+- `user.deleted` (`users` → `skills`, `organizations`): hard `deleteMany` of `partition: LOCAL` via `purgeLocalByOwner` (GLOBAL untouched)
 
 Do not use Mongoose `pre('deleteOne')` hooks — they miss `findByIdAndDelete` / `deleteMany`.
 

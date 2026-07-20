@@ -28,10 +28,15 @@ export class SkillsRepository {
     SortSkillInput
   >;
   private readonly stats: StatsRepository<SkillModel>;
+  private readonly model: Model<SkillModel>;
 
-  constructor(@InjectModel(SkillModel.name) model: Model<SkillModel>) {
+  constructor(
+    @InjectModel(SkillModel.name)
+    model: Model<SkillModel>
+  ) {
     this.crud = new CrudRepository(model, new SkillMapper());
     this.stats = new StatsRepository(model);
+    this.model = model;
   }
 
   catalogCrud(ctx: AuthContext) {
@@ -68,5 +73,11 @@ export class SkillsRepository {
       projection,
       NOT_DISABLED
     );
+  }
+
+  async purgeLocalByOwner(ownerId: string): Promise<void> {
+    await this.model
+      .deleteMany({ ownerId, partition: CatalogPartition.LOCAL })
+      .exec();
   }
 }
