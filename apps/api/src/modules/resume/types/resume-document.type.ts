@@ -19,15 +19,11 @@ export interface ResumeSkillGroup {
   skills: string[];
 }
 
-export interface ResumeExperienceRole {
+export interface ResumeExperience {
   description: string;
+  organization: string;
   period?: string;
   title: string;
-}
-
-export interface ResumeExperience {
-  organization: string;
-  roles: ResumeExperienceRole[];
 }
 
 export interface ResumeEducation {

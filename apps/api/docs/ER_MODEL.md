@@ -50,12 +50,9 @@ erDiagram
     ObjectId ownerId FK
     string slug "optional UK per owner"
     ObjectId organizationId FK
-    object roles "embed"
-  }
-  ExperienceRole {
+    ObjectId skillIds FK "array"
     object i18n "embed"
     object period "embed"
-    ObjectId skillIds FK "array"
   }
   Education {
     ObjectId _id PK
@@ -111,8 +108,7 @@ erDiagram
   Organization ||--o{ Experience : organizationId
   Organization ||--o{ Education : organizationId
   Organization ||--o{ Course : organizationId
-  Experience ||--|{ ExperienceRole : roles
-  Skill ||--o{ ExperienceRole : skillIds
+  Skill ||--o{ Experience : skillIds
   Skill ||--o{ Education : skillIds
   Skill ||--o{ Course : skillIds
   Skill ||--o{ Project : skillIds
@@ -127,10 +123,11 @@ Both are MongoDB `ObjectId` references. The FK always lives on the document that
 - **Organization (`organizationId`, scalar `ObjectId`):** many-to-one. Each
   Experience/Education/Course points to at most one org.
 - **Skill (`skillIds`, `ObjectId[]`):** many-to-many in practice. Each
-  Education/Course/Project/role stores many skill ids; the same skill id appears on many
+  Experience/Education/Course/Project stores many skill ids; the same skill id appears on many
   owners.
-- **Experience:** `organizationId` is on the root document; `skillIds` only on embedded
-  `ExperienceRole`, so the Skill edge attaches to `ExperienceRole`, not `Experience`.
+- **Experience:** `organizationId`, `skillIds`, `i18n`, and `period` live on the root
+  document (one role per experience). Grouping multiple roles at the same company is a
+  read-time concern by `organizationId`.
 - **Private entities:** `ownerId` → `User` (required). Slug uniqueness is compound
   `{ ownerId, slug }`, not global.
 
@@ -183,9 +180,10 @@ set `ownerId` / `partition` from auth scope, not from client input.
 
 - **Source:** `src/modules/experiences/schemas/experience.schema.ts`
 - **Key fields:** `ownerId` (required, ref → User), `slug` (optional; unique per owner when set via
-  sparse `{ ownerId, slug }` index), `category` (enum, indexed), `relevance`
-- **Embedded:** `roles[]` (`ExperienceRole`: `i18n[]`, `period`, `skillIds[]`)
-- **References:** `ownerId` → User; `organizationId` → Organization (optional ObjectId)
+  sparse `{ ownerId, slug }` index), `category` (enum, indexed), `relevance`, `period`, `i18n[]`
+- **Embedded:** `i18n[]` translations, `period` (`DateRange`: `from`, `to`)
+- **References:** `ownerId` → User; `organizationId` → Organization (optional ObjectId);
+  `skillIds[]` → Skill
 
 ### Education (`educations`)
 
@@ -228,7 +226,7 @@ set `ownerId` / `partition` from auth scope, not from client input.
 - **UrlEmbed** (`src/core/schemas/url.schema.ts`): `title`, `value`. Embedded in User and
   Project.
 - **DateRange** (`src/core/schemas/daterange.schema.ts`): `from`, `to`. Embedded in
-  Education, Course, and Experience roles.
+  Experience, Education, and Course.
 - **Translation pattern** (`src/core/schemas/translation.schema.ts`): `locale` +
   `messages` sub-object. Embedded per entity (not a shared collection).
 
@@ -238,12 +236,12 @@ set `ownerId` / `partition` from auth scope, not from client input.
    `ownerId`. Same slug may exist on different users (compound unique index).
 2. Experience, Education, Course optionally reference **one** Organization (`organizationId`:
    scalar `ObjectId`).
-3. Education, Course, Project, User, and embedded Experience roles reference **many**
-   Skills (`skillIds`: `ObjectId[]`). Same skill `_id` can appear on multiple owners
-   (many-to-many). User `skillIds` order is CV display priority.
+3. Experience, Education, Course, Project, and User reference **many** Skills (`skillIds`:
+   `ObjectId[]`). Same skill `_id` can appear on multiple owners (many-to-many). User
+   `skillIds` order is CV display priority.
 4. User and Project embed URL pairs; no separate `urls` collection.
-5. Experience embeds an ordered list of roles; each role embeds its own i18n, period, and
-   `skillIds[]`.
+5. Each Experience is one role (`i18n`, `period`, `skillIds` on the root). Multiple roles at
+   the same company are separate documents sharing `organizationId`.
 6. **ApiToken** belongs to one **User** via `ownerId`. CRUD requires session JWT;
    `X-Api-Key` header authenticates GraphQL (QUERY / MUTATE permissions). See
    `agents/api.md` auth and `BACKLOG.md` for token hardening.
@@ -253,7 +251,7 @@ set `ownerId` / `partition` from auth scope, not from client input.
 - **`disable*` / `enable*`** on Skill and Organization set `disabled` only — no domain
   events, no cascade. Disabled rows stay referenced until hard delete or manual ref edit.
 - `skill.deleted` event: consumers `$pull` skill refs from Project, Course, Education,
-  User (`skillIds`), and nested Experience role arrays (`detachSkill`).
+  Experience, and User (`skillIds`) via `detachSkill`.
 - `organization.deleted` event: hard `deleteMany` on Course, Education, Experience tied
   to that organization **across all tenants** (`purgeByOrganization`) — intentional.
 - `user.deleted` event: hard `deleteMany` on Experience, Education, Course, Project,

@@ -82,7 +82,7 @@
   },
   "experiences": {
     "manageTitle": "Experience",
-    "manageDescription": "Jobs and roles in your professional history.",
+    "manageDescription": "Jobs in your professional history. One role per entry.",
     "entity": "experience",
     "entityPlural": "experiences",
     "newButton": "New experience",

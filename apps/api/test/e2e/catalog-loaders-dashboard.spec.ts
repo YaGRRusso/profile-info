@@ -179,21 +179,17 @@ describe("Catalog loaders and dashboard counts (e2e)", () => {
     const userACtx = testAuthContext({ id: userAId });
     const experience = await experiencesService.createOne(userACtx, {
       category: ExperienceCategory.FREELANCE,
-      organizationId: localOrg.id,
-      roles: [
+      i18n: [
         {
-          i18n: [
-            {
-              locale: "en",
-              messages: {
-                description: "Local org work",
-                title: "Freelancer",
-              },
-            },
-          ],
-          skillIds: [skillOnExperience.id],
+          locale: "en",
+          messages: {
+            description: "Local org work",
+            title: "Freelancer",
+          },
         },
       ],
+      organizationId: localOrg.id,
+      skillIds: [skillOnExperience.id],
       slug: "loader-local-org-experience",
     });
     experienceWithLocalOrgId = experience.id;

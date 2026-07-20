@@ -47,26 +47,24 @@ const findManyExperiences = graphql(`
           name
           slug
         }
-        roles {
+        i18n {
+          locale
+          messages {
+            title
+            description
+          }
+        }
+        period {
+          from
+          to
+        }
+        skills {
+          id
+          slug
           i18n {
             locale
             messages {
               title
-              description
-            }
-          }
-          period {
-            from
-            to
-          }
-          skills {
-            id
-            slug
-            i18n {
-              locale
-              messages {
-                title
-              }
             }
           }
         }

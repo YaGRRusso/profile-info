@@ -42,12 +42,6 @@ const NESTED_PRIVATE_ENTITIES = `
           id
           slug
         }
-        roles {
-          skills {
-            id
-            slug
-          }
-        }
       }
     }
     courses: findManyCourses {
@@ -135,7 +129,6 @@ interface NestedPrivateEntitiesData {
       owner: { id: string; email: string };
       organization: { id: string; name: string };
       skills: Array<{ id: string; slug: string }>;
-      roles: Array<{ skills: Array<{ id: string; slug: string }> }>;
     }>;
   };
   projects: {
@@ -368,7 +361,7 @@ describe("Cross-tenant DataLoader isolation (e2e)", () => {
     const joaoCtx = testAuthContext({ id: joao.id });
     const bobCtx = testAuthContext({ id: bob.id });
 
-    const rolePayload = {
+    const experiencePayload = {
       i18n: [
         {
           locale: "en",
@@ -382,14 +375,14 @@ describe("Cross-tenant DataLoader isolation (e2e)", () => {
       experiencesService.createOne(joaoCtx, {
         category: ExperienceCategory.FULL_TIME,
         organizationId,
-        roles: [rolePayload],
         slug: "shared-exp",
+        ...experiencePayload,
       }),
       experiencesService.createOne(bobCtx, {
         category: ExperienceCategory.FULL_TIME,
         organizationId,
-        roles: [rolePayload],
         slug: "shared-exp",
+        ...experiencePayload,
       }),
     ]);
 
@@ -521,9 +514,6 @@ describe("Cross-tenant DataLoader isolation (e2e)", () => {
       id: organizationId,
       name: organizationName,
     });
-    expect(data.experiences.nodes[0]?.roles[0]?.skills).toEqual([
-      { id: skillId, slug: skillSlug },
-    ]);
   });
 
   it.each(crossTenantFindOneCases)(

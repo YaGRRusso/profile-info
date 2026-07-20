@@ -82,7 +82,7 @@
   },
   "experiences": {
     "manageTitle": "Experiências",
-    "manageDescription": "Empregos e funções da sua trajetória profissional.",
+    "manageDescription": "Empregos da sua trajetória profissional. Uma função por registro.",
     "entity": "experiência",
     "entityPlural": "experiências",
     "newButton": "Nova experiência",

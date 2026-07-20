@@ -153,7 +153,7 @@ Never build keys dynamically (`t(\`stats.${key}\`)`, `t(item.id)`). Dynamic list
 | Key | Use when |
 |-----|----------|
 | `requiredField` | Scalar missing / empty |
-| `requiredGroup` | Array must have ≥1 entry (`i18n[]`, `roles[]`) |
+| `requiredGroup` | Array must have ≥1 entry (`i18n[]`) |
 | `minLength` / `maxLength` | String character bounds (`{{value}}`) |
 | `minCount` / `maxCount` | Array selection bounds (`{{value}}`) |
 | `minValue` / `maxValue` | Numeric bounds (`{{value}}`) |

@@ -19,25 +19,6 @@ export class ExperienceMessagesModel {
   description: string;
 }
 
-@Schema({ _id: false })
-export class ExperienceRoleModel {
-  @Prop({
-    required: true,
-    type: [createTranslationModel(ExperienceMessagesModel)],
-  })
-  i18n: TranslationModel<ExperienceMessagesModel>[];
-
-  @Prop({
-    type: SchemaFactory.createForClass(DateRangeModel),
-  })
-  period?: DateRangeModel;
-
-  @Prop({
-    type: [{ ref: SkillModel.name, type: mongoose.Schema.Types.ObjectId }],
-  })
-  skillIds?: (mongoose.Types.ObjectId | string)[];
-}
-
 @Schema({ timestamps: true })
 export class ExperienceModel extends BaseModel {
   @Prop({ default: 0, required: true, type: Number })
@@ -67,9 +48,19 @@ export class ExperienceModel extends BaseModel {
 
   @Prop({
     required: true,
-    type: [SchemaFactory.createForClass(ExperienceRoleModel)],
+    type: [createTranslationModel(ExperienceMessagesModel)],
   })
-  roles: ExperienceRoleModel[];
+  i18n: TranslationModel<ExperienceMessagesModel>[];
+
+  @Prop({
+    type: SchemaFactory.createForClass(DateRangeModel),
+  })
+  period?: DateRangeModel;
+
+  @Prop({
+    type: [{ ref: SkillModel.name, type: mongoose.Schema.Types.ObjectId }],
+  })
+  skillIds?: (mongoose.Types.ObjectId | string)[];
 }
 
 export type ExperienceDocument = HydratedDocument<ExperienceModel>;

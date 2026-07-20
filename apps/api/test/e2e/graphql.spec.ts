@@ -238,20 +238,16 @@ describe("GraphQL (e2e)", () => {
 
     const experience = await experiencesService.createOne(portfolioCtx, {
       category: ExperienceCategory.FULL_TIME,
-      organizationId: organization.id,
-      roles: [
+      i18n: [
         {
-          i18n: [
-            {
-              locale: "en",
-              messages: {
-                description: "Built APIs",
-                title: "Engineer",
-              },
-            },
-          ],
+          locale: "en",
+          messages: {
+            description: "Built APIs",
+            title: "Engineer",
+          },
         },
       ],
+      organizationId: organization.id,
       slug: "nested-experience",
     });
 

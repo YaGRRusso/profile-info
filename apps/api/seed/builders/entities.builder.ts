@@ -122,20 +122,17 @@ export function buildExperiencesForPersona(
 ) {
   return buildMany(counts.experiences, (index) => {
     const globalIndex = seedOffset + index;
-    const roleCount = faker.number.int({ max: 4, min: 1 });
 
     return {
       category: faker.helpers.arrayElement(EXPERIENCE_CATEGORIES),
+      i18n: bilingualTitleDescription(globalIndex),
       organizationId: optionalForIndex(globalIndex, () =>
         faker.helpers.arrayElement(organizationIds)
       ),
       ownerId,
+      period: optionalForIndex(globalIndex, period),
       relevance: relevance(),
-      roles: buildMany(roleCount, (roleIndex) => ({
-        i18n: bilingualTitleDescription(globalIndex + roleIndex),
-        period: optionalForIndex(globalIndex + roleIndex, period),
-        skillIds: pickSkillIds(skillIds, globalIndex + roleIndex),
-      })),
+      skillIds: pickSkillIds(skillIds, globalIndex),
       slug: slugFor(faker.person.jobTitle(), globalIndex),
     } satisfies Partial<ExperienceModel>;
   });

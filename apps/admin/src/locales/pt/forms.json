@@ -101,10 +101,6 @@
       "placeholder": "Escolha um...",
       "tooltip": "Situação atual: em andamento, concluído ou outra opção."
     },
-    "role": {
-      "label": "Função",
-      "tooltip": "Um cargo neste empregador. Você pode adicionar mais de um."
-    },
     "userRole": {
       "label": "Papel da conta",
       "placeholder": "Escolha um...",
@@ -232,16 +228,6 @@
     "links": {
       "label": "Links",
       "tooltip": "Sites relacionados (demo, repositório, case e similares)."
-    },
-    "roles": {
-      "title": {
-        "label": "Funções",
-        "tooltip": "Cargos neste empregador, na ordem do currículo."
-      },
-      "translations": {
-        "label": "Traduções",
-        "tooltip": "Título e descrição localizados desta função."
-      }
     },
     "personal": "Pessoal",
     "contact": "Contato",

@@ -248,8 +248,8 @@ removeOneSkill(id)
       ┌────────────┼────────────┬──────────────┐
       ▼            ▼            ▼              ▼
   Projects     Courses     Educations    Experiences
-  $pull skill  $pull skill $pull skill   $pull from
-  from array   from array  from array   roles.skillIds
+  $pull skill  $pull skill $pull skill   $pull skill
+  from array   from array  from array   from array
 ```
 
 **Por que eventos e não chamada direta?**

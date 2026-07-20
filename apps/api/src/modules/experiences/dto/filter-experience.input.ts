@@ -8,6 +8,8 @@ export class FilterExperienceInput extends PartialType(
     "slug",
     "organizationId",
     "category",
-    "roles",
+    "i18n",
+    "period",
+    "skillIds",
   ] as const)
 ) {}

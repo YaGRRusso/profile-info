@@ -122,18 +122,14 @@ describe("Organization nullability (integration)", () => {
 
     await experienceModel.create({
       category: ExperienceCategory.FULL_TIME,
-      ownerId,
-      relevance: 0,
-      roles: [
+      i18n: [
         {
-          i18n: [
-            {
-              locale: "en",
-              messages: { description: "No organization", title: "Role" },
-            },
-          ],
+          locale: "en",
+          messages: { description: "No organization", title: "Experience" },
         },
       ],
+      ownerId,
+      relevance: 0,
       slug: "experience-without-org",
     });
   });

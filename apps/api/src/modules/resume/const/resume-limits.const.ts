@@ -3,6 +3,5 @@ export const RESUME_LIMITS = {
   educations: 3,
   experiences: 3,
   projects: 3,
-  rolesPerExperience: 3,
   skillsPerCategory: 10,
 } as const;

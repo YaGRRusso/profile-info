@@ -155,9 +155,11 @@ input CreateEducationMessagesInputTranslationInput {
 
 input CreateExperienceInput {
   category: ExperienceCategory!
+  i18n: [CreateExperienceMessagesInputTranslationInput!]!
   organizationId: String!
+  period: DateRangeInput
   relevance: Float
-  roles: [CreateExperienceRoleInput!]!
+  skillIds: [String!]
   slug: String
 }
 
@@ -169,12 +171,6 @@ input CreateExperienceMessagesInput {
 input CreateExperienceMessagesInputTranslationInput {
   locale: String!
   messages: CreateExperienceMessagesInput!
-}
-
-input CreateExperienceRoleInput {
-  i18n: [CreateExperienceMessagesInputTranslationInput!]!
-  period: DateRangeInput
-  skillIds: [String!]
 }
 
 input CreateOrganizationInput {
@@ -378,13 +374,15 @@ enum ExperienceCategory {
 type ExperienceEntity {
   category: ExperienceCategory!
   createdAt: DateTime!
+  i18n: [ExperienceTranslationLocale!]!
   id: ID!
   organization: OrganizationEntity
   organizationId: ID
   owner: UserEntity!
   ownerId: ID!
+  period: DateRangeEntity
   relevance: Float!
-  roles: [ExperienceRole!]!
+  skillIds: [ID!]
   skills: [SkillEntity!]
   slug: String
   updatedAt: DateTime!
@@ -393,13 +391,6 @@ type ExperienceEntity {
 type ExperienceMessages {
   description: String!
   title: String!
-}
-
-type ExperienceRole {
-  i18n: [ExperienceTranslationLocale!]!
-  period: DateRangeEntity
-  skillIds: [ID!]
-  skills: [SkillEntity!]
 }
 
 type ExperienceTranslationLocale {
@@ -440,9 +431,11 @@ input FilterEducationInput {
 
 input FilterExperienceInput {
   category: ExperienceCategory
+  i18n: [CreateExperienceMessagesInputTranslationInput!]
   organizationId: String
+  period: DateRangeInput
   relevance: Float
-  roles: [CreateExperienceRoleInput!]
+  skillIds: [String!]
   slug: String
 }
 
@@ -849,9 +842,11 @@ input UpdateEducationInput {
 
 input UpdateExperienceInput {
   category: ExperienceCategory
+  i18n: [CreateExperienceMessagesInputTranslationInput!]
   organizationId: String
+  period: DateRangeInput
   relevance: Float
-  roles: [CreateExperienceRoleInput!]
+  skillIds: [String!]
   slug: String
 }
 

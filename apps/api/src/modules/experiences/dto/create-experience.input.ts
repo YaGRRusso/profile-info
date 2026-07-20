@@ -35,22 +35,6 @@ const ExperienceTranslationInput = createTranslationInput(
 );
 
 @InputType()
-export class CreateExperienceRoleInput {
-  @RequiredField(() => [ExperienceTranslationInput])
-  @IsArray()
-  @ValidateNested({ each: true })
-  @Type(() => ExperienceTranslationInput)
-  i18n: TranslationInput<CreateExperienceMessagesInput>[];
-
-  @OptionalField(() => DateRangeInput)
-  period?: DateRangeInput;
-
-  @OptionalField(() => [String])
-  @IsMongoId({ each: true })
-  skillIds?: string[];
-}
-
-@InputType()
 export class CreateExperienceInput {
   @OptionalField(() => Number)
   relevance?: number;
@@ -67,9 +51,16 @@ export class CreateExperienceInput {
   @IsEnum(ExperienceCategory)
   category: ExperienceCategory;
 
-  @RequiredField(() => [CreateExperienceRoleInput])
+  @RequiredField(() => [ExperienceTranslationInput])
   @IsArray()
   @ValidateNested({ each: true })
-  @Type(() => CreateExperienceRoleInput)
-  roles: CreateExperienceRoleInput[];
+  @Type(() => ExperienceTranslationInput)
+  i18n: TranslationInput<CreateExperienceMessagesInput>[];
+
+  @OptionalField(() => DateRangeInput)
+  period?: DateRangeInput;
+
+  @OptionalField(() => [String])
+  @IsMongoId({ each: true })
+  skillIds?: string[];
 }

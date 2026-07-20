@@ -41,35 +41,26 @@ import {
 import { isSlugTaken } from "@/lib/slug";
 import { CommonFormProps } from "./common";
 
-const roleI18nSchema = z
-  .array(
-    z.object({
-      description: z.string().min(1, FormError.requiredField),
-      locale: z.string().min(1, FormError.requiredField),
-      title: z.string().min(1, FormError.requiredField),
-    })
-  )
-  .min(1, FormError.requiredGroup)
-  .refine(hasUniqueLocales, { message: FormError.uniqueField });
-
 const experienceSchema = z.object({
   category: z.enum(ExperienceCategory, FormError.requiredField),
-  organizationId: z.string().min(1, FormError.requiredField),
-  relevance: z.number().min(1, FormError.minValue),
-  roles: z
+  i18n: z
     .array(
       z.object({
-        i18n: roleI18nSchema,
-        period: z
-          .object({ from: z.string(), to: z.string() })
-          .refine(
-            (range) => !(range.from && range.to) || range.from <= range.to,
-            { message: FormError.invalidRange }
-          ),
-        skillIds: z.array(z.string()),
+        description: z.string().min(1, FormError.requiredField),
+        locale: z.string().min(1, FormError.requiredField),
+        title: z.string().min(1, FormError.requiredField),
       })
     )
-    .min(1, FormError.requiredGroup),
+    .min(1, FormError.requiredGroup)
+    .refine(hasUniqueLocales, { message: FormError.uniqueField }),
+  organizationId: z.string().min(1, FormError.requiredField),
+  period: z
+    .object({ from: z.string(), to: z.string() })
+    .refine((range) => !(range.from && range.to) || range.from <= range.to, {
+      message: FormError.invalidRange,
+    }),
+  relevance: z.number().min(1, FormError.minValue),
+  skillIds: z.array(z.string()),
   slug: z.string().regex(SLUG_REGEX, FormError.invalidFormat).or(z.literal("")),
 });
 
@@ -84,25 +75,23 @@ export function experienceToInput(
 ): CreateExperienceInput {
   return {
     category: data.category,
-    organizationId: data.organizationId,
-    relevance: data.relevance,
-    roles: data.roles.map((role) => ({
-      i18n: role.i18n.map((translation) => ({
-        locale: translation.locale,
-        messages: {
-          description: translation.description,
-          title: translation.title,
-        },
-      })),
-      period:
-        !role.period.from && !role.period.to
-          ? null
-          : {
-              from: nullIfEmpty(toIsoDate(role.period.from)),
-              to: nullIfEmpty(toIsoDate(role.period.to)),
-            },
-      skillIds: nullIfEmpty(role.skillIds),
+    i18n: data.i18n.map((translation) => ({
+      locale: translation.locale,
+      messages: {
+        description: translation.description,
+        title: translation.title,
+      },
     })),
+    organizationId: data.organizationId,
+    period:
+      !data.period.from && !data.period.to
+        ? null
+        : {
+            from: nullIfEmpty(toIsoDate(data.period.from)),
+            to: nullIfEmpty(toIsoDate(data.period.to)),
+          },
+    relevance: data.relevance,
+    skillIds: nullIfEmpty(data.skillIds),
     slug: nullIfEmpty(data.slug),
   };
 }
@@ -112,20 +101,18 @@ export function experienceToForm(
 ): Partial<ExperienceSchema> {
   return {
     category: experience.category,
-    organizationId: experience.organization?.id ?? "",
-    relevance: experience.relevance,
-    roles: (experience.roles ?? []).map((role) => ({
-      i18n: role.i18n.map((translation) => ({
-        description: translation.messages.description,
-        locale: translation.locale,
-        title: translation.messages.title,
-      })),
-      period: {
-        from: toDateInput(role.period?.from),
-        to: toDateInput(role.period?.to),
-      },
-      skillIds: (role.skills ?? []).map((skill) => skill.id),
+    i18n: experience.i18n.map((translation) => ({
+      description: translation.messages.description,
+      locale: translation.locale,
+      title: translation.messages.title,
     })),
+    organizationId: experience.organization?.id ?? "",
+    period: {
+      from: toDateInput(experience.period?.from),
+      to: toDateInput(experience.period?.to),
+    },
+    relevance: experience.relevance,
+    skillIds: (experience.skills ?? []).map((skill) => skill.id),
     slug: experience.slug ?? "",
   };
 }
@@ -134,14 +121,6 @@ const CATEGORY_OPTIONS = Object.values(ExperienceCategory).map((category) => ({
   label: category,
   value: category,
 }));
-
-function emptyRole() {
-  return {
-    i18n: createEmptyI18n({ description: "", title: "" }),
-    period: { from: "", to: "" },
-    skillIds: Array.of<string>(),
-  };
-}
 
 export function ExperienceForm({
   onSubmit,
@@ -190,9 +169,11 @@ export function ExperienceForm({
   const form = useForm({
     defaultValues: {
       category: ExperienceCategory.FullTime,
+      i18n: createEmptyI18n({ description: "", title: "" }),
       organizationId: "",
+      period: { from: "", to: "" },
       relevance: 1,
-      roles: [emptyRole()],
+      skillIds: Array.of<string>(),
       slug: "",
       ...defaultValues,
     },
@@ -202,8 +183,7 @@ export function ExperienceForm({
 
   const handleAtsOptimize = useCallback(
     async <Field extends DeepKeys<ExperienceSchema>>(
-      fieldParent: ExperienceSchema["roles"][number],
-      fieldGroup: ExperienceSchema["roles"][number]["i18n"][number],
+      fieldGroup: ExperienceSchema["i18n"][number],
       fieldName: Field,
       fieldValue: DeepValue<ExperienceSchema, Field>
     ) => {
@@ -219,19 +199,21 @@ export function ExperienceForm({
 
       const skills = i18nLabelsByIds(
         findManySkills.data?.nodes,
-        fieldParent.skillIds
+        form.getFieldValue("skillIds")
       );
 
       const { title } = fieldGroup;
       if (title) details.push({ key: "Title", value: [title] });
 
-      const { period } = fieldParent;
-      const periodValue = compact([
-        period.from ? `from ${period.from}` : "",
-        period.to ? `to ${period.to}` : "",
-      ]);
-      if (periodValue.length)
-        details.push({ key: "Period", value: periodValue });
+      const period = form.getFieldValue("period");
+      if (period?.from || period?.to)
+        details.push({
+          key: "Period",
+          value: compact([
+            period.from ? `from ${period.from}` : "",
+            period.to ? `to ${period.to}` : "",
+          ]),
+        });
 
       const category = form.getFieldValue("category");
       if (category) details.push({ key: "Category", value: [category] });
@@ -284,7 +266,7 @@ export function ExperienceForm({
 
   const handleTranslate = useCallback(
     async <Field extends DeepKeys<ExperienceSchema>>(
-      fieldGroup: ExperienceSchema["roles"][number]["i18n"][number],
+      fieldGroup: ExperienceSchema["i18n"][number],
       fieldName: Field,
       fieldValue: DeepValue<ExperienceSchema, Field>
     ) => {
@@ -391,153 +373,105 @@ export function ExperienceForm({
           />
         )}
       </Field>
+      <Field name="period">
+        {(field) => (
+          <DateRangeInput
+            error={fieldError(field.state.meta)}
+            label={tForm("fields.period.label")}
+            onChange={field.handleChange}
+            optional
+            tooltip={tForm("fields.period.tooltip")}
+            value={field.state.value}
+          />
+        )}
+      </Field>
+      <Field name="skillIds">
+        {(field) => (
+          <MultiSelectInput
+            error={fieldError(field.state.meta)}
+            label={tForm("fields.skills.label")}
+            onChange={field.handleChange}
+            optional
+            options={skillOptions}
+            placeholder={tForm("fields.skills.placeholder")}
+            tooltip={tForm("fields.skills.tooltip")}
+            value={field.state.value}
+          />
+        )}
+      </Field>
 
       <FormDivider
-        label={tForm("sections.roles.title.label")}
-        tooltip={tForm("sections.roles.title.tooltip")}
+        label={tForm("sections.translations.label")}
+        tooltip={tForm("sections.translations.tooltip")}
       />
 
-      <Field mode="array" name="roles">
-        {(rolesField) => (
+      <Field mode="array" name="i18n">
+        {(arrayField) => (
           <FieldArray
-            error={fieldError(rolesField.state.meta)}
-            label={tForm("fields.role.label")}
-            onAdd={() => rolesField.pushValue(emptyRole())}
-            onMoveDown={(index) => rolesField.swapValues(index, index + 1)}
-            onMoveUp={(index) => rolesField.swapValues(index, index - 1)}
-            onRemove={(index) => rolesField.removeValue(index)}
-            tooltip={tForm("fields.role.tooltip")}
-            values={rolesField.state.value}
+            error={fieldError(arrayField.state.meta)}
+            label={tForm("fields.translation.label")}
+            onAdd={() =>
+              arrayField.pushValue({ description: "", locale: "", title: "" })
+            }
+            onRemove={(index) => arrayField.removeValue(index)}
+            tooltip={tForm("fields.translation.tooltip")}
+            values={arrayField.state.value}
           >
-            {(roleIndex) => (
+            {(index) => (
               <>
-                <Field name={`roles[${roleIndex}].period`}>
+                <Field name={`i18n[${index}].locale`}>
                   {(field) => (
-                    <DateRangeInput
+                    <SelectInput
                       error={fieldError(field.state.meta)}
-                      label={tForm("fields.period.label")}
+                      label={tForm("fields.locale.label")}
+                      name={field.name}
                       onChange={field.handleChange}
-                      optional
-                      tooltip={tForm("fields.period.tooltip")}
+                      options={LOCALES}
+                      placeholder={tForm("fields.locale.placeholder")}
+                      tooltip={tForm("fields.locale.tooltip")}
                       value={field.state.value}
                     />
                   )}
                 </Field>
-
-                <Field name={`roles[${roleIndex}].skillIds`}>
+                <Field name={`i18n[${index}].title`}>
                   {(field) => (
-                    <MultiSelectInput
+                    <TextInput
                       error={fieldError(field.state.meta)}
-                      label={tForm("fields.skills.label")}
+                      label={tForm("fields.experienceTitle.label")}
+                      name={field.name}
                       onChange={field.handleChange}
-                      optional
-                      options={skillOptions}
-                      placeholder={tForm("fields.skills.placeholder")}
-                      tooltip={tForm("fields.skills.tooltip")}
+                      placeholder={tForm("fields.experienceTitle.placeholder")}
+                      tooltip={tForm("fields.experienceTitle.tooltip")}
                       value={field.state.value}
                     />
                   )}
                 </Field>
-
-                <FormDivider
-                  label={tForm("sections.roles.translations.label")}
-                  tooltip={tForm("sections.roles.translations.tooltip")}
-                />
-
-                <Field mode="array" name={`roles[${roleIndex}].i18n`}>
-                  {(i18nField) => (
-                    <FieldArray
-                      error={fieldError(i18nField.state.meta)}
-                      label={tForm("fields.translation.label")}
-                      onAdd={() =>
-                        i18nField.pushValue({
-                          description: "",
-                          locale: "",
-                          title: "",
-                        })
+                <Field name={`i18n[${index}].description`}>
+                  {(field) => (
+                    <TextareaInput
+                      disabled={atsSummarize.isPending || translate.isPending}
+                      error={fieldError(field.state.meta)}
+                      label={tForm("fields.description.label")}
+                      name={field.name}
+                      onChange={field.handleChange}
+                      onOptimize={() =>
+                        handleAtsOptimize(
+                          arrayField.state.value[index],
+                          field.name,
+                          field.state.value
+                        )
                       }
-                      onRemove={(index) => i18nField.removeValue(index)}
-                      sublevel
-                      tooltip={tForm("fields.translation.tooltip")}
-                      values={i18nField.state.value}
-                    >
-                      {(i18nIndex) => (
-                        <>
-                          <Field
-                            name={`roles[${roleIndex}].i18n[${i18nIndex}].locale`}
-                          >
-                            {(field) => (
-                              <SelectInput
-                                error={fieldError(field.state.meta)}
-                                label={tForm("fields.locale.label")}
-                                name={field.name}
-                                onChange={field.handleChange}
-                                options={LOCALES}
-                                placeholder={tForm("fields.locale.placeholder")}
-                                tooltip={tForm("fields.locale.tooltip")}
-                                value={field.state.value}
-                              />
-                            )}
-                          </Field>
-                          <Field
-                            name={`roles[${roleIndex}].i18n[${i18nIndex}].title`}
-                          >
-                            {(field) => (
-                              <TextInput
-                                error={fieldError(field.state.meta)}
-                                label={tForm("fields.experienceTitle.label")}
-                                name={field.name}
-                                onChange={field.handleChange}
-                                placeholder={tForm(
-                                  "fields.experienceTitle.placeholder"
-                                )}
-                                tooltip={tForm(
-                                  "fields.experienceTitle.tooltip"
-                                )}
-                                value={field.state.value}
-                              />
-                            )}
-                          </Field>
-                          <Field
-                            name={`roles[${roleIndex}].i18n[${i18nIndex}].description`}
-                          >
-                            {(field) => (
-                              <TextareaInput
-                                disabled={
-                                  atsSummarize.isPending || translate.isPending
-                                }
-                                error={fieldError(field.state.meta)}
-                                label={tForm("fields.description.label")}
-                                name={field.name}
-                                onChange={field.handleChange}
-                                onOptimize={() =>
-                                  handleAtsOptimize(
-                                    rolesField.state.value[roleIndex],
-                                    i18nField.state.value[i18nIndex],
-                                    field.name,
-                                    field.state.value
-                                  )
-                                }
-                                onTranslate={() =>
-                                  handleTranslate(
-                                    rolesField.state.value[roleIndex].i18n[
-                                      i18nIndex
-                                    ],
-                                    field.name,
-                                    field.state.value
-                                  )
-                                }
-                                placeholder={tForm(
-                                  "fields.description.placeholder"
-                                )}
-                                tooltip={tForm("fields.description.tooltip")}
-                                value={field.state.value}
-                              />
-                            )}
-                          </Field>
-                        </>
-                      )}
-                    </FieldArray>
+                      onTranslate={() =>
+                        handleTranslate(
+                          arrayField.state.value[index],
+                          field.name,
+                          field.state.value
+                        )
+                      }
+                      placeholder={tForm("fields.description.placeholder")}
+                      tooltip={tForm("fields.description.tooltip")}
+                      value={field.state.value}
+                    />
                   )}
                 </Field>
               </>

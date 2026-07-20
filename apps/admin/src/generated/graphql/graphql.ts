@@ -101,9 +101,11 @@ export type CreateEducationMessagesInputTranslationInput = {
 
 export type CreateExperienceInput = {
   category: ExperienceCategory;
+  i18n: Array<CreateExperienceMessagesInputTranslationInput>;
   organizationId: string;
+  period?: DateRangeInput | null | undefined;
   relevance?: number | null | undefined;
-  roles: Array<CreateExperienceRoleInput>;
+  skillIds?: Array<string> | null | undefined;
   slug?: string | null | undefined;
 };
 
@@ -115,12 +117,6 @@ export type CreateExperienceMessagesInput = {
 export type CreateExperienceMessagesInputTranslationInput = {
   locale: string;
   messages: CreateExperienceMessagesInput;
-};
-
-export type CreateExperienceRoleInput = {
-  i18n: Array<CreateExperienceMessagesInputTranslationInput>;
-  period?: DateRangeInput | null | undefined;
-  skillIds?: Array<string> | null | undefined;
 };
 
 export type CreateOrganizationInput = {
@@ -275,9 +271,11 @@ export type FilterEducationInput = {
 
 export type FilterExperienceInput = {
   category?: ExperienceCategory | null | undefined;
+  i18n?: Array<CreateExperienceMessagesInputTranslationInput> | null | undefined;
   organizationId?: string | null | undefined;
+  period?: DateRangeInput | null | undefined;
   relevance?: number | null | undefined;
-  roles?: Array<CreateExperienceRoleInput> | null | undefined;
+  skillIds?: Array<string> | null | undefined;
   slug?: string | null | undefined;
 };
 
@@ -455,9 +453,11 @@ export type UpdateEducationInput = {
 
 export type UpdateExperienceInput = {
   category?: ExperienceCategory | null | undefined;
+  i18n?: Array<CreateExperienceMessagesInputTranslationInput> | null | undefined;
   organizationId?: string | null | undefined;
+  period?: DateRangeInput | null | undefined;
   relevance?: number | null | undefined;
-  roles?: Array<CreateExperienceRoleInput> | null | undefined;
+  skillIds?: Array<string> | null | undefined;
   slug?: string | null | undefined;
 };
 
@@ -972,7 +972,7 @@ export type FindManyExperiencesQueryVariables = Exact<{
 }>;
 
 
-export type FindManyExperiencesQuery = { findManyExperiences: { found: number, nodes: Array<{ id: string, slug: string | null, category: ExperienceCategory, relevance: number, createdAt: string, updatedAt: string, owner: { id: string, nickname: string, name: string, role: UserRole, email: string, phone: string | null, avatar: string | null }, organization: { id: string, name: string, slug: string | null } | null, roles: Array<{ i18n: Array<{ locale: string, messages: { title: string, description: string } }>, period: { from: string | null, to: string | null } | null, skills: Array<{ id: string, slug: string | null, i18n: Array<{ locale: string, messages: { title: string } }> }> | null }> }> } };
+export type FindManyExperiencesQuery = { findManyExperiences: { found: number, nodes: Array<{ id: string, slug: string | null, category: ExperienceCategory, relevance: number, createdAt: string, updatedAt: string, owner: { id: string, nickname: string, name: string, role: UserRole, email: string, phone: string | null, avatar: string | null }, organization: { id: string, name: string, slug: string | null } | null, i18n: Array<{ locale: string, messages: { title: string, description: string } }>, period: { from: string | null, to: string | null } | null, skills: Array<{ id: string, slug: string | null, i18n: Array<{ locale: string, messages: { title: string } }> }> | null }> } };
 
 export type FindManyOrganizationsQueryVariables = Exact<{
   organizationFilters?: FilterOrganizationInput | null | undefined;
@@ -1839,26 +1839,24 @@ export const FindManyExperiencesDocument = new TypedDocumentString(`
         name
         slug
       }
-      roles {
+      i18n {
+        locale
+        messages {
+          title
+          description
+        }
+      }
+      period {
+        from
+        to
+      }
+      skills {
+        id
+        slug
         i18n {
           locale
           messages {
             title
-            description
-          }
-        }
-        period {
-          from
-          to
-        }
-        skills {
-          id
-          slug
-          i18n {
-            locale
-            messages {
-              title
-            }
           }
         }
       }

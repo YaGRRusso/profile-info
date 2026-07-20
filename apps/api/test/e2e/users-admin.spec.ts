@@ -160,32 +160,24 @@ describe("Users admin (e2e)", () => {
 
     await experiencesService.createOne(userCtx, {
       category: ExperienceCategory.FULL_TIME,
-      organizationId,
-      roles: [
+      i18n: [
         {
-          i18n: [
-            {
-              locale: "en",
-              messages: { description: "Work", title: "Engineer" },
-            },
-          ],
+          locale: "en",
+          messages: { description: "Work", title: "Engineer" },
         },
       ],
+      organizationId,
       slug: "user-experience",
     } as CreateExperienceInput);
     await experiencesService.createOne(userCtx, {
       category: ExperienceCategory.FREELANCE,
-      organizationId,
-      roles: [
+      i18n: [
         {
-          i18n: [
-            {
-              locale: "en",
-              messages: { description: "Side", title: "Consultant" },
-            },
-          ],
+          locale: "en",
+          messages: { description: "Side", title: "Consultant" },
         },
       ],
+      organizationId,
       slug: "user-experience-freelance",
     } as CreateExperienceInput);
     await educationsService.createOne(userCtx, {

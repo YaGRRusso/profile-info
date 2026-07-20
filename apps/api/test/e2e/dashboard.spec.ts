@@ -173,33 +173,25 @@ describe("Dashboard (e2e)", () => {
 
     await experiencesService.createOne(joaoCtx, {
       category: ExperienceCategory.FULL_TIME,
-      organizationId,
-      roles: [
+      i18n: [
         {
-          i18n: [
-            {
-              locale: "en",
-              messages: { description: "Backend work", title: "Engineer" },
-            },
-          ],
+          locale: "en",
+          messages: { description: "Backend work", title: "Engineer" },
         },
       ],
+      organizationId,
       slug: "alice-experience-full-time",
     } as CreateExperienceInput);
 
     await experiencesService.createOne(joaoCtx, {
       category: ExperienceCategory.FREELANCE,
-      organizationId,
-      roles: [
+      i18n: [
         {
-          i18n: [
-            {
-              locale: "en",
-              messages: { description: "Side projects", title: "Consultant" },
-            },
-          ],
+          locale: "en",
+          messages: { description: "Side projects", title: "Consultant" },
         },
       ],
+      organizationId,
       slug: "alice-experience-freelance",
     } as CreateExperienceInput);
 

@@ -8,8 +8,6 @@ import {
   ResolveField,
   Resolver,
 } from "@nestjs/graphql";
-import { compact, keyBy, uniq } from "lodash";
-import { sortDateRange } from "@/common/helpers/daterange.helper";
 import type { AuthContext } from "@/core/context/auth-context.interface";
 import type { GraphqlContext } from "@/core/context/graphql-context.interface";
 import { BatchEntity } from "@/core/entities/batch.entity";
@@ -24,7 +22,6 @@ import { SortExperienceInput } from "./dto/sort-experience.input";
 import { UpdateExperienceInput } from "./dto/update-experience.input";
 import {
   ExperienceEntity,
-  ExperienceRole,
   PaginatedExperienceEntity,
 } from "./entities/experience.entity";
 import { ExperiencesService } from "./experiences.service";
@@ -166,29 +163,6 @@ export class ExperiencesResolver {
     return ctx.loaders.batchUsers.load(ownerId);
   }
 
-  @ResolveField(() => [ExperienceRole])
-  async roles(
-    @Parent() experience: ExperienceEntity,
-    @Context() ctx: GraphqlContext
-  ) {
-    const { ownerId, roles } = experience;
-    if (!roles?.length) return roles;
-
-    const sortedRoles = sortDateRange([...roles]);
-    const skillIds = uniq(sortedRoles.flatMap((role) => role.skillIds ?? []));
-    if (!(ownerId && skillIds.length)) return sortedRoles;
-
-    const byId = keyBy(
-      compact(await ctx.loaders.batchSkills.forKey(ownerId).loadMany(skillIds)),
-      "id"
-    );
-
-    return sortedRoles.map((role) => ({
-      ...role,
-      skills: compact(role.skillIds?.map((id) => byId[id])),
-    }));
-  }
-
   @ResolveField(() => OrganizationEntity, { nullable: true })
   organization(
     @Parent() experience: ExperienceEntity,
@@ -204,12 +178,8 @@ export class ExperiencesResolver {
     @Parent() experience: ExperienceEntity,
     @Context() ctx: GraphqlContext
   ) {
-    const { ownerId, roles } = experience;
-    if (!ownerId) return [];
-
-    const skillIds = uniq(roles.flatMap((role) => role.skillIds ?? []));
-    if (!skillIds.length) return [];
-
+    const { ownerId, skillIds } = experience;
+    if (!(skillIds && ownerId)) return [];
     return ctx.loaders.batchSkills.forKey(ownerId).loadMany(skillIds);
   }
 }

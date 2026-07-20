@@ -27,21 +27,6 @@ export class ExperienceTranslationLocale {
 }
 
 @ObjectType()
-export class ExperienceRole {
-  @Field(() => [ExperienceTranslationLocale])
-  i18n: ExperienceTranslationLocale[];
-
-  @OptionalField(() => DateRangeEntity)
-  period?: DateRangeEntity;
-
-  @OptionalField(() => [ID])
-  skillIds?: string[];
-
-  @OptionalField(() => [SkillEntity])
-  skills?: SkillEntity[];
-}
-
-@ObjectType()
 export class ExperienceEntity extends BaseEntity {
   @Field(() => Number)
   relevance: number;
@@ -64,8 +49,14 @@ export class ExperienceEntity extends BaseEntity {
   @Field(() => ExperienceCategory)
   category: ExperienceCategory;
 
-  @Field(() => [ExperienceRole])
-  roles: ExperienceRole[];
+  @Field(() => [ExperienceTranslationLocale])
+  i18n: ExperienceTranslationLocale[];
+
+  @OptionalField(() => DateRangeEntity)
+  period?: DateRangeEntity;
+
+  @OptionalField(() => [ID])
+  skillIds?: string[];
 
   @OptionalField(() => [SkillEntity])
   skills?: SkillEntity[];
@@ -73,11 +64,7 @@ export class ExperienceEntity extends BaseEntity {
 
 export const PaginatedExperienceEntity = createPaginatedModel(ExperienceEntity);
 
-export type ExperienceRoleRecord = Omit<ExperienceRole, "skills">;
-
 export type ExperienceEntityRecord = Omit<
   ExperienceEntity,
-  "owner" | "organization" | "skills" | "roles"
-> & {
-  roles: ExperienceRoleRecord[];
-};
+  "owner" | "organization" | "skills"
+>;

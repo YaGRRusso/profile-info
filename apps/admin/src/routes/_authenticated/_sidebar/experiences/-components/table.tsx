@@ -143,10 +143,7 @@ const getColumns = (
     header: "Slug",
   }),
   columnHelper.accessor(
-    (row) => {
-      const role = row.roles?.[0];
-      return role ? i18nLabel({ i18n: role.i18n }, locale) : "";
-    },
+    (row) => (row.i18n?.length ? i18nLabel({ i18n: row.i18n }, locale) : ""),
     {
       cell: (data) => {
         const value = data.getValue();
@@ -181,19 +178,8 @@ const getColumns = (
     filterFn: "equals",
     header: "Category",
   }),
-  columnHelper.accessor((row) => row.roles?.length ?? 0, {
-    cell: (data) => (
-      <span className="badge badge-soft badge-sm">{data.getValue()}</span>
-    ),
-    enableGlobalFilter: false,
-    header: "Roles",
-    id: "roles",
-  }),
   columnHelper.accessor(
-    (row) =>
-      row.roles?.flatMap(
-        (role) => role.skills?.map((s) => i18nLabel(s, locale)) ?? []
-      ) ?? [],
+    (row) => row.skills?.map((s) => i18nLabel(s, locale)) ?? [],
     {
       cell: (data) => <BadgeList values={data.getValue()} />,
       enableGlobalFilter: false,
@@ -202,16 +188,13 @@ const getColumns = (
       id: `skills-${locale}`,
     }
   ),
-  columnHelper.accessor(
-    (row) => row.roles?.flatMap((role) => role.i18n.map((e) => e.locale)) ?? [],
-    {
-      cell: (data) => <BadgeList values={data.getValue()} />,
-      enableGlobalFilter: false,
-      enableSorting: false,
-      header: "Languages",
-      id: "languages",
-    }
-  ),
+  columnHelper.accessor((row) => row.i18n?.map((e) => e.locale) ?? [], {
+    cell: (data) => <BadgeList values={data.getValue()} />,
+    enableGlobalFilter: false,
+    enableSorting: false,
+    header: "Languages",
+    id: "languages",
+  }),
   columnHelper.accessor((row) => row.owner?.nickname ?? "", {
     cell: (data) => {
       const value = data.getValue();

@@ -125,17 +125,13 @@ describe("User delete cascade (integration)", () => {
 
     await experiencesService.createOne(doomedCtx, {
       category: ExperienceCategory.FULL_TIME,
-      organizationId: organization.id,
-      roles: [
+      i18n: [
         {
-          i18n: [
-            {
-              locale: "en",
-              messages: { description: "Gone soon", title: "Doomed Role" },
-            },
-          ],
+          locale: "en",
+          messages: { description: "Gone soon", title: "Doomed Experience" },
         },
       ],
+      organizationId: organization.id,
       slug: "doomed-experience",
     });
 

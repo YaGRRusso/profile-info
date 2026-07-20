@@ -57,21 +57,17 @@ const REMOVE_ONE_EXPERIENCE = `
 function buildExperienceInput(slug: string, organizationId: string) {
   return {
     category: ExperienceCategory.FULL_TIME,
-    organizationId,
-    relevance: 1,
-    roles: [
+    i18n: [
       {
-        i18n: [
-          {
-            locale: "en",
-            messages: {
-              description: "Built APIs",
-              title: "Engineer",
-            },
-          },
-        ],
+        locale: "en",
+        messages: {
+          description: "Built APIs",
+          title: "Engineer",
+        },
       },
     ],
+    organizationId,
+    relevance: 1,
     slug,
   };
 }
@@ -194,27 +190,14 @@ describe("Experiences tenant isolation (e2e)", () => {
     expect(response.data).toBeNull();
   });
 
-  it("should reject create with invalid skillIds in roles", async () => {
+  it("should reject create with invalid skillIds", async () => {
     const response = await graphqlRequest(app, {
       query: CREATE_ONE_EXPERIENCE,
       token: userAToken,
       variables: {
         createExperienceInput: {
           ...buildExperienceInput("invalid-skills-experience", organizationId),
-          roles: [
-            {
-              i18n: [
-                {
-                  locale: "en",
-                  messages: {
-                    description: "Built APIs",
-                    title: "Engineer",
-                  },
-                },
-              ],
-              skillIds: [INVALID_OBJECT_ID],
-            },
-          ],
+          skillIds: [INVALID_OBJECT_ID],
         },
       },
     });
@@ -240,27 +223,14 @@ describe("Experiences tenant isolation (e2e)", () => {
     expect(response.data).toBeNull();
   });
 
-  it("should reject create with unknown skillIds in roles", async () => {
+  it("should reject create with unknown skillIds", async () => {
     const response = await graphqlRequest(app, {
       query: CREATE_ONE_EXPERIENCE,
       token: userAToken,
       variables: {
         createExperienceInput: {
           ...buildExperienceInput("unknown-skills-experience", organizationId),
-          roles: [
-            {
-              i18n: [
-                {
-                  locale: "en",
-                  messages: {
-                    description: "Built APIs",
-                    title: "Engineer",
-                  },
-                },
-              ],
-              skillIds: [UNKNOWN_CATALOG_ID],
-            },
-          ],
+          skillIds: [UNKNOWN_CATALOG_ID],
         },
       },
     });

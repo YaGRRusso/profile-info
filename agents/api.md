@@ -40,7 +40,7 @@ Request flow: Apollo → `GqlAuthenticationGuard` (unless `@Public()`) → `GqlA
 Full diagram and field detail: `apps/api/docs/ER_MODEL.md`.
 
 - MongoDB via Mongoose; eight top-level collections (User, Skill, Organization, Experience, Education, Course, Project, ApiToken).
-- Organization is referenced by Experience, Education, and Course; Skill is referenced by arrays on Education, Course, Project, and nested Experience roles.
+- Organization is referenced by Experience, Education, and Course; Skill is referenced by arrays on Experience, Education, Course, and Project.
 - Deletes use domain events (`skill.deleted`, `organization.deleted`) for detach and purge; see ER doc for behavior.
 
 ## Core technologies
@@ -120,7 +120,7 @@ Notable specifics:
 
 - `modules/users/users.service.ts`: hashes password on create; `findOneByEmailWithPassword` (with `select("+password")`) is auth-only and returns `null` when missing — public CRUD methods never load password. Password validation lives in `AuthService.validate` (missing user / bad password both → `UnauthorizedException`). Public `register` creates `USER` rows with `disabled: true`; `createOneUser` / `createManyUsers` create enabled accounts. `UsersValidatorService.assertUserEnabled` blocks `signIn`, JWT, and API-token auth for disabled users with `UnauthorizedException(USER_ACCOUNT_DISABLED)`; `users.messages.ts` owns the `{ en, es, pt }` copy and the global filter localizes it. `SUPER_ADMIN` enables via `updateOneUser { disabled: false }`. Filter-based user reads (`findOneUser`, `findManyUsers`) and user mutations require `SUPER_ADMIN`; `findOneUserById` / `findManyUserById` stay auth-only (resume uses the service `findOneById`, not GraphQL).
 - `modules/api-tokens/api-tokens.service.ts`: hashes secret on create; `findOneByIdWithHashedSecret` (with `select("+hashedSecret")`) is auth-only — public CRUD methods never load `hashedSecret`. Credential validation (parse, expiry, bcrypt compare) lives in `ApiTokenStrategy.validate`; `parseApiToken` is shared with create formatting.
-- `modules/experiences/experiences.resolver.ts`: `@ResolveField` for `organization`, `skills`, sorted `roles`.
+- `modules/experiences/experiences.resolver.ts`: `@ResolveField` for `organization`, `skills`.
 - `modules/skills/` and `modules/organizations/` export loader and validator services. **Catalog (ADR 001):** browse = caller `ctx` (`findMany*` / `findOne*` vs `*Active*`); resolve stored refs via owner-scoped loaders (`forKey(parent.ownerId)`, disabled included); validate writes via `assert*Enabled`. Principles only — `apps/api/docs/adr/001-local-catalog.md`.
 - **Catalog** (`skills`, `organizations`): `partition` (`GLOBAL` | `LOCAL`); `ownerId` on every row (server-assigned on create). Unique `{ partition, ownerId, slug }`. **Skill:** slug + `i18n[].messages.title`. **Organization:** root `name` + `i18n[].messages.description`. `disable*` / `enable*` without domain events; `remove*` hard delete + cascade events. **Admin UI:** GLOBAL → enable/disable; LOCAL → remove (`catalog-mutation-access.ts`). E2e scope: `test/e2e/skills-catalog-scope.spec.ts`, `test/e2e/organizations-catalog-scope.spec.ts`, `test/e2e/catalog-batch-edge.spec.ts`, `test/e2e/catalog-loaders-dashboard.spec.ts`; integration: `test/integration/catalog-local-delete-cascade.spec.ts`, `test/integration/user-delete-local-catalog-purge.spec.ts`.
 
@@ -133,7 +133,7 @@ Listeners are thin (`@OnEvent` + delegate to a service method). All MongoDB writ
 - `skill.deleted` (`skills` → `projects`): `$pull` from `skillIds` array via `detachSkill`
 - `skill.deleted` (`skills` → `courses`): `$pull` from `skillIds` array via `detachSkill`
 - `skill.deleted` (`skills` → `educations`): `$pull` from `skillIds` array via `detachSkill`
-- `skill.deleted` (`skills` → `experiences`): `$pull` from nested `roles.skillIds` via `detachSkill`
+- `skill.deleted` (`skills` → `experiences`): `$pull` from `skillIds` array via `detachSkill`
 - `skill.deleted` (`skills` → `users`): `$pull` from `skillIds` array via `detachSkill`
 - `organization.deleted` (`organizations` → `courses`): hard `deleteMany` via `purgeByOrganization`
 - `organization.deleted` (`organizations` → `educations`): hard `deleteMany` via `purgeByOrganization`

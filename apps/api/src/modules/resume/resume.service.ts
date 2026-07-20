@@ -1,5 +1,4 @@
 import { Injectable } from "@nestjs/common";
-import { sortDateRange } from "@/common/helpers/daterange.helper";
 import { formatPeriod } from "@/common/helpers/format-period.helper";
 import { pickTranslation } from "@/common/helpers/pick-translation.helper";
 import { DEFAULT_LOCALE, type LocaleCode } from "@/common/i18n/locales";
@@ -23,7 +22,6 @@ import type {
   ResumeDocumentData,
   ResumeEducation,
   ResumeExperience,
-  ResumeExperienceRole,
   ResumeHeader,
   ResumeProject,
 } from "./types/resume-document.type";
@@ -161,30 +159,22 @@ export class ResumeService {
     organizationMap: Map<string, OrganizationEntityRecord>,
     locale: LocaleCode
   ): ResumeExperience[] {
-    return experiences.map((experience) => {
+    return experiences.flatMap((experience): ResumeExperience[] => {
+      const translation = pickTranslation(experience.i18n, locale);
+      if (!translation) return [];
+
       const organization = organizationMap.get(
         String(experience.organizationId ?? "")
       );
 
-      const roles = sortDateRange(experience.roles ?? [])
-        .slice(0, RESUME_LIMITS.rolesPerExperience)
-        .flatMap((role): ResumeExperienceRole[] => {
-          const translation = pickTranslation(role.i18n, locale);
-          if (!translation) return [];
-
-          return [
-            {
-              description: translation.messages.description,
-              period: formatPeriod(role.period, locale),
-              title: translation.messages.title,
-            },
-          ];
-        });
-
-      return {
-        organization: organization?.name ?? "Unknown organization",
-        roles,
-      };
+      return [
+        {
+          description: translation.messages.description,
+          organization: organization?.name ?? "Unknown organization",
+          period: formatPeriod(experience.period, locale),
+          title: translation.messages.title,
+        },
+      ];
     });
   }
 

@@ -5,11 +5,13 @@ Deferred API and admin work, ordered by **criticality**, then **effort** (ascend
 ## Priority
 
 - **Error monitoring** — Integrate an error-monitoring service with structured context, environment and release metadata, alerting, and sensitive-data filtering.
+
 - **Email delivery integration** — Add a provider-neutral email port, provider adapter, templates, configuration, and delivery-failure handling.
 - **Event-driven user emails** — Publish explicit business events and send transactional emails from listeners (for example, registration and account-status changes), with each event's recipient, locale, and delivery policy defined as part of that use case.
 
 ## Backlog
 
+- **Group experiences by organization (read)** — Persist one role per experience; merge/group by `organizationId` only for CV/UI read views.
 - **CV tailoring** — Per-user or per-job variants (sections, emphasis, templates).
 - **Redis (or shared) cache** — swap `AppCacheModule` `stores` when multiple API instances need a shared Tavily result store. In-process TTL + LRU is enough for single-instance / spam Optimize today.
 - **AI tools plans / rate limits** — Cost control when user base grows; optional paid tier.

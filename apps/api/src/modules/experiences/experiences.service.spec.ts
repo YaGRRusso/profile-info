@@ -16,9 +16,9 @@ const validId = "507f1f77bcf86cd799439013";
 const ctx = testAuthContext({ id: ownerId });
 
 const fakeEntity = {
+  i18n: [],
   id: validId,
   ownerId,
-  roles: [],
   slug: "software-engineer",
 };
 
@@ -90,20 +90,16 @@ describe("ExperiencesService", () => {
   describe("createOne", () => {
     const createInput = {
       category: ExperienceCategory.FULL_TIME,
-      organizationId,
-      roles: [
+      i18n: [
         {
-          i18n: [
-            {
-              locale: "en",
-              messages: {
-                description: "Backend development",
-                title: "Software Engineer",
-              },
-            },
-          ],
+          locale: "en",
+          messages: {
+            description: "Backend development",
+            title: "Software Engineer",
+          },
         },
       ],
+      organizationId,
       slug: "software-engineer",
     };
 

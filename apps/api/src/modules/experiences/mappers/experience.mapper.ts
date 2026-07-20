@@ -20,41 +20,9 @@ import { CreateExperienceInput } from "../dto/create-experience.input";
 import { FilterExperienceInput } from "../dto/filter-experience.input";
 import { SortExperienceInput } from "../dto/sort-experience.input";
 import { UpdateExperienceInput } from "../dto/update-experience.input";
-import type {
-  ExperienceEntityRecord,
-  ExperienceRoleRecord,
-} from "../entities/experience.entity";
+import type { ExperienceEntityRecord } from "../entities/experience.entity";
 import type { ExperienceCategory } from "../enums/category.enum";
-import type {
-  ExperienceModel,
-  ExperienceRoleModel,
-} from "../schemas/experience.schema";
-
-function toExperienceRoleRecord(
-  model: ExperienceRoleModel
-): ExperienceRoleRecord {
-  return {
-    i18n:
-      toTranslationEntityList(model.i18n)?.map((entry) => ({
-        locale: entry.locale,
-        messages: {
-          description: entry.messages.description,
-          title: entry.messages.title,
-        },
-      })) ?? [],
-    period: model.period ? toDateRangeEntity(model.period) : undefined,
-    skillIds: toIdStrings(model.skillIds),
-  };
-}
-
-function mapRolesForPersistence<TRole extends { skillIds?: string[] }>(
-  roles: TRole[]
-) {
-  return roles.map((role) => ({
-    ...role,
-    skillIds: toObjectIds(role.skillIds),
-  }));
-}
+import type { ExperienceModel } from "../schemas/experience.schema";
 
 export class ExperienceMapper
   implements
@@ -71,10 +39,19 @@ export class ExperienceMapper
     return {
       ...toBaseEntityFields(model),
       category: model.category as ExperienceCategory,
+      i18n:
+        toTranslationEntityList(model.i18n)?.map((entry) => ({
+          locale: entry.locale,
+          messages: {
+            description: entry.messages.description,
+            title: entry.messages.title,
+          },
+        })) ?? [],
       organizationId: toIdString(model.organizationId),
       ownerId: toIdString(model.ownerId) ?? "",
+      period: model.period ? toDateRangeEntity(model.period) : undefined,
       relevance: model.relevance,
-      roles: model.roles.map(toExperienceRoleRecord),
+      skillIds: toIdStrings(model.skillIds),
       slug: model.slug,
     };
   }
@@ -85,7 +62,7 @@ export class ExperienceMapper
     return {
       ...entity,
       organizationId: toObjectId(entity.organizationId),
-      roles: mapRolesForPersistence(entity.roles),
+      skillIds: toObjectIds(entity.skillIds),
     };
   }
 
@@ -97,21 +74,17 @@ export class ExperienceMapper
       organizationId: entity.organizationId
         ? toObjectId(entity.organizationId)
         : undefined,
-      roles: entity.roles ? mapRolesForPersistence(entity.roles) : undefined,
+      skillIds: toObjectIds(entity.skillIds),
     };
   }
 
   toPersistenceForFilter(
     entity: FilterExperienceInput
   ): QueryFilter<ExperienceModel> {
-    const { roles, ...rest } = entity;
-    const filter = withObjectIdRefs(rest, { single: ["organizationId"] });
-    if (!roles) return filter;
-
-    return {
-      ...filter,
-      roles: mapRolesForPersistence(roles),
-    } as QueryFilter<ExperienceModel>;
+    return withObjectIdRefs(entity, {
+      array: ["skillIds"],
+      single: ["organizationId"],
+    });
   }
 
   toPersistenceForSort(

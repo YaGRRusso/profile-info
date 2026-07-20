@@ -6,21 +6,7 @@ import type { PdfContext } from "@/common/pdf/pdf-context";
 import type {
   ResumeDocumentData,
   ResumeExperience,
-  ResumeExperienceRole,
 } from "../../types/resume-document.type";
-
-interface ExperienceRoleEntry {
-  experience: ResumeExperience;
-  role: ResumeExperienceRole;
-}
-
-function flattenExperienceRoles(
-  experiences: ResumeExperience[]
-): ExperienceRoleEntry[] {
-  return experiences.flatMap((experience) =>
-    experience.roles.map((role) => ({ experience, role }))
-  );
-}
 
 export function renderExperiences(
   ctx: PdfContext,
@@ -28,14 +14,12 @@ export function renderExperiences(
   title: string
 ): void {
   renderSection(ctx, {
-    items: flattenExperienceRoles(document.experiences),
+    items: document.experiences,
     title,
-    ...entryBlockSectionHandlers<ExperienceRoleEntry>(
-      ({ experience, role }) => ({
-        description: role.description,
-        meta: [experience.organization, role.period],
-        title: role.title,
-      })
-    ),
+    ...entryBlockSectionHandlers<ResumeExperience>((experience) => ({
+      description: experience.description,
+      meta: [experience.organization, experience.period],
+      title: experience.title,
+    })),
   });
 }

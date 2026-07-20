@@ -18,7 +18,7 @@ import { ExperiencesRepository } from "./experiences.repository";
 
 interface ExperienceCatalogRefs {
   organizationId?: string;
-  roles?: Array<{ skillIds?: string[] }>;
+  skillIds?: string[];
 }
 
 @Injectable()
@@ -137,19 +137,13 @@ export class ExperiencesService {
   ): Promise<RecentActivityRecord[]> {
     const rows = await this.repository
       .tenantStats(ctx)
-      .findRecentlyUpdated(limit, "slug roles updatedAt");
+      .findRecentlyUpdated(limit, "slug i18n updatedAt");
 
-    return rows.map((row) => {
-      const roles = row.roles as
-        | Array<{ i18n?: RecentActivityRecord["i18n"] }>
-        | undefined;
-
-      return {
-        i18n: roles?.[0]?.i18n ?? [],
-        slug: row.slug as string | undefined,
-        updatedAt: row.updatedAt,
-      };
-    });
+    return rows.map((row) => ({
+      i18n: (row.i18n as RecentActivityRecord["i18n"]) ?? [],
+      slug: row.slug as string | undefined,
+      updatedAt: row.updatedAt,
+    }));
   }
 
   async detachSkill(skillId: string): Promise<void> {
@@ -164,10 +158,6 @@ export class ExperiencesService {
     await this.repository.purgeByOwner(ownerId);
   }
 
-  private collectSkillIds(roles?: Array<{ skillIds?: string[] }>): string[] {
-    return roles?.flatMap((role) => role.skillIds ?? []) ?? [];
-  }
-
   private async assertCatalogReferences(
     ctx: AuthContext,
     input: ExperienceCatalogRefs
@@ -179,9 +169,8 @@ export class ExperiencesService {
       );
     }
 
-    const skillIds = this.collectSkillIds(input.roles);
-    if (skillIds.length > 0) {
-      await this.skillsValidator.assertSkillsEnabled(ctx, skillIds);
+    if (input.skillIds?.length) {
+      await this.skillsValidator.assertSkillsEnabled(ctx, input.skillIds);
     }
   }
 
@@ -194,9 +183,7 @@ export class ExperiencesService {
         .map((item) => item.organizationId)
         .filter((id): id is string => !isNil(id))
     );
-    const skillIds = uniq(
-      inputs.flatMap((item) => this.collectSkillIds(item.roles))
-    );
+    const skillIds = uniq(inputs.flatMap((item) => item.skillIds ?? []));
 
     if (organizationIds.length > 0) {
       await this.organizationsValidator.assertOrganizationsEnabled(

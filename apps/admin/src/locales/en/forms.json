@@ -101,10 +101,6 @@
       "placeholder": "Choose one...",
       "tooltip": "Current state: in progress, completed, or another option."
     },
-    "role": {
-      "label": "Role",
-      "tooltip": "One position held at this employer. You can add more than one."
-    },
     "userRole": {
       "label": "Account role",
       "placeholder": "Choose one...",
@@ -232,16 +228,6 @@
     "links": {
       "label": "Links",
       "tooltip": "Related websites (demo, repo, case study, and similar)."
-    },
-    "roles": {
-      "title": {
-        "label": "Roles",
-        "tooltip": "Positions held at this employer, in CV order."
-      },
-      "translations": {
-        "label": "Translations",
-        "tooltip": "Localized title and description for this role."
-      }
     },
     "personal": "Personal",
     "contact": "Contact",

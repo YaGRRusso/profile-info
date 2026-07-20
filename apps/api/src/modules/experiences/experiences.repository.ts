@@ -44,11 +44,7 @@ export class ExperiencesRepository {
 
   async detachSkill(skillId: string): Promise<void> {
     await this.model
-      .updateMany(
-        { "roles.skillIds": skillId },
-        { $pull: { "roles.$[roleElem].skillIds": skillId } },
-        { arrayFilters: [{ "roleElem.skillIds": skillId }] }
-      )
+      .updateMany({ skillIds: skillId }, { $pull: { skillIds: skillId } })
       .exec();
   }
 
