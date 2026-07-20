@@ -37,6 +37,7 @@ platform        ← transport composition (GraphQL wiring, DataLoader aggregatio
 | **`core/`** | Cross-cutting infra: configs, Nest `CacheModule` (`AppCacheModule`), `OrchestratorService`, validation decorators, shared inputs/entities, `domain-events`, `AuthContext`, `UserRole`. | Domain/service contracts — not GraphQL transport. |
 | **`integrations/open-router/`** | OpenRouter adapter + AI port (`ai-chat.provider.ts`). Binds `AiChatProvider` → `OpenRouterService`; mappers translate SDK ↔ loose DTO. | SDK and port live together; `ai-tools` owns strong GraphQL types. |
 | **`integrations/tavily/`** | Tavily adapter: `WebContentProvider` (page extract) + `WebSearchProvider` (query search). | AI context enrichment (ADR 004). |
+| **`integrations/sentry/`** | Sentry adapter + `ErrorMonitoringProvider`. Enabled by `SENTRY_DSN`; `GET /sentry-test` smoke; filter reports ≥ 500. | Error monitoring. |
 | **`modules/`** | Business domains. Each CRUD entity = resolver + service + schema + entity + dto. | Where profile rules and GraphQL operations live. |
 | **`platform/graphql/`** | GraphQL transport: `GraphqlModule`, `LoadersService`, loader registry augmentation. | Apollo wiring and per-request context. |
 | **`modules/auth/`** | JWT strategies, `signIn`, `getMe`. `GqlAuthenticationGuard` + `GqlAuthorizationGuard`. | Security cross-cut; uses `UsersService.findOneByEmailWithPassword`. |
@@ -108,8 +109,10 @@ src/
 │   └── persistence/          # CrudRepository, StatsRepository, CrudMapperInterface, scoped()
 ├── integrations/
 │   ├── open-router/          # AI port + OpenRouter adapter
+│   ├── sentry/               # ErrorMonitoringProvider + Sentry adapter
 │   └── tavily/               # WebContentProvider + WebSearchProvider (ADR 004)
 ├── platform/
+│   ├── errors/               # ApiExceptionFilter (+ Sentry report on ≥ 500)
 │   └── graphql/              # GraphqlModule, LoadersService, loader registry
 └── modules/
     ├── auth/

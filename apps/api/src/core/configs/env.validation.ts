@@ -20,6 +20,7 @@ export const envSchema = z.object({
     }),
   OPENROUTER_API_KEY: z.string().min(1),
   PORT: z.coerce.number().default(8080),
+  SENTRY_DSN: z.string().min(1).optional(),
   TAVILY_API_KEY: z.string().min(1),
 });
 

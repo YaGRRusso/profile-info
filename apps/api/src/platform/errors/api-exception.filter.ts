@@ -3,6 +3,7 @@ import {
   Catch,
   type ExceptionFilter,
   HttpException,
+  Injectable,
   InternalServerErrorException,
 } from "@nestjs/common";
 import { GqlArgumentsHost, GqlExceptionFilter } from "@nestjs/graphql";
@@ -10,12 +11,27 @@ import type { Response } from "express";
 import { COMMON_UNEXPECTED } from "@/core/errors/common.messages";
 import { isErrorMessage, localizeError } from "@/core/errors/error-message";
 import { mapPersistenceError } from "@/core/persistence/persistence-error.mapper";
+import { ErrorMonitoringProvider } from "@/integrations/sentry/error-monitoring.provider";
+import { shouldReportStatus } from "./should-report-status.helper";
 
 @Catch()
+@Injectable()
 export class ApiExceptionFilter implements ExceptionFilter, GqlExceptionFilter {
+  constructor(private readonly errorMonitoring: ErrorMonitoringProvider) {}
+
   catch(exception: unknown, host: ArgumentsHost) {
     const acceptLanguage = requestLanguage(host);
     const response = resolveApiError(exception, acceptLanguage);
+
+    if (shouldReportStatus(response.statusCode)) {
+      this.errorMonitoring.captureException(exception, {
+        extras: {
+          statusCode: response.statusCode,
+          transport: host.getType(),
+        },
+        tags: { source: "api-exception-filter" },
+      });
+    }
 
     if (host.getType<"graphql">() === "graphql") {
       return new HttpException(response, response.statusCode);

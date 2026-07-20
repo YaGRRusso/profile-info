@@ -86,12 +86,13 @@ Full diagram and field detail: `apps/api/docs/ER_MODEL.md`.
 
 - `open-router/`: OpenRouter adapter + AI port (`ai-chat.provider.ts`: `AiChatProvider` + loose `IntegrationChatResult`). `OpenRouterModule` binds port → `OpenRouterService`; mappers translate SDK ↔ integration DTO. Flat sibling of `tavily/`.
 - `tavily/`: flat. Owns `web-content.provider.ts` (abstract `WebContentProvider` + extract types) and `web-search.provider.ts` (abstract `WebSearchProvider` + search types); `TavilyService implements WebContentProvider, WebSearchProvider` (vendor `Tavily*` types stay inside the adapter); `tavily.module.ts` binds both via `useExisting: TavilyService`. See ADR 004 (`apps/api/docs/adr/004-generic-tavily-context.md`).
+- `sentry/`: error-monitoring port (`error-monitoring.provider.ts`: abstract `ErrorMonitoringProvider` + `IntegrationErrorContext`) + `SentryService` adapter. `SentryModule` binds `{ provide: ErrorMonitoringProvider, useClass: SentryService }` (same shape as `OpenRouterModule`). SDK inits when `SENTRY_DSN` is set (any env except `test`); omit the key to disable. Mappers: `scrub-sentry-event`, `apply-error-context`. Platform `ApiExceptionFilter` reports via the port when resolved status is ≥ 500. `GET /sentry-test` throws when DSN is set (404 otherwise) to verify capture.
 
 DI pattern is the NestJS-idiomatic **abstract class as token**: ports are abstract classes (no `Symbol`, no `@Inject()`); modules bind `{ provide: Port, useClass: Impl }` and consumers inject the port by type. A service implementing a port `extends` it and must call `super()` in its constructor.
 
 `platform/` (transport composition — may import `modules/`; not a business domain):
 
-- `errors/api-exception.filter.ts`: the only global `APP_FILTER`. It preserves known Nest status codes, explicitly asks infrastructure mappers to normalize foreign errors, localizes `ErrorMessage`, and applies the safe fallback to unknown errors. Feature modules need messages, not filters.
+- `errors/api-exception.filter.ts`: the only global `APP_FILTER`. It preserves known Nest status codes, explicitly asks infrastructure mappers to normalize foreign errors, localizes `ErrorMessage`, reports resolved status ≥ 500 through `ErrorMonitoringProvider`, and applies the safe fallback to unknown errors. Feature modules need messages, not filters.
 - `graphql/`: `graphql.module.ts` (Apollo `forRootAsync`, `formatError` strips stacktrace in production), `loaders.service.ts` (loader composition), `loaders.registry.ts` (augments `AppLoaders` on `core/context/graphql-context.interface`). Batching logic stays in each entity's `*LoaderService`.
 
 `modules/` (business domains):
@@ -172,7 +173,7 @@ Loaded via `--env-file .env.development` / `.env.production` and `ConfigModule`.
 - `HOST` (optional, default `0.0.0.0`), `PORT` (optional, default `8080`).
 - `GRAPHQL_INTROSPECTION` (required, `true` | `false`): Apollo Sandbox schema introspection. Set `true` in development; `false` in production unless you explicitly want the public schema explorer.
 - `OPENROUTER_API_KEY`, `OPENROUTER_AI_MODELS`, `TAVILY_API_KEY` (required for the `ai-tools` module): read via `ConfigService`. `OPENROUTER_AI_MODELS` is a comma-separated list of model ids, tried in order; on any failure (unavailable, paid-only, rate limit, token budget, timeout, etc.) `OpenRouterService` tries the next model and only throws after the last one fails. Exception: OpenRouter **401 / auth** errors stop immediately via `isOpenRouterAuthError` (same API key; another model cannot recover).
-
+- `SENTRY_DSN` (optional): Sentry project DSN. **Presence enables Sentry** in development and production; omit the key to disable. Ignored when `NODE_ENV=test`.
 ## Scripts / commands
 
 Run from `apps/api/` or via root `api:*` aliases: `dev`, `prod`, `build`, `start`, `seed`, `test`, `test:coverage`, `test:e2e`, `typecheck`, `lint`, `format`.
