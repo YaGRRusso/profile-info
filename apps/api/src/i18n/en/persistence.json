@@ -1,10 +1,16 @@
 {
-  "NOT_FOUND": "Not found",
-  "NOT_CREATED": "Not created",
-  "NOT_UPDATED": "Not updated",
-  "NOT_REMOVED": "Not removed",
-  "DUPLICATE": "A record with this value already exists",
-  "INVALID": "Invalid value",
-  "VALIDATION": "Validation failed",
+  "NOT_FOUND": "{resource} was not found",
+  "NOT_FOUND_BY_ID": "{resource} \"{id}\" was not found",
+  "NOT_CREATED": "{resource} was not created",
+  "NOT_CREATED_BATCH": "{resource} was not created ({failed} failed)",
+  "NOT_UPDATED": "{resource} was not updated",
+  "NOT_UPDATED_BY_ID": "{resource} \"{id}\" was not updated",
+  "NOT_REMOVED": "{resource} was not removed",
+  "NOT_REMOVED_BY_ID": "{resource} \"{id}\" was not removed",
+  "DUPLICATE": "A record with {field} \"{value}\" already exists",
+  "DUPLICATE_GENERIC": "A record with this value already exists",
+  "INVALID": "Invalid value for {field}: \"{value}\"",
+  "VALIDATION": "Validation failed: {details}",
+  "VALIDATION_GENERIC": "Validation failed",
   "UNAVAILABLE": "Database temporarily unavailable"
 }

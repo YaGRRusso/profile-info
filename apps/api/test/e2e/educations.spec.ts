@@ -15,6 +15,10 @@ import {
 } from "../support/catalog-reference-validation";
 import { clearTestDatabase } from "../support/clear-test-database";
 import { createTestApp } from "../support/create-test-app";
+import {
+  NOT_FOUND_MESSAGE,
+  NOT_REMOVED_MESSAGE,
+} from "../support/error-message-matchers";
 import { graphqlRequest } from "../support/graphql-request";
 
 const CREATE_ONE_EDUCATION = `
@@ -274,7 +278,7 @@ describe("Educations tenant isolation (e2e)", () => {
       variables: { educationId },
     });
 
-    expect(response.errors?.[0]?.message).toContain("Not found");
+    expect(response.errors?.[0]?.message).toMatch(NOT_FOUND_MESSAGE);
     expect(response.data?.findOneEducationById).toBeUndefined();
   });
 
@@ -295,7 +299,7 @@ describe("Educations tenant isolation (e2e)", () => {
       variables: { educationId },
     });
 
-    expect(response.errors?.[0]?.message).toContain("Not removed");
+    expect(response.errors?.[0]?.message).toMatch(NOT_REMOVED_MESSAGE);
   });
 
   it("should let SUPER_ADMIN read USER A education by explicit id", async () => {

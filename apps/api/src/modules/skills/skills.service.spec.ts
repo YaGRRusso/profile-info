@@ -187,7 +187,9 @@ describe("SkillsService", () => {
       crud.findManyById.mockResolvedValue([{ ...fakeEntity, disabled: true }]);
 
       await expect(service.findManyActiveById(ctx, [validId])).rejects.toThrow(
-        new NotFoundException(i18nKey("persistence.NOT_FOUND"))
+        new NotFoundException(
+          i18nKey("persistence.NOT_FOUND", { resource: "Skill" })
+        )
       );
     });
   });

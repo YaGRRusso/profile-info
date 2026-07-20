@@ -21,6 +21,7 @@ import { ProjectsService } from "@/modules/projects/projects.service";
 import { UsersService } from "@/modules/users/users.service";
 import { clearTestDatabase } from "../support/clear-test-database";
 import { createTestApp } from "../support/create-test-app";
+import { INSUFFICIENT_PERMISSIONS_MESSAGE } from "../support/error-message-matchers";
 import { graphqlRequest } from "../support/graphql-request";
 
 const SUPER_ADMIN_CANNOT_DELETE_REGEX = /SUPER_ADMIN users cannot be deleted/i;
@@ -347,7 +348,9 @@ describe("Users admin (e2e)", () => {
       "findOneUserById",
       "ownedCounts",
     ]);
-    expect(response.errors?.[0]?.message).toBe("Insufficient permissions");
+    expect(response.errors?.[0]?.message).toMatch(
+      INSUFFICIENT_PERMISSIONS_MESSAGE
+    );
     expect(response.errors?.[0]?.extensions?.code).toBe("FORBIDDEN");
     // Non-null ownedCounts failure drops the parent from data.
     expect(response.data?.findOneUserById).toBeUndefined();

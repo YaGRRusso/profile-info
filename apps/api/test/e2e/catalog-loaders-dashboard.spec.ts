@@ -14,6 +14,7 @@ import { SkillsService } from "@/modules/skills/skills.service";
 import { UsersService } from "@/modules/users/users.service";
 import { clearTestDatabase } from "../support/clear-test-database";
 import { createTestApp } from "../support/create-test-app";
+import { NOT_FOUND_MESSAGE } from "../support/error-message-matchers";
 import { graphqlRequest } from "../support/graphql-request";
 import { organizationI18n } from "../support/organization-i18n";
 import { skillI18n } from "../support/skill-i18n";
@@ -319,6 +320,6 @@ describe("Catalog loaders and dashboard counts (e2e)", () => {
       variables: { skillFilters: { slug: "loader-global-disabled" } },
     });
 
-    expect(response.errors?.[0]?.message).toContain("Not found");
+    expect(response.errors?.[0]?.message).toMatch(NOT_FOUND_MESSAGE);
   });
 });

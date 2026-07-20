@@ -9,7 +9,7 @@ import {
 import type { GqlExceptionFilter } from "@nestjs/graphql";
 import type { Response } from "express";
 import { I18nContext, I18nService, type TranslateOptions } from "nestjs-i18n";
-import { i18nKey } from "@/core/i18n/i18n";
+import { type I18nExceptionBody, i18nKey } from "@/core/i18n/i18n";
 import { mapPersistenceError } from "@/core/persistence/persistence-error.mapper";
 import { ErrorMonitoringProvider } from "@/integrations/sentry/error-monitoring.provider";
 import { shouldReportStatus } from "./should-report-status.helper";
@@ -58,10 +58,10 @@ export function resolveApiError(
   translate: TranslateFn
 ): { message: string; statusCode: number } {
   const httpException = normalizeException(exception);
-  const key = extractI18nKey(httpException.getResponse());
+  const { key, args } = extractI18nPayload(httpException.getResponse());
 
   return {
-    message: translate(key),
+    message: translate(key, args ? { args } : undefined),
     statusCode: httpException.getStatus(),
   };
 }
@@ -77,21 +77,33 @@ export function translateErrorKey(
   return i18n.t(i18nKey("common.UNEXPECTED"), options) as string;
 }
 
-function extractI18nKey(exceptionResponse: string | object): string {
+function extractI18nPayload(exceptionResponse: string | object): {
+  key: string;
+  args?: Record<string, unknown>;
+} {
   if (typeof exceptionResponse === "string") {
-    return exceptionResponse;
+    return { key: exceptionResponse };
   }
 
-  if (
-    typeof exceptionResponse === "object" &&
-    exceptionResponse !== null &&
-    "message" in exceptionResponse &&
-    typeof exceptionResponse.message === "string"
-  ) {
-    return exceptionResponse.message;
+  if (typeof exceptionResponse !== "object" || exceptionResponse === null) {
+    return { key: i18nKey("common.UNEXPECTED") };
   }
 
-  return i18nKey("common.UNEXPECTED");
+  const body = exceptionResponse as Partial<I18nExceptionBody> & {
+    message?: unknown;
+    args?: unknown;
+  };
+
+  if (typeof body.message !== "string") {
+    return { key: i18nKey("common.UNEXPECTED") };
+  }
+
+  const args =
+    body.args && typeof body.args === "object" && !Array.isArray(body.args)
+      ? (body.args as Record<string, unknown>)
+      : undefined;
+
+  return { args, key: body.message };
 }
 
 function normalizeException(exception: unknown): HttpException {

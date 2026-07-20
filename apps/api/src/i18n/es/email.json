@@ -2,6 +2,7 @@
   "NOT_CONFIGURED": "El envío de correo no está configurado",
   "FROM_REQUIRED": "Se requiere una dirección de remitente (from)",
   "UNAUTHORIZED": "El proveedor de correo rechazó las credenciales de la API",
-  "INVALID_REQUEST": "El proveedor de correo rechazó la solicitud",
-  "PROVIDER_FAILURE": "El proveedor de correo no pudo enviar el mensaje"
+  "INVALID_REQUEST": "El proveedor de correo rechazó la solicitud: {detail}",
+  "PROVIDER_FAILURE": "El proveedor de correo no pudo enviar el mensaje: {detail}",
+  "PROVIDER_FAILURE_GENERIC": "El proveedor de correo no pudo enviar el mensaje"
 }

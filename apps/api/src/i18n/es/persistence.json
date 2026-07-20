@@ -1,10 +1,16 @@
 {
-  "NOT_FOUND": "No encontrado",
-  "NOT_CREATED": "No creado",
-  "NOT_UPDATED": "No actualizado",
-  "NOT_REMOVED": "No eliminado",
-  "DUPLICATE": "Ya existe un registro con este valor",
-  "INVALID": "Valor inválido",
-  "VALIDATION": "Validación fallida",
+  "NOT_FOUND": "No se encontró {resource}",
+  "NOT_FOUND_BY_ID": "No se encontró {resource} \"{id}\"",
+  "NOT_CREATED": "No se creó {resource}",
+  "NOT_CREATED_BATCH": "No se creó {resource} ({failed} fallaron)",
+  "NOT_UPDATED": "No se actualizó {resource}",
+  "NOT_UPDATED_BY_ID": "No se actualizó {resource} \"{id}\"",
+  "NOT_REMOVED": "No se eliminó {resource}",
+  "NOT_REMOVED_BY_ID": "No se eliminó {resource} \"{id}\"",
+  "DUPLICATE": "Ya existe un registro con {field} \"{value}\"",
+  "DUPLICATE_GENERIC": "Ya existe un registro con este valor",
+  "INVALID": "Valor inválido para {field}: \"{value}\"",
+  "VALIDATION": "Validación fallida: {details}",
+  "VALIDATION_GENERIC": "Validación fallida",
   "UNAVAILABLE": "Base de datos temporalmente no disponible"
 }

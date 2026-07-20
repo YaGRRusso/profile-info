@@ -53,7 +53,9 @@ export class ResendService extends EmailProvider {
       }
 
       if (!data) {
-        throw new BadGatewayException(i18nKey("email.PROVIDER_FAILURE"));
+        throw new BadGatewayException(
+          i18nKey("email.PROVIDER_FAILURE_GENERIC")
+        );
       }
 
       return resendResultMapper(data);

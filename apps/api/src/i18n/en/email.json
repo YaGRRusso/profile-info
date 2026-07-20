@@ -2,6 +2,7 @@
   "NOT_CONFIGURED": "Email delivery is not configured",
   "FROM_REQUIRED": "A sender address (from) is required",
   "UNAUTHORIZED": "Email provider rejected the API credentials",
-  "INVALID_REQUEST": "Email provider rejected the request",
-  "PROVIDER_FAILURE": "Email provider failed to send the message"
+  "INVALID_REQUEST": "Email provider rejected the request: {detail}",
+  "PROVIDER_FAILURE": "Email provider failed to send the message: {detail}",
+  "PROVIDER_FAILURE_GENERIC": "Email provider failed to send the message"
 }

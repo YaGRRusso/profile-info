@@ -208,7 +208,9 @@ describe("ResendService", () => {
         to: "user@example.com",
       })
     ).rejects.toMatchObject({
-      response: expect.objectContaining({ message: "email.PROVIDER_FAILURE" }),
+      response: expect.objectContaining({
+        message: "email.PROVIDER_FAILURE_GENERIC",
+      }),
     });
   });
 

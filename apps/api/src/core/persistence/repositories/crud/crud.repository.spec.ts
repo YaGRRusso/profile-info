@@ -89,6 +89,7 @@ describe("CrudRepository", () => {
       findOne: jest.fn(),
       findOneAndDelete: jest.fn(),
       findOneAndUpdate: jest.fn(),
+      modelName: "Test",
       updateMany: jest.fn(),
     };
 
@@ -113,7 +114,9 @@ describe("CrudRepository", () => {
       await expect(
         repository.findOne({ filters: { name: "Missing" } })
       ).rejects.toThrow(
-        new NotFoundException(i18nKey("persistence.NOT_FOUND"))
+        new NotFoundException(
+          i18nKey("persistence.NOT_FOUND", { resource: "Test" })
+        )
       );
     });
   });
@@ -130,7 +133,12 @@ describe("CrudRepository", () => {
       model.findOne.mockReturnValue(mockQueryChain(null));
 
       await expect(repository.findOneById(docId)).rejects.toThrow(
-        new NotFoundException(i18nKey("persistence.NOT_FOUND"))
+        new NotFoundException(
+          i18nKey("persistence.NOT_FOUND_BY_ID", {
+            id: docId,
+            resource: "Test",
+          })
+        )
       );
     });
 
@@ -254,7 +262,12 @@ describe("CrudRepository", () => {
       await expect(
         repository.createMany([{ name: "A" }] as never)
       ).rejects.toThrow(
-        new BadRequestException(i18nKey("persistence.NOT_CREATED"))
+        new BadRequestException(
+          i18nKey("persistence.NOT_CREATED_BATCH", {
+            failed: 1,
+            resource: "Test",
+          })
+        )
       );
     });
   });
@@ -312,7 +325,9 @@ describe("CrudRepository", () => {
       await expect(
         repository.updateManyById([docId], { name: "Updated" })
       ).rejects.toThrow(
-        new NotFoundException(i18nKey("persistence.NOT_UPDATED"))
+        new NotFoundException(
+          i18nKey("persistence.NOT_UPDATED", { resource: "Test" })
+        )
       );
     });
   });
@@ -348,7 +363,9 @@ describe("CrudRepository", () => {
       await expect(
         repository.deleteOne({ filters: { name: "Missing" } })
       ).rejects.toThrow(
-        new NotFoundException(i18nKey("persistence.NOT_REMOVED"))
+        new NotFoundException(
+          i18nKey("persistence.NOT_REMOVED", { resource: "Test" })
+        )
       );
     });
   });
@@ -377,7 +394,9 @@ describe("CrudRepository", () => {
       model.deleteMany.mockReturnValue(mockExecChain({ deletedCount: 0 }));
 
       await expect(repository.deleteManyById([docId])).rejects.toThrow(
-        new NotFoundException(i18nKey("persistence.NOT_REMOVED"))
+        new NotFoundException(
+          i18nKey("persistence.NOT_REMOVED", { resource: "Test" })
+        )
       );
     });
   });
@@ -433,7 +452,12 @@ describe("CrudRepository", () => {
             .scoped(tenantScope({ crossTenant: false, userId: otherOwnerId }))
             .findOneById(docId)
         ).rejects.toThrow(
-          new NotFoundException(i18nKey("persistence.NOT_FOUND"))
+          new NotFoundException(
+            i18nKey("persistence.NOT_FOUND_BY_ID", {
+              id: docId,
+              resource: "Test",
+            })
+          )
         );
       });
     });

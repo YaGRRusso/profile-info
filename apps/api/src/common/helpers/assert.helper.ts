@@ -9,10 +9,12 @@ export function assertReferencesExist(
   if (requestedIds.length === 0) return;
 
   const foundSet = new Set([...foundIds].map(String));
-  const missing = requestedIds.some((id) => !foundSet.has(id));
+  const missing = requestedIds.filter((id) => !foundSet.has(id));
 
-  if (missing)
-    throw new BadRequestException(i18nKey("common.REFERENCES_NOT_FOUND"));
+  if (missing.length > 0)
+    throw new BadRequestException(
+      i18nKey("common.REFERENCES_NOT_FOUND", { ids: missing.join(", ") })
+    );
 }
 
 export async function assertReferencesResolved(

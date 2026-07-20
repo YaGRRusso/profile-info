@@ -55,6 +55,10 @@ export class CrudRepository<
     return new CrudRepository(this.model, this.mapper, noopScope());
   }
 
+  private resource(): string {
+    return this.model.modelName;
+  }
+
   // --- scope ---
 
   private cleanFilter(filters?: QueryFilter<TModel>): QueryFilter<TModel> {
@@ -112,7 +116,9 @@ export class CrudRepository<
 
     const document = await this.model.findOne(scopedFilter).exec();
     if (isNil(document))
-      throw new NotFoundException(i18nKey("persistence.NOT_FOUND"));
+      throw new NotFoundException(
+        i18nKey("persistence.NOT_FOUND", { resource: this.resource() })
+      );
     return await this.mapper.toDomain(document);
   }
 
@@ -145,7 +151,12 @@ export class CrudRepository<
 
     const document = await this.model.findOne(scopedFilter).exec();
     if (isNil(document))
-      throw new NotFoundException(i18nKey("persistence.NOT_FOUND"));
+      throw new NotFoundException(
+        i18nKey("persistence.NOT_FOUND_BY_ID", {
+          id,
+          resource: this.resource(),
+        })
+      );
     return await this.mapper.toDomain(document);
   }
 
@@ -173,7 +184,9 @@ export class CrudRepository<
     const payload = this.applyCreatePayload(mapped);
     const document = await this.model.create(payload);
     if (isNil(document))
-      throw new BadRequestException(i18nKey("persistence.NOT_CREATED"));
+      throw new BadRequestException(
+        i18nKey("persistence.NOT_CREATED", { resource: this.resource() })
+      );
     return await this.mapper.toDomain(document);
   }
 
@@ -186,14 +199,24 @@ export class CrudRepository<
     });
     const documents = await this.model.create(payloads);
     if (isNil(documents))
-      throw new BadRequestException(i18nKey("persistence.NOT_CREATED"));
+      throw new BadRequestException(
+        i18nKey("persistence.NOT_CREATED", { resource: this.resource() })
+      );
 
+    const failed = createInputs.length - documents.length;
     return assertBatchSucceeded(
       {
-        failed: createInputs.length - documents.length,
+        failed,
         succeeded: documents.length,
       },
-      new BadRequestException(i18nKey("persistence.NOT_CREATED"))
+      new BadRequestException(
+        failed > 0
+          ? i18nKey("persistence.NOT_CREATED_BATCH", {
+              failed,
+              resource: this.resource(),
+            })
+          : i18nKey("persistence.NOT_CREATED", { resource: this.resource() })
+      )
     );
   }
 
@@ -215,7 +238,9 @@ export class CrudRepository<
       .exec();
 
     if (isNil(document))
-      throw new NotFoundException(i18nKey("persistence.NOT_UPDATED"));
+      throw new NotFoundException(
+        i18nKey("persistence.NOT_UPDATED", { resource: this.resource() })
+      );
     return await this.mapper.toDomain(document);
   }
 
@@ -239,7 +264,9 @@ export class CrudRepository<
 
     return assertBatchSucceeded(
       { failed: 0, succeeded: result.matchedCount },
-      new NotFoundException(i18nKey("persistence.NOT_UPDATED"))
+      new NotFoundException(
+        i18nKey("persistence.NOT_UPDATED", { resource: this.resource() })
+      )
     );
   }
 
@@ -259,7 +286,12 @@ export class CrudRepository<
       .exec();
 
     if (isNil(document))
-      throw new NotFoundException(i18nKey("persistence.NOT_UPDATED"));
+      throw new NotFoundException(
+        i18nKey("persistence.NOT_UPDATED_BY_ID", {
+          id,
+          resource: this.resource(),
+        })
+      );
     return await this.mapper.toDomain(document);
   }
 
@@ -281,7 +313,9 @@ export class CrudRepository<
 
     const batch = assertBatchSucceeded(
       { failed: 0, succeeded: result.matchedCount },
-      new NotFoundException(i18nKey("persistence.NOT_UPDATED"))
+      new NotFoundException(
+        i18nKey("persistence.NOT_UPDATED", { resource: this.resource() })
+      )
     );
     return {
       failed: ids.length - batch.succeeded,
@@ -298,7 +332,9 @@ export class CrudRepository<
 
     const document = await this.model.findOneAndDelete(scopedFilter).exec();
     if (isNil(document))
-      throw new NotFoundException(i18nKey("persistence.NOT_REMOVED"));
+      throw new NotFoundException(
+        i18nKey("persistence.NOT_REMOVED", { resource: this.resource() })
+      );
     return await this.mapper.toDomain(document);
   }
 
@@ -309,7 +345,9 @@ export class CrudRepository<
     const result = await this.model.deleteMany(scopedFilter).exec();
     return assertBatchSucceeded(
       { failed: 0, succeeded: result.deletedCount },
-      new NotFoundException(i18nKey("persistence.NOT_REMOVED"))
+      new NotFoundException(
+        i18nKey("persistence.NOT_REMOVED", { resource: this.resource() })
+      )
     );
   }
 
@@ -320,7 +358,12 @@ export class CrudRepository<
 
     const document = await this.model.findOneAndDelete(scopedFilter).exec();
     if (isNil(document))
-      throw new NotFoundException(i18nKey("persistence.NOT_REMOVED"));
+      throw new NotFoundException(
+        i18nKey("persistence.NOT_REMOVED_BY_ID", {
+          id,
+          resource: this.resource(),
+        })
+      );
     return await this.mapper.toDomain(document);
   }
 
@@ -335,7 +378,9 @@ export class CrudRepository<
 
     const batch = assertBatchSucceeded(
       { failed: 0, succeeded: result.deletedCount },
-      new NotFoundException(i18nKey("persistence.NOT_REMOVED"))
+      new NotFoundException(
+        i18nKey("persistence.NOT_REMOVED", { resource: this.resource() })
+      )
     );
     return {
       failed: ids.length - batch.succeeded,

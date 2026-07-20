@@ -53,7 +53,9 @@ describe("SkillsValidatorService", () => {
       await expect(
         validator.assertSkillsEnabled(ctx, [missingId])
       ).rejects.toThrow(
-        new BadRequestException(i18nKey("common.REFERENCES_NOT_FOUND"))
+        new BadRequestException(
+          i18nKey("common.REFERENCES_NOT_FOUND", { ids: missingId })
+        )
       );
     });
 

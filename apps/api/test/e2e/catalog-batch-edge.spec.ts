@@ -16,10 +16,9 @@ import { SkillsService } from "@/modules/skills/skills.service";
 import { UsersService } from "@/modules/users/users.service";
 import { clearTestDatabase } from "../support/clear-test-database";
 import { createTestApp } from "../support/create-test-app";
+import { MUTATION_BLOCKED_MESSAGE } from "../support/error-message-matchers";
 import { graphqlRequest } from "../support/graphql-request";
 import { skillI18n } from "../support/skill-i18n";
-
-const MUTATION_BLOCKED_MESSAGE = /Not (found|updated|removed)/;
 
 async function signIn(
   app: INestApplication<App>,

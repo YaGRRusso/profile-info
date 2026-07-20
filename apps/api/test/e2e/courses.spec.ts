@@ -13,6 +13,10 @@ import {
 } from "../support/catalog-reference-validation";
 import { clearTestDatabase } from "../support/clear-test-database";
 import { createTestApp } from "../support/create-test-app";
+import {
+  NOT_FOUND_MESSAGE,
+  NOT_REMOVED_MESSAGE,
+} from "../support/error-message-matchers";
 import { graphqlRequest } from "../support/graphql-request";
 
 const CREATE_ONE_COURSE = `
@@ -268,7 +272,7 @@ describe("Courses tenant isolation (e2e)", () => {
       variables: { courseId },
     });
 
-    expect(response.errors?.[0]?.message).toContain("Not found");
+    expect(response.errors?.[0]?.message).toMatch(NOT_FOUND_MESSAGE);
     expect(response.data?.findOneCourseById).toBeUndefined();
   });
 
@@ -289,7 +293,7 @@ describe("Courses tenant isolation (e2e)", () => {
       variables: { courseId },
     });
 
-    expect(response.errors?.[0]?.message).toContain("Not removed");
+    expect(response.errors?.[0]?.message).toMatch(NOT_REMOVED_MESSAGE);
   });
 
   it("should let SUPER_ADMIN read USER A course by explicit id", async () => {

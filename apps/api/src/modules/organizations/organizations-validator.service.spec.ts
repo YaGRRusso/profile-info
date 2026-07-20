@@ -54,7 +54,9 @@ describe("OrganizationsValidatorService", () => {
       await expect(
         validator.assertOrganizationsEnabled(ctx, [missingId])
       ).rejects.toThrow(
-        new BadRequestException(i18nKey("common.REFERENCES_NOT_FOUND"))
+        new BadRequestException(
+          i18nKey("common.REFERENCES_NOT_FOUND", { ids: missingId })
+        )
       );
     });
 

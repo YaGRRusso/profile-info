@@ -26,6 +26,7 @@ export type I18nTranslations = {
         "UNAUTHORIZED": string;
         "INVALID_REQUEST": string;
         "PROVIDER_FAILURE": string;
+        "PROVIDER_FAILURE_GENERIC": string;
     };
     "open-router": {
         "UNAUTHORIZED": string;
@@ -33,12 +34,18 @@ export type I18nTranslations = {
     };
     "persistence": {
         "NOT_FOUND": string;
+        "NOT_FOUND_BY_ID": string;
         "NOT_CREATED": string;
+        "NOT_CREATED_BATCH": string;
         "NOT_UPDATED": string;
+        "NOT_UPDATED_BY_ID": string;
         "NOT_REMOVED": string;
+        "NOT_REMOVED_BY_ID": string;
         "DUPLICATE": string;
+        "DUPLICATE_GENERIC": string;
         "INVALID": string;
         "VALIDATION": string;
+        "VALIDATION_GENERIC": string;
         "UNAVAILABLE": string;
     };
     "resume": {

@@ -42,7 +42,9 @@ export class GqlAuthorizationGuard implements CanActivate {
 
       if (!hasPermission(user, required)) {
         throw new ForbiddenException(
-          i18nKey("auth.INSUFFICIENT_API_TOKEN_PERMISSIONS")
+          i18nKey("auth.INSUFFICIENT_API_TOKEN_PERMISSIONS", {
+            permission: required,
+          })
         );
       }
     }
@@ -57,7 +59,11 @@ export class GqlAuthorizationGuard implements CanActivate {
       requiredRoles?.length &&
       (!user.role || !requiredRoles.includes(user.role))
     ) {
-      throw new ForbiddenException(i18nKey("auth.INSUFFICIENT_PERMISSIONS"));
+      throw new ForbiddenException(
+        i18nKey("auth.INSUFFICIENT_PERMISSIONS", {
+          roles: requiredRoles.join(", "),
+        })
+      );
     }
 
     return true;

@@ -20,6 +20,7 @@ import { UsersService } from "@/modules/users/users.service";
 import { assertDefined } from "../support/assert-defined";
 import { clearTestDatabase } from "../support/clear-test-database";
 import { createTestApp } from "../support/create-test-app";
+import { NOT_FOUND_MESSAGE } from "../support/error-message-matchers";
 import { graphqlRequest } from "../support/graphql-request";
 import { skillI18n } from "../support/skill-i18n";
 
@@ -528,7 +529,7 @@ describe("Cross-tenant DataLoader isolation (e2e)", () => {
         variables: { [variableName]: entityId },
       });
 
-      expect(response.errors?.[0]?.message).toContain("Not found");
+      expect(response.errors?.[0]?.message).toMatch(NOT_FOUND_MESSAGE);
       expect(response.data?.[dataKey]).toBeUndefined();
     }
   );

@@ -19,7 +19,9 @@ describe("assert.helper", () => {
 
     it("rejects when any requested id is missing", () => {
       expect(() => assertReferencesExist(["a", "missing"], ["a"])).toThrow(
-        new BadRequestException(i18nKey("common.REFERENCES_NOT_FOUND"))
+        new BadRequestException(
+          i18nKey("common.REFERENCES_NOT_FOUND", { ids: "missing" })
+        )
       );
     });
 

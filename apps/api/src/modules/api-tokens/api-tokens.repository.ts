@@ -49,7 +49,12 @@ export class ApiTokensRepository {
       .lean();
 
     if (!document && isNil(document))
-      throw new NotFoundException(i18nKey("persistence.NOT_FOUND"));
+      throw new NotFoundException(
+        i18nKey("persistence.NOT_FOUND_BY_ID", {
+          id,
+          resource: "ApiToken",
+        })
+      );
 
     return {
       ...this.mapper.toDomain(document),

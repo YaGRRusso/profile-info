@@ -1,5 +1,5 @@
 {
   "UNEXPECTED": "Algo salió mal",
-  "INVALID_ID": "ID inválido",
-  "REFERENCES_NOT_FOUND": "Recurso referenciado no encontrado"
+  "INVALID_ID": "ID inválido: \"{id}\"",
+  "REFERENCES_NOT_FOUND": "Recurso referenciado no encontrado: {ids}"
 }

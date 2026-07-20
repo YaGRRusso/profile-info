@@ -13,6 +13,10 @@ import { OrganizationsService } from "@/modules/organizations/organizations.serv
 import { UsersService } from "@/modules/users/users.service";
 import { clearTestDatabase } from "../support/clear-test-database";
 import { createTestApp } from "../support/create-test-app";
+import {
+  INSUFFICIENT_API_TOKEN_PERMISSIONS_MESSAGE,
+  SESSION_REQUIRED_MESSAGE,
+} from "../support/error-message-matchers";
 import { graphqlRequest } from "../support/graphql-request";
 
 const FIND_MANY_COURSES = `
@@ -204,8 +208,8 @@ describe("API token authentication (e2e)", () => {
       },
     });
 
-    expect(response.errors?.[0]?.message).toBe(
-      "Insufficient API token permissions"
+    expect(response.errors?.[0]?.message).toMatch(
+      INSUFFICIENT_API_TOKEN_PERMISSIONS_MESSAGE
     );
   });
 
@@ -244,8 +248,8 @@ describe("API token authentication (e2e)", () => {
       query: FIND_MANY_COURSES,
     });
 
-    expect(response.errors?.[0]?.message).toBe(
-      "Insufficient API token permissions"
+    expect(response.errors?.[0]?.message).toMatch(
+      INSUFFICIENT_API_TOKEN_PERMISSIONS_MESSAGE
     );
   });
 
@@ -255,6 +259,6 @@ describe("API token authentication (e2e)", () => {
       query: FIND_MANY_API_TOKENS,
     });
 
-    expect(response.errors?.[0]?.message).toBe("Session required");
+    expect(response.errors?.[0]?.message).toMatch(SESSION_REQUIRED_MESSAGE);
   });
 });

@@ -236,13 +236,17 @@ export class OrganizationsService {
 
   private assertActive(entry: { disabled: boolean }): void {
     if (entry.disabled) {
-      throw new NotFoundException(i18nKey("persistence.NOT_FOUND"));
+      throw new NotFoundException(
+        i18nKey("persistence.NOT_FOUND", { resource: "Organization" })
+      );
     }
   }
 
   private assertAllActive(entries: Array<{ disabled: boolean }>): void {
     if (entries.some((entry) => entry.disabled)) {
-      throw new NotFoundException(i18nKey("persistence.NOT_FOUND"));
+      throw new NotFoundException(
+        i18nKey("persistence.NOT_FOUND", { resource: "Organization" })
+      );
     }
   }
 }

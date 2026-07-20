@@ -155,7 +155,11 @@ export class UsersResolver {
     @Context() ctx: GraphqlContext
   ) {
     if (auth.role !== UserRole.SUPER_ADMIN) {
-      throw new ForbiddenException(i18nKey("auth.INSUFFICIENT_PERMISSIONS"));
+      throw new ForbiddenException(
+        i18nKey("auth.INSUFFICIENT_PERMISSIONS", {
+          roles: UserRole.SUPER_ADMIN,
+        })
+      );
     }
     return ctx.loaders.batchUserOwnedCounts.load(user.id);
   }

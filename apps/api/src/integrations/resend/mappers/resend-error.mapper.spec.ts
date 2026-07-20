@@ -29,7 +29,10 @@ describe("mapResendError", () => {
 
     expect(error).toBeInstanceOf(BadRequestException);
     expect(error.getResponse()).toEqual(
-      expect.objectContaining({ message: "email.INVALID_REQUEST" })
+      expect.objectContaining({
+        args: { detail: "Invalid from" },
+        message: "email.INVALID_REQUEST",
+      })
     );
   });
 
@@ -42,7 +45,10 @@ describe("mapResendError", () => {
 
     expect(error).toBeInstanceOf(ServiceUnavailableException);
     expect(error.getResponse()).toEqual(
-      expect.objectContaining({ message: "email.PROVIDER_FAILURE" })
+      expect.objectContaining({
+        args: { detail: "Too many requests" },
+        message: "email.PROVIDER_FAILURE",
+      })
     );
   });
 
@@ -55,7 +61,10 @@ describe("mapResendError", () => {
 
     expect(error).toBeInstanceOf(BadGatewayException);
     expect(error.getResponse()).toEqual(
-      expect.objectContaining({ message: "email.PROVIDER_FAILURE" })
+      expect.objectContaining({
+        args: { detail: "Boom" },
+        message: "email.PROVIDER_FAILURE",
+      })
     );
   });
 
@@ -64,7 +73,7 @@ describe("mapResendError", () => {
 
     expect(error).toBeInstanceOf(BadGatewayException);
     expect(error.getResponse()).toEqual(
-      expect.objectContaining({ message: "email.PROVIDER_FAILURE" })
+      expect.objectContaining({ message: "email.PROVIDER_FAILURE_GENERIC" })
     );
   });
 });

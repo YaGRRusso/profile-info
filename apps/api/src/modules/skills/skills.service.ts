@@ -226,13 +226,17 @@ export class SkillsService {
 
   private assertActive(entry: { disabled: boolean }): void {
     if (entry.disabled) {
-      throw new NotFoundException(i18nKey("persistence.NOT_FOUND"));
+      throw new NotFoundException(
+        i18nKey("persistence.NOT_FOUND", { resource: "Skill" })
+      );
     }
   }
 
   private assertAllActive(entries: Array<{ disabled: boolean }>): void {
     if (entries.some((entry) => entry.disabled)) {
-      throw new NotFoundException(i18nKey("persistence.NOT_FOUND"));
+      throw new NotFoundException(
+        i18nKey("persistence.NOT_FOUND", { resource: "Skill" })
+      );
     }
   }
 }

@@ -2,6 +2,7 @@
   "NOT_CONFIGURED": "O envio de e-mail não está configurado",
   "FROM_REQUIRED": "É necessário um endereço de remetente (from)",
   "UNAUTHORIZED": "O provedor de e-mail rejeitou as credenciais da API",
-  "INVALID_REQUEST": "O provedor de e-mail rejeitou a solicitação",
-  "PROVIDER_FAILURE": "O provedor de e-mail falhou ao enviar a mensagem"
+  "INVALID_REQUEST": "O provedor de e-mail rejeitou a solicitação: {detail}",
+  "PROVIDER_FAILURE": "O provedor de e-mail falhou ao enviar a mensagem: {detail}",
+  "PROVIDER_FAILURE_GENERIC": "O provedor de e-mail falhou ao enviar a mensagem"
 }
