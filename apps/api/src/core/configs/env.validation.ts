@@ -3,6 +3,7 @@ import { parseCommaSeparatedList } from "@/common/helpers/parse-comma-separated-
 
 export const envSchema = z.object({
   DATABASE_URL: z.string().min(1),
+  EMAIL_FROM: z.string().min(1).optional(),
   GRAPHQL_INTROSPECTION: z
     .enum(["true", "false"])
     .transform((value) => value === "true"),
@@ -20,6 +21,7 @@ export const envSchema = z.object({
     }),
   OPENROUTER_API_KEY: z.string().min(1),
   PORT: z.coerce.number().default(8080),
+  RESEND_API_KEY: z.string().min(1).optional(),
   SENTRY_DSN: z.string().min(1).optional(),
   TAVILY_API_KEY: z.string().min(1),
 });

@@ -4,8 +4,7 @@ Deferred API and admin work, ordered by **criticality**, then **effort** (ascend
 
 ## Priority
 
-- **Email delivery integration** — Add a provider-neutral email port, provider adapter, templates, configuration, and delivery-failure handling.
-- **Event-driven user emails** — Publish explicit business events and send transactional emails from listeners (for example, registration and account-status changes), with each event's recipient, locale, and delivery policy defined as part of that use case.
+- **Event-driven user emails** — Publish explicit business events and send transactional emails from listeners (for example, registration and account-status changes), with each event's recipient, locale, and delivery policy defined as part of that use case. Templates (locale-aware bodies) land with this work; delivery plumbing is `integrations/resend/` (`EmailProvider`).
 
 ## Backlog
 
