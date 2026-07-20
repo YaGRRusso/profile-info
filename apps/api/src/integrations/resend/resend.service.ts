@@ -8,6 +8,7 @@ import {
 import { ConfigService } from "@nestjs/config";
 import { Resend } from "resend";
 import type { Env } from "@/core/configs/env.validation";
+import { i18nKey } from "@/core/i18n/i18n";
 import {
   EmailProvider,
   type IntegrationEmailMessage,
@@ -16,11 +17,6 @@ import {
 import { mapResendError } from "./mappers/resend-error.mapper";
 import { resendRequestMapper } from "./mappers/resend-request.mapper";
 import { resendResultMapper } from "./mappers/resend-result.mapper";
-import {
-  EMAIL_FROM_REQUIRED,
-  EMAIL_NOT_CONFIGURED,
-  EMAIL_PROVIDER_FAILURE,
-} from "./resend.messages";
 
 @Injectable()
 export class ResendService extends EmailProvider {
@@ -39,12 +35,12 @@ export class ResendService extends EmailProvider {
     message: IntegrationEmailMessage
   ): Promise<IntegrationEmailResult> {
     if (!this.client) {
-      throw new ServiceUnavailableException(EMAIL_NOT_CONFIGURED);
+      throw new ServiceUnavailableException(i18nKey("email.NOT_CONFIGURED"));
     }
 
     const from = message.from ?? this.defaultFrom;
     if (!from) {
-      throw new BadRequestException(EMAIL_FROM_REQUIRED);
+      throw new BadRequestException(i18nKey("email.FROM_REQUIRED"));
     }
 
     try {
@@ -57,7 +53,7 @@ export class ResendService extends EmailProvider {
       }
 
       if (!data) {
-        throw new BadGatewayException(EMAIL_PROVIDER_FAILURE);
+        throw new BadGatewayException(i18nKey("email.PROVIDER_FAILURE"));
       }
 
       return resendResultMapper(data);

@@ -1,5 +1,5 @@
 import { BadRequestException } from "@nestjs/common";
-import { COMMON_REFERENCES_NOT_FOUND } from "@/core/errors/common.messages";
+import { i18nKey } from "@/core/i18n/i18n";
 import {
   assertReferencesExist,
   assertReferencesResolved,
@@ -19,7 +19,7 @@ describe("assert.helper", () => {
 
     it("rejects when any requested id is missing", () => {
       expect(() => assertReferencesExist(["a", "missing"], ["a"])).toThrow(
-        new BadRequestException(COMMON_REFERENCES_NOT_FOUND)
+        new BadRequestException(i18nKey("common.REFERENCES_NOT_FOUND"))
       );
     });
 

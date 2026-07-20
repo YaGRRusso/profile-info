@@ -1,5 +1,5 @@
 import { PdfContext } from "@/common/pdf/pdf-context";
-import { resolveResumeLabels } from "../const/resume-labels.const";
+import type { ResumeLabels } from "../const/resume-labels.const";
 import type { ResumeDocumentData } from "../types/resume-document.type";
 import { renderCertifications } from "./sections/render-certifications";
 import { renderEducations } from "./sections/render-education";
@@ -10,9 +10,9 @@ import { renderSkills } from "./sections/render-skills";
 
 export function renderResumeDocument(
   pdf: PDFKit.PDFDocument,
-  document: ResumeDocumentData
+  document: ResumeDocumentData,
+  labels: ResumeLabels
 ): void {
-  const labels = resolveResumeLabels(document.locale);
   const ctx = new PdfContext(pdf);
 
   renderHeader(ctx, document);

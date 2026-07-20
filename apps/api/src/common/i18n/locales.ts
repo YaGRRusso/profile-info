@@ -8,7 +8,7 @@ export type LocaleCode = (typeof Locale)[keyof typeof Locale];
 
 export const DEFAULT_LOCALE: LocaleCode = Locale.EN;
 
-/** App-owned locales (resume PDF, API error messages). */
+/** App-owned locales (entity `i18n[]`, resume PDF). */
 export const LOCALES: readonly LocaleCode[] = Object.values(Locale);
 
 export const DEFAULT_TRANSLATION_FALLBACKS = [

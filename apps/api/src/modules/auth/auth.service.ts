@@ -1,8 +1,8 @@
 import { Injectable, UnauthorizedException } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
 import { compare } from "bcryptjs";
-import { AUTH_INVALID_CREDENTIALS } from "@/core/auth/auth.messages";
 import type { AuthContext } from "@/core/context/auth-context.interface";
+import { i18nKey } from "@/core/i18n/i18n";
 import { RegisterUserInput } from "@/modules/users/dto/register-user.input";
 import { UsersService } from "@/modules/users/users.service";
 import { UsersValidatorService } from "@/modules/users/users-validator.service";
@@ -20,10 +20,12 @@ export class AuthService {
 
   private async validate(email: string, password: string) {
     const user = await this.usersService.findOneByEmailWithPassword(email);
-    if (!user) throw new UnauthorizedException(AUTH_INVALID_CREDENTIALS);
+    if (!user)
+      throw new UnauthorizedException(i18nKey("auth.INVALID_CREDENTIALS"));
 
     const match = await compare(password, user.password);
-    if (!match) throw new UnauthorizedException(AUTH_INVALID_CREDENTIALS);
+    if (!match)
+      throw new UnauthorizedException(i18nKey("auth.INVALID_CREDENTIALS"));
 
     this.usersValidator.assertUserEnabled(user);
 

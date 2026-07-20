@@ -4,7 +4,7 @@ import type { AuthContext } from "@/core/context/auth-context.interface";
 import { BatchEntity } from "@/core/entities/batch.entity";
 import { DomainEvents } from "@/core/events/domain-events";
 import { SkillDeletedEvent } from "@/core/events/skill-deleted.event";
-import { PERSISTENCE_NOT_FOUND } from "@/core/persistence/persistence.messages";
+import { i18nKey } from "@/core/i18n/i18n";
 import type {
   FieldCount,
   MultiPaged,
@@ -226,13 +226,13 @@ export class SkillsService {
 
   private assertActive(entry: { disabled: boolean }): void {
     if (entry.disabled) {
-      throw new NotFoundException(PERSISTENCE_NOT_FOUND);
+      throw new NotFoundException(i18nKey("persistence.NOT_FOUND"));
     }
   }
 
   private assertAllActive(entries: Array<{ disabled: boolean }>): void {
     if (entries.some((entry) => entry.disabled)) {
-      throw new NotFoundException(PERSISTENCE_NOT_FOUND);
+      throw new NotFoundException(i18nKey("persistence.NOT_FOUND"));
     }
   }
 }

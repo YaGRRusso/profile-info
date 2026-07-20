@@ -6,7 +6,6 @@ import {
 import { App } from "supertest/types";
 import { CatalogPartition } from "@/core/enums/catalog-partition.enum";
 import { UserRole } from "@/core/enums/user-role.enum";
-import { PERSISTENCE_NOT_FOUND } from "@/core/persistence/persistence.messages";
 import { OrganizationCategory } from "@/modules/organizations/enums/category.enum";
 import { OrganizationsService } from "@/modules/organizations/organizations.service";
 import { UsersService } from "@/modules/users/users.service";
@@ -446,7 +445,7 @@ describe("Organizations catalog scope (e2e)", () => {
       },
     });
 
-    expect(response.errors?.[0]?.message).toContain(PERSISTENCE_NOT_FOUND.en);
+    expect(response.errors?.[0]?.message).toContain("Not found");
   });
 
   it("9 — FilterOrganizationInput with another users ownerId and LOCAL does not leak", async () => {

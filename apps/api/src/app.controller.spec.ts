@@ -15,8 +15,8 @@ describe("AppController", () => {
   });
 
   describe("root", () => {
-    it('should return "Hello World!"', () => {
-      expect(appController.getHello()).toBe("Hello World!");
+    it("returns the hello key when I18nContext is absent", () => {
+      expect(appController.getHello()).toBe("app.HELLO_WORLD");
     });
   });
 });

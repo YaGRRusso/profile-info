@@ -1,4 +1,7 @@
-import { Locale, type LocaleCode } from "@/common/i18n/locales";
+import type { I18nService } from "nestjs-i18n";
+import type { LocaleCode } from "@/common/i18n/locales";
+import { i18nKey } from "@/core/i18n/i18n";
+import type { I18nPath } from "@/generated/i18n.generated";
 
 export interface ResumeLabels {
   formatHours: (hours: number) => string;
@@ -11,39 +14,22 @@ export interface ResumeLabels {
   };
 }
 
-const RESUME_LABELS: Record<LocaleCode, ResumeLabels> = {
-  [Locale.EN]: {
-    formatHours: (hours) => `${hours} hours`,
-    sections: {
-      certifications: "Certifications",
-      education: "Education",
-      experience: "Experience",
-      projects: "Projects",
-      skills: "Skills",
-    },
-  },
-  [Locale.PT]: {
-    formatHours: (hours) => `${hours} horas`,
-    sections: {
-      certifications: "Certificações",
-      education: "Formação",
-      experience: "Experiência",
-      projects: "Projetos",
-      skills: "Habilidades",
-    },
-  },
-  [Locale.ES]: {
-    formatHours: (hours) => `${hours} horas`,
-    sections: {
-      certifications: "Certificaciones",
-      education: "Formación",
-      experience: "Experiencia",
-      projects: "Proyectos",
-      skills: "Habilidades",
-    },
-  },
-};
+export function resolveResumeLabels(
+  i18n: Pick<I18nService, "t">,
+  locale: LocaleCode
+): ResumeLabels {
+  const translate = (key: I18nPath, args?: Record<string, unknown>) =>
+    i18n.t(key, { args, lang: locale }) as string;
 
-export function resolveResumeLabels(locale: LocaleCode): ResumeLabels {
-  return RESUME_LABELS[locale] ?? RESUME_LABELS[Locale.EN];
+  return {
+    formatHours: (hours) =>
+      translate(i18nKey("resume.FORMAT_HOURS"), { hours }),
+    sections: {
+      certifications: translate(i18nKey("resume.SECTION_CERTIFICATIONS")),
+      education: translate(i18nKey("resume.SECTION_EDUCATION")),
+      experience: translate(i18nKey("resume.SECTION_EXPERIENCE")),
+      projects: translate(i18nKey("resume.SECTION_PROJECTS")),
+      skills: translate(i18nKey("resume.SECTION_SKILLS")),
+    },
+  };
 }

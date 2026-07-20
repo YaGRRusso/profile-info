@@ -6,6 +6,7 @@ import { MongooseModule } from "@nestjs/mongoose";
 import { AppController } from "@/app.controller";
 import { AppService } from "@/app.service";
 import { AppCacheModule } from "@/core/cache/app-cache.module";
+import { AppI18nModule } from "@/core/i18n/app-i18n.module";
 import { SentryModule } from "@/integrations/sentry/sentry.module";
 import { ApiTokensModule } from "@/modules/api-tokens/api-tokens.module";
 import { AuthModule } from "@/modules/auth/auth.module";
@@ -26,6 +27,7 @@ import { GraphqlModule } from "@/platform/graphql/graphql.module";
   imports: [
     EventEmitterModule.forRoot({ global: true }),
     ConfigModule.forRoot({ isGlobal: true }),
+    AppI18nModule,
     SentryModule,
     AppCacheModule,
     MongooseModule.forRootAsync({

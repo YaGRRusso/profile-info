@@ -7,6 +7,7 @@ import { BatchEntity } from "@/core/entities/batch.entity";
 import { UserRole } from "@/core/enums/user-role.enum";
 import { DomainEvents } from "@/core/events/domain-events";
 import { UserDeletedEvent } from "@/core/events/user-deleted.event";
+import { i18nKey } from "@/core/i18n/i18n";
 import type { MultiPaged } from "@/core/persistence/types/output.type";
 import { SkillsValidatorService } from "@/modules/skills/skills-validator.service";
 import { CreateUserInput } from "./dto/create-user.input";
@@ -17,7 +18,6 @@ import { UpdateUserInput } from "./dto/update-user.input";
 import type { UserEntityRecord } from "./entities/user.entity";
 import type { UserWithPasswordEntity } from "./entities/user-with-password.entity";
 import type { UserCreateRecord, UserUpdateRecord } from "./mappers/user.mapper";
-import { USER_SUPER_ADMIN_NOT_DELETABLE } from "./users.messages";
 import { UsersRepository } from "./users.repository";
 
 @Injectable()
@@ -186,7 +186,7 @@ export class UsersService {
 
   private assertDeletable(user: UserEntityRecord): void {
     if (user.role === UserRole.SUPER_ADMIN) {
-      throw new ForbiddenException(USER_SUPER_ADMIN_NOT_DELETABLE);
+      throw new ForbiddenException(i18nKey("users.SUPER_ADMIN_NOT_DELETABLE"));
     }
   }
 

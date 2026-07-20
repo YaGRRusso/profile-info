@@ -3,16 +3,13 @@ import {
   type HttpException,
   UnauthorizedException,
 } from "@nestjs/common";
+import { i18nKey } from "@/core/i18n/i18n";
 import { isOpenRouterAuthError } from "../helpers/is-open-router-auth-error.helper";
-import {
-  OPENROUTER_PROVIDER_FAILURE,
-  OPENROUTER_UNAUTHORIZED,
-} from "../open-router.messages";
 
 export function mapOpenRouterError(error: unknown): HttpException {
   if (isOpenRouterAuthError(error)) {
-    return new UnauthorizedException(OPENROUTER_UNAUTHORIZED);
+    return new UnauthorizedException(i18nKey("open-router.UNAUTHORIZED"));
   }
 
-  return new BadGatewayException(OPENROUTER_PROVIDER_FAILURE);
+  return new BadGatewayException(i18nKey("open-router.PROVIDER_FAILURE"));
 }

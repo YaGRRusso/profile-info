@@ -1,10 +1,6 @@
 import { BadGatewayException, UnauthorizedException } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { Test, TestingModule } from "@nestjs/testing";
-import {
-  OPENROUTER_PROVIDER_FAILURE,
-  OPENROUTER_UNAUTHORIZED,
-} from "./open-router.messages";
 import { OpenRouterService } from "./open-router.service";
 
 const sendMock = jest.fn();
@@ -104,7 +100,9 @@ describe("OpenRouterService", () => {
     sendMock.mockRejectedValueOnce(unauthorizedError());
 
     await expect(service.chat(chatRequest)).rejects.toMatchObject({
-      response: OPENROUTER_UNAUTHORIZED,
+      response: expect.objectContaining({
+        message: "open-router.UNAUTHORIZED",
+      }),
     });
     expect(sendMock).toHaveBeenCalledTimes(1);
   });
@@ -124,7 +122,9 @@ describe("OpenRouterService", () => {
       .mockRejectedValueOnce(new Error("final model unavailable"));
 
     await expect(service.chat(chatRequest)).rejects.toMatchObject({
-      response: OPENROUTER_PROVIDER_FAILURE,
+      response: expect.objectContaining({
+        message: "open-router.PROVIDER_FAILURE",
+      }),
     });
     expect(sendMock).toHaveBeenCalledTimes(3);
     expect(

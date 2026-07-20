@@ -1,12 +1,12 @@
 import { Injectable, UnauthorizedException } from "@nestjs/common";
+import { i18nKey } from "@/core/i18n/i18n";
 import type { UserEntityRecord } from "./entities/user.entity";
-import { USER_ACCOUNT_DISABLED } from "./users.messages";
 
 @Injectable()
 export class UsersValidatorService {
   assertUserEnabled(user: Pick<UserEntityRecord, "disabled">): void {
     if (user.disabled) {
-      throw new UnauthorizedException(USER_ACCOUNT_DISABLED);
+      throw new UnauthorizedException(i18nKey("users.ACCOUNT_DISABLED"));
     }
   }
 }

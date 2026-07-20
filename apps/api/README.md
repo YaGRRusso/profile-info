@@ -9,6 +9,7 @@ by the `@profile-info/admin` dashboard.
 
 - **NestJS 11**: modules, resolvers, services, DI.
 - **Apollo GraphQL (code-first)**: schema generated to `src/schema.gql`.
+- **nestjs-i18n**: API copy under `src/i18n/{en,es,pt}/`; typed keys in `src/generated/i18n.generated.ts` via `npm run i18n:types`.
 - **MongoDB + Mongoose**: ODM schemas in `src/modules/<name>/schemas/`.
 - **Passport JWT**: global `GqlAuthenticationGuard` with `@Public()` opt-out and `GqlAuthorizationGuard` for roles and API token permissions.
 - **DataLoader**: batches skill, organization, and user lookups on nested fields.
@@ -105,6 +106,8 @@ src/
 ├── main.ts
 ├── app.module.ts             # Composition root: infra → GraphqlModule → domain modules
 ├── schema.gql                # Auto-generated (commit after API type changes)
+├── i18n/                     # nestjs-i18n catalogs ({en,es,pt}/*.json)
+├── generated/                # i18n.generated.ts (npm run i18n:types)
 ├── common/
 ├── core/
 │   └── persistence/          # CrudRepository, StatsRepository, CrudMapperInterface, scoped()
@@ -163,6 +166,8 @@ npm run api:dev
 ```
 
 After GraphQL type changes, rebuild or boot the API so `src/schema.gql` regenerates, then run admin codegen (`npm run admin:build` or `npx graphql-codegen` in `apps/admin`). Tests never write to this file (`NODE_ENV=test` keeps the schema in memory).
+
+After editing `src/i18n/**/*.json`, run `npm run i18n:types` (from `apps/api` or via the workspace) and commit `src/generated/i18n.generated.ts`.
 
 ### Resume PDF export
 

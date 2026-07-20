@@ -1,5 +1,4 @@
 import { UnauthorizedException } from "@nestjs/common";
-import { USER_ACCOUNT_DISABLED } from "./users.messages";
 import { UsersValidatorService } from "./users-validator.service";
 
 describe("UsersValidatorService", () => {
@@ -17,7 +16,9 @@ describe("UsersValidatorService", () => {
     } catch (error) {
       expect(error).toBeInstanceOf(UnauthorizedException);
       if (error instanceof UnauthorizedException) {
-        expect(error.getResponse()).toEqual(USER_ACCOUNT_DISABLED);
+        expect(error.getResponse()).toEqual(
+          expect.objectContaining({ message: "users.ACCOUNT_DISABLED" })
+        );
       }
     }
   });

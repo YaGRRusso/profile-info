@@ -1,5 +1,4 @@
 import { BadGatewayException } from "@nestjs/common";
-import { TAVILY_PROVIDER_FAILURE } from "../tavily.messages";
 import { mapTavilyError } from "./tavily-error.mapper";
 
 describe("mapTavilyError", () => {
@@ -7,6 +6,8 @@ describe("mapTavilyError", () => {
     const error = mapTavilyError(new Error("upstream down"));
 
     expect(error).toBeInstanceOf(BadGatewayException);
-    expect(error.getResponse()).toEqual(TAVILY_PROVIDER_FAILURE);
+    expect(error.getResponse()).toEqual(
+      expect.objectContaining({ message: "tavily.PROVIDER_FAILURE" })
+    );
   });
 });

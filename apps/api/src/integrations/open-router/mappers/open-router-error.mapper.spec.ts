@@ -1,8 +1,4 @@
 import { BadGatewayException } from "@nestjs/common";
-import {
-  OPENROUTER_PROVIDER_FAILURE,
-  OPENROUTER_UNAUTHORIZED,
-} from "../open-router.messages";
 import { mapOpenRouterError } from "./open-router-error.mapper";
 
 describe("mapOpenRouterError", () => {
@@ -14,13 +10,17 @@ describe("mapOpenRouterError", () => {
       })
     );
 
-    expect(error.getResponse()).toEqual(OPENROUTER_UNAUTHORIZED);
+    expect(error.getResponse()).toEqual(
+      expect.objectContaining({ message: "open-router.UNAUTHORIZED" })
+    );
   });
 
   it("maps other errors to BadGatewayException", () => {
     const error = mapOpenRouterError(new Error("model unavailable"));
 
     expect(error).toBeInstanceOf(BadGatewayException);
-    expect(error.getResponse()).toEqual(OPENROUTER_PROVIDER_FAILURE);
+    expect(error.getResponse()).toEqual(
+      expect.objectContaining({ message: "open-router.PROVIDER_FAILURE" })
+    );
   });
 });

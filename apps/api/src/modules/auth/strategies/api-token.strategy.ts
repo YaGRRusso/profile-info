@@ -2,9 +2,9 @@ import { Injectable, UnauthorizedException } from "@nestjs/common";
 import { PassportStrategy } from "@nestjs/passport";
 import { compare } from "bcryptjs";
 import { HeaderAPIKeyStrategy } from "passport-headerapikey";
-import { AUTH_UNAUTHORIZED } from "@/core/auth/auth.messages";
 import { toApiTokenAuthContext } from "@/core/context/auth-context.helper";
 import type { ApiTokenAuthContext } from "@/core/context/auth-context.interface";
+import { i18nKey } from "@/core/i18n/i18n";
 import { ApiTokensService } from "@/modules/api-tokens/api-tokens.service";
 import { UsersService } from "@/modules/users/users.service";
 import { UsersValidatorService } from "@/modules/users/users-validator.service";
@@ -28,29 +28,29 @@ export class ApiTokenStrategy extends PassportStrategy(
   async validate(apiKey: string): Promise<ApiTokenAuthContext> {
     const parsed = this.apiTokensService.parseApiToken(apiKey);
     if (!parsed) {
-      throw new UnauthorizedException(AUTH_UNAUTHORIZED);
+      throw new UnauthorizedException(i18nKey("auth.UNAUTHORIZED"));
     }
 
     const token = await this.apiTokensService.findOneByIdWithHashedSecret(
       parsed.tokenId
     );
     if (!token) {
-      throw new UnauthorizedException(AUTH_UNAUTHORIZED);
+      throw new UnauthorizedException(i18nKey("auth.UNAUTHORIZED"));
     }
 
     const isExpired =
       token.expiresAt && token.expiresAt.getTime() <= Date.now();
     if (isExpired) {
-      throw new UnauthorizedException(AUTH_UNAUTHORIZED);
+      throw new UnauthorizedException(i18nKey("auth.UNAUTHORIZED"));
     }
 
     const secretMatches = await compare(parsed.secret, token.hashedSecret);
     if (!secretMatches) {
-      throw new UnauthorizedException(AUTH_UNAUTHORIZED);
+      throw new UnauthorizedException(i18nKey("auth.UNAUTHORIZED"));
     }
 
     const user = await this.usersService.findOneById(token.ownerId);
-    if (!user) throw new UnauthorizedException(AUTH_UNAUTHORIZED);
+    if (!user) throw new UnauthorizedException(i18nKey("auth.UNAUTHORIZED"));
 
     this.usersValidator.assertUserEnabled(user);
 

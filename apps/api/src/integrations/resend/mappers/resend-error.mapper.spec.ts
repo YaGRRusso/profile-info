@@ -4,11 +4,6 @@ import {
   ServiceUnavailableException,
   UnauthorizedException,
 } from "@nestjs/common";
-import {
-  EMAIL_INVALID_REQUEST,
-  EMAIL_PROVIDER_FAILURE,
-  EMAIL_UNAUTHORIZED,
-} from "../resend.messages";
 import { mapResendError } from "./resend-error.mapper";
 
 describe("mapResendError", () => {
@@ -20,7 +15,9 @@ describe("mapResendError", () => {
     });
 
     expect(error).toBeInstanceOf(UnauthorizedException);
-    expect(error.getResponse()).toEqual(EMAIL_UNAUTHORIZED);
+    expect(error.getResponse()).toEqual(
+      expect.objectContaining({ message: "email.UNAUTHORIZED" })
+    );
   });
 
   it("maps validation errors to BadRequestException", () => {
@@ -31,7 +28,9 @@ describe("mapResendError", () => {
     });
 
     expect(error).toBeInstanceOf(BadRequestException);
-    expect(error.getResponse()).toEqual(EMAIL_INVALID_REQUEST);
+    expect(error.getResponse()).toEqual(
+      expect.objectContaining({ message: "email.INVALID_REQUEST" })
+    );
   });
 
   it("maps rate limits to ServiceUnavailableException", () => {
@@ -42,7 +41,9 @@ describe("mapResendError", () => {
     });
 
     expect(error).toBeInstanceOf(ServiceUnavailableException);
-    expect(error.getResponse()).toEqual(EMAIL_PROVIDER_FAILURE);
+    expect(error.getResponse()).toEqual(
+      expect.objectContaining({ message: "email.PROVIDER_FAILURE" })
+    );
   });
 
   it("maps unknown provider errors to BadGatewayException", () => {
@@ -53,13 +54,17 @@ describe("mapResendError", () => {
     });
 
     expect(error).toBeInstanceOf(BadGatewayException);
-    expect(error.getResponse()).toEqual(EMAIL_PROVIDER_FAILURE);
+    expect(error.getResponse()).toEqual(
+      expect.objectContaining({ message: "email.PROVIDER_FAILURE" })
+    );
   });
 
   it("maps non-Resend errors to BadGatewayException", () => {
     const error = mapResendError(new Error("network down"));
 
     expect(error).toBeInstanceOf(BadGatewayException);
-    expect(error.getResponse()).toEqual(EMAIL_PROVIDER_FAILURE);
+    expect(error.getResponse()).toEqual(
+      expect.objectContaining({ message: "email.PROVIDER_FAILURE" })
+    );
   });
 });

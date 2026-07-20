@@ -49,6 +49,7 @@ import "./loaders.registry";
             req,
             res,
           }),
+          fieldResolverEnhancers: ["filters"],
           formatError: (
             formattedError: GraphQLFormattedError
           ): GraphQLFormattedError => {

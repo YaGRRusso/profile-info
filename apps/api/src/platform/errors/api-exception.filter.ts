@@ -6,22 +6,33 @@ import {
   Injectable,
   InternalServerErrorException,
 } from "@nestjs/common";
-import { GqlArgumentsHost, GqlExceptionFilter } from "@nestjs/graphql";
+import type { GqlExceptionFilter } from "@nestjs/graphql";
 import type { Response } from "express";
-import { COMMON_UNEXPECTED } from "@/core/errors/common.messages";
-import { isErrorMessage, localizeError } from "@/core/errors/error-message";
+import { I18nContext, I18nService, type TranslateOptions } from "nestjs-i18n";
+import { i18nKey } from "@/core/i18n/i18n";
 import { mapPersistenceError } from "@/core/persistence/persistence-error.mapper";
 import { ErrorMonitoringProvider } from "@/integrations/sentry/error-monitoring.provider";
 import { shouldReportStatus } from "./should-report-status.helper";
 
+type TranslateFn = (key: string, options?: TranslateOptions) => string;
+
 @Catch()
 @Injectable()
 export class ApiExceptionFilter implements ExceptionFilter, GqlExceptionFilter {
-  constructor(private readonly errorMonitoring: ErrorMonitoringProvider) {}
+  constructor(
+    private readonly errorMonitoring: ErrorMonitoringProvider,
+    private readonly i18nService: I18nService
+  ) {}
 
   catch(exception: unknown, host: ArgumentsHost) {
-    const acceptLanguage = requestLanguage(host);
-    const response = resolveApiError(exception, acceptLanguage);
+    const lang = I18nContext.current(host)?.lang ?? I18nContext.current()?.lang;
+    const response = resolveApiError(exception, (key, options) =>
+      translateErrorKey(
+        this.i18nService,
+        key,
+        lang === undefined ? options : { ...options, lang }
+      )
+    );
 
     if (shouldReportStatus(response.statusCode)) {
       this.errorMonitoring.captureException(exception, {
@@ -44,19 +55,43 @@ export class ApiExceptionFilter implements ExceptionFilter, GqlExceptionFilter {
 
 export function resolveApiError(
   exception: unknown,
-  acceptLanguage?: string
+  translate: TranslateFn
 ): { message: string; statusCode: number } {
   const httpException = normalizeException(exception);
-  const exceptionResponse = httpException.getResponse();
-  const message = isErrorMessage(exceptionResponse)
-    ? exceptionResponse
-    : COMMON_UNEXPECTED;
-  const localizedMessage = localizeError(message, acceptLanguage);
+  const key = extractI18nKey(httpException.getResponse());
 
   return {
-    message: localizedMessage,
+    message: translate(key),
     statusCode: httpException.getStatus(),
   };
+}
+
+export function translateErrorKey(
+  i18n: Pick<I18nService, "t">,
+  key: string,
+  options?: TranslateOptions
+): string {
+  const translated = i18n.t(key, options) as string;
+  if (translated !== key) return translated;
+
+  return i18n.t(i18nKey("common.UNEXPECTED"), options) as string;
+}
+
+function extractI18nKey(exceptionResponse: string | object): string {
+  if (typeof exceptionResponse === "string") {
+    return exceptionResponse;
+  }
+
+  if (
+    typeof exceptionResponse === "object" &&
+    exceptionResponse !== null &&
+    "message" in exceptionResponse &&
+    typeof exceptionResponse.message === "string"
+  ) {
+    return exceptionResponse.message;
+  }
+
+  return i18nKey("common.UNEXPECTED");
 }
 
 function normalizeException(exception: unknown): HttpException {
@@ -65,19 +100,5 @@ function normalizeException(exception: unknown): HttpException {
   const persistenceException = mapPersistenceError(exception);
   if (persistenceException) return persistenceException;
 
-  return new InternalServerErrorException(COMMON_UNEXPECTED);
-}
-
-type RequestHeaders = Record<string, string | string[] | undefined>;
-
-function requestLanguage(host: ArgumentsHost): string | undefined {
-  const headers =
-    host.getType<"graphql">() === "graphql"
-      ? GqlArgumentsHost.create(host).getContext<{
-          req: { headers: RequestHeaders };
-        }>().req.headers
-      : host.switchToHttp().getRequest<{ headers: RequestHeaders }>().headers;
-
-  const acceptLanguage = headers["accept-language"];
-  return Array.isArray(acceptLanguage) ? acceptLanguage[0] : acceptLanguage;
+  return new InternalServerErrorException(i18nKey("common.UNEXPECTED"));
 }

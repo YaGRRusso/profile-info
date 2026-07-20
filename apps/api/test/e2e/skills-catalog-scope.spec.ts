@@ -6,7 +6,6 @@ import {
 import { App } from "supertest/types";
 import { CatalogPartition } from "@/core/enums/catalog-partition.enum";
 import { UserRole } from "@/core/enums/user-role.enum";
-import { PERSISTENCE_NOT_FOUND } from "@/core/persistence/persistence.messages";
 import { SkillsService } from "@/modules/skills/skills.service";
 import { UsersService } from "@/modules/users/users.service";
 import { clearTestDatabase } from "../support/clear-test-database";
@@ -409,7 +408,7 @@ describe("Skills catalog scope (e2e)", () => {
       variables: { updateMeInput: { skillIds: [disabledSkill.id] } },
     });
 
-    expect(response.errors?.[0]?.message).toContain(PERSISTENCE_NOT_FOUND.en);
+    expect(response.errors?.[0]?.message).toContain("Not found");
   });
 
   it("9 — FilterSkillInput with another users ownerId and LOCAL does not leak", async () => {

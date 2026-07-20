@@ -9,6 +9,7 @@ import { AppService } from "./app.service";
 import { AppCacheModule } from "./core/cache/app-cache.module";
 import { type Env, validateEnv } from "./core/configs/env.validation";
 import { HealthModule } from "./core/health/health.module";
+import { AppI18nModule } from "./core/i18n/app-i18n.module";
 import { ResendModule } from "./integrations/resend/resend.module";
 import { SentryModule } from "./integrations/sentry/sentry.module";
 import { AiToolsModule } from "./modules/ai-tools/ai-tools.module";
@@ -34,6 +35,7 @@ import { GraphqlModule } from "./platform/graphql/graphql.module";
       isGlobal: true,
       validate: validateEnv,
     }),
+    AppI18nModule,
     SentryModule,
     ResendModule,
     AppCacheModule,

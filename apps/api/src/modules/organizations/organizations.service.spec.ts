@@ -5,7 +5,7 @@ import { testAuthContext } from "@test/fixtures/auth-context";
 import { CatalogPartition } from "@/core/enums/catalog-partition.enum";
 import { DomainEvents } from "@/core/events/domain-events";
 import { OrganizationDeletedEvent } from "@/core/events/organization-deleted.event";
-import { PERSISTENCE_NOT_FOUND } from "@/core/persistence/persistence.messages";
+import { i18nKey } from "@/core/i18n/i18n";
 import {
   createMockCrud,
   createMockStats,
@@ -190,7 +190,7 @@ describe("OrganizationsService", () => {
       crud.findManyById.mockResolvedValue([{ ...fakeEntity, disabled: true }]);
 
       await expect(service.findManyActiveById(ctx, [validId])).rejects.toThrow(
-        new NotFoundException(PERSISTENCE_NOT_FOUND)
+        new NotFoundException(i18nKey("persistence.NOT_FOUND"))
       );
     });
   });

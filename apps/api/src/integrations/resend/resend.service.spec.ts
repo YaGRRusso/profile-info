@@ -6,12 +6,6 @@ import {
 } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { Test, TestingModule } from "@nestjs/testing";
-import {
-  EMAIL_FROM_REQUIRED,
-  EMAIL_NOT_CONFIGURED,
-  EMAIL_PROVIDER_FAILURE,
-  EMAIL_UNAUTHORIZED,
-} from "./resend.messages";
 import { ResendService } from "./resend.service";
 
 const sendMock = jest.fn();
@@ -53,7 +47,7 @@ describe("ResendService", () => {
         to: "user@example.com",
       })
     ).rejects.toMatchObject({
-      response: EMAIL_NOT_CONFIGURED,
+      response: expect.objectContaining({ message: "email.NOT_CONFIGURED" }),
     });
     expect(sendMock).not.toHaveBeenCalled();
   });
@@ -80,7 +74,7 @@ describe("ResendService", () => {
         to: "user@example.com",
       })
     ).rejects.toMatchObject({
-      response: EMAIL_FROM_REQUIRED,
+      response: expect.objectContaining({ message: "email.FROM_REQUIRED" }),
     });
     expect(sendMock).not.toHaveBeenCalled();
   });
@@ -168,7 +162,7 @@ describe("ResendService", () => {
         to: "user@example.com",
       })
     ).rejects.toMatchObject({
-      response: EMAIL_UNAUTHORIZED,
+      response: expect.objectContaining({ message: "email.UNAUTHORIZED" }),
     });
   });
 
@@ -214,7 +208,7 @@ describe("ResendService", () => {
         to: "user@example.com",
       })
     ).rejects.toMatchObject({
-      response: EMAIL_PROVIDER_FAILURE,
+      response: expect.objectContaining({ message: "email.PROVIDER_FAILURE" }),
     });
   });
 

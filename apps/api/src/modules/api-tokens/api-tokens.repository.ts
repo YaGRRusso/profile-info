@@ -4,7 +4,7 @@ import { isNil } from "lodash";
 import { Model } from "mongoose";
 import { tenantPersistenceScope } from "@/core/context/auth-context.helper";
 import type { AuthContext } from "@/core/context/auth-context.interface";
-import { PERSISTENCE_NOT_FOUND } from "@/core/persistence/persistence.messages";
+import { i18nKey } from "@/core/i18n/i18n";
 import { CrudRepository } from "@/core/persistence/repositories/crud/crud.repository";
 import { FilterApiTokenInput } from "./dto/filter-api-token.input";
 import { SortApiTokenInput } from "./dto/sort-api-token.input";
@@ -49,7 +49,7 @@ export class ApiTokensRepository {
       .lean();
 
     if (!document && isNil(document))
-      throw new NotFoundException(PERSISTENCE_NOT_FOUND);
+      throw new NotFoundException(i18nKey("persistence.NOT_FOUND"));
 
     return {
       ...this.mapper.toDomain(document),

@@ -5,12 +5,6 @@ import {
 } from "@nestjs/common";
 import { MongoServerError } from "mongodb";
 import mongoose from "mongoose";
-import {
-  PERSISTENCE_DUPLICATE,
-  PERSISTENCE_INVALID,
-  PERSISTENCE_UNAVAILABLE,
-  PERSISTENCE_VALIDATION,
-} from "./persistence.messages";
 import { mapPersistenceError } from "./persistence-error.mapper";
 
 describe("mapPersistenceError", () => {
@@ -21,7 +15,9 @@ describe("mapPersistenceError", () => {
     const result = mapPersistenceError(error);
 
     expect(result).toBeInstanceOf(ConflictException);
-    expect(result?.getResponse()).toEqual(PERSISTENCE_DUPLICATE);
+    expect(result?.getResponse()).toEqual(
+      expect.objectContaining({ message: "persistence.DUPLICATE" })
+    );
   });
 
   it("maps document validation failures", () => {
@@ -31,7 +27,9 @@ describe("mapPersistenceError", () => {
     const result = mapPersistenceError(error);
 
     expect(result).toBeInstanceOf(BadRequestException);
-    expect(result?.getResponse()).toEqual(PERSISTENCE_VALIDATION);
+    expect(result?.getResponse()).toEqual(
+      expect.objectContaining({ message: "persistence.VALIDATION" })
+    );
   });
 
   it("maps invalid values", () => {
@@ -39,14 +37,18 @@ describe("mapPersistenceError", () => {
     const result = mapPersistenceError(error);
 
     expect(result).toBeInstanceOf(BadRequestException);
-    expect(result?.getResponse()).toEqual(PERSISTENCE_INVALID);
+    expect(result?.getResponse()).toEqual(
+      expect.objectContaining({ message: "persistence.INVALID" })
+    );
   });
 
   it("maps Mongoose validation failures", () => {
     const result = mapPersistenceError(new mongoose.Error.ValidationError());
 
     expect(result).toBeInstanceOf(BadRequestException);
-    expect(result?.getResponse()).toEqual(PERSISTENCE_VALIDATION);
+    expect(result?.getResponse()).toEqual(
+      expect.objectContaining({ message: "persistence.VALIDATION" })
+    );
   });
 
   it("maps unavailable database errors", () => {
@@ -56,7 +58,9 @@ describe("mapPersistenceError", () => {
     const result = mapPersistenceError(error);
 
     expect(result).toBeInstanceOf(ServiceUnavailableException);
-    expect(result?.getResponse()).toEqual(PERSISTENCE_UNAVAILABLE);
+    expect(result?.getResponse()).toEqual(
+      expect.objectContaining({ message: "persistence.UNAVAILABLE" })
+    );
   });
 
   it("ignores unrelated errors", () => {

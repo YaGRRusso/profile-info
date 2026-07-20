@@ -1,8 +1,7 @@
 import { BadRequestException, NotFoundException } from "@nestjs/common";
 import { Test, TestingModule } from "@nestjs/testing";
 import { testAuthContext } from "@test/fixtures/auth-context";
-import { COMMON_REFERENCES_NOT_FOUND } from "@/core/errors/common.messages";
-import { PERSISTENCE_NOT_FOUND } from "@/core/persistence/persistence.messages";
+import { i18nKey } from "@/core/i18n/i18n";
 import { OrganizationsService } from "./organizations.service";
 import { OrganizationsValidatorService } from "./organizations-validator.service";
 
@@ -54,17 +53,21 @@ describe("OrganizationsValidatorService", () => {
 
       await expect(
         validator.assertOrganizationsEnabled(ctx, [missingId])
-      ).rejects.toThrow(new BadRequestException(COMMON_REFERENCES_NOT_FOUND));
+      ).rejects.toThrow(
+        new BadRequestException(i18nKey("common.REFERENCES_NOT_FOUND"))
+      );
     });
 
     it("rejects when any organization is disabled", async () => {
       organizationsService.findManyActiveById.mockRejectedValue(
-        new NotFoundException(PERSISTENCE_NOT_FOUND)
+        new NotFoundException(i18nKey("persistence.NOT_FOUND"))
       );
 
       await expect(
         validator.assertOrganizationsEnabled(ctx, [organizationId])
-      ).rejects.toThrow(new NotFoundException(PERSISTENCE_NOT_FOUND));
+      ).rejects.toThrow(
+        new NotFoundException(i18nKey("persistence.NOT_FOUND"))
+      );
     });
   });
 });

@@ -1,6 +1,6 @@
 import { BadRequestException } from "@nestjs/common";
 import { uniq } from "lodash";
-import { COMMON_REFERENCES_NOT_FOUND } from "@/core/errors/common.messages";
+import { i18nKey } from "@/core/i18n/i18n";
 
 export function assertReferencesExist(
   requestedIds: string[],
@@ -11,7 +11,8 @@ export function assertReferencesExist(
   const foundSet = new Set([...foundIds].map(String));
   const missing = requestedIds.some((id) => !foundSet.has(id));
 
-  if (missing) throw new BadRequestException(COMMON_REFERENCES_NOT_FOUND);
+  if (missing)
+    throw new BadRequestException(i18nKey("common.REFERENCES_NOT_FOUND"));
 }
 
 export async function assertReferencesResolved(

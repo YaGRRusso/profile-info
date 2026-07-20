@@ -4,7 +4,7 @@ import { compare } from "bcryptjs";
 import { ApiTokenPermission } from "@/core/enums/api-token-permission.enum";
 import { CredentialKind } from "@/core/enums/credential-kind.enum";
 import { UserRole } from "@/core/enums/user-role.enum";
-import { PERSISTENCE_NOT_FOUND } from "@/core/persistence/persistence.messages";
+import { i18nKey } from "@/core/i18n/i18n";
 import { ApiTokensService } from "@/modules/api-tokens/api-tokens.service";
 import { UsersService } from "@/modules/users/users.service";
 import { UsersValidatorService } from "@/modules/users/users-validator.service";
@@ -140,7 +140,9 @@ describe("ApiTokenStrategy", () => {
       });
       (
         mockApiTokensService.findOneByIdWithHashedSecret as jest.Mock
-      ).mockRejectedValue(new NotFoundException(PERSISTENCE_NOT_FOUND));
+      ).mockRejectedValue(
+        new NotFoundException(i18nKey("persistence.NOT_FOUND"))
+      );
 
       await expect(strategy.validate(apiKey)).rejects.toThrow(
         NotFoundException
@@ -191,7 +193,7 @@ describe("ApiTokenStrategy", () => {
     it("propagates NotFoundException when findOneById rejects (CrudRepository behavior)", async () => {
       mockValidTokenLookup();
       (mockUsersService.findOneById as jest.Mock).mockRejectedValue(
-        new NotFoundException(PERSISTENCE_NOT_FOUND)
+        new NotFoundException(i18nKey("persistence.NOT_FOUND"))
       );
 
       await expect(strategy.validate(apiKey)).rejects.toThrow(

@@ -1,3 +1,9 @@
 {
-  "USER_ID_REQUIRED": "userId is required"
+  "USER_ID_REQUIRED": "userId is required",
+  "SECTION_SKILLS": "Skills",
+  "SECTION_EXPERIENCE": "Experience",
+  "SECTION_EDUCATION": "Education",
+  "SECTION_CERTIFICATIONS": "Certifications",
+  "SECTION_PROJECTS": "Projects",
+  "FORMAT_HOURS": "{hours} hours"
 }

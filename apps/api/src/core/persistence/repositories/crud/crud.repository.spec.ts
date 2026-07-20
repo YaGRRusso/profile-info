@@ -1,16 +1,11 @@
 import { BadRequestException, NotFoundException } from "@nestjs/common";
 import mongoose from "mongoose";
+import { i18nKey } from "@/core/i18n/i18n";
 import {
   DEFAULT_PAGE_SIZE,
   MAX_PAGE_SIZE,
 } from "@/core/persistence/consts/limits.const";
 import { tenantScope } from "@/core/persistence/helpers/tenant-scope.helper";
-import {
-  PERSISTENCE_NOT_CREATED,
-  PERSISTENCE_NOT_FOUND,
-  PERSISTENCE_NOT_REMOVED,
-  PERSISTENCE_NOT_UPDATED,
-} from "@/core/persistence/persistence.messages";
 import type { CrudMapperInterface } from "@/core/persistence/repositories/crud/crud.interface";
 import { CrudRepository } from "@/core/persistence/repositories/crud/crud.repository";
 import { createPassThroughMapper } from "@/core/persistence/repositories/testing/repository-spec.helper";
@@ -117,7 +112,9 @@ describe("CrudRepository", () => {
 
       await expect(
         repository.findOne({ filters: { name: "Missing" } })
-      ).rejects.toThrow(new NotFoundException(PERSISTENCE_NOT_FOUND));
+      ).rejects.toThrow(
+        new NotFoundException(i18nKey("persistence.NOT_FOUND"))
+      );
     });
   });
 
@@ -133,7 +130,7 @@ describe("CrudRepository", () => {
       model.findOne.mockReturnValue(mockQueryChain(null));
 
       await expect(repository.findOneById(docId)).rejects.toThrow(
-        new NotFoundException(PERSISTENCE_NOT_FOUND)
+        new NotFoundException(i18nKey("persistence.NOT_FOUND"))
       );
     });
 
@@ -256,7 +253,9 @@ describe("CrudRepository", () => {
 
       await expect(
         repository.createMany([{ name: "A" }] as never)
-      ).rejects.toThrow(new BadRequestException(PERSISTENCE_NOT_CREATED));
+      ).rejects.toThrow(
+        new BadRequestException(i18nKey("persistence.NOT_CREATED"))
+      );
     });
   });
 
@@ -312,7 +311,9 @@ describe("CrudRepository", () => {
 
       await expect(
         repository.updateManyById([docId], { name: "Updated" })
-      ).rejects.toThrow(new NotFoundException(PERSISTENCE_NOT_UPDATED));
+      ).rejects.toThrow(
+        new NotFoundException(i18nKey("persistence.NOT_UPDATED"))
+      );
     });
   });
 
@@ -346,7 +347,9 @@ describe("CrudRepository", () => {
 
       await expect(
         repository.deleteOne({ filters: { name: "Missing" } })
-      ).rejects.toThrow(new NotFoundException(PERSISTENCE_NOT_REMOVED));
+      ).rejects.toThrow(
+        new NotFoundException(i18nKey("persistence.NOT_REMOVED"))
+      );
     });
   });
 
@@ -374,7 +377,7 @@ describe("CrudRepository", () => {
       model.deleteMany.mockReturnValue(mockExecChain({ deletedCount: 0 }));
 
       await expect(repository.deleteManyById([docId])).rejects.toThrow(
-        new NotFoundException(PERSISTENCE_NOT_REMOVED)
+        new NotFoundException(i18nKey("persistence.NOT_REMOVED"))
       );
     });
   });
@@ -429,7 +432,9 @@ describe("CrudRepository", () => {
           repository
             .scoped(tenantScope({ crossTenant: false, userId: otherOwnerId }))
             .findOneById(docId)
-        ).rejects.toThrow(new NotFoundException(PERSISTENCE_NOT_FOUND));
+        ).rejects.toThrow(
+          new NotFoundException(i18nKey("persistence.NOT_FOUND"))
+        );
       });
     });
 
