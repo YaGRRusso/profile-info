@@ -5,6 +5,7 @@ import { DomainEvents } from "@/core/events/domain-events";
 import { UserRegisteredEvent } from "@/core/events/user-registered.event";
 import { EmailProvider } from "@/integrations/resend/email.provider";
 import { registerMailTemplateId } from "../const/resend-mail-templates.const";
+import { formatMailError } from "../helpers/format-mail-error.helper";
 
 @Injectable()
 export class OnUserRegisteredListener {
@@ -24,8 +25,7 @@ export class OnUserRegisteredListener {
       });
     } catch (error) {
       this.logger.warn(
-        `Failed to send registration email to ${event.email}`,
-        error instanceof Error ? error.stack : undefined
+        `Failed to send registration email to ${event.email}: ${formatMailError(error)}`
       );
     }
   }

@@ -5,6 +5,7 @@ import { UserAccountEnabledEvent } from "@/core/events/user-account-enabled.even
 import { t } from "@/core/i18n/i18n";
 import { EmailProvider } from "@/integrations/resend/email.provider";
 import { escapeHtml } from "../helpers/escape-html.helper";
+import { formatMailError } from "../helpers/format-mail-error.helper";
 
 @Injectable()
 export class OnUserAccountEnabledListener {
@@ -25,8 +26,7 @@ export class OnUserAccountEnabledListener {
       });
     } catch (error) {
       this.logger.warn(
-        `Failed to send account-enabled email to ${event.email}`,
-        error instanceof Error ? error.stack : undefined
+        `Failed to send account-enabled email to ${event.email}: ${formatMailError(error)}`
       );
     }
   }
