@@ -5,6 +5,19 @@ export function resendRequestMapper(
   message: IntegrationEmailMessage,
   from: string
 ): CreateEmailOptions {
+  if (message.template) {
+    return {
+      from,
+      replyTo: message.replyTo,
+      subject: message.subject,
+      template: {
+        id: message.template.id,
+        variables: message.template.variables,
+      },
+      to: message.to,
+    } as CreateEmailOptions;
+  }
+
   return {
     from,
     html: message.html,

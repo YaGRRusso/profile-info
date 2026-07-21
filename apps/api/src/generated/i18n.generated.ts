@@ -29,9 +29,6 @@ export type I18nTranslations = {
         "PROVIDER_FAILURE_GENERIC": string;
     };
     "mail": {
-        "REGISTERED_SUBJECT": string;
-        "REGISTERED_TEXT": string;
-        "REGISTERED_HTML": string;
         "ACCOUNT_ENABLED_SUBJECT": string;
         "ACCOUNT_ENABLED_TEXT": string;
         "ACCOUNT_ENABLED_HTML": string;

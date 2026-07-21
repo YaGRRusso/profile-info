@@ -1,10 +1,10 @@
 import { Injectable, Logger } from "@nestjs/common";
 import { OnEvent } from "@nestjs/event-emitter";
+import { I18nContext } from "nestjs-i18n";
 import { DomainEvents } from "@/core/events/domain-events";
 import { UserRegisteredEvent } from "@/core/events/user-registered.event";
-import { t } from "@/core/i18n/i18n";
 import { EmailProvider } from "@/integrations/resend/email.provider";
-import { escapeHtml } from "../helpers/escape-html.helper";
+import { registerMailTemplateId } from "../const/resend-mail-templates.const";
 
 @Injectable()
 export class OnUserRegisteredListener {
@@ -16,9 +16,10 @@ export class OnUserRegisteredListener {
   async handle(event: UserRegisteredEvent) {
     try {
       await this.emailProvider.send({
-        html: t("mail.REGISTERED_HTML", { name: escapeHtml(event.name) }),
-        subject: t("mail.REGISTERED_SUBJECT"),
-        text: t("mail.REGISTERED_TEXT", { name: event.name }),
+        template: {
+          id: registerMailTemplateId(I18nContext.current()?.lang),
+          variables: { name: event.name },
+        },
         to: event.email,
       });
     } catch (error) {

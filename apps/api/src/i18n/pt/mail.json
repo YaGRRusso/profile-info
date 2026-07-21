@@ -1,7 +1,4 @@
 {
-  "REGISTERED_SUBJECT": "Cadastro recebido — Profile Info",
-  "REGISTERED_TEXT": "Olá {name},\n\nObrigado por se cadastrar. Sua conta aguarda a aprovação de um administrador, então você ainda não pode entrar. Avisaremos por e-mail quando estiver liberada.\n\nNão foi você? Ignore este e-mail.\n\n— Profile Info\n",
-  "REGISTERED_HTML": "<p style=\"margin:0 0 16px;font-size:16px;line-height:1.6;color:#3f3f46;\">Olá {name},</p><p style=\"margin:0 0 16px;font-size:16px;line-height:1.6;color:#3f3f46;\">Obrigado por se cadastrar. Sua conta aguarda a aprovação de um administrador, então você ainda não pode entrar. Avisaremos por e-mail quando estiver liberada.</p><p style=\"margin:0;font-size:14px;line-height:1.6;color:#71717a;\">Não foi você? Ignore este e-mail.</p>",
   "ACCOUNT_ENABLED_SUBJECT": "Conta aprovada — Profile Info",
   "ACCOUNT_ENABLED_TEXT": "Olá {name},\n\nUm administrador aprovou sua conta. Entre com o e-mail e a senha do cadastro.\n\nBem-vindo(a) — Profile Info\n",
   "ACCOUNT_ENABLED_HTML": "<p style=\"margin:0 0 16px;font-size:16px;line-height:1.6;color:#3f3f46;\">Olá {name},</p><p style=\"margin:0;font-size:16px;line-height:1.6;color:#3f3f46;\">Um administrador aprovou sua conta. Entre com o e-mail e a senha do cadastro.</p>"

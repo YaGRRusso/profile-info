@@ -11,9 +11,6 @@ describe("OnUserRegisteredListener", () => {
 
   beforeEach(async () => {
     jest.clearAllMocks();
-    jest.spyOn(I18nContext, "current").mockReturnValue({
-      t: jest.fn((key: string) => `translated:${key}`),
-    } as unknown as I18nContext);
 
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -33,7 +30,11 @@ describe("OnUserRegisteredListener", () => {
     jest.restoreAllMocks();
   });
 
-  it("sends html and text registration email", async () => {
+  it("sends the pt Resend template when request lang is pt", async () => {
+    jest.spyOn(I18nContext, "current").mockReturnValue({
+      lang: "pt",
+    } as unknown as I18nContext);
+
     await listener.handle(
       new UserRegisteredEvent(
         "507f1f77bcf86cd799439013",
@@ -43,14 +44,40 @@ describe("OnUserRegisteredListener", () => {
     );
 
     expect(emailProvider.send).toHaveBeenCalledWith({
-      html: "translated:mail.REGISTERED_HTML",
-      subject: "translated:mail.REGISTERED_SUBJECT",
-      text: "translated:mail.REGISTERED_TEXT",
+      template: {
+        id: "register-pt",
+        variables: { name: "Jane" },
+      },
+      to: "jane@example.com",
+    });
+  });
+
+  it("falls back to register-en for other locales", async () => {
+    jest.spyOn(I18nContext, "current").mockReturnValue({
+      lang: "es",
+    } as unknown as I18nContext);
+
+    await listener.handle(
+      new UserRegisteredEvent(
+        "507f1f77bcf86cd799439013",
+        "jane@example.com",
+        "Jane"
+      )
+    );
+
+    expect(emailProvider.send).toHaveBeenCalledWith({
+      template: {
+        id: "register-en",
+        variables: { name: "Jane" },
+      },
       to: "jane@example.com",
     });
   });
 
   it("swallows EmailProvider errors", async () => {
+    jest.spyOn(I18nContext, "current").mockReturnValue({
+      lang: "en",
+    } as unknown as I18nContext);
     emailProvider.send.mockRejectedValue(new Error("resend down"));
     const warn = jest.spyOn(Logger.prototype, "warn").mockImplementation();
 

@@ -56,4 +56,28 @@ describe("resendRequestMapper", () => {
       to: ["a@example.com", "b@example.com"],
     });
   });
+
+  it("maps template messages without html or text", () => {
+    expect(
+      resendRequestMapper(
+        {
+          template: {
+            id: "register-en",
+            variables: { name: "Jane" },
+          },
+          to: "user@example.com",
+        },
+        "from@example.com"
+      )
+    ).toEqual({
+      from: "from@example.com",
+      replyTo: undefined,
+      subject: undefined,
+      template: {
+        id: "register-en",
+        variables: { name: "Jane" },
+      },
+      to: "user@example.com",
+    });
+  });
 });
