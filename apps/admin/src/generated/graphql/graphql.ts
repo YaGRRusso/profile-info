@@ -505,7 +505,6 @@ export type UpdateUserInput = {
   address?: string | null | undefined;
   avatar?: string | null | undefined;
   birth?: string | null | undefined;
-  disabled?: boolean | null | undefined;
   email?: string | null | undefined;
   i18n?: Array<CreateUserMessagesInputTranslationInput> | null | undefined;
   name?: string | null | undefined;
@@ -927,6 +926,22 @@ export type RemoveManyUsersMutationVariables = Exact<{
 
 
 export type RemoveManyUsersMutation = { removeManyUsers: { succeeded: number, failed: number } };
+
+export type ToggleStatusOneUserMutationVariables = Exact<{
+  userId: string | number;
+  disabled: boolean;
+}>;
+
+
+export type ToggleStatusOneUserMutation = { toggleStatusOneUser: { id: string } };
+
+export type ToggleStatusManyUsersMutationVariables = Exact<{
+  userIds: Array<string | number> | string | number;
+  disabled: boolean;
+}>;
+
+
+export type ToggleStatusManyUsersMutation = { toggleStatusManyUsers: { succeeded: number, failed: number } };
 
 export type FindManyApiTokensQueryVariables = Exact<{
   apiTokenFilters?: FilterApiTokenInput | null | undefined;
@@ -1601,6 +1616,21 @@ export const RemoveManyUsersDocument = new TypedDocumentString(`
   }
 }
     `) as unknown as TypedDocumentString<RemoveManyUsersMutation, RemoveManyUsersMutationVariables>;
+export const ToggleStatusOneUserDocument = new TypedDocumentString(`
+    mutation ToggleStatusOneUser($userId: ID!, $disabled: Boolean!) {
+  toggleStatusOneUser(userId: $userId, disabled: $disabled) {
+    id
+  }
+}
+    `) as unknown as TypedDocumentString<ToggleStatusOneUserMutation, ToggleStatusOneUserMutationVariables>;
+export const ToggleStatusManyUsersDocument = new TypedDocumentString(`
+    mutation ToggleStatusManyUsers($userIds: [ID!]!, $disabled: Boolean!) {
+  toggleStatusManyUsers(userIds: $userIds, disabled: $disabled) {
+    succeeded
+    failed
+  }
+}
+    `) as unknown as TypedDocumentString<ToggleStatusManyUsersMutation, ToggleStatusManyUsersMutationVariables>;
 export const FindManyApiTokensDocument = new TypedDocumentString(`
     query FindManyApiTokens($apiTokenFilters: FilterApiTokenInput, $apiTokenPagination: PaginationInput, $apiTokenSort: SortApiTokenInput) {
   findManyApiTokens(

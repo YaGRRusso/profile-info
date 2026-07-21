@@ -27,9 +27,9 @@ const SIGN_IN = `
   }
 `;
 
-const UPDATE_ONE_USER = `
-  mutation UpdateOneUser($userId: ID!, $updateUserInput: UpdateUserInput!) {
-    updateOneUser(userId: $userId, updateUserInput: $updateUserInput) {
+const TOGGLE_STATUS_ONE_USER = `
+  mutation ToggleStatusOneUser($userId: ID!, $disabled: Boolean!) {
+    toggleStatusOneUser(userId: $userId, disabled: $disabled) {
       id
       disabled
     }
@@ -119,10 +119,10 @@ describe("User registration (e2e)", () => {
     });
 
     await graphqlRequest(app, {
-      query: UPDATE_ONE_USER,
+      query: TOGGLE_STATUS_ONE_USER,
       token: adminToken,
       variables: {
-        updateUserInput: { disabled: false },
+        disabled: false,
         userId: user.id,
       },
     });
@@ -147,10 +147,10 @@ describe("User registration (e2e)", () => {
     });
 
     await graphqlRequest(app, {
-      query: UPDATE_ONE_USER,
+      query: TOGGLE_STATUS_ONE_USER,
       token: adminToken,
       variables: {
-        updateUserInput: { disabled: true },
+        disabled: true,
         userId: user.id,
       },
     });

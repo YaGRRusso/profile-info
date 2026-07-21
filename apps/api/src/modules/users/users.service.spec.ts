@@ -5,7 +5,9 @@ import { testSuperAdminContext } from "@test/fixtures/auth-context";
 import { hash } from "bcryptjs";
 import { UserRole } from "@/core/enums/user-role.enum";
 import { DomainEvents } from "@/core/events/domain-events";
+import { UserAccountEnabledEvent } from "@/core/events/user-account-enabled.event";
 import { UserDeletedEvent } from "@/core/events/user-deleted.event";
+import { UserRegisteredEvent } from "@/core/events/user-registered.event";
 import { createMockCrud } from "@/core/persistence/repositories/testing/service-spec.mock";
 import { SkillsValidatorService } from "@/modules/skills/skills-validator.service";
 import { UsersRepository } from "./users.repository";
@@ -128,12 +130,10 @@ describe("UsersService", () => {
     };
 
     it("creates a disabled USER account", async () => {
-      crud.createOne.mockResolvedValue({ ...fakeUser, ...registerInput });
+      const created = { ...fakeUser, ...registerInput, disabled: true };
+      crud.createOne.mockResolvedValue(created);
 
-      await expect(service.register(registerInput)).resolves.toEqual({
-        ...fakeUser,
-        ...registerInput,
-      });
+      await expect(service.register(registerInput)).resolves.toEqual(created);
 
       expect(crud.createOne).toHaveBeenCalledWith({
         ...registerInput,
@@ -141,6 +141,23 @@ describe("UsersService", () => {
         password: "hashed-password",
         role: UserRole.USER,
       });
+    });
+
+    it("emits user.registered after create", async () => {
+      const created = {
+        ...fakeUser,
+        ...registerInput,
+        disabled: true,
+        id: validId,
+      };
+      crud.createOne.mockResolvedValue(created);
+
+      await service.register(registerInput);
+
+      expect(eventEmitter.emitAsync).toHaveBeenCalledWith(
+        DomainEvents.user.registered,
+        new UserRegisteredEvent(validId, created.email, created.name)
+      );
     });
   });
 
@@ -262,6 +279,94 @@ describe("UsersService", () => {
       expect(crud.updateOneById).toHaveBeenCalledWith(validId, {
         name: "Jane",
       });
+    });
+
+    it("does not emit account-enabled", async () => {
+      crud.updateOneById.mockResolvedValue(fakeUser);
+
+      await service.updateOne(ctx, validId, { name: "Jane" });
+
+      expect(eventEmitter.emitAsync).not.toHaveBeenCalled();
+    });
+  });
+
+  describe("toggleStatusOne", () => {
+    it("emits user.account-enabled when disabled becomes false", async () => {
+      const disabledUser = { ...fakeUser, disabled: true };
+      const enabledUser = { ...fakeUser, disabled: false };
+      crud.findOneById.mockResolvedValue(disabledUser);
+      crud.updateOneById.mockResolvedValue(enabledUser);
+
+      await service.toggleStatusOne(validId, false);
+
+      expect(crud.updateOneById).toHaveBeenCalledWith(validId, {
+        disabled: false,
+      });
+      expect(eventEmitter.emitAsync).toHaveBeenCalledWith(
+        DomainEvents.user.accountEnabled,
+        new UserAccountEnabledEvent(
+          validId,
+          enabledUser.email,
+          enabledUser.name
+        )
+      );
+    });
+
+    it("does not emit when disabling", async () => {
+      crud.findOneById.mockResolvedValue(fakeUser);
+      crud.updateOneById.mockResolvedValue({ ...fakeUser, disabled: true });
+
+      await service.toggleStatusOne(validId, true);
+
+      expect(eventEmitter.emitAsync).not.toHaveBeenCalled();
+    });
+
+    it("does not emit when the account was already enabled", async () => {
+      crud.findOneById.mockResolvedValue(fakeUser);
+      crud.updateOneById.mockResolvedValue(fakeUser);
+
+      await service.toggleStatusOne(validId, false);
+
+      expect(eventEmitter.emitAsync).not.toHaveBeenCalled();
+    });
+  });
+
+  describe("toggleStatusMany", () => {
+    it("emits user.account-enabled for each previously disabled user", async () => {
+      const otherId = "507f1f77bcf86cd799439014";
+      const disabledA = {
+        ...fakeUser,
+        disabled: true,
+        email: "a@example.com",
+        id: validId,
+        name: "A",
+      };
+      const enabledB = {
+        ...fakeUser,
+        disabled: false,
+        email: "b@example.com",
+        id: otherId,
+        name: "B",
+      };
+      crud.findManyById.mockResolvedValue([disabledA, enabledB]);
+      crud.updateManyById.mockResolvedValue({ failed: 0, succeeded: 2 });
+
+      await service.toggleStatusMany([validId, otherId], false);
+
+      expect(eventEmitter.emitAsync).toHaveBeenCalledTimes(1);
+      expect(eventEmitter.emitAsync).toHaveBeenCalledWith(
+        DomainEvents.user.accountEnabled,
+        new UserAccountEnabledEvent(validId, "a@example.com", "A")
+      );
+    });
+
+    it("does not load or emit when disabling", async () => {
+      crud.updateManyById.mockResolvedValue({ failed: 0, succeeded: 1 });
+
+      await service.toggleStatusMany([validId], true);
+
+      expect(crud.findManyById).not.toHaveBeenCalled();
+      expect(eventEmitter.emitAsync).not.toHaveBeenCalled();
     });
   });
 

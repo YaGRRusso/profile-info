@@ -39,7 +39,8 @@ platform        ← transport composition (GraphQL wiring, DataLoader aggregatio
 | **`integrations/open-router/`** | OpenRouter adapter + AI port (`ai-chat.provider.ts`). Binds `AiChatProvider` → `OpenRouterService`; mappers translate SDK ↔ loose DTO. | SDK and port live together; `ai-tools` owns strong GraphQL types. |
 | **`integrations/tavily/`** | Tavily adapter: `WebContentProvider` (page extract) + `WebSearchProvider` (query search). | AI context enrichment (ADR 004). |
 | **`integrations/sentry/`** | Sentry adapter + `ErrorMonitoringProvider`. Enabled by `SENTRY_DSN`; `GET /sentry-test` smoke; filter reports ≥ 500. | Error monitoring. |
-| **`integrations/resend/`** | Resend adapter + `EmailProvider`. Enabled by `RESEND_API_KEY`; default sender via `EMAIL_FROM`. Neutral `send` only (no templates yet). | Transactional email delivery. |
+| **`integrations/resend/`** | Resend adapter + `EmailProvider`. Enabled by `RESEND_API_KEY`; default sender via `EMAIL_FROM`. Neutral `send` only. | Transactional email delivery. |
+| **`modules/mail/`** | Event listeners for `user.registered` / `user.account-enabled`; nestjs-i18n `mail.*` copy + `EmailProvider`. Fail-open. | User lifecycle emails. |
 | **`modules/`** | Business domains. Each CRUD entity = resolver + service + schema + entity + dto. | Where profile rules and GraphQL operations live. |
 | **`platform/graphql/`** | GraphQL transport: `GraphqlModule`, `LoadersService`, loader registry augmentation. | Apollo wiring and per-request context. |
 | **`modules/auth/`** | JWT strategies, `signIn`, `getMe`. `GqlAuthenticationGuard` + `GqlAuthorizationGuard`. | Security cross-cut; uses `UsersService.findOneByEmailWithPassword`. |

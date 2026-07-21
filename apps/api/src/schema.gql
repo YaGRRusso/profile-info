@@ -532,6 +532,8 @@ type Mutation {
   removeOneUser(userId: ID!): UserEntity!
   signIn(signInInput: SignInInput!): String!
   summarize(summarizeInput: SummarizeInput!): AiEntity!
+  toggleStatusManyUsers(disabled: Boolean!, userIds: [ID!]!): BatchEntity!
+  toggleStatusOneUser(disabled: Boolean!, userId: ID!): UserEntity!
   translate(translateInput: TranslateInput!): AiEntity!
   updateManyApiTokens(apiTokenIds: [ID!]!, updateApiTokenInput: UpdateApiTokenInput!): BatchEntity!
   updateManyCourses(courseIds: [ID!]!, updateCourseInput: UpdateCourseInput!): BatchEntity!
@@ -893,7 +895,6 @@ input UpdateUserInput {
   address: String
   avatar: String
   birth: String
-  disabled: Boolean
   email: String
   i18n: [CreateUserMessagesInputTranslationInput!]
   name: String

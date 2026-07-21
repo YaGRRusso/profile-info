@@ -1,0 +1,8 @@
+{
+  "REGISTERED_SUBJECT": "Registration received — Profile Info",
+  "REGISTERED_TEXT": "Hi {name},\n\nThanks for signing up. Your account is waiting for admin approval, so you can't sign in yet. We'll email you when it's ready.\n\nDidn't create this account? Ignore this email.\n\n— Profile Info\n",
+  "REGISTERED_HTML": "<p style=\"margin:0 0 16px;font-size:16px;line-height:1.6;color:#3f3f46;\">Hi {name},</p><p style=\"margin:0 0 16px;font-size:16px;line-height:1.6;color:#3f3f46;\">Thanks for signing up. Your account is waiting for admin approval, so you can't sign in yet. We'll email you when it's ready.</p><p style=\"margin:0;font-size:14px;line-height:1.6;color:#71717a;\">Didn't create this account? Ignore this email.</p>",
+  "ACCOUNT_ENABLED_SUBJECT": "You're approved — Profile Info",
+  "ACCOUNT_ENABLED_TEXT": "Hi {name},\n\nAn admin approved your account. Sign in with the email and password you chose at registration.\n\nWelcome — Profile Info\n",
+  "ACCOUNT_ENABLED_HTML": "<p style=\"margin:0 0 16px;font-size:16px;line-height:1.6;color:#3f3f46;\">Hi {name},</p><p style=\"margin:0;font-size:16px;line-height:1.6;color:#3f3f46;\">An admin approved your account. Sign in with the email and password you chose at registration.</p>"
+}

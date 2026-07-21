@@ -131,6 +131,24 @@ export class UsersResolver {
 
   @Roles(UserRole.SUPER_ADMIN)
   @Mutation(() => UserEntity)
+  toggleStatusOneUser(
+    @Args("userId", { type: () => ID }) userId: string,
+    @Args("disabled", { type: () => Boolean }) disabled: boolean
+  ) {
+    return this.usersService.toggleStatusOne(userId, disabled);
+  }
+
+  @Roles(UserRole.SUPER_ADMIN)
+  @Mutation(() => BatchEntity)
+  toggleStatusManyUsers(
+    @Args("userIds", { type: () => [ID] }) userIds: string[],
+    @Args("disabled", { type: () => Boolean }) disabled: boolean
+  ) {
+    return this.usersService.toggleStatusMany(userIds, disabled);
+  }
+
+  @Roles(UserRole.SUPER_ADMIN)
+  @Mutation(() => UserEntity)
   removeOneUser(@Args("userId", { type: () => ID }) userId: string) {
     return this.usersService.removeOne(userId);
   }

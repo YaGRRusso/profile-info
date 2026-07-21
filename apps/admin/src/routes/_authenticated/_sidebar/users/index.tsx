@@ -107,7 +107,7 @@ function RouteComponent() {
           closeForm();
           toast.success(
             tAlert("batchEnabled", {
-              count: data.updateManyUsers.succeeded,
+              count: data.toggleStatusManyUsers.succeeded,
               entityPlural,
             })
           );
@@ -121,7 +121,7 @@ function RouteComponent() {
           closeForm();
           toast.success(
             tAlert("batchDisabled", {
-              count: data.updateManyUsers.succeeded,
+              count: data.toggleStatusManyUsers.succeeded,
               entityPlural,
             })
           );

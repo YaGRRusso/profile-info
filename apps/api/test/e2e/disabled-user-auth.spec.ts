@@ -19,9 +19,9 @@ const SIGN_IN = `
   }
 `;
 
-const UPDATE_ONE_USER = `
-  mutation UpdateOneUser($userId: ID!, $updateUserInput: UpdateUserInput!) {
-    updateOneUser(userId: $userId, updateUserInput: $updateUserInput) {
+const TOGGLE_STATUS_ONE_USER = `
+  mutation ToggleStatusOneUser($userId: ID!, $disabled: Boolean!) {
+    toggleStatusOneUser(userId: $userId, disabled: $disabled) {
       id
       disabled
     }
@@ -117,10 +117,10 @@ describe("Disabled user authentication (e2e)", () => {
     expect(before.data?.getMe.email).toBe("joao@profile.info");
 
     await graphqlRequest(app, {
-      query: UPDATE_ONE_USER,
+      query: TOGGLE_STATUS_ONE_USER,
       token: adminToken,
       variables: {
-        updateUserInput: { disabled: true },
+        disabled: true,
         userId,
       },
     });

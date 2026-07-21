@@ -28,6 +28,7 @@ export type UserCreateRecord = Omit<CreateUserInput, "password"> & {
 
 export type UserUpdateRecord = Omit<UpdateUserInput, "password"> & {
   password?: string;
+  disabled?: boolean;
 };
 
 export class UserMapper

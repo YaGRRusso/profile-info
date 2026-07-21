@@ -85,6 +85,23 @@ const removeManyUsers = graphql(`
   }
 `);
 
+const toggleStatusOneUser = graphql(`
+  mutation ToggleStatusOneUser($userId: ID!, $disabled: Boolean!) {
+    toggleStatusOneUser(userId: $userId, disabled: $disabled) {
+      id
+    }
+  }
+`);
+
+const toggleStatusManyUsers = graphql(`
+  mutation ToggleStatusManyUsers($userIds: [ID!]!, $disabled: Boolean!) {
+    toggleStatusManyUsers(userIds: $userIds, disabled: $disabled) {
+      succeeded
+      failed
+    }
+  }
+`);
+
 function invalidateUserQueries(queryClient: ReturnType<typeof useQueryClient>) {
   queryClient.invalidateQueries({ queryKey: ["findManyUsers"] });
 }
@@ -173,61 +190,41 @@ export function useRemoveManyUsers() {
 }
 
 export function useEnableOneUser() {
-  const updateOneUserMutation = useUpdateOneUser();
-  return {
-    ...updateOneUserMutation,
-    mutate: (
-      userId: string,
-      options?: Parameters<typeof updateOneUserMutation.mutate>[1]
-    ) =>
-      updateOneUserMutation.mutate(
-        { updateUserInput: { disabled: false }, userId },
-        options
-      ),
-  };
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (userId: string) =>
+      request(toggleStatusOneUser, { disabled: false, userId }),
+    mutationKey: ["toggleStatusOneUser", "enable"],
+    onSuccess: () => invalidateUserQueries(queryClient),
+  });
 }
 
 export function useDisableOneUser() {
-  const updateOneUserMutation = useUpdateOneUser();
-  return {
-    ...updateOneUserMutation,
-    mutate: (
-      userId: string,
-      options?: Parameters<typeof updateOneUserMutation.mutate>[1]
-    ) =>
-      updateOneUserMutation.mutate(
-        { updateUserInput: { disabled: true }, userId },
-        options
-      ),
-  };
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (userId: string) =>
+      request(toggleStatusOneUser, { disabled: true, userId }),
+    mutationKey: ["toggleStatusOneUser", "disable"],
+    onSuccess: () => invalidateUserQueries(queryClient),
+  });
 }
 
 export function useEnableManyUsers() {
-  const updateManyUsersMutation = useUpdateManyUsers();
-  return {
-    ...updateManyUsersMutation,
-    mutate: (
-      userIds: string[],
-      options?: Parameters<typeof updateManyUsersMutation.mutate>[1]
-    ) =>
-      updateManyUsersMutation.mutate(
-        { updateUserInput: { disabled: false }, userIds },
-        options
-      ),
-  };
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (userIds: string[]) =>
+      request(toggleStatusManyUsers, { disabled: false, userIds }),
+    mutationKey: ["toggleStatusManyUsers", "enable"],
+    onSuccess: () => invalidateUserQueries(queryClient),
+  });
 }
 
 export function useDisableManyUsers() {
-  const updateManyUsersMutation = useUpdateManyUsers();
-  return {
-    ...updateManyUsersMutation,
-    mutate: (
-      userIds: string[],
-      options?: Parameters<typeof updateManyUsersMutation.mutate>[1]
-    ) =>
-      updateManyUsersMutation.mutate(
-        { updateUserInput: { disabled: true }, userIds },
-        options
-      ),
-  };
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (userIds: string[]) =>
+      request(toggleStatusManyUsers, { disabled: true, userIds }),
+    mutationKey: ["toggleStatusManyUsers", "disable"],
+    onSuccess: () => invalidateUserQueries(queryClient),
+  });
 }

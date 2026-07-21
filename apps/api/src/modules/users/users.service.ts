@@ -6,7 +6,9 @@ import type { AuthContext } from "@/core/context/auth-context.interface";
 import { BatchEntity } from "@/core/entities/batch.entity";
 import { UserRole } from "@/core/enums/user-role.enum";
 import { DomainEvents } from "@/core/events/domain-events";
+import { UserAccountEnabledEvent } from "@/core/events/user-account-enabled.event";
 import { UserDeletedEvent } from "@/core/events/user-deleted.event";
+import { UserRegisteredEvent } from "@/core/events/user-registered.event";
 import { i18nKey } from "@/core/i18n/i18n";
 import type { MultiPaged } from "@/core/persistence/types/output.type";
 import { SkillsValidatorService } from "@/modules/skills/skills-validator.service";
@@ -68,12 +70,19 @@ export class UsersService {
     password,
     ...input
   }: RegisterUserInput): Promise<UserEntityRecord> {
-    return this.repository.crud.createOne({
+    const user = await this.repository.crud.createOne({
       ...input,
       disabled: true,
       password: await hash(password, 8),
       role: UserRole.USER,
     });
+
+    await this.eventEmitter.emitAsync(
+      DomainEvents.user.registered,
+      new UserRegisteredEvent(user.id, user.email, user.name)
+    );
+
+    return user;
   }
 
   async createOne(
@@ -145,6 +154,49 @@ export class UsersService {
     };
 
     return this.repository.crud.updateManyById(ids, update);
+  }
+
+  async toggleStatusOne(
+    id: string,
+    disabled: boolean
+  ): Promise<UserEntityRecord> {
+    const before = await this.repository.crud.findOneById(id);
+    const updated = await this.repository.crud.updateOneById(id, { disabled });
+
+    if (before.disabled && !updated.disabled) {
+      await this.eventEmitter.emitAsync(
+        DomainEvents.user.accountEnabled,
+        new UserAccountEnabledEvent(updated.id, updated.email, updated.name)
+      );
+    }
+
+    return updated;
+  }
+
+  async toggleStatusMany(
+    ids: string[],
+    disabled: boolean
+  ): Promise<BatchEntity> {
+    const beforeUsers = disabled
+      ? []
+      : await this.repository.crud.findManyById(ids);
+
+    const batch = await this.repository.crud.updateManyById(ids, { disabled });
+
+    if (!disabled) {
+      await Promise.all(
+        beforeUsers
+          .filter((user) => user.disabled)
+          .map((user) =>
+            this.eventEmitter.emitAsync(
+              DomainEvents.user.accountEnabled,
+              new UserAccountEnabledEvent(user.id, user.email, user.name)
+            )
+          )
+      );
+    }
+
+    return batch;
   }
 
   async removeOne(id: string): Promise<UserEntityRecord> {

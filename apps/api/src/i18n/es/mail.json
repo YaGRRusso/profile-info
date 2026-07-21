@@ -1,0 +1,8 @@
+{
+  "REGISTERED_SUBJECT": "Registro recibido — Profile Info",
+  "REGISTERED_TEXT": "Hola {name},\n\nGracias por registrarte. Tu cuenta espera la aprobación de un administrador, así que aún no puedes iniciar sesión. Te escribiremos cuando esté lista.\n\n¿No creaste esta cuenta? Ignora este correo.\n\n— Profile Info\n",
+  "REGISTERED_HTML": "<p style=\"margin:0 0 16px;font-size:16px;line-height:1.6;color:#3f3f46;\">Hola {name},</p><p style=\"margin:0 0 16px;font-size:16px;line-height:1.6;color:#3f3f46;\">Gracias por registrarte. Tu cuenta espera la aprobación de un administrador, así que aún no puedes iniciar sesión. Te escribiremos cuando esté lista.</p><p style=\"margin:0;font-size:14px;line-height:1.6;color:#71717a;\">¿No creaste esta cuenta? Ignora este correo.</p>",
+  "ACCOUNT_ENABLED_SUBJECT": "Cuenta aprobada — Profile Info",
+  "ACCOUNT_ENABLED_TEXT": "Hola {name},\n\nUn administrador aprobó tu cuenta. Entra con el correo y la contraseña del registro.\n\nBienvenido/a — Profile Info\n",
+  "ACCOUNT_ENABLED_HTML": "<p style=\"margin:0 0 16px;font-size:16px;line-height:1.6;color:#3f3f46;\">Hola {name},</p><p style=\"margin:0;font-size:16px;line-height:1.6;color:#3f3f46;\">Un administrador aprobó tu cuenta. Entra con el correo y la contraseña del registro.</p>"
+}

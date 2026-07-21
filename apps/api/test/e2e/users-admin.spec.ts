@@ -258,7 +258,7 @@ describe("Users admin (e2e)", () => {
       query: UPDATE_ONE_USER,
       token: userToken,
       variables: {
-        updateUserInput: { disabled: true },
+        updateUserInput: { name: "Nope" },
         userId,
       },
     });
