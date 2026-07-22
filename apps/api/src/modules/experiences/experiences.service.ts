@@ -12,8 +12,10 @@ import { SkillsValidatorService } from "@/modules/skills/skills-validator.servic
 import { CreateExperienceInput } from "./dto/create-experience.input";
 import { FilterExperienceInput } from "./dto/filter-experience.input";
 import { SortExperienceInput } from "./dto/sort-experience.input";
+import { SortGroupedExperienceInput } from "./dto/sort-grouped-experience.input";
 import { UpdateExperienceInput } from "./dto/update-experience.input";
 import type { ExperienceEntityRecord } from "./entities/experience.entity";
+import type { GroupedExperienceEntityRecord } from "./entities/grouped-experience.entity";
 import { ExperiencesRepository } from "./experiences.repository";
 
 interface ExperienceCatalogRefs {
@@ -71,6 +73,41 @@ export class ExperiencesService {
       skip,
       sort,
     });
+  }
+
+  findManyGrouped(
+    ctx: AuthContext,
+    {
+      filters,
+      sort,
+      skip = 0,
+      limit = 50,
+    }: {
+      filters?: FilterExperienceInput;
+      sort?: SortGroupedExperienceInput;
+      limit?: number;
+      skip?: number;
+    }
+  ): Promise<MultiPaged<GroupedExperienceEntityRecord>> {
+    return this.repository.findManyGrouped(ctx, {
+      filters,
+      limit,
+      skip,
+      sort,
+    });
+  }
+
+  findOneGrouped(
+    ctx: AuthContext,
+    {
+      filters,
+      sort,
+    }: {
+      filters?: FilterExperienceInput;
+      sort?: SortGroupedExperienceInput;
+    }
+  ): Promise<GroupedExperienceEntityRecord> {
+    return this.repository.findOneGrouped(ctx, { filters, sort });
   }
 
   async createOne(

@@ -7,6 +7,9 @@ import {
 import type { BaseEntity } from "@/core/entities/base.entity";
 import type { BaseModel } from "@/core/schemas/base.schema";
 
+export type IdLike = string | { toString: () => string } | null | undefined;
+export type IdLikeList = IdLike[] | null | undefined;
+
 export function toBaseEntityFields(
   model: BaseModel
 ): Pick<BaseEntity, "id" | "createdAt" | "updatedAt"> {
@@ -17,31 +20,30 @@ export function toBaseEntityFields(
   };
 }
 
-export function toIdString(
-  value: string | { toString: () => string } | undefined
-): string | undefined {
-  if (isNil(value)) return;
+export function toIdString(value: IdLike): string | null | undefined {
+  if (isNil(value)) return value;
   return String(value);
 }
 
-export function toIdStrings(
-  values: (string | { toString: () => string })[] | undefined
-): string[] | undefined {
-  return values?.map((value) => String(value));
+export function toIdStrings(values: IdLikeList): string[] | null | undefined {
+  if (isNil(values)) return values;
+  return values.map((value) => String(value));
 }
 
 export function toObjectId(
-  value: string | { toString: () => string }
-): mongoose.Types.ObjectId {
+  value: IdLike
+): mongoose.Types.ObjectId | null | undefined {
+  if (isNil(value)) return value;
   const id = String(value);
   assertValidObjectId(id);
   return new mongoose.Types.ObjectId(id);
 }
 
 export function toObjectIds(
-  values: string[] | null | undefined
+  values: IdLikeList
 ): mongoose.Types.ObjectId[] | null | undefined {
   if (isNil(values)) return values;
-  assertValidObjectIds(values);
-  return values.map((value) => new mongoose.Types.ObjectId(value));
+  const ids = values.map((value) => String(value));
+  assertValidObjectIds(ids);
+  return ids.map((id) => new mongoose.Types.ObjectId(id));
 }

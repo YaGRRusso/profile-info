@@ -19,11 +19,16 @@ import { UserEntity } from "@/modules/users/entities/user.entity";
 import { CreateExperienceInput } from "./dto/create-experience.input";
 import { FilterExperienceInput } from "./dto/filter-experience.input";
 import { SortExperienceInput } from "./dto/sort-experience.input";
+import { SortGroupedExperienceInput } from "./dto/sort-grouped-experience.input";
 import { UpdateExperienceInput } from "./dto/update-experience.input";
 import {
   ExperienceEntity,
   PaginatedExperienceEntity,
 } from "./entities/experience.entity";
+import {
+  GroupedExperienceEntity,
+  PaginatedGroupedExperienceEntity,
+} from "./entities/grouped-experience.entity";
 import { ExperiencesService } from "./experiences.service";
 
 @Resolver(() => ExperienceEntity)
@@ -85,6 +90,53 @@ export class ExperiencesResolver {
       filters: experienceFilters,
       limit: experiencePagination?.limit,
       skip: experiencePagination?.skip,
+      sort: experienceSort,
+    });
+  }
+
+  @Query(() => PaginatedGroupedExperienceEntity)
+  findManyGroupedExperiences(
+    @Auth() ctx: AuthContext,
+    @Args("experienceFilters", {
+      nullable: true,
+      type: () => FilterExperienceInput,
+    })
+    experienceFilters?: FilterExperienceInput,
+    @Args("experiencePagination", {
+      nullable: true,
+      type: () => PaginationInput,
+    })
+    experiencePagination?: PaginationInput,
+    @Args("experienceSort", {
+      nullable: true,
+      type: () => SortGroupedExperienceInput,
+    })
+    experienceSort?: SortGroupedExperienceInput
+  ) {
+    return this.experiencesService.findManyGrouped(ctx, {
+      filters: experienceFilters,
+      limit: experiencePagination?.limit,
+      skip: experiencePagination?.skip,
+      sort: experienceSort,
+    });
+  }
+
+  @Query(() => GroupedExperienceEntity)
+  findOneGroupedExperience(
+    @Auth() ctx: AuthContext,
+    @Args("experienceFilters", {
+      nullable: true,
+      type: () => FilterExperienceInput,
+    })
+    experienceFilters?: FilterExperienceInput,
+    @Args("experienceSort", {
+      nullable: true,
+      type: () => SortGroupedExperienceInput,
+    })
+    experienceSort?: SortGroupedExperienceInput
+  ) {
+    return this.experiencesService.findOneGrouped(ctx, {
+      filters: experienceFilters,
       sort: experienceSort,
     });
   }
@@ -181,5 +233,28 @@ export class ExperiencesResolver {
     const { ownerId, skillIds } = experience;
     if (!(skillIds && ownerId)) return [];
     return ctx.loaders.batchSkills.forKey(ownerId).loadMany(skillIds);
+  }
+}
+
+@Resolver(() => GroupedExperienceEntity)
+export class GroupedExperiencesResolver {
+  @ResolveField(() => UserEntity)
+  owner(
+    @Parent() group: GroupedExperienceEntity,
+    @Context() ctx: GraphqlContext
+  ) {
+    const { ownerId } = group;
+    if (!ownerId) return null;
+    return ctx.loaders.batchUsers.load(ownerId);
+  }
+
+  @ResolveField(() => OrganizationEntity, { nullable: true })
+  organization(
+    @Parent() group: GroupedExperienceEntity,
+    @Context() ctx: GraphqlContext
+  ) {
+    const { ownerId, organizationId } = group;
+    if (!(organizationId && ownerId)) return null;
+    return ctx.loaders.batchOrganizations.forKey(ownerId).load(organizationId);
   }
 }

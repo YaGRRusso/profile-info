@@ -7,7 +7,10 @@ import {
 import { OrganizationsModule } from "@/modules/organizations/organizations.module";
 import { SkillsModule } from "@/modules/skills/skills.module";
 import { ExperiencesRepository } from "./experiences.repository";
-import { ExperiencesResolver } from "./experiences.resolver";
+import {
+  ExperiencesResolver,
+  GroupedExperiencesResolver,
+} from "./experiences.resolver";
 import { ExperiencesService } from "./experiences.service";
 import { OnOrganizationDeletedListener } from "./listeners/on-organization-deleted.listener";
 import { OnSkillDeletedListener } from "./listeners/on-skill-deleted.listener";
@@ -25,6 +28,7 @@ import { OnUserDeletedListener } from "./listeners/on-user-deleted.listener";
   providers: [
     ExperiencesRepository,
     ExperiencesResolver,
+    GroupedExperiencesResolver,
     ExperiencesService,
     OnSkillDeletedListener,
     OnOrganizationDeletedListener,

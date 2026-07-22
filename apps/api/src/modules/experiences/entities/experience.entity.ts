@@ -41,7 +41,7 @@ export class ExperienceEntity extends BaseEntity {
   owner: UserEntity;
 
   @OptionalField(() => ID)
-  organizationId?: string;
+  organizationId?: string | null;
 
   @OptionalField(() => OrganizationEntity)
   organization?: OrganizationEntity;
@@ -56,7 +56,7 @@ export class ExperienceEntity extends BaseEntity {
   period?: DateRangeEntity;
 
   @OptionalField(() => [ID])
-  skillIds?: string[];
+  skillIds?: string[] | null;
 
   @OptionalField(() => [SkillEntity])
   skills?: SkillEntity[];

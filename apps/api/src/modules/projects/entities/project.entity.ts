@@ -39,7 +39,7 @@ export class ProjectEntity extends BaseEntity {
   images?: string[];
 
   @OptionalField(() => [ID])
-  skillIds?: string[];
+  skillIds?: string[] | null;
 
   @OptionalField(() => [SkillEntity])
   skills?: SkillEntity[];

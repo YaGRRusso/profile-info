@@ -1,5 +1,6 @@
 import { Test, TestingModule } from "@nestjs/testing";
 import { testAuthContext } from "@test/fixtures/auth-context";
+import { SortEnum } from "@/core/enums/sort.enum";
 import {
   createMockCrud,
   createMockStats,
@@ -30,6 +31,8 @@ describe("ExperiencesService", () => {
     tenantCrud: jest.Mock;
     tenantStats: jest.Mock;
     detachSkill: jest.Mock;
+    findManyGrouped: jest.Mock;
+    findOneGrouped: jest.Mock;
     purgeByOrganization: jest.Mock;
     purgeByOwner: jest.Mock;
     countByOwners: jest.Mock;
@@ -42,6 +45,8 @@ describe("ExperiencesService", () => {
     repository = {
       countByOwners: jest.fn(),
       detachSkill: jest.fn(),
+      findManyGrouped: jest.fn(),
+      findOneGrouped: jest.fn(),
       purgeByOrganization: jest.fn(),
       purgeByOwner: jest.fn(),
       tenantCrud: jest.fn().mockReturnValue(crud),
@@ -148,6 +153,44 @@ describe("ExperiencesService", () => {
       });
       expect(repository.tenantCrud).toHaveBeenCalledWith(ctx);
       expect(crud.deleteManyById).toHaveBeenCalledWith([validId]);
+    });
+  });
+
+  describe("findManyGrouped", () => {
+    it("delegates to repository.findManyGrouped", async () => {
+      const page = { found: 1, nodes: [] };
+      repository.findManyGrouped.mockResolvedValue(page);
+
+      await expect(
+        service.findManyGrouped(ctx, {
+          limit: 3,
+          sort: { relevance: SortEnum.DESC },
+        })
+      ).resolves.toBe(page);
+      expect(repository.findManyGrouped).toHaveBeenCalledWith(ctx, {
+        filters: undefined,
+        limit: 3,
+        skip: 0,
+        sort: { relevance: SortEnum.DESC },
+      });
+    });
+  });
+
+  describe("findOneGrouped", () => {
+    it("delegates to repository.findOneGrouped", async () => {
+      const group = { experiences: [], organizationId };
+      repository.findOneGrouped.mockResolvedValue(group);
+
+      await expect(
+        service.findOneGrouped(ctx, {
+          filters: { organizationId },
+          sort: { relevance: SortEnum.DESC },
+        })
+      ).resolves.toBe(group);
+      expect(repository.findOneGrouped).toHaveBeenCalledWith(ctx, {
+        filters: { organizationId },
+        sort: { relevance: SortEnum.DESC },
+      });
     });
   });
 

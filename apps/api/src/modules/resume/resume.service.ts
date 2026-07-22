@@ -4,6 +4,7 @@ import { pickTranslation } from "@/common/helpers/pick-translation.helper";
 import { DEFAULT_LOCALE, type LocaleCode } from "@/common/i18n/locales";
 import { toSessionAuthContext } from "@/core/context/auth-context.helper";
 import { UserRole } from "@/core/enums/user-role.enum";
+import { toIdString } from "@/core/mappers/base.mapper";
 import { CoursesService } from "@/modules/courses/courses.service";
 import { CourseStatus } from "@/modules/courses/enums/status.enum";
 import { EducationsService } from "@/modules/educations/educations.service";
@@ -25,11 +26,6 @@ import type {
   ResumeHeader,
   ResumeProject,
 } from "./types/resume-document.type";
-
-function toIdString(value: unknown): string | undefined {
-  if (!value) return;
-  return String(value);
-}
 
 @Injectable()
 export class ResumeService {

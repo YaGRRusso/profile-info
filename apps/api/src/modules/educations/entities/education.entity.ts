@@ -42,7 +42,7 @@ export class EducationEntity extends BaseEntity {
   owner: UserEntity;
 
   @OptionalField(() => ID)
-  organizationId?: string;
+  organizationId?: string | null;
 
   @OptionalField(() => OrganizationEntity)
   organization?: OrganizationEntity;
@@ -63,7 +63,7 @@ export class EducationEntity extends BaseEntity {
   i18n: EducationTranslationLocale[];
 
   @OptionalField(() => [ID])
-  skillIds?: string[];
+  skillIds?: string[] | null;
 
   @OptionalField(() => [SkillEntity])
   skills?: SkillEntity[];

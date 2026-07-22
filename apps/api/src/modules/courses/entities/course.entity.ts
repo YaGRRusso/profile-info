@@ -40,7 +40,7 @@ export class CourseEntity extends BaseEntity {
   owner: UserEntity;
 
   @OptionalField(() => ID)
-  organizationId?: string;
+  organizationId?: string | null;
 
   @OptionalField(() => OrganizationEntity)
   organization?: OrganizationEntity;
@@ -61,7 +61,7 @@ export class CourseEntity extends BaseEntity {
   i18n: CourseTranslationLocale[];
 
   @OptionalField(() => [ID])
-  skillIds?: string[];
+  skillIds?: string[] | null;
 
   @OptionalField(() => [SkillEntity])
   skills?: SkillEntity[];

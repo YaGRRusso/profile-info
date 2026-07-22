@@ -64,7 +64,7 @@ export class UserEntity extends BaseEntity {
   urls?: UrlEntity[];
 
   @OptionalField(() => [ID])
-  skillIds?: string[];
+  skillIds?: string[] | null;
 
   @OptionalField(() => [SkillEntity])
   skills?: SkillEntity[];

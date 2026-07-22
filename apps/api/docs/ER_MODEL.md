@@ -127,7 +127,8 @@ Both are MongoDB `ObjectId` references. The FK always lives on the document that
   owners.
 - **Experience:** `organizationId`, `skillIds`, `i18n`, and `period` live on the root
   document (one role per experience). Grouping multiple roles at the same company is a
-  read-time concern by `organizationId`.
+  read-time concern by `organizationId` (`findManyGroupedExperiences` paginates by
+  organization and returns every role in each group with aggregated meta).
 - **Private entities:** `ownerId` → `User` (required). Slug uniqueness is compound
   `{ ownerId, slug }`, not global.
 
