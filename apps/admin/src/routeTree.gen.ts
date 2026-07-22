@@ -12,15 +12,15 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as AuthenticatedSidebarRouteImport } from './routes/_authenticated/_sidebar'
 import { Route as AuthenticatedSidebarIndexRouteImport } from './routes/_authenticated/_sidebar/index'
-import { Route as AuthenticatedSidebarUsersIndexRouteImport } from './routes/_authenticated/_sidebar/users/index'
-import { Route as AuthenticatedSidebarSkillsIndexRouteImport } from './routes/_authenticated/_sidebar/skills/index'
-import { Route as AuthenticatedSidebarSettingsIndexRouteImport } from './routes/_authenticated/_sidebar/settings/index'
-import { Route as AuthenticatedSidebarProjectsIndexRouteImport } from './routes/_authenticated/_sidebar/projects/index'
-import { Route as AuthenticatedSidebarOrganizationsIndexRouteImport } from './routes/_authenticated/_sidebar/organizations/index'
-import { Route as AuthenticatedSidebarExperiencesIndexRouteImport } from './routes/_authenticated/_sidebar/experiences/index'
-import { Route as AuthenticatedSidebarEducationsIndexRouteImport } from './routes/_authenticated/_sidebar/educations/index'
-import { Route as AuthenticatedSidebarCoursesIndexRouteImport } from './routes/_authenticated/_sidebar/courses/index'
 import { Route as AuthenticatedSidebarApiTokensIndexRouteImport } from './routes/_authenticated/_sidebar/api-tokens/index'
+import { Route as AuthenticatedSidebarCoursesIndexRouteImport } from './routes/_authenticated/_sidebar/courses/index'
+import { Route as AuthenticatedSidebarEducationsIndexRouteImport } from './routes/_authenticated/_sidebar/educations/index'
+import { Route as AuthenticatedSidebarExperiencesIndexRouteImport } from './routes/_authenticated/_sidebar/experiences/index'
+import { Route as AuthenticatedSidebarOrganizationsIndexRouteImport } from './routes/_authenticated/_sidebar/organizations/index'
+import { Route as AuthenticatedSidebarProjectsIndexRouteImport } from './routes/_authenticated/_sidebar/projects/index'
+import { Route as AuthenticatedSidebarSettingsIndexRouteImport } from './routes/_authenticated/_sidebar/settings/index'
+import { Route as AuthenticatedSidebarSkillsIndexRouteImport } from './routes/_authenticated/_sidebar/skills/index'
+import { Route as AuthenticatedSidebarUsersIndexRouteImport } from './routes/_authenticated/_sidebar/users/index'
 
 const AuthenticatedRoute = AuthenticatedRouteImport.update({
   id: '/_authenticated',
@@ -36,46 +36,10 @@ const AuthenticatedSidebarIndexRoute =
     path: '/',
     getParentRoute: () => AuthenticatedSidebarRoute,
   } as any)
-const AuthenticatedSidebarUsersIndexRoute =
-  AuthenticatedSidebarUsersIndexRouteImport.update({
-    id: '/users/',
-    path: '/users/',
-    getParentRoute: () => AuthenticatedSidebarRoute,
-  } as any)
-const AuthenticatedSidebarSkillsIndexRoute =
-  AuthenticatedSidebarSkillsIndexRouteImport.update({
-    id: '/skills/',
-    path: '/skills/',
-    getParentRoute: () => AuthenticatedSidebarRoute,
-  } as any)
-const AuthenticatedSidebarSettingsIndexRoute =
-  AuthenticatedSidebarSettingsIndexRouteImport.update({
-    id: '/settings/',
-    path: '/settings/',
-    getParentRoute: () => AuthenticatedSidebarRoute,
-  } as any)
-const AuthenticatedSidebarProjectsIndexRoute =
-  AuthenticatedSidebarProjectsIndexRouteImport.update({
-    id: '/projects/',
-    path: '/projects/',
-    getParentRoute: () => AuthenticatedSidebarRoute,
-  } as any)
-const AuthenticatedSidebarOrganizationsIndexRoute =
-  AuthenticatedSidebarOrganizationsIndexRouteImport.update({
-    id: '/organizations/',
-    path: '/organizations/',
-    getParentRoute: () => AuthenticatedSidebarRoute,
-  } as any)
-const AuthenticatedSidebarExperiencesIndexRoute =
-  AuthenticatedSidebarExperiencesIndexRouteImport.update({
-    id: '/experiences/',
-    path: '/experiences/',
-    getParentRoute: () => AuthenticatedSidebarRoute,
-  } as any)
-const AuthenticatedSidebarEducationsIndexRoute =
-  AuthenticatedSidebarEducationsIndexRouteImport.update({
-    id: '/educations/',
-    path: '/educations/',
+const AuthenticatedSidebarApiTokensIndexRoute =
+  AuthenticatedSidebarApiTokensIndexRouteImport.update({
+    id: '/api-tokens/',
+    path: '/api-tokens/',
     getParentRoute: () => AuthenticatedSidebarRoute,
   } as any)
 const AuthenticatedSidebarCoursesIndexRoute =
@@ -84,10 +48,46 @@ const AuthenticatedSidebarCoursesIndexRoute =
     path: '/courses/',
     getParentRoute: () => AuthenticatedSidebarRoute,
   } as any)
-const AuthenticatedSidebarApiTokensIndexRoute =
-  AuthenticatedSidebarApiTokensIndexRouteImport.update({
-    id: '/api-tokens/',
-    path: '/api-tokens/',
+const AuthenticatedSidebarEducationsIndexRoute =
+  AuthenticatedSidebarEducationsIndexRouteImport.update({
+    id: '/educations/',
+    path: '/educations/',
+    getParentRoute: () => AuthenticatedSidebarRoute,
+  } as any)
+const AuthenticatedSidebarExperiencesIndexRoute =
+  AuthenticatedSidebarExperiencesIndexRouteImport.update({
+    id: '/experiences/',
+    path: '/experiences/',
+    getParentRoute: () => AuthenticatedSidebarRoute,
+  } as any)
+const AuthenticatedSidebarOrganizationsIndexRoute =
+  AuthenticatedSidebarOrganizationsIndexRouteImport.update({
+    id: '/organizations/',
+    path: '/organizations/',
+    getParentRoute: () => AuthenticatedSidebarRoute,
+  } as any)
+const AuthenticatedSidebarProjectsIndexRoute =
+  AuthenticatedSidebarProjectsIndexRouteImport.update({
+    id: '/projects/',
+    path: '/projects/',
+    getParentRoute: () => AuthenticatedSidebarRoute,
+  } as any)
+const AuthenticatedSidebarSettingsIndexRoute =
+  AuthenticatedSidebarSettingsIndexRouteImport.update({
+    id: '/settings/',
+    path: '/settings/',
+    getParentRoute: () => AuthenticatedSidebarRoute,
+  } as any)
+const AuthenticatedSidebarSkillsIndexRoute =
+  AuthenticatedSidebarSkillsIndexRouteImport.update({
+    id: '/skills/',
+    path: '/skills/',
+    getParentRoute: () => AuthenticatedSidebarRoute,
+  } as any)
+const AuthenticatedSidebarUsersIndexRoute =
+  AuthenticatedSidebarUsersIndexRouteImport.update({
+    id: '/users/',
+    path: '/users/',
     getParentRoute: () => AuthenticatedSidebarRoute,
   } as any)
 
@@ -198,53 +198,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedSidebarIndexRouteImport
       parentRoute: typeof AuthenticatedSidebarRoute
     }
-    '/_authenticated/_sidebar/users/': {
-      id: '/_authenticated/_sidebar/users/'
-      path: '/users'
-      fullPath: '/users/'
-      preLoaderRoute: typeof AuthenticatedSidebarUsersIndexRouteImport
-      parentRoute: typeof AuthenticatedSidebarRoute
-    }
-    '/_authenticated/_sidebar/skills/': {
-      id: '/_authenticated/_sidebar/skills/'
-      path: '/skills'
-      fullPath: '/skills/'
-      preLoaderRoute: typeof AuthenticatedSidebarSkillsIndexRouteImport
-      parentRoute: typeof AuthenticatedSidebarRoute
-    }
-    '/_authenticated/_sidebar/settings/': {
-      id: '/_authenticated/_sidebar/settings/'
-      path: '/settings'
-      fullPath: '/settings/'
-      preLoaderRoute: typeof AuthenticatedSidebarSettingsIndexRouteImport
-      parentRoute: typeof AuthenticatedSidebarRoute
-    }
-    '/_authenticated/_sidebar/projects/': {
-      id: '/_authenticated/_sidebar/projects/'
-      path: '/projects'
-      fullPath: '/projects/'
-      preLoaderRoute: typeof AuthenticatedSidebarProjectsIndexRouteImport
-      parentRoute: typeof AuthenticatedSidebarRoute
-    }
-    '/_authenticated/_sidebar/organizations/': {
-      id: '/_authenticated/_sidebar/organizations/'
-      path: '/organizations'
-      fullPath: '/organizations/'
-      preLoaderRoute: typeof AuthenticatedSidebarOrganizationsIndexRouteImport
-      parentRoute: typeof AuthenticatedSidebarRoute
-    }
-    '/_authenticated/_sidebar/experiences/': {
-      id: '/_authenticated/_sidebar/experiences/'
-      path: '/experiences'
-      fullPath: '/experiences/'
-      preLoaderRoute: typeof AuthenticatedSidebarExperiencesIndexRouteImport
-      parentRoute: typeof AuthenticatedSidebarRoute
-    }
-    '/_authenticated/_sidebar/educations/': {
-      id: '/_authenticated/_sidebar/educations/'
-      path: '/educations'
-      fullPath: '/educations/'
-      preLoaderRoute: typeof AuthenticatedSidebarEducationsIndexRouteImport
+    '/_authenticated/_sidebar/api-tokens/': {
+      id: '/_authenticated/_sidebar/api-tokens/'
+      path: '/api-tokens'
+      fullPath: '/api-tokens/'
+      preLoaderRoute: typeof AuthenticatedSidebarApiTokensIndexRouteImport
       parentRoute: typeof AuthenticatedSidebarRoute
     }
     '/_authenticated/_sidebar/courses/': {
@@ -254,11 +212,53 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedSidebarCoursesIndexRouteImport
       parentRoute: typeof AuthenticatedSidebarRoute
     }
-    '/_authenticated/_sidebar/api-tokens/': {
-      id: '/_authenticated/_sidebar/api-tokens/'
-      path: '/api-tokens'
-      fullPath: '/api-tokens/'
-      preLoaderRoute: typeof AuthenticatedSidebarApiTokensIndexRouteImport
+    '/_authenticated/_sidebar/educations/': {
+      id: '/_authenticated/_sidebar/educations/'
+      path: '/educations'
+      fullPath: '/educations/'
+      preLoaderRoute: typeof AuthenticatedSidebarEducationsIndexRouteImport
+      parentRoute: typeof AuthenticatedSidebarRoute
+    }
+    '/_authenticated/_sidebar/experiences/': {
+      id: '/_authenticated/_sidebar/experiences/'
+      path: '/experiences'
+      fullPath: '/experiences/'
+      preLoaderRoute: typeof AuthenticatedSidebarExperiencesIndexRouteImport
+      parentRoute: typeof AuthenticatedSidebarRoute
+    }
+    '/_authenticated/_sidebar/organizations/': {
+      id: '/_authenticated/_sidebar/organizations/'
+      path: '/organizations'
+      fullPath: '/organizations/'
+      preLoaderRoute: typeof AuthenticatedSidebarOrganizationsIndexRouteImport
+      parentRoute: typeof AuthenticatedSidebarRoute
+    }
+    '/_authenticated/_sidebar/projects/': {
+      id: '/_authenticated/_sidebar/projects/'
+      path: '/projects'
+      fullPath: '/projects/'
+      preLoaderRoute: typeof AuthenticatedSidebarProjectsIndexRouteImport
+      parentRoute: typeof AuthenticatedSidebarRoute
+    }
+    '/_authenticated/_sidebar/settings/': {
+      id: '/_authenticated/_sidebar/settings/'
+      path: '/settings'
+      fullPath: '/settings/'
+      preLoaderRoute: typeof AuthenticatedSidebarSettingsIndexRouteImport
+      parentRoute: typeof AuthenticatedSidebarRoute
+    }
+    '/_authenticated/_sidebar/skills/': {
+      id: '/_authenticated/_sidebar/skills/'
+      path: '/skills'
+      fullPath: '/skills/'
+      preLoaderRoute: typeof AuthenticatedSidebarSkillsIndexRouteImport
+      parentRoute: typeof AuthenticatedSidebarRoute
+    }
+    '/_authenticated/_sidebar/users/': {
+      id: '/_authenticated/_sidebar/users/'
+      path: '/users'
+      fullPath: '/users/'
+      preLoaderRoute: typeof AuthenticatedSidebarUsersIndexRouteImport
       parentRoute: typeof AuthenticatedSidebarRoute
     }
   }

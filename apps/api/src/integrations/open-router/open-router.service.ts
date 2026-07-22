@@ -8,6 +8,7 @@ import {
   type IntegrationChatResult,
 } from "./ai-chat.provider";
 import { isOpenRouterAuthError } from "./helpers/is-open-router-auth-error.helper";
+import { isOpenRouterChatResult } from "./helpers/is-open-router-chat-result.helper";
 import { mapOpenRouterError } from "./mappers/open-router-error.mapper";
 import { openRouterRequestMapper } from "./mappers/open-router-request.mapper";
 import { openRouterResultMapper } from "./mappers/open-router-result.mapper";
@@ -62,8 +63,8 @@ export class OpenRouterService extends AiChatProvider {
     const chatRequest = openRouterRequestMapper(request, model);
     const completion = await this.client.chat.send({ chatRequest });
 
-    if (!completion) {
-      throw new Error("No completion received from OpenRouter");
+    if (!isOpenRouterChatResult(completion)) {
+      throw new Error("Expected a non-streaming OpenRouter chat completion");
     }
 
     return openRouterResultMapper(completion);
