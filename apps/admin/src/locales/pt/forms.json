@@ -30,6 +30,16 @@
       "placeholder": "Escolha um...",
       "tooltip": "Versão de idioma deste texto no currículo."
     },
+    "preferredLocale": {
+      "label": "Idioma preferido",
+      "placeholder": "Escolha um...",
+      "tooltip": "Idioma para e-mails e padrões. Precisa ser um dos idiomas suportados."
+    },
+    "supportedLocales": {
+      "label": "Idiomas suportados",
+      "placeholder": "Digite para buscar...",
+      "tooltip": "Idiomas com os quais você trabalha. Adicione um idioma aqui antes de defini-lo como preferido. Você não pode remover o idioma preferido desta lista."
+    },
     "description": {
       "label": "Descrição",
       "placeholder": "Escreva uma breve descrição...",
@@ -230,6 +240,7 @@
       "tooltip": "Sites relacionados (demo, repositório, case e similares)."
     },
     "personal": "Pessoal",
+    "language": "Idioma",
     "contact": "Contato",
     "security": "Segurança",
     "mainSkills": "Principais habilidades"

@@ -22,20 +22,20 @@ export function createEmptyI18n<T extends Record<string, string>>(template: T) {
 }
 
 export function pickTranslation<T extends { locale: string }>(
-  i18n: T[] | undefined,
+  entries: T[] | undefined,
   locale: string,
   fallbacks: readonly string[] = [Locale.En, Locale.Pt, Locale.Es]
 ): T | undefined {
-  if (!i18n?.length) return;
+  if (!entries?.length) return;
 
   const locales = [locale, ...fallbacks.filter((item) => item !== locale)];
 
   for (const candidate of locales) {
-    const match = i18n.find((entry) => entry.locale === candidate);
+    const match = entries.find((entry) => entry.locale === candidate);
     if (match) return match;
   }
 
-  return i18n[0];
+  return entries[0];
 }
 
 interface I18nSource {

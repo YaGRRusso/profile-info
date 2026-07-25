@@ -10,7 +10,6 @@ import { RangeInput } from "@/components/inputs/range";
 import { SelectInput } from "@/components/inputs/select";
 import { TextInput } from "@/components/inputs/text";
 import { TextareaInput } from "@/components/inputs/textarea";
-import { LOCALES } from "@/consts/locales";
 import { RawSizeEnum } from "@/consts/raw-size";
 import { SLUG_REGEX } from "@/consts/regex";
 import {
@@ -23,6 +22,7 @@ import { useQueryAllPages } from "@/hooks/custom/use-query-all-pages";
 import { useAtsSummarize, useTranslate } from "@/hooks/mutations/ai";
 import type { ProjectRow } from "@/hooks/queries/projects";
 import { useFindManySkills } from "@/hooks/queries/skills";
+import { useUserLocaleOptions } from "@/hooks/use-user-locale-options";
 import {
   arrayContextDetails,
   isContextArrayIndex,
@@ -110,6 +110,7 @@ export function ProjectForm({
   state,
 }: ProjectFormProps) {
   const { t: tForm } = useTranslation("forms");
+  const localeOptions = useUserLocaleOptions();
   const { t: tValidation } = useTranslation("validation");
   const { t: tAction } = useTranslation("actions");
   const { i18n } = useTranslation();
@@ -410,7 +411,7 @@ export function ProjectForm({
                       label={tForm("fields.locale.label")}
                       name={field.name}
                       onChange={field.handleChange}
-                      options={LOCALES}
+                      options={localeOptions}
                       placeholder={tForm("fields.locale.placeholder")}
                       tooltip={tForm("fields.locale.tooltip")}
                       value={field.state.value}

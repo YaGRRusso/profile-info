@@ -16,20 +16,25 @@ The admin **chrome** is mostly English. Two concerns must stay separate:
 | **Entity display** | Skill title in a table cell or picker | `lib/i18n.ts` (`pickTranslation`, `i18nLabel`) |
 | **UI copy** | Page help, page/modal titles and descriptions | `react-i18next` + JSON under `src/locales/` |
 
-`i18next` (`src/i18n/index.ts`) is the **single source of truth** for the active locale.
-`i18next-browser-languagedetector` persists the choice in `localStorage` (`i18nextLng`).
-It drives UI strings, `i18nLabel` (via `i18n.language`), and `dayjs` (`languageChanged` →
-`syncDayjsLocale`).
+`i18next` is the **client SSOT** for the active UI locale (localStorage via
+LanguageDetector). `User.locale` (preferred) is the **backend SSOT** for emails
+and account language.
+
+- On `getMe` / profile `updateMe`: if `locale` is set → `i18n.changeLanguage(locale)`.
+- `LocaleSwitch`: always `changeLanguage`; when signed in, also `updateMe({ locale })`.
+  Options are the user's supported `locales` when known (keeps the preferred ∈ locales invariant).
+- No user / no locale on the payload → leave i18next alone (browser preference).
+- Detection: `localStorage` only (no browser-language auto-pick); `fallbackLng` = `en`.
+- Does **not** translate table column headers, filters, or enum labels in cells.
 
 ## Decision
 
-### Active locale (i18next — not a separate Zustand store)
+### Active locale
 
-- `i18next` + `i18next-browser-languagedetector` + `react-i18next`; init in `src/i18n/index.ts`, imported from `main.tsx`.
-- Sidebar switcher calls `i18n.changeLanguage`.
-- Detection: `localStorage` only (no browser-language auto-pick); `fallbackLng` = `en`.
-- Drives entity labels via `i18nLabel` / `pickTranslation` (tables, pickers, modals).
-- Does **not** translate table column headers, filters, or enum labels in cells.
+| Layer | Source of truth |
+|-------|-----------------|
+| Admin UI (i18next) | Client store — detector + `LocaleSwitch` |
+| Backend preferred | `User.locale` |
 
 ### UI strings (react-i18next)
 

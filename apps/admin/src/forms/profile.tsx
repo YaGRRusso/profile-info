@@ -17,12 +17,14 @@ import { SLUG_REGEX } from "@/consts/regex";
 import type { GetMeQuery } from "@/generated/graphql/graphql";
 import {
   DetailInput,
+  Locale,
   ResourceType,
   type UpdateMeInput,
 } from "@/generated/graphql/graphql";
 import { useQueryAllPages } from "@/hooks/custom/use-query-all-pages";
 import { useAtsSummarize, useTranslate } from "@/hooks/mutations/ai";
 import { useFindManySkills } from "@/hooks/queries/skills";
+import { useUserLocaleOptions } from "@/hooks/use-user-locale-options";
 import { toDateInput, toIsoDate } from "@/lib/date";
 import { fieldError } from "@/lib/field-error";
 import { FormError } from "@/lib/form-errors";
@@ -33,35 +35,42 @@ import { createEmptyI18n, i18nLabel, i18nLabelsByIds } from "@/lib/i18n";
 import { useSystemMessagesStore } from "@/stores/system-messages";
 import { CommonFormProps } from "./common";
 
-const profileSchema = z.object({
-  address: z.string(),
-  avatar: z.union([z.literal(""), z.url(FormError.invalidFormat)]),
-  birth: z.union([z.literal(""), z.string()]),
-  email: z.email(FormError.invalidFormat),
-  i18n: z
-    .array(
+const profileSchema = z
+  .object({
+    address: z.string(),
+    avatar: z.union([z.literal(""), z.url(FormError.invalidFormat)]),
+    birth: z.union([z.literal(""), z.string()]),
+    email: z.email(FormError.invalidFormat),
+    i18n: z
+      .array(
+        z.object({
+          description: z.string(),
+          locale: z.string().min(1, FormError.requiredField),
+          title: z.string(),
+        })
+      )
+      .refine(hasUniqueLocales, { message: FormError.uniqueField }),
+    locale: z.enum(Locale, FormError.requiredField),
+    locales: z.array(z.enum(Locale)).min(1, FormError.minCount),
+    name: z.string().min(1, FormError.requiredField),
+    nickname: z
+      .string()
+      .regex(SLUG_REGEX, FormError.invalidFormat)
+      .or(z.literal("")),
+    password: z.union([z.literal(""), z.string().min(8, FormError.minLength)]),
+    phone: z.string(),
+    skillIds: z.array(z.string()),
+    urls: z.array(
       z.object({
-        description: z.string(),
-        locale: z.string().min(1, FormError.requiredField),
-        title: z.string(),
+        title: z.string().min(1, FormError.requiredField),
+        value: z.url(FormError.invalidFormat),
       })
-    )
-    .refine(hasUniqueLocales, { message: FormError.uniqueField }),
-  name: z.string().min(1, FormError.requiredField),
-  nickname: z
-    .string()
-    .regex(SLUG_REGEX, FormError.invalidFormat)
-    .or(z.literal("")),
-  password: z.union([z.literal(""), z.string().min(8, FormError.minLength)]),
-  phone: z.string(),
-  skillIds: z.array(z.string()),
-  urls: z.array(
-    z.object({
-      title: z.string().min(1, FormError.requiredField),
-      value: z.url(FormError.invalidFormat),
-    })
-  ),
-});
+    ),
+  })
+  .refine((value) => value.locales.includes(value.locale), {
+    message: FormError.invalidField,
+    path: ["locale"],
+  });
 
 export type ProfileSchema = z.infer<typeof profileSchema>;
 
@@ -85,6 +94,8 @@ export function profileToForm(user: GetMeUser): Partial<ProfileSchema> {
           title: translation.messages.title ?? "",
         }))
       : createEmptyI18n({ description: "", title: "" }),
+    locale: user.locale ?? Locale.En,
+    locales: user.locales ?? (user.locale ? [user.locale] : []),
     name: user.name,
     nickname: user.nickname,
     password: "",
@@ -119,6 +130,8 @@ export function profileToInput(data: ProfileSchema): UpdateMeInput {
     birth: nullIfEmpty(toIsoDate(data.birth)),
     email: data.email,
     i18n: nullIfEmpty(i18n),
+    locale: data.locale,
+    locales: data.locales,
     name: data.name,
     nickname: data.nickname,
     password: omitIfEmpty(data.password),
@@ -141,6 +154,7 @@ export function ProfileForm({
   const translate = useTranslate();
 
   const { t: tForm } = useTranslation("forms");
+  const localeOptions = useUserLocaleOptions();
   const { t: tValidation } = useTranslation("validation");
   const { t: tAction } = useTranslation("actions");
   const { t: tSystem } = useTranslation("system");
@@ -164,6 +178,8 @@ export function ProfileForm({
       birth: "",
       email: "",
       i18n: createEmptyI18n({ description: "", title: "" }),
+      locale: Locale.En,
+      locales: Array.of<Locale>(),
       name: "",
       nickname: "",
       password: "",
@@ -392,7 +408,7 @@ export function ProfileForm({
                           label={tForm("fields.locale.label")}
                           name={field.name}
                           onChange={field.handleChange}
-                          options={LOCALES}
+                          options={localeOptions}
                           placeholder={tForm("fields.locale.placeholder")}
                           tooltip={tForm("fields.locale.tooltip")}
                           value={field.state.value}
@@ -449,6 +465,54 @@ export function ProfileForm({
               </FieldArray>
             )}
           </Field>
+        </div>
+      </section>
+
+      <section className="rounded-box bg-base-200 p-4 sm:p-6">
+        <h2 className="mb-4 font-semibold text-lg">
+          {tForm("sections.language")}
+        </h2>
+        <div className="grid gap-4 md:grid-cols-2">
+          <Field name="locales">
+            {(field) => (
+              <MultiSelectInput
+                error={fieldError(field.state.meta)}
+                label={tForm("fields.supportedLocales.label")}
+                onChange={(next) => {
+                  const preferred = form.getFieldValue("locale");
+                  if (preferred && !next.includes(preferred)) {
+                    return;
+                  }
+                  field.handleChange(next);
+                }}
+                options={[...LOCALES]}
+                placeholder={tForm("fields.supportedLocales.placeholder")}
+                tooltip={tForm("fields.supportedLocales.tooltip")}
+                value={field.state.value}
+              />
+            )}
+          </Field>
+
+          <Subscribe selector={(state) => state.values.locales}>
+            {(locales) => (
+              <Field name="locale">
+                {(field) => (
+                  <SelectInput
+                    error={fieldError(field.state.meta)}
+                    label={tForm("fields.preferredLocale.label")}
+                    name={field.name}
+                    onChange={field.handleChange}
+                    options={LOCALES.filter((option) =>
+                      locales.includes(option.value)
+                    )}
+                    placeholder={tForm("fields.preferredLocale.placeholder")}
+                    tooltip={tForm("fields.preferredLocale.tooltip")}
+                    value={field.state.value}
+                  />
+                )}
+              </Field>
+            )}
+          </Subscribe>
         </div>
       </section>
 

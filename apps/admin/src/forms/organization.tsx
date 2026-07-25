@@ -9,7 +9,6 @@ import { FieldArray } from "@/components/inputs/field-array";
 import { SelectInput } from "@/components/inputs/select";
 import { TextInput } from "@/components/inputs/text";
 import { TextareaInput } from "@/components/inputs/textarea";
-import { LOCALES } from "@/consts/locales";
 import { RawSizeEnum } from "@/consts/raw-size";
 import { SLUG_REGEX } from "@/consts/regex";
 import {
@@ -21,6 +20,7 @@ import {
 } from "@/generated/graphql/graphql";
 import { useSummarize, useTranslate } from "@/hooks/mutations/ai";
 import { OrganizationRow } from "@/hooks/queries/organizations";
+import { useUserLocaleOptions } from "@/hooks/use-user-locale-options";
 import { fieldError } from "@/lib/field-error";
 import { FormError } from "@/lib/form-errors";
 import { nullIfEmpty } from "@/lib/form-input";
@@ -105,6 +105,7 @@ export function OrganizationForm({
   state,
 }: OrganizationFormProps) {
   const { t: tForm } = useTranslation("forms");
+  const localeOptions = useUserLocaleOptions();
   const { t: tValidation } = useTranslation("validation");
   const { t: tAction } = useTranslation("actions");
 
@@ -337,7 +338,7 @@ export function OrganizationForm({
                       label={tForm("fields.locale.label")}
                       name={field.name}
                       onChange={field.handleChange}
-                      options={LOCALES}
+                      options={localeOptions}
                       placeholder={tForm("fields.locale.placeholder")}
                       tooltip={tForm("fields.locale.tooltip")}
                       value={field.state.value}

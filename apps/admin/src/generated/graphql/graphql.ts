@@ -895,7 +895,7 @@ export type UpdateMeMutationVariables = Exact<{
 }>;
 
 
-export type UpdateMeMutation = { updateMe: { id: string, email: string, name: string, nickname: string, role: UserRole, avatar: string | null, phone: string | null, birth: string | null, address: string | null, i18n: Array<{ locale: string, messages: { title: string | null, description: string | null } }> | null, urls: Array<{ title: string, value: string }> | null } };
+export type UpdateMeMutation = { updateMe: { id: string, email: string, name: string, nickname: string, role: UserRole, avatar: string | null, phone: string | null, birth: string | null, address: string | null, locale: Locale | null, locales: Array<Locale> | null, i18n: Array<{ locale: string, messages: { title: string | null, description: string | null } }> | null, urls: Array<{ title: string, value: string }> | null } };
 
 export type CreateOneUserMutationVariables = Exact<{
   createUserInput: CreateUserInput;
@@ -969,7 +969,7 @@ export type FindManyApiTokensQuery = { findManyApiTokens: { found: number, nodes
 export type GetMeQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetMeQuery = { getMe: { id: string, email: string, name: string, nickname: string, role: UserRole, avatar: string | null, phone: string | null, birth: string | null, address: string | null, skillIds: Array<string> | null, i18n: Array<{ locale: string, messages: { title: string | null, description: string | null } }> | null, urls: Array<{ title: string, value: string }> | null, skills: Array<{ id: string, slug: string | null, i18n: Array<{ locale: string, messages: { title: string } }> }> | null } };
+export type GetMeQuery = { getMe: { id: string, email: string, name: string, nickname: string, role: UserRole, avatar: string | null, phone: string | null, birth: string | null, address: string | null, locale: Locale | null, locales: Array<Locale> | null, skillIds: Array<string> | null, i18n: Array<{ locale: string, messages: { title: string | null, description: string | null } }> | null, urls: Array<{ title: string, value: string }> | null, skills: Array<{ id: string, slug: string | null, i18n: Array<{ locale: string, messages: { title: string } }> }> | null } };
 
 export type FindManyCoursesQueryVariables = Exact<{
   courseFilters?: FilterCourseInput | null | undefined;
@@ -1571,6 +1571,8 @@ export const UpdateMeDocument = new TypedDocumentString(`
     phone
     birth
     address
+    locale
+    locales
     i18n {
       locale
       messages {
@@ -1686,6 +1688,8 @@ export const GetMeDocument = new TypedDocumentString(`
     phone
     birth
     address
+    locale
+    locales
     i18n {
       locale
       messages {

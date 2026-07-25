@@ -1,11 +1,12 @@
 import { useTranslation } from "react-i18next";
-import { LOCALES } from "@/consts/locales";
 import type { Locale } from "@/generated/graphql/graphql";
 import { useDownloadResume } from "@/hooks/mutations/resume";
+import { useUserLocaleOptions } from "@/hooks/use-user-locale-options";
 
 export function DownloadCvControl() {
   const { t: tAction } = useTranslation("actions");
   const downloadResume = useDownloadResume();
+  const localeOptions = useUserLocaleOptions();
 
   return (
     <select
@@ -17,7 +18,7 @@ export function DownloadCvControl() {
       <option disabled value="">
         {tAction("downloadCv")}
       </option>
-      {LOCALES.map((locale) => (
+      {localeOptions.map((locale) => (
         <option key={locale.value} value={locale.value}>
           {locale.label}
         </option>

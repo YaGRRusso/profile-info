@@ -30,6 +30,16 @@
       "placeholder": "Choose one...",
       "tooltip": "Language version of this text on the CV."
     },
+    "preferredLocale": {
+      "label": "Preferred language",
+      "placeholder": "Choose one...",
+      "tooltip": "Language for emails and defaults. Must be one of your supported languages."
+    },
+    "supportedLocales": {
+      "label": "Supported languages",
+      "placeholder": "Type to search...",
+      "tooltip": "Languages you work with. Add a language here before you can set it as preferred. You cannot remove the preferred language from this list."
+    },
     "description": {
       "label": "Description",
       "placeholder": "Write a brief description...",
@@ -230,6 +240,7 @@
       "tooltip": "Related websites (demo, repo, case study, and similar)."
     },
     "personal": "Personal",
+    "language": "Language",
     "contact": "Contact",
     "security": "Security",
     "mainSkills": "Main Skills"

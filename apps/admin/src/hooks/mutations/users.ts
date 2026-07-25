@@ -19,6 +19,8 @@ const updateMe = graphql(`
       phone
       birth
       address
+      locale
+      locales
       i18n {
         locale
         messages {

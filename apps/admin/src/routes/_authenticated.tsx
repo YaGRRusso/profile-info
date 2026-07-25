@@ -2,6 +2,7 @@ import { createFileRoute, Outlet } from "@tanstack/react-router";
 import { useEffect } from "react";
 import { DataState } from "@/components/display/data-state";
 import { useGetMe } from "@/hooks/queries/auth";
+import i18n from "@/i18n";
 import { useAuthStore, waitForAuthHydration } from "@/stores/auth";
 import { Auth } from "./-components/auth";
 
@@ -24,15 +25,19 @@ function RouteComponent() {
   }, [getMe.isError, setUser]);
 
   useEffect(() => {
-    if (user) {
-      setUser({
-        avatar: user.avatar,
-        email: user.email,
-        id: user.id,
-        name: user.name,
-        nickname: user.nickname,
-        role: user.role,
-      });
+    if (!user) return;
+
+    setUser({
+      avatar: user.avatar,
+      email: user.email,
+      id: user.id,
+      name: user.name,
+      nickname: user.nickname,
+      role: user.role,
+    });
+
+    if (user.locale) {
+      i18n.changeLanguage(user.locale);
     }
   }, [user, setUser]);
 

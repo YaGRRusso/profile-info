@@ -7,6 +7,7 @@ import { PageTitle } from "@/components/display/page-title";
 import { ProfileForm, profileToForm, profileToInput } from "@/forms/profile";
 import { useUpdateMe } from "@/hooks/mutations/users";
 import { useGetMe } from "@/hooks/queries/auth";
+import i18n from "@/i18n";
 import { pageHelp } from "@/lib/page-help";
 import { useAuthStore } from "@/stores/auth";
 import { DownloadCvControl } from "../-components/download-cv";
@@ -57,18 +58,29 @@ function RouteComponent() {
                   key={formKey}
                   onSubmit={async (values) => {
                     const updated = await updateMe.mutateAsync(
-                      profileToInput(values)
+                      profileToInput(values),
+                      {
+                        onSuccess: () => {
+                          toast.success(tAlert("profileUpdateSuccess"));
+                          setFormKey((key) => key + 1);
+                        },
+                      }
                     );
-                    toast.success(tAlert("profileUpdateSuccess"));
-                    setUser({
-                      avatar: updated.updateMe.avatar,
-                      email: updated.updateMe.email,
-                      id: updated.updateMe.id,
-                      name: updated.updateMe.name,
-                      nickname: updated.updateMe.nickname,
-                      role: updated.updateMe.role,
-                    });
-                    setFormKey((key) => key + 1);
+
+                    if (updated.updateMe) {
+                      setUser({
+                        avatar: updated.updateMe.avatar,
+                        email: updated.updateMe.email,
+                        id: updated.updateMe.id,
+                        name: updated.updateMe.name,
+                        nickname: updated.updateMe.nickname,
+                        role: updated.updateMe.role,
+                      });
+
+                      if (updated.updateMe.locale) {
+                        i18n.changeLanguage(updated.updateMe.locale);
+                      }
+                    }
                   }}
                 />
               </div>
