@@ -1,5 +1,6 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import mongoose, { type HydratedDocument } from "mongoose";
+import { Locale } from "@/core/enums/locale.enum";
 import { UserRole } from "@/core/enums/user-role.enum";
 import { BaseModel } from "@/core/schemas/base.schema";
 import {
@@ -42,6 +43,12 @@ export class UserModel extends BaseModel {
 
   @Prop({ type: String })
   address?: string;
+
+  @Prop({ enum: Locale, type: String })
+  locale?: Locale;
+
+  @Prop({ enum: Locale, type: [String] })
+  locales?: Locale[];
 
   @Prop({ type: [createTranslationModel(UserMessagesModel)] })
   i18n?: TranslationModel<UserMessagesModel>[];

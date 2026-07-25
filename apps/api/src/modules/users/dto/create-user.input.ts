@@ -4,6 +4,7 @@ import {
   IsArray,
   IsDateString,
   IsEmail,
+  IsEnum,
   IsMongoId,
   IsNotEmpty,
   IsString,
@@ -13,6 +14,7 @@ import {
 } from "class-validator";
 import { OptionalField } from "@/core/decorators/optional-field.decorator";
 import { RequiredField } from "@/core/decorators/required-field.decorator";
+import { Locale } from "@/core/enums/locale.enum";
 import { UserRole } from "@/core/enums/user-role.enum";
 import {
   createTranslationInput,
@@ -65,6 +67,15 @@ export class CreateUserInput {
 
   @OptionalField(() => String)
   address?: string;
+
+  @OptionalField(() => Locale)
+  @IsEnum(Locale)
+  locale?: Locale;
+
+  @OptionalField(() => [Locale])
+  @IsArray()
+  @IsEnum(Locale, { each: true })
+  locales?: Locale[];
 
   @OptionalField(() => [UserTranslationInput])
   @IsArray()

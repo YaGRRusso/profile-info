@@ -2,6 +2,7 @@ import { Field, ID, ObjectType } from "@nestjs/graphql";
 import { OptionalField } from "@/core/decorators/optional-field.decorator";
 import { BaseEntity } from "@/core/entities/base.entity";
 import { UrlEntity } from "@/core/entities/url.entity";
+import { Locale } from "@/core/enums/locale.enum";
 import { UserRole } from "@/core/enums/user-role.enum";
 import { createPaginatedModel } from "@/core/schemas/paginated.schema";
 import { SkillEntity } from "@/modules/skills/entities/skill.entity";
@@ -50,6 +51,12 @@ export class UserEntity extends BaseEntity {
 
   @OptionalField(() => String)
   address?: string;
+
+  @OptionalField(() => Locale)
+  locale?: Locale;
+
+  @OptionalField(() => [Locale])
+  locales?: Locale[];
 
   @OptionalField(() => [UserTranslationLocale])
   i18n?: UserTranslationLocale[];

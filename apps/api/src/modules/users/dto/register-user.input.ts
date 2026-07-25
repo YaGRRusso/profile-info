@@ -1,6 +1,15 @@
 import { InputType } from "@nestjs/graphql";
-import { IsEmail, IsNotEmpty, IsString, MinLength } from "class-validator";
+import {
+  IsArray,
+  IsEmail,
+  IsEnum,
+  IsNotEmpty,
+  IsString,
+  MinLength,
+} from "class-validator";
+import { OptionalField } from "@/core/decorators/optional-field.decorator";
 import { RequiredField } from "@/core/decorators/required-field.decorator";
+import { Locale } from "@/core/enums/locale.enum";
 
 @InputType()
 export class RegisterUserInput {
@@ -22,4 +31,13 @@ export class RegisterUserInput {
   @IsString()
   @MinLength(8)
   password: string;
+
+  @RequiredField(() => Locale)
+  @IsEnum(Locale)
+  locale: Locale;
+
+  @OptionalField(() => [Locale])
+  @IsArray()
+  @IsEnum(Locale, { each: true })
+  locales?: Locale[];
 }

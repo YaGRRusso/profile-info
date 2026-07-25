@@ -177,6 +177,8 @@ export type CreateUserInput = {
   birth?: string | null | undefined;
   email: string;
   i18n?: Array<CreateUserMessagesInputTranslationInput> | null | undefined;
+  locale?: Locale | null | undefined;
+  locales?: Array<Locale> | null | undefined;
   name: string;
   nickname: string;
   password: string;
@@ -322,6 +324,12 @@ export type FilterUserInput = {
   urls?: Array<UrlInput> | null | undefined;
 };
 
+export enum Locale {
+  En = 'en',
+  Es = 'es',
+  Pt = 'pt'
+}
+
 export enum OrganizationCategory {
   Company = 'COMPANY',
   Other = 'OTHER',
@@ -335,6 +343,8 @@ export type PaginationInput = {
 
 export type RegisterUserInput = {
   email: string;
+  locale: Locale;
+  locales?: Array<Locale> | null | undefined;
   name: string;
   nickname: string;
   password: string;
@@ -467,6 +477,8 @@ export type UpdateMeInput = {
   birth?: string | null | undefined;
   email?: string | null | undefined;
   i18n?: Array<CreateUserMessagesInputTranslationInput> | null | undefined;
+  locale?: Locale | null | undefined;
+  locales?: Array<Locale> | null | undefined;
   name?: string | null | undefined;
   nickname?: string | null | undefined;
   password?: string | null | undefined;
@@ -507,6 +519,8 @@ export type UpdateUserInput = {
   birth?: string | null | undefined;
   email?: string | null | undefined;
   i18n?: Array<CreateUserMessagesInputTranslationInput> | null | undefined;
+  locale?: Locale | null | undefined;
+  locales?: Array<Locale> | null | undefined;
   name?: string | null | undefined;
   nickname?: string | null | undefined;
   password?: string | null | undefined;

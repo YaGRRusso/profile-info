@@ -3,6 +3,7 @@ import { EventEmitter2 } from "@nestjs/event-emitter";
 import { Test, TestingModule } from "@nestjs/testing";
 import { testSuperAdminContext } from "@test/fixtures/auth-context";
 import { hash } from "bcryptjs";
+import { Locale } from "@/core/enums/locale.enum";
 import { UserRole } from "@/core/enums/user-role.enum";
 import { DomainEvents } from "@/core/events/domain-events";
 import { UserAccountEnabledEvent } from "@/core/events/user-account-enabled.event";
@@ -124,6 +125,7 @@ describe("UsersService", () => {
   describe("register", () => {
     const registerInput = {
       email: "jane@example.com",
+      locale: Locale.en,
       name: "Jane",
       nickname: "jane",
       password: "plain-pass",

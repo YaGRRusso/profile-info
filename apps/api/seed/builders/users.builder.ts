@@ -1,6 +1,7 @@
 import { faker } from "@faker-js/faker";
 import { hash } from "bcryptjs";
 import type { Model } from "mongoose";
+import { Locale } from "@/common/i18n/locales";
 import type { UserModel } from "@/modules/users/schemas/user.schema";
 import { DEV_PASSWORD, SEED_LOCALES, URL_TYPES } from "../constants";
 import { loremSentences } from "../helpers/faker-seed.helper";
@@ -39,6 +40,8 @@ export async function createPersonaUser(
         },
       }))
     ),
+    locale: Locale.EN,
+    locales: [...SEED_LOCALES],
     name: persona.name,
     nickname: persona.nickname,
     phone: optionalForIndex(profileIndex + 2, () => faker.phone.number()),

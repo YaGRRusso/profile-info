@@ -51,6 +51,8 @@ export class UserMapper
       disabled: model.disabled ?? false,
       email: model.email,
       i18n: toTranslationEntityList(model.i18n),
+      locale: model.locale,
+      locales: model.locales,
       name: model.name,
       nickname: model.nickname,
       phone: model.phone,

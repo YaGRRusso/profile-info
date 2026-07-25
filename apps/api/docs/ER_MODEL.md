@@ -29,6 +29,8 @@ erDiagram
     string nickname UK
     string email UK
     string role
+    string locale "preferred en es pt"
+    string locales "supported en es pt, array"
     object i18n "embed"
     ObjectId skillIds FK "array ordered"
   }
@@ -145,7 +147,9 @@ set `ownerId` / `partition` from auth scope, not from client input.
 - **Key fields:** `name`, `nickname` (unique), `email` (unique), `password` (required,
   `select: false`, not exposed in API), `role` (enum: `USER`, `SUPER_ADMIN`), `disabled`
   (default `false`; public `register` creates `disabled: true` until a `SUPER_ADMIN` sets
-  `disabled: false` via `updateOneUser`), `phone`,
+  `disabled: false` via `updateOneUser`), `locale` (optional; preferred UI/email
+  language; GraphQL/Mongoose enum `Locale`: `en` | `es` | `pt`; required on
+  `register`), `locales` (optional; `Locale[]`), `phone`,
   `avatar`, `birth`, `address`, `i18n[]` (embed: `locale`, `messages.title`,
   `messages.description`)
 - **Embedded:** `urls[]` (`UrlEmbed`: `title`, `value`), `i18n[]` translations

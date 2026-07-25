@@ -82,6 +82,7 @@ describe("User registration (e2e)", () => {
       variables: {
         registerInput: {
           email: "pending@profile.info",
+          locale: "en",
           name: "Pending User",
           nickname: "pending-user",
           password: "pending.123",
@@ -175,6 +176,7 @@ describe("User registration (e2e)", () => {
       variables: {
         registerInput: {
           email: "pending@profile.info",
+          locale: "en",
           name: "Other",
           nickname: "other-pending",
           password: "pending.123",
@@ -192,6 +194,7 @@ describe("User registration (e2e)", () => {
       variables: {
         registerInput: {
           email: "other-pending@profile.info",
+          locale: "en",
           name: "Other",
           nickname: "pending-user",
           password: "pending.123",
