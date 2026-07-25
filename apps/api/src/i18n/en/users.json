@@ -1,4 +1,5 @@
 {
   "ACCOUNT_DISABLED": "Account pending approval",
+  "PREFERRED_LOCALE_NOT_IN_LOCALES": "Preferred locale must be included in locales",
   "SUPER_ADMIN_NOT_DELETABLE": "SUPER_ADMIN users cannot be deleted"
 }

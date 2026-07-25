@@ -4,6 +4,7 @@ import { hash } from "bcryptjs";
 import { uniq } from "lodash";
 import type { AuthContext } from "@/core/context/auth-context.interface";
 import { BatchEntity } from "@/core/entities/batch.entity";
+import { Locale } from "@/core/enums/locale.enum";
 import { UserRole } from "@/core/enums/user-role.enum";
 import { DomainEvents } from "@/core/events/domain-events";
 import { UserAccountEnabledEvent } from "@/core/events/user-account-enabled.event";
@@ -19,6 +20,7 @@ import { SortUserInput } from "./dto/sort-user.input";
 import { UpdateUserInput } from "./dto/update-user.input";
 import type { UserEntityRecord } from "./entities/user.entity";
 import type { UserWithPasswordEntity } from "./entities/user-with-password.entity";
+import { assertPreferredLocaleInLocales } from "./helpers/assert-preferred-locale-in-locales.helper";
 import type { UserCreateRecord, UserUpdateRecord } from "./mappers/user.mapper";
 import { UsersRepository } from "./users.repository";
 
@@ -70,9 +72,13 @@ export class UsersService {
     password,
     ...input
   }: RegisterUserInput): Promise<UserEntityRecord> {
+    const locales = input.locales ?? [input.locale];
+    assertPreferredLocaleInLocales(input.locale, locales);
+
     const user = await this.repository.crud.createOne({
       ...input,
       disabled: true,
+      locales,
       password: await hash(password, 8),
       role: UserRole.USER,
     });
@@ -90,9 +96,10 @@ export class UsersService {
     { password, ...createUserInput }: CreateUserInput
   ): Promise<UserEntityRecord> {
     await this.assertSkillsExist(ctx, createUserInput.skillIds);
+    const input = this.withInitialLocales(createUserInput);
 
     return this.repository.crud.createOne({
-      ...createUserInput,
+      ...input,
       disabled: false,
       password: await hash(password, 8),
     });
@@ -108,11 +115,14 @@ export class UsersService {
     await this.assertSkillsExist(ctx, skillIds);
 
     const inputs: UserCreateRecord[] = await Promise.all(
-      createUserInputs.map(async ({ password, ...createUserInput }) => ({
-        ...createUserInput,
-        disabled: false,
-        password: await hash(password, 8),
-      }))
+      createUserInputs.map(async ({ password, ...createUserInput }) => {
+        const input = this.withInitialLocales(createUserInput);
+        return {
+          ...input,
+          disabled: false,
+          password: await hash(password, 8),
+        };
+      })
     );
 
     return this.repository.crud.createMany(inputs);
@@ -125,6 +135,16 @@ export class UsersService {
   ): Promise<UserEntityRecord> {
     const { password, ...rest } = updateInput;
     await this.assertSkillsExist(ctx, rest.skillIds);
+
+    const isChangingLocales =
+      rest.locale !== undefined || rest.locales !== undefined;
+    if (isChangingLocales) {
+      const current = await this.repository.crud.findOneById(id);
+      assertPreferredLocaleInLocales(
+        rest.locale ?? current.locale,
+        rest.locales ?? current.locales
+      );
+    }
 
     if (!password) {
       return this.repository.crud.updateOneById(id, rest);
@@ -143,6 +163,18 @@ export class UsersService {
   ): Promise<BatchEntity> {
     const { password, ...rest } = updateInput;
     await this.assertSkillsExist(ctx, rest.skillIds);
+
+    const isChangingLocales =
+      rest.locale !== undefined || rest.locales !== undefined;
+    if (isChangingLocales) {
+      const users = await this.repository.crud.findManyById(ids);
+      for (const user of users) {
+        assertPreferredLocaleInLocales(
+          rest.locale ?? user.locale,
+          rest.locales ?? user.locales
+        );
+      }
+    }
 
     if (!password) {
       return this.repository.crud.updateManyById(ids, rest);
@@ -240,6 +272,17 @@ export class UsersService {
     if (user.role === UserRole.SUPER_ADMIN) {
       throw new ForbiddenException(i18nKey("users.SUPER_ADMIN_NOT_DELETABLE"));
     }
+  }
+
+  private withInitialLocales<T extends { locale?: Locale; locales?: Locale[] }>(
+    input: T
+  ): T {
+    if (input.locale === undefined) return input;
+
+    const locales = input.locales ?? [input.locale];
+    assertPreferredLocaleInLocales(input.locale, locales);
+
+    return { ...input, locales };
   }
 
   private assertSkillsExist(

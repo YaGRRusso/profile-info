@@ -1,4 +1,5 @@
 {
   "ACCOUNT_DISABLED": "Cuenta pendiente de aprobación",
+  "PREFERRED_LOCALE_NOT_IN_LOCALES": "El idioma preferido debe estar en locales",
   "SUPER_ADMIN_NOT_DELETABLE": "Los usuarios SUPER_ADMIN no se pueden eliminar"
 }

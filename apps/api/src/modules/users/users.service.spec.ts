@@ -1,4 +1,4 @@
-import { ForbiddenException } from "@nestjs/common";
+import { BadRequestException, ForbiddenException } from "@nestjs/common";
 import { EventEmitter2 } from "@nestjs/event-emitter";
 import { Test, TestingModule } from "@nestjs/testing";
 import { testSuperAdminContext } from "@test/fixtures/auth-context";
@@ -140,9 +140,20 @@ describe("UsersService", () => {
       expect(crud.createOne).toHaveBeenCalledWith({
         ...registerInput,
         disabled: true,
+        locales: [Locale.en],
         password: "hashed-password",
         role: UserRole.USER,
       });
+    });
+
+    it("rejects locales that omit the preferred locale", async () => {
+      await expect(
+        service.register({
+          ...registerInput,
+          locales: [Locale.pt],
+        })
+      ).rejects.toThrow(BadRequestException);
+      expect(crud.createOne).not.toHaveBeenCalled();
     });
 
     it("emits user.registered after create", async () => {
@@ -289,6 +300,47 @@ describe("UsersService", () => {
       await service.updateOne(ctx, validId, { name: "Jane" });
 
       expect(eventEmitter.emitAsync).not.toHaveBeenCalled();
+    });
+
+    it("rejects changing preferred locale when it is not in locales", async () => {
+      crud.findOneById.mockResolvedValue({
+        ...fakeUser,
+        locale: Locale.en,
+        locales: [Locale.en],
+      });
+
+      await expect(
+        service.updateOne(ctx, validId, { locale: Locale.pt })
+      ).rejects.toThrow(BadRequestException);
+      expect(crud.updateOneById).not.toHaveBeenCalled();
+    });
+
+    it("rejects removing preferred locale from locales", async () => {
+      crud.findOneById.mockResolvedValue({
+        ...fakeUser,
+        locale: Locale.pt,
+        locales: [Locale.en, Locale.pt],
+      });
+
+      await expect(
+        service.updateOne(ctx, validId, { locales: [Locale.en] })
+      ).rejects.toThrow(BadRequestException);
+      expect(crud.updateOneById).not.toHaveBeenCalled();
+    });
+
+    it("allows changing preferred locale when it is already in locales", async () => {
+      crud.findOneById.mockResolvedValue({
+        ...fakeUser,
+        locale: Locale.en,
+        locales: [Locale.en, Locale.pt],
+      });
+      crud.updateOneById.mockResolvedValue(fakeUser);
+
+      await service.updateOne(ctx, validId, { locale: Locale.pt });
+
+      expect(crud.updateOneById).toHaveBeenCalledWith(validId, {
+        locale: Locale.pt,
+      });
     });
   });
 

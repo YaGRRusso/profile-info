@@ -67,6 +67,7 @@ export type I18nTranslations = {
     };
     "users": {
         "ACCOUNT_DISABLED": string;
+        "PREFERRED_LOCALE_NOT_IN_LOCALES": string;
         "SUPER_ADMIN_NOT_DELETABLE": string;
     };
 };
