@@ -1,7 +1,8 @@
 import { createInstance, type i18n as I18n } from "i18next";
 import LanguageDetector from "i18next-browser-languagedetector";
 import { initReactI18next } from "react-i18next";
-import { isLocaleEnum, LocaleEnum } from "@/consts/locales";
+import { isLocale } from "@/consts/locales";
+import { Locale } from "@/generated/graphql/graphql";
 import { i18nNamespaces, i18nResources } from "@/i18n/resources";
 import { syncDayjsLocale } from "@/lib/dayjs";
 
@@ -16,20 +17,18 @@ i18n
       caches: ["localStorage"],
       order: ["localStorage"],
     },
-    fallbackLng: LocaleEnum.ENGLISH,
+    fallbackLng: Locale.En,
     interpolation: { escapeValue: false },
     ns: [...i18nNamespaces],
     react: { useSuspense: false },
     resources: i18nResources,
-    supportedLngs: Object.values(LocaleEnum),
+    supportedLngs: Object.values(Locale),
   });
 
 i18n.on("languageChanged", (locale) => {
-  syncDayjsLocale(isLocaleEnum(locale) ? locale : LocaleEnum.ENGLISH);
+  syncDayjsLocale(isLocale(locale) ? locale : Locale.En);
 });
 
-syncDayjsLocale(
-  isLocaleEnum(i18n.language) ? i18n.language : LocaleEnum.ENGLISH
-);
+syncDayjsLocale(isLocale(i18n.language) ? i18n.language : Locale.En);
 
 export default i18n;

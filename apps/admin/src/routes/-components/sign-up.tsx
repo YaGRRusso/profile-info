@@ -2,6 +2,7 @@ import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import { SignUpForm } from "@/forms/sign-up";
 import { useSignUp } from "@/hooks/mutations/auth";
+import { resolveActiveLocale } from "@/lib/i18n";
 
 export interface SignUpProps {
   onSwitchToSignIn: () => void;
@@ -23,12 +24,15 @@ export function SignUp({ onSwitchToSignIn }: SignUpProps) {
       <SignUpForm
         isLoading={signUp.isPending}
         onSubmit={(values) =>
-          signUp.mutate(values, {
-            onSuccess: () => {
-              toast.success(tAlert("signUpSuccess"));
-              onSwitchToSignIn();
-            },
-          })
+          signUp.mutate(
+            { ...values, locale: resolveActiveLocale() },
+            {
+              onSuccess: () => {
+                toast.success(tAlert("signUpSuccess"));
+                onSwitchToSignIn();
+              },
+            }
+          )
         }
       />
       <p className="text-center text-sm">

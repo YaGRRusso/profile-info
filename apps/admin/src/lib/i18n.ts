@@ -1,19 +1,20 @@
-import { isLocaleEnum, LocaleEnum } from "@/consts/locales";
+import { isLocale } from "@/consts/locales";
+import { Locale } from "@/generated/graphql/graphql";
 import i18n from "@/i18n";
 
-export function resolveActiveLocale(): LocaleEnum {
+export function resolveActiveLocale(): Locale {
   const { language } = i18n;
 
-  if (isLocaleEnum(language)) {
+  if (isLocale(language)) {
     return language;
   }
 
   const [base] = language.split("-");
-  if (base && isLocaleEnum(base)) {
+  if (base && isLocale(base)) {
     return base;
   }
 
-  return LocaleEnum.ENGLISH;
+  return Locale.En;
 }
 
 export function createEmptyI18n<T extends Record<string, string>>(template: T) {
@@ -23,11 +24,7 @@ export function createEmptyI18n<T extends Record<string, string>>(template: T) {
 export function pickTranslation<T extends { locale: string }>(
   i18n: T[] | undefined,
   locale: string,
-  fallbacks: readonly string[] = [
-    LocaleEnum.ENGLISH,
-    LocaleEnum.PORTUGUESE,
-    LocaleEnum.SPANISH,
-  ]
+  fallbacks: readonly string[] = [Locale.En, Locale.Pt, Locale.Es]
 ): T | undefined {
   if (!i18n?.length) return;
 

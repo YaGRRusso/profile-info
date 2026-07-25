@@ -1,5 +1,6 @@
 import { useTranslation } from "react-i18next";
-import { LOCALES, type LocaleEnum } from "@/consts/locales";
+import { LOCALES } from "@/consts/locales";
+import type { Locale } from "@/generated/graphql/graphql";
 import { useDownloadResume } from "@/hooks/mutations/resume";
 
 export function DownloadCvControl() {
@@ -10,9 +11,7 @@ export function DownloadCvControl() {
     <select
       className="select"
       disabled={downloadResume.isPending}
-      onChange={(event) =>
-        downloadResume.mutate(event.target.value as LocaleEnum)
-      }
+      onChange={(event) => downloadResume.mutate(event.target.value as Locale)}
       value=""
     >
       <option disabled value="">
