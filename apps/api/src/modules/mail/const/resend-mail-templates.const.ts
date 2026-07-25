@@ -1,4 +1,4 @@
-import { Locale } from "@/common/i18n/locales";
+import { Locale } from "@/core/enums/locale.enum";
 
 /** Published Resend template aliases (dashboard). */
 export const ResendMailTemplate = {
@@ -6,12 +6,10 @@ export const ResendMailTemplate = {
   registerPt: "register-pt",
 } as const;
 
-export function registerMailTemplateId(locale?: string): string {
+export function registerMailTemplateId(locale?: Locale): string {
   switch (locale) {
-    case Locale.PT:
+    case Locale.pt:
       return ResendMailTemplate.registerPt;
-    case Locale.EN:
-      return ResendMailTemplate.registerEn;
     default:
       return ResendMailTemplate.registerEn;
   }

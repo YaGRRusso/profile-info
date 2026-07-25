@@ -1,6 +1,6 @@
 import { Logger } from "@nestjs/common";
 import { Test, TestingModule } from "@nestjs/testing";
-import { I18nContext } from "nestjs-i18n";
+import { Locale } from "@/core/enums/locale.enum";
 import { UserRegisteredEvent } from "@/core/events/user-registered.event";
 import { EmailProvider } from "@/integrations/resend/email.provider";
 import { OnUserRegisteredListener } from "./on-user-registered.listener";
@@ -30,16 +30,13 @@ describe("OnUserRegisteredListener", () => {
     jest.restoreAllMocks();
   });
 
-  it("sends the pt Resend template when request lang is pt", async () => {
-    jest.spyOn(I18nContext, "current").mockReturnValue({
-      lang: "pt",
-    } as unknown as I18nContext);
-
+  it("sends the pt Resend template when the user locale is pt", async () => {
     await listener.handle(
       new UserRegisteredEvent(
         "507f1f77bcf86cd799439013",
         "jane@example.com",
-        "Jane"
+        "Jane",
+        Locale.pt
       )
     );
 
@@ -53,10 +50,25 @@ describe("OnUserRegisteredListener", () => {
   });
 
   it("falls back to register-en for other locales", async () => {
-    jest.spyOn(I18nContext, "current").mockReturnValue({
-      lang: "es",
-    } as unknown as I18nContext);
+    await listener.handle(
+      new UserRegisteredEvent(
+        "507f1f77bcf86cd799439013",
+        "jane@example.com",
+        "Jane",
+        Locale.es
+      )
+    );
 
+    expect(emailProvider.send).toHaveBeenCalledWith({
+      template: {
+        id: "register-en",
+        variables: { name: "Jane" },
+      },
+      to: "jane@example.com",
+    });
+  });
+
+  it("falls back to register-en when the user has no locale", async () => {
     await listener.handle(
       new UserRegisteredEvent(
         "507f1f77bcf86cd799439013",
@@ -75,9 +87,6 @@ describe("OnUserRegisteredListener", () => {
   });
 
   it("swallows EmailProvider errors", async () => {
-    jest.spyOn(I18nContext, "current").mockReturnValue({
-      lang: "en",
-    } as unknown as I18nContext);
     emailProvider.send.mockRejectedValue(new Error("resend down"));
     const warn = jest.spyOn(Logger.prototype, "warn").mockImplementation();
 
@@ -86,7 +95,8 @@ describe("OnUserRegisteredListener", () => {
         new UserRegisteredEvent(
           "507f1f77bcf86cd799439013",
           "jane@example.com",
-          "Jane"
+          "Jane",
+          Locale.en
         )
       )
     ).resolves.toBeUndefined();

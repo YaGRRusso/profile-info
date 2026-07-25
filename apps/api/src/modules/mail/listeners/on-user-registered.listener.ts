@@ -1,6 +1,5 @@
 import { Injectable, Logger } from "@nestjs/common";
 import { OnEvent } from "@nestjs/event-emitter";
-import { I18nContext } from "nestjs-i18n";
 import { DomainEvents } from "@/core/events/domain-events";
 import { UserRegisteredEvent } from "@/core/events/user-registered.event";
 import { EmailProvider } from "@/integrations/resend/email.provider";
@@ -18,7 +17,7 @@ export class OnUserRegisteredListener {
     try {
       await this.emailProvider.send({
         template: {
-          id: registerMailTemplateId(I18nContext.current()?.lang),
+          id: registerMailTemplateId(event.locale),
           variables: { name: event.name },
         },
         to: event.email,

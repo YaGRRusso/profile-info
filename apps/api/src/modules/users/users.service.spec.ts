@@ -6,6 +6,7 @@ import { hash } from "bcryptjs";
 import { Locale } from "@/core/enums/locale.enum";
 import { UserRole } from "@/core/enums/user-role.enum";
 import { DomainEvents } from "@/core/events/domain-events";
+import { UserAccountDisabledEvent } from "@/core/events/user-account-disabled.event";
 import { UserAccountEnabledEvent } from "@/core/events/user-account-enabled.event";
 import { UserDeletedEvent } from "@/core/events/user-deleted.event";
 import { UserRegisteredEvent } from "@/core/events/user-registered.event";
@@ -169,7 +170,7 @@ describe("UsersService", () => {
 
       expect(eventEmitter.emitAsync).toHaveBeenCalledWith(
         DomainEvents.user.registered,
-        new UserRegisteredEvent(validId, created.email, created.name)
+        new UserRegisteredEvent(validId, created.email, created.name, Locale.en)
       );
     });
   });
@@ -294,7 +295,7 @@ describe("UsersService", () => {
       });
     });
 
-    it("does not emit account-enabled", async () => {
+    it("does not emit account status events", async () => {
       crud.updateOneById.mockResolvedValue(fakeUser);
 
       await service.updateOne(ctx, validId, { name: "Jane" });
@@ -366,16 +367,19 @@ describe("UsersService", () => {
       );
     });
 
-    it("does not emit when disabling", async () => {
+    it("emits user.account-disabled when disabled becomes true", async () => {
       crud.findOneById.mockResolvedValue(fakeUser);
       crud.updateOneById.mockResolvedValue({ ...fakeUser, disabled: true });
 
       await service.toggleStatusOne(validId, true);
 
-      expect(eventEmitter.emitAsync).not.toHaveBeenCalled();
+      expect(eventEmitter.emitAsync).toHaveBeenCalledWith(
+        DomainEvents.user.accountDisabled,
+        new UserAccountDisabledEvent(validId, fakeUser.email, fakeUser.name)
+      );
     });
 
-    it("does not emit when the account was already enabled", async () => {
+    it("does not emit when the status did not change", async () => {
       crud.findOneById.mockResolvedValue(fakeUser);
       crud.updateOneById.mockResolvedValue(fakeUser);
 
@@ -414,13 +418,16 @@ describe("UsersService", () => {
       );
     });
 
-    it("does not load or emit when disabling", async () => {
+    it("emits user.account-disabled when disabling previously enabled users", async () => {
+      crud.findManyById.mockResolvedValue([fakeUser]);
       crud.updateManyById.mockResolvedValue({ failed: 0, succeeded: 1 });
 
       await service.toggleStatusMany([validId], true);
 
-      expect(crud.findManyById).not.toHaveBeenCalled();
-      expect(eventEmitter.emitAsync).not.toHaveBeenCalled();
+      expect(eventEmitter.emitAsync).toHaveBeenCalledWith(
+        DomainEvents.user.accountDisabled,
+        new UserAccountDisabledEvent(validId, fakeUser.email, fakeUser.name)
+      );
     });
   });
 

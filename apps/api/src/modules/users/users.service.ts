@@ -7,6 +7,7 @@ import { BatchEntity } from "@/core/entities/batch.entity";
 import { Locale } from "@/core/enums/locale.enum";
 import { UserRole } from "@/core/enums/user-role.enum";
 import { DomainEvents } from "@/core/events/domain-events";
+import { UserAccountDisabledEvent } from "@/core/events/user-account-disabled.event";
 import { UserAccountEnabledEvent } from "@/core/events/user-account-enabled.event";
 import { UserDeletedEvent } from "@/core/events/user-deleted.event";
 import { UserRegisteredEvent } from "@/core/events/user-registered.event";
@@ -85,7 +86,7 @@ export class UsersService {
 
     await this.eventEmitter.emitAsync(
       DomainEvents.user.registered,
-      new UserRegisteredEvent(user.id, user.email, user.name)
+      new UserRegisteredEvent(user.id, user.email, user.name, user.locale)
     );
 
     return user;
@@ -195,11 +196,8 @@ export class UsersService {
     const before = await this.repository.crud.findOneById(id);
     const updated = await this.repository.crud.updateOneById(id, { disabled });
 
-    if (before.disabled && !updated.disabled) {
-      await this.eventEmitter.emitAsync(
-        DomainEvents.user.accountEnabled,
-        new UserAccountEnabledEvent(updated.id, updated.email, updated.name)
-      );
+    if (before.disabled !== updated.disabled) {
+      await this.emitAccountStatusChanged(updated, updated.disabled);
     }
 
     return updated;
@@ -209,24 +207,14 @@ export class UsersService {
     ids: string[],
     disabled: boolean
   ): Promise<BatchEntity> {
-    const beforeUsers = disabled
-      ? []
-      : await this.repository.crud.findManyById(ids);
-
+    const beforeUsers = await this.repository.crud.findManyById(ids);
     const batch = await this.repository.crud.updateManyById(ids, { disabled });
 
-    if (!disabled) {
-      await Promise.all(
-        beforeUsers
-          .filter((user) => user.disabled)
-          .map((user) =>
-            this.eventEmitter.emitAsync(
-              DomainEvents.user.accountEnabled,
-              new UserAccountEnabledEvent(user.id, user.email, user.name)
-            )
-          )
-      );
-    }
+    await Promise.all(
+      beforeUsers
+        .filter((user) => user.disabled !== disabled)
+        .map((user) => this.emitAccountStatusChanged(user, disabled))
+    );
 
     return batch;
   }
@@ -272,6 +260,28 @@ export class UsersService {
     if (user.role === UserRole.SUPER_ADMIN) {
       throw new ForbiddenException(i18nKey("users.SUPER_ADMIN_NOT_DELETABLE"));
     }
+  }
+
+  private emitAccountStatusChanged(
+    user: Pick<UserEntityRecord, "id" | "email" | "name" | "locale">,
+    disabled: boolean
+  ): Promise<unknown[]> {
+    if (disabled) {
+      return this.eventEmitter.emitAsync(
+        DomainEvents.user.accountDisabled,
+        new UserAccountDisabledEvent(
+          user.id,
+          user.email,
+          user.name,
+          user.locale
+        )
+      );
+    }
+
+    return this.eventEmitter.emitAsync(
+      DomainEvents.user.accountEnabled,
+      new UserAccountEnabledEvent(user.id, user.email, user.name, user.locale)
+    );
   }
 
   private withInitialLocales<T extends { locale?: Locale; locales?: Locale[] }>(
