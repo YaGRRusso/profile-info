@@ -1,8 +1,7 @@
+# Optional GitHub Pages deploy
 name: Deploy admin to GitHub Pages
 
 on:
-  push:
-    branches: [main]
   workflow_dispatch:
 
 permissions:

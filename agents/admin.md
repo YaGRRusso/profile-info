@@ -9,7 +9,7 @@ and update `apps/admin/README.md` when setup or run changes.
 
 ## Overview
 
-The admin dashboard for profile-info: a React 19 + Vite SPA that authenticates against the `@profile-info/api` GraphQL endpoint and edits the profile data. Typed end to end via GraphQL Codegen, TanStack Query for fetching, TanStack Router for file-based routing, Zustand for persisted auth/theme. Builds to a static bundle deployed to GitHub Pages.
+The admin dashboard for profile-info: a React 19 + Vite SPA that authenticates against the `@profile-info/api` GraphQL endpoint and edits the profile data. Typed end to end via GraphQL Codegen, TanStack Query for fetching, TanStack Router for file-based routing, Zustand for persisted auth/theme. Builds to a static bundle deployed to Cloudflare Pages (`admin.yagorusso.com`).
 
 ## Architecture & flow
 
@@ -79,7 +79,7 @@ Keep `components/`, `hooks/custom/`, and `lib/` domain-agnostic. Table toolbar c
 ## Environment variables
 
 - `VITE_API_URL` (required): API origin only (e.g. `http://localhost:8080`) — no `/graphql` suffix; baked in at build time.
-- `VITE_BASE_PATH` (optional): Vite `base` / router `basepath`; CI sets GitHub Pages subpath.
+- `VITE_BASE_PATH` (optional): Vite `base` / router `basepath`; leave unset for `/` on Cloudflare Pages.
 
 ## Scripts / commands
 
@@ -98,8 +98,9 @@ Keep `components/`, `hooks/custom/`, and `lib/` domain-agnostic. Table toolbar c
 - `src/generated/graphql/` and `routeTree.gen.ts` are generated.
 - Do not add ad-hoc 401 handling in hooks.
 - `dev` backgrounds codegen; first start may race — run `build` once if types missing.
-- GitHub Pages: deploy copies `index.html` to `404.html`; `VITE_BASE_PATH` must match Pages subpath.
-- Social share tags in `index.html`: `description`, full Open Graph (`og:title` / `description` / `url` / `site_name` / `locale` / `image` + width/height/alt / `type`), and Twitter (`twitter:card=summary_large_image`, title, description, image). Absolute URLs for Pages. Image: `public/og.png` (1200×630). Instagram does not unfurl links the same way.
+- Cloudflare Pages: `public/_redirects` SPA fallback (`/* → /index.html` 200). Do not set `VITE_BASE_PATH` for the custom domain at `/`.
+- Optional GitHub Pages (manual): `.github/workflows/deploy.yml` — sets `VITE_BASE_PATH` to `/<repo>/` and copies `index.html` → `404.html` for SPA refresh.
+- Social share tags in `index.html`: `description`, full Open Graph (`og:title` / `description` / `url` / `site_name` / `locale` / `image` + width/height/alt / `type`), and Twitter (`twitter:card=summary_large_image`, title, description, image). Absolute URLs for `admin.yagorusso.com`. Image: `public/og.png` (1200×630). Instagram does not unfurl links the same way.
 - Auth shell (`routes/-components/auth.tsx`) composes the localized, feature-led
   `AuthBrandPanel` marketing surface with the focused `SignIn` / `SignUp` form.
 - No test framework configured in this package.

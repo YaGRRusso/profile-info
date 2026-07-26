@@ -2,6 +2,7 @@ import { INestApplication, Logger } from "@nestjs/common";
 import chalk from "chalk";
 
 const localhost = /^http:\/\/localhost:\d+$/;
+const cloudflare = /^https:\/\/[a-z0-9.-]+\.pages\.dev$/;
 
 export async function appConfig(app: INestApplication) {
   const port = Number(process.env.PORT) || 8080;
@@ -11,7 +12,7 @@ export async function appConfig(app: INestApplication) {
     allowedHeaders: ["Content-Type", "Authorization", "X-Api-Key"],
     credentials: true,
     methods: ["GET", "POST", "OPTIONS"],
-    origin: [localhost, "https://yagrrusso.github.io"],
+    origin: [localhost, cloudflare, "https://admin.yagorusso.com"],
   });
 
   // app.use(

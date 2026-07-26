@@ -2,7 +2,8 @@
 
 React 19 single-page admin dashboard for the profile-info project. It signs in
 against the `@profile-info/api` GraphQL endpoint, stores the returned JWT, and
-provides CRUD screens for the profile data. It deploys to GitHub Pages.
+provides CRUD screens for the profile data. It deploys to Cloudflare Pages
+(`admin.yagorusso.com`).
 
 ## Tech stack
 
@@ -87,6 +88,19 @@ npm run api:dev
 ```bash
 npm run admin:dev
 ```
+
+## Deploy (Cloudflare Pages)
+
+Connect the repo in Cloudflare Pages. Build from the monorepo root:
+
+| Setting | Value |
+|---------|--------|
+| Build command | `npm ci && npm run admin:build` |
+| Build output directory | `apps/admin/dist` |
+| `NODE_VERSION` | `22` |
+| `VITE_API_URL` | public API origin (no `/graphql`) |
+
+Leave `VITE_BASE_PATH` unset. Custom domain: `admin.yagorusso.com`. SPA fallback is `public/_redirects`.
 
 ### Download CV
 
