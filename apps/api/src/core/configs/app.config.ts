@@ -2,7 +2,7 @@ import { INestApplication, Logger } from "@nestjs/common";
 import chalk from "chalk";
 
 const localhost = /^http:\/\/localhost:\d+$/;
-const cloudflare = /^https:\/\/[a-z0-9.-]+\.pages\.dev$/;
+const cloudflare = /^https:\/\/[a-z0-9.-]+\.(pages|workers)\.dev$/;
 
 export async function appConfig(app: INestApplication) {
   const port = Number(process.env.PORT) || 8080;

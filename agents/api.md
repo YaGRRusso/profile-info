@@ -22,7 +22,7 @@ Entry point `src/main.ts`:
 
 1. `NestFactory.create(AppModule)`.
 2. `validationConfig(app)` installs a global `ValidationPipe` with `whitelist: true`, `transform: true`, and `stopAtFirstError: true`.
-3. `await appConfig(app)` reads `PORT` (default 8080) and `HOST` (default `0.0.0.0`), enables CORS (`localhost:*`, `*.pages.dev`, `https://admin.yagorusso.com`), and starts listening.
+3. `await appConfig(app)` reads `PORT` (default 8080) and `HOST` (default `0.0.0.0`), enables CORS (`localhost:*`, `*.pages.dev`, `*.workers.dev`, `https://admin.yagorusso.com`), and starts listening.
 
 `src/app.module.ts` composition root (ordered: infra → GraphQL → domain):
 
