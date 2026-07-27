@@ -1,5 +1,5 @@
 {
-  "name": "profile-info-admin",
+  "name": "admin",
   "compatibility_date": "2026-06-01",
   "assets": {
     "directory": "./apps/admin/dist",
