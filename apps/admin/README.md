@@ -100,7 +100,7 @@ Connect the repo via Workers Builds. Build from the monorepo root:
 | `NODE_VERSION` | `22` |
 | `VITE_API_URL` | public API origin (no `/graphql`) |
 
-Config: root `wrangler.jsonc` (`assets.directory` = `./apps/admin/dist`, SPA via `not_found_handling`). Leave `VITE_BASE_PATH` unset. Custom domain: `admin.yagorusso.com`. Do not add `public/_redirects` — it conflicts with Workers assets.
+Config: root `wrangler.jsonc` (`assets.directory` = `./apps/admin/dist`, SPA via `not_found_handling`). Leave `VITE_BASE_PATH` unset. Custom domain: `admin.yagorusso.com`. Set `VITE_API_URL` / `NODE_VERSION` as **Build** variables (not Worker Variables — static-assets Workers reject those). Do not add `public/_redirects` — it conflicts with Workers assets. Manual redeploy: Deployments → Retry deployment.
 
 ### Download CV
 

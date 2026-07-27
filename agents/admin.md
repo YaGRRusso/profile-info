@@ -98,7 +98,7 @@ Keep `components/`, `hooks/custom/`, and `lib/` domain-agnostic. Table toolbar c
 - `src/generated/graphql/` and `routeTree.gen.ts` are generated.
 - Do not add ad-hoc 401 handling in hooks.
 - `dev` backgrounds codegen; first start may race — run `build` once if types missing.
-- Cloudflare Workers (static assets): SPA fallback via `wrangler.jsonc` `assets.not_found_handling = "single-page-application"`. Do not ship `public/_redirects` — it conflicts with that setting. Do not set `VITE_BASE_PATH` for the custom domain at `/`.
+- Cloudflare Workers (static assets): SPA via `wrangler.jsonc` `not_found_handling`. No `public/_redirects`. `VITE_API_URL` is a **Build** variable (Worker Variables are rejected for assets-only). Redeploy: Deployments → Retry deployment.
 - Optional GitHub Pages (manual): `.github/workflows/deploy.yml` — sets `VITE_BASE_PATH` to `/<repo>/` and copies `index.html` → `404.html` for SPA refresh.
 - Social share tags in `index.html`: `description`, full Open Graph (`og:title` / `description` / `url` / `site_name` / `locale` / `image` + width/height/alt / `type`), and Twitter (`twitter:card=summary_large_image`, title, description, image). Absolute URLs for `admin.yagorusso.com`. Image: `public/og.png` (1200×630). Instagram does not unfurl links the same way.
 - Auth shell (`routes/-components/auth.tsx`) composes the localized, feature-led
