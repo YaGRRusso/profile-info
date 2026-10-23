@@ -31,6 +31,8 @@ import { type ReactNode, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { z } from "zod";
 import { Avatar } from "@/components/display/avatar";
+import { EmptyValue } from "@/components/display/empty-value";
+import { ViewCell } from "@/components/display/view-cell";
 import { BatchButton, BatchToolbar } from "@/components/table/batch-buttons";
 import { FiltersButton } from "@/components/table/filters-button";
 import {
@@ -44,6 +46,7 @@ import { useActiveFilters } from "@/hooks/custom/use-active-filters";
 import { usePersistedState } from "@/hooks/custom/use-persisted-state";
 import type { UserRow } from "@/hooks/queries/users";
 import { cn } from "@/lib/cn";
+import { isEmptyValue } from "@/lib/empty-value";
 import { getUniqueFacets } from "@/lib/facets";
 import { parseAsShape } from "@/lib/parsers";
 import { DEFAULT_META_COLUMN_VISIBILITY } from "@/lib/table-columns";
@@ -130,7 +133,16 @@ const getColumns = (
     enableSorting: false,
     header: "Avatar",
   }),
-  columnHelper.accessor("name", { header: "Name" }),
+  columnHelper.accessor("name", {
+    cell: (data) => {
+      const value = data.getValue();
+      if (isEmptyValue(value)) return <EmptyValue />;
+      return (
+        <ViewCell onClick={() => onView(data.row.original)}>{value}</ViewCell>
+      );
+    },
+    header: "Name",
+  }),
   columnHelper.accessor("nickname", { header: "Nickname" }),
   columnHelper.accessor("email", { header: "Email" }),
   columnHelper.accessor("role", {

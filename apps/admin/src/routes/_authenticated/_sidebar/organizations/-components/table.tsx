@@ -32,6 +32,7 @@ import { useTranslation } from "react-i18next";
 import { z } from "zod";
 import { EmptyValue } from "@/components/display/empty-value";
 import { Link } from "@/components/display/link";
+import { ViewCell } from "@/components/display/view-cell";
 import { BatchButton, BatchToolbar } from "@/components/table/batch-buttons";
 import { FiltersButton } from "@/components/table/filters-button";
 import {
@@ -147,6 +148,13 @@ const getColumns = (
     header: "Slug",
   }),
   columnHelper.accessor("name", {
+    cell: (data) => {
+      const value = data.getValue();
+      if (isEmptyValue(value)) return <EmptyValue />;
+      return (
+        <ViewCell onClick={() => onView(data.row.original)}>{value}</ViewCell>
+      );
+    },
     header: "Name",
   }),
   columnHelper.accessor("category", {

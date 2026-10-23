@@ -30,6 +30,7 @@ import { useTranslation } from "react-i18next";
 import { z } from "zod";
 import { BadgeList } from "@/components/display/badge-list";
 import { EmptyValue } from "@/components/display/empty-value";
+import { ViewCell } from "@/components/display/view-cell";
 import { BatchButton, BatchToolbar } from "@/components/table/batch-buttons";
 import { FiltersButton } from "@/components/table/filters-button";
 import {
@@ -148,7 +149,9 @@ const getColumns = (
       cell: (data) => {
         const value = data.getValue();
         if (isEmptyValue(value)) return <EmptyValue />;
-        return value;
+        return (
+          <ViewCell onClick={() => onView(data.row.original)}>{value}</ViewCell>
+        );
       },
       header: "Title",
       id: `title-${locale}`,

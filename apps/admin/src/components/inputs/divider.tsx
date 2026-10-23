@@ -16,14 +16,16 @@ export function FormDivider({
 }: FormDividerProps) {
   return (
     <div className={cn("divider", className)} {...props}>
-      <div className="flex items-center gap-1">
-        {label && <span>{label}</span>}
-        {tooltip && (
-          <FormTooltip content={tooltip}>
-            <QuestionIcon />
-          </FormTooltip>
-        )}
-      </div>
+      {label && (
+        <div className="flex items-center gap-1">
+          <span>{label}</span>
+          {tooltip && (
+            <FormTooltip content={tooltip}>
+              <QuestionIcon />
+            </FormTooltip>
+          )}
+        </div>
+      )}
     </div>
   );
 }
