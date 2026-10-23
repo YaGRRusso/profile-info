@@ -1,4 +1,5 @@
 {
+  "empty": "Nenhum resultado encontrado",
   "search": "Digite para buscar...",
   "rangeMin": "Mín. ({{value}})",
   "rangeMax": "Máx. ({{value}})"

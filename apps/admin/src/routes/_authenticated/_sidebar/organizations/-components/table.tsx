@@ -3,6 +3,7 @@ import {
   ArrowsDownUpIcon,
   ArrowUpIcon,
   CheckCircleIcon,
+  EmptyIcon,
   EyeIcon,
   MagnifyingGlassIcon,
   PencilIcon,
@@ -30,6 +31,8 @@ import { useQueryState } from "nuqs";
 import { type ReactNode, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { z } from "zod";
+import { Alert } from "@/components/display/alert";
+import { DataState } from "@/components/display/data-state";
 import { EmptyValue } from "@/components/display/empty-value";
 import { Link } from "@/components/display/link";
 import { ViewCell } from "@/components/display/view-cell";
@@ -583,57 +586,65 @@ export function OrganizationsTable({
         </div>
       )}
 
-      <div className="overflow-x-auto rounded bg-base-200">
-        <table className="table">
-          <thead>
-            {table.getHeaderGroups().map((headerGroup) => (
-              <tr key={headerGroup.id}>
-                {headerGroup.headers.map((header) => (
-                  <th
+      <DataState isEmpty={table.getRowCount() === 0}>
+        <DataState.Content>
+          <div className="overflow-x-auto rounded bg-base-200">
+            <table className="table">
+              <thead>
+                {table.getHeaderGroups().map((headerGroup) => (
+                  <tr key={headerGroup.id}>
+                    {headerGroup.headers.map((header) => (
+                      <th
+                        className={cn(
+                          header.column.getCanSort() &&
+                            "cursor-pointer select-none"
+                        )}
+                        key={header.id}
+                        onClick={header.column.getToggleSortingHandler()}
+                      >
+                        <div className="flex items-center gap-1">
+                          {flexRender(
+                            header.column.columnDef.header,
+                            header.getContext()
+                          )}
+                          {header.column.getCanSort() && (
+                            <SortIcon sorted={header.column.getIsSorted()} />
+                          )}
+                        </div>
+                      </th>
+                    ))}
+                  </tr>
+                ))}
+              </thead>
+              <tbody>
+                {table.getRowModel().rows.map((row) => (
+                  <tr
                     className={cn(
-                      header.column.getCanSort() && "cursor-pointer select-none"
+                      "hover:bg-base-200",
+                      row.getIsSelected() && "bg-base-200"
                     )}
-                    key={header.id}
-                    onClick={header.column.getToggleSortingHandler()}
+                    key={row.id}
                   >
-                    <div className="flex items-center gap-1">
-                      {flexRender(
-                        header.column.columnDef.header,
-                        header.getContext()
-                      )}
-                      {header.column.getCanSort() && (
-                        <SortIcon sorted={header.column.getIsSorted()} />
-                      )}
-                    </div>
-                  </th>
+                    {row.getVisibleCells().map((cell) => (
+                      <td key={cell.id}>
+                        <div className="line-clamp-1">
+                          {flexRender(
+                            cell.column.columnDef.cell,
+                            cell.getContext()
+                          )}
+                        </div>
+                      </td>
+                    ))}
+                  </tr>
                 ))}
-              </tr>
-            ))}
-          </thead>
-          <tbody>
-            {table.getRowModel().rows.map((row) => (
-              <tr
-                className={cn(
-                  "hover:bg-base-200",
-                  row.getIsSelected() && "bg-base-200"
-                )}
-                key={row.id}
-              >
-                {row.getVisibleCells().map((cell) => (
-                  <td key={cell.id}>
-                    <div className="line-clamp-1">
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext()
-                      )}
-                    </div>
-                  </td>
-                ))}
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+              </tbody>
+            </table>
+          </div>
+        </DataState.Content>
+        <DataState.Empty>
+          <Alert icon={<EmptyIcon />} title={tTable("empty")} />
+        </DataState.Empty>
+      </DataState>
     </div>
   );
 }

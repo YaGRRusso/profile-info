@@ -1,4 +1,5 @@
 {
+  "empty": "No results found",
   "search": "Type to search...",
   "rangeMin": "Min ({{value}})",
   "rangeMax": "Max ({{value}})"
