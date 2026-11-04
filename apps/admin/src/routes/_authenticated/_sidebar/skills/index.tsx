@@ -4,6 +4,7 @@ import {
   WarningIcon,
 } from "@phosphor-icons/react";
 import { createFileRoute } from "@tanstack/react-router";
+import { sortBy, uniq } from "lodash";
 import { useCallback, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
@@ -57,6 +58,18 @@ function RouteComponent() {
 
   const findManySkills = useFindManySkills();
   useQueryAllPages(findManySkills);
+
+  const categoriesList = useMemo(
+    () =>
+      sortBy(
+        uniq(
+          (findManySkills.data?.nodes ?? [])
+            .map((skill) => skill.category)
+            .filter(isNonEmptyString)
+        )
+      ),
+    [findManySkills.data?.nodes]
+  );
 
   const createOneSkill = useCreateOneSkill();
   const updateOneSkill = useUpdateOneSkill();
@@ -266,6 +279,7 @@ function RouteComponent() {
         title={tPage("skills.modalManage")}
       >
         <SkillForm
+          categoriesList={categoriesList}
           customValues={formValues?.customValues}
           defaultValues={formValues?.defaultValues}
           isLoading={createOneSkill.isPending || updateOneSkill.isPending}
@@ -288,6 +302,7 @@ function RouteComponent() {
         title={tPage("skills.modalBatchUpdate")}
       >
         <SkillMultiForm
+          categoriesList={categoriesList}
           isLoading={updateManySkills.isPending}
           onCancel={() => setFormValues(undefined)}
           onSubmit={(updateSkillInput) =>

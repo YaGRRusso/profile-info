@@ -3,6 +3,7 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import z from "zod";
 import { CheckboxInput } from "@/components/inputs/checkbox";
+import { Suggestions } from "@/components/inputs/suggestions";
 import { TextInput } from "@/components/inputs/text";
 import type { UpdateSkillInput } from "@/generated/graphql/graphql";
 import { fieldError } from "@/lib/field-error";
@@ -14,10 +15,12 @@ const skillMultiSchema = z.object({
 
 export type SkillMultiSchema = z.infer<typeof skillMultiSchema>;
 
-export interface SkillMultiFormProps
-  extends CommonFormProps<UpdateSkillInput> {}
+export interface SkillMultiFormProps extends CommonFormProps<UpdateSkillInput> {
+  categoriesList?: string[];
+}
 
 export function SkillMultiForm({
+  categoriesList = [],
   onSubmit,
   onCancel,
   isDisabled,
@@ -58,16 +61,22 @@ export function SkillMultiForm({
 
       <Field name="category">
         {(field) => (
-          <TextInput
-            disabled={!changeCategory}
-            error={fieldError(field.state.meta)}
-            label={tForm("fields.skillCategory.label")}
-            name={field.name}
-            onChange={field.handleChange}
-            placeholder={tForm("fields.skillCategory.placeholder")}
-            tooltip={tForm("fields.skillCategory.tooltip")}
+          <Suggestions
+            items={categoriesList}
+            onSelect={field.handleChange}
             value={field.state.value ?? ""}
-          />
+          >
+            <TextInput
+              disabled={!changeCategory}
+              error={fieldError(field.state.meta)}
+              label={tForm("fields.skillCategory.label")}
+              name={field.name}
+              onChange={field.handleChange}
+              placeholder={tForm("fields.skillCategory.placeholder")}
+              tooltip={tForm("fields.skillCategory.tooltip")}
+              value={field.state.value ?? ""}
+            />
+          </Suggestions>
         )}
       </Field>
 

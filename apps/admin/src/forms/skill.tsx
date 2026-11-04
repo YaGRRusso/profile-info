@@ -5,6 +5,7 @@ import z from "zod";
 import { FormDivider } from "@/components/inputs/divider";
 import { FieldArray } from "@/components/inputs/field-array";
 import { SelectInput } from "@/components/inputs/select";
+import { Suggestions } from "@/components/inputs/suggestions";
 import { TextInput } from "@/components/inputs/text";
 import { SLUG_REGEX } from "@/consts/regex";
 import { type CreateSkillInput } from "@/generated/graphql/graphql";
@@ -36,6 +37,7 @@ const skillSchema = z.object({
 export type SkillSchema = z.infer<typeof skillSchema>;
 
 export interface SkillFormProps extends CommonFormProps<SkillSchema> {
+  categoriesList?: string[];
   slugsList?: string[];
 }
 
@@ -62,6 +64,7 @@ export function skillToForm(skill: SkillRow): Partial<SkillSchema> {
 }
 
 export function SkillForm({
+  categoriesList = [],
   onSubmit,
   onCancel,
   defaultValues,
@@ -129,16 +132,22 @@ export function SkillForm({
 
       <Field name="category">
         {(field) => (
-          <TextInput
-            error={fieldError(field.state.meta)}
-            label={tForm("fields.skillCategory.label")}
-            name={field.name}
-            onChange={field.handleChange}
-            optional
-            placeholder={tForm("fields.skillCategory.placeholder")}
-            tooltip={tForm("fields.skillCategory.tooltip")}
+          <Suggestions
+            items={categoriesList}
+            onSelect={field.handleChange}
             value={field.state.value ?? ""}
-          />
+          >
+            <TextInput
+              error={fieldError(field.state.meta)}
+              label={tForm("fields.skillCategory.label")}
+              name={field.name}
+              onChange={field.handleChange}
+              optional
+              placeholder={tForm("fields.skillCategory.placeholder")}
+              tooltip={tForm("fields.skillCategory.tooltip")}
+              value={field.state.value ?? ""}
+            />
+          </Suggestions>
         )}
       </Field>
 
