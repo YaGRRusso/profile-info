@@ -23,4 +23,18 @@ describe("mapOpenRouterError", () => {
       expect.objectContaining({ message: "open-router.PROVIDER_FAILURE" })
     );
   });
+
+  it("keeps the original error as the cause of provider failures", () => {
+    const original = new Error("model unavailable");
+
+    expect(mapOpenRouterError(original).cause).toBe(original);
+  });
+
+  it("keeps the original error as the cause of auth failures", () => {
+    const original = Object.assign(new Error("Invalid API key"), {
+      statusCode: 401,
+    });
+
+    expect(mapOpenRouterError(original).cause).toBe(original);
+  });
 });

@@ -8,8 +8,12 @@ import { isOpenRouterAuthError } from "../helpers/is-open-router-auth-error.help
 
 export function mapOpenRouterError(error: unknown): HttpException {
   if (isOpenRouterAuthError(error)) {
-    return new UnauthorizedException(i18nKey("open-router.UNAUTHORIZED"));
+    return new UnauthorizedException(i18nKey("open-router.UNAUTHORIZED"), {
+      cause: error,
+    });
   }
 
-  return new BadGatewayException(i18nKey("open-router.PROVIDER_FAILURE"));
+  return new BadGatewayException(i18nKey("open-router.PROVIDER_FAILURE"), {
+    cause: error,
+  });
 }

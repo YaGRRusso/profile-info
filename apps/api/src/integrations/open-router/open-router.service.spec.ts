@@ -1,4 +1,8 @@
-import { BadGatewayException, UnauthorizedException } from "@nestjs/common";
+import {
+  BadGatewayException,
+  Logger,
+  UnauthorizedException,
+} from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { Test, TestingModule } from "@nestjs/testing";
 import { OpenRouterService } from "./open-router.service";
@@ -47,8 +51,11 @@ function unauthorizedError(): Error {
 describe("OpenRouterService", () => {
   let service: OpenRouterService;
 
+  let warnSpy: jest.SpyInstance;
+
   beforeEach(async () => {
     jest.clearAllMocks();
+    warnSpy = jest.spyOn(Logger.prototype, "warn").mockImplementation();
 
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -140,6 +147,46 @@ describe("OpenRouterService", () => {
 
     await expect(service.chat(chatRequest)).rejects.toBeInstanceOf(
       BadGatewayException
+    );
+  });
+
+  it("logs every failed model, including the last one", async () => {
+    sendMock
+      .mockRejectedValueOnce(new Error("rate limited"))
+      .mockRejectedValueOnce(new Error("token budget exceeded"))
+      .mockRejectedValueOnce(new Error("final model unavailable"));
+
+    await expect(service.chat(chatRequest)).rejects.toThrow();
+
+    expect(warnSpy).toHaveBeenCalledTimes(3);
+    expect(warnSpy).toHaveBeenLastCalledWith(
+      "OpenRouter model model-c failed",
+      "final model unavailable"
+    );
+  });
+
+  it("attaches the last model error as the cause when every model fails", async () => {
+    const lastError = new Error("final model unavailable");
+    sendMock
+      .mockRejectedValueOnce(new Error("rate limited"))
+      .mockRejectedValueOnce(new Error("token budget exceeded"))
+      .mockRejectedValueOnce(lastError);
+
+    await expect(service.chat(chatRequest)).rejects.toMatchObject({
+      cause: lastError,
+    });
+  });
+
+  it("logs and attaches the cause when an auth failure stops the chain", async () => {
+    const authError = unauthorizedError();
+    sendMock.mockRejectedValueOnce(authError);
+
+    await expect(service.chat(chatRequest)).rejects.toMatchObject({
+      cause: authError,
+    });
+    expect(warnSpy).toHaveBeenCalledWith(
+      "OpenRouter model model-a failed",
+      "Invalid API key"
     );
   });
 });

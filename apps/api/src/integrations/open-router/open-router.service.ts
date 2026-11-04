@@ -39,17 +39,17 @@ export class OpenRouterService extends AiChatProvider {
 
         return result;
       } catch (error) {
+        this.logger.warn(
+          `OpenRouter model ${model} failed`,
+          error instanceof Error ? error.message : String(error)
+        );
+
         const hasNext = index < this.models.length - 1;
         const canRetry = hasNext && !isOpenRouterAuthError(error);
 
         if (!canRetry) {
           throw mapOpenRouterError(error);
         }
-
-        this.logger.warn(
-          `OpenRouter model ${model} failed, trying next model`,
-          error instanceof Error ? error.message : String(error)
-        );
       }
     }
 
