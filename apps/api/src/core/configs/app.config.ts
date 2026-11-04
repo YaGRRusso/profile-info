@@ -3,6 +3,7 @@ import chalk from "chalk";
 
 const localhost = /^http:\/\/localhost:\d+$/;
 const cloudflare = /^https:\/\/[a-z0-9.-]+\.(pages|workers)\.dev$/;
+const yagorusso = /^https:\/\/([a-z0-9-]+\.)*yagorusso\.com$/;
 
 export async function appConfig(app: INestApplication) {
   const port = Number(process.env.PORT) || 8080;
@@ -12,7 +13,7 @@ export async function appConfig(app: INestApplication) {
     allowedHeaders: ["Content-Type", "Authorization", "X-Api-Key"],
     credentials: true,
     methods: ["GET", "POST", "OPTIONS"],
-    origin: [localhost, cloudflare, "https://admin.yagorusso.com"],
+    origin: [localhost, cloudflare, yagorusso],
   });
 
   // app.use(
