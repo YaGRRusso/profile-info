@@ -14,6 +14,7 @@ import { FormTooltip } from "./tooltip";
 
 export interface FieldArrayProps {
   children: (index: number) => ReactNode;
+  disabled?: boolean;
   error?: string;
   label?: string;
   onAdd: () => void;
@@ -36,6 +37,7 @@ export function FieldArray({
   sublevel,
   tooltip,
   values,
+  disabled,
 }: FieldArrayProps) {
   const { t: tForm } = useTranslation("forms");
   const itemLabel = label ?? tForm("fieldArray.item");
@@ -104,7 +106,12 @@ export function FieldArray({
             {children(index)}
           </div>
         ))}
-        <button className="btn btn-soft btn-sm" onClick={onAdd} type="button">
+        <button
+          className="btn btn-soft btn-sm"
+          disabled={disabled}
+          onClick={onAdd}
+          type="button"
+        >
           <PlusIcon />
           {tForm("fieldArray.addItem", { item: itemLabel })}
         </button>

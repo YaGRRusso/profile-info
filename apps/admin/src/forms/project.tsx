@@ -1,4 +1,10 @@
-import { DeepKeys, DeepValue, useForm } from "@tanstack/react-form";
+import {
+  DeepKeys,
+  DeepValue,
+  useForm,
+  useSelector,
+} from "@tanstack/react-form";
+import { isEqual } from "lodash";
 import { useCallback, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
@@ -33,6 +39,7 @@ import { nullIfEmpty } from "@/lib/form-input";
 import { hasUniqueLocales } from "@/lib/form-validation";
 import { hasLength } from "@/lib/has-length";
 import { createEmptyI18n, i18nLabel, i18nLabelsByIds } from "@/lib/i18n";
+import { availableOptions } from "@/lib/select-options";
 import { isSlugTaken } from "@/lib/slug";
 import { CommonFormProps } from "./common";
 
@@ -145,6 +152,13 @@ export function ProjectForm({
     onSubmit: ({ value }) => onSubmit?.(value),
     validators: { onChange: projectSchema },
   });
+
+  const selectedLocales = useSelector(
+    form.store,
+    (formState) =>
+      formState.values.i18n.map((translation) => translation.locale),
+    { compare: isEqual }
+  );
 
   const handleAtsOptimize = useCallback(
     async <Field extends DeepKeys<ProjectSchema>>(
@@ -393,6 +407,7 @@ export function ProjectForm({
       <Field mode="array" name="i18n">
         {(arrayField) => (
           <FieldArray
+            disabled={arrayField.state.value.length >= localeOptions.length}
             error={fieldError(arrayField.state.meta)}
             label={tForm("fields.translation.label")}
             onAdd={() =>
@@ -411,7 +426,11 @@ export function ProjectForm({
                       label={tForm("fields.locale.label")}
                       name={field.name}
                       onChange={field.handleChange}
-                      options={localeOptions}
+                      options={availableOptions(
+                        localeOptions,
+                        selectedLocales,
+                        field.state.value
+                      )}
                       placeholder={tForm("fields.locale.placeholder")}
                       tooltip={tForm("fields.locale.tooltip")}
                       value={field.state.value}
